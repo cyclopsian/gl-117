@@ -115,7 +115,7 @@ void FileTokenizer::revertBuffer (int start, int end)
 {
   int i;
   char c;
-  for (i = 0; i <= (end - start) / 2; i ++)
+  for (i = 0; i < (end - start + 1) / 2; i ++)
   {
     c = buffer [start + i];
     buffer [start + i] = buffer [end - i];

@@ -191,7 +191,7 @@ void Cockpit::drawCounter (bool beep)
   {
     sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name.c_str (), fplayer->stat.fighterkills);
     font1->drawText (-30.0F, 15.0F, -3.0F, buf, blue);
-    for (i = 1; i < 8; i ++)
+    for (unsigned i = 1; i < 8; i ++)
     {
       sprintf (buf, "PILOT%d: %d", i, fighter [i]->stat.fighterkills);
       font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);
@@ -199,7 +199,7 @@ void Cockpit::drawCounter (bool beep)
   }
   if (mission->id == MISSION_DEATHMATCH2)
   {
-    for (i = 0; i < 4; i ++)
+    for (unsigned i = 0; i < 4; i ++)
     {
       sprintf (buf, "TEAM%d: %d", i, fighter [i * 2]->stat.fighterkills + fighter [i * 2 + 1]->stat.fighterkills);
       font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);

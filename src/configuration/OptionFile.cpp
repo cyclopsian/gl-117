@@ -47,14 +47,14 @@ OptionFile::OptionFile (const std::string &filename)
     if (!file.nextToken (token, 4096) || strcmp (token, "="))
     {
       assert (false);
-      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected \"=\", but got %s",
+      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected \"=\", but got \"%s\"",
                     filename.c_str (), file.getLine (), token));
       return;
     }
     if (!file.nextToken (token, 4096))
     {
       assert (false);
-      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected a value, but got %s",
+      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected a value, but got \"%s\"",
                     filename.c_str (), file.getLine (), token));
       return;
     }
@@ -75,8 +75,8 @@ bool OptionFile::getString (const std::string &name, std::string &value)
   OptionList::iterator it = optionList.find (name);
   if (it == optionList.end ())
   {
-    DISPLAY_DEBUG(FormatString ("Option \"%s\" not found in file \"%s\".",
-                  name.c_str (), file.getFilename ()));
+//    DISPLAY_DEBUG(FormatString ("Option \"%s\" not found in file \"%s\".",
+//                  name.c_str (), file.getFilename ()));
     return false;
   }
   value = it->second;

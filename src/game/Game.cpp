@@ -658,7 +658,7 @@ int game_levelInit ()
   // initialize object's height over the surface
   for (i = 0; i < fighter.size (); i ++)
   {
-    if (fighter [i]->id >= AntiAircraftBeginDescriptor && fighter [i]->id <= AntiAircraftEndDescriptor)
+    if (fighter [i]->id >= StaticAaBeginDescriptor && fighter [i]->id <= StaticAaEndDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x;
     }

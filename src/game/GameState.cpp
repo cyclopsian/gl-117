@@ -1167,7 +1167,7 @@ void StateFame::display ()
   {
     font1->zoom = 0.07;
     drawRank (textx + 0.2, i - 3.7, -2, p->tp [index [i]]->ranking, 0.7);
-    sprintf (buf, "%s %s", p->tp [index [i]]->getRank (), p->tp [index [i]]->name);
+    sprintf (buf, "%s %s", p->tp [index [i]]->getRank ().c_str (), p->tp [index [i]]->name.c_str ());
     font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, *col);
     sprintf (buf, "%d", p->tp [index [i]]->fighterkills);
     font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, *col);
@@ -1682,8 +1682,15 @@ void StatePlay::display ()
       unsigned stars = maxstar;
       if (weather != WEATHER_CLOUDY)
         stars = maxstar / 2;
-      StarsRealizer sr;
-      sr.draw (stars, star);
+      for (unsigned i = 0; i < stars; i ++)
+      {
+        glPushMatrix (); // PUSH -> 2
+        glRotatef (star [i]->phi, 0.0, 1.0, 0.0);
+        glRotatef (star [i]->gamma, 1.0, 0.0, 0.0);
+        glTranslatef (0, 0, -10);
+        star [i]->draw ();
+        glPopMatrix ();
+      }
     }
   }
 

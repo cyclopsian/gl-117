@@ -100,10 +100,10 @@ extern UnitDescriptor LightDestroyerDescriptor;
 extern UnitDescriptor ShipEndDescriptor;
 // static ground units from here
 extern UnitDescriptor StaticGroundBeginDescriptor;
-extern UnitDescriptor AntiAircraftBeginDescriptor;
+extern UnitDescriptor StaticAaBeginDescriptor;
 extern UnitDescriptor SacDescriptor;
 extern UnitDescriptor SamDescriptor;
-extern UnitDescriptor AntiAircraftEndDescriptor;
+extern UnitDescriptor StaticAaEndDescriptor;
 // passive static units from here
 extern UnitDescriptor StaticPassiveBeginDescriptor;
 extern UnitDescriptor TentDescriptor;

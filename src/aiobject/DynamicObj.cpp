@@ -248,7 +248,7 @@ void DynamicObj::checkShield ()
       { explode = 1; active = false; }
       if (id >= TankBeginDescriptor && id <= TankEndDescriptor)
       { explode = 1; active = false; }
-      if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor)
+      if (id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor)
       { explode = 1; active = false; }
       if (id >= StaticPassiveBeginDescriptor)
       { explode = 1; active = false; }
@@ -349,7 +349,7 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
               d->source->stat.fighterkills ++;
             else if (id >= ShipBeginDescriptor && id <= ShipEndDescriptor)
               d->source->stat.shipkills ++;
-            else if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
+            else if ((id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
               d->source->stat.tankkills ++;
             else
               d->source->stat.otherkills ++;

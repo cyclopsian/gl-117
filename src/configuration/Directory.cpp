@@ -33,6 +33,7 @@
 
 #include "configuration/Directory.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <cassert>
 
@@ -69,7 +70,7 @@ void Directory::append (std::string &target, const std::string &str)
   target.append ("\\");
 #else
   if (target [target.length () - 1] != '/')
-    target.append (target, "/");
+    target.append ("/");
   target.append (str);
   target.append ("/");
 #endif
@@ -106,7 +107,8 @@ void Directory::init (char *arg)
     while (*p != '\\') p --;
     p --;
     while (*p != '\\') p --;
-    if (toupper (p [1]) == 'D' && toupper (p [2]) == 'E' && toupper (p [3]) == 'B')
+    if ((toupper (p [1]) == 'D' && toupper (p [2]) == 'E' && toupper (p [3]) == 'B') ||
+        (toupper (p [1]) == 'R' && toupper (p [2]) == 'E' && toupper (p [3]) == 'L'))
     {
       p --;
       while (*p != '\\') p --;
@@ -153,9 +155,9 @@ void Directory::init (char *arg)
     char cwd [4096];
     getcwd (cwd, 4096); // get current working directory
     char mypath [8092];
-    strncpy (mypath, 8092, cwd);
-    strncat (mypath, 8092, ":");
-    strncat (mypath, 8092, path);
+    strncpy (mypath, cwd, 8092);
+    strncat (mypath, ":", 8092);
+    strncat (mypath, path, 8092);
     char *p = mypath;
     int pathlen = strlen (mypath);
 
@@ -164,13 +166,13 @@ void Directory::init (char *arg)
       p = strtok (p, (int) (path + pathlen - p), ":");
       while (p + strlen (p) - 1 < mypath + pathlen)
       {
-        strncpy (myfile, 4096, p);
+        strncpy (myfile, p, 4096);
         if (myfile [strlen (myfile) - 1] != '/')
-          strncat (myfile, 4096, "/");
+          strncat (myfile, "/", 4096);
         if (*arg == '.' && *(arg+1) == '/')
-          strncat (myfile, 4096, arg + 2);
+          strncat (myfile, arg + 2, 4096);
         else
-          strncat (myfile, 4096, arg);
+          strncat (myfile, arg, 4096);
         if (!stat (myfile, &mystat))
         {
 	        if (S_ISREG (mystat.st_mode))

@@ -1011,10 +1011,10 @@ void MissionCustom::start ()
       obj [i].idle = nextidle;
   }
 
-  fplayer = fighter [0];
   if (numobjects > 0)
   {
     playerInit ();
+    fplayer = fighter [0];
     if (obj [0].idle == 100)
     {
       l->searchPlain (-1, -1, &relx, &rely);
@@ -1041,7 +1041,18 @@ void MissionCustom::start ()
     }
     else
     {
-      fighter [i]->newinit (obj [i].id, obj [i].party, obj [i].intelligence);
+      if (obj [i].id >= FighterBeginDescriptor && obj [i].id <= FighterEndDescriptor)
+        objectInit (new Fighter (obj [i].id), obj [i].party, obj [i].intelligence);
+      else if (obj [i].id >= TankBeginDescriptor && obj [i].id <= TankEndDescriptor)
+        objectInit (new Tank (obj [i].id), obj [i].party, obj [i].intelligence);
+      else if (obj [i].id >= ShipBeginDescriptor && obj [i].id <= ShipEndDescriptor)
+        objectInit (new Ship (obj [i].id), obj [i].party, obj [i].intelligence);
+      else if (obj [i].id >= StaticAaBeginDescriptor && obj [i].id <= StaticAaEndDescriptor)
+        objectInit (new StaticAa (obj [i].id), obj [i].party, obj [i].intelligence);
+      else if (obj [i].id >= StaticPassiveBeginDescriptor)
+        objectInit (new StaticPassive (obj [i].id), obj [i].party, obj [i].intelligence);
+      else
+        objectInit (new AiObj (obj [i].id), obj [i].party, obj [i].intelligence);
     }
     if (!obj [i].explode)
     {

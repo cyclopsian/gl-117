@@ -93,10 +93,10 @@ UnitDescriptor LightDestroyerDescriptor (810, "LightDestroyer", "LIGHT DESTROYER
 UnitDescriptor ShipEndDescriptor (899);
 // static ground units from here
 UnitDescriptor StaticGroundBeginDescriptor (1000);
-UnitDescriptor AntiAircraftBeginDescriptor (1000);
+UnitDescriptor StaticAaBeginDescriptor (1000);
 UnitDescriptor SacDescriptor (1000, "Sac", "SA CANNON");
 UnitDescriptor SamDescriptor (1010, "Sam", "SAM");
-UnitDescriptor AntiAircraftEndDescriptor (1099);
+UnitDescriptor StaticAaEndDescriptor (1099);
 // passive static units from here
 UnitDescriptor StaticPassiveBeginDescriptor (10000);
 UnitDescriptor TentDescriptor (10000, "Tent", "TENT");
@@ -487,7 +487,7 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.3;
     missiles [6] = 100;
   }
-  if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor)
+  if (id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor)
   {
     o->cube.set (zoom * cubefac1, zoom * cubefac1, zoom * cubefac1);
   }
@@ -801,7 +801,7 @@ void AiObj::initValues (DynamicObj *dobj, float phi)
   float cgamma = currot.gamma;
   dobj->trafo.translation.x = trafo.translation.x + COS(cgamma) * SIN(phi) * fac;
   dobj->trafo.translation.y = trafo.translation.y - SIN(cgamma) * fac;
-  if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
+  if ((id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
     dobj->trafo.translation.y += fac;
   dobj->trafo.translation.z = trafo.translation.z + COS(cgamma) * COS(phi) * fac;
   dobj->currot.phi = phi;
@@ -1357,7 +1357,7 @@ void AiObj::estimateTargetPosition (float *dx2, float *dz2)
   newphi += (float) target->currot.phi;
   if (newphi >= 360) newphi -= 360;
   if (newphi < 0) newphi += 360;
-  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
+  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
   {
     ex = target->trafo.translation.x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
     ez = target->trafo.translation.z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
@@ -1627,7 +1627,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
 
   float dx2, dz2;
   float dx = target->trafo.translation.x - trafo.translation.x, dz = target->trafo.translation.z - trafo.translation.z; // current distances
-  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= MissileBeginDescriptor && id <= MissileEndDescriptor) || (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
+  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= MissileBeginDescriptor && id <= MissileEndDescriptor) || (id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
   {
     estimateTargetPosition (&dx2, &dz2);
   }
@@ -1658,7 +1658,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
       }
     }
   }
-  else if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) // ground-air-cannon
+  else if (id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) // ground-air-cannon
   {
     recthrust = 0; thrust = 0;
     if (aw > 5)
@@ -1707,7 +1707,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
   }
 
   // thrust and manoever calculations
-  if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || id == CruiserDescriptor || id == LightDestroyerDescriptor || id == MobileSamDescriptor)
+  if ((id >= StaticAaBeginDescriptor && id <= StaticAaEndDescriptor) || id == CruiserDescriptor || id == LightDestroyerDescriptor || id == MobileSamDescriptor)
   {
     if (firecannonttl <= 0)
       for (unsigned i = 0; i < f.size (); i ++)

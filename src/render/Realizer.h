@@ -30,7 +30,7 @@ class Model3dRealizer
 {
   public:
 
-    static const bool showCollision = true;
+    static const bool showCollision = false;
 
     void draw (const Model3d &model, const Transformation &trafo,
                float lum, int explode)
@@ -41,6 +41,10 @@ class Model3dRealizer
       float zoom = trafo.scaling.x;
 
       VertexArray va1 (VERTEXARRAY_V3N3C4T2);
+      VertexArray va2 (VERTEXARRAY_V3N3C4);
+      VertexArray va3 (VERTEXARRAY_V3N3C4);
+      va2.glBegin (GL_TRIANGLES);
+      va3.glBegin (GL_QUADS);
       VertexArray *va = &va1;
 
       if (model.nolight) // if model wants to be rendered without light, call draw2
@@ -179,12 +183,14 @@ class Model3dRealizer
           {
             v = cm->triangle [j].v [whichVertex];
             va->glNormal3f (v->normal.x, v->normal.y, v->normal.z);
+//            va2.glNormal3f (v->normal.x, v->normal.y, v->normal.z);
             if (cm->hasTexture)
             {
               if (cm->vertex)
               {
                 va->glTexCoord2f (v->tex.x, v->tex.y);
                 va->glColor4f (1, 1, 1, 1);
+//                va2.glColor4f (1, 1, 1, 0.5);
               }
             }
             else
@@ -197,15 +203,18 @@ class Model3dRealizer
                 {
     //              model.rotateColor (30); // TODO: rotate
                   va->glColor4ub (color [0] + rotcol, color [1] + rotcol, color [2] + rotcol * 3, 255);
+//                  va2.glColor4ub (color [0] + rotcol, color [1] + rotcol, color [2] + rotcol * 3, 255);
                 }
                 else
                 {
                   va->glColor4ub (color [0], color [1], color [2], color [3]);
+//                  va2.glColor4ub (color [0], color [1], color [2], 128);
                 }
               }
             }
       //    glColor3ub (255, 255, 0);
             va->glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
+//            va2.glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
           }
         }
         va->glEnd ();
@@ -224,12 +233,14 @@ class Model3dRealizer
           {
             v = cm->quad [j].v [whichVertex];
             va->glNormal3f (v->normal.x, v->normal.y, v->normal.z);
+//            va3.glNormal3f (v->normal.x, v->normal.y, v->normal.z);
             if (cm->hasTexture)
             {
               if (cm->vertex)
               {
                 va->glTexCoord2f (v->tex.x, v->tex.y);
                 va->glColor4f (1, 1, 1, 1);
+//                va3.glColor4f (1, 1, 1, 0.5);
               }
             }
             else
@@ -238,13 +249,28 @@ class Model3dRealizer
               {
                 unsigned char *pColor = model.material [cm->material->texture->textureID]->color.c;
                 va->glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
+//                va3.glColor4ub (pColor [0], pColor [1], pColor [2], 128);
               }
             }
             va->glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
+//            va3.glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
           }
         }
         va->glEnd ();
       }
+      
+/*      float light_specular [4] = {1.0, 1.0, 1.0, 1.0};
+      glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
+      float light_ambient [3] = {0.0, 0.0, 0.0};
+      glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
+      float light_diffuse [3] = {0.0, 0.0, 0.0};
+      glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+      glLighti (GL_LIGHT0, GL_SPOT_EXPONENT, 100);
+      glLighti (GL_LIGHT0, GL_SPOT_CUTOFF, 20);
+//      glEnable (GL_BLEND);
+      va2.glEnd ();
+      va3.glEnd ();
+//      glDisable (GL_BLEND); */
 
       // DEBUG: show normal vectors
 /*      for (i = 0; i < model.numObjects; i ++)
@@ -599,7 +625,7 @@ class Model3dRealizer
 
 };
 
-#include "effects/Effects.h"
+/*#include "effects/Effects.h"
 #include "configuration/Configuration.h"
 
 class StarsRealizer
@@ -627,7 +653,7 @@ class StarsRealizer
         glPopMatrix (); // POP -> 1
       }
     }
-};
+};*/
 
 
 

@@ -874,7 +874,7 @@ void GlLandscape::drawTown (int x, int y)
     tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
     glPushMatrix ();
     Model3dRealizer mr;
-    mr.draw (*Model3dRegistry::get ("House"), Transformation(Vector3 (), rot, Vector3(0.3)), 1.0, 0);
+    mr.draw (*Model3dRegistry::get ("House"), Transformation(tl, rot, Vector3(0.3)), 1.0, 0);
 //    model_house1.draw (tl, Vector3 (), rot, 0.3, 1, 0);
     glPopMatrix ();
     return;
@@ -2996,8 +2996,8 @@ GlLandscape::GlLandscape (int type, int *heightmask)
       for (i = 0; i <= MAXX; i ++)
         for (i2 = 0; i2 <= MAXX; i2 ++)
         {
-          f [i] [i2] = DEEPWATER;
-          h [i] [i2] = 10000;
+          f [i] [i2] = XDEEPWATER;
+          h [i] [i2] = 25000;
           hw [i] [i2] = 30000;
         }
     }

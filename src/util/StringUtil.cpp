@@ -29,14 +29,14 @@
 std::string UpperString (const std::string &str)
 {
   std::string upperstr (str);
-//  transform (upperstr.begin(), upperstr.end(), upperstr.begin(), toupper);
+//  transform (upperstr.begin(), upperstr.end(), upperstr.begin(), toupper); // does not work on VC6
   return upperstr;
 }
 
 std::string LowerString (const std::string &str)
 {
   std::string lowerstr (str);
-//  transform (lowerstr.begin(), lowerstr.end(), lowerstr.begin(), tolower);
+//  transform (lowerstr.begin(), lowerstr.end(), lowerstr.begin(), tolower); // does not work on VC6
   return lowerstr;
 }
 
