@@ -314,7 +314,7 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
       gl->disableLinearTexture (texsmoke3->textureID);
     gl->enableAlphaBlending ();
     glEnable (GL_ALPHA_TEST);
-    glAlphaFunc (GL_GEQUAL, 0.1);
+    glAlphaFunc (GL_GEQUAL, 0.02);
     gl->enableTextures (texsmoke3->textureID);
     glBegin (GL_QUADS);
     int myalpha = 255 - (100 - ttl * 5);
