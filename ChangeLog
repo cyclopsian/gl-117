@@ -9,13 +9,23 @@
      \/_______/    \/________/               \/_/      \/_/    \/_/
 
 
+Version 1.2:
+	- Map editor and examples
+	- bugfix: "Texture XXX not found" problem
+	- bugfix: mouse/joystick events do not occur in different controls settings
+	- bugfix: some missions produced a seg fault when selecting a bomber
+
 Version 1.1:
 	- new graphical user interface
 	- new settings for video and user interface (via menu!)
-	- AI now uses flight maneuvers (Immelmann, barrel roll)
+	- AI now uses flight maneuvers (immelmann, barrel roll)
 	- two additional tutorials
 	- randomized tree placement
-	- lots of visual improvements and bugfixes
+	- lots of visual improvements
+
+Version 1.0.1-2:
+	- bugfix: missiles likely caused own fighter to crash, esp. DF missiles
+	- bugfix: "Texture XXX not found" problem ignored
 
 Version 1.0.1:
 	- major bugfixes concerning coordinates (lighting, sun)
