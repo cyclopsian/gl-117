@@ -62,6 +62,7 @@ class Flash
   ~Flash ();
   void set (float x, float y, float z, int phi);
   void draw ();
+  void drawHQ ();
 };
 
 // Explosion balls

@@ -179,42 +179,43 @@ void Flash::draw ()
   glEnd ();
 }
 
-/*  void Flash::drawHQ ()
+void Flash::drawHQ ()
 {
   int i;
   glDisable (GL_TEXTURE_2D);
   gl->enableAlphaBlending ();
   glBegin (GL_QUADS);
   float myzoom = 0.4;
+  float alphawidth = 0.7;
   for (i = 0; i < 9; i ++)
   {
     glColor4ub (255, 255, 255, 0);
     glVertex3f (w [i].x - myzoom * cosi [phi], w [i].y, w [i].z + myzoom * sine [phi]);
     glColor4ub (255, 255, 255, 255);
-    glVertex3f (w [i].x - myzoom / 2 * cosi [phi], w [i].y, w [i].z + myzoom / 2 * sine [phi]);
+    glVertex3f (w [i].x - myzoom * alphawidth * cosi [phi], w [i].y, w [i].z + myzoom * alphawidth * sine [phi]);
     glColor4ub (255, 255, 255, 255);
-    glVertex3f (w [i + 1].x - myzoom / 2 * cosi [phi], w [i + 1].y, w [i + 1].z + myzoom / 2 * sine [phi]);
+    glVertex3f (w [i + 1].x - myzoom * alphawidth * cosi [phi], w [i + 1].y, w [i + 1].z + myzoom * alphawidth * sine [phi]);
     glColor4ub (255, 255, 255, 0);
     glVertex3f (w [i + 1].x - myzoom * cosi [phi], w [i + 1].y, w [i + 1].z + myzoom * sine [phi]);
 
     glColor4ub (255, 255, 255, 255);
-    glVertex3f (w [i].x - myzoom / 2 * cosi [phi], w [i].y, w [i].z + myzoom / 2 * sine [phi]);
-    glVertex3f (w [i].x + myzoom / 2 * cosi [phi], w [i].y, w [i].z - myzoom / 2 * sine [phi]);
-    glVertex3f (w [i + 1].x + myzoom / 2 * cosi [phi], w [i + 1].y, w [i + 1].z - myzoom / 2 * sine [phi]);
-    glVertex3f (w [i + 1].x - myzoom / 2 * cosi [phi], w [i + 1].y, w [i + 1].z + myzoom / 2 * sine [phi]);
+    glVertex3f (w [i].x - myzoom * alphawidth * cosi [phi], w [i].y, w [i].z + myzoom * alphawidth * sine [phi]);
+    glVertex3f (w [i].x + myzoom * alphawidth * cosi [phi], w [i].y, w [i].z - myzoom * alphawidth * sine [phi]);
+    glVertex3f (w [i + 1].x + myzoom * alphawidth * cosi [phi], w [i + 1].y, w [i + 1].z - myzoom * alphawidth * sine [phi]);
+    glVertex3f (w [i + 1].x - myzoom * alphawidth * cosi [phi], w [i + 1].y, w [i + 1].z + myzoom * alphawidth * sine [phi]);
 
     glColor4ub (255, 255, 255, 255);
-    glVertex3f (w [i].x + myzoom / 2 * cosi [phi], w [i].y, w [i].z - myzoom / 2 * sine [phi]);
+    glVertex3f (w [i].x + myzoom * alphawidth * cosi [phi], w [i].y, w [i].z - myzoom * alphawidth * sine [phi]);
     glColor4ub (255, 255, 255, 0);
     glVertex3f (w [i].x + myzoom * cosi [phi], w [i].y, w [i].z - myzoom * sine [phi]);
     glColor4ub (255, 255, 255, 0);
     glVertex3f (w [i + 1].x + myzoom * cosi [phi], w [i + 1].y, w [i + 1].z - myzoom * sine [phi]);
     glColor4ub (255, 255, 255, 255);
-    glVertex3f (w [i + 1].x + myzoom / 2 * cosi [phi], w [i + 1].y, w [i + 1].z - myzoom / 2 * sine [phi]);
+    glVertex3f (w [i + 1].x + myzoom * alphawidth * cosi [phi], w [i + 1].y, w [i + 1].z - myzoom * alphawidth * sine [phi]);
   }
   glEnd ();
   gl->disableAlphaBlending ();
-}*/
+}
 
 
 
@@ -297,30 +298,34 @@ void CBlackSmoke::move ()
 
 void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
-  if (ttl <= 0) return;
+  if (ttl <= 0 || quality == 0) return;
   if (draw == 2 || gl->isCubeInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
   {
-  gl->enableAlphaBlending ();
-  glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.1);
-  gl->enableTextures (texsmoke3->textureID);
-  glBegin (GL_QUADS);
-  int myalpha = 255 - (100 - ttl * 5);
-  if (myalpha > 255) myalpha = 255;
-  glColor4ub (0, 0, 0, myalpha);
-  float myzoom = zoom;
-  glTexCoord2f (0, 0);
-  glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z + myzoom * sine [(int) myphi]);
-  glTexCoord2f (1, 0);
-  glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z - myzoom * sine [(int) myphi]);
-  glTexCoord2f (1, 1);
-  glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z - myzoom * sine [(int) myphi]);
-  glTexCoord2f (0, 1);
-  glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z + myzoom * sine [(int) myphi]);
-  glEnd ();
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_ALPHA_TEST);
-  gl->disableAlphaBlending ();
+    if (quality >= 3)
+      gl->enableLinearTexture (texsmoke3->textureID);
+    else
+      gl->disableLinearTexture (texsmoke3->textureID);
+    gl->enableAlphaBlending ();
+    glEnable (GL_ALPHA_TEST);
+    glAlphaFunc (GL_GEQUAL, 0.1);
+    gl->enableTextures (texsmoke3->textureID);
+    glBegin (GL_QUADS);
+    int myalpha = 255 - (100 - ttl * 5);
+    if (myalpha > 255) myalpha = 255;
+    glColor4ub (0, 0, 0, myalpha);
+    float myzoom = zoom;
+    glTexCoord2f (0, 0);
+    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z + myzoom * sine [(int) myphi]);
+    glTexCoord2f (1, 0);
+    glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z - myzoom * sine [(int) myphi]);
+    glTexCoord2f (1, 1);
+    glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z - myzoom * sine [(int) myphi]);
+    glTexCoord2f (0, 1);
+    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z + myzoom * sine [(int) myphi]);
+    glEnd ();
+    glDisable (GL_TEXTURE_2D);
+    glDisable (GL_ALPHA_TEST);
+    gl->disableAlphaBlending ();
   }
 }
 

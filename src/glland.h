@@ -116,7 +116,7 @@ class GLLandscape : public Landscape
   
   void draw (int phi, int gamma); // draw ALL
 
-  void calcDynamicLight (CExplosion **explo); // explosions light up the surface
+  void calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile); // explosions light up the surface
 
   GLLandscape (Space *space2, int type, int *heightmask);
 };

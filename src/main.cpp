@@ -24,9 +24,10 @@
 /*
 TODO:
 - missile countermeasure
-- source code: DynamicObj, AIObj => aiobject.cpp; MissionX => mission.cpp
+- source code: MissionX => mission.cpp
 - southern seashore landscape (additional missions)
 - torpedo, water
+- clouds
 */
 
 #ifndef IS_MAIN_H
@@ -6880,10 +6881,10 @@ void finish_display ()
   font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", &col);
   font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", &col);
   font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY,", &col);
-  font1->drawTextCentered (0, -2, -3, "BY TOM ALEC DREXL.", &col);
+  font1->drawTextCentered (0, -2, -3, "BY THOMAS ALEXANDER DREXL.", &col);
   font1->drawTextCentered (0, -6, -3, "THANKS TO HOOPY, THE GREATEST UNIX FREAK OUT THERE,", &col);
-  font1->drawTextCentered (0, -8, -3, "PRIMETIME, FOR WRITING THE INTRO AND THE MOON LANDSCAPE,", &col);
-  font1->drawTextCentered (0, -10, -3, "AND JOSEF FOR HIS HELP TO DESIGN THE FIGHTER MODELS.", &col);
+  font1->drawTextCentered (0, -8, -3, "JOSEF FOR HIS HELP TO DESIGN THE FIGHTER MODELS,", &col);
+  font1->drawTextCentered (0, -10, -3, "PIOTR FOR THE LENS FLARES AND BERND FOR HIS IDEAS.", &col);
 }
 
 int vibration = 0;
@@ -7177,7 +7178,7 @@ void game_display ()
 //  glEnable (GL_DITHER);
 
 // draw terrain
-  l->calcDynamicLight (explosion);
+  l->calcDynamicLight (explosion, laser, (DynamicObj **) missile);
   glEnable (GL_CULL_FACE);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
@@ -7188,15 +7189,20 @@ void game_display ()
   if (camera != 50)
   {
     space->lum = sunlight;
-  for (i = 0; i < space->no; i ++)
-  {
-    if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
-    space->o [i]->lum = 0.5;
-    else
-    space->o [i]->lum = 1.0;
-  }
-  if (flash > 5)
-    flash1->draw ();
+    for (i = 0; i < space->no; i ++)
+    {
+      if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
+        space->o [i]->lum = 0.5;
+      else
+        space->o [i]->lum = 1.0;
+    }
+    if (flash > 5)
+    {
+      if (quality <= 2)
+        flash1->draw ();
+      else
+        flash1->drawHQ ();
+    }
     if (lighting)
     {
       glEnable( GL_LIGHTING);

@@ -2361,7 +2361,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   precalculate ();
 }
 
-void GLLandscape::calcDynamicLight (CExplosion **explo)
+void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile)
 {
   int i, x, y;
   memset (dl, 0, (MAXX + 1) * (MAXX + 1));
@@ -2387,6 +2387,65 @@ void GLLandscape::calcDynamicLight (CExplosion **explo)
             if (dist < radius)
             {
               int light = (int) ((radius - dist) * intens / radius * explo [i]->zoom) + dl [xn] [yn];
+              if (light > 255) light = 255;
+              dl [xn] [yn] = light;
+            }
+          }
+      }
+    }
+  }
+  if (!day)
+    for (i = 0; i < maxlaser; i ++)
+    {
+      if (cannon [i]->draw && cannon [i]->active)
+      {
+        int mx = MAXX / 2 + (int) cannon [i]->tl->x;
+        int mz = MAXX / 2 - (int) cannon [i]->tl->z;
+        float h = cannon [i]->tl->y - getHeight (cannon [i]->tl->x, cannon [i]->tl->z);
+        if (h < 0) h = 0;
+        float radius = h / 2 + 3;
+        if (h < 10)
+        {
+          float intens = 50.0 - 5 * h;
+          for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
+            for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
+            {
+              int xn = getCoord (x);
+              int yn = getCoord (y);
+              int dx = x - mx, dy = y - mz;
+              float dist = sqrt (dx*dx + dy*dy);
+              if (dist < radius)
+              {
+                int light = (int) ((radius - dist) * intens / radius * cannon [i]->zoom) + dl [xn] [yn];
+                if (light > 255) light = 255;
+                dl [xn] [yn] = light;
+              }
+            }
+        }
+      }
+    }
+  for (i = 0; i < maxmissile; i ++)
+  {
+    if (missile [i]->draw && missile [i]->active)
+    {
+      int mx = MAXX / 2 + (int) missile [i]->tl->x;
+      int mz = MAXX / 2 - (int) missile [i]->tl->z;
+      float h = missile [i]->tl->y - getHeight (missile [i]->tl->x, missile [i]->tl->z);
+      if (h < 0) h = 0;
+      float radius = h / 2 + 3;
+      if (h < 10)
+      {
+        float intens = 100.0 - 10 * h;
+        for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
+          for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
+          {
+            int xn = getCoord (x);
+            int yn = getCoord (y);
+            int dx = x - mx, dy = y - mz;
+            float dist = sqrt (dx*dx + dy*dy);
+            if (dist < radius)
+            {
+              int light = (int) ((radius - dist) * intens / radius * missile [i]->zoom) + dl [xn] [yn];
               if (light > 255) light = 255;
               dl [xn] [yn] = light;
             }
