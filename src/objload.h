@@ -5,6 +5,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+#define int32 int
+
+class CFile
+{
+  public:
+  FILE *in;
+  int32 size;
+  int32 filepointer;
+  char *data;
+
+  CFile (char *filename);
+  ~CFile ();
+  float readFloat (int32 offset);
+  float readFloat ();
+  int readInteger (int32 offset);
+  int readInteger ();
+  char *readWord (int32 offset);
+  char *readWord ();
+  char *getChar ();
+  void nextWhite ();
+  void skipWhite ();
+};
 
 #include "model.h"
 
@@ -16,16 +40,10 @@ class CLoadOBJ
   bool ImportOBJ (CModel *model, char *filename);
   
   private:
-  char *data; // file content data array
-  long size; // size of data array = file size
-  long filepointer; // pointer (index) to data array
-  int aktobject; // object being loaded
-  int verticesread; // vertices read while loading
-  int normalread;
-  int ReadInteger (int offset);
-  float ReadValue (int offset);
-  void PreLoad (char *filename);
+  CFile *file;
   void ComputeNormals (CModel *model);
+  void ComputeColors (CModel *model);
+  void Normalize (CModel *model);
   void LoadObject (CModel *model);
 };
 

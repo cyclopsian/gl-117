@@ -4,15 +4,38 @@
 
 #include "objload.h"
 
-CLoadOBJ::CLoadOBJ ()
+CFile::CFile (char *filename)
 {
+  in = fopen (filename, "rb");
+  if (in == NULL)
+  {
+    fprintf (stderr, "Kann Datei %s nicht laden!\n", filename);
+    fflush (stderr);
+    return;
+  }
+  fseek (in, 0, SEEK_END);
+  size = ftell (in);
+  fseek (in, 0, SEEK_SET);
+  data = new char [size];
+  int32 z = 0;
+  while (!feof (in))
+  {
+    fread (&data [z], 4096, sizeof (char), in);
+    z += 4096;
+  }
+  fclose (in);
+  filepointer = 0;
 }
 
-// trim string and return a floating point value
-float CLoadOBJ::ReadValue (int offset)
+CFile::~CFile ()
 {
-  int i = offset;
-  while (data [i] == ' ' || data [i] == '\t') i ++;
+  delete data;
+}
+
+float CFile::readFloat (int32 offset)
+{
+  int32 i = offset;
+  while (data [i] == ' ' || data [i] == '\t' || data [i] == 0) i ++;
   offset = i;
   while ((data [i] >= '0' && data [i] <= '9') || data [i] == '.' || data [i] == '-') i ++;
   data [i] = 0;
@@ -22,11 +45,15 @@ float CLoadOBJ::ReadValue (int offset)
   return (float) strtod (&data [offset], p2);
 }
 
-// trim string and return an integer value
-int CLoadOBJ::ReadInteger (int offset)
+float CFile::readFloat ()
 {
-  int i = offset;
-  while (data [i] == ' ' || data [i] == '\t') i ++;
+  return readFloat (filepointer);
+}
+
+int CFile::readInteger (int32 offset)
+{
+  int32 i = offset;
+  while (data [i] == ' ' || data [i] == '\t' || data [i] == 0) i ++;
   offset = i;
   while ((data [i] >= '0' && data [i] <= '9') || data [i] == '-') i ++;
   data [i] = 0;
@@ -35,214 +62,74 @@ int CLoadOBJ::ReadInteger (int offset)
   char **p2 = &p1;
   return (int) atoi (&data [offset]);
 }
-
-// load the complete file to the "data" buffer
-void CLoadOBJ::PreLoad (char *filename)
+int CFile::readInteger ()
 {
-  FILE *in = fopen (filename, "rb");
-  if (in == NULL) // file could not be opened
-  {
-    fprintf (stderr, "Kann Datei %s nicht laden!\n", filename);
-    fflush (stderr);
-    return;
-  }
-  fseek (in, 0, SEEK_END); // get file size
-  size = ftell (in);
-  fseek (in, 0, SEEK_SET);
-  data = new char [size]; // new data array
-  long z = 0;
-  while (!feof (in)) // read file in 4096 block, fastest on most systems (esp. MSWindows)
-  {
-    fread (&data [z], 4096, sizeof (char), in);
-    z += 4096;
-  }
-  fclose (in);
-  filepointer = 0; // set filepointer of data array to the start
-  verticesread = 0;
+  return readInteger (filepointer);
 }
 
-// load the complete model
-void CLoadOBJ::LoadObject (CModel *model)
+char *CFile::readWord (int32 offset)
 {
-  int i = filepointer;
-  int vertices = 0, texturecoords = 0, normals = 0, faces = 0;
+  int32 i = offset;
+  while (data [i] == ' ' || data [i] == '\t' || data [i] == 0) i ++;
+  offset = i;
+  while (data [i] > ' ' && data [i] <= 'z') i ++;
+  data [i] = 0;
+  filepointer = i + 1;
+  return &data [offset];
+}
 
-  // first count the vertices, faces, normals needed
-  while (i < size)
-  {
-    while (data [i] != 'v' && data [i] != 'f' && i < size) i ++;
-    if (data [i] == 'v')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t') vertices ++;
-      if (data [i + 1] == 't') texturecoords ++;
-      if (data [i + 1] == 'n') normals ++;
-    }
-    if (data [i] == 'f')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t')
-      { faces ++; goto weiter1; }
-    }
-    i ++;
-  }
-weiter1:;
-  while (i < size)
-  {
-    while (data [i] != 'v' && data [i] != 'f' && i < size) i ++;
-    if (data [i] == 'f')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t') faces ++;
-    }
-/*  if (data [i] == 'v')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t') goto weiter2;
-      if (data [i + 1] == 't') goto weiter2;
-      if (data [i + 1] == 'n') goto weiter2;
-    }*/
-    i ++;
-  }
-//weiter2:;
+char *CFile::readWord ()
+{
+  return readWord (filepointer);
+}
 
-  // create a new CObject
-  CVector3 *n = new CVector3 [normals];
-  model->object [aktobject] = new CObject;
-  model->numObjects ++;
-  CObject *object = model->object [aktobject];
-  aktobject ++;
-  object->numVertices = vertices;
-  object->numTriangles = faces;
-  object->numQuads = faces;
+char *CFile::getChar ()
+{
+  return &data [filepointer];
+}
 
-  // create array of vertices and faces (triangles, quads)
-  object->vertex = new CVertex [object->numVertices];
-  object->triangle = new CTriangle [object->numTriangles];
-  object->quad = new CQuad [object->numQuads];
-
-  // now load the vertices and faces
-  i = filepointer;
-  int z = 0, z2 = 0;
-  while (i < size)
-  {
-    while (data [i] != 'v' && data [i] != 'f' && i < size) i ++;
-    if (data [i] == 'v')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t')
-      {
-        object->vertex [z].vector.x = ReadValue (i + 2);
-        object->vertex [z].vector.y = ReadValue (filepointer);
-        object->vertex [z].vector.z = ReadValue (filepointer);
-        i = filepointer;
-        z ++;
-        i -= 2;
-      }
-      else if (data [i + 1] == 'n')
-      {
-        n [z2].x = ReadValue (i + 2);
-        n [z2].y = ReadValue (filepointer);
-        n [z2].z = ReadValue (filepointer);
-        i = filepointer;
-        z2 ++;
-        i -= 2;
-      }
-//      if (data [i + 1] == 't') texturecoords ++;
-//      if (data [i + 1] == 'n') normals ++;
-    }
-    if (data [i] == 'f')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t')
-      { i --; goto weiter3; }
-    }
-    i ++;
-  }
-weiter3:;
-  int qn = 0, tn = 0;
-  while (i < size)
-  {
-    while (data [i] != 'v' && data [i] != 'f' && i < size) i ++;
-    if (data [i] == 'f')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t')
-      {
-        int a = ReadInteger (i + 1) - verticesread;
-        while (data [filepointer] != '/' && filepointer < size - 1) filepointer ++;
-        if (filepointer >= size - 1)
-          goto weiter4;
-        int na = ReadInteger (filepointer + 1) - normalread;
-        i = filepointer;
-        while (data [i] == ' ' || data [i] == '\t') i ++;
-        if (i >= size)
-          i = i;
-        int b = ReadInteger (i) - verticesread;
-        while (data [filepointer] != '/' && filepointer < size - 1) filepointer ++;
-        if (filepointer >= size - 1)
-          goto weiter4;
-        int nb = ReadInteger (filepointer + 1) - normalread;
-        i = filepointer;
-        while (data [i] == ' ' || data [i] == '\t') i ++;
-        if (i >= size)
-          i = i;
-        int c = ReadInteger (i) - verticesread;
-        while (data [filepointer] != '/' && filepointer < size - 1) filepointer ++;
-        if (filepointer >= size - 1)
-          goto weiter4;
-        int nc = ReadInteger (filepointer + 1) - normalread;
-        i = filepointer;
-        while (data [i] == ' ' || data [i] == '\t') i ++;
-        if (i >= size)
-          i = i;
-        int d = -1, nd = -1;
-        if (data [i] != '\n')
-        {
-          if ((data [i] >= '0' && data [i] <= '9') || data [i] == '-')
-          {
-            d = ReadInteger (i) - verticesread;
-            while (data [filepointer] != '/' && filepointer < size - 1) filepointer ++;
-            if (filepointer >= size - 1) goto weiter4;
-            nd = ReadInteger (filepointer + 1) - normalread;
-          }
-        }
-        if (d >= 0) // map indices
-        {
-          object->quad [qn].v [0] = &object->vertex [a - 1];
-          object->quad [qn].v [1] = &object->vertex [b - 1];
-          object->quad [qn].v [2] = &object->vertex [c - 1];
-          object->quad [qn].v [3] = &object->vertex [d - 1];
-/*        object->quad [qn].v [0]->normal.add (&n [na - 1]);
-          object->quad [qn].v [1]->normal.add (&n [nb - 1]);
-          object->quad [qn].v [2]->normal.add (&n [nc - 1]);
-          object->quad [qn].v [3]->normal.add (&n [nd - 1]);*/
-          qn ++;
-        }
-        else
-        {
-          object->triangle [tn].v [0] = &object->vertex [a - 1];
-          object->triangle [tn].v [1] = &object->vertex [b - 1];
-          object->triangle [tn].v [2] = &object->vertex [c - 1];
-/*        object->triangle [tn].v [0]->normal.add (&n [na - 1]);
-          object->triangle [tn].v [1]->normal.add (&n [nb - 1]);
-          object->triangle [tn].v [2]->normal.add (&n [nc - 1]);*/
-          tn ++;
-        }
-      }
-    }
-    if (data [i] == 'v')
-    {
-      if (data [i + 1] == ' ' || data [i + 1] == '\t') goto weiter4;
-      if (data [i + 1] == 't') goto weiter4;
-      if (data [i + 1] == 'n') goto weiter4;
-    }
-    i ++;
-  }
-weiter4:;
-
-  object->numTriangles = tn;
-  object->numQuads = qn;
+void CFile::nextWhite ()
+{
+  int32 i = filepointer;
+  while (data [i] != ' ' && data [i] != '\t' && data [i] != '\n' && i < size) i ++;
   filepointer = i;
-  verticesread += vertices;
-  normalread += normals;
-  delete n;
+}
 
-/*  for (i = 0; i < object->numVertices; i ++)
-    object->vertex [i].normal.norm ();*/
+void CFile::skipWhite ()
+{
+  int32 i = filepointer;
+  while (data [i] == ' ' || data [i] == '\t') i ++;
+  filepointer = i;
+}
+
+
+
+CLoadOBJ::CLoadOBJ ()
+{
+}
+
+void CLoadOBJ::ComputeColors (CModel *model)
+{
+  int i, i2;
+
+  if (model->numObjects <= 0)
+    return;
+
+  CVector3 n;
+  CVector3 light (1.0, 1.0, 1.0);
+  light.norm ();
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    CObject *object = (model->object [i]);
+    for (i2 = 0; i2 < object->numVertices; i2 ++)
+    {
+      n.take (&object->vertex [i2].normal);
+      int lum = (int) (255.0 - 255.0 * acos (n.dotproduct (&light)));
+      object->vertex [i2].color.c [0] = lum;
+      object->vertex [i2].color.c [1] = lum;
+      object->vertex [i2].color.c [2] = lum;
+    }
+  }
 }
 
 void CLoadOBJ::ComputeNormals (CModel *model)
@@ -259,6 +146,7 @@ void CLoadOBJ::ComputeNormals (CModel *model)
     for (i2 = 0; i2 < object->numTriangles; i2 ++)
     {
       object->triangle [i2].getNormal (&n);
+      if (n.x == 0 && n.y == 0 && n.z == 0) n.z = 1;
       for (i3 = 0; i3 < 3; i3 ++)
       {
         object->triangle [i2].v [i3]->addNormal (&n);
@@ -289,13 +177,147 @@ void CLoadOBJ::ComputeNormals (CModel *model)
   }
 }
 
+void CLoadOBJ::Normalize (CModel *model)
+{
+  int i, i2;
+  float minx = 1E10, miny = 1E10, minz = 1E10;
+  float maxx = -1E10, maxy = -1E10, maxz = -1E10;
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    CObject *object = (model->object [i]);
+    for (i2 = 0; i2 < object->numVertices; i2 ++)
+    {
+      CVertex *v = &object->vertex [i2];
+      if (v->vector.x > maxx) maxx = v->vector.x;
+      if (v->vector.y > maxy) maxy = v->vector.y;
+      if (v->vector.z > maxz) maxz = v->vector.z;
+      if (v->vector.x < minx) minx = v->vector.x;
+      if (v->vector.y < miny) miny = v->vector.y;
+      if (v->vector.z < minz) minz = v->vector.z;
+    }
+  }
+
+  float tlx = (float) (maxx + minx) / 2.0F;
+  float tly = (float) (maxy + miny) / 2.0F;
+  float tlz = (float) (maxz + minz) / 2.0F;
+  float scx = (float) (maxx - minx) * 0.5F;
+  float scy = (float) (maxy - miny) * 0.5F;
+  float scz = (float) (maxz - minz) * 0.5F;
+  float sc = scx > scy ? scx : scy;
+  sc = scz > sc ? scz : sc; 
+
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    CObject *object = (model->object [i]);
+    for (i2 = 0; i2 < object->numVertices; i2 ++)
+    {
+      CVertex *v = &object->vertex [i2];
+      v->vector.x -= tlx;
+      v->vector.x /= sc;
+      v->vector.y -= tly;
+      v->vector.y /= sc;
+      v->vector.z -= tlz;
+      v->vector.z /= sc;
+    }
+  }
+
+//  model->scale = sc;
+};
+
 bool CLoadOBJ::ImportOBJ (CModel *model, char *filename)
 {
-  aktobject = 0;
-  PreLoad (filename);
-  while (filepointer < size)
-    LoadObject (model);
+  file = new CFile (filename);
+  int32 i = 0;
+  int i2;
+  int vertices = 0, faces = 0;
+
+  // precalculate number of vertices and number of triangles
+  while (i < file->size - 1)
+  {
+    // one vertex
+    if (file->data [i] == 'v' && (file->data [i + 1] == ' ' || file->data [i + 1] == '\t'))
+      vertices ++;
+    // read number of vertices in this face
+    if (file->data [i] == 'f' && (file->data [i + 1] == ' ' || file->data [i + 1] == '\t'))
+    {
+      file->filepointer = i + 1;
+      file->skipWhite ();
+      char *p;
+      int z = 0;
+      do
+      {
+        int a = file->readInteger ();
+        file->nextWhite ();
+        file->skipWhite ();
+        p = file->getChar ();
+        z ++;
+      } while (*p >= '0' && *p <= '9');
+      faces += (z - 2);
+    }
+    i ++;
+  }
+
+  // create new object
+  model->object [model->numObjects] = new CObject;
+  CObject *object = model->object [model->numObjects];
+  model->numObjects ++;
+  object->numVertices = vertices;
+  object->numTriangles = faces;
+  object->numQuads = 0;
+
+  // create array of vertices and faces (triangles, quads)
+  object->vertex = new CVertex [object->numVertices];
+  object->triangle = new CTriangle [object->numTriangles];
+  object->quad = new CQuad [object->numQuads];
+
+  int vn = 0, tn = 0, qn = 0;
+  i = 0;
+  while (i < file->size - 1)
+  {
+    // read vertex
+    if (file->data [i] == 'v' && (file->data [i + 1] == ' ' || file->data [i + 1] == '\t'))
+    {
+      object->vertex [vn].vector.x = file->readFloat (i + 2);
+      object->vertex [vn].vector.y = file->readFloat ();
+      object->vertex [vn].vector.z = file->readFloat ();
+      i = file->filepointer - 2;
+      vn ++;
+    }
+    // read face
+    if (file->data [i] == 'f' && (file->data [i + 1] == ' ' || file->data [i + 1] == '\t'))
+    {
+      file->filepointer = i + 1;
+      file->skipWhite ();
+      char *p;
+      int z = 0;
+      int a [100];
+      // read vertex indices
+      do
+      {
+        a [z] = file->readInteger ();
+        file->nextWhite ();
+        file->skipWhite ();
+        p = file->getChar ();
+        z ++;
+      } while (*p >= '0' && *p <= '9' && z < 100);
+      // create triangles (triangulation)
+      for (i2 = 2; i2 < z; i2 ++)
+      {
+        object->triangle [tn].v [0] = &object->vertex [a [0] - 1];
+        object->triangle [tn].v [1] = &object->vertex [a [i2 - 1] - 1];
+        object->triangle [tn].v [2] = &object->vertex [a [i2] - 1];
+        tn ++;
+      }
+    }
+    i ++;
+  }
+
+  delete file;
+
   ComputeNormals (model);
+  ComputeColors (model);
+  Normalize (model);
+
   return true;
 }
 

@@ -23,8 +23,6 @@
 
 /*
 TODO:
-- moon base
-- asteroids (animation)
 - missile countermeasure
 - source code: DynamicObj, AIObj => aiobject.cpp; MissionX => mission.cpp
 - southern seashore landscape (additional missions)
@@ -8486,11 +8484,14 @@ void credits_display ()
   glTranslatef (0, -3.5 + 0.015 * (float) creditstimer, 0);
   CColor col (255, 255, 255, 255);
   CColor col2 (255, 255, 0, 255);
-  font2->drawTextCentered (0, 10, -2, "GAME PROGRAMMING", &col);
-  font2->drawTextCentered (0, 8, -2, "GRAPHICS SOUND MUSIC", &col);
+  font2->drawTextCentered (0, 10, -2, "GAME PROGRAMMING,", &col);
+  font2->drawTextCentered (0, 8, -2, "GRAPHICS, SOUND & MUSIC", &col);
   font1->drawTextCentered (0, 6, -2, "THOMAS A. DREXL", &col2);
-  font2->drawTextCentered (0, 2, -2, "INTRO MOON", &col);
+  font2->drawTextCentered (0, 2, -2, "INTRO & MOON", &col);
   font1->drawTextCentered (0, 0, -2, "NORBERT DREXL", &col2);
+// Hi Piotr, please enter your full name or just delete the two lines!
+  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
+  font1->drawTextCentered (0, -6, -2, "P. P.", &col2);
 }
 
 void finish_display ()
