@@ -35,6 +35,7 @@ TODO:
 - particle systems
 - pseudo random number generator
 - tunnel
+- ROAM code Norbert (test)
 */
 
 #ifndef IS_MAIN_H
@@ -381,9 +382,10 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   glDisable (GL_TEXTURE_2D);
 }
 
-void drawMedal (float xp, float yp, float zp, int medal, float zoom)
+void drawMedal (float xp, float yp, float zp, int medal, float zoom, int missionid)
 {
   if (medal < 0) return;
+  if (missionid < MISSION_CAMPAIGN1 || missionid > MISSION_CAMPAIGN2) return;
   float x = xp / 10.0 - zoom / 20, y = yp / 10.0 - zoom / 20, z = zp;
   float tx1 = 0.5 * (medal % 2);
   float tx2 = tx1 + 0.5;
@@ -1058,6 +1060,7 @@ void createMission (int missionid)
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
   else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
   else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
+  else if (missionid == MISSION_FREEFLIGHT1) missionnew = new MissionFreeFlight1 ();
   else if (missionid == MISSION_DEATHMATCH1) missionnew = new MissionDeathmatch1 ();
   else if (missionid == MISSION_DEATHMATCH2) missionnew = new MissionDeathmatch2 ();
   else if (missionid == MISSION_TEAMBASE1) missionnew = new MissionTeamBase1 ();
@@ -2304,15 +2307,23 @@ void mission_display ()
     font1->drawText (xstatstab, ystats, -3, "FAILED", colorstd);
   else
     font1->drawText (xstatstab, ystats, -3, "EMPTY", colorstd);
-  font1->drawText (xstats, ystats - 1.5, -3, "SCORE:");
-  int score = p->mission_score [missionnew->id];
-  if (score < -10000 || score > 100000) score = 0;
-  sprintf (buf, "%d", score);
-  font1->drawText (xstatstab, ystats - 1.5, -3, buf, colorstd);
-  font1->drawText (xstats, ystats - 3, -3, "KILLS:");
-  sprintf (buf, "%d AIRCRAFTS", p->mission_fighterkills [missionnew->id]);
-  font1->drawText (xstatstab, ystats - 3, -3, buf, colorstd);
-  drawMedal (xstatstab + 2, ystats - 5.5, -3, getMedal (p->mission_score [missionnew->id]), 3.5);
+  if (missionnew->id >= MISSION_CAMPAIGN1 && missionnew->id <= MISSION_CAMPAIGN2)
+  {
+    font1->drawText (xstats, ystats - 1.5, -3, "SCORE:");
+    int score = p->mission_score [missionnew->id];
+    if (score < -10000 || score > 100000) score = 0;
+    sprintf (buf, "%d", score);
+    font1->drawText (xstatstab, ystats - 1.5, -3, buf, colorstd);
+    font1->drawText (xstats, ystats - 3, -3, "KILLS:");
+    sprintf (buf, "%d AIRCRAFTS", p->mission_fighterkills [missionnew->id]);
+    font1->drawText (xstatstab, ystats - 3, -3, buf, colorstd);
+    drawMedal (xstatstab + 2, ystats - 5.5, -3, getMedal (p->mission_score [missionnew->id]), 3.5, mission->id);
+  }
+  else
+  {
+    font1->drawText (xstats, ystats - 1.5, -3, "SCORE:");
+    font1->drawText (xstatstab, ystats - 1.5, -3, "TRAINING");
+  }
   
   font1->drawText (-22, piloty, -3, "PILOTS:");
   strcpy (buf, pilots->pilot [pilots->aktpilot]->getRank ());
@@ -2917,6 +2928,14 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT);
         }
       }
+      if (ry >= 0.21 && ry <= 0.23)
+      {
+        menuitemselected = 13;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_FREEFLIGHT1);
+        }
+      }
       if (ry >= 0.24 && ry <= 0.26)
       {
         menuitemselected = 14;
@@ -3409,7 +3428,7 @@ void drawMissionElement (float x, float y, float z, int thismissionid, int missi
   {
     font1->drawText (x, y, z, string, &colorgrey);
   }
-  drawMedal (x - 0.8, y + 0.6, z, getMedal (p->mission_score [thismissionid]), 1.0);
+  drawMedal (x - 0.8, y + 0.6, z, getMedal (p->mission_score [thismissionid]), 1.0, thismissionid);
 }
 
 void stats_display ()
@@ -3436,8 +3455,8 @@ void stats_display ()
   glVertex3f (-xf, -yf, zf);
   glEnd ();
 
-  drawMedal (-5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6);
-  drawMedal (5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6);
+  drawMedal (-5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6, mission->id);
+  drawMedal (5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6, mission->id);
 
   char buf [100];
   float xf1 = -12, xf2 = 0;
@@ -3629,37 +3648,43 @@ void menu_display ()
       font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: PILOTING", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TUTORIAL: PILOTING");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TUTORIAL]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TUTORIAL]), 1.0, MISSION_TUTORIAL);
     yf -= 1.5;
     if (menuitemselected == 11)
       font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: DOGFIGHT", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TUTORIAL: DOGFIGHT");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DOGFIGHT]), 1.0);
-    yf -= 3.0 * 1.5;
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DOGFIGHT]), 1.0, MISSION_DOGFIGHT);
+    yf -= 2.0 * 1.5;
+    if (menuitemselected == 13)
+      font1->drawTextScaled (textx2, yf, zf, "FREE FLIGHT", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yf, zf, "FREE FLIGHT");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_FREEFLIGHT1]), 1.0, MISSION_FREEFLIGHT1);
+    yf -= 1.5;
     if (menuitemselected == 14)
       font1->drawTextScaled (textx2, yf, zf, "DEATHMATCH", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "DEATHMATCH");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH1]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH1]), 1.0, MISSION_DEATHMATCH1);
     yf -= 1.5;
     if (menuitemselected == 15)
       font1->drawTextScaled (textx2, yf, zf, "TEAM DEATHMATCH", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TEAM DEATHMATCH");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH2]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH2]), 1.0, MISSION_DEATHMATCH2);
     yf -= 1.5;
     if (menuitemselected == 16)
       font1->drawTextScaled (textx2, yf, zf, "TEAM BASE", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TEAM BASE");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEAMBASE1]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEAMBASE1]), 1.0, MISSION_TEAMBASE1);
     yf -= 1.5;
     if (menuitemselected == 17)
       font1->drawTextScaled (textx2, yf, zf, "WAVES", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "WAVES");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_WAVES1]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_WAVES1]), 1.0, MISSION_WAVES1);
     yf -= 1.5;
   }
   else if (menuitem == 2)
@@ -3670,7 +3695,7 @@ void menu_display ()
       font1->drawTextScaled (textx2, yf, zf, "EAGLE TEST1", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "EAGLE TEST1");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEST1]), 1.0);
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEST1]), 1.0, MISSION_TEST1);
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
@@ -3846,7 +3871,7 @@ void credits_display ()
   font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", col2);
   font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", col);
   font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL IMPROVEMENTS", col);
+  font2->drawTextCentered (0, yt -= 4, zf, "IMPROVEMENTS TO PHYSICAL MODEL & COCKPIT", col);
   font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", col2);
 }
 

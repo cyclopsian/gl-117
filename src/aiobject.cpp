@@ -837,6 +837,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxtheta = 30;
     flares = 0;
     chaffs = 20;
+    ammo = 0;
   }
   else if (id == FIGHTER_BUZZARD)
   {
@@ -1921,6 +1922,8 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
     }
   }
+
+  if (id == FIGHTER_TRANSPORT && recheight < 10) recheight = 25;
 
   if (ai)
   {

@@ -306,7 +306,7 @@ MissionTutorial1::MissionTutorial1 ()
   id = MISSION_TUTORIAL;
   strcpy (name, "TUTORIAL");
   alliedfighters = 1;
-  strcpy (briefing, "WELCOME TO THE EAGLE SQUADRON! BEFORE FLYING ANY MISSION YOU SHOULD PLAY THIS TUTORIAL. LEARN TO HANDLE YOUR FIGHTER AND THE BASIC CONTROLS LIKE TARGETING OR FIRING A MISSILE.");
+  strcpy (briefing, "WELCOME TO THE FIRST TUTORIAL! BEFORE FLYING ANY MISSION YOU SHOULD PLAY THIS TUTORIAL. LEARN TO HANDLE YOUR FIGHTER AND THE BASIC CONTROLS LIKE TARGETING OR FIRING A MISSILE.");
   autoLFBriefing ();
   maxtime = 2500 * timestep;
   heading = 210;
@@ -545,7 +545,7 @@ MissionDogfight1::MissionDogfight1 ()
 {
   id = MISSION_DOGFIGHT;
   strcpy (name, "DOGFIGHT");
-  strcpy (briefing, "HERE IS THE SECOND TASK: PRACTICE YOUR DOGFIGHT SKILLS.");
+  strcpy (briefing, "HERE IS THE SECOND TUTORIAL: PRACTICE YOUR DOGFIGHT SKILLS.");
   autoLFBriefing ();
   alliedfighters = 1;
   maxtime = 5000 * timestep;
@@ -698,6 +698,127 @@ void MissionDogfight1::draw ()
 
 
 
+MissionFreeFlight1::MissionFreeFlight1 ()
+{
+  id = MISSION_FREEFLIGHT1;
+  strcpy (name, "FREE FLIGHT");
+  strcpy (briefing, "THIS IS A SIMPLE TRAINING MISSION: SHOOT ALL TRANSPORTER WAVES.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  selweapons = 2;
+  maxtime = 4000 * timestep;
+}
+
+void MissionFreeFlight1::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  heading = 200;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 20;
+  fplayer->tl->z = 70;
+  for (i = 1; i <= 9; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->tl->x = -i * 10;
+    fighter [i]->tl->z = -i * 10;
+    fighter [i]->o = &model_figt;
+    fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 395);
+    if (i >= 3)
+    {
+      fighter [i]->deactivate ();
+    }
+  }
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionFreeFlight1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 9; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  state ++;
+  if (state == 1)
+  {
+    for (i = 3; i <= 5; i ++)
+    {
+      fighter [i]->activate ();
+      int phi = 120 * i;
+      fighter [i]->tl->x = fplayer->tl->x + 40 * COS(phi);
+      fighter [i]->tl->z = fplayer->tl->z + 40 * SIN(phi);
+      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+    }
+    return 0;
+  }
+  else if (state == 2)
+  {
+    for (i = 6; i <= 9; i ++)
+    {
+      fighter [i]->activate ();
+      int phi = 90 * i;
+      fighter [i]->tl->x = fplayer->tl->x + 40 * COS(phi);
+      fighter [i]->tl->z = fplayer->tl->z + 40 * SIN(phi);
+      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+    }
+    return 0;
+  }
+//  fplayer->shield = 1;
+  return 1;
+}
+
+void MissionFreeFlight1::draw ()
+{
+  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
+
+  if (laststate != state)
+  {
+    texttimer = 1;
+    laststate = state;
+  }
+  if (texttimer > 0)
+  {
+    if (state == 1)
+    {
+      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", &textcolor);
+      return;
+    }
+    if (state == 2)
+    {
+      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", &textcolor);
+      return;
+    }
+  }
+
+  if (timer >= 0 && timer <= timeroff - timerlag)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
 MissionDeathmatch1::MissionDeathmatch1 ()
 {
   id = MISSION_DEATHMATCH1;
@@ -749,7 +870,7 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
   {
     if (fighter [i]->fighterkills >= 10)
     {
-      fplayer->shield = 1;
+//      fplayer->shield = 1;
       if (i == 0) return 1;
       else return 2;
     }
@@ -858,7 +979,7 @@ int MissionDeathmatch2::processtimer (Uint32 dt)
   {
     if (fighter [i * 2]->fighterkills + fighter [i * 2 + 1]->fighterkills >= 12)
     {
-      fplayer->shield = 1;
+//      fplayer->shield = 1;
       if (i == 0) return 1;
       else return 2;
     }
@@ -993,11 +1114,25 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px;
+  fighter [n]->tl->x = px - 15;
   fighter [n]->tl->z = py - 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 400);
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px + 0;
+  fighter [n]->tl->z = py - 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px + 15;
+  fighter [n]->tl->z = py - 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 1;
 
   l->searchPlain (1, 2, &px, &py);
@@ -1066,11 +1201,25 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px;
+  fighter [n]->tl->x = px - 15;
   fighter [n]->tl->z = py + 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 400);
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px + 0;
+  fighter [n]->tl->z = py + 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px + 15;
+  fighter [n]->tl->z = py + 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 2;
 
   state = 0;
@@ -1097,7 +1246,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
   }
 
   bool testb1 = false, testb2 = false;
-  for (i = 4; i <= 25; i ++)
+  for (i = 4; i <= 29; i ++)
   {
     if (fighter [i]->active)
     {
@@ -1255,7 +1404,7 @@ int MissionWaves1::processtimer (Uint32 dt)
     playerInit ();
     return 0;
   }
-  fplayer->shield = 1;
+//  fplayer->shield = 1;
   return 1;
 }
 

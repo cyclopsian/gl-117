@@ -60,6 +60,7 @@
 #define MISSION_CAMPAIGN2 40
 #define MISSION_TUTORIAL 80
 #define MISSION_DOGFIGHT 81
+#define MISSION_FREEFLIGHT1 84
 #define MISSION_DEATHMATCH1 85
 #define MISSION_DEATHMATCH2 86
 #define MISSION_TEAMBASE1 87
@@ -127,6 +128,16 @@ class MissionDogfight1 : public Mission
   public:
   int laststate, texttimer;
   MissionDogfight1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionFreeFlight1 : public Mission
+{
+  public:
+  int laststate, texttimer;
+  MissionFreeFlight1 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();
