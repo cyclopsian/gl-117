@@ -297,6 +297,7 @@ SoundSystem::SoundSystem ()
   wavehit1 = new WaveFile (dirs->getSounds ("hit1.wav"));
   wavebeep1 = new WaveFile (dirs->getSounds ("beep1.wav"));
   wavechaff1 = new WaveFile (dirs->getSounds ("chaff1.wav"));
+  wavebeep2 = new WaveFile (dirs->getSounds ("beep2.wav"));
   wavecannon1->setVolume (50);
   wavemissile1->setVolume (110);
   waveclick1->setVolume (80);
@@ -324,6 +325,7 @@ SoundSystem::~SoundSystem ()
   delete wavehit1;
   delete wavebeep1;
   delete wavechaff1;
+  delete wavebeep2;
 }
 
 void SoundSystem::play (int sample)
@@ -358,6 +360,9 @@ void SoundSystem::play (int sample)
       break;
     case SOUND_CHAFF1:
       wavechaff1->play ();
+      break;
+    case SOUND_BEEP2:
+      wavebeep2->play ();
       break;
   }
 }
@@ -394,6 +399,9 @@ void SoundSystem::playLoop (int sample)
       break;
     case SOUND_CHAFF1:
       wavechaff1->playLoop ();
+      break;
+    case SOUND_BEEP2:
+      wavebeep2->playLoop ();
       break;
   }
 }
@@ -514,6 +522,9 @@ void SoundSystem::setVolume (int sample, int level)
     case SOUND_CHAFF1:
       wavechaff1->setVolume (level);
       break;
+    case SOUND_BEEP2:
+      wavebeep2->setVolume (level);
+      break;
   }
 }
 
@@ -530,6 +541,7 @@ void SoundSystem::setVolume ()
   wavehit1->setVolume (level);
   wavebeep1->setVolume (level);
   wavechaff1->setVolume (level);
+  wavebeep2->setVolume (level);
 }
 
 void SoundSystem::setVolumeMusic ()
@@ -572,6 +584,9 @@ void SoundSystem::stop (int sample)
       break;
     case SOUND_CHAFF1:
       wavechaff1->stop ();
+      break;
+    case SOUND_BEEP2:
+      wavebeep2->stop ();
       break;
   }
 }

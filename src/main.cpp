@@ -43,7 +43,7 @@ int dithering = 0;
 int volumesound = 100;
 int volumemusic = 100;
 
-bool debug = false;
+int debug = 0;
 bool multiplayer = false, isserver = false;
 int fullscreen = 1;
 int day = 1;
@@ -3062,7 +3062,7 @@ class Cockpit
           else
             chaffwarn = true;
         }
-    if (flarewarn)
+    if (flarewarn && game == GAME_PLAY)
     {
       if (flarewarning <= 0) flarewarning = 10;
       flarewarning --;
@@ -3077,9 +3077,9 @@ class Cockpit
         glEnd ();
       }
       if (flarewarning == 1)
-        sound->play (SOUND_BEEP1);
+        sound->play (SOUND_BEEP2);
     }
-    if (chaffwarn)
+    if (chaffwarn && game == GAME_PLAY)
     {
       if (chaffwarning <= 0) chaffwarning = 10;
       chaffwarning --;
@@ -4841,22 +4841,22 @@ void event_fireCannon ()
 void event_fireMissile ()
 {
   if (!fplayer->active) return;
-  fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
-  sound->play (SOUND_MISSILE1);
+  if (fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile))
+    sound->play (SOUND_MISSILE1);
 }
 
 void event_fireChaff ()
 {
   if (!fplayer->active) return;
-  fplayer->fireChaff (chaff, missile);
-  sound->play (SOUND_CHAFF1);
+  if (fplayer->fireChaff (chaff, missile))
+    sound->play (SOUND_CHAFF1);
 }
 
 void event_fireFlare ()
 {
   if (!fplayer->active) return;
-  fplayer->fireFlare (flare, missile);
-  sound->play (SOUND_CHAFF1);
+  if (fplayer->fireFlare (flare, missile))
+    sound->play (SOUND_CHAFF1);
 }
 
 void event_selectMissile ()
@@ -7349,13 +7349,8 @@ void game_display ()
   int i;
   double sunx, suny, sunz;
 
-  if (debug)
-    printf ("\nentering myDisplayFunc()"); fflush (stdout);
-
-//  if (quality > 0) dithering = 1;
-//  else dithering = 0;
-  if (dithering) glEnable(GL_DITHER);
-  else glDisable(GL_DITHER);
+  if (dithering) glEnable (GL_DITHER);
+  else glDisable (GL_DITHER);
 
   bool sunvisible = false;
   float pseudoview = getView ();
@@ -7993,9 +7988,6 @@ if (quality > 0)
 
   if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE)
     drawMouseCursor ();
-
-  if (debug)
-  { printf ("\nleaving myDisplayFunc()"); fflush (stdout); }
 }
 
 float lastspeed;
@@ -8017,30 +8009,26 @@ void game_timer ()
 
   if (lastshield > fplayer->shield && !fplayer->ai)
   {
-//    fprintf (stdout, "\nshield=%d", fplayer->shield);
     sound->play (SOUND_HIT1);
     lastshield = fplayer->shield;
     vibration = 25;
   }
 
-  if (debug)
-  { printf ("\nentering myTimerFunc()"); fflush (stdout); }
-
-    if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (40))
-    {
-      flash = 10;
-      int fphi = (int) camphi + myrandom (50) - 25;
-      if (fphi < 0) fphi += 360;
-      else if (fphi >= 360) fphi -= 360;
-      float pseudoview = getView ();
-      float fdist = myrandom ((int) pseudoview - 20) + 10;
-      float fx = fplayer->tl->x - sine [fphi] * fdist;
-      float fz = fplayer->tl->z - cosi [fphi] * fdist;
-      flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
-      int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
-      sound->setVolume (SOUND_THUNDER1, lev);
-      sound->play (SOUND_THUNDER1);
-    }
+  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (40))
+  {
+    flash = 10;
+    int fphi = (int) camphi + myrandom (50) - 25;
+    if (fphi < 0) fphi += 360;
+    else if (fphi >= 360) fphi -= 360;
+    float pseudoview = getView ();
+    float fdist = myrandom ((int) pseudoview - 20) + 10;
+    float fx = fplayer->tl->x - sine [fphi] * fdist;
+    float fz = fplayer->tl->z - cosi [fphi] * fdist;
+    flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
+    int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
+    sound->setVolume (SOUND_THUNDER1, lev);
+    sound->play (SOUND_THUNDER1);
+  }
 
   if (initing) return;
 
@@ -8293,9 +8281,6 @@ void game_timer ()
       }
     }
   }
-
-  if (debug)
-  { printf ("\nleaving myTimerFunc()"); fflush (stdout); }
 }
 
 int net_thread_main (void *data)
@@ -8307,24 +8292,21 @@ int net_thread_main (void *data)
 
   gametimer ++;
 
-  if (debug)
-  { printf ("\nentering myTimerFunc()"); fflush (stdout); }
-
-    if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
-    {
-      flash = 10;
-      int fphi = (int) camphi + myrandom (50) - 25;
-      if (fphi < 0) fphi += 360;
-      else if (fphi >= 360) fphi -= 360;
-      float pseudoview = getView ();
-      float fdist = myrandom ((int) pseudoview - 20) + 10;
-      float fx = fplayer->tl->x - sine [fphi] * fdist;
-      float fz = fplayer->tl->z - cosi [fphi] * fdist;
-      flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
-      int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
-      sound->setVolume (SOUND_THUNDER1, lev);
-      sound->play (SOUND_THUNDER1);
-    }
+  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
+  {
+    flash = 10;
+    int fphi = (int) camphi + myrandom (50) - 25;
+    if (fphi < 0) fphi += 360;
+    else if (fphi >= 360) fphi -= 360;
+    float pseudoview = getView ();
+    float fdist = myrandom ((int) pseudoview - 20) + 10;
+    float fx = fplayer->tl->x - sine [fphi] * fdist;
+    float fz = fplayer->tl->z - cosi [fphi] * fdist;
+    flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
+    int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
+    sound->setVolume (SOUND_THUNDER1, lev);
+    sound->play (SOUND_THUNDER1);
+  }
 
   if (flash)
     flash --;
@@ -8506,10 +8488,6 @@ int net_thread_main (void *data)
     }
   }
 
-  if (debug)
-  { printf ("\nleaving myTimerFunc()"); fflush (stdout); }
-
-
   if (multiplayer)
   {
 
@@ -8577,28 +8555,11 @@ void menu_timer ()
         {
           if (view < quality * 10 + 50) view += 10;
           else { quality ++; view = quality * 10 + 20; }
-/*
-          if (view <= 40) view += 10; // view 50 erreichen
-          else if (quality <= 1) quality ++; // quality 2 erreichen
-          else if (view <= 60) view += 10; // view 70 erreichen
-          else if (quality <= 3) quality ++; // quality 4 erreichen
-          else if (view <= 60) view += 10; // view 70 erreichen
-          else if (quality <= 4) quality ++; // quality 5 erreichen
-          else if (view <= 90) view += 10; // view 100 erreichen
-*/
         }
         else if (fps <= 23)
         {
           if (view > quality * 10 + 20) view -= 10;
           else { quality --; view = quality * 10 + 50; }
-/*
-          if (quality >= 5) quality --; // quality 4 erreichen
-          else if (view >= 60) view -= 10; // view 50 erreichen
-          else if (quality >= 3) quality --; // quality 2 erreichen
-          else if (view >= 50) view -= 10; // view 40 erreichen
-          else if (quality >= 1) quality --; // quality 0 erreichen
-          else if (view >= 30) view -= 10; // view 20 erreichen
-*/
         }
         menu_reshape ();
       }
@@ -8697,12 +8658,6 @@ void join_timer ()
 void myInit ()
 {
   int i;
-  if (debug)
-  { printf ("\nentering myInit()"); fflush (stdout); }
-
-  if (debug)
-  { printf ("\n initing landscape"); fflush (stdout); }
-
   texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
   texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
   texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
@@ -8751,9 +8706,6 @@ void myInit ()
   tlminf = new CVector3 (-1E10, -1E10, -1E10);
   tlnull = new CVector3 (0, 0, 0);
 
-  if (debug)
-  { printf ("\n initing fighters"); fflush (stdout); }
-
   for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i] = new DynamicObj (space, &model_tent1, 3);
@@ -8783,9 +8735,6 @@ void myInit ()
   {
     fighter [i] = new AIObj (space, &model_fig, 0.4);
   }
-
-  if (debug)
-  { printf ("\n initing sphere"); fflush (stdout); }
 
   highclouds = new HighClouds (25);
   highclouds->setTexture (texclouds3);
@@ -8819,18 +8768,12 @@ void myInit ()
 
   flash1 = new Flash ();
 
-  if (debug)
-  { printf ("\n initing lasers"); fflush (stdout); }
-
 //  objlaser = new CModel ();
 //  objlaser->loadFromFile ("./data/c1.v3d");
   for (i = 0; i < maxlaser; i ++)
   {
     laser [i] = new DynamicObj (space, &model_cannon1, 0.07);
   }
-
-  if (debug)
-  { printf ("\n initing missiles"); fflush (stdout); }
 
 //  objmissile = new CModel ();
 //  objmissile->loadFromFile ("./data/r1.v3d");
@@ -8861,9 +8804,6 @@ void myInit ()
   game_levelInit ();
 
   menu_reshape ();
-
-  if (debug)
-  { printf ("\nleaving myInit()"); fflush (stdout); }
 }
 
 
@@ -8894,34 +8834,24 @@ void myFirstInit ()
 {
   int i;
 
-  if (debug) { printf ("\niniting mathtab"); fflush (stdout); }
   mathtab_init ();
 
-  if (debug) { printf ("\nnew GL"); fflush (stdout); }
   gl = new GL (); //(1.0, 1000.0);
-  if (debug) { printf ("\nnew fonts"); fflush (stdout); }
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 //  texfont1 = gl->genTextureTGA ("../textures/font2.tga", 0, 1, 0);
-  if (debug) { printf ("\nimporting models"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig7.3ds"));
   model_fig.setName ("FALCON");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_figa, dirs->getModels ("fig4.3ds"));
   model_figa.setName ("SWALLOW");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_figb, dirs->getModels ("fig2.3ds"));
   model_figb.setName ("HAWK");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_figc, dirs->getModels ("fig3.3ds"));
   model_figc.setName ("HAWK II");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_figd, dirs->getModels ("fig1.3ds"));
   model_figd.setName ("BUZZARD");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_fige, dirs->getModels ("fig6.3ds"));
   model_fige.setName ("CROW");
-  if (debug) { printf ("\n1"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_figf, dirs->getModels ("fig8.3ds"));
   model_figf.setName ("PHOENIX");
   g_Load3ds.Import3DS (&model_figg, dirs->getModels ("fig9.3ds"));
@@ -9015,15 +8945,12 @@ void myFirstInit ()
     model.pMaterials[i]->texureId = i;
   }*/
 
-  if (debug) { printf ("\ndone importing models"); fflush (stdout); }
+  // enable Z-Buffer
+  glEnable (GL_DEPTH_TEST);
 
-  /* Z-Buffer f. Berechnung verdeckter Flaechen einschalten */
-  glEnable(GL_DEPTH_TEST);
-
-  /* Vorder- u. Rueckseite der Polygone nur als Randlinien darstellen */
+  // fill polygons (GL_LINE for wireframe models)
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-  if (debug) { printf ("\n initing space"); fflush (stdout); }
   space = new Space ();
   space->drawlight = true;
   clip1 = space->z1;
@@ -9764,8 +9691,6 @@ int main (int argc, char **argv)
 
   dirs = new Dirs (argv [0]);
   
-  if (argc > 1)
-    debug = true;
 //  dirs->getSaves ("filename");
 
   if (!load_config ())
@@ -9878,32 +9803,27 @@ int main (int argc, char **argv)
 
   SDL_ShowCursor (0);
 
-  if (debug) { printf ("\nnew SoundSystem"); fflush (stdout); }
   sound = new SoundSystem ();
-  if (debug) { printf ("\ndone new SoundSystem"); fflush (stdout); }
   sound->volumesound = volumesound;
   sound->volumemusic = volumemusic;
   sound->setVolume ();
   sound->setVolumeMusic ();
 
-  if (debug) { printf ("\nplay Music"); fflush (stdout); }
   sound->playMusic ();
 
-  if (debug) { printf ("\nfirst init for intro"); fflush (stdout); }
   myFirstInit ();
   myReshapeFunc (width, height);
 
-  if (debug) { printf ("\njoysticks"); fflush (stdout); }
   joystick = SDL_NumJoysticks ();
   if (joystick > 0)
   {
     SDL_JoystickEventState (SDL_ENABLE);
     sdljoystick = SDL_JoystickOpen (0);
-    printf ("\nJoystick detected."); fflush (stdout);
+    fprintf (stdout, "\nJoystick detected."); fflush (stdout);
   }
   else
   {
-    printf ("\nNo joystick found."); fflush (stdout);
+    fprintf (stdout, "\nNo joystick found."); fflush (stdout);
     sdljoystick = NULL;
     if (controls == 2)
       controls = CONTROLS_MOUSE;
@@ -9923,4 +9843,3 @@ int main (int argc, char **argv)
 }
 
 #endif
-

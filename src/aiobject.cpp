@@ -1176,7 +1176,7 @@ void AIObj::fireCannon (DynamicObj **laser)
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
-printf ("%d:m=%d\n", party, id); fflush (stdout);
+  if (debug == 1) { printf ("%d:m=%d\n", party, id); fflush (stdout); }
   missile->dinit ();
   missile->aiinit ();
   missile->newinit (id, party, 0);
@@ -1206,7 +1206,7 @@ printf ("%d:m=%d\n", party, id); fflush (stdout);
 
 void AIObj::fireFlare2 (DynamicObj *flare)
 {
-printf ("%d:flare\n", party); fflush (stdout);
+  if (debug == 1) { printf ("%d:flare\n", party); fflush (stdout); }
   flare->dinit ();
   flare->speed = 0;
   flare->realspeed = 0;
@@ -1228,7 +1228,7 @@ printf ("%d:flare\n", party); fflush (stdout);
 
 void AIObj::fireChaff2 (DynamicObj *chaff)
 {
-printf ("%d:chaff\n", party); fflush (stdout);
+  if (debug == 1) { printf ("%d:chaff\n", party); fflush (stdout); }
   chaff->dinit ();
   chaff->speed = 0;
   chaff->realspeed = 0;
@@ -1300,11 +1300,11 @@ void AIObj::decreaseMissile (int id)
   missiles [id] --;
 }
 
-void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
+bool AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
 {
   int i;
-  if (!haveMissile (id)) return;
-  if (ttf > 0) return;
+  if (!haveMissile (id)) return false;
+  if (ttf > 0) return false;
   for (i = 0; i < maxmissile; i ++)
   {
     if (missile [i]->ttl <= 0) break;
@@ -1314,32 +1314,34 @@ void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
     fireMissile2 (id, missile [i], target);
     decreaseMissile (id);
     firemissilettl = 100;
+    return true;
   }
+  return false;
 }
 
-void AIObj::fireMissile (AIObj **missile, AIObj *target)
+bool AIObj::fireMissile (AIObj **missile, AIObj *target)
 {
-  if (ttf > 0) return;
-  fireMissile (missiletype + MISSILE1, missile, (AIObj *) target);
+  if (ttf > 0) return false;
+  return fireMissile (missiletype + MISSILE1, missile, (AIObj *) target);
 }
 
-void AIObj::fireMissile (int id, AIObj **missile)
+bool AIObj::fireMissile (int id, AIObj **missile)
 {
-  if (ttf > 0) return;
-  fireMissile (id, missile, (AIObj *) target);
+  if (ttf > 0) return false;
+  return fireMissile (id, missile, (AIObj *) target);
 }
 
-void AIObj::fireMissile (AIObj **missile)
+bool AIObj::fireMissile (AIObj **missile)
 {
-  if (ttf > 0) return;
-  fireMissile (missiletype + MISSILE1, missile);
+  if (ttf > 0) return false;
+  return fireMissile (missiletype + MISSILE1, missile);
 }
 
-void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
+bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
 {
   int i, i2;
-  if (flares <= 0) return;
-  if (fireflarettl > 0) return;
+  if (flares <= 0) return false;
+  if (fireflarettl > 0) return false;
   for (i = 0; i < maxflare; i ++)
   {
     if (flare [i]->ttl <= 0) break;
@@ -1367,20 +1369,22 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             if (hit)
             {
-              printf ("\n missile to flare");
+              if (debug == 1) printf ("\n missile to flare");
               missile [i2]->target = flare [i];
             }
           }
       }
     }
+    return true;
   }
+  return false;
 }
 
-void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
+bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
 {
   int i, i2;
-  if (chaffs <= 0) return;
-  if (firechaffttl > 0) return;
+  if (chaffs <= 0) return false;
+  if (firechaffttl > 0) return false;
   for (i = 0; i < maxchaff; i ++)
   {
     if (chaff [i]->ttl <= 0) break;
@@ -1408,24 +1412,26 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             if (hit)
             {
-              printf ("\n missile to chaff");
+              if (debug == 1) printf ("\n missile to chaff");
               missile [i2]->target = chaff [i];
             }
           }
       }
     }
+    return true;
   }
+  return false;
 }
 
-void AIObj::fireMissileAir (AIObj **missile, AIObj *target)
+bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
 {
-  if (ttf > 0) return;
+  if (ttf > 0) return false;
   if (haveMissile (MISSILE_AIR3))
-    fireMissile (MISSILE_AIR3, missile, (AIObj *) target);
+    return fireMissile (MISSILE_AIR3, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_AIR2))
-    fireMissile (MISSILE_AIR2, missile, (AIObj *) target);
+    return fireMissile (MISSILE_AIR2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_AIR1))
-    fireMissile (MISSILE_AIR1, missile, (AIObj *) target);
+    return fireMissile (MISSILE_AIR1, missile, (AIObj *) target);
 }
 
 bool AIObj::selectMissileAir (AIObj **missile)
@@ -1437,13 +1443,13 @@ bool AIObj::selectMissileAir (AIObj **missile)
   return sel;
 }
 
-void AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
+bool AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
 {
-  if (ttf > 0) return;
+  if (ttf > 0) return false;
   if (haveMissile (MISSILE_FF2))
-    fireMissile (MISSILE_FF2, missile, (AIObj *) target);
+    return fireMissile (MISSILE_FF2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_FF1))
-    fireMissile (MISSILE_FF1, missile, (AIObj *) target);
+    return fireMissile (MISSILE_FF1, missile, (AIObj *) target);
 }
 
 bool AIObj::selectMissileAirFF (AIObj **missile)
@@ -1454,13 +1460,13 @@ bool AIObj::selectMissileAirFF (AIObj **missile)
   return sel;
 }
 
-void AIObj::fireMissileGround (AIObj **missile)
+bool AIObj::fireMissileGround (AIObj **missile)
 {
-  if (ttf > 0) return;
+  if (ttf > 0) return false;
   if (haveMissile (MISSILE_GROUND2))
-    fireMissile (MISSILE_GROUND2, missile, (AIObj *) target);
+    return fireMissile (MISSILE_GROUND2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_GROUND1))
-    fireMissile (MISSILE_GROUND1, missile, (AIObj *) target);
+    return fireMissile (MISSILE_GROUND1, missile, (AIObj *) target);
 }
 
 bool AIObj::selectMissileGround (AIObj **missile)
@@ -1554,12 +1560,8 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
 {
   int i;
 
-  if (debug)
-  { printf ("a("); fflush (stdout); }
   if (!active && !draw) // not active, not drawn, then exit
   {
-    if (debug)
-    { printf (")"); fflush (stdout); }
     return;
   }
 
@@ -1589,14 +1591,10 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
 
   if (!active) // not active, then exit
   {
-    if (debug)
-    { printf (")"); fflush (stdout); }
     return;
   }
   if (explode || sink) // exploding or sinking, then exit
   {
-    if (debug)
-    { printf (")"); fflush (stdout); }
     return;
   }
 
@@ -1832,8 +1830,6 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
 
   if (!ai || target == NULL) // no AI (player) or no target found, then exit
   {
-    if (debug)
-    { printf (")"); fflush (stdout); }
     return;
   }
 
@@ -2162,8 +2158,6 @@ m [0]->tl->y = target->tl->y;
     if (rectheta > 90 - intelligence / 5) rectheta = 90 - intelligence / 5;
     else if (rectheta < -90 + intelligence / 5) rectheta = -90 + intelligence / 5;
   }
-  if (debug)
-  { printf (")"); fflush (stdout); }
 }
 
 #endif

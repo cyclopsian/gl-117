@@ -49,7 +49,7 @@ extern int dithering;
 // mouse coordinates
 extern int mousex, mousey;
 
-extern bool debug;
+extern int debug;
 extern bool multiplayer, isserver;
 extern int fullscreen;
 extern int day;

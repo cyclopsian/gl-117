@@ -75,6 +75,7 @@ class WaveFile
 #define SOUND_HIT1 6
 #define SOUND_BEEP1 7
 #define SOUND_CHAFF1 8
+#define SOUND_BEEP2 9
 #define MUSIC_DARK1 0
 #define MUSIC_WINNER1 1
 #define MUSIC_STANDBY1 2
@@ -95,7 +96,7 @@ class SoundSystem
   Mix_Music *music1;
 #endif
   WaveFile *waveexplosion1, *waveclick1, *wavecannon1, *wavemissile1;
-  WaveFile *wavethunder1, *waveplane1, *wavehit1, *wavebeep1, *wavechaff1;
+  WaveFile *wavethunder1, *waveplane1, *wavehit1, *wavebeep1, *wavechaff1, *wavebeep2;
   SoundSystem ();
   ~SoundSystem ();
   void play (int sample);
