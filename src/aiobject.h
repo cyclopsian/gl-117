@@ -130,6 +130,9 @@ class DynamicObj : public CSpaceObj
   float elevatoreffect; // number between 1.0 and -0.5, as diving should be less
   float ruddereffect;
   float rolleffect;
+  float recelevatoreffect; // number between 1.0 and -0.5, as diving should be less
+  float recruddereffect;
+  float recrolleffect;
   int party; // usually 0 for enemies, 1 for allieds
   int points, fighterkills, shipkills, tankkills, otherkills; // statistics
   int sink; // ships will not explode but sink

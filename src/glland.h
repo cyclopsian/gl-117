@@ -82,6 +82,8 @@ class GLLandscape : public Landscape
   int fargridstep; // landscape far grid resolution (1=fine ... 4=coarse)
   int gridstep; // landscape raster block grid resolution (1=fine ... 4=coarse)
   float glittering; // water glittering
+  unsigned short hcmin [MAXX/4 + 1] [MAXX/4 + 1]; // height mask on a coarser grid: max{h[x+-2][y+-2]}
+  unsigned short hcmax [MAXX/4 + 1] [MAXX/4 + 1]; // height mask on a coarser grid: max{h[x+-2][y+-2]}
 
   private:
 //  float hh, hh2, zoomz2;
@@ -107,7 +109,9 @@ class GLLandscape : public Landscape
 
   public:
 
-  float getHeight (float x, float z); // height at (int) landscape point
+  float getMinHeight (float x, float z); // min height of 4x4 grid at landscape point
+  float getMaxHeight (float x, float z); // min height of 4x4 grid at landscape point
+  float getHeight (float x, float z); // height at landscape point
 
   float getExactHeight2 (float x, float z); // linear interpolation, coarse grid
   float getExactHeight3 (float x, float z); // linear interpolation, coarse grid

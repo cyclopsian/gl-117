@@ -48,6 +48,7 @@ unsigned int joystick_view_x = 4, joystick_view_y = 5;
 
 unsigned char mouse_firecannon = MOUSE_BUTTON_LEFT, mouse_firemissile = MOUSE_BUTTON_RIGHT;
 unsigned char mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
+unsigned int mouse_sensitivity = 100;
 
 ConfigFile::ConfigFile () {}
 
@@ -392,7 +393,9 @@ void save_configInterface ()
   cf->writeText ("\n# ---------------------------------------------------------------------");
   cf->writeText ("# Mouse section");
   cf->writeText ("# ---------------------------------------------------------------------\n");
-  cf->writeText ("# Buttons: 1=Left, 2=Middle, 3=Right");
+  cf->writeText ("# Sensitivity: 70...200%, 70%=full screen area, 200%=max sensitivity");
+  cf->write (" mouse_sensitivity", (int) mouse_sensitivity);
+  cf->writeText ("\n# Buttons: 1=Left, 2=Middle, 3=Right");
   int mousebutton = 1;
   if (mouse_firecannon == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
   else if (mouse_firecannon == MOUSE_BUTTON_RIGHT) mousebutton = 3;
@@ -513,6 +516,14 @@ int load_configInterface ()
 
   str = cf->getString (ret, "key_decthrust");
   key_thrustdown = getKey (str, 'D');
+
+  str = cf->getString (ret, "mouse_sensitivity");
+  if (str == NULL)
+  { mouse_sensitivity = 100; }
+  else
+  { mouse_sensitivity = atoi (str); }
+  if (mouse_sensitivity < 70) mouse_sensitivity = 70;
+  else if (mouse_sensitivity > 200) mouse_sensitivity = 200;
 
   int mousebutton = 1;
   str = cf->getString (ret, "mouse_firecannon");

@@ -375,7 +375,7 @@ Star::Star (int phi, int gamma, float size)
 
 void Star::draw ()
 {
-  glPointSize (size);
+  glPointSize (LINEWIDTH(size));
 //    gl->enableAntiAliasing ();
   glBegin (GL_POINTS);
   glColor3ub (255, 255, 255);

@@ -125,6 +125,21 @@ void GLLandscape::precalculate ()
     }
   }
 
+  // create coarse height map
+  for (x = 0; x <= MAXX - 4; x += 4)
+    for (z = 0; z <= MAXX - 4; z += 4)
+    {
+      unsigned short max = 0, min = 65535;
+      for (i = 0; i <= 3; i ++)
+        for (i2 = 0; i2 <= 3; i2 ++)
+        {
+          if (hw [x + i] [z + i2] > max) max = hw [x + i] [z + i2];
+          if (hw [x + i] [z + i2] < min) min = hw [x + i] [z + i2];
+        }
+      hcmax [x / 4] [z / 4] = max;
+      hcmin [x / 4] [z / 4] = min;
+    }
+
   // set the colors of the landscape
   float mzoom = zoomz;
   for (x=0; x<=MAXX; x++)
@@ -312,6 +327,7 @@ void GLLandscape::precalculate ()
                    {2,4,2},
                    {1,2,1}};
   for (i = 1; i <= MAXX - 1; i ++)
+  {
     for (i2 = 1; i2 <= MAXX - 1; i2 ++)
     {
       sum = 0;
@@ -321,8 +337,9 @@ void GLLandscape::precalculate ()
           sum += g3_1[i3][i4] * nl[i+i3-1][i2+i4-1];
         }
       sum /= 16;
-      lg[i][i2]=sum;
+      lg[i][i2] = (unsigned short) sum;
     }
+  }
   for (i = 1; i <= MAXX - 1; i ++)
     for (i2 = 1; i2 <= MAXX - 1; i2 ++)
     {
@@ -415,6 +432,22 @@ void GLLandscape::precalculate ()
       { drawrule [i] [i2] = 2; tex1 [i] [i2] = 0xFF; tex2 [i] [i2] = texrocks->textureID; }
     }
 
+}
+
+// Get height over landscape/water, no interpolation (fast)
+float GLLandscape::getMinHeight (float x, float z)
+{
+  int mx = GETCOORD((int)x+MAXX2);
+  int mz = GETCOORD(MAXX2-(int)z);
+  return (ZOOM * ((float)hcmin[mx/4][mz/4]*zoomz - zoomz2));
+}
+
+// Get height over landscape/water, no interpolation (fast)
+float GLLandscape::getMaxHeight (float x, float z)
+{
+  int mx = GETCOORD((int)x+MAXX2);
+  int mz = GETCOORD(MAXX2-(int)z);
+  return (ZOOM * ((float)hcmax[mx/4][mz/4]*zoomz - zoomz2));
 }
 
 // Get height over landscape/water, no interpolation (fast)
@@ -1942,6 +1975,7 @@ void GLLandscape::draw (int phi, int gamma)
   float z2 = ZOOM; // that's wrong if one would change MAXX
 //  float z2 = ZOOM;
   glScalef(z2, ZOOM, z2);
+//  glScalef(1, 1, 1);
 
   gl->extractFrustum ();
     
@@ -2058,10 +2092,10 @@ void GLLandscape::draw (int phi, int gamma)
       for (int i3 = 0; i3 < zy - ay + 1; i3 += 4)
         for (int i4 = 0; i4 < zx - ax + 1; i4 += 4)
         {
-          int by = getCoord (ay + i3);
-          int bx = getCoord (ax + i4);
-          if (hw [bx] [by] < vmin [i] [i2]) vmin [i] [i2] = hw [bx] [by];
-          if (hw [bx] [by] > vmax [i] [i2]) vmax [i] [i2] = hw [bx] [by];
+          int by = getCoord (ay + i3) / 4;
+          int bx = getCoord (ax + i4) / 4;
+          if (hcmin [bx] [by] < vmin [i] [i2]) vmin [i] [i2] = hcmin [bx] [by];
+          if (hcmax [bx] [by] > vmax [i] [i2]) vmax [i] [i2] = hcmax [bx] [by];
         }
     }
 
@@ -2126,7 +2160,7 @@ void GLLandscape::draw (int phi, int gamma)
             dhp = -30000;
           int h11 = vminref + dhp;
           if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
-          if (h11 > h1) h1 = h11;
+          if (h11 < h1) h1 = h11;
         }
       }
 
@@ -2187,7 +2221,7 @@ void GLLandscape::draw (int phi, int gamma)
             dhp = -30000;
           int h11 = vminref + dhp;
           if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
-          if (h11 > h1) h1 = h11;
+          if (h11 < h1) h1 = h11;
         }
       }
 
@@ -2248,7 +2282,7 @@ void GLLandscape::draw (int phi, int gamma)
             dhp = -30000;
           int h11 = vminref + dhp;
           if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
-          if (h11 > h1) h1 = h11;
+          if (h11 < h1) h1 = h11;
         }
       }
 
@@ -2309,7 +2343,7 @@ void GLLandscape::draw (int phi, int gamma)
             dhp = -30000;
           int h11 = vminref + dhp;
           if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
-          if (h11 > h1) h1 = h11;
+          if (h11 < h1) h1 = h11;
         }
       }
 

@@ -59,6 +59,8 @@
 #define Uint16 unsigned short
 #endif
 
+#define LINEWIDTH(x) (float) x * height / 600.0F
+
 // game states
 #define GAME_INIT 0
 #define GAME_PLAY 1

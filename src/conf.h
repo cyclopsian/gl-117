@@ -44,6 +44,7 @@ extern unsigned int joystick_view_x, joystick_view_y;
 
 extern unsigned char mouse_firecannon, mouse_firemissile;
 extern unsigned char mouse_selectmissile;
+extern unsigned int mouse_sensitivity;
 
 // the abstract config file as text file in memory
 class ConfigFile

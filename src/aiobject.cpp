@@ -95,7 +95,7 @@ void DynamicObj::dinit ()
   source = NULL;
   points = 0;
   party = 0;
-  easymodel = true; // easy model
+  easymodel = 1; // easy model
   elevatoreffect = 0;
   ruddereffect = 0;
   rolleffect = 0;
@@ -1212,9 +1212,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
 
   if (difficulty == 0) // easy
   {
-    intelligence = 400 - (400 - intelligence) * 1 / 2;
-    precision = 400 - (400 - precision) * 1 / 2;
-    aggressivity = 400 - (400 - aggressivity) * 1 / 2;
+    intelligence = 400 - (400 - intelligence) * 1 / 3;
+    precision = 400 - (400 - precision) * 1 / 3;
+    aggressivity = 400 - (400 - aggressivity) * 1 / 3;
     if (party != 1 && shield > 10) // not player party
     {
       shield = shield * 8 / 10;
@@ -1223,17 +1223,23 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   else if (difficulty == 1) // normal
   {
-    intelligence = 400 - (400 - intelligence) * 3 / 4;
-    precision = 400 - (400 - precision) * 3 / 4;
-    aggressivity = 400 - (400 - aggressivity) * 3 / 4;
+    intelligence = 400 - (400 - intelligence) * 2 / 3;
+    precision = 400 - (400 - precision) * 2 / 3;
+    aggressivity = 400 - (400 - aggressivity) * 2 / 3;
   }
   else if (difficulty == 2) // hard
   {
+    if (party == 1) // player party
+    {
+/*      intelligence = 400 - (400 - intelligence) * 5 / 6;
+      precision = 400 - (400 - precision) * 5 / 6;
+      aggressivity = 400 - (400 - aggressivity) * 5 / 6;*/
+    }
     if (party != 1) // not player party
     {
-      intelligence = intelligence * 4 / 5;
+/*      intelligence = intelligence * 4 / 5;
       precision = precision * 4 / 5;
-      aggressivity = aggressivity * 4 / 5;
+      aggressivity = aggressivity * 4 / 5;*/
     }
   }
 
@@ -1991,9 +1997,51 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   if (!ai) return;
 
+
+/*  float dgamma = getAngleH (target);
+  float dphi = getAngle (target);
+//  if (dphi < -90) dphi = -90;
+//  else if (dphi > 90) dphi = 90;
+//  if (fabs (dphi) > 20)
+  {
+    float delta = atan (dgamma / dphi) * 180 / PI;
+    if (dphi > 0) delta -= 180;
+    rectheta = -delta - 90;
+    if (rectheta < -180) rectheta += 360;
+    if (rectheta >= 180) rectheta -= 360;
+    recelevatoreffect = 0;
+  }
+  if (fabs (theta - rectheta) > 150 && fabs (dphi) < 50 && fabs (dgamma) < 50)
+  {
+    recrolleffect = 0;
+    recelevatoreffect = -0.5;
+  }
+  if (theta - rectheta > 25) recrolleffect = -1;
+  else if (theta - rectheta < -25) recrolleffect = 1;
+  else
+  {
+    recrolleffect = 0;
+    recelevatoreffect = 1;
+  }
+  easymodel = 2;
+  if (phi >= 360) phi -= 360;
+  if (phi < 0) phi += 360;
+  if (gamma >= 360) gamma -= 360;
+  if (gamma < 0) gamma += 360;
+  thrust = maxthrust * 0.7;
+
+  float pulljoystick = 0.005;
+  float nocorrection = 0.1;
+  if (recrolleffect > rolleffect + nocorrection) rolleffect += pulljoystick * timestep;
+  else if (recrolleffect < rolleffect - nocorrection) rolleffect -= pulljoystick * timestep;
+  if (recelevatoreffect > elevatoreffect + nocorrection) elevatoreffect += pulljoystick * timestep;
+  else if (recelevatoreffect < elevatoreffect - nocorrection) elevatoreffect -= pulljoystick * timestep;
+  return;*/
+
+
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  int lsdist = 10;
+  int lsdist = 5;
 //  if (id == 200) printf ("%1.2f, %1.2F  ", lsdist * forcex, lsdist * forcez);
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
@@ -2015,11 +2063,11 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       else
       {
         // precalculated height
-        float flyx2 = tl->x + forcex * lsdist * 3, flyz2 = tl->z + forcez * lsdist * 3;
-        float flyx3 = tl->x + forcex * lsdist * 8, flyz3 = tl->z + forcez * lsdist * 8;
-        float h1 = l->getHeight (flyx, flyz);
-        float h2 = l->getHeight (flyx2, flyz2);
-        float h3 = l->getHeight (flyx3, flyz3);
+        float flyx2 = tl->x + forcex * lsdist * 4, flyz2 = tl->z + forcez * lsdist * 4;
+        float flyx3 = tl->x + forcex * lsdist * 10, flyz3 = tl->z + forcez * lsdist * 10;
+        float h1 = l->getMaxHeight (flyx, flyz);
+        float h2 = l->getMaxHeight (flyx2, flyz2);
+        float h3 = l->getMaxHeight (flyx3, flyz3);
         h1 = h1 > h2 ? h1 : h2;
         h1 = h1 > h3 ? h1 : h3;
         recheight2 = recheight + h1;
@@ -2312,7 +2360,7 @@ m [0]->tl->y = target->tl->y;
           rectheta = -90;
           manoevertheta = timestep * (10 + myrandom ((400 - intelligence) / 4)); // turn hard left or right
           if (manoeverthrust <= 0)
-            recthrust = maxthrust - myrandom (intelligence) * 0.0003; // fly faster
+            recthrust = maxthrust / (1.0F + (float) intelligence * 0.0015); // fly faster
           if (manoeverheight <= 0)
           { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); } // stay low
         }
@@ -2334,7 +2382,7 @@ m [0]->tl->y = target->tl->y;
           rectheta = 90;
           manoevertheta = timestep * (10 + myrandom ((400 - intelligence) / 4));
           if (manoeverthrust <= 0)
-            recthrust = maxthrust - myrandom (intelligence) * 0.0003;
+            recthrust = maxthrust - (1.0F + (float) intelligence * 0.0015);
           if (manoeverheight <= 0)
           { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); }
         }
@@ -2423,8 +2471,8 @@ m [0]->tl->y = target->tl->y;
   {
     if (disttarget > 5 + aggressivity / 12) // 2.5 seems to be best, but fighters become far too strong
     {
-      if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
-        recthrust = maxthrust / (2 - intelligence * 0.001);
+      if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0)
+        recthrust = maxthrust / (1.0F + (float) intelligence * 0.0025);
       else thrustUp (); // otherwise fly faster
     }
     else if (manoeverthrust <= 0)
@@ -2452,6 +2500,7 @@ m [0]->tl->y = target->tl->y;
       {
         manoeverthrust = 25 * timestep;
         recthrust = maxthrust;
+        if (difficulty == 0) recthrust = maxthrust * 0.8F;
         manoevertheta = 25 * timestep;
         rectheta = 0;
         manoeverheight = 25 * timestep;
@@ -2475,7 +2524,7 @@ m [0]->tl->y = target->tl->y;
 //          if (!(l->lsticker & 7))
           {
             fireMissile (m, (AIObj *) target);
-            firemissilettl += aggressivity / 2 * timestep;
+            firemissilettl += aggressivity * 2 / 3 * timestep;
           }
       }
       else // ground target

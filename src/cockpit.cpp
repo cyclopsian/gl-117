@@ -112,7 +112,7 @@ void Cockpit::drawCounter ()
       glEnd ();
     }
   }
-  glLineWidth (1.0F);
+  glLineWidth (LINEWIDTH(1.0F));
   glColor3ub (255, 0, 0);
   glBegin (GL_LINE_STRIP);
   glVertex3f (xf - xfl, yf2 - yfl, zf);
@@ -284,7 +284,7 @@ void Cockpit::drawHeading ()
   int alpha = 175;
   setColor (&color, alpha);
   glDisable (GL_LIGHTING);
-  glLineWidth (2.0);
+  glLineWidth (LINEWIDTH(2.0F));
   glDisable (GL_DEPTH_TEST);
   float xf;
   float yf = 17.5;
@@ -426,7 +426,7 @@ void Cockpit::drawHeading ()
   float innerx = 5, outerx = 10, widthx = 1;
   int step = 15;
 
-  glLineWidth (1.2F);
+  glLineWidth (LINEWIDTH(1.2F));
 
   glBegin (GL_LINES);
   //float tmp = int(fplayer->gamma+360)%360-180;
@@ -471,7 +471,7 @@ void Cockpit::drawHeading ()
   glEnd ();
   gl->disableAlphaBlending ();
 
-  glLineWidth (2.0F);
+  glLineWidth (LINEWIDTH(2.0F));
 }
 
 void Cockpit::drawTargetedElement ()
@@ -572,7 +572,7 @@ void Cockpit::drawRadar ()
   glEnd ();
   glDisable (GL_ALPHA_TEST);
   glDisable (GL_TEXTURE_2D);
-  glLineWidth (1.0);
+  glLineWidth (LINEWIDTH(1.0F));
   glBegin (GL_LINES);
   glVertex3f (0, yf - yl * 0.9, zf);
   glVertex3f (0, yf + yl * 0.9, zf);
@@ -591,7 +591,7 @@ void Cockpit::drawRadar ()
   glEnd ();*/
   int radarzoom = 1;
   if (fplayer->disttarget < 40) radarzoom = 2;
-  glPointSize (2.5);
+  glPointSize (LINEWIDTH(2.5F));
   glBegin (GL_POINTS);
   glColor4ub (255, 255, 255, 255);
   glVertex3f (0.0, yf, zf);
@@ -632,8 +632,8 @@ void Cockpit::drawRadar ()
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
       {
         glColor4ub (255, 255, 255, 255);
+        glVertex3f (px, py, zf);
       }
-      glVertex3f (px, py, zf);
     }
   }
   glEnd ();

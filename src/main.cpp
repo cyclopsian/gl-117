@@ -25,8 +25,6 @@
 
 /*
 TODO:
-- bug: selected item & enemy drawn out of radar
-- mouse sensitivity (annoying to control on big monitors)
 - southern seashore landscape (additional missions)
 - alpine snow landscape
 - tree colors (fall, spring), draw more tree textures
@@ -1296,6 +1294,14 @@ void game_key (unsigned char key, int x, int y)
     game = GAME_PLAY;
     return;
   }
+/*    if (hikey == 'R')
+    {
+      view_x += 20;
+    }
+    else if (hikey == 'F')
+    {
+      view_y += 20;
+    }*/
 /*  if (key == 'v')
   {
     view += 10.0;
@@ -1627,6 +1633,8 @@ void game_mousemotion (int x, int y)
 //  float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
   float dx = x - mx, dy = my - y;
+  dx *= mouse_sensitivity / 70.0F;
+  dy *= mouse_sensitivity / 70.0F;
   if (controls == CONTROLS_MOUSE_REVERSE)
     dy *= -1;
 /*  int t = (int) fplayer->theta;
@@ -2677,7 +2685,7 @@ model = &model_missile7; */
   strcpy (buf, "SPEED: ");
   if (fplayer->maxthrust < 0.20) strcat (buf, "VERY SLOW");
   else if (fplayer->maxthrust < 0.25) strcat (buf, "SLOW");
-  else if (fplayer->maxthrust < 0.3) strcat (buf, "INTERMEDITATE");
+  else if (fplayer->maxthrust < 0.3) strcat (buf, "MEDIUM");
   else if (fplayer->maxthrust < 0.33) strcat (buf, "FAST");
   else strcat (buf, "EXTREMELY FAST");
   font1->drawText (-10, yf, -2.5, buf);
@@ -2685,7 +2693,7 @@ model = &model_missile7; */
   strcpy (buf, "MANOEVERABILITY: ");
   if (fplayer->manoeverability <= 0.25) strcat (buf, "VERY BAD");
   else if (fplayer->manoeverability <= 0.33) strcat (buf, "BAD");
-  else if (fplayer->manoeverability <= 0.42) strcat (buf, "INTERMEDITATE");
+  else if (fplayer->manoeverability <= 0.42) strcat (buf, "MEDIUM");
   else if (fplayer->manoeverability <= 0.5) strcat (buf, "HIGH");
   else strcat (buf, "EXTREMELY HIGH");
   font1->drawText (-10, yf, -2.5, buf);
@@ -2693,7 +2701,7 @@ model = &model_missile7; */
   strcpy (buf, "SHIELD: ");
   if (fplayer->maxshield <= 70) strcat (buf, "VERY LOW");
   else if (fplayer->maxshield <= 100) strcat (buf, "LOW");
-  else if (fplayer->maxshield <= 130) strcat (buf, "INTERMEDITATE");
+  else if (fplayer->maxshield <= 130) strcat (buf, "MEDIUM");
   else if (fplayer->maxshield <= 160) strcat (buf, "STRONG");
   else strcat (buf, "EXTREMELY STRONG");
   font1->drawText (-10, yf, -2.5, buf);
@@ -4191,7 +4199,7 @@ void game_display ()
   {
     if (!day)
     {
-      glPointSize (1.0);
+      glPointSize (LINEWIDTH(1.0F));
       int stars = maxstar;
       if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
       for (i = 0; i < stars; i ++)
@@ -4460,8 +4468,12 @@ void game_display ()
   {
     if (quality > 0)
       glEnable (GL_LINE_SMOOTH);
+    glPushMatrix ();
+    glRotatef (view_y, 1, 0, 0);
+    glRotatef (-view_x, 0, 1, 0);
     cockpit->drawCross ();
     cockpit->drawHeading ();
+    glPopMatrix ();
     if (quality > 0)
       glDisable (GL_LINE_SMOOTH);
     cockpit->drawRadar ();
@@ -4529,12 +4541,13 @@ void game_display ()
 #else
     akttime = glutGet (GLUT_ELAPSED_TIME);
 #endif
-    if (akttime - starttime < 15000)
-    {
-      font1->drawTextCentered (0, -8, -2, "PLEASE WAIT WHILE", &colorred);
-      font1->drawTextCentered (0, -9, -2, "ADJUSTING QUALITY", &colorred);
-      write = true;
-    }
+    if (akttime - starttime < 20000)
+      if ((akttime - starttime) / 300 % 3)
+      {
+        font1->drawTextCentered (0, 0, -1.8, "PLEASE WAIT WHILE", &colorred);
+        font1->drawTextCentered (0, -1, -1.8, "ADJUSTING QUALITY", &colorred);
+        write = true;
+      }
   }
   if (fps <= 20 && !write)
   {
@@ -4921,19 +4934,19 @@ void menu_timer (Uint32 dt)
   akttime = glutGet (GLUT_ELAPSED_TIME);
 #endif
   if (firststart)
-    if (akttime - starttime < 15000)
+    if (akttime - starttime < 20000)
     {
       if (lastfps != fps)
       {
         lastfps = fps;
         if (fps > 40)
         {
-          if (view < quality * 10 + 60) view += 10;
+          if (view < quality * 10 + 60 && view < 100) view += 10;
           else if (quality < 5) { quality ++; view = quality * 10 + 30; }
         }
         else if (fps < 30)
         {
-          if (view > quality * 10 + 30) view -= 10;
+          if (view > quality * 10 + 30 && view > 20) view -= 10;
           else if (quality > 0) { quality --; view = quality * 10 + 60; }
         }
         menu_reshape ();
@@ -5591,25 +5604,28 @@ void proceedFire ()
       // col in [0...512]
       int yind = i;
 	  int h = heat [yind] [i2];
-	  int b = h * 8;
-	  if (h > 30) b = (60 - h) * 8;
+	  int b = h * 5;
+	  if (h > 30) b = (60 - h) * 5;
 	  if (h >= 60) b = 0;
 	  h -= 50;
-      int r = h * 2; // blend out late for red->black
-      if (r > 255) r = 255;
+    int r = h * 2; // blend out late for red->black
+    if (r > 255) r = 255;
 	  else if (r < 0) r = 0;
 	  h -= 127;
-      int g = h * 2; // blend out for yellow->red
-      if (g > 255) g = 255;
-      else if (g < 0) g = 0;
+    int g = h * 2; // blend out for yellow->red
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
 	  h -= 127;
+    if (h > 0)
+    {
       b = h - 256; // blend out early to get white->yellow
       if (b > 255) b = 255;
+    }
 /*      else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
       else if (b < -412) b = (-412 - b) * 3;*/
-      else if (b < 0) b = 0;
-      int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
-      glColor4ub (r, g, b, a);
+    else if (b < 0) b = 0;
+    int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
+    glColor4ub (r, g, b, a);
 	  firetex [(i * maxfx + i2) * 4] = r;
 	  firetex [(i * maxfx + i2) * 4 + 1] = g;
 	  firetex [(i * maxfx + i2) * 4 + 2] = b;
@@ -5643,6 +5659,7 @@ void init_timer (Uint32 dt)
   tl.y = (tl.z + 3) * (tl.z + 3) * 0.02 - 0.8; //0.9 * tl.x;
   tl.z += 0.14;
 
+  tl2.y = 0.3F;
   if (initexplode1 == -1 && tl2.z < 3)
   {
     tl2.z += 0.25;
