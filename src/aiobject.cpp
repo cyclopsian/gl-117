@@ -1359,11 +1359,11 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             bool hit = false;
             if (easymodel)
             {
-              if (myrandom (theta + 20) > 50) hit = true;
+              if (myrandom ((int) (theta + 20)) > 50) hit = true;
             }
             else
             {
-              if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
+              if (myrandom ((int) (fabs (aileroneffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
@@ -1400,11 +1400,11 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             bool hit = false;
             if (easymodel)
             {
-              if (myrandom (theta + 20) > 50) hit = true;
+              if (myrandom ((int) (theta + 20)) > 50) hit = true;
             }
             else
             {
-              if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
+              if (myrandom ((int) (fabs (aileroneffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
@@ -1609,7 +1609,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
   float flyx = tl->x + forcex * 6, flyz = tl->z + forcez * 6;
-  int flyxs = l->getX (flyx), flyzs = l->getX (flyz);
+  int flyxs = l->getX ((int) flyx), flyzs = l->getX ((int) flyz);
   if (ttl != 0)
   {
     if (manoeverheight)
@@ -1790,7 +1790,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
       }
       else if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
       {
-        if (disttarget < 40)
+        if (disttarget < 50)
         {
           if (ttf > 0)
           {
@@ -2015,11 +2015,11 @@ m [0]->tl->y = target->tl->y;
       rectheta = -maxtheta;
     }
     if (id == TANK_AIR1)
-      if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 30 && target->tl->y > tl->y + 2)
+      if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->tl->y > tl->y + 2)
         if (myrandom (intelligence) < 80)
           fireCannon (c);
     if (id == TANK_GROUND1)
-      if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 30 && target->tl->y <= tl->y + 1 && target->tl->y >= tl->y - 1)
+      if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 35 && target->tl->y <= tl->y + 1 && target->tl->y >= tl->y - 1)
         if (myrandom (intelligence) < 100)
           fireCannon (c);
   }
@@ -2064,7 +2064,7 @@ m [0]->tl->y = target->tl->y;
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
-        if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 40/* && target->theta < 20*/)
+        if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 45/* && target->theta < 20*/)
           if (myrandom (intelligence) < difficulty * 10 + 4)
             fireMissile (m, (AIObj *) target);
       }
@@ -2120,14 +2120,14 @@ m [0]->tl->y = target->tl->y;
       else if (difficulty == 1) firerate = 3;
       else firerate = 1;
       if (id == FLAK_AIR1 || id == SHIP_DESTROYER1)
-        if (fabs (aw) < 35 && disttarget < 40) // + aggressive
+        if (fabs (aw) < 35 && disttarget < 45) // + aggressive
           if (f [i]->tl->y > tl->y + 2)
 //              if (myrandom (intelligence) < 120)
             if (!(l->lsticker & firerate))
               fireCannon (c);
       if (id == FLARAK_AIR1)
         if (!(l->lsticker & 31))
-          if (fabs (aw) < 25 && disttarget < 40) // + aggressive
+          if (fabs (aw) < 25 && disttarget < 45) // + aggressive
             if (f [i]->tl->y > tl->y + 2)
               if (myrandom (intelligence) < 80)
               {
@@ -2137,7 +2137,7 @@ m [0]->tl->y = target->tl->y;
       if (id == SHIP_CRUISER)
       {
         if (!(l->lsticker & 15))
-          if (fabs (aw) >= -30 && fabs (aw) < 30 && disttarget < 40) // + aggressive
+          if (fabs (aw) >= -30 && fabs (aw) < 30 && disttarget < 45) // + aggressive
             if (myrandom (intelligence) < 100)
             {
               ttf = 0;
@@ -2147,13 +2147,13 @@ m [0]->tl->y = target->tl->y;
 //          if (myrandom (intelligence) < 120)
         if (!(l->lsticker & firerate))
         {
-          if (fabs (aw) >= 0 && fabs (aw) < 40 && disttarget < 40) // + aggressive
+          if (fabs (aw) >= 0 && fabs (aw) < 40 && disttarget < 45) // + aggressive
             fireCannon (c, aw);
-          if (fabs (aw) >= -40 && fabs (aw) < 0 && disttarget < 40) // + aggressive
+          if (fabs (aw) >= -40 && fabs (aw) < 0 && disttarget < 45) // + aggressive
             fireCannon (c, aw + 360);
-          if (fabs (aw) >= 120 && fabs (aw) < 160 && disttarget < 40) // + aggressive
+          if (fabs (aw) >= 120 && fabs (aw) < 160 && disttarget < 45) // + aggressive
             fireCannon (c, aw);
-          if (fabs (aw) >= -160 && fabs (aw) < -120 && disttarget < 40) // + aggressive
+          if (fabs (aw) >= -160 && fabs (aw) < -120 && disttarget < 45) // + aggressive
             fireCannon (c, aw + 360);
         }
       }
