@@ -94,6 +94,7 @@
 #define XDEEPWATER 44
 #define MOONSAND 50
 #define DESERTSAND 60
+#define TOWN 90
 #define TRYLAKE 100
 
 class Landscape
@@ -115,10 +116,8 @@ class Landscape
   int maxx; // same as MAXX, 512 is ideal
   int hoehe, maxn, n; // surface extents
 
-  protected:
-  int highestpoint, lowestpoint;
-
   public:
+  int highestpoint, lowestpoint;
   int getCoord (int a); // modulo MAXX
   void convolveGauss (int radius, int hmin, int hmax); // fast convolution function (isotropic)
   void gauss (int x, int y); // convolution for only one raster point

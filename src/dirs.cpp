@@ -89,6 +89,7 @@ Dirs::Dirs (char *arg)
   strcpy (sound, path);
   strcpy (models, path);
   strcpy (saves, path);
+  strcpy (maps, path);
   append (saves, "saves");
 #else
   char buf [STDSIZE];
@@ -198,6 +199,7 @@ Dirs::Dirs (char *arg)
     strcpy (music, env);
     strcpy (sound, env);
     strcpy (models, env);
+    strcpy (maps, env);
   }
   else
   {
@@ -207,12 +209,14 @@ Dirs::Dirs (char *arg)
     strcpy (music, myfile);
     strcpy (sound, myfile);
     strcpy (models, myfile);
+    strcpy (maps, myfile);
   }
 #endif
   append (textures, "textures");
   append (music, "music");
   append (sound, "sounds");
   append (models, "models");
+  append (maps, "maps");
 }
 
 Dirs::~Dirs () {}
@@ -248,6 +252,13 @@ char *Dirs::getSounds (char *name)
 char *Dirs::getModels (char *name)
 {
   strcpy (dir, models);
+  strcat (dir, name);
+  return dir;
+}
+
+char *Dirs::getMaps (char *name)
+{
+  strcpy (dir, maps);
   strcat (dir, name);
   return dir;
 }

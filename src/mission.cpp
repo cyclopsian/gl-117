@@ -24,6 +24,7 @@
 #ifndef IS_MISSION_H
 
 #include "mission.h"
+#include "main.h"
 
 void Mission::autoLFBriefing ()
 {
@@ -284,10 +285,11 @@ void MissionDemo1::start ()
   if (l != NULL) delete l;
   l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
   fplayer = fighter [0];
-  fplayer->tl->x = 220;
-  fplayer->tl->z = -30;
-  fplayer->target = fighter [2];
-  fplayer->newinit (FIGHTER_FALCON, 1, 0);
+  fighter [0]->tl->x = 220;
+  fighter [0]->tl->z = -30;
+  fighter [0]->o = &model_fig;
+  fighter [0]->target = fighter [2];
+  fighter [0]->newinit (FIGHTER_FALCON, 1, 0);
   fighter [1]->target = fighter [3];
   fighter [1]->o = &model_fig;
   fighter [1]->tl->x = 49;
@@ -712,7 +714,6 @@ int MissionTutorial3::processtimer (Uint32 dt)
 
 void MissionTutorial3::draw ()
 {
-  char buf [250], buf2 [10];
   int timeroff = 100 * timestep, timerdelay = 350 * timestep, timerlag = 120 * timestep;
   if (timer >= 0 && timer <= timeroff - 20)
   {

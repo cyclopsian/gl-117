@@ -497,7 +497,11 @@ CMaterial::CMaterial ()
   uoffset = 0;
   voffset = 0;
   wrot = 0;
+  char tmp [255] = {0};
+  strcpy (filename, tmp);
+  strcpy (name, tmp);
 }
+
 
 
 CObject::CObject ()

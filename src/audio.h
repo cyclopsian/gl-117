@@ -49,13 +49,12 @@ class WaveFile
   WaveFile (char *filename);
   ~WaveFile ();
   void load (char *filename);
-  void play ();
-  void playLoop ();
+  void play (int channel, bool loop);
   void stop ();
   void setVolume (int level);
 };
 
-#define SOUND_EXPLOSION1 0
+#define SOUND_EXPLOSION1 1000
 #define SOUND_CLICK1 1
 #define SOUND_CANNON1 2
 #define SOUND_MISSILE1 3
@@ -81,16 +80,18 @@ class SoundSystem
   bool sound, music;
   bool musicplaying;
   int volumesound, volumemusic;
+  int engine;
 #ifdef HAVE_SDL_MIXER
   int playtime;
   Mix_Music *music1;
 #endif
   WaveFile *waveexplosion1, *waveclick1, *wavecannon1, *wavemissile1;
-  WaveFile *wavethunder1, *waveplane1, *wavehit1, *wavebeep1, *wavechaff1, *wavebeep2;
+  WaveFile *wavethunder1, *waveplane [10], *wavehit1, *wavebeep1, *wavechaff1, *wavebeep2;
   SoundSystem ();
   ~SoundSystem ();
-  void play (int sample);
+  void play (int sample, bool loop);
   void playLoop (int sample);
+  void setPosition (int sample, int angle, int dist);
   void stop (int sample);
   void stopAll ();
   void playMusic ();

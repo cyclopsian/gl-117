@@ -76,6 +76,26 @@ void fillonce (void *unused, Uint8 *stream, int len)
 #endif
 #endif
 
+void freqEffect (int channel, void *stream, int len, void *udata)
+{
+  /* 16 bits * 2 channels. */
+  Uint32 *ptr = (Uint32 *) stream;
+  int i;
+
+  for (i = 0; i < len / 4 *7/8; i ++)
+  {
+    ptr [i] = ptr [i*8/7];
+  }
+  for (i = len/4*7/8; i < len/4; i ++)
+  {
+    ptr [i] = 0;
+  }
+/*  for (i = 0; i < len; i += sizeof (Uint32), ptr ++)
+  {
+    *ptr = (((*ptr) & 0xFFFF0000) >> 16) | (((*ptr) & 0x0000FFFF) << 16);
+  }*/
+}
+
 WaveFile::WaveFile ()
 {
 #ifndef USE_GLUT
@@ -94,6 +114,7 @@ WaveFile::WaveFile (char *filename)
   soundpos = 0;
 #else
   channel = -1;
+//  Mix_RegisterEffect (MIX_CHANNEL_POST, freqEffect, NULL, NULL);
 #endif
   volume = 100;
   load (filename);
@@ -123,11 +144,18 @@ void WaveFile::load (char *filename)
     display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
+/*  Uint32 *ptr = (Uint32 *) chunk->abuf;
+  int i;
+  for (i = 0; i < chunk->alen/8; i ++)
+    ptr [i] = ptr [i*2];
+  for (i = chunk->alen/4 * 9/10; i < chunk->alen/4; i ++)
+    buf2 [i] = 0;
+  chunk->alen = chunk->alen * 9/10; */
 #endif
 #endif
 }
 
-void WaveFile::play ()
+void WaveFile::play (int chan, bool loop)
 {
 #ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
@@ -139,17 +167,8 @@ void WaveFile::play ()
   wave = this;
   SDL_PauseAudio (0);
 #else
-  channel = Mix_PlayChannel (-1, chunk, 0);
-#endif
-#endif
-}
-
-void WaveFile::playLoop ()
-{
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
-#else
-  channel = Mix_PlayChannel (-1, chunk, -1);
+  if (!loop) channel = Mix_PlayChannel (chan, chunk, 0);
+  else channel = Mix_PlayChannel (chan, chunk, -1);
 #endif
 #endif
 }
@@ -292,12 +311,18 @@ SoundSystem::SoundSystem ()
   }
   playtime = 0;
 #endif
+  int i;
   waveexplosion1 = new WaveFile (dirs->getSounds ("explode1.wav"));
   waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
   wavecannon1 = new WaveFile (dirs->getSounds ("cannon1.wav"));
   wavemissile1 = new WaveFile (dirs->getSounds ("missile1.wav"));
   wavethunder1 = new WaveFile (dirs->getSounds ("thunder1.wav"));
-  waveplane1 = new WaveFile (dirs->getSounds ("plane1.wav"));
+  for (i = 0; i < 1; i ++)
+  {
+    sprintf (buf, "plane%d.wav", i + 1);
+    waveplane [i] = new WaveFile (dirs->getSounds (buf));
+  }
+  engine = 0;
   wavehit1 = new WaveFile (dirs->getSounds ("hit1.wav"));
   wavebeep1 = new WaveFile (dirs->getSounds ("beep1.wav"));
   wavechaff1 = new WaveFile (dirs->getSounds ("chaff1.wav"));
@@ -310,6 +335,7 @@ SoundSystem::SoundSystem ()
 
 SoundSystem::~SoundSystem ()
 {
+  int i;
   if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   if (music1)
@@ -325,48 +351,49 @@ SoundSystem::~SoundSystem ()
   delete wavecannon1;
   delete wavemissile1;
   delete wavethunder1;
-  delete waveplane1;
+  for (i = 0; i < 1; i ++)
+    delete waveplane [i];
   delete wavehit1;
   delete wavebeep1;
   delete wavechaff1;
   delete wavebeep2;
 }
 
-void SoundSystem::play (int sample)
+void SoundSystem::play (int sample, bool loop)
 {
   if (!audio) return;
   if (!sound) return;
   switch (sample)
   {
     case SOUND_CLICK1:
-      waveclick1->play ();
+      waveclick1->play (0, loop);
       break;
     case SOUND_CANNON1:
-      wavecannon1->play ();
+      wavecannon1->play (0, loop);
       break;
     case SOUND_MISSILE1:
-      wavemissile1->play ();
+      wavemissile1->play (1, loop);
       break;
     case SOUND_EXPLOSION1:
-      waveexplosion1->play ();
+      waveexplosion1->play (2, loop);
       break;
     case SOUND_THUNDER1:
-      wavethunder1->play ();
+      wavethunder1->play (3, loop);
       break;
     case SOUND_PLANE1:
-      waveplane1->play ();
+      waveplane [0]->play (4, loop); // should be [engine] instead of [0], first find better sounds
       break;
     case SOUND_HIT1:
-      wavehit1->play ();
+      wavehit1->play (5, loop);
       break;
     case SOUND_BEEP1:
-      wavebeep1->play ();
+      wavebeep1->play (6, loop);
       break;
     case SOUND_CHAFF1:
-      wavechaff1->play ();
+      wavechaff1->play (7, loop);
       break;
     case SOUND_BEEP2:
-      wavebeep2->play ();
+      wavebeep2->play (6, loop);
       break;
   }
 }
@@ -375,39 +402,7 @@ void SoundSystem::playLoop (int sample)
 {
   if (!audio) return;
   if (!sound) return;
-  switch (sample)
-  {
-    case SOUND_CLICK1:
-      waveclick1->playLoop ();
-      break;
-    case SOUND_CANNON1:
-      wavecannon1->playLoop ();
-      break;
-    case SOUND_MISSILE1:
-      wavemissile1->playLoop ();
-      break;
-    case SOUND_EXPLOSION1:
-      waveexplosion1->playLoop ();
-      break;
-    case SOUND_THUNDER1:
-      wavethunder1->playLoop ();
-      break;
-    case SOUND_PLANE1:
-      waveplane1->playLoop ();
-      break;
-    case SOUND_HIT1:
-      wavehit1->playLoop ();
-      break;
-    case SOUND_BEEP1:
-      wavebeep1->playLoop ();
-      break;
-    case SOUND_CHAFF1:
-      wavechaff1->playLoop ();
-      break;
-    case SOUND_BEEP2:
-      wavebeep2->playLoop ();
-      break;
-  }
+  play (sample, true);
 }
 
 void SoundSystem::playMusic ()
@@ -530,7 +525,7 @@ void SoundSystem::setVolume (int sample, int level)
       wavethunder1->setVolume (level);
       break;
     case SOUND_PLANE1:
-      waveplane1->setVolume (level);
+      waveplane [0]->setVolume (level); // should be [engine] instead of [0], first find better sounds
       break;
     case SOUND_HIT1:
       wavehit1->setVolume (level);
@@ -550,13 +545,15 @@ void SoundSystem::setVolume (int sample, int level)
 void SoundSystem::setVolume ()
 {
   if (!audio) return;
+  int i;
   int level = 128 * volumesound / 100;
   waveclick1->setVolume (level * 80 / 128);
   wavecannon1->setVolume (level * 50 / 128);
   wavemissile1->setVolume (level * 110 / 128);
   waveexplosion1->setVolume (level);
   wavethunder1->setVolume (level);
-  waveplane1->setVolume (level);
+  for (i = 0; i < 1; i ++)
+    waveplane [i]->setVolume (level);
   wavehit1->setVolume (level);
   wavebeep1->setVolume (level);
   wavechaff1->setVolume (level);
@@ -570,6 +567,19 @@ void SoundSystem::setVolumeMusic ()
   int level = 128 * volumemusic / 100;
   Mix_VolumeMusic (level);
 #endif
+}
+
+void SoundSystem::setPosition (int sample, int angle, int dist)
+{
+  if (!audio) return;
+  switch (sample)
+  {
+    case SOUND_EXPLOSION1:
+#ifdef HAVE_SDL_MIXER
+      Mix_SetPosition (2, angle, dist);
+#endif
+      break;
+  }
 }
 
 void SoundSystem::stop (int sample)
@@ -593,7 +603,7 @@ void SoundSystem::stop (int sample)
       wavethunder1->stop ();
       break;
     case SOUND_PLANE1:
-      waveplane1->stop ();
+      waveplane [0]->stop (); // should be [engine] instead of [0], first find better sounds
       break;
     case SOUND_HIT1:
       wavehit1->stop ();

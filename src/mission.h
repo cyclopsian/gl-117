@@ -26,8 +26,9 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#include "main.h"
+#include "common.h"
+#include "model.h"
+#include "aiobject.h"
 
 #define MISSION_DEMO 0
 #define MISSION_CAMPAIGN1 1
@@ -66,6 +67,8 @@
 #define MISSION_DEATHMATCH2 86
 #define MISSION_TEAMBASE1 87
 #define MISSION_WAVES1 88
+#define MISSION_CUSTOM1 800
+#define MISSION_CUSTOM2 999
 #define MISSION_MULTIPLAYER 1000
 #define MISSION_MULTIPLAYER_DOGFIGHT 1000
 
@@ -78,8 +81,8 @@ class Mission
   int timer; // mission timer
   int maxtime; // maximum time to get a time bonus
   int alliedfighters; // number of allied fighters
-  char briefing [1000]; // briefing text
-  char name [64]; // mission title
+  char briefing [1024]; // briefing text
+  char name [1024]; // mission title
   int id; // mission id
   int selfighter [3]; // fighter to choose
   int selfighters, wantfighter; // selected fighter

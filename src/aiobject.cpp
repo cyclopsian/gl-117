@@ -886,6 +886,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   dualshot = false;
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams
+  o = getModel (id);
   o->cubex = zoom; o->cubey = zoom; o->cubez = zoom;
   
   if (id == FIGHTER_FALCON)
@@ -1951,8 +1952,9 @@ void AIObj::targetNearestGroundEnemy (AIObj **f)
       }
     }
   }
-  if (distance (target) > 300)
-  { target = NULL; }
+  if (target)
+    if (distance (target) > 400)
+    { target = NULL; }
 }
 
 void AIObj::targetNearestEnemy (AIObj **f)
@@ -1974,7 +1976,7 @@ void AIObj::targetNearestEnemy (AIObj **f)
     }
   }
   if (!ai && target)
-    if (distance (target) > 300)
+    if (distance (target) > 400)
       target = NULL;
 }
 
@@ -2013,7 +2015,7 @@ void AIObj::targetNext (AIObj **f)
     if (f [i] == this)
     { i ++; z ++; }
     if (i >= maxfighter) i = 0;
-  } while ((!f [i]->active || distance (f [i]) > 300) && z <= 1);
+  } while ((!f [i]->active || distance (f [i]) > 400) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
@@ -2035,7 +2037,7 @@ void AIObj::targetNextEnemy (AIObj **f)
     if (f [i] == this)
     { i ++; z ++; }
     if (i >= maxfighter) i = 0;
-  } while ((!f [i]->active || distance (f [i]) > 300 || party == f [i]->party) && z <= 1);
+  } while ((!f [i]->active || distance (f [i]) > 400 || party == f [i]->party) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
@@ -2056,7 +2058,7 @@ void AIObj::targetPrevious (AIObj **f)
     if (f [i] == this)
     { i --; z ++; }
     if (i < 0) i = maxfighter - 1;
-  } while ((!f [i]->active || distance (f [i]) > 300) && z <= 1);
+  } while ((!f [i]->active || distance (f [i]) > 400) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
@@ -2729,14 +2731,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           manoeverstate = 1;
           display ("Manoever: Immelmann", LOG_ALL);
         }
-        else if (aw > 160.0F + 0.03 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
+        else if (aw > 160.0F + 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
           manoeverstate = 1;
           display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw > 160 && disttarget < 25) // target is at the back
         {
-          if (fabs (tl->y - myheight) > 7 && gamma >= 175) // high enough over ground
+          if (fabs (tl->y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
             display ("Manoever: Roll", LOG_ALL);
@@ -2744,12 +2746,18 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           else
           {
             rectheta = -90;
-            manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8)); // turn hard left or right
+            if (manoevertheta <= 0)
+            {
+              manoevertheta = timestep * (100 + myrandom ((400 - intelligence) / 8)); // turn hard left or right
+              display ("Manoever: Turn", LOG_ALL);
+            }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
-            if (manoeverheight <= 0)
-            { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); } // stay low
-            display ("Manoever: Turn", LOG_ALL);
+            if (intelligence < 280 && manoeverheight <= 0)
+            {
+              recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
+              display ("Manoever: Height change", LOG_ALL);
+            } // stay low
           }
         }
         else if (aw < 40 && disttarget > 60)
@@ -2781,14 +2789,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           manoeverstate = 1;
           display ("Manoever: Immelmann", LOG_ALL);
         }
-        else if (aw < -160.0F - 0.03 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
+        else if (aw < -160.0F - 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
           manoeverstate = 1;
           display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw < -160 && disttarget < 25)
         {
-          if (fabs (tl->y - myheight) > 7 && gamma >= 175) // high enough over ground
+          if (fabs (tl->y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
             display ("Manoever: Roll", LOG_ALL);
@@ -2796,12 +2804,18 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           else
           {
             rectheta = 90;
-            manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8));
+            if (manoevertheta <= 0)
+            {
+              manoevertheta = timestep * (100 + myrandom ((400 - intelligence) / 8));
+              display ("Manoever: Turn", LOG_ALL);
+            }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
-            if (manoeverheight <= 0)
-            { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); }
-            display ("Manoever: Turn", LOG_ALL);
+            if (intelligence < 280 && manoeverheight <= 0)
+            {
+              recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
+              display ("Manoever: Height change", LOG_ALL);
+            }
           }
         }
         else if (aw > -40 && disttarget > 60)

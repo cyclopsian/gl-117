@@ -81,7 +81,7 @@ void Cockpit::drawCounter ()
     if (flarewarning <= 0)
     {
       flarewarning = 10 * timestep;
-      sound->play (SOUND_BEEP2);
+      sound->play (SOUND_BEEP2, false);
     }
     flarewarning -= dt;
     if (flarewarning <= 6 * timestep)
@@ -100,7 +100,7 @@ void Cockpit::drawCounter ()
     if (chaffwarning <= 0)
     {
       chaffwarning = 10 * timestep;
-      sound->play (SOUND_BEEP1);
+      sound->play (SOUND_BEEP1, false);
     }
     chaffwarning -= dt;
     if (chaffwarning <= 6 * timestep)

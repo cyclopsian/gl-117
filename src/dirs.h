@@ -45,6 +45,7 @@ class Dirs
   char music [4096];
   char sound [4096];
   char models [4096];
+  char maps [4096];
 
   void append (char *target, char *str); // append subdir/file to path using (back-)slashes
   Dirs (char *arg);
@@ -54,6 +55,7 @@ class Dirs
   char *getSounds (char *name);
   char *getMusic (char *name);
   char *getModels (char *name);
+  char *getMaps (char *name);
 };
 
 extern Dirs *dirs; // paths to directories with game data or saves

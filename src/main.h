@@ -57,6 +57,7 @@
 #include "mission.h"
 #include "cockpit.h"
 #include "menu.h"
+#include "maploader.h"
 
 extern Font *font1, *font2;
 
@@ -121,6 +122,7 @@ extern CModel model_base1;
 extern CModel model_barrier1;
 extern CModel model_rubble1;
 extern CModel model_depot1;
+extern CModel model_house1;
 
 extern DynamicObj *flare [maxflare];
 extern DynamicObj *chaff [maxchaff];
@@ -139,6 +141,9 @@ extern SoundSystem *sound;
 
 // get name of a keyboard's key (ENTER, SPACE)
 extern char *getKeyString (int key, char *str);
+
+// own export: main.h may be included in the cpp files
+extern CModel *getModel (int id);
 
 #endif
 

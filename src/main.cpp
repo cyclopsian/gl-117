@@ -75,7 +75,7 @@ SDL_Thread *threadnet = NULL;
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_MOST;
+int debuglevel = LOG_ALL;
 int showcollision = 0;
 int brightness = 0;
 
@@ -96,6 +96,8 @@ float getView ()
 int clouds = 0;
 
 CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
+
+MapLoader *maploader;
 
 
 
@@ -302,6 +304,7 @@ CModel model_base1;
 CModel model_barrier1;
 CModel model_rubble1;
 CModel model_depot1;
+CModel model_house1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -572,6 +575,10 @@ int getTrainingIdFromValue (int n)
   else if (n == z ++) return MISSION_DEATHMATCH2;
   else if (n == z ++) return MISSION_TEAMBASE1;
   else if (n == z ++) return MISSION_WAVES1;
+  else
+  {
+    return MISSION_CUSTOM1 + n - 9;
+  }
   return 0;
 }
 
@@ -642,10 +649,15 @@ void setPlaneVolume ()
   if (game == GAME_PLAY)
   {
     int lev = (int) ((float) 128 * fplayer->thrust / fplayer->maxthrust) - 32;
+    sound->stop (SOUND_PLANE1);
+    sound->engine = (int) (fplayer->thrust / fplayer->maxthrust * 20) - 10;
     sound->setVolume (SOUND_PLANE1, lev);
+    sound->playLoop (SOUND_PLANE1);
   }
   else
+  {
     sound->setVolume (SOUND_PLANE1, 0);
+  }
 }
 
 void setLightSource (int gamma)
@@ -678,18 +690,36 @@ CModel *getModel (int id)
   else if (id == MISSILE_DF1) return &model_missile6;
   else if (id == MISSILE_FF1) return &model_missile7;
   else if (id == MISSILE_FF2) return &model_missile8;
+  else if (id == TANK_AIR1) return &model_tank1;
+  else if (id == TANK_GROUND1) return &model_tank2;
+  else if (id == TANK_TRSAM1) return &model_trsam;
+  else if (id == TANK_PICKUP1) return &model_pickup1;
+  else if (id == TANK_TRUCK1) return &model_truck1;
+  else if (id == TANK_TRUCK2) return &model_truck2;
+  else if (id == SHIP_CRUISER) return &model_ship1;
+  else if (id == SHIP_DESTROYER1) return &model_ship2;
+  else if (id == FLAK_AIR1) return &model_flak1;
+  else if (id == FLARAK_AIR1) return &model_flarak1;
+  else if (id == STATIC_TENT1) return &model_tent1;
+  else if (id == STATIC_TENT4) return &model_tent4;
+  else if (id == STATIC_CONTAINER1) return &model_container1;
+  else if (id == STATIC_HALL1) return &model_hall1;
+  else if (id == STATIC_HALL2) return &model_hall2;
+  else if (id == STATIC_OILRIG1) return &model_oilrig;
+  else if (id == STATIC_COMPLEX1) return &model_egg;
+  else if (id == STATIC_RADAR1) return &model_radar;
+  else if (id == STATIC_BASE1) return &model_base1;
+  else if (id == STATIC_DEPOT1) return &model_depot1;
+  else if (id == STATIC_BARRIER1) return &model_barrier1;
+  else if (id == ASTEROID) return &model_aster1;
   return &model_fig;
 }
 
-void game_levelInit ()
+int game_levelInit ()
 {
   int i, i2;
 
-  initing = true;
-  flash = 0;
-
   // init all objects
-
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i]->dinit ();
@@ -706,7 +736,6 @@ void game_levelInit ()
     fighter [i]->rectheta = 0;
     fighter [i]->o = &model_fig;
   }
-
   for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i]->dinit ();
@@ -718,13 +747,79 @@ void game_levelInit ()
 //  if (l != NULL) delete l;
   if (!multiplayer || isserver || !isserver) // clients do not need the mission
   {
-    if (mission != NULL)
-    { delete mission; mission = NULL; }
+    Mission *missionold = mission;
     mission = missionnew;
     missionnew = NULL;
     mission->difficulty = difficulty;
     mission->start ();
+    if (mission->id >= MISSION_CUSTOM1 && mission->id <= MISSION_CUSTOM2)
+    {
+      if (((MissionCustom *) mission)->reterror)
+      {
+        display ("Could not startup mission", LOG_ERROR);
+        delete mission;
+        mission = missionold;
+        return 0;
+      }
+    }
+    if (missionold != NULL)
+    { delete missionold; missionold = NULL; }
   }
+
+  initing = true;
+  flash = 0;
+
+/*FILE *in;
+unsigned short hdata [120] [720];
+in = fopen ("mydata.bin", "rb");
+fread ((unsigned short *) hdata, 2, 120 * 720, in);
+fclose (in);
+memset (l->h, 0x77, 2 * 513 * 513);
+memset (l->hw, 0x77, 2 * 513 * 513);
+memset (l->f, 0, 1 * 513 * 513);
+int start = 300, start2 = 0;
+int div = 4;
+int height = 3;
+for (i = 0; i < 480; i ++)
+  for (i2 = 0; i2 < 480; i2 ++)
+  {
+    l->h [i] [512 - i2] = hdata [i/div + start2] [i2/div + start] * height + 0x7777;
+    l->hw [i] [512 - i2] = l->h [i] [512 - i2];
+    if (l->h [i] [512 - i2] > 0x7777 + 1700 * height) l->f [i] [512 - i2] = ROCKS;
+    if (l->h [i] [512 - i2] > 0x7777 + 2500 * height) l->f [i] [512 - i2] = GLACIER;
+    if (hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2] [i2/div + start + 1] &&
+      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2] [i2/div + start - 1] &&
+      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2+1] [i2/div + start] &&
+      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2-1] [i2/div + start])
+    {
+      l->f [i] [512 - i2] = WATER;
+      l->h [i] [512 - i2] -= 100;
+      l->f [i-1] [512 - i2] = WATER;
+      l->h [i-1] [512 - i2] -= 100;
+      l->f [i+1] [512 - i2] = WATER;
+      l->h [i+1] [512 - i2] -= 100;
+      l->f [i] [512 - i2+1] = WATER;
+      l->h [i] [512 - i2+1] -= 100;
+      l->f [i] [512 - i2-1] = WATER;
+      l->h [i] [512 - i2-1] -= 100;
+    }
+  }
+fplayer->tl->x = 125;
+fplayer->tl->z = -75;
+l->convolveGauss (3, 0, 65000);
+for (i = 0; i < 513; i ++)
+  for (i2 = 0; i2 < 513; i2 ++)
+  {
+    if (l->f [i] [i2] == ROCKS)
+    {
+      l->h [i] [i2] += myrandom (200) * height - 80;
+    }
+    if (l->f [i] [i2] != WATER)
+    {
+      l->hw [i] [i2] = l->h [i] [i2];
+    }
+  }
+l->precalculate ();*/
 
   if (clouds == 0) highclouds->setTexture (NULL);
   else if (clouds == 1) highclouds->setTexture (texclouds1);
@@ -1009,6 +1104,7 @@ void game_levelInit ()
   }
 #endif*/
 
+  return 1;
 }
 
 void game_reshape ()
@@ -1202,6 +1298,12 @@ void createMission (int missionid)
   else if (missionid == MISSION_TEAMBASE1) missionnew = new MissionTeamBase1 ();
   else if (missionid == MISSION_WAVES1) missionnew = new MissionWaves1 ();
   else if (missionid == MISSION_MULTIPLAYER_DOGFIGHT) missionnew = new MissionMultiDogfight1 ();
+  else if (missionid >= MISSION_CUSTOM1 && missionid <= MISSION_CUSTOM2)
+  {
+    missionnew = new MissionCustom ();
+    missionnew->id = missionid;
+    ((MissionCustom *) missionnew)->init ();
+  }
   if (mission != NULL)
   {
     if (mission->id == missionnew->id)
@@ -1218,6 +1320,16 @@ void switch_mission (int missionid)
   setLightSource (60);
   game = GAME_MISSION;
   createMission (missionid);
+  if (missionid >= MISSION_CUSTOM1 && missionid <= MISSION_CUSTOM2)
+  {
+    if (((MissionCustom *) missionnew)->reterror)
+    {
+      display ("Could not init mission", LOG_ERROR);
+      // play error sound
+      switch_menu ();
+      return;
+    }
+  }
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
@@ -1377,7 +1489,7 @@ void event_fireMissile ()
   if (!fplayer->active) return;
   if (fplayer->firemissilettl > 0) return;
   if (fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile))
-    sound->play (SOUND_MISSILE1);
+    sound->play (SOUND_MISSILE1, false);
 }
 
 void event_fireChaff ()
@@ -1385,7 +1497,7 @@ void event_fireChaff ()
   if (!fplayer->active) return;
   if (fplayer->firechaffttl > 0) return;
   if (fplayer->fireChaff (chaff, missile))
-    sound->play (SOUND_CHAFF1);
+    sound->play (SOUND_CHAFF1, false);
 }
 
 void event_fireFlare ()
@@ -1393,7 +1505,7 @@ void event_fireFlare ()
   if (!fplayer->active) return;
   if (fplayer->fireflarettl > 0) return;
   if (fplayer->fireFlare (flare, missile))
-    sound->play (SOUND_CHAFF1);
+    sound->play (SOUND_CHAFF1, false);
 }
 
 void event_selectMissile ()
@@ -1406,28 +1518,28 @@ void event_targetNearest ()
 {
   if (!fplayer->active) return;
   fplayer->targetNearestEnemy ((AIObj **) fighter);
-  sound->play (SOUND_CLICK1);
+  sound->play (SOUND_CLICK1, false);
 }
 
 void event_targetNext ()
 {
   if (!fplayer->active) return;
   fplayer->targetNext ((AIObj **) fighter);
-  sound->play (SOUND_CLICK1);
+  sound->play (SOUND_CLICK1, false);
 }
 
 void event_targetPrevious ()
 {
   if (!fplayer->active) return;
   fplayer->targetPrevious ((AIObj **) fighter);
-  sound->play (SOUND_CLICK1);
+  sound->play (SOUND_CLICK1, false);
 }
 
 void event_targetLocking ()
 {
   if (!fplayer->active) return;
   fplayer->targetLockingEnemy ((AIObj **) fighter);
-  sound->play (SOUND_CLICK1);
+  sound->play (SOUND_CLICK1, false);
 }
 
 void event_thrustUp ()
@@ -1490,7 +1602,7 @@ void game_key (int key, int x, int y)
   else if (key >= '1' && key <= '9')
   {
     fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
-    sound->play (SOUND_CLICK1);
+    sound->play (SOUND_CLICK1, false);
   }
   else if (hikey == key_targetnearest || lokey == key_targetnearest)
   {
@@ -1508,12 +1620,12 @@ void game_key (int key, int x, int y)
   {
     event_targetLocking ();
   }
-/*  else if (key == 'k')
+  else if (key == 'K')
   {
     if (fplayer->target != NULL)
       fplayer->target->shield = -1;
-  }*/
-  else if (key == ' ')
+  }
+  else if (hikey == key_firecannon || lokey == key_firecannon)
   {
     fplayer->autofire = false;
   }
@@ -1786,7 +1898,7 @@ void game_joystickbutton (int button)
       startcannon = true;
     }
 #else
-    sound->play (SOUND_CANNON1);
+    sound->play (SOUND_CANNON1, 1);
 #endif
   }
   if (button == joystick_firemissile)
@@ -2065,7 +2177,11 @@ void mission_key (unsigned char key, int x, int y)
   else if (key == 13)
   {
     pleaseWait ();
-    game_levelInit ();
+    if (!game_levelInit ())
+    {
+      switch_menu ();
+      return;
+    }
     switch_game ();
     missionactive = true;
   }
@@ -4030,10 +4146,17 @@ void game_display ()
         write = true;
       }
   }
-  if (fps <= 20 && !write)
+  if (fps >= 5 && fps <= 20 && !write)
   {
     font1->drawTextCentered (0, -8, -2, "FPS TOO LOW", &colorred);
     font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
+  }
+
+  if (fps < 5 && !write)
+  {
+    font1->drawTextCentered (0, -8, -2, "FPS FAR TOO LOW", &colorred);
+    font1->drawTextCentered (0, -9, -2, "SEE \"README\" OR \"FAQ\" FILES", &colorred);
+    font1->drawTextCentered (0, -10, -2, "HIT \"ESC\" AND 'Y' TO EXIT THE GAME", &colorred);
   }
 
   if (controls == CONTROLS_MOUSE && !mouse_relative)
@@ -4079,7 +4202,7 @@ void game_timer (int dt)
         startcannon = true;
       }
 #else
-      sound->play (SOUND_CANNON1);
+      sound->play (SOUND_CANNON1, 1);
 #endif
     }
   }
@@ -4096,7 +4219,7 @@ void game_timer (int dt)
 
   if (lastshield > fplayer->shield && !fplayer->ai)
   {
-    sound->play (SOUND_HIT1);
+    sound->play (SOUND_HIT1, false);
     lastshield = (int) fplayer->shield;
     vibration = 25 * timestep;
   }
@@ -4115,7 +4238,7 @@ void game_timer (int dt)
     flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
     int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
     sound->setVolume (SOUND_THUNDER1, lev);
-    sound->play (SOUND_THUNDER1);
+    sound->play (SOUND_THUNDER1, false);
   }
 
   if (initing) return;
@@ -4125,9 +4248,12 @@ void game_timer (int dt)
   if (flash <= 7 * timestep && flash > 0)
     flash -= dt;
 
-  if (lastthrust != fplayer->thrust && !((gametimer / timestep) & 15))
-    setPlaneVolume ();
-  lastthrust = fplayer->thrust;
+  if (!fplayer->ai)
+    if (sound->engine != (int) ((fplayer->thrust / fplayer->maxthrust * 20) - 10))
+    {
+      setPlaneVolume ();
+      lastthrust = fplayer->thrust;
+    }
 
   // collision tests
   for (i = 0; i < maxfighter; i ++)
@@ -4165,8 +4291,11 @@ void game_timer (int dt)
     float lev;
     if (fighter [i]->explode == 1 && (lev = fplayer->distance (fighter [i])) < 32)
     {
-      sound->setVolume (SOUND_EXPLOSION1, 128 - (int) (lev * 4.0));
-      sound->play (SOUND_EXPLOSION1);
+      sound->setVolume (SOUND_EXPLOSION1, 128);
+      float angle = fplayer->getAngle (fighter [i]);
+      angle = 180 - angle;
+      sound->setPosition (SOUND_EXPLOSION1, (int) angle, (int) (lev * 4.0));
+      sound->play (SOUND_EXPLOSION1, false);
     }
   }
   for (i = 0; i < maxlaser; i ++)
@@ -4980,6 +5109,8 @@ void myFirstInit ()
   g_Load3ds.Import3DS (&model_depot1, dirs->getModels ("depot1.3ds"));
   model_depot1.setName ("DEPOT");
   model_depot1.scaleTexture (2, 2);
+  g_Load3ds.Import3DS (&model_house1, dirs->getModels ("house1.3ds"));
+  model_house1.setName ("HOUSE");
 
   setMissiles (&model_fig);
   setMissiles (&model_figa);
@@ -5399,7 +5530,8 @@ static void mySpecialFuncUp (int key, int x, int y)
 static void myPassiveRelMotionFunc (int xrel, int yrel)
 {
   if (game == GAME_PLAY)
-    game_mouserelmotion (xrel, yrel);
+    if (controls == CONTROLS_MOUSE)
+      game_mouserelmotion (xrel, yrel);
 }
 
 static void myPassiveMotionFunc (int x, int y)
@@ -5450,7 +5582,8 @@ static void myMouseFunc (int button, int state, int x, int y)
 #endif
   if (game == GAME_PLAY)
   {
-    game_mouse (button, state, x, y);
+    if (controls == CONTROLS_MOUSE)
+      game_mouse (button, state, x, y);
   }
   else if (game == GAME_INIT)
   {
@@ -5631,7 +5764,8 @@ static void myJoystickAxisFunc (int x, int y, int t, int r)
 {
   if (game == GAME_PLAY)
   {
-    game_joystickaxis (x, y, t, r);
+    if (controls == CONTROLS_JOYSTICK)
+      game_joystickaxis (x, y, t, r);
   }
 }
 
@@ -5639,7 +5773,8 @@ static void myJoystickButtonFunc (int button)
 {
   if (game == GAME_PLAY)
   {
-    game_joystickbutton (button);
+    if (controls == CONTROLS_JOYSTICK)
+      game_joystickbutton (button);
   }
   else if (game == GAME_MENU)
   {
@@ -5659,7 +5794,8 @@ static void myJoystickHatFunc (int hat)
 #endif
   if (game == GAME_PLAY)
   {
-    game_joystickhat (normhat);
+    if (controls == CONTROLS_JOYSTICK)
+      game_joystickhat (normhat);
   }
   else if (game == GAME_MENU)
   {
@@ -6364,7 +6500,11 @@ void callbackJoystickAxis (Component *comp, int key)
 void callbackSwitchStartMission (Component *comp, int key)
 {
   pleaseWait ();
-  game_levelInit ();
+  if (!game_levelInit ())
+  {
+    switch_menu ();
+    return;
+  }
   switch_game ();
   missionactive = true;
 }
@@ -6727,7 +6867,7 @@ void callbackSound (Component *comp, int key)
       volumesound = sound->volumesound;
       sound->setVolume ();
       setPlaneVolume ();
-      sound->play (SOUND_CLICK1);
+      sound->play (SOUND_CLICK1, false);
       menu_reshape ();
     }
     else
@@ -6738,7 +6878,7 @@ void callbackSound (Component *comp, int key)
       volumesound = sound->volumesound;
       sound->setVolume ();
       setPlaneVolume ();
-      sound->play (SOUND_CLICK1);
+      sound->play (SOUND_CLICK1, false);
       menu_reshape ();
     }
     sprintf (buf, "%d%%", volumesound);
@@ -7127,6 +7267,19 @@ void createMenu ()
   }
 
   trainingstartid = submenu [1]->components [0]->id;
+
+  yf -= yfstep;
+  for (i = 0; i < maploader->getMapNumber (); i ++)
+  {
+    char str [256];
+    strcpy (str, maploader->getNextMap ());
+    maploader->toUpper (str);
+    button = new Button (str);
+    button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    button->setFunction (callbackTraining);
+    yf -= yfstep;
+    submenu [1]->add (button);
+  }
 
   xf = xsubmenu; yf = ysubmenu; yfstep = 1;
   button = new Button ("FIGHTER INFO");
@@ -7916,6 +8069,8 @@ int main (int argc, char **argv)
 
   load_configInterface (); // load interface settings from conf.interface and validate
   save_configInterface (); // save interface settings
+
+  maploader = new MapLoader ();
 
 // here srand should be called to initialize the random number generator
 // this is currently done by grabbing random numbers via the init methods (not very elegant)

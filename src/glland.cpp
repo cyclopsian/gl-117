@@ -93,6 +93,7 @@ int GLLandscape::selectColor (int x, int y)
   else if (f [x] [y] == DESERTSAND || f [x] [y] == CACTUS0) return 13;
   else if (f [x] [y] == GREYSAND) return 14;
   else if (f [x] [y] == GRAVEL) return 15;
+  else if (f [x] [y] == TOWN) return 16;
   else return 0;
 }
 
@@ -141,6 +142,7 @@ void GLLandscape::precalculate ()
     }
 
   // set the colors of the landscape
+  hastowns = false;
   float mzoom = zoomz;
   for (x=0; x<=MAXX; x++)
     for (z=0; z<=MAXX; z++)
@@ -154,6 +156,10 @@ void GLLandscape::precalculate ()
       else if (type == 4 && a == 4)
       {
         a = 2;
+      }
+      else if (a == 16)
+      {
+        hastowns = true;
       }
       if (day)
       {
@@ -982,6 +988,24 @@ void GLLandscape::drawTreeQuad (int x, int y, int phi, bool hq)
                     if (hq) texturetree2 = -1;
                     drawTree (xs, ys, 0.004, 0.3, phi);
                   }*/
+}
+
+void GLLandscape::drawTown (int x, int y)
+{
+  int xs = getCoord (x);
+  int ys = getCoord (y);
+  if (f [xs] [ys] == TOWN)
+  {
+    CVector3 tl;
+    CRotation rot;
+    rot.a = 270;
+    rot.c = 90 * ((xs + ys / 3) & 3);
+    tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
+    glPushMatrix ();
+    model_house1.draw (&tl, NULL, &rot, 0.3, 1, 0);
+    glPopMatrix ();
+    return;
+  }
 }
 
 int visibility = 0;
@@ -2119,7 +2143,7 @@ void GLLandscape::draw (int phi, int gamma)
   glPushMatrix ();
 
   float z2 = ZOOM; // that's wrong if one would change MAXX
-  glScalef(z2, ZOOM, z2);
+  glScalef (MAXX2, ZOOM, MAXX2);
 
   gl->extractFrustum ();
     
@@ -2785,6 +2809,48 @@ void GLLandscape::draw (int phi, int gamma)
 
   glPopMatrix ();
 
+  if (quality >= 1 && hastowns)
+  {
+    float mydep = 1000;
+    if (quality == 2) mydep = 1800;
+    else if (quality == 3) mydep = 2500;
+    else if (quality == 4) mydep = 3200;
+    else if (quality == 5) mydep = 3800;
+    if (mydep > view * view) mydep = view * view;
+
+    for (i = 0; i < parts; i ++)
+      for (i2 = 0; i2 < parts; i2 ++)
+      {
+        int ax = minx + (int) (dx * (float) i2);
+        int ay = miny + (int) (dy * (float) i);
+        int ex = minx + (int) (dx * (float) (i2 + 1));
+        int ey = miny + (int) (dy * (float) (i + 1));
+        float dep;
+        for (xs = ax; xs < ex;)
+        {
+          x = GETCOORD(xs);
+          zz = 0;
+          for (ys = ay; ys <= ey;)
+          {
+            y = GETCOORD(ys);
+            if (f [x] [y] == TOWN)
+            {
+              float tdx = camx - xs;
+              float tdy = camz - ys;
+              dep = tdx * tdx + tdy * tdy;
+              if (dep < mydep)
+                if (gl->isSphereInFrustum (hh2*(xs), (float)h[x][y]*zoomz - zoomz2, hh2*((ys)), hh2*2))
+                {
+                  drawTown (xs, ys);
+                }
+            }
+            ys += 1;
+          } // ys for
+          xs += 1;
+        } // xs for
+      }
+  }
+
   gridstep = neargridstep; // set to finer grid for ground collision detection
 }
 
@@ -3065,13 +3131,14 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
   mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
   mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
+  mat [16] [0] = 0.7; mat [16] [1] = 0.7; mat [16] [2] = 0.7; mat [16] [3] = 1.0;
 
   texmap [0] = texmap [1] = texmap [10] = texmap [12] = texmap [13] = texgrass;
   texmap [2] = texmap [7] = texrocks;
   texmap [4] = texmap [5] = texmap [6] = texmap [8] = texmap [9] = texwater;
   texmap [11] = texredstone;
   texmap [13] = texsand;
-  texmap [3] = texmap [14] = texmap [15] = NULL;
+  texmap [3] = texmap [14] = texmap [15] = texmap [16] = NULL;
 
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
@@ -3084,8 +3151,8 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   while (i < 256)
   {
     bool again = false;
-    xtree [i] = -0.47 + 0.001 * myrandom (940);
-    ytree [i] = -0.47 + 0.001 * myrandom (940);
+    xtree [i] = -0.48 + 0.001 * myrandom (960);
+    ytree [i] = -0.48 + 0.001 * myrandom (960);
     for (i2 = i - 1; i2 >= 0 && i2 >= i - 6; i2 --)
     {
       if (fabs (xtree [i] - xtree [i2]) + fabs (ytree [i] - ytree [i2]) < 0.08)
@@ -3097,7 +3164,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
     if (!again) i ++;
   }
 
-  precalculate ();
+  if (type >= 0) precalculate (); // do not precalculate anything for custom height maps
 }
 
 #endif

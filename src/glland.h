@@ -53,7 +53,7 @@
 #define LANDSCAPE_ARCTIC 50
 
 // number of materials
-#define MAXMATERIAL 16
+#define MAXMATERIAL 17
 
 // textures are loaded in main.cpp
 extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
@@ -84,6 +84,7 @@ class GLLandscape : public Landscape
   float glittering; // water glittering
   unsigned short hcmin [MAXX/4 + 1] [MAXX/4 + 1]; // height mask on a coarser grid: max{h[x+-2][y+-2]}
   unsigned short hcmax [MAXX/4 + 1] [MAXX/4 + 1]; // height mask on a coarser grid: max{h[x+-2][y+-2]}
+  bool hastowns;
 
   private:
 //  float hh, hh2, zoomz2;
@@ -105,9 +106,10 @@ class GLLandscape : public Landscape
   int selectColor (int x, int y);
   
   unsigned short lg [MAXX + 1] [MAXX + 1]; // gaussian filter result
-  void precalculate (); // precalculate everything (colors, light mask)
 
   public:
+
+  void precalculate (); // precalculate everything (colors, light mask)
 
   float getMinHeight (float x, float z); // min height of 4x4 grid at landscape point
   float getMaxHeight (float x, float z); // min height of 4x4 grid at landscape point
@@ -130,6 +132,7 @@ class GLLandscape : public Landscape
   void drawTree (float x, float y, float htree, float wtree, int phi); // two in one
   void drawTreeQuad (int x, int y, int phi, bool hq);
 //  void drawTreeGrid (float x, float y, float htree, float wtree, int phi); // 9 trees in 6 quads
+  void drawTown (int x, int y);
 
   int detail [PARTS] [PARTS]; // LOD
 //  int done [100] [100];
