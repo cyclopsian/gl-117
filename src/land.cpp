@@ -1207,18 +1207,29 @@ void Landscape::genLake (int depthpc)
           if (extent <= 0) break;
         }
       }
+      int waterlevel1 = 200;
+      int waterlevel2 = 450;
+      int waterlevel3 = 900;
+      int waterlevel4 = 1500;
+      if (type == LAND_CANYON)
+      {
+        waterlevel1 = 300;
+        waterlevel2 = 600;
+        waterlevel3 = 1400;
+        waterlevel4 = 2000;
+      }
       for (i = 0; i <= MAXX; i ++)
         for (i2 = 0; i2 <= MAXX; i2 ++)
           if (ftry [i] [i2] == TRYLAKE)
           {
             ftry [i] [i2] = GRASS;
-            if (level - h [i] [i2] < 200)
+            if (level - h [i] [i2] < waterlevel1)
               f [i] [i2] = XSHALLOWWATER;
-            else if (level - h [i] [i2] < 400)
+            else if (level - h [i] [i2] < waterlevel2)
               f [i] [i2] = SHALLOWWATER;
-            else if (level - h [i] [i2] < 900)
+            else if (level - h [i] [i2] < waterlevel3)
               f [i] [i2] = WATER;
-            else if (level - h [i] [i2] < 1500)
+            else if (level - h [i] [i2] < waterlevel4)
               f [i] [i2] = DEEPWATER;
             else
               f [i] [i2] = XDEEPWATER;

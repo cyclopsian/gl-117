@@ -1121,7 +1121,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id == STATIC_OILRIG1)
   {
-    shield = maxshield = 800;
+    shield = maxshield = 1000;
     zoom = 3.5;
     impact = 20;
   }

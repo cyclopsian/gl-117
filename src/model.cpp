@@ -772,11 +772,11 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);
-      if (cm->material->texture->alpha)
+/*      if (cm->material->texture->alpha)
       {
         glEnable (GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      }
+      }*/
     }
   }
 
@@ -901,11 +901,11 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   }
   else glCallList (list2);
 
-  if (cm->hasTexture)
+/*  if (cm->hasTexture)
     if (cm->material->texture->alpha)
     {
       glDisable (GL_BLEND);
-    }
+    }*/
 //  printf ("\n%f,%f %f,%f %f,%f",ix,mx,iy,my,iz,mz); fflush (stdout);
 //  printf ("\n%d,%d",object[0]->numVertices,object[0]->numTriangles); fflush (stdout);
   glPopMatrix ();

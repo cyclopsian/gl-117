@@ -53,11 +53,16 @@
 #define MAXMATERIAL 16
 
 // textures are loaded in main.cpp
-extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand, *texredsand, *texgravel1;
+extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
+extern CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *texcactusu1;
+extern CTexture *textree4, *texearth, *texsand, *texredsand, *texgravel1;
 extern CTexture *texglitter1;
 
 class GLLandscape : public Landscape
 {
+  private:
+  int texturetree1, texturetree2;
+
   public:
   short nl [MAXX + 1] [MAXX + 1]; // lighting mask
   float lv [3];
@@ -101,16 +106,16 @@ class GLLandscape : public Landscape
   float getHeight (float x, float z); // height at (int) landscape point
 
   float getExactHeight2 (float x, float z); // linear interpolation, coarse grid
+  float getExactHeight3 (float x, float z); // linear interpolation, coarse grid
   float getExactHeight (float x, float z); // linear interpolation
 
   float getExactLSHeight2 (float x, float z); // linear interpolation, coarse grid
+  float getExactLSHeight3 (float x, float z); // linear interpolation, coarse grid
   float getExactLSHeight (float x, float z); // linear interpolation
 
   float getRayHeight (float x, float z); // height of lowest sun ray
 
   float getExactRayHeight (float x, float z); // linear interpolation
-
-  void drawRotatedTree (float x, float y, float htree, float wtree, int phi);
 
   void drawTree (float x, float y, float htree, float wtree, int phi); // two in one
 //  void drawTreeGrid (float x, float y, float htree, float wtree, int phi); // 9 trees in 6 quads

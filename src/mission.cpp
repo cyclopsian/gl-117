@@ -2481,7 +2481,7 @@ void MissionMoonBase1::start ()
   {
     fighter [i]->tl->x = cosi [(i * 140) % 360] * 4.5;
     fighter [i]->tl->z = i * 0.6;
-    fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + sine [(i * 160) % 360] * 4.5 + 25.0;
+    fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + sine [(i * 160) % 360] * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
     fighter [i]->phi = 200;
     fighter [i]->o = &model_aster1;

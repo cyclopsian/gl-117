@@ -2518,6 +2518,7 @@ void fighter_display ()
   else if (aktfighter == 6) { model = &model_figg; id = FIGHTER_REDARROW; }
   else if (aktfighter == 7) { model = &model_figf; id = FIGHTER_PHOENIX; }
   else { model = &model_figh; id = FIGHTER_BLACKBIRD; }
+gl->clearScreen ();
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
   model->draw (&vec, &tl, &rot, 1.0, 1.0, 0);
@@ -5333,10 +5334,15 @@ void myInit ()
   texredsand = gl->genTextureTGA (dirs->getTextures ("redsand1.tga"), 0, 0, 1, false);
   texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1, false);
   textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, -1, 1, true);
+  textreeu = gl->genTextureTGA (dirs->getTextures ("treeu1.tga"), 0, -1, 1, true);
   textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, -1, 1, true);
+  textreeu2 = gl->genTextureTGA (dirs->getTextures ("treeu2.tga"), 0, -1, 1, true);
   textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
+  textreeu3 = gl->genTextureTGA (dirs->getTextures ("treeu3.tga"), 0, 3, 1, true);
   textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
+  textreeu4 = gl->genTextureTGA (dirs->getTextures ("treeu4.tga"), 0, 3, 1, true);
   texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
+  texcactusu1 = gl->genTextureTGA (dirs->getTextures ("cactusu1.tga"), 0, 3, 1, true);
   texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, -1, 1, true);
   texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, -1, 1, true);
   texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke3.tga"), 0, 5, 1, true);

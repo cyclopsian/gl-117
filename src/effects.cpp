@@ -273,6 +273,7 @@ CBlackSmoke::CBlackSmoke (Space *space)
   draw = false;
   zoom = 0.1;
   drawlight = false;
+  alpha = -1;
 }
 
 void CBlackSmoke::setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len)

@@ -41,7 +41,7 @@
 // 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
-#define VERSIONSTRING "GL-117 V. 0.8.2 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.8.5 (BETA) BY THOMAS A. DREXL"
 
 // data types
 #ifdef USE_GLUT
