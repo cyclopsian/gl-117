@@ -101,6 +101,8 @@ extern int controls; // see CONTROLS-constants
 
 extern int game; // see GAME-constants
 
+extern float blackout, redout; // high force
+
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
 //#define SIN(x) sine[(int)x]

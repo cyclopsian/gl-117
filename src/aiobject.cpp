@@ -439,13 +439,13 @@ void DynamicObj::move ()
   {
     if (id >= FLAK1 && id <= FLAK2)
     {
-      phi += sine [(int) theta0] * manoeverability * 10.0;
+      phi += sine [theta0] * manoeverability * 10.0;
     }
     else
     {
       float div = maxspeed + speed;
       if (div == 0) div = 1;
-      phi += sine [(int) theta0] * manoeverability * 10.0 * maxspeed / div;
+      phi += sine [theta0] * manoeverability * 6.67; //10.0 * maxspeed / div;
     }
   }
   else // now this is much more general:
@@ -456,10 +456,10 @@ void DynamicObj::move ()
     // change heading and elevation due to ailerons and rudder
     if (maxspeed + speed <= -0.00001 || maxspeed + speed >= 0.00001)
     {
-      phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
-      gamma += COS(theta0) * elevatoreffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
-      phi += -vz * COS(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
-      gamma += SIN(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
+      phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 6.67; //10.0 * maxspeed / (maxspeed + speed);
+      gamma += COS(theta0) * elevatoreffect * manoeverability * 6.67; //10.0 * maxspeed / (maxspeed + speed);
+      phi += -vz * COS(theta0) * ruddereffect * manoeverability * 1.33; //2.0 * maxspeed / (maxspeed + speed);
+      gamma += SIN(theta0) * ruddereffect * manoeverability * 1.33; //2.0 * maxspeed / (maxspeed + speed);
     }
     // change roll due to roll ;-)
     if (rolleffect)
@@ -1519,7 +1519,9 @@ void AIObj::targetNearestEnemy (AIObj **f)
   {
     if (this != f [i] && party != f [i]->party && f [i]->active)
     {
-      float d2 = distance (f [i]);
+//      float d2 = distance (f [i]);
+      float phi = getAngle (f [i]);
+      float d2 = distance (f [i]) * (60 + fabs (phi)); // prefer enemies in front
       if (d2 < d)
       {
         d = d2;

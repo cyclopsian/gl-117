@@ -137,6 +137,7 @@ void Cockpit::drawCounter ()
   glVertex3f (xf - 1.0F, yf + 1.0F, zf);
   glEnd ();
   glDisable (GL_BLEND);
+  glDisable (GL_TEXTURE_2D);
 }
 
 void Cockpit::drawTargeter ()
@@ -212,35 +213,35 @@ void Cockpit::drawCross ()
 {
   glDisable (GL_LIGHTING);
 
-gl->enableAlphaBlending ();
-glEnable (GL_ALPHA_TEST);
-glAlphaFunc (GL_GEQUAL, 0.1);
-//  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-if (fplayer->o == &model_fig || fplayer->o == &model_figg)
-{
-  gl->enableTextures (texcross->textureID);
-}
-else
-{
-  gl->enableTextures (texcross2->textureID);
-}
+  gl->enableAlphaBlending ();
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, 0.1);
+  //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  {
+    gl->enableTextures (texcross->textureID);
+  }
+  else
+  {
+    gl->enableTextures (texcross2->textureID);
+  }
 
-float xf = 0.1, yf = 0.1, zf = 1.0;
-setColor (150);
-glBegin (GL_QUADS);
-glTexCoord2d (0, 0);
-glVertex3f (-xf, -yf, -zf);
-glTexCoord2d (0, 1);
-glVertex3f (-xf, yf, -zf);
-glTexCoord2d (1, 1);
-glVertex3f (xf, yf, -zf);
-glTexCoord2d (1, 0);
-glVertex3f (xf, -yf, -zf);
-glEnd ();
-glDisable (GL_ALPHA_TEST);
-glDisable (GL_TEXTURE_2D);
-gl->disableAlphaBlending ();
-//  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  float xf = 0.1, yf = 0.1, zf = 1.0;
+  setColor (150);
+  glBegin (GL_QUADS);
+  glTexCoord2d (0, 0);
+  glVertex3f (-xf, -yf, -zf);
+  glTexCoord2d (0, 1);
+  glVertex3f (-xf, yf, -zf);
+  glTexCoord2d (1, 1);
+  glVertex3f (xf, yf, -zf);
+  glTexCoord2d (1, 0);
+  glVertex3f (xf, -yf, -zf);
+  glEnd ();
+  glDisable (GL_ALPHA_TEST);
+  glDisable (GL_TEXTURE_2D);
+  gl->disableAlphaBlending ();
+  //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
 void Cockpit::drawHeading ()

@@ -47,6 +47,8 @@ int camera = 0;
 float camx = 0, camy = 0, camz = 0, camphi = 0, camgamma = 0, camtheta = 0;
 float sunlight = 1.0;
 
+float blackout = 0, redout = 0;
+
 int lighting = 1;
 int mode = 0;
 //int modes [4];
@@ -4201,73 +4203,79 @@ void game_display ()
   glEnd ();*/
 
 // draw flares
-if (quality > 0)
-  if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
-  {
-  CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
-  double fl_position[]=   {0.2,      1.6,      3.2,      8.1,      -1.4,     -2.2,     -3.5,     0};
-  double fl_size[]=       {0.8,      0.6,      0.5,      0.4,      0.8,      0.4,      0.5,      0};
-  double proj[16];
-  double modl[16];
-  double dr[2];
-  int vp[4];
-  double objx,objy,objz;
+  if (quality > 0)
+    if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
+    {
+      CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
+      double fl_position[]=   {0.2,      1.6,      3.2,      8.1,      -1.4,     -2.2,     -3.5,     0};
+      double fl_size[]=       {0.8,      0.6,      0.5,      0.4,      0.8,      0.4,      0.5,      0};
+      double proj[16];
+      double modl[16];
+      double dr[2];
+      int vp[4];
+      double objx,objy,objz;
 
-  glGetDoublev( GL_PROJECTION_MATRIX, proj );
-  glGetDoublev( GL_MODELVIEW_MATRIX, modl );
-  glGetIntegerv( GL_VIEWPORT, vp );
-  glGetDoublev( GL_DEPTH_RANGE, dr );
+      glGetDoublev( GL_PROJECTION_MATRIX, proj );
+      glGetDoublev( GL_MODELVIEW_MATRIX, modl );
+      glGetIntegerv( GL_VIEWPORT, vp );
+      glGetDoublev( GL_DEPTH_RANGE, dr );
 
-  double cx=vp[2]/2+vp[0];
-  double cy=vp[3]/2+vp[1];
+      double cx=vp[2]/2+vp[0];
+      double cy=vp[3]/2+vp[1];
 
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  int i=0;
-  double flarez_eye=4;
-  double flarez_win=(-proj[10]+proj[14]/flarez_eye)*(dr[1]-dr[0])/2+(dr[1]+dr[0])/2;
-  while (CTexture *tex=fl_texture[i]) {
-  double position=fl_position[i];
-  double flarex,flarey,size=fl_size[i];
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      int i=0;
+      double flarez_eye=4;
+      double flarez_win=(-proj[10]+proj[14]/flarez_eye)*(dr[1]-dr[0])/2+(dr[1]+dr[0])/2;
+      while (CTexture *tex=fl_texture[i])
+      {
+        double position=fl_position[i];
+        double flarex,flarey,size=fl_size[i];
 
-  i++;
+        i++;
 
-  flarex=(cx-sunx)*position+sunx;
-  flarey=(cy-suny)*position+suny;
+        flarex=(cx-sunx)*position+sunx;
+        flarey=(cy-suny)*position+suny;
 
-  if (gluUnProject (flarex, flarey, flarez_win, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
-  {
-  gl->enableTextures (tex->textureID);
-  gl->enableAlphaBlending ();
-  glDisable (GL_ALPHA_TEST);
-  glDisable (GL_DEPTH_TEST);
-  glDisable (GL_FOG);
+        if (gluUnProject (flarex, flarey, flarez_win, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
+        {
+          gl->enableTextures (tex->textureID);
+          gl->enableAlphaBlending ();
+          glDisable (GL_ALPHA_TEST);
+          glDisable (GL_DEPTH_TEST);
+          glDisable (GL_FOG);
 
-  glBegin (GL_QUADS);
-  glColor4f (1.0, 1.0, 1.0, 1.0);
-  glTexCoord2d (0, 1);
-  glVertex3f (-size+objx, size+objy, objz);
-  glTexCoord2d (1, 1);
-  glVertex3f (size+objx, size+objy, objz);
-  glTexCoord2d (1, 0);
-  glVertex3f (size+objx, -size+objy, objz);
-  glTexCoord2d (0, 0);
-  glVertex3f (-size+objx, -size+objy, objz);
-  glEnd ();
-  }
-  }
-  glEnable (GL_DEPTH_TEST);
-  glDisable (GL_TEXTURE_2D);
-  gl->disableAlphaBlending ();
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  }
+          glBegin (GL_QUADS);
+          glColor4f (1.0, 1.0, 1.0, 1.0);
+          glTexCoord2d (0, 1);
+          glVertex3f (-size+objx, size+objy, objz);
+          glTexCoord2d (1, 1);
+          glVertex3f (size+objx, size+objy, objz);
+          glTexCoord2d (1, 0);
+          glVertex3f (size+objx, -size+objy, objz);
+          glTexCoord2d (0, 0);
+          glVertex3f (-size+objx, -size+objy, objz);
+          glEnd ();
+        }
+      }
+      glEnable (GL_DEPTH_TEST);
+      glDisable (GL_TEXTURE_2D);
+      gl->disableAlphaBlending ();
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    }
 
 // sunblinding test
 
-  if (sunvisible) {
+  if (sunvisible)
+  {
     GLfloat zbuf[1];
     glReadPixels((int)sunx,(int)suny,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,zbuf);
     sunblinding=(zbuf[0]<1)?false:true;
-  } else sunblinding=false;
+  }
+  else
+  {
+    sunblinding=false;
+  }
 
 /*  int maxi = 4;
   for (i = maxi - 1; i >= 1; i --)
@@ -4327,6 +4335,40 @@ if (quality > 0)
     cockpit->drawWeapon ();
     cockpit->drawCounter ();
   }
+
+  if (camera == 0)
+  {
+    int black = (int) blackout;
+    if (black > 255) black = 255;
+    int red = (int) redout;
+    if (red > 255) red = 255;
+    float xf = 2.0, yf = 1.5, zf = 1.0;
+    if (black > 0)
+    {
+      glColor4ub (0, 0, 0, black);
+    }
+    else if (red > 0)
+    {
+      glColor4ub (255, 0, 0, red);
+      printf ("red=%d\n", red);
+    }
+    if (black > 0 || red > 0)
+    {
+      glDisable (GL_DEPTH_TEST);
+      glEnable (GL_BLEND);
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glBegin (GL_QUADS);
+      glVertex3f (-xf, -yf, -zf);
+      glVertex3f (-xf, yf, -zf);
+      glVertex3f (xf, yf, -zf);
+      glVertex3f (xf, -yf, -zf);
+      glEnd ();
+      gl->disableAlphaBlending ();
+      glDisable (GL_BLEND);
+      glEnable (GL_DEPTH_TEST);
+    }
+  }
+
 //  glPopMatrix ();
 //  glutStrokeCharacter (GLUT_STROKE_ROMAN, 'A');
 
@@ -4543,6 +4585,24 @@ void game_timer ()
     explosion [i]->move ();
   for (i = 0; i < maxblacksmoke; i ++)
     blacksmoke [i]->move ();
+
+  if (blackout > 0) blackout -= 3.0F;
+  if (blackout < 0) blackout = 0;
+  if (redout > 0) redout -= 3.0F;
+  if (redout < 0) redout = 0;
+  if (blackout > 400) blackout = 400;
+  if (redout > 400) redout = 400;
+  float testout;
+  if (redout < 1)
+  {
+    testout = (fplayer->speed * fplayer->elevatoreffect - 0.15F) * 40.0F;
+    if (testout > 0) blackout += testout;
+  }
+  if (blackout < 1)
+  {
+    testout = (fplayer->speed * fplayer->elevatoreffect + 0.075F) * 80.0F;
+    if (testout < 0) redout -= testout;
+  }
 
   if (fplayer->shield <= 0)
     camera = 1;
@@ -5407,7 +5467,7 @@ void myFirstInit ()
 
   init_reshape ();
 
-  CColor mycolor (200, 200, 0);
+/*  CColor mycolor (200, 200, 0);
   CColor mycolor2 (100, 100, 0);
   mysphere = new CSphere (1, 8, 1, 1, 1);
   mysphere->setColor (&mycolor2);
@@ -5415,7 +5475,7 @@ void myFirstInit ()
   for (i = 0; i < 100; i++)
   {
     mykugel [i] = new InitKugel (mysphere);
-  }
+  }*/
 
   tl.x = 0.0;
   tl.y = 0.0;
@@ -5427,7 +5487,6 @@ void myFirstInit ()
   rot2.c = 90;
   rot2.a = 270;
   rot2.b = 270;
-//  rot2.a = 270;
   initexplode = 0;
   initexplode1 = 0;
 
@@ -5440,12 +5499,13 @@ void myFirstInit ()
   glEnable (GL_COLOR_MATERIAL);
 
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-//  glDisable (GL_DITHER);
 }
 
 void init_key (int key, int x, int y)
 {
 //  game_quit ();
+//  gl->clearScreen ();
+//  glutSwapBuffers ();
   myInit ();
   switch_menu ();
   fplayer->ai = true;
@@ -5457,28 +5517,21 @@ void init_key (int key, int x, int y)
 #endif
 }
 
+const int maxfx = 80;
+const int maxfy = 40;
+
+int col [maxfy] [maxfx];
+int col2 [maxfy] [maxfx];
+
 void init_display ()
 {
-  int i;
-//  char buf [20];
-//  char buf2 [20];
+  int i, i2;
   CVector3 vec;
   CColor color (200, 200, 200, 255);
 
-//  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0); // should be sqrt(2) or 1.5
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-//  glShadeModel(GL_SMOOTH);
-//  glPushMatrix ();
-//  gluPerspective (80.0, (float) width / height, nearclippingplane, 150.0); // should be sqrt(2) or 1.5
-
-/*  glBegin (GL_TRIANGLES);
-  glColor3ub (255,255,0);
-  glVertex3f (-1,-1,-1.1);
-  glVertex3f (1,-1,-1.1);
-  glVertex3f (0,1,-1.1);
-  glEnd ();*/
 
   glPushMatrix ();
 
@@ -5486,105 +5539,106 @@ void init_display ()
   glEnable (GL_LIGHTING);
 
   glPushMatrix ();
-  glTranslatef (0,0,-5);
+  glTranslatef (0, 0, -5);
   model_fig.draw (&vec, &tl, &rot, 1.0, 1.0, initexplode1);
   glPopMatrix ();
 
   if (initexplode1 < 0)
   {
     glPushMatrix ();
-    glTranslatef (0,0,-5);
+    glTranslatef (0, 0, -5);
     model_gl117.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
     glPopMatrix ();
   }
 
   glDisable (GL_LIGHTING);
-  glTranslatef (1,1,-50);
+  glPopMatrix ();
+
+  glPopMatrix ();
+
+  glDisable (GL_DEPTH_TEST);
+  glEnable (GL_BLEND);
+  float xf = 2.0F, yf = 2.0F, zf = 2.0F;
 
   glPushMatrix ();
-  gl->rotate (0 ,inittimer, 0);
-  gl->rotate (0 ,0 ,inittimer);
-  int num = 10 + quality * 8;
-  for (i = 0; i < num; i++)
+  for (i = 0; i < maxfy; i ++)
   {
-    mykugel[i]->draw ();
+    glBegin (GL_QUAD_STRIP);
+    for (i2 = 0; i2 < maxfx + 1; i2 ++)
+    {
+      int r = col [i] [i2];
+      if (r > 255) r = 255;
+      int g = col [i] [i2] - 255;
+      if (g > 255) g = 255;
+      else if (g < 0) g = 0;
+      int b = col [i] [i2] - 512;
+      if (b > 255) b = 255;
+      else if (b < -462) b = (512 + b) * 5;
+      else if (b < -412) b = (-412 - b) * 5;
+      else if (b < 0) b = 0;
+      glColor4ub (r, g, b, r);
+      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * i / maxfy, -zf);
+      r = col [i + 1] [i2];
+      if (r > 255) r = 255;
+      g = col [i + 1] [i2] - 255;
+      if (g > 255) g = 255;
+      else if (g < 0) g = 0;
+      b = col [i + 1] [i2] - 512;
+      if (b > 255) b = 255;
+      else if (b < 0) b = 0;
+      glColor4ub (r, g, b, r);
+      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * (i + 1) / maxfy, -zf);
+    }
+    glEnd ();
   }
   glPopMatrix ();
-  glPushMatrix ();
-  gl->rotate (0 ,0 ,360 - inittimer);
-  gl->rotate (0 ,360 - inittimer, 0);
-  for (i = 100 - num; i < 100; i++)
-  {
-    mykugel[i]->draw ();
-  }
-  glPopMatrix ();
-  glPopMatrix ();
-
-
-/*  glPushMatrix ();
-  glTranslatef (0,0,-5);
-  glEnable (GL_DEPTH_TEST);
-  model_fig.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
-  glPopMatrix ();*/
-
-/*  glPushMatrix ();
-  glTranslatef (0,0,inittextz);
-  gl->rotate ((int) inittextrot, 0, 0);
-  strcpy (buf, "GL-117");
-  buf2 [1] = 0;
-  for (i = 0; i < 10; i++)
-  {
-    buf2 [0] = buf [i];
-    drawText (i-3, -0.5, 0.05, buf2, &color);
-    gl->rotate (-18, 0, 0);
-  }*/
-
-  glPopMatrix ();
-  //drawText (0, 0, -0.9, "LOADING...", &color);
+  glDisable (GL_BLEND);
 
   font2->drawText (-20, -20, -3, VERSIONSTRING, &color);
+}
 
-//  glPopMatrix ();
-//  glutSwapBuffers ();
+void genFireLine ()
+{
+  int i, i2;
+  for (i = 0; i < maxfx; i ++)
+  {
+    col [maxfy - 1] [i] = myrandom (255 * 2);
+  }
+  for (i = 0; i < 5; i ++)
+  {
+    int r = myrandom (maxfx + 1);
+    for (i2 = 0; i2 <= 0; i2 ++)
+    {
+      col [maxfy - 1] [r + i2] = 255 * 3 + 100;
+    }
+  }
+}
+
+void proceedFire ()
+{
+  int i, i2;
+  for (i = maxfy - 2; i >= 0; i --)
+    for (i2 = 1; i2 < maxfx - 1; i2 ++)
+    {
+      col2 [i] [i2] = (col [i + 1] [i2 - 1] + 6 * col [i + 1] [i2] + col [i + 1] [i2 + 1]) / 8 - 500.0F / maxfy;
+      if (col2 [i] [i2] < 0) col2 [i] [i2] = 0;
+    }
+  memcpy (col, col2, maxfx * maxfy * sizeof (int));
 }
 
 void init_timer ()
 {
-  if (initexplode > 30) initexplode = -1;
-  if (initexplode1 > 30) initexplode1 = -1;
-
   int r = myrandom (100);
   if (r == 50) r = myrandom (100); // do not optimize this
 
-/*  if (inittextz < -0.5)
-  {
-    inittextz += 0.06;
-  }*/
-  if (inittimer > 200)
-  {
-    if (!mykugel [0]->explosion)
-      for (int i = 0; i < 100; i ++)
-        mykugel [i]->explosion ++;
-  }
-  tl.x = 8.0 * pow (1.5, -(5 + tl.z)) - 0.4;
-  tl.y = 0.5 * tl.x;
+  tl.x = 6.0 * pow (1.5, -(5 + tl.z)) - 0.4;
+  tl.y = 0.9 * tl.x;
   tl.z += 0.15;
+
   if (initexplode1 == -1 && tl2.z < 3)
   {
     tl2.z += 0.25;
   }
-  if (initexplode1 >= 0 && tl.z > 2) initexplode1 ++;
-//  tl2.z += 0.15;
-  if (!mykugel [0]->explosion)
-    inittimer ++;
-  if (mykugel [0]->explosion >= 100)
-  {
-    init_key (27, 0, 0); // switch to menu
-  }
-//  initexplode ++;
-//  inittextrot += 5;
-  
-//  rot.a ++;
   if (tl2.z < 3)
   {
     rot2.b -= 20;
@@ -5592,10 +5646,35 @@ void init_timer ()
   }
   if (tl.z > -4.0)
   {
-    rot.b --;
-//    rot2.b --;
+    rot.b ++;
   }
-//  rot.c ++;
+
+  if (inittimer == 0)
+  {
+    memset (col, 0, 20 * 40 * sizeof (int));
+    memset (col2, 0, 20 * 40 * sizeof (int));
+  }
+
+  genFireLine ();
+  proceedFire ();
+
+  if (inittimer >= 75)
+  {
+    initexplode1 = -1;
+  }
+
+  if (inittimer >= 150)
+  {
+    initexplode ++;
+  }
+
+  if (inittimer >= 200)
+  {
+    init_key (27, 0, 0); // switch to menu
+  }
+
+  inittimer ++;
+
 #ifdef USE_GLUT
   glutPostRedisplay();
 #else
