@@ -17,6 +17,10 @@ rm configure.in.save
 rm stamp-h
 rm stamp-h1
 rm stamp-h.in
+cp /usr/share/automake*/missing .
+cp /usr/share/automake*/depcomp .
+cp /usr/share/automake*/mkinstalldirs .
+cp /usr/share/automake*/install-sh .
 aclocal
 autoheader
 autoconf

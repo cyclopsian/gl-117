@@ -1,3 +1,20 @@
+Version 0.8.8:
+	- new missions (training)
+	- AI bugfixes and improvements
+	- soundtrack addition and improvements
+	- new cannon sound and ammo restriction
+	- further code cleanup and documentation
+	- some visual improvements
+
+Version 0.8.5:
+	- time dependant calculations (enables higher FPS rates)
+	- improved models, replaced fighter models
+	- level of detail: different terrain resolutions
+	- lots of graphical improvements (trees, explosions, smoke, cannon)
+	- added brightness option
+	- added man page and updated documentation
+	- lots of minor improvements and bugfixes
+
 Version 0.8.2:
 	- major code cleanup
 	- added debug levels

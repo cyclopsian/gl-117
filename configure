@@ -838,6 +838,13 @@ Optional Features:
   --disable-dependency-tracking Speeds up one-time builds
   --enable-dependency-tracking  Do not reject slow dependency extractors
 
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-opengl-dir=<path>
+                          Search for OpenGL files in <path>
+  --with-sdl-dir=<path>   Search for SDL files in <path>
+
 Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
@@ -1451,7 +1458,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gl-117
- VERSION=0.8.2
+ VERSION=0.8.8
 
 
 # Some tools Automake needs.
@@ -1576,6 +1583,21 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 
+# Check whether --with-opengl-dir or --without-opengl-dir was given.
+if test "${with_opengl_dir+set}" = set; then
+  withval="$with_opengl_dir"
+
+fi;
+
+# Check whether --with-sdl-dir or --without-sdl-dir was given.
+if test "${with_sdl_dir+set}" = set; then
+  withval="$with_sdl_dir"
+
+fi;
+
+
+
+
 
 
 
@@ -1587,7 +1609,6 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 LDFLAGS="$LDFLAGS -lm"
-
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -2887,7 +2908,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -2964,7 +2984,6 @@ test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
 test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
-
 
 echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \${MAKE}" >&5
 echo $ECHO_N "checking whether ${MAKE-make} sets \${MAKE}... $ECHO_C" >&6
@@ -3198,6 +3217,50 @@ echo "$as_me: error: unknown endianess
 presetting ac_cv_c_bigendian=no (or yes) will help" >&2;}
    { (exit 1); exit 1; }; } ;;
 esac
+
+
+
+echo "$as_me:$LINENO: checking for OpenGL directory" >&5
+echo $ECHO_N "checking for OpenGL directory... $ECHO_C" >&6
+ path=""
+ for tmp in /usr/local /usr/X11R6 /usr $with_opengl_dir
+ do
+  if test -f $tmp/include/GL/gl.h ; then
+   path=$tmp
+  fi
+ done
+ if test -z $path ; then
+  echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+ else
+  echo "$as_me:$LINENO: result: $path" >&5
+echo "${ECHO_T}$path" >&6
+  CPPFLAGS="$CPPFLAGS -I$path/include"
+  CXXFLAGS="$CXXFLAGS -I$path/include"
+  LIBS="$LIBS -L$path/lib"
+ fi
+
+
+echo "$as_me:$LINENO: checking for SDL directory" >&5
+echo $ECHO_N "checking for SDL directory... $ECHO_C" >&6
+ path=""
+ for tmp in /usr/local /usr/X11R6 /usr $with_sdl_dir
+ do
+  if test -f $tmp/include/SDL/SDL.h ; then
+   path=$tmp
+  fi
+ done
+ if test -z $path ; then
+  echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+ else
+  echo "$as_me:$LINENO: result: $path" >&5
+echo "${ECHO_T}$path" >&6
+  CPPFLAGS="$CPPFLAGS -I$path/include"
+  CXXFLAGS="$CXXFLAGS -I$path/include"
+  LIBS="$LIBS -L$path/lib"
+ fi
+
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4356,7 +4419,7 @@ if test "${ac_cv_lib_SDL_SDL_Init+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lSDL  $LIBS"
+LIBS="-lSDL -lpthread $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 #include "confdefs.h"
@@ -4477,6 +4540,7 @@ fi
 
 CFLAGS="$CFLAGS -Wall -pedantic"
 CPPFLAGS="-DDATADIR='\"$datadir\"'"
+CXXFLAGS="$CXXFLAGS"
 
 ac_config_files="$ac_config_files Makefile src/Makefile"
 cat >confcache <<\_ACEOF
@@ -5683,5 +5747,4 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
-
 

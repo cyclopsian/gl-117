@@ -1,8 +1,15 @@
-GL-117 Frequently Asked Questions
+________________________________________________________________________
+
+GL-117 FREQUENTLY ASKED QUESTIONS
+________________________________________________________________________
 
 Section 1: Installing on Linux and Mac
-Section 2: Starting the game
+Section 2: Configuring the game
 
+
+________________________________________________________________________
+
+S E C T I O N   1
 ________________________________________________________________________
 
 Q: ./configure does not find the libraries?
@@ -32,12 +39,22 @@ You can also use this technique to alter the file
 removing e.g. library checks and modifying the LDFLAGS variable.
 ________________________________________________________________________
 
+Q: Wrong version of automake?
+
+As described for the last question, copy the automake files to the
+gl-117 directory and execute the rebuild script.
+
+Or just install a new version of automake.
+________________________________________________________________________
+
 Q: How to compile on MacOSX?
 
 In the Makefile, set LIBS to
--framework OpenGL -framework SDL -framework GLUT -framework Foundation 
--lSDL_mixer -lSDLmain -framework QuickTime -framework CoreServices 
+-framework OpenGL -framework SDL -framework GLUT -framework Foundation
+-lSDL_mixer -lSDLmain -framework QuickTime -framework CoreServices
 -framework AppKit
+
+Make sure that the library and header files can be found by configure.
 ________________________________________________________________________
 
 Q: Libraries are installed, but gcc (linker) does not find them?
@@ -45,14 +62,48 @@ Q: Libraries are installed, but gcc (linker) does not find them?
 Try the command
  g++ -g -O2 -lm -o gl-117 main.o gl.o model.o 3ds.o audio.o land.o \
   glland.o aiobject.o effects.o roam.o net.o mathtab.o dirs.o \
-  objload.o pilots.o common.o \
+  objload.o pilots.o common.o object.o cockpit.o \
   -lGL -lGLU -lglut -lSDL -lSDLmain -lSDL_mixer \
   -lXmu -lXext -lXi -lXxf86vm
 ________________________________________________________________________
 
+Q: internal error, core dump, submit bug report?
+
+Sorry, the cause is unknown. Just execute make again until everything is
+compiled and linked properly.
+
+
+________________________________________________________________________
+
+S E C T I O N   2
+________________________________________________________________________
+
+Q: How to alter resolution, color depth?
+
+As the resolution and color depth can not be changed in-game, please edit
+the (text) file
+ $HOME/.gl-117/conf (Unix)
+ GL-117_DIR\saves\conf (Windows)
+and set the corresponding values manually.
+________________________________________________________________________
+
+Q: How to configure the input devices?
+
+Just edit the file
+ $HOME/.gl-117/conf.interface (Unix)
+ GL-117_DIR\saves\conf.interface (Windows)
+and adjust the settings.
+________________________________________________________________________
+
+Q: The joystick rudder and throttle are swapped?
+
+The joystick axes identification depends on the driver (OS).
+Just edit the file conf.interface as described above.
+________________________________________________________________________
+
 Q: Cannot open GLX?
 
-Try another bpp setting. (32, 16, 8)
+Try another bpp setting in the file conf (described above). (32, 16, 8)
 ________________________________________________________________________
 
 Q: Graphics do not initialize?
@@ -66,5 +117,6 @@ Sorry, OpenGL is not supported by every graphics card.
 You will need at least an Nvidia TNT2 chipset to seriously play the game,
 as well as the appropriate drivers.
 The game has been tested in 800x600 mode on
- Athlon 1400 GeForce2, quality=3, view=50: FPS>30
+ AMD K2 500 AGP1x TNT, quality=0, view=50: FPS>30
+ Athlon 1400 GeForce2, quality=3, view=70: FPS>30
  P4 2.4GHz GeForce4, quality=5, view=100: FPS>30
