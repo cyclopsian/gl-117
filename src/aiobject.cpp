@@ -259,8 +259,8 @@ void DynamicObj::crashGround ()
     shield -= 1;
 //      shield += (int) height - 2;
   }
-  // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 100
-  if (height > 100) tl->y = l->getHeight (tl->x, tl->z) + 100;
+  // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 80
+  if (height > 80) tl->y = l->getHeight (tl->x, tl->z) + 80;
 }
 
 // check for collision, simplified model, each model is surrounded by a cube
@@ -956,8 +956,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   if (id == MISSILE_AIR1)
   {
     intelligence = 100;
-    maxthrust = 0.44;
-    nimbility = 4.0; // old 2.2
+    maxthrust = 0.48;
+    nimbility = 4.5; // old 2.2
     manoeverability = 2.5;
     ttl = 200;
     impact = 35;
@@ -965,8 +965,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
-    maxthrust = 0.45;
-    nimbility = 5.0; // old 3.5
+    maxthrust = 0.49;
+    nimbility = 5.5; // old 3.5
     manoeverability = 3.0;
     ttl = 220;
     impact = 45;
@@ -974,7 +974,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
-    maxthrust = 0.45;
+    maxthrust = 0.50;
     nimbility = 6.5;
     manoeverability = 3.5;
     ttl = 250;
@@ -1013,18 +1013,18 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_FF1)
   {
     intelligence = 0;
-    maxthrust = 0.48;
-    nimbility = 3.5;
-    manoeverability = 2.0;
+    maxthrust = 0.54;
+    nimbility = 4.0;
+    manoeverability = 2.2;
     ttl = 250;
     impact = 40;
   }
   else if (id == MISSILE_FF2)
   {
     intelligence = 0;
-    maxthrust = 0.5;
-    nimbility = 4.2;
-    manoeverability = 2.3;
+    maxthrust = 0.55;
+    nimbility = 4.5;
+    manoeverability = 2.5;
     ttl = 250;
     impact = 50;
   }
@@ -2122,7 +2122,7 @@ m [0]->tl->y = target->tl->y;
     if (disttarget > 2.5 + aggressivity / 100)
     {
       if (disttarget < 50 && abs (aw) > 30 && !manoeverthrust) // low thrust for faster heading changes in melee combat
-        recthrust = maxthrust / 2;
+        recthrust = maxthrust / (2 - intelligence * 0.001);
       else thrustUp (); // otherwise fly faster
     }
     else if (!manoeverthrust)
