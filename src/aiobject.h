@@ -185,6 +185,7 @@ class AIObj : public DynamicObj
   void fireCannon (DynamicObj **laser, float phi);
   void fireCannon (DynamicObj **laser);
   void fireMissile2 (int id, AIObj *missile, AIObj *target);
+  int firstMissile ();
   int nextMissile (int from);
   bool haveMissile (int id);
   void decreaseMissile (int id);

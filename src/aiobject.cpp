@@ -1124,6 +1124,17 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
   }
 }
 
+int AIObj::firstMissile ()
+{
+  int i = 0;
+  while (!missiles [i])
+  {
+    i ++;
+    if (i >= missiletypes) return 0;
+  }
+  return i;
+}
+
 int AIObj::nextMissile (int from)
 {
   int i = from + 1;

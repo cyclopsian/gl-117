@@ -136,100 +136,11 @@ class HighClouds : public CSpaceObj
 {
   public:
   CSpherePart *sphere;
-  HighClouds (int theta)
-  {
-    init (theta);
-  }
-  ~HighClouds ()
-  {
-    delete sphere;
-  }
-  void init (int theta)
-  {
-    sphere = new CSpherePart (1, 9, theta);
-    CObject *co = sphere->object [0];
-    co->hasTexture = true;
-    co->material = new CMaterial ();
-    for (int i2 = 0; i2 < co->numVertices; i2 ++)
-    {
-      co->vertex [i2].tex.x = co->vertex [i2].vector.x * 5;
-      co->vertex [i2].tex.y = co->vertex [i2].vector.y * 5;
-    }
-    co->hasTexture = true;
-    sphere->displaylist = false;
-    o = sphere;
-    rot->b = 90;
-    draw = 2;
-    drawlight = false;
-    zoom = 300;
-  }
-  void setTexture (CTexture *texture)
-  {
-    sphere->object [0]->material->texture = texture;
-  }
-  void drawGL (CVector3 *tl, CVector3 *textl)
-  {
-    int i = 0, j;
-    CObject *cm = o->object [0];
-    for (int i2 = 0; i2 < cm->numVertices; i2 ++)
-    {
-      cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl->x / zoom;
-      cm->vertex [i2].tex.y = cm->vertex [i2].vector.y * 4 - textl->z / zoom;
-    }
-
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glPushMatrix ();
-    glTranslatef (tl->x, tl->y, tl->z);
-    glRotatef (90, 0, -1, 0);
-    glRotatef (270, 1, 0, 0);
-    glRotatef (90, 0, 0, 1);
-    glScalef (zoom, zoom, zoom);
-
-    glShadeModel (GL_SMOOTH);
-
-    glEnable (GL_TEXTURE_2D);
-    glColor3ub (255, 255, 255);
-
-    glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin (GL_TRIANGLES);
-    for (j = 0; j < cm->numTriangles; j++)
-    {
-      CVertex *v = cm->triangle [j].v [0];
-      for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
-      {
-        v = cm->triangle [j].v [whichVertex];
-        glNormal3f (v->normal.x, v->normal.y, v->normal.z);
-        glTexCoord2f (v->tex.x, v->tex.y);
-        glVertex3f(v->vector.x, v->vector.y, v->vector.z);
-      }
-    }
-    glEnd();
-
-    glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glBegin(GL_QUADS);
-    for (j = 0; j < cm->numQuads; j++)
-    {
-      CVertex *v = cm->quad [j].v [0];
-      for (int whichVertex = 0; whichVertex < 4; whichVertex ++)
-      {
-        v = cm->quad [j].v [whichVertex];
-        glNormal3f (v->normal.x, v->normal.y, v->normal.z);
-        glTexCoord2f(v->tex.x, v->tex.y);
-        glVertex3f(v->vector.x, v->vector.y, v->vector.z);
-      }
-    }
-    glEnd();
-
-    glDisable (GL_BLEND);
-    glDisable (GL_TEXTURE_2D);
-    glPopMatrix ();
-  }
+  HighClouds (int theta);
+  ~HighClouds ();
+  void init (int theta);
+  void setTexture (CTexture *texture);
+  void drawGL (CVector3 *tl, CVector3 *textl);
 };
 
 #endif

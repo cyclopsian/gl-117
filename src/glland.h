@@ -37,7 +37,7 @@
 #endif
 #endif
 
-#define PARTS 12
+#define PARTS 20
 
 #include <string.h>
 

@@ -535,7 +535,7 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     cm = object [i];
     if (cm->hasTexture)
     {
-      if (quality >= 3)
+      if (quality >= 2)
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);
@@ -685,7 +685,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     cm = object [i];
     if (cm->hasTexture)
     {
-      if (quality >= 3)
+      if (quality >= 2)
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);

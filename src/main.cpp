@@ -108,6 +108,7 @@ int clouds = 0;
 
 
 CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+CTexture *texradar1, *texradar2;
 
 CTexture *texclouds1, *texclouds2, *texclouds3;
 
@@ -3134,6 +3135,24 @@ class Cockpit
     return aw;
   }*/
 
+  void setColor (int alpha)
+  {
+    if (fplayer->o == &model_fig) glColor4ub (255, 255, 0, alpha);
+    else if (fplayer->o == &model_figb) glColor4ub (255, 150, 100, alpha);
+    else if (fplayer->o == &model_figc) glColor4ub (200, 200, 100, alpha);
+    else if (fplayer->o == &model_figg) glColor4ub (255, 0, 0, alpha);
+    else glColor4ub (100, 100, 255, alpha);
+  }
+
+  void setColor (CColor *color, int alpha)
+  {
+    if (fplayer->o == &model_fig) color->setColor (255, 255, 0, alpha);
+    else if (fplayer->o == &model_figb) color->setColor (255, 150, 100, alpha);
+    else if (fplayer->o == &model_figc) color->setColor (200, 200, 100, alpha);
+    else if (fplayer->o == &model_figg) color->setColor (255, 0, 0, alpha);
+    else color->setColor (100, 100, 255, alpha);
+  }
+
   void drawTargeter ()
   {
     if (fplayer->target)
@@ -3225,11 +3244,18 @@ class Cockpit
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
 //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  gl->enableTextures (texcross->textureID);
+  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  {
+    gl->enableTextures (texcross->textureID);
+  }
+  else
+  {
+    gl->enableTextures (texcross2->textureID);
+  }
 
   float xf = 0.1, yf = 0.1, zf = 1.0;
+  setColor (150);
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 0, 255);
   glTexCoord2d (0, 0);
   glVertex3f (-xf, -yf, -zf);
   glTexCoord2d (0, 1);
@@ -3250,8 +3276,7 @@ class Cockpit
     CColor color;
     int i = 0;
     int alpha = 175;
-    color.setColor (255, 255, 0);
-    color.c [3] = alpha;
+    setColor (&color, alpha);
     glDisable (GL_LIGHTING);
     glLineWidth (2.0);
     glDisable (GL_DEPTH_TEST);
@@ -3276,8 +3301,8 @@ class Cockpit
           g = 0.1;
         xf = p / 6.0;
         gl->enableAlphaBlending ();
+        setColor (alpha);
         glBegin (GL_LINES);
-        glColor4ub (255, 255, 0, alpha);
         glVertex3f (xf * 0.1, (yf - g) * 0.1, zf);
         glVertex3f (xf * 0.1, (yf + g) * 0.1, zf);
         glEnd ();
@@ -3400,8 +3425,8 @@ class Cockpit
         xf = p / 6.0;
         gl->enableAlphaBlending ();
         yf = -7;
+        setColor (alpha);
         glBegin (GL_LINES);
-        glColor4ub (255, 255, 0, alpha);
         glVertex3f ((yf - g) * 0.1, xf * 0.1, zf);
         glVertex3f ((yf + g) * 0.1, xf * 0.1, zf);
         glEnd ();
@@ -3431,8 +3456,8 @@ class Cockpit
     if (t3 < 0) t3 += 360;
     if (t4 < 0) t4 += 360;
     xf = 0.6; yf = 0.6;
+    setColor (130);
     glBegin (GL_LINES);
-    glColor4ub (255, 255, 0, 130);
     glVertex3f (xf * cosi [t1], yf * sine [t1], zf);
     glVertex3f (xf * cosi [t2], yf * sine [t2], zf);
     glVertex3f (xf * cosi [t3], yf * sine [t3], zf);
@@ -3504,8 +3529,40 @@ class Cockpit
   void drawRadar ()
   {
     int i;
-    float yf = -4.5, zf = -7.0;
-    gl->enableAlphaBlending ();
+    float yf = -4.2, zf = -7.0;
+  gl->enableAlphaBlending ();
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, 0.1);
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  setColor (150);
+  float xl, yl;
+  int type;
+  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  {
+    gl->enableTextures (texradar2->textureID);
+    xl = 1.4; yl = 1.3;
+    type = 0;
+  }
+  else
+  {
+    gl->enableTextures (texradar1->textureID);
+    xl = 1.5; yl = 1.2;
+    type = 1;
+  }
+  glBegin (GL_QUADS);
+  glTexCoord2d (0, 0);
+  glVertex3f (-xl, yf - yl, zf);
+  glTexCoord2d (0, 1);
+  glVertex3f (-xl, yf + yl, zf);
+  glTexCoord2d (1, 1);
+  glVertex3f (xl, yf + yl, zf);
+  glTexCoord2d (1, 0);
+  glVertex3f (xl, yf - yl, zf);
+  glEnd ();
+  glDisable (GL_ALPHA_TEST);
+  glDisable (GL_TEXTURE_2D);
+//  gl->disableAlphaBlending ();
+/*    gl->enableAlphaBlending ();
     glDisable (GL_DEPTH_TEST);
     glBegin (GL_QUADS);
     glColor4ub (255, 255, 0, 100);
@@ -3513,10 +3570,10 @@ class Cockpit
     glVertex3f (1.2, yf - 1.0, zf);
     glVertex3f (1.2, yf + 1.0, zf);
     glVertex3f (-1.2, yf + 1.0, zf);
-    glEnd ();
+    glEnd ();*/
     glPointSize (2.0);
     glBegin (GL_POINTS);
-    glColor4ub (200, 200, 200, 255);
+    glColor4ub (255, 255, 255, 255);
     glVertex3f (0.0, yf, zf);
     for (i = 0; i < maxfighter; i ++)
       if (fighter [i] != fplayer && fighter [i]->active)
@@ -3526,7 +3583,7 @@ class Cockpit
         float d = fplayer->distance (fighter [i]) / 100.0;
         float px = -d * sine [aw];
         float py = yf + d * cosi [aw];
-        if (px >= -1.2 && px <= 1.2 && py >= yf - 1.0 && py <= yf + 1.0)
+        if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
         {
           if (fighter [i] == fplayer->target)
             glColor4ub (255, 200, 0, 255);
@@ -4389,6 +4446,8 @@ void game_levelInit ()
 //  glDisable (GL_DITHER);
 
 //  mission = new MissionDemo1 (space);
+
+  fplayer->missiletype = fplayer->firstMissile ();
   initing = false;
   lastshield = fplayer->shield;
 
@@ -8356,14 +8415,15 @@ void myInit ()
   texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, 4, 1, true);
   texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 4, 1, true);
   texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 5, 1, true);
-  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, 2, 1, true);
-//  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, 2, 1);
+  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, -1, 1, true);
   texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
   texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 1, true);
   texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 1, true);
   texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, 4, 1, true);
   texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
+  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 1, true);
+  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 1, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
 /*  for (i = 0; i < maxchars; i ++)
   {

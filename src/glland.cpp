@@ -971,6 +971,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
     return;
   texture = true;
+//  glActiveTextureARB(100);
   gl->enableTextures (texwater->textureID);
   texlight = texwater->texlight;
   texzoom = 0.5;
@@ -1015,7 +1016,11 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   for (j = 0; j < 4; j ++)
   {
     if (texture)
+    {
+//            glMultiTexCoord2fARB(100, tf [j] [0], tf [j] [1]);
+//            glMultiTexCoord2fARB(101, tf [j] [0], tf [j] [1]);
       glTexCoord2fv (tf [j]);
+    }
     glColor4fv (col [j]);
     glVertex3fv (pos [j]);
   }
@@ -1437,7 +1442,7 @@ void GLLandscape::draw (int phi, int gamma)
   if (lsticker >= 36000000)
     lsticker = 0;
 
-  if (quality < 3) gridstep = 2;
+  if (quality < 4) gridstep = 2;
   else gridstep = 1;
 
   glPushMatrix ();
@@ -1473,7 +1478,7 @@ void GLLandscape::draw (int phi, int gamma)
   float pseudoview = getView ();
   float radius = pseudoview / cosi [45];
 
-  int w = (int) phi;
+/*  int w = (int) phi;
   float qx [4], qy [4];
   int addw [4] = { 45, 90, 45, 0 };
 
@@ -1508,11 +1513,11 @@ void GLLandscape::draw (int phi, int gamma)
     if ((int) qy [i] > maxy) maxy = (int) qy [i];
   }
   minx -= 20; maxx += 20; miny -= 20; maxy += 20;
-
-/*  int minx = camx + MAXX/2 - radius;
+*/
+  int minx = camx + MAXX/2 - radius;
   int miny = MAXX/2 - camz - radius;
   int maxx = minx + radius * 2;
-  int maxy = miny + radius * 2;*/
+  int maxy = miny + radius * 2;
 
 /*  if (minx < 0) minx = 0;
   if (maxx >= MAXX) maxx = MAXX;
@@ -1533,16 +1538,20 @@ void GLLandscape::draw (int phi, int gamma)
   }
 //    printf ("\nx=%d, y=%d", minx, miny); fflush (stdout);
 
-  float dx = (float) (maxx - minx + 1) / PARTS;
-  float dy = (float) (maxy - miny + 1) / PARTS;
+  int parts = view / 13;
+  parts *= 2;
+  parts ++;
+
+  float dx = (float) (maxx - minx + 1) / parts;
+  float dy = (float) (maxy - miny + 1) / parts;
   float fx, fy;
-  for (i = 0; i < PARTS; i ++)
-    for (i2 = 0; i2 < PARTS; i2 ++)
+  for (i = 0; i < parts; i ++)
+    for (i2 = 0; i2 < parts; i2 ++)
     {
       fx = (float) minx + (float) (dx * (0.5 + (float) i2));
       fy = (float) miny + (float) (dy * (0.5 + (float) i));
       float d = dist (camx + MAXX/2 - fx, MAXX/2 - camz - fy);
-      detail [i] [i2] = (int) ((d - dx/2) / 12.0);
+      detail [i] [i2] = (int) ((d - dx/2) / 10.0);
       if (detail [i] [i2] < 0) detail [i] [i2] = 0;
     }
 
@@ -1798,8 +1807,8 @@ void GLLandscape::draw (int phi, int gamma)
 
 //    glDisable (GL_CULL_FACE); // Why ???
 
-      for (i = 0; i < PARTS; i ++)
-        for (i2 = 0; i2 < PARTS; i2 ++)
+      for (i = 0; i < parts; i ++)
+        for (i2 = 0; i2 < parts; i2 ++)
         {
           int ax = (minx + (int) (dx * (float) i2));
           int ay = (miny + (int) (dy * (float) i));
@@ -2080,7 +2089,7 @@ void GLLandscape::draw (int phi, int gamma)
 
     float mydep = 1000;
     if (quality == 2) mydep = 1500;
-    else if (quality == 3) mydep = 1800;
+    else if (quality == 3) mydep = 2000;
     else if (quality == 4) mydep = 2500;
     else if (quality == 5) mydep = 3500;
     if (mydep > view * view) mydep = view * view;
@@ -2097,8 +2106,8 @@ void GLLandscape::draw (int phi, int gamma)
     float x42 = -0.28, y42 = -0.18;
     float x43 = 0.31, y43 = 0.17;
     float x44 = -0.21, y44 = 0.32;
-    for (i = 0; i < PARTS; i ++)
-      for (i2 = 0; i2 < PARTS; i2 ++)
+    for (i = 0; i < parts; i ++)
+      for (i2 = 0; i2 < parts; i2 ++)
       {
         if (detail [i] [i2] <= lineartree)
         {
