@@ -290,10 +290,15 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
 //      printf (" c(%d,%d)=>s(%d,%d)\n", id, d->id, shield, d->shield);
     if (d->source != NULL && active) // only for missiles/cannons
     {
-      if (d->source->party != party && maxshield < 2000) // calculate points
-        d->source->points += impact; // extra points for shooting an enemy object
+      if (d->source->party != party) // calculate points
+      {
+        if (maxshield < 2000)
+          d->source->points += impact; // extra points for shooting an enemy object
+      }
       else
+      {
         d->source->points -= impact; // subtract points for shooting an own object
+      }
       
       if (d->source->party != party && active && draw && !killed)
         if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
@@ -757,7 +762,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 12.0;
-    shield = 80;
+    shield = maxshield = 80;
     zoom = 0.35;
   }
   if (id == FLARAK_AIR1)
@@ -767,7 +772,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 6.0;
-    shield = 70;
+    shield = maxshield = 70;
     zoom = 0.3;
     missiles [0] = 100;
   }
@@ -780,7 +785,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 8.0;
-    shield = 160;
+    shield = maxshield  = 160;
     zoom = 0.35;
   }
   else if (id == TANK_GROUND1)
@@ -791,7 +796,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 8.0;
-    shield = 200;
+    shield = maxshield = 200;
     zoom = 0.4;
   }
   else if (id == TANK_PICKUP1)
@@ -801,7 +806,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 0;
-    shield = 30;
+    shield = maxshield = 30;
     zoom = 0.25;
   }
   else if (id == TANK_TRUCK1)
@@ -811,7 +816,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 0;
     maxtheta = 3;
     manoeverability = 0;
-    shield = 20;
+    shield = maxshield = 20;
     zoom = 0.45;
   }
 
@@ -824,7 +829,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxtheta = 3;
     manoeverability = 4.0;
     impact = 20;
-    shield = 2800;
+    shield = maxshield = 4500;
     missiles [1] = 200;
   }
   else if (id == SHIP_DESTROYER1)
@@ -836,7 +841,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxtheta = 3;
     manoeverability = 6.0;
     impact = 20;
-    shield = 1600;
+    shield = maxshield = 2500;
   }
 
   if (id == MISSILE_AIR1)
@@ -874,7 +879,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 1.0;
     ai = true;
     ttl = 250;
-    impact = 250;
+    impact = 280;
   }
   else if (id == MISSILE_GROUND2)
   {
@@ -884,7 +889,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 1.0;
     ai = true;
     ttl = 310;
-    impact = 300;
+    impact = 400;
   }
   else if (id == MISSILE_DF1)
   {
@@ -894,7 +899,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.0;
     ai = true;
     ttl = 300;
-    impact = 650;
+    impact = 900;
   }
   else if (id == MISSILE_MINE1)
   {
@@ -919,53 +924,53 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id == STATIC_TENT1)
   {
-    shield = 80;
+    shield = maxshield = 80;
     zoom = 0.5;
   }
   if (id == STATIC_TENT4)
   {
-    shield = 150;
+    shield = maxshield = 160;
     zoom = 1.2;
   }
   if (id == STATIC_CONTAINER1)
   {
-    shield = 30;
+    shield = maxshield = 30;
     zoom = 1.0;
     impact = 20;
   }
   if (id == STATIC_HALL1)
   {
-    shield = 250;
+    shield = maxshield = 450;
     zoom = 1.8;
     impact = 20;
   }
   if (id == STATIC_HALL2)
   {
-    shield = 400;
+    shield = maxshield = 920;
     zoom = 2.5;
     impact = 20;
   }
   if (id == STATIC_OILRIG1)
   {
-    shield = 1300;
+    shield = maxshield = 1400;
     zoom = 3.5;
     impact = 20;
   }
   if (id == STATIC_COMPLEX1)
   {
-    shield = 2000;
+    shield = maxshield = 5800;
     zoom = 2.0;
     impact = 20;
   }
   if (id == STATIC_RADAR1)
   {
-    shield = 400;
+    shield = maxshield = 500;
     zoom = 1.3;
     impact = 20;
   }
   if (id == ASTEROID)
   {
-    shield = 30000;
+    shield = maxshield = 32000;
     zoom = 0.01 * myrandom (60) + 1.0;
     impact = 5;
     speed = 0.18;
@@ -974,7 +979,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id == STATIC_BASE1)
   {
-    shield = 4000;
+    shield = maxshield = 5500;
     zoom = 4.0;
     impact = 20;
   }
@@ -1269,9 +1274,10 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
     float sy = -sine [(int) gamma] * zoom * 1.1;
     float sx = cosi [(int) gamma] * sine [(int) phi] * zoom * 1.1;
     smoke->move ();
-    smoke->setSmoke (tl->x - sx - forcex * 0.67, tl->y - sy - forcey * 0.67, tl->z - sz - forcez * 0.67, (int) phi, 8);
-    smoke->setSmoke (tl->x - sx - forcex * 0.33, tl->y - sy - forcey * 0.33, tl->z - sz - forcez * 0.33, (int) phi, 9);
-    smoke->setSmoke (tl->x - sx, tl->y - sy, tl->z - sz, (int) phi, 10);
+    smoke->setSmoke (tl->x - sx - forcex * 0.75, tl->y - sy - forcey * 0.75, tl->z - sz - forcez * 0.75, (int) phi, 16);
+    smoke->setSmoke (tl->x - sx - forcex * 0.5, tl->y - sy - forcey * 0.5, tl->z - sz - forcez * 0.5, (int) phi, 17);
+    smoke->setSmoke (tl->x - sx - forcex * 0.25, tl->y - sy - forcey * 0.25, tl->z - sz - forcez * 0.25, (int) phi, 18);
+    smoke->setSmoke (tl->x - sx, tl->y - sy, tl->z - sz, (int) phi, 19);
   }
 
   if (!active)
