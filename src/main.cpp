@@ -455,6 +455,7 @@ CSphere *objsphere;
 //CSpaceObj *csphere;
 //CSpherePart *cloudsphere;
 HighClouds *highclouds;
+HighClouds *highclouds2;
 
 //GLLandscape *l;
 CModel *obj, *objlaser, *objmissile;
@@ -4255,6 +4256,11 @@ void game_levelInit ()
   else if (clouds == 2) highclouds->setTexture (texclouds2);
   else if (clouds == 3) highclouds->setTexture (texclouds3);
 
+  if (clouds == 0) highclouds2->setTexture (NULL);
+  else if (clouds == 1) highclouds2->setTexture (texclouds1);
+  else if (clouds == 2) highclouds2->setTexture (texclouds2);
+  else if (clouds == 3) highclouds2->setTexture (texclouds3);
+
   for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
@@ -7228,10 +7234,20 @@ void game_display ()
   if (quality >= 1 && clouds > 0)
   {
     gl->enableFog (pseudoview);
+
+    if (quality >= 3)
+    {
+      highclouds2->zoom = 350;
+      float ch2 = -332 - fplayer->tl->y / 10.5;
+      CVector3 tlsphere3 (0, ch2, 0);
+      highclouds2->drawGL (&tlsphere3, fplayer->tl);
+    }
+
     highclouds->zoom = 300;
     float ch2 = -288 - fplayer->tl->y / 10.0;
     CVector3 tlsphere2 (0, ch2, 0);
     highclouds->drawGL (&tlsphere2, fplayer->tl);
+
     glDisable (GL_FOG);
   }
 
@@ -8526,6 +8542,9 @@ void myInit ()
   highclouds = new HighClouds (25);
   highclouds->setTexture (texclouds3);
 
+  highclouds2 = new HighClouds (25);
+  highclouds2->setTexture (texclouds3);
+
 /*  cloudsphere = new CSpherePart (1, 9, 25);
   CObject *co = cloudsphere->object [0];
   co->hasTexture = true;
@@ -8623,8 +8642,8 @@ void myFirstInit ()
   if (debug) { printf ("\nnew GL"); fflush (stdout); }
   gl = new GL (); //(1.0, 1000.0);
   if (debug) { printf ("\nnew fonts"); fflush (stdout); }
-  font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!');
-  font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!');
+  font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
+  font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 //  texfont1 = gl->genTextureTGA ("../textures/font2.tga", 0, 1, 0);
   if (debug) { printf ("\nimporting models"); fflush (stdout); }
   g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig7.3ds"));

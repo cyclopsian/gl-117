@@ -360,6 +360,12 @@ void Star::draw ()
 
 
 
+/* Each font is stored in one bitmap, width=height=2^n!
+   Use GIMP or equiv and put the ASCII letters of your favourite font
+   there, ascending order, start whereever you want. Write as many
+   letters as possible per line, each separated by at least one whitespace.
+   Look at the font*.tga files for examples. The max letter height is fixed. */
+
 bool Font::isPixel (int x, int y)
 {
   y = texture->height - y;
@@ -369,7 +375,7 @@ bool Font::isPixel (int x, int y)
   return false;
 }
 
-void Font::extractLetters (int height, char start)
+void Font::extractLetters (int height, char start, int num)
 {
   int i;
   int mode = 0;
@@ -408,7 +414,7 @@ void Font::extractLetters (int height, char start)
         lettery [n] = y;
         letterw [n] = xe - xs + 1;
         n ++;
-        if (n >= 64) return;
+        if (n >= num) return;
       }
     }
     x ++;
@@ -422,7 +428,7 @@ void Font::extractLetters (int height, char start)
         lettery [n] = y;
         letterw [n] = xe - xs + 3;
         n ++;
-        if (n >= 64) return;
+        if (n >= num) return;
       }
       y += height;
       x = 0;
@@ -431,10 +437,11 @@ void Font::extractLetters (int height, char start)
   }
 }
 
-Font::Font (char *filename, int height, char start)
+Font::Font (char *filename, int height, char start, int num)
 {
   texture = gl->genTextureTGA (filename, 0, 1, 0, true);
-  extractLetters (height, start);
+  extractLetters (height, start, num);
+  zoom = 0.1F;
 }
 
 void Font::drawText (float x, float y, float z, char *str, CColor *c, bool centered)
@@ -448,7 +455,7 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
   glAlphaFunc (GL_GEQUAL, 0.1);
   glBegin (GL_QUADS);
   glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);
-  float xz = x * 0.1, yz = y * 0.1;
+  float xz = x * zoom, yz = y * zoom;
 
   if (centered)
   {
@@ -458,18 +465,18 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
       if (str [i] >= start && str [i] <= start + n)
       {
         int c = (int) (str [i] - start);
-        xw += 0.1 * letterw [c] / height;
+        xw += zoom * letterw [c] / height;
       }
       else if (str [i] == '\t')
       {
         int xzint = (int) (xw * 10.0);
         xzint -= xzint & 3; // modulo 4
         xzint += 4;
-        xw = (float) xzint / 10.0;
+        xw = (float) xzint * zoom;
       }
       else
       {
-        xw += 0.05;
+        xw += 0.5 * zoom;
       }
     }
     xz -= xw / 2;
@@ -484,8 +491,8 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
       float ty = 1.0 - (float) lettery [c] / texture->height;
       float tx2 = (float) tx + (float) letterw [c] / texture->width;
       float ty2 = (float) ty - (float) height / texture->height;
-      float xi = 0.1 * letterw [c] / height;
-      float yi = 0.1;
+      float xi = zoom * letterw [c] / height;
+      float yi = zoom;
       glTexCoord2f (tx, ty2);
       glVertex3f (xz, yz, z);
       glTexCoord2f (tx, ty);
@@ -501,16 +508,16 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
       int xzint = (int) (xz * 10.0);
       xzint -= xzint & 3; // modulo 4
       xzint += 4;
-      xz = (float) xzint / 10.0;
+      xz = (float) xzint * zoom;
     }
     else if (str [i] == '\n')
     {
-      yz -= 0.1;
-      xz = x * 0.1;
+      yz -= zoom;
+      xz = x * zoom;
     }
     else
     {
-      xz += 0.05;
+      xz += 0.5 * zoom;
     }
   }
   glEnd ();

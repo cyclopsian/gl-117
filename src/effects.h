@@ -113,16 +113,20 @@ class Star
 class Font
 {
   public:
-  CTexture *texture;
-  char start;
-  int height;
-  int n;
-  short letterx [64];
-  short lettery [64];
-  short letterw [64];
-  bool isPixel (int x, int y);
-  void extractLetters (int height, char start);
-  Font (char *filename, int height, char start);
+  CTexture *texture; // the font texture
+  char start; // starting character
+  int height; // fixed line height in the texture (should be maximum letter height)
+  int n; // number of letters
+  float zoom; // zoom factor for output
+  short letterx [256]; // starting x coordinate in the texture
+  short lettery [256]; // starting y coordinate in the texture
+  short letterw [256]; // width in the texture
+  
+  bool isPixel (int x, int y); // is pixel set in the texture?
+  void extractLetters (int height, char start, int num); // extract the letters
+  Font (char *filename, int height, char start, int num); // new Font
+
+  // some custom OpenGL output methods
   void drawText (float x, float y, float z, char *str, CColor *c, bool centered);
   void drawText (float x, float y, float z, char *str, CColor *c);
   void drawText (float x, float y, float z, char *str);
