@@ -82,6 +82,7 @@ class GLLandscape : public Landscape
   unsigned char dl [MAXX + 1] [MAXX + 1]; // dynamic light mask (explosions)
   int lsticker; // a timer increased every time draw() is called
   int gridstep; // landscape grid resolution (1=fine or 2=coarse)
+  float glittering; // water glittering
 
   private:
   float hh, hh2, zoomz2;

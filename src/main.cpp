@@ -7145,6 +7145,12 @@ void game_display ()
     }
   }
 
+  if (camera == 0 && l->glittering > 1.0F)
+  {
+    sunlight += l->glittering * 2.0F - 2.0F;
+  }
+  l->glittering = false;
+
 
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 //  glClear(GL_DEPTH_BUFFER_BIT);

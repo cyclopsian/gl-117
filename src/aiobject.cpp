@@ -1393,7 +1393,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
 
   // do a smooth roll
   float deltatheta = rectheta - theta;
-  float mynimbility = fabs (deltatheta) / 10.0F * nimbility;
+  float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
   if (mynimbility > nimbility) mynimbility = nimbility;
   float nimbility2 = mynimbility;
   if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
@@ -1403,13 +1403,13 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
   else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility;
   else if (deltatheta > 0)
   {
-    float estimatedtheta = dtheta * (dtheta + mynimbility) / 2 / nimbility2;
+    float estimatedtheta = dtheta * (dtheta + mynimbility * 5) / 2 / nimbility2;
     if (deltatheta > estimatedtheta + 1) dtheta += mynimbility;
     else if (deltatheta < estimatedtheta - 1) dtheta -= mynimbility;
   }
   else
   {
-    float estimatedtheta = -dtheta * (dtheta - mynimbility) / 2 / nimbility2;
+    float estimatedtheta = -dtheta * (dtheta - mynimbility * 5) / 2 / nimbility2;
     if (deltatheta < estimatedtheta - 1) dtheta -= mynimbility;
     else if (deltatheta > estimatedtheta + 1) dtheta += mynimbility;
   }

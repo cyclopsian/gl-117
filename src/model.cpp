@@ -70,8 +70,14 @@ void CColor::take (CColor *col)
 
 CTexture::CTexture ()
 {
-  texlight = 1.0; width = 0; height = 0; textureID = -1; data = NULL;
+  texlight = 1.0F; width = 0; height = 0; textureID = -1; data = NULL;
+  texred = 1.0F; texgreen = 1.0F; texblue = 1.0F;
   mipmap = true; quality = 0;
+}
+
+CTexture::~CTexture ()
+{
+  if (data != NULL) delete data;
 }
 
 int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) // only 24 bit TGA
@@ -91,6 +97,10 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
   data = (unsigned char *) malloc (width * height * 4); // global 32 bpp texture buffer
   fread (buf, width * height * 3, 1, in);*/
   long texl = 0;
+  long texr = 0;
+  long texg = 0;
+  long texb = 0;
+
   for (i = 0; i < height; i ++)
     for (i2 = 0; i2 < width; i2 ++)
     {
@@ -105,6 +115,9 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
       int n2 = (i * width + i2)*4;
 
       texl += (int) data [n2+2] + data [n2+1] + data [n2];
+      texr += (int) data [n2];
+      texg += (int) data [n2 + 1];
+      texb += (int) data [n2 + 2];
 
       if (alphatype == 0) // alpha=255 or 0
       {
@@ -156,6 +169,9 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
     }
 //  free (buf);
   texlight = (float) texl / width / height / 3 / 256; // average brightness
+  texred = (float) texr / width / height / 256; // average red
+  texgreen = (float) texg / width / height / 256; // average green
+  texblue = (float) texb / width / height / 256; // average blue
   strcpy (name, fname);
   this->quality = quality;
   this->mipmap = (mipmap != 0);

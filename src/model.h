@@ -53,9 +53,13 @@ class CTexture
   int textureID; // texture ID of native GL code
   int width, height;
   float texlight; // average of texture's overall brightness
+  float texred; // average of texture's red
+  float texgreen; // average of texture's green
+  float texblue; // average of texture's blue
   int quality; // texture quality of native GL code
   bool alpha; // alpha blending necessary
   CTexture ();
+  ~CTexture ();
   int loadFromTGA (char *fname, int quality, int alphatype, int mipmap);
   void getColor (CColor *c, int x, int y);
 };

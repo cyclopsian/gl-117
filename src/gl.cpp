@@ -50,9 +50,9 @@ GL::GL () // (GLfloat clipback, GLfloat clipfront)
 
 GL::~GL ()
 {
-  int i;
+/*  int i;
   for (i = 0; i <= texnum; i ++)
-    delete tex [i];
+    delete tex [i];*/
 }
 
 void GL::clearScreen ()

@@ -742,12 +742,14 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
   int x, y, xs, ys;
   float cr, cg, cb;
   bool water = false;
-  float texlight = 1.0;
   bool last = false;
   int step = gridstep;
+  float texred, texgreen, texblue;
 
   glDisable (GL_TEXTURE_2D);
-    
+
+  CTexture *tex;
+
   for (xs = x1; xs < x2;)
   {
 //    glBegin (GL_QUAD_STRIP);
@@ -768,39 +770,45 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             last = true;
             glBegin (GL_QUAD_STRIP);
           }
-          texlight = 1.0;
+          tex = NULL;
           if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
-            texlight = texgrass->texlight;
+            tex = texgrass;
           else if (a == 2 || a == 7)
-            texlight = texrocks->texlight;
+            tex = texrocks;
           else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-            texlight = texgrass->texlight; // not texwater!
+            tex = texgrass; // not texwater!
           else if (a == 11)
-            texlight = texredstone->texlight;
+            tex = texredstone;
           else if (a == 13)
-            texlight = texsand->texlight;
-          cr = r [x] [y];
-          cg = g [x] [y];
-          cb = b [x] [y];
-          float fac = 0.001 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight / 256.0 * texlight;
-          cr = (float) cr * fac;
-          cg = (float) cg * fac;
-          cb = (float) cb * fac;
-          if (cr >= texlight) cr = texlight;
-          if (cg >= texlight) cg = texlight;
-          if (cb >= texlight) cb = texlight;
+            tex = texsand;
+          if (tex == NULL)
+          {
+            texred = 1.0F;
+            texgreen = 1.0F;
+            texblue = 1.0F;
+          }
+          else
+          {
+            texred = tex->texred;
+            texgreen = tex->texgreen;
+            texblue = tex->texblue;
+          }
+          float fac = 0.001F * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight / 256.0F;
+          cr = (float) r [x] [y] * fac * texred;
+          cg = (float) g [x] [y] * fac * texgreen;
+          cb = (float) b [x] [y] * fac * texblue;
+          if (cr >= texred) cr = texred;
+          if (cg >= texgreen) cg = texgreen;
+          if (cb >= texblue) cb = texblue;
           glColor3f (cr, cg, cb);
           glVertex3f (hh2*xs - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
-          cr = r [x+step] [y];
-          cg = g [x+step] [y];
-          cb = b [x+step] [y];
-          fac = 0.001 * (nl [xstep] [y] + (short) dl [xstep] [y] * 16) * sunlight / 256.0 * texlight;
-          cr = (float) cr * fac;
-          cg = (float) cg * fac;
-          cb = (float) cb * fac;
-          if (cr >= texlight) cr = texlight;
-          if (cg >= texlight) cg = texlight;
-          if (cb >= texlight) cb = texlight;
+          fac = 0.001F * (nl [xstep] [y] + (short) dl [xstep] [y] * 16) * sunlight / 256.0F;
+          cr = (float) r [x + step] [y] * fac * texred;
+          cg = (float) g [x + step] [y] * fac * texgreen;
+          cb = (float) b [x + step] [y] * fac * texblue;
+          if (cr >= texred) cr = texred;
+          if (cg >= texgreen) cg = texgreen;
+          if (cb >= texblue) cb = texblue;
           glColor3f (cr, cg, cb);
           glVertex3f (hh2*(xs+step) - 1.0, (float)h[xstep][y]*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
         }
@@ -824,6 +832,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
   last = false;
   if (water)
   {
+    float texlight;
     float watergreen = 0.00025;
     if (day) watergreen = 0.0004;
     for (xs = x1; xs < x2;)
@@ -956,7 +965,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
-  float texlight = 1.0;
+//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1008,7 +1017,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   {
     texzoom = 0.25;
   }
-  float fac2 = 0.001 * sunlight * texlight / 256;
+  float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
     int mx = getCoord (px [j]), my = getCoord (py [j]);
@@ -1054,7 +1063,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
-  float texlight = 1.0;
+//  float texlight = 1.0;
   bool texture = false;
   float col [4] [4];
   float pos [4] [3];
@@ -1088,41 +1097,61 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float) h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
     return;
 
-  bool glittering = false;
+//  glittering = 0;
   float glitter [4] = { 1, 1, 1, 1 };
   if (quality >= 2)
   {
-    float lz1 = fabs ((float) MAXX/2 + camx - xs);
-    float lz2 = fabs ((float) MAXX/2 + camx - xs - step);
-    if (lz1 <= 5 || lz2 <= 5)
+    float dz1 = fabs ((float) MAXX/2 + camx - xs);
+    float dz2 = fabs ((float) MAXX/2 + camx - xs - step);
+    float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
+    float dtheta1 = fabs (atan (dy / dz1) * 180.0 / PI - 90);
+    float dtheta2 = fabs (atan (dy / dz2) * 180.0 / PI - 90);
+    dtheta1 /= 4; dtheta2 /= 4;
+//    if (lz1 <= 5 || lz2 <= 5)
     {
       float dx1 = -((float) MAXX/2 - camz - ys);
       float dx2 = -((float) MAXX/2 - camz - ys - step);
-      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
+//      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
       float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
       float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
       dgamma1 /= 4; dgamma2 /= 4;
-      float sc = 2.0;
+      float sc = 1.0;
       float test;
       if (h1 >= hray [x] [y])
       {
-        test = sc * exp ((-dgamma1 * dgamma1 - lz1 * lz1) / 8.0) + 0.9;
-        if (test > 1.0) { glitter [0] = test; glittering = true; }
+        test = sc * exp ((-dgamma1 * dgamma1 - dtheta1 * dtheta1) / 8.0) + 0.98;
+        if (test > 1.0)
+        {
+          glitter [0] = test;
+          if (test > glittering) glittering = test;
+        }
       }
       if (h1 >= hray [xstep] [y])
       {
-        test = sc * exp ((-dgamma1 * dgamma1 - lz2 * lz2) / 8.0) + 0.9;
-        if (test > 1.0) { glitter [1] = test; glittering = true; }
+        test = sc * exp ((-dgamma1 * dgamma1 - dtheta2 * dtheta2) / 8.0) + 0.98;
+        if (test > 1.0)
+        {
+          glitter [1] = test;
+          if (test > glittering) glittering = test;
+        }
       }
       if (h1 >= hray [x] [ystep])
       {
-        test = sc * exp ((-dgamma2 * dgamma2 - lz1 * lz1) / 8.0) + 0.9;
-        if (test > 1.0) { glitter [3] = test; glittering = true; }
+        test = sc * exp ((-dgamma2 * dgamma2 - dtheta1 * dtheta1) / 8.0) + 0.98;
+        if (test > 1.0)
+        {
+          glitter [3] = test;
+          if (test > glittering) glittering = test;
+        }
       }
       if (h1 >= hray [xstep] [ystep])
       {
-        test = sc * exp ((-dgamma2 * dgamma2 - lz2 * lz2) / 8.0) + 0.9;
-        if (test > 1.0) { glitter [2] = test; glittering = true; }
+        test = sc * exp ((-dgamma2 * dgamma2 - dtheta2 * dtheta2) / 8.0) + 0.98;
+        if (test > 1.0)
+        {
+          glitter [2] = test;
+          if (test > glittering) glittering = test;
+        }
       }
 /*      li [0] *= glitter [0];
       li [1] *= glitter [1];
@@ -1134,7 +1163,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   texture = true;
 //  glActiveTextureARB(100);
   gl->enableTextures (texwater->textureID);
-  texlight = texwater->texlight;
+//  texlight = texwater->texlight;
   texzoom = 0.5;
   float watergreen = 0.00025;
   if (day) watergreen = 0.0004;
@@ -1192,13 +1221,13 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 
 //  glDisable (GL_DEPTH_TEST);
 
-  if (quality >= 2 && glittering)
+  if (quality >= 2 && glittering > 0)
   {
     glEnable (GL_BLEND);
     glDepthFunc (GL_LEQUAL);
     glBlendFunc (GL_ONE, GL_SRC_ALPHA);
     glEnable (GL_ALPHA_TEST);
-    glAlphaFunc (GL_GEQUAL, 0.5);
+    glAlphaFunc (GL_GEQUAL, 0.2);
   //  glBlendFunc (GL_ONE, GL_ONE);
     gl->enableTextures (texglitter1->textureID);
     gl->enableLinearTexture (texglitter1->textureID);
@@ -1323,7 +1352,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
   int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
-  float texlight = 1.0;
+//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1360,7 +1389,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
     texzoom = 0.25;
   }
 
-  float fac2 = 0.001 * sunlight * texlight / 256;
+  float fac2 = 0.001F * sunlight / 256.0F;
 
   for (j = 0; j < 4; j ++)
   {
@@ -1462,7 +1491,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
-  float texlight = 1.0;
+//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1532,8 +1561,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
     texzoom = 0.25;
   }
 
-
-  float fac2 = 0.001 * sunlight * texlight / 256;
+  float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
     int mx = getCoord (px [j]), my = getCoord (py [j]);
