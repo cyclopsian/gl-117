@@ -23,72 +23,58 @@
 
 #ifndef IS_MATHTAB_H
 
+#include "Math.h"
+
 #include <math.h>
 #include <stdlib.h>
 
-#include "mathtab.h"
-#include "common.h"
 
-float PI;
-float sine [360];
-float cosi [360];
 
-int randommaster [64] [64];
-int randptr = 0;
+Math math;
 
-float smokezoom [MAXSMOKEELEM];
-
-void mathtab_init ()
+Math::Math ()
 {
-  int i, i2;
-  PI = (float) (atan (1.0) * 4.0);
+  int i;
   
-  for (i = 0; i < 360; i ++)
-  {
-    sine [i] = (float) sin ((float) i / 180.0 * PI);
-    cosi [i] = (float) cos ((float) i / 180.0 * PI);
-  }
-
+#ifdef MULTIPLAYER
+  int i2;
   for (i = 0; i < 63; i ++)
     for (i2 = 0; i2 < 63; i2 ++)
-      randommaster [i] [i2] = (i * i2 * 2000) % 32678;
-  
+      randommaster [i] [i2] = rand ();
+#endif
+
   for (i = 0; i < MAXSMOKEELEM; i ++)
-    smokezoom [i] = (2.0 - 1.8 * i / MAXSMOKEELEM) * 0.15;
-/*  float smokezoom[] = { 2.0, 0.198, 0.195, 0.193, 0.19, 0.188, 0.185, 0.182, 0.18, 0.177,
-                            0.174, 0.171, 0.168, 0.165, 0.162, 0.159, 0.156, 0.153, 0.15, 0.149,
-                            0.146, 0.143, 0.14, 0.136, 0.132, 0.128, 0.124, 0.12, 0.115, 0.11,
-                            0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };*/
+    smokezoom [i] = (2.0F - 1.8F * i / MAXSMOKEELEM) * 0.15F;
 }
 
 // return random number
-int myrandom (int n)
+int Math::random (int n)
 {
   if (n == 0) return 0;
-  if (!multiplayer)
-  {
-    return rand () % n;
-  }
+
+#ifndef MULTIPLAYER
+  return rand () % n;
+#else
   randptr ++;
   if (randptr >= 64) randptr = 0;
   return randommaster [randptr] [randptr] % n;
+#endif
 }
 
 // return random number, but prefer extremely high and low values
-int extremerandom (int n)
+int Math::extremeRandom (int n)
 {
   if (n == 0) return 0;
+
+#ifndef MULTIPLAYER
   int ret;
-  if (!multiplayer)
-  {
-    ret = rand () % n;
-  }
-  else
-  {
-    randptr ++;
-    if (randptr >= 64) randptr = 0;
-    ret = randommaster [randptr] [randptr] % n;
-  }
+  ret = rand () % n;
+#else
+  randptr ++;
+  if (randptr >= 64) randptr = 0;
+  ret = randommaster [randptr] [randptr] % n;
+#endif
+
   if ((ret % 5) <= 4)
   {
     if (ret > n/2 && ret < 3*n/4) return ret + n/4;
@@ -97,18 +83,31 @@ int extremerandom (int n)
   return ret;
 }
 
-int myrandom (int n, int x, int y)
+int Math::random (int n, int x, int y)
 {
   if (n == 0) return 0;
+
+#ifndef MULTIPLAYER
   int ret;
-  if (!multiplayer)
-  {
-    ret = rand () % n;
-  }
-  else
-  {
-    ret = (randommaster [x%63] [y%63] ^ (31*x) ^ (71*y)) % n;
-  }
+  ret = rand () % n;
+#else
+  ret = (randommaster [x%63] [y%63] ^ (31*x) ^ (71*y)) % n;
+#endif
+
+  return ret;
+}
+
+int Math::extremeRandom (int n, int x, int y)
+{
+  if (n == 0) return 0;
+
+#ifndef MULTIPLAYER
+  int ret;
+  ret = rand () % n;
+#else
+  ret = (randommaster [x%63] [y%63] ^ (31*x) ^ (71*y)) % n;
+#endif
+
   if ((ret % 5) <= 4)
   {
     if (ret > n/2 && ret < 3*n/4) return ret + n/4;
@@ -117,29 +116,9 @@ int myrandom (int n, int x, int y)
   return ret;
 }
 
-int extremerandom (int n, int x, int y)
+float Math::dist (float dx, float dy)
 {
-  if (n == 0) return 0;
-  int ret;
-  if (!multiplayer)
-  {
-    ret = rand () % n;
-  }
-  else
-  {
-    ret = (randommaster [x%63] [y%63] ^ (31*x) ^ (71*y)) % n;
-  }
-  if ((ret % 5) <= 4)
-  {
-    if (ret > n/2 && ret < 3*n/4) return ret + n/4;
-    else if (ret < n/2 && ret > n/4) return ret - n/4;
-  }
-  return ret;
-}
-
-float dist (float dx, float dy)
-{
-  return (float) sqrt (dx*dx + dy*dy);
+  return (float) sqrt (dx * dx + dy * dy);
 }
 
 #endif

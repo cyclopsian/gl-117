@@ -28,7 +28,7 @@
 #include "mission.h"
 #include "common.h"
 #include "main.h"
-#include "mathtab.h"
+#include "math/Math.h"
 #include "conf.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -198,7 +198,7 @@ void Mission::invertZ ()
   int i;
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->tl->z = -fighter [i]->tl->z;
+    fighter [i]->tl.z = -fighter [i]->tl.z;
     fighter [i]->phi += 180;
   }
 }
@@ -228,7 +228,7 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
         else
         {
           if (id >= MISSION_CAMPAIGN1 && id <= MISSION_CAMPAIGN2)
-            p->tp [i]->flyMission (myrandom (4));
+            p->tp [i]->flyMission (math.random (4));
         }
       }
     }
@@ -291,20 +291,20 @@ void MissionDemo1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   fplayer = fighter [0];
-  fighter [0]->tl->x = 220;
-  fighter [0]->tl->z = -30;
+  fighter [0]->tl.x = 220;
+  fighter [0]->tl.z = -30;
   fighter [0]->o = &model_fig;
   fighter [0]->target = fighter [2];
   fighter [0]->newinit (FIGHTER_FALCON, 1, 0);
   fighter [1]->target = fighter [3];
   fighter [1]->o = &model_fig;
-  fighter [1]->tl->x = 49;
-  fighter [1]->tl->z = -30;
+  fighter [1]->tl.x = 49;
+  fighter [1]->tl.z = -30;
   fighter [1]->newinit (FIGHTER_FALCON, 1, 0);
   fighter [1]->aggressivity = 300;
   for (i = 2; i <= 8; i ++)
   {
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_figa;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
   }
@@ -356,8 +356,8 @@ void MissionTutorial1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 220;
-  fplayer->tl->z = -30;
+  fplayer->tl.x = 220;
+  fplayer->tl.z = -30;
 }
 
 int MissionTutorial1::processtimer (Uint32 dt)
@@ -560,14 +560,14 @@ void MissionTutorial1::draw ()
     fighter [1]->target = fighter [0];
     fighter [1]->o = &model_figt;
     fighter [1]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [1]->tl->x = fplayer->tl->x - 30;
-    fighter [1]->tl->z = fplayer->tl->z - 30;
+    fighter [1]->tl.x = fplayer->tl.x - 30;
+    fighter [1]->tl.z = fplayer->tl.z - 30;
     fighter [2]->activate ();
     fighter [2]->target = fighter [0];
     fighter [2]->o = &model_figt;
     fighter [2]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [2]->tl->x = fplayer->tl->x + 30;
-    fighter [2]->tl->z = fplayer->tl->z + 30;
+    fighter [2]->tl.x = fplayer->tl.x + 30;
+    fighter [2]->tl.z = fplayer->tl.z + 30;
   }
 }
 
@@ -603,15 +603,15 @@ void MissionTutorial2::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl->x = px;
-  fplayer->tl->z = py + 150;
+  fplayer->tl.x = px;
+  fplayer->tl.z = py + 150;
   for (i = 1; i <= 2; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_tank1;
-    fighter [i]->tl->x = px + 6 - i * 4;
-    fighter [i]->tl->z = py + 6 - i * 4;
+    fighter [i]->tl.x = px + 6 - i * 4;
+    fighter [i]->tl.z = py + 6 - i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400);
     fighter [i]->maxthrust = 0;
   }
@@ -697,8 +697,8 @@ void MissionTutorial3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl->x = 220;
-  fplayer->tl->z = -30;
+  fplayer->tl.x = 220;
+  fplayer->tl.z = -30;
 }
 
 int MissionTutorial3::processtimer (Uint32 dt)
@@ -793,14 +793,14 @@ void MissionTutorial3::draw ()
     fighter [1]->target = fighter [0];
     fighter [1]->o = &model_figt;
     fighter [1]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [1]->tl->x = fplayer->tl->x - 30;
-    fighter [1]->tl->z = fplayer->tl->z - 30;
+    fighter [1]->tl.x = fplayer->tl.x - 30;
+    fighter [1]->tl.z = fplayer->tl.z - 30;
     fighter [2]->activate ();
     fighter [2]->target = fighter [0];
     fighter [2]->o = &model_figt;
     fighter [2]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [2]->tl->x = fplayer->tl->x + 30;
-    fighter [2]->tl->z = fplayer->tl->z + 30;
+    fighter [2]->tl.x = fplayer->tl.x + 30;
+    fighter [2]->tl.z = fplayer->tl.z + 30;
   }
 }
 
@@ -828,15 +828,15 @@ void MissionDogfight1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 20;
-  fplayer->tl->z = 70;
+  fplayer->tl.x = 20;
+  fplayer->tl.z = 70;
   for (i = 1; i <= 6; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 395);
     fighter [i]->deactivate ();
   }
@@ -870,9 +870,9 @@ int MissionDogfight1::processtimer (Uint32 dt)
     for (i = 2; i <= 3; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
-      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
+      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
     }
     return 0;
   }
@@ -881,9 +881,9 @@ int MissionDogfight1::processtimer (Uint32 dt)
     for (i = 4; i <= 6; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
-      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
+      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
     }
     return 0;
   }
@@ -996,14 +996,14 @@ void MissionFreeFlight1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 20;
-  fplayer->tl->z = 70;
+  fplayer->tl.x = 20;
+  fplayer->tl.z = 70;
   for (i = 1; i <= 9; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->o = &model_figt;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 395);
     if (i >= 3)
@@ -1041,9 +1041,9 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
     {
       fighter [i]->activate ();
       int phi = 120 * i;
-      fighter [i]->tl->x = fplayer->tl->x + 40 * COS(phi);
-      fighter [i]->tl->z = fplayer->tl->z + 40 * SIN(phi);
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+      fighter [i]->tl.x = fplayer->tl.x + 40 * COS(phi);
+      fighter [i]->tl.z = fplayer->tl.z + 40 * SIN(phi);
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
     }
     return 0;
   }
@@ -1053,9 +1053,9 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
     {
       fighter [i]->activate ();
       int phi = 90 * i;
-      fighter [i]->tl->x = fplayer->tl->x + 40 * COS(phi);
-      fighter [i]->tl->z = fplayer->tl->z + 40 * SIN(phi);
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+      fighter [i]->tl.x = fplayer->tl.x + 40 * COS(phi);
+      fighter [i]->tl.z = fplayer->tl.z + 40 * SIN(phi);
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
     }
     return 0;
   }
@@ -1118,16 +1118,16 @@ void MissionDeathmatch1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 50;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 50;
   for (i = 1; i <= 7; i ++)
   {
     fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
   }
   state = 0;
   laststate = 0;
@@ -1208,8 +1208,8 @@ void MissionDeathmatch2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 50;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 50;
   for (i = 1; i <= 7; i ++)
   {
     if (i <= 1)
@@ -1234,8 +1234,8 @@ void MissionDeathmatch2::start ()
     }
     fighter [i]->party = i / 2 + 1;
     fighter [i]->target = fighter [(i + 4) % 8];
-    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
   }
   state = 0;
   laststate = 0;
@@ -1320,8 +1320,8 @@ void MissionDeathmatch3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 50;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 50;
   fplayer->ammo = 100000;
   for (i2 = 0; i2 < missiletypes; i2 ++)
   {
@@ -1334,8 +1334,8 @@ void MissionDeathmatch3::start ()
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
     fighter [i]->ammo = 100000;
     for (i2 = 0; i2 < missiletypes; i2 ++)
     {
@@ -1428,8 +1428,8 @@ void MissionTeamBase1::start ()
   l->flatten (px, py, 8, 8);
   team1x = px; team1y = py + 50;
   playerInit ();
-  fplayer->tl->x = px;
-  fplayer->tl->z = py;
+  fplayer->tl.x = px;
+  fplayer->tl.z = py;
   fplayer->phi = 180;
   if (fplayer->id == FIGHTER_FALCON)
   {
@@ -1444,40 +1444,40 @@ void MissionTeamBase1::start ()
     fighter [1]->target = fighter [3];
   }
   fighter [1]->party = 1;
-  fighter [1]->tl->x = px + 5;
-  fighter [1]->tl->z = py + 5;
+  fighter [1]->tl.x = px + 5;
+  fighter [1]->tl.z = py + 5;
 
   int n = 4;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py + 5;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py + 5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall2;
   fighter [n]->newinit (STATIC_HALL2, 0, 400);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px - 1.5;
-  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->tl.x = px - 1.5;
+  fighter [n]->tl.z = py - 4.5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
@@ -1485,8 +1485,8 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
@@ -1494,22 +1494,22 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px - 15;
-  fighter [n]->tl->z = py - 20;
+  fighter [n]->tl.x = px - 15;
+  fighter [n]->tl.z = py - 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px + 0;
-  fighter [n]->tl->z = py - 20;
+  fighter [n]->tl.x = px + 0;
+  fighter [n]->tl.z = py - 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 1;
   n ++;
-  fighter [n]->tl->x = px + 15;
-  fighter [n]->tl->z = py - 20;
+  fighter [n]->tl.x = px + 15;
+  fighter [n]->tl.z = py - 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
@@ -1520,8 +1520,8 @@ void MissionTeamBase1::start ()
   team2x = px; team2y = py - 50;
   fighter [2]->newinit (FIGHTER_BUZZARD, 0, 200);
   fighter [2]->o = &model_figd;
-  fighter [2]->tl->x = px;
-  fighter [2]->tl->z = py;
+  fighter [2]->tl.x = px;
+  fighter [2]->tl.z = py;
   if (fplayer->id == FIGHTER_FALCON)
     fighter [2]->target = fighter [1];
   else
@@ -1529,41 +1529,41 @@ void MissionTeamBase1::start ()
   fighter [2]->party = 2;
   fighter [3]->newinit (FIGHTER_SWALLOW, 0, 200);
   fighter [3]->o = &model_figa;
-  fighter [3]->tl->x = px + 5;
-  fighter [3]->tl->z = py + 5;
+  fighter [3]->tl.x = px + 5;
+  fighter [3]->tl.z = py + 5;
   fighter [3]->target = NULL;
   fighter [3]->party = 2;
 
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py + 5;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py + 5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall2;
   fighter [n]->newinit (STATIC_HALL2, 0, 400);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px - 1.5;
-  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->tl.x = px - 1.5;
+  fighter [n]->tl.z = py - 4.5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
@@ -1571,8 +1571,8 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
@@ -1580,22 +1580,22 @@ void MissionTeamBase1::start ()
   fighter [n]->maxtheta = 0;
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px - 15;
-  fighter [n]->tl->z = py + 20;
+  fighter [n]->tl.x = px - 15;
+  fighter [n]->tl.z = py + 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px + 0;
-  fighter [n]->tl->z = py + 20;
+  fighter [n]->tl.x = px + 0;
+  fighter [n]->tl.z = py + 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
   fighter [n]->party = 2;
   n ++;
-  fighter [n]->tl->x = px + 15;
-  fighter [n]->tl->z = py + 20;
+  fighter [n]->tl.x = px + 15;
+  fighter [n]->tl.z = py + 20;
   fighter [n]->target = NULL;
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 300);
@@ -1663,13 +1663,13 @@ int MissionTeamBase1::processtimer (Uint32 dt)
       fighter [i]->killed = false;
       if (i <= 1)
       {
-        fighter [i]->tl->x = team1x;
-        fighter [i]->tl->z = team1y;
+        fighter [i]->tl.x = team1x;
+        fighter [i]->tl.z = team1y;
       }
       else
       {
-        fighter [i]->tl->x = team2x;
-        fighter [i]->tl->z = team2y;
+        fighter [i]->tl.x = team2x;
+        fighter [i]->tl.z = team2y;
       }
       camera = 0;
     }
@@ -1709,14 +1709,14 @@ void MissionWaves1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 20;
-  fplayer->tl->z = 70;
+  fplayer->tl.x = 20;
+  fplayer->tl.z = 70;
   for (i = 1; i <= 9; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     if (i <= 2)
     {
       fighter [i]->o = &model_fige;
@@ -1764,9 +1764,9 @@ int MissionWaves1::processtimer (Uint32 dt)
     for (i = 3; i <= 5; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
-      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
+      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
     }
     playerInit ();
     return 0;
@@ -1776,9 +1776,9 @@ int MissionWaves1::processtimer (Uint32 dt)
     for (i = 6; i <= 9; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
-      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
+      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
     }
     playerInit ();
     return 0;
@@ -1842,8 +1842,8 @@ void MissionTest1::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl->x = px;
-  fplayer->tl->z = py + 100;
+  fplayer->tl.x = px;
+  fplayer->tl.z = py + 100;
   for (i = 0; i < missiletypes; i ++)
   {
     fplayer->missiles [i] = 0;
@@ -1853,8 +1853,8 @@ void MissionTest1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_pickup1;
-    fighter [i]->tl->x = px + 4 - ((i - 1) / 2) * 4;
-    fighter [i]->tl->z = py + 4 - ((i - 1) & 1) * 8;
+    fighter [i]->tl.x = px + 4 - ((i - 1) / 2) * 4;
+    fighter [i]->tl.z = py + 4 - ((i - 1) & 1) * 8;
     fighter [i]->newinit (TANK_PICKUP1, 0, 400);
   }
 }
@@ -1910,8 +1910,8 @@ void MissionTest2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 50;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 50;
   for (i = 0; i < missiletypes; i ++)
   {
     fplayer->missiles [i] = 0;
@@ -1920,8 +1920,8 @@ void MissionTest2::start ()
   fighter [1]->party = 0;
   fighter [1]->target = fighter [0];
   fighter [1]->o = &model_fig;
-  fighter [1]->tl->x = 0;
-  fighter [1]->tl->z = 0;
+  fighter [1]->tl.x = 0;
+  fighter [1]->tl.z = 0;
   fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
   fighter [1]->aggressivity = 0;
 //  fighter [1]->intelligence = 0;
@@ -2009,18 +2009,18 @@ void MissionTransport::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 5;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 5;
+  fighter [1]->tl.z = 105;
   for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 340);
   }
   for (i = 5; i <= 6; i ++)
@@ -2028,8 +2028,8 @@ void MissionTransport::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_figt;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 200);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -2088,11 +2088,11 @@ void MissionConvoy::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl->x = px;
-  fplayer->tl->z = py + 100;
+  fplayer->tl.x = px;
+  fplayer->tl.z = py + 100;
   alliedInit (FIGHTER_HAWK, alliedpilot [0], fighter [1]); // always match together 0<->1, 1<->2 etc.
-  fighter [1]->tl->x = px + 5;
-  fighter [1]->tl->z = py + 105;
+  fighter [1]->tl.x = px + 5;
+  fighter [1]->tl.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
     fighter [i]->party = 0;
@@ -2100,8 +2100,8 @@ void MissionConvoy::start ()
     fighter [i]->o = &model_tank1;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_AIR1, 0, 200);
-    fighter [i]->tl->x = px + sine [phi] * 3.0;
-    fighter [i]->tl->z = py + cosi [phi] * 3.0;
+    fighter [i]->tl.x = px + SIN(phi) * 3.0;
+    fighter [i]->tl.z = py + COS(phi) * 3.0;
     fighter [i]->phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->maxthrust = 0;
@@ -2112,8 +2112,8 @@ void MissionConvoy::start ()
     fighter [i]->target = fighter [0];
     if (i == 6 || i == 9) fighter [i]->o = &model_pickup1;
     else fighter [i]->o = &model_truck1;
-    fighter [i]->tl->x = px + 7.5 - i;
-    fighter [i]->tl->z = py + 7.5 - i;
+    fighter [i]->tl.x = px + 7.5 - i;
+    fighter [i]->tl.z = py + 7.5 - i;
     if (i == 6 || i == 9) fighter [i]->newinit (TANK_PICKUP1, 0, 400);
     else fighter [i]->newinit (TANK_TRUCK1, 0, 400);
   }
@@ -2172,27 +2172,27 @@ void MissionDogfight2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 5;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 5;
+  fighter [1]->tl.z = 105;
   for (i = 2; i <= 6; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   for (i = 7; i <= 8; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10 - 100;
-    fighter [i]->tl->z = -i * 10 - 100;
+    fighter [i]->tl.x = -i * 10 - 100;
+    fighter [i]->tl.z = -i * 10 - 100;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
@@ -2229,12 +2229,12 @@ void MissionDogfight2::draw ()
     state ++;
     fighter [7]->activate ();
     fighter [8]->activate ();
-    fighter [7]->tl->x = fplayer->tl->x + 50;
-    fighter [7]->tl->z = fplayer->tl->z + 50;
-    fighter [7]->tl->y = l->getHeight (fighter [7]->tl->x, fighter [7]->tl->z) + 10;
-    fighter [8]->tl->x = fplayer->tl->x + 60;
-    fighter [8]->tl->z = fplayer->tl->z + 60;
-    fighter [8]->tl->y = l->getHeight (fighter [8]->tl->x, fighter [8]->tl->z) + 10;
+    fighter [7]->tl.x = fplayer->tl.x + 50;
+    fighter [7]->tl.z = fplayer->tl.z + 50;
+    fighter [7]->tl.y = l->getHeight (fighter [7]->tl.x, fighter [7]->tl.z) + 10;
+    fighter [8]->tl.x = fplayer->tl.x + 60;
+    fighter [8]->tl.z = fplayer->tl.z + 60;
+    fighter [8]->tl.y = l->getHeight (fighter [8]->tl.x, fighter [8]->tl.z) + 10;
   }
   if (timer >= 1000 * timestep && timer <= 1200 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", &textcolor);
@@ -2269,37 +2269,37 @@ void MissionAirBattle::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   for (i = 1; i <= 6; i ++)
   {
     alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
     if (i % 2)
-      fighter [i]->tl->x = ((i + 1) / 2) * 5;
+      fighter [i]->tl.x = ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl->x = -((i + 1) / 2) * 5;
-    fighter [i]->tl->z = 100 + i * 5;
+      fighter [i]->tl.x = -((i + 1) / 2) * 5;
+    fighter [i]->tl.z = 100 + i * 5;
     fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (7)];
+    fighter [i]->target = fighter [math.random (7)];
     fighter [i]->o = &model_fige;
     if (i <= 13)
     {
-      fighter [i]->tl->x = -i * 5;
-      fighter [i]->tl->z = -i * 5;
+      fighter [i]->tl.x = -i * 5;
+      fighter [i]->tl.z = -i * 5;
     }
     else if (i <= 25)
     {
-      fighter [i]->tl->x = -i * 8 - 150;
-      fighter [i]->tl->z = -i * 8 - 150;
+      fighter [i]->tl.x = -i * 8 - 150;
+      fighter [i]->tl.z = -i * 8 - 150;
     }
     else
     {
-      fighter [i]->tl->x = -i * 8 - 350;
-      fighter [i]->tl->z = -i * 8 - 350;
+      fighter [i]->tl.x = -i * 8 - 350;
+      fighter [i]->tl.z = -i * 8 - 350;
     }
     fighter [i]->newinit (FIGHTER_CROW, 0, 440 - i * 10);
   }
@@ -2363,17 +2363,17 @@ void MissionGround1::start ()
 //  px = px - MAXX / 2;
 //  py = MAXX / 2 - py;
   playerInit ();
-  fplayer->tl->x = px + 10;
-  fplayer->tl->z = py + 80;
+  fplayer->tl.x = px + 10;
+  fplayer->tl.z = py + 80;
   fplayer->target = fighter [2];
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = px + 20;
-  fighter [1]->tl->z = py + 90;
+  fighter [1]->tl.x = px + 20;
+  fighter [1]->tl.z = py + 90;
   fighter [1]->target = fighter [2];
   for (i = 2; i <= 4; i ++)
   {
-    fighter [i]->tl->x = px - 9 + i * 3;
-    fighter [i]->tl->z = py;
+    fighter [i]->tl.x = px - 9 + i * 3;
+    fighter [i]->tl.z = py;
     fighter [i]->target = fighter [0];
     if (i == 2)
     {
@@ -2390,18 +2390,18 @@ void MissionGround1::start ()
   l->flatten (px, py, 3, 3);
   for (i = 5; i <= 6; i ++)
   {
-    fighter [i]->tl->x = px - 17 + i * 3;
-    fighter [i]->tl->z = py;
+    fighter [i]->tl.x = px - 17 + i * 3;
+    fighter [i]->tl.z = py;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
-  fighter [7]->tl->x = px + 1;
-  fighter [7]->tl->z = py - 1;
+  fighter [7]->tl.x = px + 1;
+  fighter [7]->tl.z = py - 1;
   fighter [7]->o = &model_tent1;
   fighter [7]->newinit (STATIC_TENT1, 0, 200);
-  fighter [8]->tl->x = px - 1;
-  fighter [8]->tl->z = py - 1;
+  fighter [8]->tl.x = px - 1;
+  fighter [8]->tl.z = py - 1;
   fighter [8]->o = &model_tent1;
   fighter [8]->newinit (STATIC_TENT1, 0, 200);
 }
@@ -2458,18 +2458,18 @@ void MissionScout::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 5;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 5;
+  fighter [1]->tl.z = 105;
   for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_figd;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -2542,102 +2542,102 @@ void MissionBase::start ()
       l->b [i] [i2] = sum - 15;
     }
   playerInit ();
-  fplayer->tl->x = px + 10;
-  fplayer->tl->z = py + 100;
+  fplayer->tl.x = px + 10;
+  fplayer->tl.z = py + 100;
   fplayer->target = fighter [4];
   for (i = 1; i <= 3; i ++)
   {
     alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
-    fighter [i]->tl->x = px + 10 + i * 5;
-    fighter [i]->tl->z = py + 100 + i * 5;
+    fighter [i]->tl.x = px + 10 + i * 5;
+    fighter [i]->tl.z = py + 100 + i * 5;
   }
   int n = 4;
-  fighter [n]->tl->x = px - 4;
-  fighter [n]->tl->z = py;
+  fighter [n]->tl.x = px - 4;
+  fighter [n]->tl.z = py;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall2;
   fighter [n]->newinit (STATIC_HALL2, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py + 5;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py + 5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall2;
   fighter [n]->newinit (STATIC_HALL2, 0, 400);
   n ++;
-  fighter [n]->tl->x = px;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 4;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px + 4;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 1.5;
-  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->tl.x = px - 1.5;
+  fighter [n]->tl.z = py - 4.5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 1.5;
-  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->tl.x = px + 1.5;
+  fighter [n]->tl.z = py - 4.5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 3;
-  fighter [n]->tl->z = py + 4;
+  fighter [n]->tl.x = px - 3;
+  fighter [n]->tl.z = py + 4;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 5.5;
-  fighter [n]->tl->z = py + 4;
+  fighter [n]->tl.x = px - 5.5;
+  fighter [n]->tl.z = py + 4;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 4;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px - 4;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 90;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 0;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px + 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 270;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px + 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
@@ -2647,11 +2647,11 @@ void MissionBase::start ()
   for (i = n; i < n + 6; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (4)];
+    fighter [i]->target = fighter [math.random (4)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = px + i * 5 - 60;
-    fighter [i]->tl->z = py + i * 5 - 60;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 180 + myrandom (200));
+    fighter [i]->tl.x = px + i * 5 - 60;
+    fighter [i]->tl.z = py + i * 5 - 60;
+    fighter [i]->newinit (FIGHTER_CROW, 0, 180 + math.random (200));
   }
 }
 
@@ -2719,111 +2719,111 @@ void MissionDepot::start ()
       l->b [i] [i2] = sum - 15;
     }
   playerInit ();
-  fplayer->tl->x = px + 10;
-  fplayer->tl->z = py + 130;
+  fplayer->tl.x = px + 10;
+  fplayer->tl.z = py + 130;
   fplayer->target = fighter [4];
   for (i = 1; i <= 1; i ++)
   {
     alliedInit (FIGHTER_STORM, alliedpilot [i - 1], fighter [i]);
-    fighter [i]->tl->x = px + 10 + i * 5;
-    fighter [i]->tl->z = py + 130 + i * 5;
+    fighter [i]->tl.x = px + 10 + i * 5;
+    fighter [i]->tl.z = py + 130 + i * 5;
     fighter [i]->target = fighter [2];
     fighter [i]->bomber = true;
   }
   int n = 2;
-  fighter [n]->tl->x = px - 4;
-  fighter [n]->tl->z = py;
+  fighter [n]->tl.x = px - 4;
+  fighter [n]->tl.z = py;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_depot1;
   fighter [n]->newinit (STATIC_DEPOT1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py + 5;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py + 5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_depot1;
   fighter [n]->newinit (STATIC_DEPOT1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 2;
-  fighter [n]->tl->z = py - 1;
+  fighter [n]->tl.x = px + 2;
+  fighter [n]->tl.z = py - 1;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-  fighter [n]->tl->x = px + 1.5;
-  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->tl.x = px + 1.5;
+  fighter [n]->tl.z = py - 4.5;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
   n ++;
-  fighter [n]->tl->x = px - 3;
-  fighter [n]->tl->z = py + 4;
+  fighter [n]->tl.x = px - 3;
+  fighter [n]->tl.z = py + 4;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 90;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 0;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 6;
-  fighter [n]->tl->z = py - 6;
+  fighter [n]->tl.x = px + 6;
+  fighter [n]->tl.z = py - 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 270;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 6;
-  fighter [n]->tl->z = py + 6;
+  fighter [n]->tl.x = px + 6;
+  fighter [n]->tl.z = py + 6;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
   fighter [n]->phi = 180;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px - 6;
-  fighter [n]->tl->z = py + 35;
+  fighter [n]->tl.x = px - 6;
+  fighter [n]->tl.z = py + 35;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 200);
   fighter [n]->phi = 180;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 6;
-  fighter [n]->tl->z = py + 35;
+  fighter [n]->tl.x = px + 6;
+  fighter [n]->tl.z = py + 35;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 200);
   fighter [n]->phi = 180;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px + 35;
-  fighter [n]->tl->z = py;
+  fighter [n]->tl.x = px + 35;
+  fighter [n]->tl.z = py;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 200);
   fighter [n]->phi = 180;
   fighter [n]->maxtheta = 0;
   n ++;
-  fighter [n]->tl->x = px - 35;
-  fighter [n]->tl->z = py;
+  fighter [n]->tl.x = px - 35;
+  fighter [n]->tl.z = py;
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flarak1;
   fighter [n]->newinit (FLARAK_AIR1, 0, 200);
@@ -2885,17 +2885,17 @@ void MissionDefend1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl->x = 10;
-  fplayer->tl->z = 90;
+  fplayer->tl.x = 10;
+  fplayer->tl.z = 90;
   fplayer->target = fighter [7];
   alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 20;
-  fighter [1]->tl->z = 100;
+  fighter [1]->tl.x = 20;
+  fighter [1]->tl.z = 100;
   fighter [1]->target = fighter [8];
   for (i = 2; i <= 6; i ++)
   {
-    fighter [i]->tl->x = 20 + i * 5;
-    fighter [i]->tl->z = 10;
+    fighter [i]->tl.x = 20 + i * 5;
+    fighter [i]->tl.z = 10;
     if (i == 3 || i == 4 || i == 5)
     {
       fighter [i]->o = &model_flarak1;
@@ -2915,8 +2915,8 @@ void MissionDefend1::start ()
     int off = 35;
     if (difficulty == 0) off = 55;
     else off = 15;
-    fighter [i]->tl->x = i * 5 - 50;
-    fighter [i]->tl->z = -i * 5 - off;
+    fighter [i]->tl.x = i * 5 - 50;
+    fighter [i]->tl.z = -i * 5 - off;
     fighter [i]->o = &model_tank2;
     fighter [i]->newinit (TANK_GROUND1, 0, 300);
     fighter [i]->target = fighter [i - 4];
@@ -2926,8 +2926,8 @@ void MissionDefend1::start ()
     int off = 40;
     if (difficulty == 0) off = 55;
     else off = 25;
-    fighter [i]->tl->x = i * 5 - 50;
-    fighter [i]->tl->z = -i * 5 - off * 2;
+    fighter [i]->tl.x = i * 5 - 50;
+    fighter [i]->tl.z = -i * 5 - off * 2;
     if (i == 12)
     {
       fighter [i]->newinit (TANK_AIR1, 0, 300);
@@ -3012,33 +3012,33 @@ void MissionDogfight3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 5;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 5;
+  fighter [1]->tl.z = 105;
   alliedInit (FIGHTER_FALCON, alliedpilot [1], fighter [2]);
-  fighter [2]->tl->x = 10;
-  fighter [2]->tl->z = 110;
+  fighter [2]->tl.x = 10;
+  fighter [2]->tl.z = 110;
   alliedInit (FIGHTER_FALCON, alliedpilot [2], fighter [3]);
-  fighter [3]->tl->x = 15;
-  fighter [3]->tl->z = 115;
+  fighter [3]->tl.x = 15;
+  fighter [3]->tl.z = 115;
   for (i = 4; i <= 8; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (4)];
+    fighter [i]->target = fighter [math.random (4)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 25);
   }
   for (i = 9; i <= 11; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (4)];
+    fighter [i]->target = fighter [math.random (4)];
     fighter [i]->o = &model_figa;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
@@ -3076,15 +3076,15 @@ void MissionDogfight3::draw ()
     fighter [9]->activate ();
     fighter [10]->activate ();
     fighter [11]->activate ();
-    fighter [9]->tl->x = fplayer->tl->x + 55;
-    fighter [9]->tl->z = fplayer->tl->z + 55;
-    fighter [9]->tl->y = l->getHeight (fighter [9]->tl->x, fighter [9]->tl->z) + 10;
-    fighter [10]->tl->x = fplayer->tl->x + 60;
-    fighter [10]->tl->z = fplayer->tl->z + 60;
-    fighter [10]->tl->y = l->getHeight (fighter [10]->tl->x, fighter [10]->tl->z) + 10;
-    fighter [11]->tl->x = fplayer->tl->x + 65;
-    fighter [11]->tl->z = fplayer->tl->z + 65;
-    fighter [11]->tl->y = l->getHeight (fighter [11]->tl->x, fighter [11]->tl->z) + 10;
+    fighter [9]->tl.x = fplayer->tl.x + 55;
+    fighter [9]->tl.z = fplayer->tl.z + 55;
+    fighter [9]->tl.y = l->getHeight (fighter [9]->tl.x, fighter [9]->tl.z) + 10;
+    fighter [10]->tl.x = fplayer->tl.x + 60;
+    fighter [10]->tl.z = fplayer->tl.z + 60;
+    fighter [10]->tl.y = l->getHeight (fighter [10]->tl.x, fighter [10]->tl.z) + 10;
+    fighter [11]->tl.x = fplayer->tl.x + 65;
+    fighter [11]->tl.z = fplayer->tl.z + 65;
+    fighter [11]->tl.y = l->getHeight (fighter [11]->tl.x, fighter [11]->tl.z) + 10;
   }
   if (timer >= 800 * timestep && timer <= 1000 * timestep)
     font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", &textcolor);
@@ -3116,18 +3116,18 @@ void MissionTank1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 5;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 5;
+  fighter [1]->tl.z = 105;
   for (i = 2; i <= 7; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_tank2;
-    fighter [i]->tl->x = -i * 4;
-    fighter [i]->tl->z = -i * 4;
+    fighter [i]->tl.x = -i * 4;
+    fighter [i]->tl.z = -i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400 - i * 25);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
@@ -3135,10 +3135,10 @@ void MissionTank1::start ()
   for (i = 8; i <= 10; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_tank1;
-    fighter [i]->tl->x = i * 3;
-    fighter [i]->tl->z = i * 3;
+    fighter [i]->tl.x = i * 3;
+    fighter [i]->tl.z = i * 3;
     fighter [i]->newinit (TANK_AIR1, 0, 80);
   }
   for (i = 11; i <= 13; i ++)
@@ -3146,8 +3146,8 @@ void MissionTank1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_container1;
-    fighter [i]->tl->x = i * 3;
-    fighter [i]->tl->z = 60;
+    fighter [i]->tl.x = i * 3;
+    fighter [i]->tl.z = 60;
     fighter [i]->newinit (STATIC_CONTAINER1, 0, 0);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3207,11 +3207,11 @@ void MissionConvoy2::start ()
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   int px = 200, py = 200;
   playerInit ();
-  fplayer->tl->x = px;
-  fplayer->tl->z = py + 100;
+  fplayer->tl.x = px;
+  fplayer->tl.z = py + 100;
   alliedInit (FIGHTER_HAWK, alliedpilot [0], fighter [1]); // always match together 0<->1, 1<->2 etc.
-  fighter [1]->tl->x = px + 5;
-  fighter [1]->tl->z = py + 105;
+  fighter [1]->tl.x = px + 5;
+  fighter [1]->tl.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
     fighter [i]->party = 0;
@@ -3219,8 +3219,8 @@ void MissionConvoy2::start ()
     fighter [i]->o = &model_trsam;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_TRSAM1, 0, 200);
-    fighter [i]->tl->x = px + sine [phi] * 5.0;
-    fighter [i]->tl->z = py + cosi [phi] * 5.0;
+    fighter [i]->tl.x = px + SIN(phi) * 5.0;
+    fighter [i]->tl.z = py + COS(phi) * 5.0;
 //    fighter [i]->phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->maxthrust = 0;
@@ -3231,18 +3231,18 @@ void MissionConvoy2::start ()
     fighter [i]->target = fighter [0];
     if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
     else fighter [i]->o = &model_truck2;
-    fighter [i]->tl->x = px + (i % 3) * 3 - 4;
-    fighter [i]->tl->z = py + (i / 3) * 3 - 4;
+    fighter [i]->tl.x = px + (i % 3) * 3 - 4;
+    fighter [i]->tl.z = py + (i / 3) * 3 - 4;
     if (i == 6 || i == 7) fighter [i]->newinit (TANK_TRUCK1, 0, 400);
     else fighter [i]->newinit (TANK_TRUCK2, 0, 400);
   }
   for (i = 10; i <= 12; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = px - i * 10;
-    fighter [i]->tl->z = py - i * 10;
+    fighter [i]->tl.x = px - i * 10;
+    fighter [i]->tl.z = py - i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3300,12 +3300,12 @@ void MissionShip1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl->x = 80;
-  fplayer->tl->z = 0;
+  fplayer->tl.x = 80;
+  fplayer->tl.z = 0;
   fplayer->phi = 90;
   alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 85;
-  fighter [1]->tl->z = 5;
+  fighter [1]->tl.x = 85;
+  fighter [1]->tl.z = 5;
   fighter [1]->phi = 90;
   fighter [1]->target = fighter [6];
   for (i = 2; i <= 3; i ++)
@@ -3313,8 +3313,8 @@ void MissionShip1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [i - 2];
     fighter [i]->o = &model_ship2;
-    fighter [i]->tl->x = -i * 4;
-    fighter [i]->tl->z = -i * 4;
+    fighter [i]->tl.x = -i * 4;
+    fighter [i]->tl.z = -i * 4;
     fighter [i]->newinit (SHIP_DESTROYER1, 0, 50);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
@@ -3322,10 +3322,10 @@ void MissionShip1::start ()
   for (i = 4; i <= 8; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = 0;
+    fighter [i]->tl.x = -i * 10;
+    fighter [i]->tl.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3385,17 +3385,17 @@ void MissionShip2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl->x = 80;
-  fplayer->tl->z = 0;
+  fplayer->tl.x = 80;
+  fplayer->tl.z = 0;
   fplayer->phi = 90;
   alliedInit (FIGHTER_REDARROW, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 85;
-  fighter [1]->tl->z = 5;
+  fighter [1]->tl.x = 85;
+  fighter [1]->tl.z = 5;
   fighter [1]->phi = 90;
   fighter [1]->target = fighter [6];
   fighter [2]->o = &model_oilrig;
-  fighter [2]->tl->x = 20;
-  fighter [2]->tl->z = 0;
+  fighter [2]->tl.x = 20;
+  fighter [2]->tl.z = 0;
   fighter [2]->newinit (STATIC_OILRIG1, 0, 0);
   fighter [2]->maxthrust = 0;
   fighter [2]->thrust = 0;
@@ -3403,10 +3403,10 @@ void MissionShip2::start ()
   for (i = 3; i <= 5; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -50 - i * 10;
-    fighter [i]->tl->z = 0;
+    fighter [i]->tl.x = -50 - i * 10;
+    fighter [i]->tl.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 300 - i * 10);
   }
   for (i = 6; i <= 7; i ++)
@@ -3414,8 +3414,8 @@ void MissionShip2::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [2];
     fighter [i]->o = &model_figa;
-    fighter [i]->tl->x = -80 - i * 10;
-    fighter [i]->tl->z = 0;
+    fighter [i]->tl.x = -80 - i * 10;
+    fighter [i]->tl.z = 0;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3476,29 +3476,29 @@ void MissionShip3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl->x = 80;
-  fplayer->tl->z = 0;
+  fplayer->tl.x = 80;
+  fplayer->tl.z = 0;
   fplayer->phi = 90;
   alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 85;
-  fighter [1]->tl->z = 5;
+  fighter [1]->tl.x = 85;
+  fighter [1]->tl.z = 5;
   fighter [1]->phi = 90;
   fighter [1]->target = fighter [6];
   fighter [2]->party = 0;
   fighter [2]->target = fighter [0];
   fighter [2]->o = &model_ship1;
-  fighter [2]->tl->x = -20;
-  fighter [2]->tl->z = 0;
+  fighter [2]->tl.x = -20;
+  fighter [2]->tl.z = 0;
   fighter [2]->newinit (SHIP_CRUISER, 0, 200);
   fighter [2]->maxthrust = 0;
   fighter [2]->thrust = 0;
   for (i = 4; i <= 7; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 5;
-    fighter [i]->tl->z = 0;
+    fighter [i]->tl.x = -i * 5;
+    fighter [i]->tl.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3559,22 +3559,22 @@ void MissionCanyon1::start ()
   l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl->x = px + 130;
-  fplayer->tl->z = py + 130;
+  fplayer->tl.x = px + 130;
+  fplayer->tl.z = py + 130;
   fplayer->phi = 45;
   fplayer->target = fighter [1];
   fighter [1]->o = &model_egg;
   fighter [1]->newinit (STATIC_COMPLEX1, 0, 0);
-  fighter [1]->tl->x = px + 1;
-  fighter [1]->tl->z = py + 1;
+  fighter [1]->tl.x = px + 1;
+  fighter [1]->tl.z = py + 1;
   fighter [1]->maxthrust = 0;
   fighter [1]->thrust = 0;
   for (i = 2; i < 4; i ++)
   {
     fighter [i]->o = &model_radar;
     fighter [i]->newinit (STATIC_RADAR1, 0, 0);
-    fighter [i]->tl->x = px - 2 - (i - 2) * 2;
-    fighter [i]->tl->z = py - 2 - (i - 2) * 2;
+    fighter [i]->tl.x = px - 2 - (i - 2) * 2;
+    fighter [i]->tl.z = py - 2 - (i - 2) * 2;
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
@@ -3585,8 +3585,8 @@ void MissionCanyon1::start ()
     fighter [i]->o = &model_figd;
     fighter [i]->phi = 180;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 50 + i * 20);
-    fighter [i]->tl->x = px - 15 - i * 3;
-    fighter [i]->tl->z = py - 15 - i * 3;
+    fighter [i]->tl.x = px - 15 - i * 3;
+    fighter [i]->tl.z = py - 15 - i * 3;
     fighter [i]->deactivate ();
   }
   for (i = 11; i <= 12; i ++)
@@ -3594,8 +3594,8 @@ void MissionCanyon1::start ()
     fighter [i]->o = &model_flarak1;
     fighter [i]->target = fighter [0];
     fighter [i]->newinit (FLARAK_AIR1, 0, 200);
-    fighter [i]->tl->x = px + 4;
-    fighter [i]->tl->z = py + i * 3 - 30;
+    fighter [i]->tl.x = px + 4;
+    fighter [i]->tl.z = py + i * 3 - 30;
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
     fighter [i]->phi = 220;
@@ -3611,7 +3611,7 @@ int MissionCanyon1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  if (fplayer->tl->y >= fighter [1]->tl->y && dist (fplayer->tl->x - fighter [1]->tl->x, fplayer->tl->z - fighter [1]->tl->z) < 150)
+  if (fplayer->tl.y >= fighter [1]->tl.y && math.dist (fplayer->tl.x - fighter [1]->tl.x, fplayer->tl.z - fighter [1]->tl.z) < 150)
   {
     for (i = 4; i <= 10; i ++)
     {
@@ -3666,45 +3666,45 @@ void MissionCanyon2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   playerInit ();
-  fplayer->tl->x = 100;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 100;
+  fplayer->tl.z = 100;
   fplayer->phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
     alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], fighter [i]);
     if (i % 2)
-      fighter [i]->tl->x = 100 + ((i + 1) / 2) * 5;
+      fighter [i]->tl.x = 100 + ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl->x = 100 - ((i + 1) / 2) * 5;
-    fighter [i]->tl->z = 100 + i * 5;
+      fighter [i]->tl.x = 100 - ((i + 1) / 2) * 5;
+    fighter [i]->tl.z = 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
     fighter [i]->phi = 45;
   }
   for (i = 5; i <= 22; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (5)];
+    fighter [i]->target = fighter [math.random (5)];
     if (i <= 15)
     {
-      fighter [i]->tl->x = -i * 5;
-      fighter [i]->tl->z = -i * 5;
+      fighter [i]->tl.x = -i * 5;
+      fighter [i]->tl.z = -i * 5;
       fighter [i]->o = &model_fige;
-      fighter [i]->newinit (FIGHTER_CROW, 0, myrandom (120) + 260);
+      fighter [i]->newinit (FIGHTER_CROW, 0, math.random (120) + 260);
     }
     else if (i <= 19)
     {
-      fighter [i]->tl->x = -i * 8 - 160;
-      fighter [i]->tl->z = -i * 8 - 160;
+      fighter [i]->tl.x = -i * 8 - 160;
+      fighter [i]->tl.z = -i * 8 - 160;
       fighter [i]->o = &model_figd;
-      fighter [i]->newinit (FIGHTER_BUZZARD, 0, myrandom (120) + 160);
+      fighter [i]->newinit (FIGHTER_BUZZARD, 0, math.random (120) + 160);
     }
     else
     {
-      fighter [i]->tl->x = -i * 8 - 240;
-      fighter [i]->tl->z = -i * 8 - 240;
+      fighter [i]->tl.x = -i * 8 - 240;
+      fighter [i]->tl.z = -i * 8 - 240;
       fighter [i]->o = &model_figa;
-      fighter [i]->newinit (FIGHTER_SWALLOW, 0, myrandom (120) + 200);
+      fighter [i]->newinit (FIGHTER_SWALLOW, 0, math.random (120) + 200);
     }
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -3767,25 +3767,25 @@ void MissionCanyon3::start ()
   l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl->x = px + 100;
-  fplayer->tl->z = py + 100;
+  fplayer->tl.x = px + 100;
+  fplayer->tl.z = py + 100;
   fplayer->phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
     alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], fighter [i]);
     if (i % 2)
-      fighter [i]->tl->x = px + 100 + ((i + 1) / 2) * 5;
+      fighter [i]->tl.x = px + 100 + ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl->x = px + 100 - ((i + 1) / 2) * 5;
-    fighter [i]->tl->z = py + 100 + i * 5;
+      fighter [i]->tl.x = px + 100 - ((i + 1) / 2) * 5;
+    fighter [i]->tl.z = py + 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
     fighter [i]->phi = 45;
   }
   fighter [5]->o = &model_egg;
   fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
-  fighter [5]->tl->x = px;
-  fighter [5]->tl->z = py;
+  fighter [5]->tl.x = px;
+  fighter [5]->tl.z = py;
   fighter [5]->maxthrust = 0;
   fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
@@ -3795,18 +3795,18 @@ void MissionCanyon3::start ()
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
-  fighter [6]->tl->x = px + 3;
-  fighter [6]->tl->z = py + 3;
-  fighter [7]->tl->x = px - 3;
-  fighter [7]->tl->z = py + 3;
-  fighter [8]->tl->x = px - 3;
-  fighter [8]->tl->z = py - 3;
-  fighter [9]->tl->x = px + 3;
-  fighter [9]->tl->z = py - 3;
+  fighter [6]->tl.x = px + 3;
+  fighter [6]->tl.z = py + 3;
+  fighter [7]->tl.x = px - 3;
+  fighter [7]->tl.z = py + 3;
+  fighter [8]->tl.x = px - 3;
+  fighter [8]->tl.z = py - 3;
+  fighter [9]->tl.x = px + 3;
+  fighter [9]->tl.z = py - 3;
   for (i = 10; i <= 19; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (5)];
+    fighter [i]->target = fighter [math.random (5)];
     fighter [i]->phi = 180;
     if (i <= 15)
     {
@@ -3818,8 +3818,8 @@ void MissionCanyon3::start ()
       fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 15);
     }
-    fighter [i]->tl->x = px - i * 3;
-    fighter [i]->tl->z = py - i * 3;
+    fighter [i]->tl.x = px - i * 3;
+    fighter [i]->tl.z = py - i * 3;
   }
 }
 
@@ -3878,22 +3878,22 @@ void MissionMoonDefense1::start ()
   l = new GlLandscape (LANDSCAPE_MOON, NULL);
 //  l->genTrench (12, 5000);
   playerInit ();
-  fplayer->tl->x = 100;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 100;
+  fplayer->tl.z = 100;
   fplayer->phi = 45;
   fplayer->target = fighter [6];
   alliedInit (FIGHTER_PHOENIX, alliedpilot [0], fighter [1]);
-  fighter [1]->tl->x = 105;
-  fighter [1]->tl->z = 105;
+  fighter [1]->tl.x = 105;
+  fighter [1]->tl.z = 105;
   fighter [1]->target = fighter [6];
   fighter [1]->phi = 45;
   for (i = 2; i <= 10; i ++)
   {
     int ix = (i - 2) % 3;
     int iy = (i - 2) / 3;
-    fighter [i]->tl->x = ix * 10;
-    fighter [i]->tl->z = iy * 10;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->tl.x = ix * 10;
+    fighter [i]->tl.z = iy * 10;
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
@@ -3901,9 +3901,9 @@ void MissionMoonDefense1::start ()
   {
     int ix = (i - 11) % 3;
     int iy = (i - 11) / 3;
-    fighter [i]->tl->x = ix * 20 + 40;
-    fighter [i]->tl->z = iy * 20 + 40;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->tl.x = ix * 20 + 40;
+    fighter [i]->tl.z = iy * 20 + 40;
+    fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_mine1;
     fighter [i]->newinit (MISSILE_MINE1, 0, 220);
   }
@@ -3969,40 +3969,40 @@ void MissionMoonBattle::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_MOON, NULL);
   playerInit ();
-  fplayer->tl->x = 0;
-  fplayer->tl->z = 100;
+  fplayer->tl.x = 0;
+  fplayer->tl.z = 100;
   for (i = 1; i <= 6; i ++)
   {
     alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
     if (i % 2)
-      fighter [i]->tl->x = ((i + 1) / 2) * 5;
+      fighter [i]->tl.x = ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl->x = -((i + 1) / 2) * 5;
-    fighter [i]->tl->z = 100 + i * 5;
+      fighter [i]->tl.x = -((i + 1) / 2) * 5;
+    fighter [i]->tl.z = 100 + i * 5;
     fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (7)];
+    fighter [i]->target = fighter [math.random (7)];
     fighter [i]->o = &model_fige;
     fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 10);
     if (i <= 16)
     {
-      fighter [i]->tl->x = -i * 5;
-      fighter [i]->tl->z = -i * 5;
+      fighter [i]->tl.x = -i * 5;
+      fighter [i]->tl.z = -i * 5;
     }
     else if (i <= 24)
     {
-      fighter [i]->tl->x = -i * 8 - 150;
-      fighter [i]->tl->z = -i * 8 - 150;
+      fighter [i]->tl.x = -i * 8 - 150;
+      fighter [i]->tl.z = -i * 8 - 150;
       fighter [i]->o = &model_figh;
       fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 450 - i * 10);
     }
     else
     {
-      fighter [i]->tl->x = -i * 8 - 350;
-      fighter [i]->tl->z = -i * 8 - 350;
+      fighter [i]->tl.x = -i * 8 - 350;
+      fighter [i]->tl.z = -i * 8 - 350;
     }
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -4061,35 +4061,35 @@ void MissionMoonDogfight1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_MOON, NULL);
   playerInit ();
-  fplayer->tl->x = -100;
-  fplayer->tl->z = -100;
+  fplayer->tl.x = -100;
+  fplayer->tl.z = -100;
   fplayer->phi = 200;
   fplayer->target = fighter [2];
-  fighter [1]->tl->x = -110;
-  fighter [1]->tl->z = -110;
+  fighter [1]->tl.x = -110;
+  fighter [1]->tl.z = -110;
   fighter [1]->phi = 200;
   fighter [1]->target = fighter [3];
   alliedInit (FIGHTER_REDARROW, alliedpilot [0], fighter [1]);
-  fighter [2]->tl->x = 0;
-  fighter [2]->tl->z = 0;
+  fighter [2]->tl.x = 0;
+  fighter [2]->tl.z = 0;
   fighter [2]->target = fighter [0];
   fighter [2]->phi = 200;
   fighter [2]->o = &model_figh;
   fighter [2]->newinit (FIGHTER_BLACKBIRD, 0, 150);
-  fighter [3]->tl->x = 10;
-  fighter [3]->tl->z = 10;
+  fighter [3]->tl.x = 10;
+  fighter [3]->tl.z = 10;
   fighter [3]->target = fighter [1];
   fighter [3]->phi = 200;
   fighter [3]->o = &model_figh;
   fighter [3]->newinit (FIGHTER_BLACKBIRD, 0, 200);
-  fighter [4]->tl->x = 200;
-  fighter [4]->tl->z = 200;
+  fighter [4]->tl.x = 200;
+  fighter [4]->tl.z = 200;
   fighter [4]->target = fighter [0];
   fighter [4]->phi = 200;
   fighter [4]->o = &model_figh;
   fighter [4]->newinit (FIGHTER_BLACKBIRD, 0, 60);
-  fighter [5]->tl->x = 210;
-  fighter [5]->tl->z = 210;
+  fighter [5]->tl.x = 210;
+  fighter [5]->tl.z = 210;
   fighter [5]->target = fighter [1];
   fighter [5]->phi = 200;
   fighter [5]->o = &model_figh;
@@ -4149,22 +4149,22 @@ void MissionTunnel1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_CANYON_TRENCH, NULL);
   playerInit ();
-  fplayer->tl->x = 256;
-  fplayer->tl->z = 256;
+  fplayer->tl.x = 256;
+  fplayer->tl.z = 256;
   fplayer->phi = 90;
   fplayer->target = fighter [6];
   for (i = 1; i <= 9; i ++)
   {
     int ix = (i / 2) * 8 - 200 + 256;
     int iy = (i & 1) * 4 - 2 + 256;
-    fighter [i]->tl->x = ix;
-    fighter [i]->tl->z = iy;
+    fighter [i]->tl.x = ix;
+    fighter [i]->tl.z = iy;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
-  fighter [i]->tl->x = -200 + 256;
-  fighter [i]->tl->z = 0 + 256;
+  fighter [i]->tl.x = -200 + 256;
+  fighter [i]->tl.z = 0 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
@@ -4172,26 +4172,26 @@ void MissionTunnel1::start ()
   {
     int ix = (i - 11) * 10 - 100 + 256;
     int iy = (i % 2) * 3 - 3 + 256;
-    fighter [i]->tl->x = ix;
-    fighter [i]->tl->z = iy;
+    fighter [i]->tl.x = ix;
+    fighter [i]->tl.z = iy;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 300);
   }
-  fighter [i]->tl->x = -250 + 256;
-  fighter [i]->tl->z = -2 + 256;
+  fighter [i]->tl.x = -250 + 256;
+  fighter [i]->tl.z = -2 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
   i ++;
-  fighter [i]->tl->x = -250 + 256;
-  fighter [i]->tl->z = 2 + 256;
+  fighter [i]->tl.x = -250 + 256;
+  fighter [i]->tl.z = 2 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
   i ++;
-  fighter [i]->tl->x = -350 + 256;
-  fighter [i]->tl->z = 0 + 256;
+  fighter [i]->tl.x = -350 + 256;
+  fighter [i]->tl.z = 0 + 256;
   fighter [i]->o = &model_barrier1;
   fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
   for (i = 19; i < 26; i ++)
@@ -4199,8 +4199,8 @@ void MissionTunnel1::start ()
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 8);
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_figd;
-    fighter [i]->tl->x = 256;
-    fighter [i]->tl->z = 256;
+    fighter [i]->tl.x = 256;
+    fighter [i]->tl.z = 256;
     fighter [i]->deactivate ();
   }
 }
@@ -4209,7 +4209,7 @@ int MissionTunnel1::processtimer (Uint32 dt)
 {
 //  bool b = false;
   int i;
-  if (timer <= 0) fplayer->tl->y = l->getHeight (fplayer->tl->x, fplayer->tl->z) + 5;
+  if (timer <= 0) fplayer->tl.y = l->getHeight (fplayer->tl.x, fplayer->tl.z) + 5;
   timer += dt;
   if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
@@ -4217,21 +4217,21 @@ int MissionTunnel1::processtimer (Uint32 dt)
   }
 //  if (timer > 40 * timestep)
   {
-    if (fplayer->tl->y - l->getHeight (fplayer->tl->x, fplayer->tl->z) > 15)
+    if (fplayer->tl.y - l->getHeight (fplayer->tl.x, fplayer->tl.z) > 15)
     {
       if (!fighter [24]->active && fighter [24]->shield > 0)
       {
         for (i = 19; i < 26; i ++)
         {
           fighter [i]->activate ();
-          fighter [i]->tl->x = fplayer->tl->x - 80 - (i - 18) * 8;
-          fighter [i]->tl->z = fplayer->tl->z - 20;
-          fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+          fighter [i]->tl.x = fplayer->tl.x - 80 - (i - 18) * 8;
+          fighter [i]->tl.z = fplayer->tl.z - 20;
+          fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
         }
       }
     }
   }
-  if (fplayer->tl->x < -450 + 256)
+  if (fplayer->tl.x < -450 + 256)
     return 1;
   return 0;
 }
@@ -4270,15 +4270,15 @@ void MissionMoonBase1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_FLAT_MOON, NULL);
   playerInit ();
-  fplayer->tl->x = -20;
-  fplayer->tl->z = -40;
+  fplayer->tl.x = -20;
+  fplayer->tl.z = -40;
   fplayer->phi = 200;
   fplayer->target = fighter [29];
   for (i = 1; i < 21; i ++)
   {
-    fighter [i]->tl->x = cosi [(i * 140) % 360] * 4.5;
-    fighter [i]->tl->z = i * 0.6;
-    fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + sine [(i * 160) % 360] * 4.0 + 25.0;
+    fighter [i]->tl.x = COS((i * 140) % 360) * 4.5;
+    fighter [i]->tl.z = i * 0.6;
+    fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
     fighter [i]->phi = 200;
     fighter [i]->o = &model_aster1;
@@ -4287,15 +4287,15 @@ void MissionMoonBase1::start ()
   }
   for (i = 21; i < 29; i ++)
   {
-    fighter [i]->tl->x = (i - 20) * 4;
-    fighter [i]->tl->z = 210;
+    fighter [i]->tl.x = (i - 20) * 4;
+    fighter [i]->tl.z = 210;
     fighter [i]->target = fighter [0];
     fighter [i]->phi = 50;
     fighter [i]->o = &model_figh;
     fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
   }
-  fighter [29]->tl->x = 50 + difficulty * 15;
-  fighter [29]->tl->z = 180 + difficulty * 30;
+  fighter [29]->tl.x = 50 + difficulty * 15;
+  fighter [29]->tl.z = 180 + difficulty * 30;
   fighter [29]->o = &model_base1;
   fighter [29]->newinit (STATIC_BASE1, 0, 100);
 }
@@ -4356,8 +4356,8 @@ void MissionMultiDogfight1::start ()
     fighter [i]->party = i;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl->x = 50 + i * 30;
-    fighter [i]->tl->z = 100;
+    fighter [i]->tl.x = 50 + i * 30;
+    fighter [i]->tl.z = 100;
   }
   fighter[1]->ai = true;
   if (isserver)

@@ -45,7 +45,7 @@ TODO:
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net.h"
-#include "mathtab.h"
+#include "math/Math.h"
 #include "cockpit.h"
 #include "conf.h"
 #include "mission.h"
@@ -211,8 +211,12 @@ HighClouds *highclouds;
 HighClouds *highclouds2;
 
 Model3d *obj, *objlaser, *objmissile;
-Vector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
-Rotation *rotnull, *rotmissile;
+//Vector3 *clip1, *clip2;
+Vector3 tlnull (0, 0, 0);
+Vector3 tlinf (1E10, 1E10, 1E10);
+Vector3 tlminf (-1E10, -1E10, -1E10);
+Rotation rotnull (0, 0, 0);
+Rotation rotmissile (90, 0, 270);
 
 GLenum polygonMode = GL_FILL;
 
@@ -572,8 +576,8 @@ void setPlaneVolume ()
 
 void setLightSource (int gamma)
 {
-  light_position0 [0] = -cosi [gamma];
-  light_position0 [1] = sine [gamma];
+  light_position0 [0] = -COS(gamma);
+  light_position0 [1] = SIN(gamma);
   light_position0 [2] = 0;
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
@@ -636,8 +640,8 @@ int game_levelInit ()
     fighter [i]->aiinit ();
 //    fighter [i]->fighterinit ();
     fighter [i]->explode = 0;
-    fighter [i]->tl->x = 0;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl.x = 0;
+    fighter [i]->tl.z = -i * 10;
     fighter [i]->party = 0;
     fighter [i]->zoom = 0.35;
     fighter [i]->deactivate ();
@@ -717,67 +721,67 @@ int game_levelInit ()
   {
     if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom;
     }
     else if (fighter [i]->id == SHIP_DESTROYER1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 4;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 4;
     }
     else if (fighter [i]->id == SHIP_CRUISER)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 4;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 4;
     }
     else if (fighter [i]->id >= TANK1 && fighter [i]->id <= TANK2)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom * 0.55;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom * 0.55;
     }
     else if (fighter [i]->id == STATIC_TENT1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z);
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z);
     }
     else if (fighter [i]->id == STATIC_CONTAINER1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 2;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 2;
     }
     else if (fighter [i]->id == STATIC_HALL1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 3;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
     }
     else if (fighter [i]->id == STATIC_HALL2)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 3;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
     }
     else if (fighter [i]->id == STATIC_TENT4)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 3;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
     }
     else if (fighter [i]->id == STATIC_OILRIG1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 5;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 5;
     }
     else if (fighter [i]->id == STATIC_COMPLEX1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.55 * fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.55 * fighter [i]->zoom;
     }
     else if (fighter [i]->id == STATIC_RADAR1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.7 * fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.7 * fighter [i]->zoom;
     }
     else if (fighter [i]->id == STATIC_BASE1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.5 * fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.5 * fighter [i]->zoom;
     }
     else if (fighter [i]->id == STATIC_DEPOT1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.5 * fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.5 * fighter [i]->zoom;
     }
     else if (fighter [i]->id == STATIC_BARRIER1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.3 * fighter [i]->zoom;
+      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.3 * fighter [i]->zoom;
     }
     else if (fighter [i]->id == MISSILE_MINE1)
     {
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 5 + myrandom (20);
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 5 + math.random (20);
     }
     else if (fighter [i]->id == ASTEROID)
     {
@@ -785,7 +789,7 @@ int game_levelInit ()
     }
     else
     {
-      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 20;
+      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 20;
     }
   }
 
@@ -825,9 +829,9 @@ int game_levelInit ()
 
   for (i = 0; i < maxstar; i ++)
   {
-    star [i]->phi = myrandom (360);
-    star [i]->gamma = myrandom (85);
-    star [i]->size = 0.6 + 0.15 * myrandom (8);
+    star [i]->phi = math.random (360);
+    star [i]->gamma = math.random (85);
+    star [i]->size = 0.6 + 0.15 * math.random (8);
   }
 
   Color skycolor;
@@ -1028,7 +1032,7 @@ void stats_reshape ()
 
 void playRandomMusic ()
 {
-  int r = myrandom (6);
+  int r = math.random (6);
   if (r == 0)
     sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
@@ -1830,12 +1834,12 @@ void drawCircles (Color *colorstd)
     {
       xf = -3 + 0.3 * i2;
       yf = -3 + 0.3 * i;
-      float cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
+      float cola = SIN((int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360) / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
       glVertex3f (xf, yf, zf);
       yf = -3 + 0.3 * (i + 1);
-      cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
+      cola = SIN((int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360) / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
       glVertex3f (xf, yf, zf);
@@ -1854,14 +1858,14 @@ void drawQuads (Color *colorstd)
     glBegin (GL_QUAD_STRIP);
     for (int i2 = 0; i2 < 14; i2 ++)
     {
-      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      float cola = SIN((i * 100+missionmenutimer*4 / timestep)) / 10 + SIN((i2 * 100)) / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + SIN((i * 100)) / 2);
+      cola = SIN(((i+1) * 100+missionmenutimer*4 / timestep)) / 10 + SIN((i2 * 100)) / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
+      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + SIN(((i+1) * 100)) / 2);
     }
     glEnd ();
   }
@@ -2587,9 +2591,6 @@ void game_quit ()
   for (i = 0; i < maxblacksmoke; i ++)
     delete (blacksmoke [i]);
   delete pilots;
-  delete tlinf;
-  delete tlminf;
-  delete tlnull;
   delete explsphere;
   delete objsphere;
   delete sphere;
@@ -2798,7 +2799,7 @@ void menu_display ()
   int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
-  Color color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
+  Color color2 (255, 255, (int) (255.0 * COS(menutimernorm)), 255);
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
@@ -3195,7 +3196,7 @@ void game_display ()
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
   gl.setFogLuminance (mylight);
-  sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
+  sphere->drawGL (tlnull, space->alpha, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
@@ -3226,9 +3227,9 @@ void game_display ()
     gl.enableFog (cloudfog * GLOBALSCALE, quality <= 5);
 
     highclouds->zoom = 400;
-    float ch2 = -382 - fplayer->tl->y / 10.0;
+    float ch2 = -382 - fplayer->tl.y / 10.0;
     Vector3 tlsphere2 (0, ch2, 0);
-    highclouds->drawGL (&tlsphere2, fplayer->tl);
+    highclouds->drawGL (&tlsphere2, &fplayer->tl);
 
     glDisable (GL_FOG);
   }
@@ -3323,7 +3324,30 @@ void game_display ()
   }
 
   // draw terrain
-  l->calcDynamicLight (explosion, (SpaceObj **) laser, (SpaceObj **) missile, (SpaceObj **) flare);
+  if (dynamiclighting)
+  {
+    memset (l->dl, 0, (MAXX + 1) * (MAXX + 1));
+    for (i = 0; i < maxexplosion; i ++)
+    {
+      if (explosion [i]->ttl > 0)
+        l->calcDynamicLight (explosion [i], 50.0F, 100.0F, 2.0F);
+    }
+    for (i = 0; i < maxlaser; i ++)
+    {
+      if (laser [i]->draw)
+        l->calcDynamicLight (laser [i], 15.0F, 75.0F, 5.0F);
+    }
+    for (i = 0; i < maxmissile; i ++)
+    {
+      if (missile [i]->draw)
+        l->calcDynamicLight (missile [i], 15.0F, 75.0F, 5.0F);
+    }
+    for (i = 0; i < maxflare; i ++)
+    {
+      if (flare [i]->draw)
+        l->calcDynamicLight (flare [i], 15.0F, 75.0F, 5.0F);
+    }
+  }
   glEnable (GL_CULL_FACE);
   glCullFace (GL_FRONT);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
@@ -3340,7 +3364,7 @@ void game_display ()
     {
       for (i = 0; i < space->no; i ++)
       {
-        if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
+        if (space->o [i]->tl.y < l->getExactRayHeight (space->o [i]->tl.x, space->o [i]->tl.z))
           space->o [i]->lum = 0.5 * dayfac;
         else
           space->o [i]->lum = 1.0 * dayfac;
@@ -3647,16 +3671,16 @@ void game_timer (int dt)
   }
 
   // create flash during thunderstorm
-  if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !myrandom (2000 / dt))
+  if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !math.random (2000 / dt))
   {
     flash = 18 * timestep;
-    int fphi = (int) camphi + myrandom (50) - 25;
+    int fphi = (int) camphi + math.random (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
     float pseudoview = getView ();
-    float fdist = myrandom ((int) pseudoview - 20) + 10;
-    float fx = fplayer->tl->x - sine [fphi] * fdist;
-    float fz = fplayer->tl->z - cosi [fphi] * fdist;
+    float fdist = math.random ((int) pseudoview - 20) + 10;
+    float fx = fplayer->tl.x - SIN(fphi) * fdist;
+    float fz = fplayer->tl.z - COS(fphi) * fdist;
     flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
     int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
     sound->setVolume (SOUND_THUNDER1, lev);
@@ -3772,9 +3796,9 @@ void game_timer (int dt)
     float cgamma = fplayer->gamma + 25.0F * COS(fplayer->theta);
     float cphi = fplayer->phi + 25.0F * SIN(fplayer->theta);
     float fac = fplayer->zoom / 2;
-    camx = fplayer->tl->x + COS(cgamma) * SIN(cphi) * fac;
-    camy = fplayer->tl->y - SIN(cgamma) * fac;
-    camz = fplayer->tl->z + COS(cgamma) * COS(cphi) * fac;
+    camx = fplayer->tl.x + COS(cgamma) * SIN(cphi) * fac;
+    camy = fplayer->tl.y - SIN(cgamma) * fac;
+    camz = fplayer->tl.z + COS(cgamma) * COS(cphi) * fac;
     camphi = fplayer->phi;
     camgamma = -fplayer->gamma + 180;
     fplayer->draw = 0;
@@ -3782,9 +3806,9 @@ void game_timer (int dt)
   if (camera == 1) // chase
   {
     cf = fplayer->zoom * 3;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
+    camy = fplayer->tl.y + fplayer->zoom;
+    camz = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 20;
@@ -3792,9 +3816,9 @@ void game_timer (int dt)
   else if (camera == 2) // backwards
   {
     cf = -fplayer->zoom * 3;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
+    camy = fplayer->tl.y + fplayer->zoom;
+    camz = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi + 180.0;
     fplayer->draw = 1;
     camgamma = 20;
@@ -3802,9 +3826,9 @@ void game_timer (int dt)
   else if (camera == 3) // other players
   {
     cf = fighter [aktcam]->zoom * 3;
-    camx = fighter [aktcam]->tl->x + cf * SIN(fighter [aktcam]->phi);
-    camy = fighter [aktcam]->tl->y + fighter [aktcam]->zoom;
-    camz = fighter [aktcam]->tl->z + cf * COS(fighter [aktcam]->phi);
+    camx = fighter [aktcam]->tl.x + cf * SIN(fighter [aktcam]->phi);
+    camy = fighter [aktcam]->tl.y + fighter [aktcam]->zoom;
+    camz = fighter [aktcam]->tl.z + cf * COS(fighter [aktcam]->phi);
     camphi = fighter [aktcam]->phi;
     camgamma = 20;
     camtheta = fighter [aktcam]->theta;
@@ -3813,18 +3837,18 @@ void game_timer (int dt)
   else if (camera == 4) // missile
   {
     cf = missile [0]->zoom * 10;
-    camx = missile [0]->tl->x + cf * SIN(missile [0]->phi);
-    camy = missile [0]->tl->y + fplayer->zoom * 2;
-    camz = missile [0]->tl->z + cf * COS(missile [0]->phi);
+    camx = missile [0]->tl.x + cf * SIN(missile [0]->phi);
+    camy = missile [0]->tl.y + fplayer->zoom * 2;
+    camz = missile [0]->tl.z + cf * COS(missile [0]->phi);
     camphi = missile [0]->phi;
     fplayer->draw = 1;
   }
   else if (camera == 5) // top
   {
     cf = fplayer->zoom * 15;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + 5.5;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
+    camy = fplayer->tl.y + 5.5;
+    camz = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -3835,9 +3859,9 @@ void game_timer (int dt)
     camphi = fplayer->phi + 90.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * SIN(camphi);
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(camphi);
+    camx = fplayer->tl.x + cf * SIN(camphi);
+    camy = fplayer->tl.y + fplayer->zoom;
+    camz = fplayer->tl.z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
@@ -3847,18 +3871,18 @@ void game_timer (int dt)
     camphi = fplayer->phi + 270.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * SIN(camphi);
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(camphi);
+    camx = fplayer->tl.x + cf * SIN(camphi);
+    camy = fplayer->tl.y + fplayer->zoom;
+    camz = fplayer->tl.z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
   else if (camera == 8) // top near
   {
     cf = fplayer->zoom * 5;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + 2.5;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
+    camy = fplayer->tl.y + 2.5;
+    camz = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -3866,9 +3890,9 @@ void game_timer (int dt)
   else if (camera == 9) // top very near
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + 1.0;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
+    camy = fplayer->tl.y + 1.0;
+    camz = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4159,15 +4183,6 @@ void myInit ()
 {
   int i, i2;
 
-  // useful global variables/constants
-  tlinf = new Vector3 (1E10, 1E10, 1E10);
-  tlminf = new Vector3 (-1E10, -1E10, -1E10);
-  tlnull = new Vector3 (0, 0, 0);
-  rotnull = new Rotation ();
-  rotmissile = new Rotation ();
-  rotmissile->a = 90;
-  rotmissile->c = 270;
-
   // initialize all global variables
 
   for (i = 0; i < maxgroundobj; i ++)
@@ -4182,7 +4197,7 @@ void myInit ()
   explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
   {
-    explsphere->object [0]->vertex [i].color.set (myrandom (100) + 155, myrandom (100) + 100, 0, myrandom (3) / 2 * 255);
+    explsphere->object [0]->vertex [i].color.set (math.random (100) + 155, math.random (100) + 100, 0, math.random (3) / 2 * 255);
   }
   for (i = 0; i < maxexplosion; i ++)
   {
@@ -4209,9 +4224,9 @@ void myInit ()
 
   objsphere = new Sphere (1, 9, 1, 1, 1);
   sphere = new SpaceObj (objsphere, 10.0);
-  sphere->rot->a = 90;
-  sphere->rot->b = 90;
-  sphere->rot->c = 270;
+  sphere->rot.a = 90;
+  sphere->rot.b = 90;
+  sphere->rot.c = 270;
   sphere->draw = 2;
   sphere->drawLight = false;
 
@@ -4239,7 +4254,7 @@ void myInit ()
 
   for (i = 0; i < maxstar; i ++)
   {
-    star [i] = new Star (myrandom (360), myrandom (85), 0.4 + 0.1 * myrandom (8));
+    star [i] = new Star (math.random (360), math.random (85), 0.4 + 0.1 * math.random (8));
   }
 
   cockpit = new Cockpit ();
@@ -4284,7 +4299,7 @@ void init_reshape ()
 void myFirstInit ()
 {
   display ("Creating calculation tables", LOG_ALL);
-  mathtab_init ();
+//  mathtab_init ();
 
   display ("Creating advanced OpenGL methods", LOG_ALL);
 //  gl = new GlPrimitives ();
@@ -4292,6 +4307,7 @@ void myFirstInit ()
 
   // create textures (OpenGL)
   display ("Loading textures", LOG_ALL);
+  g_Load3ds.setTextureDir (std::string (dirs->getTextures ("")));
   texgrass = new Texture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
   texrocks = new Texture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
   texwater = new Texture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
@@ -4563,14 +4579,16 @@ void myFirstInit ()
   display ("Setting up world geometry", LOG_ALL);
   space = new Space ();
   space->drawLight = true;
-  clip1 = space->z1;
+//  space->z1.set (-ZOOM, -ZOOM, -ZOOM);
+//  space->z2.set (ZOOM, ZOOM, ZOOM);
+/*  clip1 = space->z1;
   clip2 = space->z2;
   clip1->x = -ZOOM;
   clip1->y = -ZOOM;
   clip1->z = -ZOOM;
   clip2->x = ZOOM;
   clip2->y = ZOOM;
-  clip2->z = ZOOM;
+  clip2->z = ZOOM;*/
 
   // prepare intro
   init_reshape ();
@@ -4712,11 +4730,11 @@ void genFireLine ()
   int i, i2;
   for (i = 0; i < maxfx; i ++)
   {
-    heat [maxfy - 1] [i] = myrandom (400);
+    heat [maxfy - 1] [i] = math.random (400);
   }
   for (i = 0; i < 5; i ++)
   {
-    int r = myrandom (maxfx - 7) + 3;
+    int r = math.random (maxfx - 7) + 3;
     for (i2 = -3; i2 <= 3; i2 ++)
     {
       heat [maxfy - 1] [r + i2] = 1200; // insert hot spots at the bottom line
@@ -4795,8 +4813,8 @@ void init_timer (Uint32 dt)
   }
   else return;
 
-  int r = myrandom (100);
-  if (r == 50) r = myrandom (100); // do not optimize this: random number generator initialization
+  int r = math.random (100);
+  if (r == 50) r = math.random (100); // do not optimize this: random number generator initialization
 
   tl.x = 6.0 * pow (1.5, -(5 + tl.z));
   tl.y = (tl.z + 3) * (tl.z + 3) * 0.02 - 0.8; //0.9 * tl.x;

@@ -19,23 +19,50 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes a collection of functions and precalculated tables. */
+#ifndef IS_MODEL3D_H
 
-#ifndef IS_MATHTAB_H
-#define IS_MATHTAB_H
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
 
-extern float sine[], cosi[]; // sine and cosine tables (only use for approximations)
-//extern float PI;
+#include "Model3d.h"
 
-extern void mathtab_init (); // calculate tables
-extern int myrandom (int n); // random integer number [0;n-1]
-extern int extremerandom (int n); // random integer number [0;n-1], prefer extremely low/high values
-extern int myrandom (int n, int x, int y); // random integer number [0;n-1]
-extern int extremerandom (int n, int x, int y); // random integer number [0;n-1], prefer extremely low/high values
-extern float dist (float dx, float dy); // distance (Euklidean norm, 2D vector)
-extern int randptr;
 
-#define MAXSMOKEELEM 40
-extern float smokezoom [MAXSMOKEELEM];
+
+Triangle::Triangle ()
+{
+  v [0] = NULL;
+  v [1] = NULL;
+  v [2] = NULL;
+}
+
+void Triangle::calcNormal (Vector3 *n)
+{
+  Vector3 dummy;
+  n->set (v [1]->vector);
+  n->sub (v [0]->vector);
+  dummy.set (v [2]->vector);
+  dummy.sub (v [0]->vector);
+  n->crossproduct (dummy);
+}
+
+void Triangle::setVertices (Vertex *a, Vertex *b, Vertex *c)
+{
+  int i;
+  Vector3 dummy;
+  v [0] = a;
+  v [1] = b;
+  v [2] = c;
+  calcNormal (&dummy);
+  dummy.norm ();
+  if (dummy.z > 0)
+    dummy.neg ();
+  for (i = 0; i < 3; i ++)
+  {
+    v [i]->addNormal (dummy);
+  }
+}
 
 #endif
+

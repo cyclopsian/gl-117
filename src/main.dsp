@@ -342,6 +342,18 @@ SOURCE=.\menu\Label.cpp
 SOURCE=.\menu\TextField.cpp
 # End Source File
 # End Group
+# Begin Group "math"
+
+# PROP Default_Filter "*.*"
+# Begin Source File
+
+SOURCE=.\math\Math.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\math\Math.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\aiobject.cpp
@@ -397,14 +409,6 @@ SOURCE=.\maploader.cpp
 # Begin Source File
 
 SOURCE=.\maploader.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\mathtab.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\mathtab.h
 # End Source File
 # Begin Source File
 

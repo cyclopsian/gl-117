@@ -28,7 +28,7 @@
 #include "cockpit.h"
 #include "main.h"
 #include "pilots.h"
-#include "mathtab.h"
+#include "math/Math.h"
 #include "mission.h"
 #include "opengl/GlPrimitives.h"
 #include "gllandscape/GlLandscape.h"
@@ -330,7 +330,7 @@ void Cockpit::drawTargeter ()
     DynamicObj *o = fplayer->target;
     float myphi = fplayer->phi;
     if (myphi < 0) myphi += 360;
-    float ex1 = cosi [(int) myphi] * o->zoom, ey1 = -sine [(int) myphi] * o->zoom;
+    float ex1 = COS((int) myphi) * o->zoom, ey1 = -SIN((int) myphi) * o->zoom;
     float ex2 = -ex1, ey2 = -ey1;
     float ez = o->zoom;
     gl.enableAlphaBlending ();
@@ -356,34 +356,34 @@ void Cockpit::drawTargeter ()
       float dy = (ey2 - ey1) / 4;
       float dz = ez / 2;
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez - dz, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex1 + dx, o->tl->y + ez, o->tl->z + ey1 + dy);
+      glVertex3f (o->tl.x + ex1, o->tl.y + ez - dz, o->tl.z + ey1);
+      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
+      glVertex3f (o->tl.x + ex1 + dx, o->tl.y + ez, o->tl.z + ey1 + dy);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl->x + ex2 - dx, o->tl->y + ez, o->tl->z + ey2 - dy);
-      glVertex3f (o->tl->x + ex2, o->tl->y + ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex2, o->tl->y + ez - dz, o->tl->z + ey2);
+      glVertex3f (o->tl.x + ex2 - dx, o->tl.y + ez, o->tl.z + ey2 - dy);
+      glVertex3f (o->tl.x + ex2, o->tl.y + ez, o->tl.z + ey2);
+      glVertex3f (o->tl.x + ex2, o->tl.y + ez - dz, o->tl.z + ey2);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl->x + ex2, o->tl->y - ez + dz, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex2, o->tl->y - ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex2 - dx, o->tl->y - ez, o->tl->z + ey2 - dy);
+      glVertex3f (o->tl.x + ex2, o->tl.y - ez + dz, o->tl.z + ey2);
+      glVertex3f (o->tl.x + ex2, o->tl.y - ez, o->tl.z + ey2);
+      glVertex3f (o->tl.x + ex2 - dx, o->tl.y - ez, o->tl.z + ey2 - dy);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl->x + ex1 + dx, o->tl->y - ez, o->tl->z + ey1 + dy);
-      glVertex3f (o->tl->x + ex1, o->tl->y - ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex1, o->tl->y - ez + dz, o->tl->z + ey1);
+      glVertex3f (o->tl.x + ex1 + dx, o->tl.y - ez, o->tl.z + ey1 + dy);
+      glVertex3f (o->tl.x + ex1, o->tl.y - ez, o->tl.z + ey1);
+      glVertex3f (o->tl.x + ex1, o->tl.y - ez + dz, o->tl.z + ey1);
       glEnd ();
     }
     else
     {
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex2, o->tl->y + ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex2, o->tl->y - ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex1, o->tl->y - ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
+      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
+      glVertex3f (o->tl.x + ex2, o->tl.y + ez, o->tl.z + ey2);
+      glVertex3f (o->tl.x + ex2, o->tl.y - ez, o->tl.z + ey2);
+      glVertex3f (o->tl.x + ex1, o->tl.y - ez, o->tl.z + ey1);
+      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
       glEnd ();
     }
     gl.disableAlphaBlending ();
@@ -573,7 +573,7 @@ void Cockpit::drawTargetedElement ()
     if (fplayer->target->active)
     {
       glEnable (GL_LIGHTING);
-      fplayer->target->o->draw (n, tl, *fplayer->target->rot, 0.05, 0.3, 0);
+      fplayer->target->o->draw (n, tl, fplayer->target->rot, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
@@ -607,7 +607,7 @@ void Cockpit::drawWeapon ()
   else if (fplayer->missiletype == 6) missile = &model_missile7;
   else if (fplayer->missiletype == 7) missile = &model_missile8;
   glEnable (GL_LIGHTING);
-  missile->draw (n, tl, *fplayer->rot, 0.05, 1.0, 0);
+  missile->draw (n, tl, fplayer->rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), &color);
@@ -666,8 +666,8 @@ void Cockpit::drawRadar ()
       int aw = fplayer->getAngle (fighter [i]);
       if (aw < 0) aw += 360;
       float d = fplayer->distanceXZ (fighter [i]) / 100.0 * radarzoom;
-      float px = -d * sine [aw];
-      float py = yf + d * cosi [aw];
+      float px = -d * SIN(aw);
+      float py = yf + d * COS(aw);
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
       {
         if (fighter [i] == fplayer->target)
@@ -691,8 +691,8 @@ void Cockpit::drawRadar ()
       int aw = fplayer->getAngle (missile [i]);
       if (aw < 0) aw += 360;
       float d = fplayer->distance (missile [i]) / 100.0 * radarzoom;
-      float px = -d * sine [aw];
-      float py = yf + d * cosi [aw];
+      float px = -d * SIN(aw);
+      float py = yf + d * COS(aw);
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
       {
         drawBlip(TRIANGLE_BLIP, px, py, zf, 255, 255, 255);
@@ -715,7 +715,7 @@ void Cockpit::drawRelativeHeightBar()
   gl.enableAlphaBlending ();
   
   float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
-  float px = fplayer->tl->x, py = fplayer->tl->y, pz = fplayer->tl->z;
+  float px = fplayer->tl.x, py = fplayer->tl.y, pz = fplayer->tl.z;
   float lh = l->getExactHeight(px, pz);
   setColor(80); // low alpha for better visibility
   // add 100.0 to each player_y and land_h to avoid values <= 0.0
