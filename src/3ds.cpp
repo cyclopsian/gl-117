@@ -556,9 +556,18 @@ void CLoad3DS::ComputeColors (CModel *model)
       }
       else
       {
-        object->vertex [i2].color.c [0] = object->material->color.c [0];
-        object->vertex [i2].color.c [1] = object->material->color.c [1];
-        object->vertex [i2].color.c [2] = object->material->color.c [2];
+        if (object->material)
+        {
+          object->vertex [i2].color.c [0] = object->material->color.c [0];
+          object->vertex [i2].color.c [1] = object->material->color.c [1];
+          object->vertex [i2].color.c [2] = object->material->color.c [2];
+        }
+        else
+        {
+          object->vertex [i2].color.c [0] = 200;
+          object->vertex [i2].color.c [1] = 200;
+          object->vertex [i2].color.c [2] = 200;
+        }
       }
     }
   }

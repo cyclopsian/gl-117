@@ -24,6 +24,7 @@
 #ifndef IS_MODEL_H
 #define IS_MODEL_H
 
+#include "common.h"
 #include "loader_tga.h"
 
 // CColor stores color information
@@ -168,10 +169,10 @@ class CMaterial
 class CObject
 {
   public:
-  int numVertices;
-  int numTriangles;
-  int numQuads;
-  int numTexVertex;
+  Uint16 numVertices;
+  Uint16 numTriangles;
+  Uint16 numQuads;
+  Uint16 numTexVertex;
   CMaterial *material; // an object has one unique material
   bool hasTexture; // an object can have one unique texture
   char name [255]; // unique object name
@@ -196,8 +197,8 @@ class CModel
   public:
   char name [20]; // unique model name like "GL-117"
   int shading;
-  int numObjects;
-  int numMaterials;
+  Uint16 numObjects;
+  Uint16 numMaterials;
   bool displaylist; // enable using a display list
   int list1, list2, list3; // display lists already generated for each type of draw() method
   CMaterial *material [100]; // materials, at most 100 (these are only pointers)

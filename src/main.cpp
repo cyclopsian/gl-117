@@ -2065,7 +2065,7 @@ void mission_display ()
   CColor colorgreen (100, 255, 100, 255);
   CColor colororange (255, 150, 100, 255);
   CColor colorred (255, 0, 0, 255);
-  float xstats = 2, ystats = 6;
+  float xstats = 1, ystats = 6;
   float xstatstab = 10;
   float piloty = 6;
   Pilot *p = pilots->pilot [pilots->aktpilot];
@@ -2078,7 +2078,7 @@ void mission_display ()
   glLoadIdentity ();
   glPushMatrix ();
   float zf = -3, yf;
-  for (i = 0; i < 14; i ++)
+/*  for (i = 0; i < 14; i ++)
   {
     yf = -3 + 0.5 * i - (float) (missionmenutimer & 63) / 64.0;
     glBegin (GL_QUAD_STRIP);
@@ -2094,45 +2094,85 @@ void mission_display ()
       glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
     }
     glEnd ();
-/*    glBegin (GL_QUADS);
-    glColor3ubv (colorstd->c);
-    glVertex3f (-3, yf, zf);
-    glColor3ub (0, 0, 0);
-    glVertex3f (-3, yf + 0.25, zf);
-    glVertex3f (-2, yf + 0.25, zf);
-    glVertex3f (-2, yf, zf);
-    glColor3ubv (colorstd->c);
-    glVertex3f (-3, yf, zf);
-    glColor3ub (0, 0, 0);
-    glVertex3f (-3, yf - 0.25, zf);
-    glVertex3f (-2, yf - 0.25, zf);
-    glVertex3f (-2, yf, zf);
-    glColor3ubv (colorstd->c);
-    glVertex3f (3, yf, zf);
-    glColor3ub (0, 0, 0);
-    glVertex3f (3, yf + 0.25, zf);
-    glVertex3f (2, yf + 0.25, zf);
-    glVertex3f (2, yf, zf);
-    glColor3ubv (colorstd->c);
-    glVertex3f (3, yf, zf);
-    glColor3ub (0, 0, 0);
-    glVertex3f (3, yf - 0.25, zf);
-    glVertex3f (2, yf - 0.25, zf);
-    glVertex3f (2, yf, zf);
-    glEnd ();*/
+  }*/
+
+  float zf1 = -2.98;
+  float yind = 200.0 * sin (0.003 * missionmenutimer) + 200.0;
+  float xind = 200.0 * cos (0.003 * missionmenutimer) + 200.0;
+  float yind2 = -200.0 * sin (0.003 * missionmenutimer) + 200.0;
+  float xind2 = -200.0 * cos (0.003 * missionmenutimer) + 200.0;
+  for (i = 0; i < 21; i ++)
+  {
+    yf = -2.5 + 0.25 * i;
+    float yif = yind + i * 5;
+    int yi = (int) yif;
+    float yr = yif - yi;
+    float yif2 = yind2 + i * 5;
+    int yi2 = (int) yif2;
+    float yr2 = yif2 - yi2;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 21; i2 ++)
+    {
+      float xf = -2.5 + 0.25 * i2;
+      float xif = xind + i2 * 5;
+      int xi = (int) xif;
+      float xr = xif - xi;
+      float xif2 = xind2 + i2 * 5;
+      int xi2 = (int) xif2;
+      float xr2 = xif2 - xi2;
+      float h1 = xr * yr * l->h [yi + 1] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi] [xi] +
+                 xr * (1.0 - yr) * l->h [yi] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1] [xi];
+      float h2 = xr * yr * l->h [yi + 1 + 5] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5] [xi] +
+                 xr * (1.0 - yr) * l->h [yi + 5] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5] [xi];
+      float h3 = xr2 * yr2 * l->h [yi2 + 1] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2] [xi2] +
+                 xr2 * (1.0 - yr2) * l->h [yi2] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1] [xi2];
+      float h4 = xr2 * yr2 * l->h [yi2 + 1 + 5] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2 + 5] [xi2] +
+                 xr2 * (1.0 - yr2) * l->h [yi2 + 5] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1 + 5] [xi2];
+/*      float h3 = xr * yr * l->h [yi + 1 + 100] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 100] [xi] +
+                 xr * (1.0 - yr) * l->h [yi + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 100] [xi];
+      float h4 = xr * yr * l->h [yi + 1 + 5 + 100] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5 + 100] [xi] +
+                 xr * (1.0 - yr) * l->h [yi + 5 + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5 + 100] [xi];*/
+      float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer)) * 0.14 + 0.14;
+      float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer)) * 0.06 + 0.06;
+      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
+      else glColor3f (intens, 0, intens2);
+      glVertex3f (xf, yf, zf1);
+      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer)) * 0.14 + 0.14;
+      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer)) * 0.06 + 0.06;
+      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
+      else glColor3f (intens, 0, intens2);
+      glVertex3f (xf, yf + 0.25, zf1);
+    }
+    glEnd ();
   }
 
-/*  xf = missionnew->wantfighter - 2.6;
-  yf = -1.5;
-  zf = -3.5;
-  glBegin (GL_QUADS);
-  glColor3ub (0, 100, 0);
-  glVertex3f (xf, yf, zf);
-  glVertex3f (xf + 0.9, yf, zf);
-  glColor3ub (0, 0, 0);
-  glVertex3f (xf + 0.9, yf + 0.5, zf);
-  glVertex3f (xf, yf + 0.5, zf);
-  glEnd ();*/
+  glLineWidth (2.0);
+  glColor4ub (180, 180, 180, 255);
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (-2.3, 0.8, zf);
+  glVertex3f (2.3, 0.8, zf);
+  glVertex3f (2.3, 1.6, zf);
+  glVertex3f (-2.3, 1.6, zf);
+  glVertex3f (-2.3, 0.8, zf);
+  glEnd ();
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (-2.3, -0.3, zf);
+  glVertex3f (2.3, -0.3, zf);
+  glVertex3f (2.3, 0.8, zf);
+  glVertex3f (-2.3, 0.8, zf);
+  glVertex3f (-2.3, -0.3, zf);
+  glEnd ();
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (-2.3, -1.5, zf);
+  glVertex3f (2.3, -1.5, zf);
+  glVertex3f (2.3, -0.3, zf);
+  glVertex3f (-2.3, -0.3, zf);
+  glVertex3f (-2.3, -1.5, zf);
+  glEnd ();
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (0, 0.8, zf);
+  glVertex3f (0, -1.5, zf);
+  glEnd ();
 
   CVector3 vec;
   CVector3 tl (-4.5, 5.5, -8.0);
@@ -5706,6 +5746,7 @@ static void myDisplayFunc ()
   }
   else if (game == GAME_MISSION)
   {
+//    game_display ();
     mission_display ();
     game_view ();
   }
