@@ -1167,20 +1167,29 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
 
   if (difficulty == 0) // easy
   {
-    intelligence = 400 - (400 - intelligence) * 2 / 3;
-    precision = 400 - (400 - precision) * 2 / 3;
-    aggressivity = 400 - (400 - aggressivity) * 2 / 3;
-    if (party == 0 && shield > 10)
+    intelligence = 400 - (400 - intelligence) * 1 / 2;
+    precision = 400 - (400 - precision) * 1 / 2;
+    aggressivity = 400 - (400 - aggressivity) * 1 / 2;
+    if (party != 1 && shield > 10) // not player party
     {
       shield = shield * 8 / 10;
       maxshield = shield;
     }
   }
+  else if (difficulty == 1) // normal
+  {
+    intelligence = 400 - (400 - intelligence) * 3 / 4;
+    precision = 400 - (400 - precision) * 3 / 4;
+    aggressivity = 400 - (400 - aggressivity) * 3 / 4;
+  }
   else if (difficulty == 2) // hard
   {
-    intelligence = intelligence * 2 / 3;
-    precision = precision * 2 / 3;
-    aggressivity = aggressivity * 2 / 3;
+    if (party != 1) // not player party
+    {
+      intelligence = intelligence * 4 / 5;
+      precision = precision * 4 / 5;
+      aggressivity = aggressivity * 4 / 5;
+    }
   }
 
   this->intelligence = intelligence;

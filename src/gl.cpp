@@ -72,17 +72,6 @@ void GL::rotate (int x, int y, int z)
   glRotatef (x, 1.0f, 0.0f, 0.0f);
 }
 
-/*  void genLight (float x, float y, float z, float a)
-{
-  glEnable (0x4000 + gllightnr);
-  GLfloat position [] = { x, y, z };
-  glLightfv (0x4000 + gllightnr, GL_POSITION, position);
-  GLfloat p [] = { a, 0, 0 };
-  glLightfv (0x4000 + gllightnr, GL_CONSTANT_ATTENUATION, p);
-  gllightnr ++;
-  if (gllightnr > 7) gllightnr = 0;
-}*/
-
 GLuint GL::genListSphere (GLint slices, GLint stacks, float radius)
 {
   GLUquadricObj *quadObj;
@@ -257,14 +246,14 @@ void GL::enableFog (float view)
   glFogfv (GL_FOG_COLOR, fcol);
   glFogf (GL_FOG_DENSITY, 0.1);
   glFogi (GL_FOG_MODE, GL_LINEAR);
-//  glFogf (GL_FOG_DENSITY, 0.018);
+//  glFogf (GL_FOG_DENSITY, 0.017 * 100 / view);
 //  glFogi (GL_FOG_MODE, GL_EXP2);
   if (quality <= 5)
     glHint (GL_FOG_HINT, GL_FASTEST);
   else
     glHint (GL_FOG_HINT, GL_NICEST);
-  glFogf (GL_FOG_START, 1.0);
-  glFogf (GL_FOG_END, view);
+  glFogf (GL_FOG_START, 1.0 * GLOBALSCALE);
+  glFogf (GL_FOG_END, view * GLOBALSCALE);
 }
 
 

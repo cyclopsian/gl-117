@@ -50,6 +50,7 @@
 // 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
+#define GLOBALSCALE 1
 #define VERSIONSTRING "GL-117 V. 0.9 (BETA) BY THOMAS A. DREXL"
 
 // data types

@@ -722,19 +722,21 @@ void game_levelInit ()
     }
     else
     {
-      skycolor.setColor (127, 127, 127);
+      skycolor.setColor (127, 127, 127 + 5);
       objsphere->setColor (&skycolor);
     }
     if (sungamma < 35)
     {
       gl->fogcolor [0] = (float) (127 + 70 - 2 * sungamma) / 256.0;
+      gl->fogcolor [1] = 0.5;
+      gl->fogcolor [2] = 0.5;
     }
     else
     {
       gl->fogcolor [0] = 0.5;
+      gl->fogcolor [1] = 0.5;
+      gl->fogcolor [2] = 0.52;
     }
-    gl->fogcolor [1] = 0.5;
-    gl->fogcolor [2] = 0.5;
     skycolor.setColor (50, 200, 255);
     objsphere->setNorthPoleColor (&skycolor, 1.8);
     if (sungamma < 35)
@@ -849,7 +851,7 @@ void game_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, (float) width / height, nearclippingplane, v);
+  gluPerspective (80.0, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -869,7 +871,7 @@ void menu_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v);
+  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -886,7 +888,7 @@ void credits_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v);
+  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -903,7 +905,7 @@ void stats_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v);
+  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -3681,6 +3683,11 @@ void pause_display ()
   glPopMatrix ();
 }
 
+void credits_mouse (int button, int state, int x, int y)
+{
+  switch_menu ();
+}
+
 void credits_display ()
 {
   float yt = 12, zf = -2.4;
@@ -3865,6 +3872,8 @@ void game_display ()
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+
+  glScalef (GLOBALSCALE, GLOBALSCALE, GLOBALSCALE);
 
   glShadeModel (GL_SMOOTH);
 
@@ -4119,7 +4128,7 @@ void game_display ()
       while (CTexture *tex=fl_texture[i])
       {
         double position=fl_position[i];
-        double flarex,flarey,size=fl_size[i];
+        double flarex,flarey,size=fl_size[i]/GLOBALSCALE;
 
         i++;
 
@@ -5460,6 +5469,10 @@ static void myMouseFunc (int button, int state, int x, int y)
   {
     quit_mouse (button, state, x, y);
   }
+  else if (game == GAME_CREDITS)
+  {
+    credits_mouse (button, state, x, y);
+  }
 }
 
 static void myReshapeFunc (int width, int height)
@@ -6175,7 +6188,7 @@ int main (int argc, char **argv)
   glutTimerFunc (20, myTimerFunc, 0);
 
   // parameters: visible angle, aspectracio, z-nearclip, z-farclip
-  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0);
+  gluPerspective (80.0, (float) width / height, nearclippingplane * GLOBALSCALE, 50.0 * GLOBALSCALE);
   
   // no keyboard available with GLUT, as there are no KEY_DOWN/UP events
   if (controls <= 0)
