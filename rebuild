@@ -39,10 +39,10 @@ rm stamp-h 2> /dev/null
 rm stamp-h1 2> /dev/null
 rm stamp-h.in 2> /dev/null
 rm -rf auto* 2> /dev/null
-find . -name "cvs" -print > dellog
-DELLOG=`cat dellog`
-rm -rf $DELLOG 2> /dev/null
-rm dellog 2> /dev/null
+#find . -name "cvs" -print > dellog
+#DELLOG=`cat dellog`
+#rm -rf $DELLOG 2> /dev/null
+#rm dellog 2> /dev/null
 
 echo Trying to copy latest automake files...
 cp /usr/share/automake*/missing . 2> /dev/null
