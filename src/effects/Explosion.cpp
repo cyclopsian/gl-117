@@ -23,10 +23,10 @@
 
 #ifndef IS_EFFECTS_H
 
+#include "Effects.h"
+
 #include <math.h>
 #include <stdlib.h>
-
-#include "Effects.h"
 
 
 

@@ -23,6 +23,9 @@
 #define IS_COMPONENT_H
 
 #include "model3d/Model3d.h" // ok
+#include "effects/Effects.h" // ok
+
+extern Font *font1;
 
 extern Color StandardTextColor;
 extern Color DeactiveTextColor;

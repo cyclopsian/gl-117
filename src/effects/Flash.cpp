@@ -23,11 +23,11 @@
 
 #ifndef IS_EFFECTS_H
 
-#include <math.h>
-#include <stdlib.h>
-
 #include "Effects.h"
 #include "opengl/GlPrimitives.h"
+
+#include <math.h>
+#include <stdlib.h>
 
 
 

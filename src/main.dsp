@@ -430,45 +430,213 @@ SOURCE=.\pilot\PilotList.cpp
 SOURCE=.\pilot\TeamPilot.cpp
 # End Source File
 # End Group
+# Begin Group "cockpit"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\aiobject.cpp
+SOURCE=.\cockpit\Cockpit.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\aiobject.h
+SOURCE=.\cockpit\Cockpit.h
+# End Source File
+# End Group
+# Begin Group "mission"
+
+# PROP Default_Filter "*"
+# Begin Source File
+
+SOURCE=.\mission\MapLoader.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\cockpit.cpp
+SOURCE=.\mission\MapLoader.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\cockpit.h
+SOURCE=.\mission\Mission.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\main.cpp
+SOURCE=.\mission\Mission.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\main.h
+SOURCE=.\mission\MissionAirBattle.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\maploader.cpp
+SOURCE=.\mission\MissionBase.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\maploader.h
+SOURCE=.\mission\MissionCanyon1.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mission.cpp
+SOURCE=.\mission\MissionCanyon2.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mission.h
+SOURCE=.\mission\MissionCanyon3.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionConvoy.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionConvoy2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDeathMatch1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDeathMatch2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDeathMatch3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDefend1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDemo1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDepot.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDogfight1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDogfight2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionDogfight3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionFreeFlight1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionGround1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionMoonBase1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionMoonBattle.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionMoonDefense1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionMoonDogfight1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionMultiDogfight1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionScout.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionShip1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionShip2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionShip3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTank1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTeamBase1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTest1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTest2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTransport.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTunnel1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTutorial1.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTutorial2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionTutorial3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission\MissionWaves1.cpp
+# End Source File
+# End Group
+# Begin Group "aiobject"
+
+# PROP Default_Filter "*"
+# Begin Source File
+
+SOURCE=.\aiobject\AiObj.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\AiObj.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\DynamicObj.cpp
+# End Source File
+# End Group
+# Begin Group "game"
+
+# PROP Default_Filter "*"
+# Begin Source File
+
+SOURCE=.\game\Game.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\globals.h
+# End Source File
+# End Group
 # End Target
 # End Project

@@ -23,15 +23,16 @@
 
 #ifndef IS_COCKPIT_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "cockpit.h"
-#include "main.h"
+#include "game/globals.h"
+#include "cockpit/Cockpit.h"
 #include "pilot/Pilot.h"
 #include "math/Math.h"
-#include "mission.h"
+#include "mission/Mission.h"
 #include "opengl/GlPrimitives.h"
 #include "gllandscape/GlLandscape.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TRIANGLE_BLIP 1
 #define SQUARE_BLIP   2

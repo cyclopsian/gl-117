@@ -25,7 +25,9 @@
 #define IS_MISSION_H
 
 #include "model3d/Model3d.h" // ok
-#include "aiobject.h" // ok
+#include "aiobject/AiObj.h" // ok
+
+#include <math.h>
 
 #define MISSION_DEMO 0
 #define MISSION_CAMPAIGN1 1
@@ -70,6 +72,10 @@
 #define MISSION_MULTIPLAYER 1000
 #define MISSION_MULTIPLAYER_DOGFIGHT 1000
 
+/**
+* Mission is an abstract class for Mission implementations and provides some basic methods
+* to initialize players, store the weapon selection, etc.
+*/
 class Mission
 {
   protected:

@@ -23,17 +23,20 @@
 
 #ifndef IS_MAPLOADER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include "maploader.h"
-#include "main.h"
+#include "Maploader.h"
+#include "game/globals.h"
 #include "loadbitmap/LoadTga.h"
 #include "filetokenizer/FileTokenizer.h"
 #include "configuration/Dirs.h"
 #include "gllandscape/GlLandscape.h"
 #include "logging/Logging.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+
 
 int mapPilotname2Num (char *str)
 {

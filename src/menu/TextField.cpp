@@ -22,7 +22,6 @@
 #ifndef IS_COMPONENT_H
 
 #include "Component.h"
-#include "main.h"
 
 
 

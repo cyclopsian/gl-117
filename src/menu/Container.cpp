@@ -22,8 +22,9 @@
 #ifndef IS_COMPONENT_H
 
 #include "Component.h"
-#include "main.h"
+//#include "main.h"
 
+#define GLOBALSCALE 1.0
 
 
 Container::Container ()

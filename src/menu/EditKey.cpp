@@ -22,7 +22,7 @@
 #ifndef IS_COMPONENT_H
 
 #include "Component.h"
-#include "main.h"
+#include "configuration/Configuration.h" // TODO: not good to make dependancy here!
 
 
 

@@ -19,38 +19,42 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes the cockpit rendering methods. */
-
 #ifndef IS_COCKPIT_H
 #define IS_COCKPIT_H
 
 #include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok
 
+/**
+* This class includes all methods to render a standard cockpit.
+*/
 class Cockpit
 {
-  private:
-  void cockpitvertex (float phi, float gamma);
-
   public:
-  int flarewarning, chaffwarning;
-  Uint32 dt;
 
-  Cockpit ();
+    int flarewarning;
+    int chaffwarning;
+    Uint32 dt;
 
-  void drawBlip (int shape, float x, float y, float z, unsigned char r, unsigned char g, unsigned char b);
+    Cockpit ();
 
-  void setColor (int alpha);
-  void setColor (Color *color, int alpha);
-  void drawCounter ();
-  void drawTargeter ();
-  void drawCross ();
-  void drawHeading ();
-  void drawTargetedElement ();
-  void drawWeapon ();
-  void drawRadar ();
-  void drawRelativeHeightBar();
-  void drawThrustBar();
+    void drawBlip (int shape, float x, float y, float z, unsigned char r, unsigned char g, unsigned char b);
+
+    void setColor (int alpha);
+    void setColor (Color *color, int alpha);
+    void drawCounter ();
+    void drawTargeter ();
+    void drawCross ();
+    void drawHeading ();
+    void drawTargetedElement ();
+    void drawWeapon ();
+    void drawRadar ();
+    void drawRelativeHeightBar();
+    void drawThrustBar();
+
+  private:
+
+    void cockpitvertex (float phi, float gamma);
 };
 
 #endif

@@ -23,13 +23,11 @@
 
 #ifndef IS_EFFECTS_H
 
+#include "Effects.h"
+#include "opengl/GlPrimitives.h"
+
 #include <math.h>
 #include <stdlib.h>
-
-#include "Effects.h"
-//#include "GlLandscape.h"
-#include "opengl/GlPrimitives.h"
-//#include "configuration/Common.h"
 
 
 

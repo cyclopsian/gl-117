@@ -24,8 +24,7 @@
 #ifndef IS_MAPLOADER_H
 #define IS_MAPLOADER_H
 
-#include "aiobject.h" // ok
-#include "mission.h" // ok
+#include "Mission.h" // ok
 #include "filetokenizer/FileTokenizer.h" // ok
 
 #define MAXMAPS 100

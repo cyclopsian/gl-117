@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes the main program. */
-
 /* To fully understand the GL-117 code, please read the methods from bottom to top! */
 
 /*
@@ -39,21 +37,23 @@ TODO:
 
 #ifndef IS_MAIN_H
 
-#include "main.h"
+#include "game/globals.h"
 #include "menu/Component.h"
-#include "maploader.h"
+#include "mission/MapLoader.h"
 #include "configuration/Dirs.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net/net.h"
 #include "math/Math.h"
-#include "cockpit.h"
+#include "cockpit/Cockpit.h"
 #include "configuration/Configuration.h"
-#include "mission.h"
+#include "mission/Mission.h"
 #include "gllandscape/GlLandscape.h"
 #include "logging/Logging.h"
 
 #include <ctype.h>
+
+
 
 int mousex, mousey;
 

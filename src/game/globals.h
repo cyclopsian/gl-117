@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes the main program. */
-
 #ifndef IS_MAIN_H
 #define IS_MAIN_H
 
@@ -28,25 +26,20 @@
 //#define HAVE_SDL_MIXER
 //#define USE_GLUT
 
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-
 /* Load definitions of GNU autoconf:
     USE_GLUT: no SDL
     HAVE_SDL: SDL installed
     HAVE_SDL_MIXER: SDL_mixer installed
     HAVE_SDL_NET: SDL_net installed */
 
-#include "aiobject.h" // ok
-#include "model3d/Model3d.h" // ok
-#include "loadmodel/Load3ds.h" // ok
-#include "effects/Effects.h" // ok
-#include "sound/SoundSystem.h" // ok
-#include "configuration/Dirs.h" // ok
-#include "pilot/Pilot.h" // ok
+#include "aiobject/AiObj.h"
+#include "model3d/Model3d.h"
+#include "loadmodel/Load3ds.h"
+#include "effects/Effects.h"
+#include "sound/SoundSystem.h"
+#include "configuration/Dirs.h"
+#include "pilot/Pilot.h"
 
-//extern Dirs *dirs; ///< paths to directories with game data or saves
 extern Font *font1, *font2;
 
 extern Texture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
@@ -57,8 +50,8 @@ extern PilotList *pilots; // other pilots of the Eagle Squad
 extern Explosion *explosion [maxexplosion];
 extern BlackSmoke *blacksmoke [maxblacksmoke];
 
-//extern Load3ds g_Load3ds;
-extern Model3d model_fig; // fighter models
+// fighter models
+extern Model3d model_fig;
 extern Model3d model_figa;
 extern Model3d model_figb;
 extern Model3d model_figc;
@@ -70,6 +63,7 @@ extern Model3d model_figh;
 extern Model3d model_figi;
 extern Model3d model_figt;
 
+// all other models
 extern Model3d model_cannon1;
 extern Model3d model_cannon2;
 extern Model3d model_cannon1b;
@@ -126,9 +120,6 @@ extern Space *space; // the scene (everything) without the landscape
 extern AIObj *fplayer; // the player itself
 
 extern SoundSystem *sound;
-
-// get name of a keyboard's key (ENTER, SPACE)
-//extern char *getKeyString (int key, char *str);
 
 // own export: main.h may be included in the cpp files
 extern Model3d *getModel (int id);

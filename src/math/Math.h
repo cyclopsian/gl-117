@@ -22,6 +22,8 @@
 #ifndef IS_MATHTAB_H
 #define IS_MATHTAB_H
 
+#include <math.h>
+
 #define MULTIPLAYER 1
 #undef MULTIPLAYER
 
@@ -30,9 +32,9 @@
 #define SIN(x) sin(x*PI/180.0)
 #define COS(x) cos(x*PI/180.0)
 
-
-
 #define MAXSMOKEELEM 40
+
+
 
 /**
 * This class includes a collection of functions and precalculated tables.

@@ -21,13 +21,13 @@
 
 #ifndef IS_LANDSCAPE_H
 
+#include "Landscape.h"
+#include "math/Math.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#include "Landscape.h"
-#include "math/Math.h"
 
 
 
