@@ -8,7 +8,7 @@
 // HAVE_SDL_MIXER means SDL and SDL_mixer are available
 // HAVE_SDL_NET means SDL_net is available
 
-#define HAVE_SDL_NET // dummy
+//#define HAVE_SDL_NET // dummy
 //#undef HAVE_SDL_MIXER // dummy
 //#undef HAVE_SDL // dummy
 
@@ -127,6 +127,8 @@ extern int game; // see GAME-constants
 
 extern float blackout, redout; // high force
 
+extern float view_x, view_y; // angles for joystick-controlled view
+
 // maximum constants for objects
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
@@ -211,6 +213,10 @@ extern int debuglevel;
 #define EXIT_COMMAND 3
 #define EXIT_ALLOC 4
 #define EXIT_CONTEXT 5
+
+// joystick constants
+const int maxjaxis = 10;
+const int maxjoysticks = 10;
 
 // global normed timestep (higher values mean slower gameplay)
 const int timestep = 33;

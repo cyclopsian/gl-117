@@ -85,8 +85,8 @@ class Server
 
 //  private:
   int num_clients;
-  MyClient *clients;
 #ifdef HAVE_SDL_NET
+  MyClient *clients;
   TCPsocket server;
   IPaddress ip;
   SDLNet_SocketSet set;

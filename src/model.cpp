@@ -449,10 +449,10 @@ CModel::CModel ()
   name [0] = '0';
   nolight = false;
   alpha = false;
-  light_ambient [0] = 0.2; light_ambient [1] = 0.2; light_ambient [2] = 0.2; light_ambient [3] = 1;
-  light_diffuse [0] = 0.8; light_diffuse [1] = 0.8; light_diffuse [2] = 0.8; light_diffuse [3] = 1;
-  light_ambient2 [0] = 0.1; light_ambient2 [1] = 0.1; light_ambient2 [2] = 0.1; light_ambient2 [3] = 1;
-  light_diffuse2 [0] = 0.4; light_diffuse2 [1] = 0.4; light_diffuse2 [2] = 0.4; light_diffuse [3] = 1;
+  light_ambient [0] = 0.3; light_ambient [1] = 0.3; light_ambient [2] = 0.3; light_ambient [3] = 1;
+  light_diffuse [0] = 0.9; light_diffuse [1] = 0.9; light_diffuse [2] = 0.9; light_diffuse [3] = 1;
+  light_ambient2 [0] = 0.2; light_ambient2 [1] = 0.2; light_ambient2 [2] = 0.2; light_ambient2 [3] = 1;
+  light_diffuse2 [0] = 0.1; light_diffuse2 [1] = 0.1; light_diffuse2 [2] = 0.1; light_diffuse [3] = 1;
   numRefpoints = 0;
   refpoint = NULL;
 }
@@ -594,20 +594,28 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   int i, j;
   CObject *cm;
   //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
-  if (lum == 1.0)
+  float la [4] = { 0.2, 0.2, 0.2, 1.0};
+  if (lum >= 1)
   {
-    glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-/*      float light_specular [4] = {1, 1, 1, 1};
-      glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
-      glLighti (GL_LIGHT0, GL_SHININESS, 125.0);*/
+    float addl = lum;
+    if (addl >= 5) addl = 5;
+    la [0] = 0.2 * addl;
+    la [1] = 0.2 * addl;
+    la [2] = 0.2 * addl;
   }
-  else // half light if enshadowed
+  glLightfv (GL_LIGHT0, GL_AMBIENT, la);
+
+  float ld [4] = { 0.7, 0.7, 0.7, 1.0};
+  if (lum != 1)
   {
-    glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient2);
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse2);
-//      glLightf (GL_LIGHT0, GL_SHININESS, 0.0);
+    ld [0] *= lum;
+    ld [1] *= lum;
+    ld [2] *= lum;
+    if (ld [0] > 1.0) ld [0] = 1.0;
+    if (ld [1] > 1.0) ld [1] = 1.0;
+    if (ld [2] > 1.0) ld [2] = 1.0;
   }
+  glLightfv (GL_LIGHT0, GL_DIFFUSE, ld);
 
   for (i = 0; i < numObjects; i ++)
   {
@@ -631,14 +639,14 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list1 == -1 && explode <= 0 && displaylist)
+/*  if (list1 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
     gl->genList (&list1);
   }
   if (listgen || explode > 0 || !displaylist)
   {
-  
+*/
     if (shading == 1)
       glShadeModel (GL_FLAT);
     else
@@ -754,9 +762,9 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     if (alpha)
     { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
-    if (listgen) glEndList ();
+/*    if (listgen) glEndList ();
   }
-  else glCallList (list1);
+  else glCallList (list1);*/
 //  printf ("\n%f,%f %f,%f %f,%f",ix,mx,iy,my,iz,mz); fflush (stdout);
 //  printf ("\n%d,%d",object[0]->numVertices,object[0]->numTriangles); fflush (stdout);
   glPopMatrix ();

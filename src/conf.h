@@ -40,6 +40,7 @@ extern unsigned int joystick_firecannon, joystick_firemissile, joystick_dropchaf
 extern unsigned int joystick_selectmissile, joystick_thrustup, joystick_thrustdown;
 extern unsigned int joystick_targetnearest, joystick_targetnext, joystick_targetprevious, joystick_targetlocking;
 extern unsigned int joystick_aileron, joystick_elevator, joystick_rudder, joystick_throttle;
+extern unsigned int joystick_view_x, joystick_view_y;
 
 extern unsigned char mouse_firecannon, mouse_firemissile;
 extern unsigned char mouse_selectmissile;

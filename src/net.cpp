@@ -321,7 +321,8 @@ int Server::checkStart()
 {
 #ifdef HAVE_SDL_NET
 
-  for (int i = 0; i < num_clients; i++)
+  int i;
+  for (i = 0; i < num_clients; i++)
   {
     sendMessage (clients[i].id, "ready", 5);
   }
@@ -352,11 +353,9 @@ int Server::checkStart()
    }
  }
  printf ("Clients not ready");
- return 0;
-
-
 
 #endif
+ return 0;
 }
 
 void Server::sendMessage(int id_client, char *buf, int len)

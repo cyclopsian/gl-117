@@ -2015,8 +2015,6 @@ void GLLandscape::draw (int phi, int gamma)
   float dx = (float) (maxx - minx + 1) / parts;
   float dy = (float) (maxy - miny + 1) / parts;
 
-
-#ifndef FASTCPU
   // Efficient occlusion culling (kind of ray casting technique):
   // Run from inner grid point (viewer) to outer grid parts and check if grid points are hidden
   // This is currently not completely correct (needs two comparisons of inner fields), but
@@ -2263,8 +2261,8 @@ void GLLandscape::draw (int phi, int gamma)
       int h1 = vminref + dhp;
       if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
 
-/*      // also test non-diagonal element if available
-      bool secondtest = false;
+      // also test non-diagonal element if available
+/*      bool secondtest = false;
       if (i < cy && i > i2 + 1)
       {
         lasty = 0;
@@ -2299,9 +2297,7 @@ void GLLandscape::draw (int phi, int gamma)
       { vis [i] [i2] = !set; count ++; }
     }
 //  printf ("c=%d ", count);
-#else
-  memset (vis, 1, PARTS * PARTS * sizeof (bool));
-#endif
+//  memset (vis, 1, PARTS * PARTS * sizeof (bool));
 
 /*  float fx, fy;
   for (i = 0; i < parts; i ++)

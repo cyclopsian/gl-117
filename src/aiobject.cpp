@@ -184,7 +184,7 @@ void DynamicObj::checkExplosion (Uint32 dt)
       }
       else
       {
-        setExplosion (0.8, 30 * timestep);
+        setExplosion (zoom * 2, 30 * timestep);
         setBlackSmoke (1.0, 60 * timestep);
       }
     }
@@ -463,6 +463,17 @@ void DynamicObj::move (Uint32 dt)
     phi = camphi; // angles to viewer (player)
     theta = 0;
     gamma = camgamma;
+  }
+
+  // check maximum gamma
+  if (easymodel == 1)
+  {
+    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
+    else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
+  }
+  else if (easymodel == 2) // otherwise check for value overflow due to loops
+  {
+    (void) checkLooping ();
   }
 
   // get a normalized theta, as our sine/cosi tables only reach from 0 to 359
@@ -1911,7 +1922,6 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 //  if (id == 200) printf ("%1.2f, %1.2F  ", lsdist * forcex, lsdist * forcez);
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
-  float flyx2 = tl->x + forcex * lsdist * 2, flyz2 = tl->z + forcez * lsdist * 2;
   int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);
   {
     if (manoeverheight > 0)
@@ -1930,6 +1940,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       else
       {
         // precalculated height
+        float flyx2 = tl->x + forcex * lsdist * 2.5, flyz2 = tl->z + forcez * lsdist * 2.5;
         float h1 = l->getHeight (flyx, flyz), h2 = l->getHeight (flyx2, flyz2);
         recheight2 = recheight + (h1 > h2 ? h1 : h2);
       }
@@ -2021,74 +2032,63 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   theta = getFunction (timer);
   lastrectheta = rectheta;*/
 
-  deltatheta = rectheta - theta;
-  if (fabs (dtheta) > 30)
-  { dtheta = 0; }
-  float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
-//  float mynimbility = nimbility;
-  if (mynimbility > nimbility) mynimbility = nimbility;
-  float nimbility2 = mynimbility;
-  if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
-    nimbility2 = 0.00001;
-//  float nn = nimbility2 * timefac;
-//  if (timefac > 1) nn = nimbility2;
-
-  if (deltatheta > 0 && dtheta < 0) dtheta += mynimbility * timefac;
-  else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility * timefac;
-  else if (deltatheta > 0)
-  {
-    float estimatedtheta = dtheta * (dtheta + nimbility2 * 5 / timefac) / 2 / nimbility2;
-    if (deltatheta > estimatedtheta/* + timefac*/) dtheta += mynimbility * timefac;
-    else if (deltatheta < estimatedtheta/* - timefac*/) dtheta -= mynimbility * timefac;
-  }
-  else
-  {
-    float estimatedtheta = -dtheta * (dtheta - nimbility2 * 5 / timefac) / 2 / nimbility2;
-    if (deltatheta < estimatedtheta/* - timefac*/) dtheta -= mynimbility * timefac;
-    else if (deltatheta > estimatedtheta/* + timefac*/) dtheta += mynimbility * timefac;
-  }
-  theta += dtheta;
-
-  // height changes
   if (easymodel == 1)
   {
-    float nimbility1 = nimbility / 5;
-    if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
-      nimbility1 = 0.00001;
-    if (theta > maxtheta) theta = maxtheta; // restrict roll angle
-    else if (theta < -maxtheta) theta = -maxtheta;
+    deltatheta = rectheta - theta;
+    if (fabs (dtheta) > 30)
+    { dtheta = 0; }
+    float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
+    if (mynimbility > nimbility) mynimbility = nimbility;
+    float nimbility2 = mynimbility;
+    if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
+      nimbility2 = 0.00001;
 
-    float deltagamma = recgamma - gamma;
-    if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
-    else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility1 * timefac;
-    else if (deltagamma > 0)
+    if (deltatheta > 0 && dtheta < 0) dtheta += mynimbility * timefac;
+    else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility * timefac;
+    else if (deltatheta > 0)
     {
-      float estimatedgamma = dgamma * (dgamma + nimbility1 * 2) / nimbility1;
-      if (id == 200)
-        id = id;
-      if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
-      else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
+      float estimatedtheta = dtheta * (dtheta + nimbility2 * 5 / timefac) / 2 / nimbility2;
+      if (deltatheta > estimatedtheta/* + timefac*/) dtheta += mynimbility * timefac;
+      else if (deltatheta < estimatedtheta/* - timefac*/) dtheta -= mynimbility * timefac;
     }
-    else if (deltagamma < 0)
+    else
     {
-      float estimatedgamma = -dgamma * (dgamma + nimbility1 * 2) / nimbility1;
-      if (id == 200)
-        id = id;
-      if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
-      else if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
+      float estimatedtheta = -dtheta * (dtheta - nimbility2 * 5 / timefac) / 2 / nimbility2;
+      if (deltatheta < estimatedtheta/* - timefac*/) dtheta -= mynimbility * timefac;
+      else if (deltatheta > estimatedtheta/* + timefac*/) dtheta += mynimbility * timefac;
     }
-    gamma += dgamma;
-  }
+    theta += dtheta;
 
-  // check maximum gamma
-  if (easymodel == 1)
-  {
-    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
-    else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
-  }
-  else if (easymodel == 2) // otherwise check for value overflow due to loops
-  {
-    (void) checkLooping ();
+    // height changes
+    if (easymodel == 1)
+    {
+      float nimbility1 = nimbility / 5;
+      if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
+        nimbility1 = 0.00001;
+      if (theta > maxtheta) theta = maxtheta; // restrict roll angle
+      else if (theta < -maxtheta) theta = -maxtheta;
+
+      float deltagamma = recgamma - gamma;
+      if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
+      else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility1 * timefac;
+      else if (deltagamma > 0)
+      {
+        float estimatedgamma = dgamma * (dgamma + nimbility1 * 2) / nimbility1;
+        if (id == 200)
+          id = id;
+        if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
+        else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
+      }
+      else if (deltagamma < 0)
+      {
+        float estimatedgamma = -dgamma * (dgamma + nimbility1 * 2) / nimbility1;
+        if (id == 200)
+          id = id;
+        if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
+        else if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
+      }
+      gamma += dgamma;
+    }
   }
 
   /*    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
@@ -2200,7 +2200,8 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // fire flares
   if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
   {
-    if (!(l->lsticker & 7))
+//    if (!(l->lsticker & 7))
+    if (!manoevertheta)
       for (i = 0; i < maxmissile; i ++)
         if (m [i]->ttl > 0)
           if (m [i]->target == this)
@@ -2409,7 +2410,7 @@ m [0]->tl->y = target->tl->y;
   // thrust and manoever calculations
   if (id >= FIGHTER1 && id <= FIGHTER2) // fighters
   {
-    if (disttarget > 2.5 + aggressivity / 20)
+    if (disttarget > 2.5 + aggressivity / 10)
     {
       if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
         recthrust = maxthrust / (2 - intelligence * 0.001);
@@ -2459,11 +2460,11 @@ m [0]->tl->y = target->tl->y;
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
-        if (fabs (rectheta - theta) < agr && fabs (aw) < agr * 3 && disttarget < 45)
-          if (!(l->lsticker & 7))
+        if (fabs (rectheta - theta) < agr / 2 && fabs (aw) < agr && disttarget < 45)
+//          if (!(l->lsticker & 7))
           {
             fireMissile (m, (AIObj *) target);
-            firemissilettl += aggressivity / 5 * timestep;
+            firemissilettl += aggressivity / 3 * timestep;
           }
       }
       else // ground target
@@ -2472,7 +2473,7 @@ m [0]->tl->y = target->tl->y;
           if (!(l->lsticker & 7))
           {
             fireMissileGround (m);
-            firemissilettl += aggressivity / 5 * timestep;
+            firemissilettl += aggressivity / 3 * timestep;
           }
       }
     }

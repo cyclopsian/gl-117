@@ -51,6 +51,7 @@ float sungamma = 45.0;
 
 int camera = 0;
 float camx = 0, camy = 0, camz = 0, camphi = 0, camgamma = 0, camtheta = 0;
+float view_x = 0, view_y = 0;
 float sunlight = 1.0, sunlight_dest = 1.0;
 
 float blackout = 0, redout = 0;
@@ -516,7 +517,6 @@ void adjustBrightness ()
 
 
 
-const int maxjoysticks = 10;
 #ifndef USE_GLUT
 SDL_Joystick *sdljoystick [maxjoysticks];
 #endif
@@ -1679,12 +1679,14 @@ void game_mousemotion (int x, int y)
 #endif
 }
 
-const int maxjaxis = 10;
 int jaxis [maxjaxis * maxjoysticks];
 
 int getJoystickAxisIndex (int n)
 {
-  return (n / 1000) * 10 + (n % 1000);
+  int idx = (n / 1000) * 10 + (n % 1000);
+  if (idx < 0) idx = 0;
+  if (idx >= maxjaxis) idx = 0;
+  return idx;
 }
 
 void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
@@ -1699,6 +1701,8 @@ void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
   int y = jaxis [getJoystickAxisIndex (joystick_elevator)];
   int rudder = jaxis [getJoystickAxisIndex (joystick_rudder)];
   int throttle = jaxis [getJoystickAxisIndex (joystick_throttle)];
+  view_x = (float) jaxis [getJoystickAxisIndex (joystick_view_x)]/(-328.0);
+  view_y = (float) jaxis [getJoystickAxisIndex (joystick_view_y)]/(-328.0);
 /*  int t = (int) fplayer->theta;
   if (t < 0) t += 360;
   float rx = x * cosi [t] - y * sine [t];
@@ -2460,11 +2464,13 @@ void create_display ()
   drawQuads (colorstd);
 
   float my = 0;
+#ifdef HAVE_SDL_NET
   for (i = 0; i < server->num_clients; i ++)
   {
     font1->drawTextCentered (0, my, -2.5, server->clients [i].name);
     my -= 2;
   }
+#endif
 
   font1->drawTextCentered (0, 9, -1.5, "CREATE GAME");
 
@@ -4046,7 +4052,7 @@ void game_display ()
   bool sunvisible = false;
   float pseudoview = getView ();
 
-  float mycamtheta = camtheta, mycamphi = camphi, mycamgamma = camgamma;
+  float mycamtheta = camtheta, mycamphi = camphi + view_x , mycamgamma = camgamma + view_y;
 
   if (vibration > 0)
   {
@@ -4300,13 +4306,24 @@ void game_display ()
   if (camera != 50)
   {
     space->lum = sunlight;
-    for (i = 0; i < space->no; i ++)
+    float dayfac = 1.0;
+    if (!day) dayfac = 0.5;
+    if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
     {
-      if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
-        space->o [i]->lum = 0.5;
-      else
-        space->o [i]->lum = 1.0;
+      for (i = 0; i < space->no; i ++)
+      {
+        if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
+          space->o [i]->lum = 0.5 * dayfac;
+        else
+          space->o [i]->lum = 1.0 * dayfac;
+      }
     }
+    else
+    {
+      for (i = 0; i < space->no; i ++)
+        space->o [i]->lum = dayfac;
+    }
+//    printf ("%2.1f*%2.1f ", fplayer->lum, sunlight);
     if (flash > 7 * timestep)
     {
       if (quality <= 2)
@@ -4982,23 +4999,25 @@ void create_timer (Uint32 dt)
 
 void join_timer (Uint32 dt)
 {
+#ifdef HAVE_SDL_NET
 #ifndef USE_GLUT
   char buf [STDSIZE];
   if (client->sock == NULL) client->getServer ("127.0.0.1", "client1");
   else 
   {
-  SDL_Delay (100);
-  mission_timer (dt);
-  client->getMessage (buf);
+    SDL_Delay (100);
+    mission_timer (dt);
+    client->getMessage (buf);
   
-  if (buf [0] == 's')
-  {
-    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
-    game_levelInit ();
-    switch_game ();
-    missionactive = true;
+    if (buf [0] == 's')
+    {
+      createMission (MISSION_MULTIPLAYER_DOGFIGHT);
+      game_levelInit ();
+      switch_game ();
+      missionactive = true;
+    }
   }
-  }
+#endif
 #endif
 }
 
@@ -5432,7 +5451,7 @@ void init_display ()
   int i, i2;
   CVector3 vec;
   CColor color (200, 200, 200, 255);
-
+  
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -6043,9 +6062,19 @@ void sdlMainLoop ()
           break;
         case SDL_JOYAXISMOTION:
 //          if (abs (event.jaxis.value) > 500)
-          jaxis [event.jaxis.axis + event.jaxis.which * 10] = event.jaxis.value;
-          if (abs (event.jaxis.value) < 1000)
+//          jaxis [event.jaxis.axis + event.jaxis.which * 10] = event.jaxis.value;
+          if (abs (event.jaxis.value) < 2000)
+          {
             jaxis [event.jaxis.axis + event.jaxis.which * 10] = 0;
+          }
+          else
+          {
+            if (event.jaxis.value < 0)
+              event.jaxis.value += 2500;
+            else
+              event.jaxis.value -= 2500;
+            jaxis [event.jaxis.axis + event.jaxis.which * 10] = (int) event.jaxis.value * 32768 / 30268;
+          }
 /*          {
             if (event.jaxis.axis == 0)
             {
