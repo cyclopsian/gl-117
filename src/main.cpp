@@ -66,7 +66,7 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
-float nearclippingplane = 0.05;
+float nearclippingplane = 0.15; // do NOT lower this!
 
 bool sunblinding=false;
 
@@ -3642,8 +3642,8 @@ void save_config ()
   cf->write (" quality", quality);
   cf->writeText ("# Far clipping plane: 20..100 (default=50)");
   cf->write (" view", (int) view);
-  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
-  cf->write (" dithering", dithering);
+//  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
+//  cf->write (" dithering", dithering);
 #ifdef HAVE_SDL_MIXER
   cf->writeText ("# Sound volume: 0..100 (default=100) per cent");
   cf->write (" sound", (int) volumesound);
@@ -3728,9 +3728,9 @@ int load_config ()
     view = 100;
   }
 
-  str = cf->getString (ret, "dithering");
+/*  str = cf->getString (ret, "dithering");
   dithering = (str == NULL)? 0 : atoi(str);
-  if (dithering) dithering = 1;
+  if (dithering) dithering = 1;*/
 
 #ifdef HAVE_SDL_MIXER
   str = cf->getString (ret, "sound");
@@ -6290,9 +6290,17 @@ void menu_mouse (int button, int state, int x, int y)
           }
         }
       }
-      else if (ry >= 0.28 && ry <= 0.33)
+/*      else if (ry >= 0.28 && ry <= 0.33)
       {
         menuitemselected = 12;
+        if (state == MOUSE_DOWN)
+        {
+          dithering = (dithering == 0 ? 1 : 0);
+        }
+      }*/
+      else if (ry >= 0.34 && ry <= 0.39)
+      {
+        menuitemselected = 13;
         if (state == MOUSE_DOWN)
         {
           if (button == MOUSE_BUTTON_LEFT)
@@ -6308,9 +6316,9 @@ void menu_mouse (int button, int state, int x, int y)
         }
       }
 #ifdef HAVE_SDL_MIXER
-      else if (ry >= 0.34 && ry <= 0.39)
+      else if (ry >= 0.40 && ry <= 0.45)
       {
-        menuitemselected = 13;
+        menuitemselected = 14;
         if (state == MOUSE_DOWN)
         {
           if (button == MOUSE_BUTTON_LEFT)
@@ -6335,9 +6343,9 @@ void menu_mouse (int button, int state, int x, int y)
           }
         }
       }
-      else if (ry >= 0.40 && ry <= 0.45)
+      else if (ry >= 0.46 && ry <= 0.51)
       {
-        menuitemselected = 14;
+        menuitemselected = 15;
         if (state == MOUSE_DOWN)
         {
           if (button == MOUSE_BUTTON_LEFT)
@@ -6364,9 +6372,9 @@ void menu_mouse (int button, int state, int x, int y)
         }
       }
 #endif
-      else if (ry >= 0.46 && ry <= 0.51)
+      else if (ry >= 0.52 && ry <= 0.57)
       {
-        menuitemselected = 15;
+        menuitemselected = 16;
         if (state == MOUSE_DOWN)
         {
           if (button == MOUSE_BUTTON_LEFT)
@@ -6784,44 +6792,53 @@ void menu_display ()
   }
   else if (menuitem == 3)
   {
+    float yt = 12;
     sprintf (buf, "QUALITY: %d", quality);
     if (menuitemselected == 10)
-      font1->drawTextRotated (textx2, 10, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, 10, -2, buf);
+      font1->drawText (textx2, yt -= 2, -2, buf);
     sprintf (buf, "VIEW: %d", (int) view);
     if (menuitemselected == 11)
-      font1->drawTextRotated (textx2, 8, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, 8, -2, buf);
+      font1->drawText (textx2, yt -= 2, -2, buf);
+/*    strcpy (buf, "DITHERING: ");
+    if (dithering) strcat (buf, "ON");
+    else strcat (buf, "OFF");
+    if (menuitemselected == 12)
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yt -= 2, -2, buf);*/
+    yt -= 2;
     strcpy (buf, "CONTROLS: ");
     if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
     else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE");
     else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
-    if (menuitemselected == 12)
-      font1->drawTextRotated (textx2, 6, -2, buf, &color2, -menutimer * 5);
+    if (menuitemselected == 13)
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, 6, -2, buf);
+      font1->drawText (textx2, yt -= 2, -2, buf);
 #ifdef HAVE_SDL_MIXER
     sprintf (buf, "SOUND: %d%%", (int) sound->volumesound);
-    if (menuitemselected == 13)
-      font1->drawTextRotated (textx2, 4, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, 4, -2, buf);
-    sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
     if (menuitemselected == 14)
-      font1->drawTextRotated (textx2, 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, 2, -2, buf);
+      font1->drawText (textx2, yt -= 2, -2, buf);
+    sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
+    if (menuitemselected == 15)
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yt -= 2, -2, buf);
 #endif
     strcpy (buf, "DIFFICULTY: ");
     if (difficulty == 0) strcat (buf, "EASY");
     else if (difficulty == 1) strcat (buf, "MEDIUM");
     else if (difficulty == 2) strcat (buf, "HARD");
-    if (menuitemselected == 15)
-      font1->drawTextRotated (textx2, 0, -2, buf, &color2, -menutimer * 5);
+    if (menuitemselected == 16)
+      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, 0, -2, buf);
+      font1->drawText (textx2, yt -= 2, -2, buf);
 /*    sprintf (buf, "MODE: %d\x%d", width, height);
     if (menuitemselected == 16)
       font1->drawTextRotated (textx2, -2, -2, buf, &color2, -menutimer * 5);
@@ -6924,7 +6941,10 @@ void game_display ()
   if (debug)
     printf ("\nentering myDisplayFunc()"); fflush (stdout);
 
-  if (dithering) glEnable(GL_DITHER); else glDisable(GL_DITHER);
+  if (quality > 0) dithering = 1;
+  else dithering = 0;
+  if (dithering) glEnable(GL_DITHER);
+  else glDisable(GL_DITHER);
 
   bool sunvisible = false;
   float pseudoview = getView ();
