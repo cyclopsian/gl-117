@@ -62,6 +62,7 @@ static DATA32* flip(DATA32* in, int w, int h);
 #define TGA_DESC_VERTICAL   0x20 
 
 #define TGA_SIGNATURE "TRUEVISION-XFILE" 
+#define TGA_FOOTER_LEN 26
 
 typedef struct { 
    unsigned char    idLength; 
@@ -79,6 +80,8 @@ typedef struct {
 } tga_header; 
 
 typedef struct { 
+   unsigned int extensionAreaOffset;
+   unsigned int developerDirectoryOffset;
    char signature[16]; 
    char dot; 
    char null; 
@@ -110,8 +113,8 @@ unsigned char* tga_load (char* im_file,int* w,int* h)
       return 0;
    
    /* read the footer first */
-   fseek (fp, 0L - (sizeof (tga_footer)), SEEK_END); 
-   if (fread (&footer, sizeof (tga_footer), 1, fp) != 1) 
+   fseek (fp, 0L - TGA_FOOTER_LEN, SEEK_END); 
+   if (fread (&footer, TGA_FOOTER_LEN, 1, fp) != 1) 
      { 
 	fclose(fp);
 	return 0; 
@@ -202,7 +205,7 @@ unsigned char* tga_load (char* im_file,int* w,int* h)
 	
 	stat(im_file, &ss);
 	datasize = ss.st_size - sizeof(tga_header) - header.idLength -
-	   (footer_present ? sizeof(tga_footer) : 0);
+	   (footer_present ? TGA_FOOTER_LEN : 0);
 	
 	buf = (unsigned char*)malloc(datasize); 
 	if(!buf) 
