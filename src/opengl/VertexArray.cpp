@@ -28,7 +28,7 @@
 
 
 
-const bool UseVertexArray = false;
+const bool UseVertexArray = true;
 
 VertexArray::VertexArray ()
 {

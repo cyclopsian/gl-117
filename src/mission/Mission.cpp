@@ -99,8 +99,6 @@ void setIntelligence (AiObj &obj, int intelligence, int precision, int aggressiv
 
 void Mission::playerInit ()
 {
-//  space->removeObject (fighter [0]);
-//  delete fighter [0];
   Fighter *f = new Fighter (selfighter [wantfighter]);
   fighter.add (f);
 
@@ -242,14 +240,23 @@ void Mission::selectMissiles (AiObj &aiobj)
     aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 2;
     aiobj.missilerack [0] = 7; aiobj.missilerack [1] = 1; aiobj.missilerack [2] = 1; aiobj.missilerack [3] = 7;
   }
+  if (id == CruiserDescriptor)
+  {
+    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+  }
+  if (id == MobileSamDescriptor)
+  {
+    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+  }
+  if (id == SamDescriptor)
+  {
+    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+  }
 }
 
-void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
+void Mission::alliedInit (const UnitDescriptor &id, int pilotid, int n)
 {
-//  AiObj *aiobj = fighter [n];
-//  space->removeObject (aiobj);
-//  delete aiobj;
-  Fighter *aiobj = new Fighter (fighterid);
+  Fighter *aiobj = new Fighter (id);
   fighter.add (aiobj);
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
@@ -277,10 +284,6 @@ void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
 
 void Mission::objectInit (AiObj *aiobj, int party, int ailevel, int n)
 {
-//  space->removeObject (aiobj);
-//  delete fighter [n];
-//  fighter [n] = aiobj;
-//  fighter [n]->space = space;
   fighter.add (aiobj);
 
   setIntelligence (*aiobj, ailevel, ailevel, ailevel);

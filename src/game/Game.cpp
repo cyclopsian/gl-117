@@ -127,21 +127,17 @@ float visibleangle = 80.0F;
 
 Texture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon = NULL, *texcross, *texcross2, *texranks, *texmedals;
 Texture *texclouds1, *texclouds2, *texclouds3;
+Texture *textitle;
+
+GlLandscape *l = NULL;
+Font *font1, *font2;
+
+Uint32 lasttime = 0;
 
 PilotList *pilots;
 
 ObjectList<Explosion *> explosion;
 ObjectList<BlackSmoke *> blacksmoke;
-GlLandscape *l = NULL;
-Font *font1, *font2;
-
-Texture *textitle;
-
-Uint32 lasttime = 0;
-
-
-
-
 ObjectList<DynamicObj *> flare;
 ObjectList<DynamicObj *> chaff;
 ObjectList<AiObj *> missile;
@@ -187,7 +183,6 @@ Container quitmenu;
 Container statsmenu;
 Component *currentsubmenu = NULL;
 Component *currentoptmenu = NULL;
-
 Container *mainmenu, *submenu [10], *optmenu [5], *controlsmenu [5];
 Button *mainbutton [10];
 Button *optbutton [10];

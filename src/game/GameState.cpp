@@ -834,11 +834,10 @@ void StateMission::display ()
   rot.phi = 90;
   
   // Draw dummy missile
-  glEnable (GL_LIGHTING);
+/*  glEnable (GL_LIGHTING);
   Model3dRealizer mr;
   mr.draw (*Model3dRegistry::get (AamHs1Descriptor.name), Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
-//  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
-  glDisable (GL_LIGHTING);
+  glDisable (GL_LIGHTING); */
   
   glEnable (GL_LIGHTING);
   glEnable (GL_DEPTH_TEST);
@@ -854,8 +853,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*Model3dRegistry::get (missionnew->selfighter [i].name), Transformation (tl, rot, Vector3(0.04)), 1.0, 0);
-//    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selfighter [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
   }
 
   tl.x = 0; tl.y = -0.075; tl.z = -0.5;
@@ -869,8 +867,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*Model3dRegistry::get (missionnew->selweapon [i].name), Transformation (tl, rot, Vector3(0.04)), 1.0, 0);
-//    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selweapon [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_LIGHTING);
@@ -1545,7 +1542,7 @@ void StateQuit::display ()
 
 void StatePlay::display ()
 {
-  int i;
+  unsigned i;
   double sunx = 0, suny = 0, sunz;
 
   if (dithering) glEnable (GL_DITHER);
@@ -2666,9 +2663,26 @@ void StateInit::display ()
   // draw fighter
   glPushMatrix ();
   glTranslatef (0, 0, -5);
+/*  tl.z = 0;
+  rot.phi = (inittimer_gl117 % (360*4)) / 4;
+  rot.theta = 0;
+  rot.gamma = 0; */
   Model3dRealizer mr;
   Model3d *model = Model3dRegistry::get (FalconDescriptor.name);
   mr.draw (*model, Transformation(tl, rot, Vector3(1.0)), 2.0, initexplode1);
+/*  glRotatef (rot.phi, 0, 1, 0);
+  glBegin (GL_QUADS);
+  glNormal3f (-1.0, -1.0, 0.0);
+  glVertex3f (-1.0, -1.0, 0.0);
+  glNormal3f (-1.0, -1.0, 0.0);
+  glVertex3f (1.0, -1.0, 0.0);
+  glNormal3f (-1.0, -1.0, 0.0);
+  glVertex3f (1.0, 1.0, 0.0);
+  glNormal3f (-1.0, -1.0, 0.0);
+  glVertex3f (-1.0, 1.0, 0.0);
+  glNormal3f (-1.0, -1.0, 0.0);
+  glVertex3f (-1.0, -1.0, 0.0);
+  glEnd (); */
   glPopMatrix ();
 
   glDisable (GL_DEPTH_TEST);

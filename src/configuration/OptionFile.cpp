@@ -75,7 +75,7 @@ bool OptionFile::getString (const std::string &name, std::string &value)
   OptionList::iterator it = optionList.find (name);
   if (it == optionList.end ())
   {
-    DISPLAY_WARN(FormatString ("Option \"%s\" not found in file \"%s\".",
+    DISPLAY_DEBUG(FormatString ("Option \"%s\" not found in file \"%s\".",
                   name.c_str (), file.getFilename ()));
     return false;
   }

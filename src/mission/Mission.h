@@ -82,43 +82,44 @@
 */
 class Mission
 {
-  protected:
-  void autoLFBriefing ();
-
   public:
-  int timer; // mission timer
-  int maxtime; // maximum time to get a time bonus
-  int alliedfighters; // number of allied fighters
-  char briefing [1024]; // briefing text
-  char name [1024]; // mission title
-  int id; // mission id
-  UnitDescriptor selfighter [3]; // fighter to choose
-  int selfighters;
-  int wantfighter; // selected fighter
-  UnitDescriptor selweapon [3]; // weapon pack to choose
-  int selweapons;
-  int wantweapon; // selected weapon pack
-  int alliedpilot [10]; // id of allied pilots
-  Color textcolor; // standard text color to blend in during flight
-  int difficulty; // difficulty level for THIS mission
-  int heading; // define northern direction (the sun is at 0 degree)
-  int state; // different mission states (individual meaning)
-  int physics; // action=0 or simulation=1
+    int timer; // mission timer
+    int maxtime; // maximum time to get a time bonus
+    int alliedfighters; // number of allied fighters
+    char briefing [1024]; // briefing text
+    char name [1024]; // mission title
+    int id; // mission id
+    UnitDescriptor selfighter [3]; // fighter to choose
+    int selfighters;
+    int wantfighter; // selected fighter
+    UnitDescriptor selweapon [3]; // weapon pack to choose
+    int selweapons;
+    int wantweapon; // selected weapon pack
+    int alliedpilot [10]; // id of allied pilots
+    Color textcolor; // standard text color to blend in during flight
+    int difficulty; // difficulty level for THIS mission
+    int heading; // define northern direction (the sun is at 0 degree)
+    int state; // different mission states (individual meaning)
+    int physics; // action=0 or simulation=1
 
-  Mission ();
-  virtual ~Mission () {}
-  void playerInit ();
-  void selectMissiles (AiObj &aiobj);
-  void alliedInit (const UnitDescriptor &fighterid, int pilotid, int i);
-  void objectInit (AiObj *aiobj, int party, int ailevel, int n);
-//  virtual void init () = 0;
-  virtual void start () = 0; // custom definitions for a mission
-  virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure
-  virtual void draw () = 0; // custom definitions that have to be drawn
-  void invertZ (); // invert Z coordinate of all fighters and objects
-  void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
-  int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
-  int getScore (int missionstate);
+    Mission ();
+    virtual ~Mission () {}
+
+    void playerInit ();
+    void selectMissiles (AiObj &aiobj);
+    void alliedInit (const UnitDescriptor &id, int pilotid, int i);
+    void objectInit (AiObj *aiobj, int party, int ailevel, int n);
+  //  virtual void init () = 0;
+    virtual void start () = 0; // custom definitions for a mission
+    virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure
+    virtual void draw () = 0; // custom definitions that have to be drawn
+    void invertZ (); // invert Z coordinate of all fighters and objects
+    void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
+    int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
+    int getScore (int missionstate);
+
+  protected:
+    void autoLFBriefing ();
 };
 
 class MissionDemo1 : public Mission

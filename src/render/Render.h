@@ -108,18 +108,16 @@ class Model3dRealizer
       Rotation rot(trafo.rotation);
       float zoom = trafo.scaling.x;
 
-      VertexArray va1;
+      VertexArray va1 (VERTEXARRAY_V3N3C4T2);
       VertexArray *va = &va1;
-//      int alpha = 0;
-//      int nolight = 0;
 
-      if (model.nolight) // if model wants to be rendered without light, call draw2
+/*      if (model.nolight) // if model wants to be rendered without light, call draw2
       {
         glDisable (GL_LIGHTING);
     //    drawNoLight (tl, tl2, rot, zoom, explode);
         glEnable (GL_LIGHTING);
         return;
-      }
+      } */
 
       int i, j;
       Object3d *cm;
@@ -227,10 +225,10 @@ class Model3dRealizer
 
         if (cm->material != NULL)
         {
-/*          if (cm->material->color.c [0] > 190 && cm->material->color.c [1] > 190 && cm->material->color.c [2] < 20)
+          if (cm->material->color.c [0] > 190 && cm->material->color.c [1] > 190 && cm->material->color.c [2] < 20)
             glDisable (GL_LIGHTING);
           else
-            glEnable (GL_LIGHTING);*/
+            glEnable (GL_LIGHTING);
         }
 
         Vector3 shift;
@@ -317,7 +315,7 @@ class Model3dRealizer
       }
 
       // DEBUG: show normal vectors
-      for (i = 0; i < model.numObjects; i ++)
+/*      for (i = 0; i < model.numObjects; i ++)
       {
         if (model.numObjects <= 0) break;
         cm = model.object [i];
@@ -347,7 +345,7 @@ class Model3dRealizer
           }
         }
         glEnd ();
-      }
+      } */
 
       if (model.alpha)
       { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
@@ -367,7 +365,7 @@ class Model3dRealizer
       int shading = 2;
       int showCollision = 0;
 
-      VertexArray va1;
+      VertexArray va1 (VERTEXARRAY_V3C4T2);
       VertexArray *va = &va1;
       int alpha = 1;
 //      int nolight = 0;
@@ -547,7 +545,7 @@ class Model3dRealizer
       Rotation rot(trafo.rotation);
       float zoom = trafo.scaling.x;
 
-      VertexArray va1;
+      VertexArray va1 (VERTEXARRAY_V3N3C4);
       VertexArray *va = &va1;
       int alpha = 1;
       int showCollision = 0;
