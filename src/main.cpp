@@ -6003,6 +6003,7 @@ Uint32 nexttime = 0;
 
 //int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
 int joystickbutton = -1;
+bool joystickfirebutton = false;
 
 // This loop emulates the glutMainLoop() of GLUT using SDL!!!
 void sdlMainLoop ()
@@ -6068,9 +6069,15 @@ void sdlMainLoop ()
           break;
         case SDL_JOYBUTTONDOWN:
           joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
+          if (joystickbutton == joystick_firecannon)
+            joystickfirebutton = true;
           myJoystickButtonFunc (joystickbutton);
+          joystickbutton = -1;
           break;
         case SDL_JOYBUTTONUP:
+          joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
+          if (joystickbutton == joystick_firecannon)
+            joystickfirebutton = false;
           joystickbutton = -1;
           break;
         case SDL_JOYHATMOTION:
@@ -6086,10 +6093,9 @@ void sdlMainLoop ()
     if (controls == CONTROLS_JOYSTICK)
     {
       myJoystickAxisFunc (/*joystickx, joysticky, joystickt, joystickr*/);
-      if (joystickbutton == joystick_firecannon)
+      if (joystickfirebutton)
         myJoystickButtonFunc (joystick_firecannon);
-      else
-        joystickbutton = -1;
+//      joystickbutton = -1;
     }
     
     if (sdldisplay) myDisplayFunc ();
