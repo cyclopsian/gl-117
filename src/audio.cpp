@@ -205,6 +205,7 @@ void WaveFile::setVolume (int level)
 
 SoundSystem::SoundSystem ()
 {
+  audio = false;
   sound = true;
   music = true;
   musicplaying = false;
@@ -215,16 +216,28 @@ SoundSystem::SoundSystem ()
   waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
   {
-    fprintf (stderr, "\nCouldn't open audio: %s", SDL_GetError ());
-    exit (2);
+    fprintf (stderr, "\nCouldn't open audio: %s, no sound available!", SDL_GetError ());
+    audio = false;
+    delete waveclick1;
+    return;
+  }
+  else
+  {
+    audio = true;
   }
   delete waveclick1;
 #else
   printf ("\nUsing SDL_mixer"); fflush (stdout);
-  if(Mix_OpenAudio(22050, AUDIO_S16, 2, 4096)) {
-         printf("Unable to open audio!\n");
-         exit(1);
-       }
+  if (Mix_OpenAudio (22050, AUDIO_S16, 2, 4096))
+  {
+    fprintf (stderr, "\nUnable to open audio device!");
+    audio = false;
+    return;
+  }
+  else
+  {
+    audio = true;
+  }
   music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
   if (music1 == NULL)
   {
@@ -276,6 +289,7 @@ SoundSystem::SoundSystem ()
 
 SoundSystem::~SoundSystem ()
 {
+  if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   if (music1)
     Mix_FreeMusic (music1);
@@ -296,6 +310,7 @@ SoundSystem::~SoundSystem ()
 
 void SoundSystem::play (int sample)
 {
+  if (!audio) return;
   if (!sound) return;
   switch (sample)
   {
@@ -325,6 +340,7 @@ void SoundSystem::play (int sample)
 
 void SoundSystem::playLoop (int sample)
 {
+  if (!audio) return;
   if (!sound) return;
   switch (sample)
   {
@@ -354,6 +370,7 @@ void SoundSystem::playLoop (int sample)
 
 void SoundSystem::playMusic ()
 {
+  if (!audio) return;
   if (!music) return;
   if (volumemusic == 0) return;
 #ifdef HAVE_SDL_MIXER
@@ -391,6 +408,7 @@ void SoundSystem::playMusic ()
 
 void SoundSystem::haltMusic ()
 {
+  if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   musicplaying = false;
   playtime = SDL_GetTicks ();
@@ -400,6 +418,7 @@ void SoundSystem::haltMusic ()
 
 void SoundSystem::loadMusic (int sample)
 {
+  if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   if (music1)
     Mix_FreeMusic (music1);
@@ -426,6 +445,7 @@ void SoundSystem::loadMusic (int sample)
 
 void SoundSystem::setVolume (int sample, int level)
 {
+  if (!audio) return;
   int ret = -1;
   level *= volumesound;
   level /= 100;
@@ -457,6 +477,7 @@ void SoundSystem::setVolume (int sample, int level)
 
 void SoundSystem::setVolume ()
 {
+  if (!audio) return;
   int level = 128 * volumesound / 100;
   waveclick1->setVolume (level * 80 / 128);
   wavecannon1->setVolume (level * 50 / 128);
@@ -469,6 +490,7 @@ void SoundSystem::setVolume ()
 
 void SoundSystem::setVolumeMusic ()
 {
+  if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   int level = 128 * volumemusic / 100;
   Mix_VolumeMusic (level);
@@ -477,6 +499,7 @@ void SoundSystem::setVolumeMusic ()
 
 void SoundSystem::stop (int sample)
 {
+  if (!audio) return;
   switch (sample)
   {
     case SOUND_CLICK1:
@@ -505,6 +528,7 @@ void SoundSystem::stop (int sample)
 
 void SoundSystem::stopAll ()
 {
+  if (!audio) return;
 #ifdef HAVE_SDL_MIXER
   Mix_HaltChannel (-1);
 #endif

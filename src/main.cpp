@@ -6483,57 +6483,63 @@ void menu_mouse (int button, int state, int x, int y)
 #ifdef HAVE_SDL_MIXER
       else if (ry >= 0.40 && ry <= 0.45)
       {
-        menuitemselected = 14;
-        if (state == MOUSE_DOWN)
+        if (sound->audio)
         {
-          if (button == MOUSE_BUTTON_LEFT)
+          menuitemselected = 14;
+          if (state == MOUSE_DOWN)
           {
-            sound->volumesound += 10;
-            if (sound->volumesound > 100)
-              sound->volumesound = 0;
-            sound->setVolume ();
-            setPlaneVolume ();
-            sound->play (SOUND_CLICK1);
-            menu_reshape ();
-          }
-          else
-          {
-            sound->volumesound -= 10;
-            if (sound->volumesound < 0)
-              sound->volumesound = 100;
-            sound->setVolume ();
-            setPlaneVolume ();
-            sound->play (SOUND_CLICK1);
-            menu_reshape ();
+            if (button == MOUSE_BUTTON_LEFT)
+            {
+              sound->volumesound += 10;
+              if (sound->volumesound > 100)
+                sound->volumesound = 0;
+              sound->setVolume ();
+              setPlaneVolume ();
+              sound->play (SOUND_CLICK1);
+              menu_reshape ();
+            }
+            else
+            {
+              sound->volumesound -= 10;
+              if (sound->volumesound < 0)
+                sound->volumesound = 100;
+              sound->setVolume ();
+              setPlaneVolume ();
+              sound->play (SOUND_CLICK1);
+              menu_reshape ();
+            }
           }
         }
       }
       else if (ry >= 0.46 && ry <= 0.51)
       {
-        menuitemselected = 15;
-        if (state == MOUSE_DOWN)
+        if (sound->audio)
         {
-          if (button == MOUSE_BUTTON_LEFT)
+          menuitemselected = 15;
+          if (state == MOUSE_DOWN)
           {
-            sound->volumemusic += 10;
-            if (sound->volumemusic > 100)
+            if (button == MOUSE_BUTTON_LEFT)
             {
-              sound->volumemusic = 0;
-              sound->haltMusic ();
+              sound->volumemusic += 10;
+              if (sound->volumemusic > 100)
+              {
+                sound->volumemusic = 0;
+                sound->haltMusic ();
+              }
+              sound->setVolumeMusic ();
+              menu_reshape ();
             }
-            sound->setVolumeMusic ();
-            menu_reshape ();
+            else
+            {
+              sound->volumemusic -= 10;
+              if (sound->volumemusic < 0)
+                sound->volumemusic = 100;
+              sound->setVolumeMusic ();
+              menu_reshape ();
+            }
+            if (sound->volumemusic != 0 && !sound->musicplaying)
+              playRandomMusic ();
           }
-          else
-          {
-            sound->volumemusic -= 10;
-            if (sound->volumemusic < 0)
-              sound->volumemusic = 100;
-            sound->setVolumeMusic ();
-            menu_reshape ();
-          }
-          if (sound->volumemusic != 0 && !sound->musicplaying)
-            playRandomMusic ();
         }
       }
 #endif
@@ -6986,12 +6992,18 @@ void menu_display ()
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 #ifdef HAVE_SDL_MIXER
-    sprintf (buf, "SOUND: %d%%", (int) sound->volumesound);
+    if (sound->audio)
+      sprintf (buf, "SOUND: %d%%", (int) sound->volumesound);
+    else
+      sprintf (buf, "SOUND: N/A");
     if (menuitemselected == 14)
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
-    sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
+    if (sound->audio)
+      sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
+    else
+      sprintf (buf, "MUSIC: N/A");
     if (menuitemselected == 15)
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else

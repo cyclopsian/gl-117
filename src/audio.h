@@ -82,6 +82,7 @@ class WaveFile
 class SoundSystem
 {
   public:
+  bool audio;
   bool sound, music;
   bool musicplaying;
   int volumesound, volumemusic;
