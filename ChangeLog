@@ -1,3 +1,22 @@
+  ________    __                        __        __    __________
+ /   ___  \  /\ \                      /  \      /  \  /\________ \
+/\  /___/\_\ \ \ \                    /    \    /    \ \/_______/\ \
+\ \ \   \/_/_ \ \ \         _______  /\__/\ \  /\__/\ \         \/ /
+ \ \ \  /\__ \ \ \ \       /\______\ \/_/\ \ \ \/_/\ \ \        / /
+  \ \ \ \/_/\ \ \ \ \      \/______/      \ \ \     \ \ \      / /
+   \ \ \___\/  \ \ \ \_______              \ \ \     \ \ \    /\ \
+    \ \________/  \ \________\              \ \_\     \ \ \   \ \_\
+     \/_______/    \/________/               \/_/      \/_/    \/_/
+
+
+Version 1.1:
+	- new graphical user interface
+	- new settings for video and user interface (via menu!)
+	- AI now uses flight maneuvers (Immelmann, barrel roll)
+	- two additional tutorials
+	- randomized tree placement
+	- lots of visual improvements and bugfixes
+
 Version 1.0.1:
 	- major bugfixes concerning coordinates (lighting, sun)
 	- improved 3DS loader and model textures

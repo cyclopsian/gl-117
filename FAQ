@@ -1,3 +1,14 @@
+  ________    __                        __        __    __________
+ /   ___  \  /\ \                      /  \      /  \  /\________ \
+/\  /___/\_\ \ \ \                    /    \    /    \ \/_______/\ \
+\ \ \   \/_/_ \ \ \         _______  /\__/\ \  /\__/\ \         \/ /
+ \ \ \  /\__ \ \ \ \       /\______\ \/_/\ \ \ \/_/\ \ \        / /
+  \ \ \ \/_/\ \ \ \ \      \/______/      \ \ \     \ \ \      / /
+   \ \ \___\/  \ \ \ \_______              \ \ \     \ \ \    /\ \
+    \ \________/  \ \________\              \ \_\     \ \ \   \ \_\
+     \/_______/    \/________/               \/_/      \/_/    \/_/
+
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   GL-117 FREQUENTLY ASKED QUESTIONS
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -8,7 +19,6 @@ Section 1: Installing on Linux and Mac
 - How to compile on MacOSX?
 - Libraries are installed, but gcc (linker) does not find them?
 - internal error, core dump, submit gcc bug report?
-- texture not found, strange texture name?
 
 Section 2: Configuring the game
 - How to alter resolution, color depth?
@@ -85,13 +95,6 @@ Q: internal error, core dump, submit gcc bug report?
 
 Sorry, the cause is unknown. Just execute make again until everything is
 compiled and linked properly.
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Q: texture not found, strange texture name?
-
-This might be a compiler problem (gcc 3.2). Recompile the game using the
-flag -O0 (-O zero instead of -O2).
 
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
