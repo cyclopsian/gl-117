@@ -52,6 +52,8 @@
 #include "roam.h"
 #include "glland.h"
 #include "pilots.h"
+#include "conf.h"
+#include "mission.h"
 
 extern Server *server;
 extern Client *client;
@@ -63,6 +65,66 @@ extern PilotList *pilots;
 extern CExplosion *explosion [maxexplosion];
 extern CBlackSmoke *blacksmoke [maxblacksmoke];
 extern Font *font1, *font2;
+
+extern CLoad3DS g_Load3ds;
+extern CModel model_fig;
+extern CModel model_figa;
+extern CModel model_figb;
+extern CModel model_figc;
+extern CModel model_figd;
+extern CModel model_fige;
+extern CModel model_figf;
+extern CModel model_figg;
+extern CModel model_figh;
+extern CModel model_figt;
+extern CModel model_cannon1;
+extern CModel model_cannon2;
+extern CModel model_flare1;
+extern CModel model_chaff1;
+extern CModel model_missile1;
+extern CModel model_missile2;
+extern CModel model_missile3;
+extern CModel model_missile4;
+extern CModel model_missile5;
+extern CModel model_missile6;
+extern CModel model_missile7;
+extern CModel model_missile8;
+extern CModel model_flak1;
+extern CModel model_flarak1;
+extern CModel model_tent1;
+extern CModel model_ship1;
+extern CModel model_ship2;
+extern CModel model_gl117;
+extern CModel model_tank1;
+extern CModel model_container1;
+extern CModel model_truck1;
+extern CModel model_pickup1;
+extern CModel model_pickup2;
+extern CModel model_tank2;
+extern CModel model_tent4;
+extern CModel model_hall1;
+extern CModel model_hall2;
+extern CModel model_oilrig;
+extern CModel model_egg;
+extern CModel model_radar;
+extern CModel model_mine1;
+extern CModel model_aster1;
+extern CModel model_base1;
+
+extern DynamicObj *flare [maxflare];
+extern DynamicObj *chaff [maxchaff];
+extern AIObj *missile [maxmissile];
+extern DynamicObj *laser [maxlaser];
+extern AIObj *fighter [maxfighter];
+extern Star *star [maxstar];
+extern DynamicObj *groundobj [maxgroundobj];
+extern Flash *flash1;
+
+extern Space *space;
+
+extern AIObj *fplayer;
+
+extern char *getKeyString (int key, char *str);
 
 #endif
 

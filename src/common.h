@@ -95,6 +95,10 @@ extern int difficulty;
 
 extern bool sunblinding;
 
+extern int clouds;
+
+extern int controls;
+
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
 //#define SIN(x) sine[(int)x]
