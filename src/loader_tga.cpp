@@ -79,8 +79,6 @@ typedef struct {
 } tga_header; 
 
 typedef struct { 
-   unsigned int extensionAreaOffset; 
-   unsigned int developerDirectoryOffset; 
    char signature[16]; 
    char dot; 
    char null; 
