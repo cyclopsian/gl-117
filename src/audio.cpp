@@ -335,6 +335,7 @@ void SoundSystem::playLoop (int sample)
 void SoundSystem::playMusic (int sample)
 {
   if (!music) return;
+  if (volumemusic == 0) return;
 #ifdef HAVE_SDL_MIXER
   musicplaying = true;
 //  haltMusic ();
