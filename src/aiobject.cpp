@@ -284,9 +284,28 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
     z *= 1.0;
   else if (id >= FLAK1 && id <= FLAK2)
     z *= 1.0;*/
-  if (tl->x >= d->tl->x - z && tl->x <= d->tl->x + z &&
-      tl->y >= d->tl->y - z && tl->y <= d->tl->y + z &&
-      tl->z >= d->tl->z - z && tl->z <= d->tl->z + z)
+  
+  bool collide = false;
+  if (id == STATIC_BARRIER1 || d->id == STATIC_BARRIER1)
+  {
+    if (tl->x >= d->tl->x - 1.0F && tl->x <= d->tl->x + 1.0F &&
+        tl->y >= d->tl->y - 10 && tl->y <= d->tl->y + 10 &&
+        tl->z >= d->tl->z - 10 && tl->z <= d->tl->z + 10)
+    {
+      collide = true;
+    }
+  }
+  else
+  {
+    if (tl->x >= d->tl->x - z && tl->x <= d->tl->x + z &&
+        tl->y >= d->tl->y - z && tl->y <= d->tl->y + z &&
+        tl->z >= d->tl->z - z && tl->z <= d->tl->z + z)
+    {
+      collide = true;
+    }
+  }
+
+  if (collide)
   {
     if (id < STATIC_PASSIVE || (id >= STATIC_PASSIVE && d->id >= MISSILE1 && d->id <= MISSILE2))
       shield -= (float) d->impact * dt / timestep;
@@ -1176,7 +1195,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   if (id == STATIC_BARRIER1)
   {
     shield = maxshield = 1000;
-    zoom = 8.0;
+    zoom = 12.0;
     impact = 2000;
   }
 
@@ -1740,7 +1759,7 @@ void AIObj::targetNext (AIObj **f)
     if (f [i] == this)
     { i ++; z ++; }
     if (i >= maxfighter) i = 0;
-  } while (!f [i]->active && z <= 1);
+  } while (!f [i]->active && z <= 1 && distance (f [i]) < 200);
   target = f [i];
 }
 
@@ -1778,7 +1797,7 @@ void AIObj::targetPrevious (AIObj **f)
     if (f [i] == this)
     { i --; z ++; }
     if (i < 0) i = maxfighter - 1;
-  } while (!f [i]->active && z <= 1);
+  } while (!f [i]->active && z <= 1 && distance (f [i]) < 200);
   target = f [i];
 }
 

@@ -3446,6 +3446,11 @@ void MissionMoonTunnel1::start ()
   fighter [i]->tl->z = 0;
   fighter [i]->o = &model_barrier1;
   fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
+  i ++;
+  fighter [i]->tl->x = -80;
+  fighter [i]->tl->z = 0;
+  fighter [i]->o = &model_barrier1;
+  fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
 }
 
 int MissionMoonTunnel1::processtimer (Uint32 dt)

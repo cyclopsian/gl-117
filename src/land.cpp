@@ -390,7 +390,7 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -409,7 +409,7 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -477,7 +477,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -496,7 +496,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -523,7 +523,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
   for (i = 0; i < maxx; i ++)
     for (i2 = 0; i2 < maxx; i2 ++)
       if (h [i] [i2] < erosion)
-        h [i] [i2] = erosion - 100 + myrandom (200);
+        h [i] [i2] = erosion - 100 + myrandom (200, i, i2);
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
 }
@@ -537,10 +537,10 @@ void Landscape::genMoonSurface (int height)
   type = LAND_MOON;
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
-      h[i][i2] = 30000 + myrandom (300);    
+      h [i] [i2] = 30000 + myrandom (300, i, i2);    
 
-  int maxholes = myrandom (1) + 1 ;
-  for (i = 0; i < maxholes; i++)
+  int maxholes = 1;
+  for (i = 0; i < maxholes; i ++)
   {
     x = myrandom (MAXX + 1);
     y = myrandom (MAXX + 1);
@@ -655,7 +655,7 @@ void Landscape::genCanyonSurface (int hoehepc)
     for (i = 0; i < 16; i ++)
       for (i2 = 0; i2 < 16; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          if (myrandom (2))
+          if (myrandom (2, i, i2))
             h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024;
           else
             h [i * step] [i2 * step] = 127 * 256 + 64 * hoehe / 1024;
@@ -673,7 +673,7 @@ void Landscape::genCanyonSurface (int hoehepc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -692,7 +692,7 @@ void Landscape::genCanyonSurface (int hoehepc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -770,7 +770,7 @@ void Landscape::genDesertSurface (int hoehepc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -789,7 +789,7 @@ void Landscape::genDesertSurface (int hoehepc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
