@@ -25,8 +25,9 @@
 
 /*
 TODO:
+- speedUp and speedDown buttons or 1...9 remap (bug Slackware7 French keyboard)
+- arctic landscape (texture bug)
 - southern seashore landscape (additional missions)
-- antarctic landscape
 - alpine snow landscape
 - tree colors (fall, spring), draw more tree textures
 - torpedo, water
@@ -34,8 +35,8 @@ TODO:
 - clouds to fly through
 - particle systems
 - pseudo random number generator
-- tunnel
 - ROAM code Norbert (test)
+- occlusion culling correction
 */
 
 #ifndef IS_MAIN_H
@@ -6018,7 +6019,6 @@ void sdlMainLoop ()
           break;
         case SDL_JOYBUTTONDOWN:
           joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
-//          if (joystickbutton >= 2)
           myJoystickButtonFunc (joystickbutton);
           break;
         case SDL_JOYBUTTONUP:
@@ -6037,8 +6037,8 @@ void sdlMainLoop ()
     if (controls == CONTROLS_JOYSTICK)
     {
       myJoystickAxisFunc (/*joystickx, joysticky, joystickt, joystickr*/);
-      if (joystickbutton == 0)
-        myJoystickButtonFunc (0);
+      if (joystickbutton == joystick_firecannon)
+        myJoystickButtonFunc (joystick_firecannon);
       else
         joystickbutton = -1;
     }

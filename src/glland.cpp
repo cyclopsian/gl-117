@@ -1877,11 +1877,11 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   glEnd();
 }
 
-bool hb [100] [100];
-float hdeg [360];
+//bool hb [100] [100];
+//float hdeg [360];
 
 // in construction, enable some lines at #1
-void GLLandscape::viewculling ()
+/*void GLLandscape::viewculling ()
 {
   memset (hb, 0, sizeof (bool) * 10000);
   for (int s = 1; s < 50; s ++)
@@ -1903,7 +1903,7 @@ void GLLandscape::viewculling ()
 //      hb [50 - i] [50 + s]
     }
   }
-}
+}*/
     
 void GLLandscape::draw (int phi, int gamma)
 {
@@ -1911,7 +1911,7 @@ void GLLandscape::draw (int phi, int gamma)
   int i, i2, x, y;
   int xs, ys;
 
-  viewculling ();
+//  viewculling ();
 
   float fac;
 
@@ -2036,6 +2036,139 @@ void GLLandscape::draw (int phi, int gamma)
 
   float dx = (float) (maxx - minx + 1) / parts;
   float dy = (float) (maxy - miny + 1) / parts;
+
+
+
+  for (i = 0; i < parts; i ++)
+    for (i2 = 0; i2 < parts; i2 ++)
+    {
+      int ax = getCoord (minx + (int) (dx * (float) i2));
+      int ay = getCoord (miny + (int) (dy * (float) i));
+      int zx = getCoord (minx + (int) (dx * (float) (i2 + 1)));
+      int zy = getCoord (miny + (int) (dy * (float) (i + 1))/* + gridstep*/);
+      vmin [i] [i2] = hw [ax] [ay];
+      if (hw [ax] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [ax] [zy];
+      if (hw [zx] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [zx] [zy];
+      if (hw [zx] [ay] < vmin [i] [i2]) vmin [i] [i2] = hw [zx] [ay];
+      vmax [i] [i2] = hw [ax] [ay];
+      if (hw [ax] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [ax] [zy];
+      if (hw [zx] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [zy];
+      if (hw [zx] [ay] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [ay];
+    }
+
+  // Efficient occlusion culling (kind of ray casting technique):
+  // Run from inner grid point (viewer) to outer grid parts and check if grid points are hidden
+  // This is currently not completely correct (needs two comparisons of inner fields), but
+  // it already works very well, so I negligate the second comparison, as it would double the code
+  int count = 0;
+  bool set = true;
+  memset (vis, 0, PARTS * PARTS * sizeof (bool));
+  int cx = parts / 2, cy = parts / 2;
+  float ch = (unsigned int) ((camy / ZOOM + zoomz2) / zoomz); // - (h1*zoomz - zoomz2) * ZOOM;
+  vh [cy] [cx] = ch;
+  vis [cy] [cx] = set;
+  for (i = cy + 1; i < parts; i ++)
+    for (i2 = parts - i - 1; i2 < i + 1; i2 ++)
+    {
+      int lasty = 1;
+      int lastx = 0;
+      if (i2 < cx) lastx = -1;
+      if (i2 > cx) lastx = 1;
+      int vminref = vh [i - lasty] [i2 - lastx];
+      int deltax = cx - i2 + lastx;
+      int deltay = cy - i + lasty;
+      float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+      float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+      int dh1 = vminref - ch;
+      int dhp;
+      if (dist1 > 1E-4)
+        dhp = (int) (dist2 * dh1 / dist1);
+      else
+        dhp = -30000;
+      int h1 = vminref + dhp;
+      if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+      vh [i] [i2] = h1;
+      if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
+      else
+      { vis [i] [i2] = !set; count ++; }
+    }
+  for (i = cy - 1; i >= 0; i --)
+    for (i2 = i; i2 < parts - i; i2 ++)
+    {
+      int lasty = -1;
+      int lastx = 0;
+      if (i2 < cx) lastx = -1;
+      if (i2 > cx) lastx = 1;
+      int vminref = vh [i - lasty] [i2 - lastx];
+      int deltax = cx - i2 + lastx;
+      int deltay = cy - i + lasty;
+      float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+      float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+      int dh1 = vminref - ch;
+      int dhp;
+      if (dist1 > 1E-4)
+        dhp = (int) (dist2 * dh1 / dist1);
+      else
+        dhp = -30000;
+      int h1 = vminref + dhp;
+      if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+      vh [i] [i2] = h1;
+      if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
+      else
+      { vis [i] [i2] = !set; count ++; }
+    }
+  for (i2 = cx + 1; i2 < parts; i2 ++)
+    for (i = parts - i2; i < i2; i ++)
+    {
+      int lasty = 0;
+      int lastx = 1;
+      if (i < cy) lasty = -1;
+      if (i > cy) lasty = 1;
+      int vminref = vh [i - lasty] [i2 - lastx];
+      int deltax = cx - i2 + lastx;
+      int deltay = cy - i + lasty;
+      float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+      float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+      int dh1 = vminref - ch;
+      int dhp;
+      if (dist1 > 1E-4)
+        dhp = (int) (dist2 * dh1 / dist1);
+      else
+        dhp = -30000;
+      int h1 = vminref + dhp;
+      if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+      vh [i] [i2] = h1;
+      if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
+      else
+      { vis [i] [i2] = !set; count ++; }
+    }
+  for (i2 = cx - 1; i2 >= 0; i2 --)
+    for (i = i2 + 1; i < parts - i2 - 1; i ++)
+    {
+      int lasty = 0;
+      int lastx = -1;
+      if (i < cy) lasty = -1;
+      if (i > cy) lasty = 1;
+      int vminref = vh [i - lasty] [i2 - lastx];
+      int deltax = cx - i2 + lastx;
+      int deltay = cy - i + lasty;
+      float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+      float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+      int dh1 = vminref - ch;
+      int dhp;
+      if (dist1 > 1E-4)
+        dhp = (int) (dist2 * dh1 / dist1);
+      else
+        dhp = -30000;
+      int h1 = vminref + dhp;
+      if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+      vh [i] [i2] = h1;
+      if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
+      else
+      { vis [i] [i2] = !set; count ++; }
+    }
+//  printf ("c=%d ", count);
+
 
 /*  float fx, fy;
   for (i = 0; i < parts; i ++)
@@ -2296,6 +2429,7 @@ void GLLandscape::draw (int phi, int gamma)
 //    glDisable (GL_CULL_FACE); // Why ???
       for (i = 0; i < parts; i ++)
         for (i2 = 0; i2 < parts; i2 ++)
+        if (vis [i] [i2])
         {
           int ax = (minx + (int) (dx * (float) i2));
           int ay = (miny + (int) (dy * (float) i));

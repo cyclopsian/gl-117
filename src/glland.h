@@ -67,7 +67,7 @@ class GLLandscape : public Landscape
   int texturetree1, texturetree2;
 
   public:
-  short nl [MAXX + 1] [MAXX + 1]; // lighting mask
+  short nl [MAXX + 2] [MAXX + 2]; // lighting mask, MAXX+1 x MAXX+1 is sufficient, but VC bug?
   float lv [3];
 //  RTerrain *rt;
   unsigned char r [MAXX + 1] [MAXX + 1]; // red
@@ -90,6 +90,10 @@ class GLLandscape : public Landscape
 //  float mata [MAXMATERIAL] [4];
   Space *space; // space of all objects
   CColor treecolor;
+  int vmin [PARTS] [PARTS]; // LOD
+  int vmax [PARTS] [PARTS]; // LOD
+  float vh [PARTS] [PARTS]; // LOD
+  bool vis [PARTS] [PARTS]; // LOD
 
   void norm (float *c);
   void normalcrossproduct (float *a, float *b, float *c);
