@@ -60,7 +60,6 @@ class LoadObj
   
   private:
 
-    TextFileObj *file;
     void computeNormals (Model3d *model);
     void computeColors (Model3d *model);
     void normalize (Model3d *model);
