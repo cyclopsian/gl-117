@@ -196,6 +196,23 @@ void Landscape::gauss (int x, int y)
     }
 }
 
+// constant height for a single raster point (7x7)
+void Landscape::flatten (int x, int y, int dx, int dy)
+{
+  int i, i2;
+  if (x < dx) x = dx;
+  else if (x > MAXX - dx) x = MAXX - dx;
+  if (y < dy) y = dy;
+  else if (y > MAXX - dy) y = MAXX - dy;
+
+  for (i = x-dx; i <= x+dx; i ++)
+    for (i2 = y-dy; i2 <= y+dy; i2 ++)
+    {
+      h[i][i2] = h[x][y];
+      hw[i][i2] = h[i][i2];
+    }
+}
+
 
 
 /****************************************************************************
@@ -423,7 +440,6 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       h [maxx] [y] = h [0] [y];
     hoehe = (int) (hoehe / 1.1);
   }
-//  smoothGlacier ();
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
   highestpoint = 0;
@@ -510,7 +526,6 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       h [maxx] [y] = h [0] [y];
     hoehe = (int) (hoehe / 1.1);
   }
-//  smoothGlacier ();
   highestpoint = 0;
   lowestpoint = 65535;
   for (i = 0; i < maxx; i ++)
@@ -602,9 +617,7 @@ void Landscape::genArcticSurface (int hoehepc, int *heightmap)
       h [maxx] [y] = h [0] [y];
     hoehe = (int) (hoehe / 1.1);
   }
-//  smoothGlacier ();
   convolveGauss (2, 0, 35000);
-//  convolveGauss (1, 35001, 65535);
   highestpoint = 0;
   lowestpoint = 65535;
   for (i = 0; i < maxx; i ++)
@@ -748,7 +761,6 @@ void Landscape::genCanyonSurface (int hoehepc)
   hoehe = hoehepc * 512;
   init ();
   step = maxx / 16;
-//    int minh = 127 * 256 - 64 * hoehe / 1024;
   int minh = 0;
   int maxh = 127 * 256 + 64 * hoehe / 1024;
     for (i = 0; i < 16; i ++)
@@ -976,7 +988,6 @@ void Landscape::genTrench (int width, int height)
         f [i] [i2] = REDSTONE;
       }
       h [i] [i2] -= height1;
-//      hw [i] [i2] -= height1;
     }
     if (i & 1)
     {
@@ -991,7 +1002,6 @@ void Landscape::genTrench (int width, int height)
     else
     {
       h [i] [MAXX / 2] -= height;
-//      hw [i] [MAXX / 2] -= height;
     }
   }
   lowestpoint -= height;
@@ -1040,7 +1050,6 @@ void Landscape::genRocks (int diffmin, int percent)
           htest = h [i] [i2] - d + myrandom (d * 2);
           if (htest > 65535) htest = 65535;
           h [i] [i2] = (unsigned short) htest;
-//            if (h [i] [i2] < rockborder) rockborder = h [i] [i2];
         }
         if (h [i] [i2] > hmax - r / 2)
           if (rd < 200 * (h [i] [i2] - r / 2) / (hmax - r / 2))
@@ -1182,7 +1191,6 @@ int Landscape::calcLake (int ys, int xs, unsigned short level, int num, int maxe
 
 void Landscape::genLake (int depthpc)
 {
-//    System.out.println ("generating lake: " + str);
   for (int j = 0; j < 5; j ++)
   {
     int a1, i, i2;
@@ -1217,7 +1225,6 @@ void Landscape::genLake (int depthpc)
     if (xs >= 0)
     {
       level = zmin + depth;
-  //      System.out.println ("depth = " + depth+" x = "+xs+" y = "+ys+" id = "+aktid);
       for (i = 0; i <= MAXX; i ++)
         for (i2 = 0; i2 <= MAXX; i2 ++)
         {
@@ -1289,7 +1296,6 @@ void Landscape::genLake (int depthpc)
 
 void Landscape::calcWoods (int dy)
 {
-//	  printf ("rockborder=%d\n", rockborder); fflush (stdout);
   int i, i2;
   int var = 2000;
   for (i = 0; i < maxx; i ++)
@@ -1367,7 +1373,6 @@ bool Landscape::riverCheck (int x, int y, int *fl, int z, int z2)
 
 void Landscape::genRiver ()
 {
-//  System.out.println ("generating river: " + name);
   bool ok, ok2;
   int lang;
   int i, i2, i3;
@@ -1461,25 +1466,6 @@ void Landscape::genRiver ()
         hw [xf] [yf] = h [xf] [yf];
         h [xf] [yf] = hf;
       }
-/*        if (xf > 0 && xf < maxx && yf > 0 && yf < maxx)
-      {
-        for (i2 = -1; i2 <= 1; i2 ++)
-          for (i3 = -1; i3 <= 1; i3 ++)
-          {
-            int border = 0;
-            for (int i4 = -1; i4 <= 1; i4 ++)
-              for (int i5 = -1; i5 <= 1; i5 ++)
-                if (isWater (f [xf + i4] [yf + i5]))
-                  border ++;
-            if (Math.abs (h [xf] [yf] - h [xf + i2] [yf + i3]) < 200
-                && !isWater (f [xf + i2] [yf + i3]) && border >= 5)
-            {
-              h [xf + i2] [yf + i3] = h [xf] [yf];
-              f [xf + i2] [yf + i3] = SHALLOWWATER << TYPE | (10 << 16);
-              f [xf + i2] [yf + i3] |= ((aktid + 1) << 16);
-            }
-          }
-      }*/
     }
   }
 }

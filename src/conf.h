@@ -50,7 +50,7 @@ extern unsigned int mouse_sensitivity;
 class ConfigFile
 {
   public:
-  char buf [32000];
+  char buf [32000]; // max file size
   int length;
   FILE *out;
   ConfigFile ();
@@ -67,7 +67,7 @@ class ConfigFile
   void close ();
 };
 
-// special config files of GL-117
+// special config files of GL-117: conf and conf.interface
 extern void save_config ();
 extern int load_config ();
 extern void save_configInterface ();

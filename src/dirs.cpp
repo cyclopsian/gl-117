@@ -81,7 +81,6 @@ Dirs::Dirs (char *arg)
   }
   else
   {
-//    strcpy (path, "d:\\temp\\gl-117\\gl-117\\");
     display ("Binary file has no context to the data files", LOG_FATAL);
     display ("Do not execute from console, just doubleclick", LOG_MOST);
     exit (EXIT_CONTEXT);
@@ -111,85 +110,74 @@ Dirs::Dirs (char *arg)
   if (!founddir)
   {
 
-  FILE *in;
-//strcpy (path, "/usr/bin:/usr/local");
-  char cwd [4096];
-  getcwd (cwd, 4096);
-//char cwd [4096];
-//strcpy (cwd, "/home/tom");
-  char mypath [8092];
-  strcpy (mypath, cwd);
-  strcat (mypath, ":");
-  strcat (mypath, path);
-  char *p = mypath;
-  int pathlen = strlen (mypath);
+    FILE *in;
+    char cwd [4096];
+    getcwd (cwd, 4096); // get current working directory
+    char mypath [8092];
+    strcpy (mypath, cwd);
+    strcat (mypath, ":");
+    strcat (mypath, path);
+    char *p = mypath;
+    int pathlen = strlen (mypath);
 
-//printf ("\nmypath %s", mypath);
-
-  if (arg [0] != '/')
-  {
-    p = mystrtok (p, (int) (path + pathlen - p), ":");
-    while (p + strlen (p) - 1 < mypath + pathlen)
+    if (arg [0] != '/')
     {
-//printf ("\np %s", p);
-      strcpy (myfile, p);
-      if (myfile [strlen (myfile) - 1] != '/')
-        strcat (myfile, "/");
-      if (*arg == '.' && *(arg+1) == '/')
-        strcat (myfile, arg + 2);
-      else
-        strcat (myfile, arg);
-//printf ("\nmyfile %s", myfile); fflush (stdout);
-      if (!stat (myfile, &mystat))
-{
-	if (S_ISREG (mystat.st_mode))
-	{
-//printf ("\nFOUND!"); fflush (stdout);
-          goto found;
+      p = mystrtok (p, (int) (path + pathlen - p), ":");
+      while (p + strlen (p) - 1 < mypath + pathlen)
+      {
+        strcpy (myfile, p);
+        if (myfile [strlen (myfile) - 1] != '/')
+          strcat (myfile, "/");
+        if (*arg == '.' && *(arg+1) == '/')
+          strcat (myfile, arg + 2);
+        else
+          strcat (myfile, arg);
+        if (!stat (myfile, &mystat))
+        {
+	        if (S_ISREG (mystat.st_mode))
+	        {
+            goto found;
+          }
         }
-}
-      p = mystrtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
+        p = mystrtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
+      }
     }
-  }
-  display ("Binary file has no context to the data files.", LOG_FATAL);
-  exit (EXIT_CONTEXT);
-
-found:;
-  int bscount = 0;
-  for (p = myfile; p < myfile + strlen (myfile); p ++)
-    if (*p == '/')
-      bscount ++;
-  if (bscount >= 2)
-  {
-    p = myfile + strlen (myfile);
-    while (*p != '/') p --;
-    p --;
-    while (*p != '/') p --;
-    if (p [1] == '.' && p [2] == '/')
-    {
-      p --;
-      while (*p != '/') p --;
-    }
-    p ++;
-    *p = 0;
-//      strcat (myfile, "../");
-  }
-  else
-  {
     display ("Binary file has no context to the data files.", LOG_FATAL);
     exit (EXIT_CONTEXT);
-  }
 
-  }
+  found:;
+    int bscount = 0;
+    for (p = myfile; p < myfile + strlen (myfile); p ++)
+      if (*p == '/')
+        bscount ++;
+    if (bscount >= 2)
+    {
+      p = myfile + strlen (myfile);
+      while (*p != '/') p --;
+      p --;
+      while (*p != '/') p --;
+      if (p [1] == '.' && p [2] == '/')
+      {
+        p --;
+        while (*p != '/') p --;
+      }
+      p ++;
+      *p = 0;
+    }
+    else
+    {
+      display ("Binary file has no context to the data files.", LOG_FATAL);
+      exit (EXIT_CONTEXT);
+    }
+
+  } // if (!founddir)
 
   if (home != NULL)
   {
     strcpy (saves, home);
     append (saves, ".gl-117");
-//printf ("\nsaves=%s ", saves); fflush (stdout);
     if (stat (saves, &mystat))
     {
-//printf ("\nsaves=%s ", saves); fflush (stdout);
       mkdir (saves, S_IRWXU);
     }
   }
@@ -213,7 +201,6 @@ found:;
   }
   else
   {
-//      strcpy (myfile, "/home/tom/gl-117_0_4_9/");
     sprintf (buf, "Found gl-117 data directory %s ", myfile);
     display (buf, LOG_MOST);
     strcpy (textures, myfile);

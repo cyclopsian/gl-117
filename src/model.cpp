@@ -36,30 +36,46 @@
 
 
 CColor::CColor ()
-{ memset (c, 255, 4 * sizeof (unsigned char)); }
+{
+  memset (c, 255, 4 * sizeof (unsigned char));
+}
 
 CColor::CColor (CColor *col)
-{ memcpy (c, col->c, 4 * sizeof (unsigned char)); }
+{
+  memcpy (c, col->c, 4 * sizeof (unsigned char));
+}
 
 CColor::CColor (short cr, short cg, short cb)
-{ c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255; }
+{
+  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255;
+}
 
 CColor::CColor (short cr, short cg, short cb, short ca)
-{ c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca; }
+{
+  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca;
+}
 
 CColor::~CColor () {};
 
 void CColor::setColor (CColor *col)
-{ memcpy (c, col->c, 4 * sizeof (unsigned char)); }
+{
+  memcpy (c, col->c, 4 * sizeof (unsigned char));
+}
 
 void CColor::setColor (short cr, short cg, short cb, short ca)
-{ c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca; }
+{
+  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca;
+}
 
 void CColor::setColor (short cr, short cg, short cb)
-{ c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255; }
+{
+  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255;
+}
 
 bool CColor::isEqual (CColor *col)
-{ return memcmp (c, col->c, 4 * sizeof (unsigned char)) == 0; }
+{
+  return memcmp (c, col->c, 4 * sizeof (unsigned char)) == 0;
+}
 
 void CColor::take (CColor *col)
 {
@@ -83,9 +99,12 @@ CTexture::~CTexture ()
 int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) // only 24 bit TGA
 {
   int i, i2;
-  data = tga_load(fname,&width,&height); // global 32 bpp texture buffer
+
+#ifdef LOADER_TGA_H
+  data = tga_load (fname, &width, &height); // global 32 bpp texture buffer
   if (!data) return 0;
-/*  unsigned char skip;
+#else
+  unsigned char skip;
   FILE *in = fopen (fname, "rb");
   if (!in) return 0;
   fread (&skip, 1, 1, in);
@@ -94,8 +113,12 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
   fread (&height, 2, 1, in);
   fseek (in, 18 + skip, SEEK_SET);
   unsigned char *buf = (unsigned char *) malloc (width * height * 3); // preload file buffer
+  if (buf == NULL) error_outofmemory ();
   data = (unsigned char *) malloc (width * height * 4); // global 32 bpp texture buffer
-  fread (buf, width * height * 3, 1, in);*/
+  if (data == NULL) error_outofmemory ();
+  fread (buf, width * height * 3, 1, in);
+#endif
+
   long texl = 0;
   long texr = 0;
   long texg = 0;
@@ -104,14 +127,6 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
   for (i = 0; i < height; i ++)
     for (i2 = 0; i2 < width; i2 ++)
     {
-/*      int n = i * width + i2;
-      texl += (int) buf [n+2] + buf [n+1] + buf [n];
-      int n2 = n * 4;
-      n *= 3;
-      data [n2+0] = buf [n+2];
-      data [n2+1] = buf [n+1];
-      data [n2+2] = buf [n];*/
-
       int n2 = (i * width + i2)*4;
 
       texl += (int) data [n2+2] + data [n2+1] + data [n2];
@@ -167,7 +182,11 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
         data [n2+2] = 0;
       }
     }
-//  free (buf);
+
+#ifndef LOADER_TGA_H
+  free (buf);
+#endif
+
   texlight = (float) texl / width / height / 3 / 256; // average brightness
   texred = (float) texr / width / height / 256; // average red
   texgreen = (float) texg / width / height / 256; // average green
@@ -192,7 +211,10 @@ void CTexture::getColor (CColor *c, int x, int y)
 
 
 
-CVector3::CVector3 () { x = y = z = 0; }
+CVector3::CVector3 ()
+{
+  x = y = z = 0;
+}
 
 CVector3::CVector3 (float x, float y, float z)
 {
@@ -205,19 +227,29 @@ CVector3::CVector3 (CVector3 *v)
 }
 
 void CVector3::set (float x, float y, float z)
-{ this->x = x; this->y = y; this->z = z; }
+{
+  this->x = x; this->y = y; this->z = z;
+}
 
 void CVector3::neg ()
-{ x = -x; y = -y; z = -z; }
+{
+  x = -x; y = -y; z = -z;
+}
 
 void CVector3::add (CVector3 *v)
-{ x += v->x; y += v->y; z += v->z; }
+{
+  x += v->x; y += v->y; z += v->z;
+}
 
 void CVector3::sub (CVector3 *v)
-{ x -= v->x; y -= v->y; z -= v->z; }
+{
+  x -= v->x; y -= v->y; z -= v->z;
+}
 
 void CVector3::mul (float fac)
-{ x *= fac; y *= fac; z *= fac; }
+{
+  x *= fac; y *= fac; z *= fac;
+}
 
 void CVector3::crossproduct (CVector3 *v)
 {
@@ -228,33 +260,45 @@ void CVector3::crossproduct (CVector3 *v)
 }
 
 float CVector3::dotproduct (CVector3 *v)   
-{ return x * v->x + y * v->y + z * v->z; }
+{
+  return x * v->x + y * v->y + z * v->z;
+}
 
 float CVector3::length ()
-{ return (float) sqrt (x * x + y * y + z * z); }
+{
+  return (float) sqrt (x * x + y * y + z * z);
+}
 
 void CVector3::norm ()
 {
   float d = sqrt (x * x + y * y + z * z);
-  if (d == 0) d = 0.0001;
+  if (d == 0) d = 1E-10;
   x /= d; y /= d; z /= d;
 }
 
 bool CVector3::isEqual (CVector3 *v)
-{ return x == v->x && y == v->y && z == v->z; }
+{
+  return x == v->x && y == v->y && z == v->z;
+}
 
 bool CVector3::isEqual (CVector3 *v, float tol)
-{ return x >= v->x - tol && x <= v->x + tol &&
+{
+  return x >= v->x - tol && x <= v->x + tol &&
          y >= v->y - tol && y <= v->y + tol &&
-         z >= v->z - tol && z <= v->z + tol; }
+         z >= v->z - tol && z <= v->z + tol;
+}
 
 void CVector3::take (CVector3 *v)
-{ x = v->x; y = v->y; z = v->z; }
+{
+  x = v->x; y = v->y; z = v->z;
+}
 
 
 
 void CVector2::take (CVector2 *v)
-{ x = v->x; y = v->y; }
+{
+  x = v->x; y = v->y;
+}
 
 
 
@@ -270,9 +314,6 @@ CVertex::CVertex (CVertex *v)
 
 void CVertex::addNormal (CVector3 *n)
 {
-// Aaaargh! This does 3D-Software for me!!!!!!!!!!!
-// if (normal.dotproduct (n) < 0) n->neg ();
-// A stupid mistake!
   triangles ++;
   normal.x = (normal.x * (triangles - 1) + n->x) / (float) triangles;
   normal.y = (normal.y * (triangles - 1) + n->y) / (float) triangles;
@@ -307,29 +348,43 @@ CRotation::CRotation ()
   calcRotation ();
   pitab = 4 * atan (1);
   for (int i = 0; i < 360; i ++)
-  { sintab [i] = sin (pitab / 180 * i);
-    costab [i] = cos (pitab / 180 * i); }
+  {
+    sintab [i] = sin (pitab / 180 * i);
+    costab [i] = cos (pitab / 180 * i);
+  }
 }
 
 CRotation::~CRotation () {}
 
 void CRotation::setAngles (short a, short b, short c)
-{ while (a < 0) a += (short) 360; while (a >= 360) a -= (short) 360;
-  while (b < 0) b += (short) 360; while (b >= 360) b -= (short) 360;
-  while (c < 0) c += (short) 360; while (c >= 360) c -= (short) 360;
-  this->a = a; this->b = b; this->c = c; }
+{
+  a %= 360;
+  if (a < 0) a += 360;
+  b %= 360;
+  if (b < 0) b += 360;
+  c %= 360;
+  if (c < 0) c += 360;
+  this->a = a;
+  this->b = b;
+  this->c = c;
+}
 
 void CRotation::addAngles (short a, short b, short c)
-{ this->a += a; this->b += b; this->c += c;
-  while (this->a < 0) this->a += (short) 360;
-  while (this->a >= 360) this->a -= (short) 360;
-  while (this->b < 0) this->b += (short) 360;
-  while (this->b >= 360) this->b -= (short) 360;
-  while (this->c < 0) this->c += (short) 360;
-  while (this->c >= 360) this->c -= (short) 360; }
+{
+  this->a += a;
+  this->b += b;
+  this->c += c;
+  this->a %= 360;
+  if (this->a < 0) this->a += 360;
+  this->b %= 360;
+  if (this->b < 0) this->b += 360;
+  this->c %= 360;
+  if (this->c < 0) this->c += 360;
+}
 
 void CRotation::calcRotation ()
-{ rot [0] [0] = costab [c] * costab [b];
+{
+  rot [0] [0] = costab [c] * costab [b];
   rot [0] [1] = sintab [a] * sintab [b] * costab [c] - sintab [c] * costab [a];
   rot [0] [2] = sintab [a] * sintab [c] + costab [a] * sintab [b] * costab [c];
   rot [1] [0] = sintab [c] * costab [b];
@@ -337,27 +392,40 @@ void CRotation::calcRotation ()
   rot [1] [2] = costab [a] * sintab [b] * sintab [c] - sintab [a] * costab [c];
   rot [2] [0] = -sintab [b];
   rot [2] [1] = sintab [a] * costab [b];
-  rot [2] [2] = costab [a] * costab [b]; }
+  rot [2] [2] = costab [a] * costab [b];
+}
 
 float CRotation::rotateX (CVector3 *v)
-{ return v->x * rot [0] [0] + v->y * rot [0] [1] + v->z * rot [0] [2]; }
+{
+  return v->x * rot [0] [0] + v->y * rot [0] [1] + v->z * rot [0] [2];
+}
 
 float CRotation::rotateY (CVector3 *v)
-{ return v->x * rot [1] [0] + v->y * rot [1] [1] + v->z * rot [1] [2]; }
+{
+  return v->x * rot [1] [0] + v->y * rot [1] [1] + v->z * rot [1] [2];
+}
 
 float CRotation::rotateZ (CVector3 *v)
-{ return v->x * rot [2] [0] + v->y * rot [2] [1] + v->z * rot [2] [2]; }
+{
+  return v->x * rot [2] [0] + v->y * rot [2] [1] + v->z * rot [2] [2];
+}
 
 float CRotation::getsintab (int a)
-{ if (a >= 0 && a < 360) return sintab [a];
-  return 0; }
+{
+  if (a >= 0 && a < 360) return sintab [a];
+  return 0;
+}
 
 float CRotation::getcostabntab (int a)
-{ if (a >= 0 && a < 360) return costab [a];
-  return 0; }
+{
+  if (a >= 0 && a < 360) return costab [a];
+  return 0;
+}
 
 void CRotation::take (CRotation *r)
-{ a = r->a; b = r->b; c = r->c; }
+{
+  a = r->a; b = r->b; c = r->c;
+}
 
 
 
@@ -370,6 +438,7 @@ void CTriangle::getNormal (CVector3 *n)
   dummy.sub (&v [0]->vector);
   n->crossproduct (&dummy);
 }
+
 void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
 {
   int i;
@@ -393,6 +462,7 @@ void CQuad::getNormal (CVector3 *n)
   dummy.sub (&v [0]->vector);
   n->crossproduct (&dummy);
 }
+
 void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
 {
   int i;
@@ -416,9 +486,11 @@ CObject::CObject ()
   material = NULL;
   hasTexture = false;
 }
+
 CObject::~CObject ()
 {
 }
+
 int CObject::addVertex (CVertex *w)
 {
   int i;
@@ -428,6 +500,7 @@ int CObject::addVertex (CVertex *w)
   vertex [numVertices ++].take (w);
   return i;
 }
+
 void CObject::setColor (CColor *col)
 {
   int i;
@@ -538,20 +611,20 @@ void CModel::drawVertexNormals (CObject *cm, float zoom)
   glEnd ();
 }
 
-/*  void drawTriangleNormals (CObject *cm, float zoom)
+/*void drawTriangleNormals (CObject *cm, float zoom)
 {
-glColor3ub (255, 0, 0);
-glBegin (GL_LINES);
-for (int j = 0; j < cm->numTriangles; j++)
-{
-  float x = cm->triangle [j].v [0]->vector.x + cm->triangle [j].v [1]->vector.x + cm->triangle [j].v [2]->vector.x;
-  float y = cm->triangle [j].v [0]->vector.y + cm->triangle [j].v [1]->vector.y + cm->triangle [j].v [2]->vector.y;
-  float z = cm->triangle [j].v [0]->vector.z + cm->triangle [j].v [1]->vector.z + cm->triangle [j].v [2]->vector.z;
-  x /= 3.0; y /= 3.0; z /= 3.0;
-  glVertex3f (x*zoom, y*zoom, z*zoom);
-//    glVertex3f ((x + cm->triangle [j].normal.x / 5)*zoom, (cm->vertex [j].vector.y + cm->vertex [j].normal.y / 5)*zoom, (cm->vertex [j].vector.z + cm->vertex [j].normal.z / 5)*zoom);
-  }
-glEnd ();
+  glColor3ub (255, 0, 0);
+  glBegin (GL_LINES);
+  for (int j = 0; j < cm->numTriangles; j++)
+  {
+    float x = cm->triangle [j].v [0]->vector.x + cm->triangle [j].v [1]->vector.x + cm->triangle [j].v [2]->vector.x;
+    float y = cm->triangle [j].v [0]->vector.y + cm->triangle [j].v [1]->vector.y + cm->triangle [j].v [2]->vector.y;
+    float z = cm->triangle [j].v [0]->vector.z + cm->triangle [j].v [1]->vector.z + cm->triangle [j].v [2]->vector.z;
+    x /= 3.0; y /= 3.0; z /= 3.0;
+    glVertex3f (x*zoom, y*zoom, z*zoom);
+  //    glVertex3f ((x + cm->triangle [j].normal.x / 5)*zoom, (cm->vertex [j].vector.y + cm->vertex [j].normal.y / 5)*zoom, (cm->vertex [j].vector.z + cm->vertex [j].normal.z / 5)*zoom);
+    }
+  glEnd ();
 }*/
 
 int CModel::rotateColor (int n)
@@ -1201,11 +1274,12 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
 
 
 
-CSphere::CSphere ()
-{ }
+CSphere::CSphere () {}
 
 CSphere::CSphere (float radius, int segments, float dx, float dy, float dz)
-{ init (radius, segments, dx, dy, dz, 0); }
+{
+  init (radius, segments, dx, dy, dz, 0);
+}
 
 CSphere::~CSphere () {}
 
@@ -1236,7 +1310,6 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
   this->dy = dy;
   this->dz = dz;
   int p [4];
-//    printf ("\n%d\n", segments); fflush (stdout);
   float step = 180.0 / segments;
   CRotation *rot = new CRotation ();
   if (rot == NULL) exit (100);
@@ -1278,7 +1351,6 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
         if (!random (randomized))
           co->quad [co->numQuads ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]], &co->vertex [p [3]]);
       }
-//    printf ("\n%d %d %d\n", nv, nr, nt); fflush (stdout);
     }
   delete rot;
   delete w;
@@ -1288,7 +1360,6 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
   {
     object [0]->vertex [i2].normal.neg ();
   }
-//    printf ("\nnv=%d", nv);
 }
 
 void CSphere::invertNormals ()
@@ -1310,7 +1381,6 @@ void CSphere::setNorthPoleColor (CColor *c, float w)
   for (i = 1; i <= num; i ++)
   {
     float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * segments * 2) / (float) num;
-  //    printf ("i=%d: w=%f (y=%f)\n", i, weight, v[i].v->z);
     for (i2 = 0; i2 < 4; i2 ++)
       object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
   }
@@ -1359,11 +1429,12 @@ void CSphere::setPoleColor (int phi, int theta, CColor *c, float w)
 
 
 
-CSpherePart::CSpherePart ()
-{ }
+CSpherePart::CSpherePart () {}
 
 CSpherePart::CSpherePart (float radius, int segments, float phi)
-{ init (radius, segments, phi); }
+{
+  init (radius, segments, phi);
+}
 
 CSpherePart::~CSpherePart () {}
 
@@ -1382,7 +1453,6 @@ void CSpherePart::init (float radius, int segments, float phi)
   this->segments = segments;
   float dx = 1, dy = 1, dz = 1;
   int p [4];
-//    printf ("\n%d\n", segments); fflush (stdout);
   float step = 360.0 / segments;
   float step2 = phi / 4;
   CRotation *rot = new CRotation ();
@@ -1419,17 +1489,11 @@ void CSpherePart::init (float radius, int segments, float phi)
       {
         co->quad [co->numQuads ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]], &co->vertex [p [3]]);
       }
-//    printf ("\n%d %d %d\n", nv, nr, nt); fflush (stdout);
     }
   delete rot;
   delete w;
   addObject (co);
   setColor (new CColor (128, 128, 128, 255));
-/*  for (int i2 = 0; i2 < object [0]->numVertices; i2 ++)
-  {
-    object [0]->vertex [i2].normal.neg ();
-  }*/
-//    printf ("\nnv=%d", nv);
 }
 
 void CSpherePart::setNorthPoleColor (CColor *c, float w)
@@ -1443,7 +1507,6 @@ void CSpherePart::setNorthPoleColor (CColor *c, float w)
   for (i = 1; i <= num; i ++)
   {
     float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * 4 * 2) / (float) num;
-  //    printf ("i=%d: w=%f (y=%f)\n", i, weight, v[i].v->z);
     for (i2 = 0; i2 < 4; i2 ++)
       object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
   }

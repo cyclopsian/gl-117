@@ -26,6 +26,7 @@
 #include "conf.h"
 #include "dirs.h"
 
+// initialization
 int quality = 3;
 float view = 50.0;
 int width = 800, height = 600, bpp = 32;
@@ -287,7 +288,6 @@ int load_config ()
   if (view < 30)
   {
     view = 30;
-//    firststart = true;
   }
   else if (view > 100)
   {
@@ -467,10 +467,6 @@ int getJoystick (char *str, int n)
   else
     return n;
   tmp = atoi (&str [1]);
-/*  if (tmp == 0) // problem: tmp=0 is valid!
-  {
-    return n;
-  }*/
   return jn * 1000 + tmp;
 }
 

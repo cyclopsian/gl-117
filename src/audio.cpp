@@ -36,7 +36,6 @@ void fillrepeat (void *unused, Uint8 *stream, int len)
 
   waveptr = wave->sound + wave->soundpos;
   waveleft = wave->soundlen - wave->soundpos;
-//  printf ("%p ", wave); fflush (stdout);
 
   while (waveleft <= len)
   {
@@ -65,7 +64,6 @@ void fillonce (void *unused, Uint8 *stream, int len)
     if (SDL_GetAudioStatus () == SDL_AUDIO_PLAYING)
     {
       SDL_PauseAudio (0);
-//      SDL_CloseAudio ();
     }
     return;
   }

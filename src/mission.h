@@ -19,7 +19,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file contains all mission data and definitions. */
+/* This file contains all mission data and definitions (really trivial). */
 
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
@@ -27,17 +27,12 @@
 #include <stdio.h>
 #include <string.h>
 
-/*#include "common.h"
-#include "model.h"
-#include "aiobject.h"*/
 #include "main.h"
 
 #define MISSION_DEMO 0
 #define MISSION_CAMPAIGN1 1
 #define MISSION_TEST1 1
 #define MISSION_TEST2 2
-//#define MISSION_MOON 5
-//#define MISSION_CANYON 6
 #define MISSION_TRANSPORT 10
 #define MISSION_CONVOY 11
 #define MISSION_DOGFIGHT2 12

@@ -39,7 +39,7 @@ BinaryFile::BinaryFile (char *filename)
   size = ftell (in);
   fseek (in, 0, SEEK_SET);
   data = new unsigned char [size];
-  if (data == NULL) exit (300);
+  if (data == NULL) error_outofmemory ();
   memset (data, 0, size);
   Uint32 z = 0;
   while (z < size)
@@ -152,6 +152,14 @@ int BinaryFile::readString (char *ptr)
   return i;
 }
 
+int BinaryFile::skip (int n)
+{
+  if (filepointer + n > size)
+    n = size - filepointer;
+  filepointer += n;
+  return n;
+}
+
 /****************************************************************************
 3DS LOADER
 ****************************************************************************/
@@ -160,9 +168,9 @@ int BinaryFile::readString (char *ptr)
 CLoad3DS::CLoad3DS ()
 {
   currentChunk = new Chunk;
-  if (currentChunk == NULL) exit (300);
+  if (currentChunk == NULL) error_outofmemory ();
   tempChunk = new Chunk;
-  if (tempChunk == NULL) exit (300);
+  if (tempChunk == NULL) error_outofmemory ();
 }
 
 // Load the whole 3DS file using the private functions below
@@ -171,7 +179,7 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   char message [255] = {0};
 
   file = new BinaryFile (filename);
-  if (file == NULL) exit (300);
+  if (file == NULL) error_outofmemory ();
 
   // Read the first chuck
   ReadChunk(currentChunk);
@@ -218,7 +226,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   char buffer [50000] = {0};
 
   currentChunk = new Chunk;
-  if (currentChunk == NULL) exit (300);
+  if (currentChunk == NULL) error_outofmemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
@@ -256,11 +264,13 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case EDITKEYFRAME:
-        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
 
       default: 
-        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -275,7 +285,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
   char buffer[50000] = {0};
 
   currentChunk = new Chunk;
-  if (currentChunk == NULL) exit (300);
+  if (currentChunk == NULL) error_outofmemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
@@ -320,7 +330,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
   char buffer[50000] = {0};
 
   currentChunk = new Chunk;
-  if (currentChunk == NULL) exit (300);
+  if (currentChunk == NULL) error_outofmemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
@@ -394,7 +404,7 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTriangles);
 
   object->triangle = new CTriangle [object->numTriangles];
-  if (object->triangle == NULL) exit (300);
+  if (object->triangle == NULL) error_outofmemory ();
   memset (object->triangle, 0, sizeof (CTriangle) * object->numTriangles);
 
   for (int i = 0; i < object->numTriangles; i ++)
@@ -415,7 +425,7 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTexVertex);
 
   CVector2 *p = new CVector2 [object->numTexVertex];
-  if (p == NULL) exit (300);
+  if (p == NULL) error_outofmemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
   
@@ -430,11 +440,11 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numVertices);
 
   object->vertex = new CVertex [object->numVertices];
-  if (object->vertex == NULL) exit (300);
+  if (object->vertex == NULL) error_outofmemory ();
   memset (object->vertex, 0, sizeof (CVertex) * object->numVertices);
 
   CVector3 *p = new CVector3 [object->numVertices];
-  if (p == NULL) exit (300);
+  if (p == NULL) error_outofmemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
     

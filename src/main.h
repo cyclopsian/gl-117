@@ -24,6 +24,7 @@
 #ifndef IS_MAIN_H
 #define IS_MAIN_H
 
+// dummy debug definitions
 //#define HAVE_SDL_MIXER
 //#define USE_GLUT
 
@@ -111,6 +112,7 @@ extern CModel model_mine1;
 extern CModel model_aster1;
 extern CModel model_base1;
 extern CModel model_barrier1;
+extern CModel model_rubble1;
 
 extern DynamicObj *flare [maxflare];
 extern DynamicObj *chaff [maxchaff];

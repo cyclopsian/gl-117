@@ -54,7 +54,7 @@ char *TeamPilot::getRank ()
   else if (ranking == 3) return "1ST LIEUTNANT";
   else if (ranking == 4) return "CAPTAIN";
   else if (ranking == 5) return "MAJOR";
-  else if (ranking == 6) return "LIEUTNANT COLONEL";
+  else if (ranking == 6) return "LT COLONEL";
   else return "COLONEL";
 }
 
@@ -112,7 +112,7 @@ void Pilot::load ()
   {
     tp = new TeamPilot *[11];
     tp [0] = new TeamPilot (5, "PRIMETIME", 200, 100, 150, 25);
-    tp [1] = new TeamPilot (2, "HEPTARGON", 80, 220, 300, 5);
+    tp [1] = new TeamPilot (1, "HEPTARGON", 80, 220, 300, 5);
     tp [2] = new TeamPilot (2, "LARA", 180, 160, 50, 10);
     tp [3] = new TeamPilot (7, "SHARK", 70, 90, 120, 35);
     tp [4] = new TeamPilot (3, "BOSS", 250, 180, 80, 12);
@@ -126,7 +126,6 @@ void Pilot::load ()
 
   char buf [4096];
   strcpy (buf, dirs->getSaves (name));
-//    strcat (buf, name);
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
@@ -154,7 +153,6 @@ void Pilot::save ()
   int i;
   char buf [4096];
   strcpy (buf, dirs->getSaves (name));
-//    strcat (buf, name);
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {

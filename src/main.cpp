@@ -296,6 +296,7 @@ CModel model_mine1;
 CModel model_aster1;
 CModel model_base1;
 CModel model_barrier1;
+CModel model_rubble1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -661,11 +662,11 @@ void game_levelInit ()
     }
     else if (fighter [i]->id == SHIP_DESTROYER1)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 3;
+      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 4;
     }
     else if (fighter [i]->id == SHIP_CRUISER)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 3;
+      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 4;
     }
     else if (fighter [i]->id >= TANK1 && fighter [i]->id <= TANK2)
     {
@@ -1736,7 +1737,7 @@ void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
   fplayer->recthrust = fplayer->maxthrust * 0.75 - fplayer->maxthrust / 4 * throttle / 32638;
 }
 
-void game_joystickbutton (int button)
+void game_joystickbutton (unsigned int button)
 {
   if (!fplayer->active) return;
   if (button == joystick_firecannon)
@@ -2464,7 +2465,6 @@ void create_mouse (int button, int state, int x, int y)
 
 void create_display ()
 {
-  int i;
   CColor *colorstd = &colorblue;
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -3928,7 +3928,7 @@ void menu_display ()
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
     font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN");
     strcpy (buf, dirs->getSaves (""));
-    for (i = 0; i < strlen (buf); i ++)
+    for (i = 0; i < (int) strlen (buf); i ++)
       buf [i] = toupper (buf [i]);
     font1->drawTextCentered (0, -18.5, -3, buf);
   }
@@ -4309,6 +4309,7 @@ void game_display ()
   // draw terrain
   l->calcDynamicLight (explosion, laser, (DynamicObj **) missile, flare);
   glEnable (GL_CULL_FACE);
+  glCullFace (GL_FRONT);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
 
@@ -5373,14 +5374,17 @@ void myFirstInit ()
   g_Load3ds.Import3DS (&model_radar, dirs->getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
   g_Load3ds.Import3DS (&model_mine1, dirs->getModels ("mine1.3ds"));
-  model_radar.setName ("MINE");
+  model_mine1.setName ("MINE");
   g_Load3ds.Import3DS (&model_aster1, dirs->getModels ("aster1.3ds"));
-  model_radar.setName ("ASTEROID");
+  model_aster1.setName ("ASTEROID");
   g_Load3ds.Import3DS (&model_base1, dirs->getModels ("base1.3ds"));
-  model_radar.setName ("MOON BASE");
+  model_base1.setName ("MOON BASE");
   g_Load3ds.Import3DS (&model_barrier1, dirs->getModels ("barrier.3ds"));
+  model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
+  g_Load3ds.Import3DS (&model_rubble1, dirs->getModels ("rubble.3ds"));
+  model_base1.setName ("RUBBLE");
 
   setMissiles (&model_fig);
   setMissiles (&model_figa);
@@ -5464,7 +5468,6 @@ int heat2 [maxfy] [maxfx];
 
 void init_display ()
 {
-  int i, i2;
   CVector3 vec;
   CColor color (200, 200, 200, 255);
   
@@ -6098,7 +6101,7 @@ Uint32 nexttime = 0;
 }*/
 
 //int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
-int joystickbutton = -1;
+unsigned int joystickbutton = -1;
 bool joystickfirebutton = false;
 
 // This loop emulates the glutMainLoop() of GLUT using SDL!!!

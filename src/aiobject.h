@@ -95,8 +95,6 @@
 #define STATIC_BASE1 10303
 #define STATIC_BARRIER1 10400
 
-//extern GLLandscape *l;
-
 class DynamicObj : public CSpaceObj
 {
   public:
@@ -141,7 +139,6 @@ class DynamicObj : public CSpaceObj
   DynamicObj *source; // missiles must keep track of the object they have been fired from -> statistics
   int bomber; // act as bomber and prefer groud targets
   char net [100];
-//  GLLandscape *l;
   
   float shield, maxshield; // current and initial/maximum shield
 

@@ -66,24 +66,17 @@ void CSmoke::move (Uint32 dt, int dec)
 
 void CSmoke::drawElem (int n)
 {
-//    glRotatef (phi [n], 0, 1, 0);
   if (n < 0 || n >= maxsmokeelem) return;
   float myzoom = smokezoom [time [n]];
+
   glPushMatrix ();
   glTranslatef (v [n].x, v [n].y, v [n].z);
   glRotatef (camphi, 0.0, 1.0, 0.0);
   glRotatef (-camgamma, 1.0, 0.0, 0.0);
   glScalef (myzoom, myzoom, myzoom);
+
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, time [n] * 5 + 100);
-/*  glTexCoord2f (0, 0);
-  glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y + myzoom, v [n].z + myzoom * sine [phi [n]]);
-  glTexCoord2f (1, 0);
-  glVertex3f (v [n].x + myzoom * cosi [phi [n]], v [n].y + myzoom, v [n].z - myzoom * sine [phi [n]]);
-  glTexCoord2f (1, 1);
-  glVertex3f (v [n].x + myzoom * cosi [phi [n]], v [n].y - myzoom, v [n].z - myzoom * sine [phi [n]]);
-  glTexCoord2f (0, 1);
-  glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y - myzoom, v [n].z + myzoom * sine [phi [n]]);*/
   float cg = 1;
   float cg2 = 0;
   glTexCoord2f (0, 0);
@@ -95,13 +88,14 @@ void CSmoke::drawElem (int n)
   glTexCoord2f (0, 1);
   glVertex3f (-1, 1, 0);
   glEnd ();
+
   glPopMatrix ();
 }
 
 void CSmoke::drawElemHQ (int n)
 {
-//    glRotatef (phi [n], 0, 1, 0);
   if (n < 0 || n >= maxsmokeelem) return;
+
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, time [n] * 10 + 55);
   float myzoom = smokezoom [time [n]];
@@ -138,24 +132,19 @@ void CSmoke::draw ()
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.02);
   gl->enableTextures (smoketype);
+  // draw smoke elements in the best order
   for (i = last; i >= 0; i --)
   {
     if (time [i] > 0)
     {
-/*      if (quality >= 3)
-        drawElemHQ (i);
-      else*/
-        drawElem (i);
+      drawElem (i);
     }
   }
   for (i = maxsmokeelem - 1; i > last; i --)
   {
     if (time [i] > 0)
     {
-/*      if (quality >= 3)
-        drawElemHQ (i);
-      else*/
-        drawElem (i);
+      drawElem (i);
     }
   }
   glDisable (GL_TEXTURE_2D);
@@ -340,14 +329,6 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
     glColor4ub (0, 0, 0, myalpha);
     float myzoom = zoom;
     float cosphi = COS(camphi), sinphi = SIN(camphi);
-/*    glTexCoord2f (0, 0);
-    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z + myzoom * sine [(int) myphi]);
-    glTexCoord2f (1, 0);
-    glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z - myzoom * sine [(int) myphi]);
-    glTexCoord2f (1, 1);
-    glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z - myzoom * sine [(int) myphi]);
-    glTexCoord2f (0, 1);
-    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z + myzoom * sine [(int) myphi]);*/
     glTexCoord2f (0, 0);
     glVertex3f (this->tl->x - myzoom * cosphi, this->tl->y + myzoom, this->tl->z + myzoom * sinphi);
     glTexCoord2f (1, 0);
@@ -733,7 +714,7 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
         glColor4ub (highlightcol->c [0], highlightcol->c [1], highlightcol->c [2], highlightcol->c [3]);
       glPushMatrix ();
       glTranslatef (xz + xi / 2 - xw / 2, yi / 2, 0);
-//      glScalef (1.0 + 0.25 * sine [abs (timer * 8 % 360)], 1, 1);
+
       glBegin (GL_QUADS);
       glTexCoord2f (tx, ty2);
       glVertex3f (-xi / 2, -yi / 2, 0);
@@ -744,6 +725,7 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
       glTexCoord2f (tx2, ty2);
       glVertex3f (xi / 2, -yi / 2, 0);
       glEnd ();
+
       glPopMatrix ();
       xz += xi;
     }

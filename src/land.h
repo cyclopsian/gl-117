@@ -122,6 +122,7 @@ class Landscape
   int getCoord (int a); // modulo MAXX
   void convolveGauss (int radius, int hmin, int hmax); // fast convolution function (isotropic)
   void gauss (int x, int y); // convolution for only one raster point
+  void flatten (int x, int y, int dx, int dy); // constant height for 2*dx x 2*dy fields
   void smoothGlacier (); // special erosion function
   bool isType (unsigned char type, unsigned char id);
   bool isWoods (int type);

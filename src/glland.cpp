@@ -170,12 +170,12 @@ void GLLandscape::precalculate ()
 //        printf ("a=%d, r=%d, g=%d, b=%d\n", a, r[x][z],g[x][z],b[x][z]); fflush (stdout);
     }
 
-  // smooth the colors (obsolete)
   long sum;
+  // smooth the colors (obsolete)
 /*  long g3[3][3]={{0,1,0},
         {1,4,1},
-        {0,1,0}};*/
-  /*for (i = 1; i < MAXX; i ++)
+        {0,1,0}};
+  for (i = 1; i < MAXX; i ++)
     for (i2 = 1; i2 < MAXX; i2 ++)
     {
       sum = 0;
@@ -392,27 +392,6 @@ void GLLandscape::precalculate ()
         tex1 [i] [i2] = 0xFF;
       }
 
-/*        if (!isWater (f1) && isWater (f2) && isWater (f3) && isWater (f4))
-      { drawrule [i] [i2] = 1; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texwater; }
-      if (isWater (f1) && !isWater (f2) && !isWater (f3) && !isWater (f4))
-      { drawrule [i] [i2] = 1; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texgrass; }
-      if (!isWater (f1) && !isWater (f2) && !isWater (f3) && isWater (f4))
-      { drawrule [i] [i2] = 1; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texgrass; }
-      if (isWater (f1) && isWater (f2) && isWater (f3) && !isWater (f4))
-      { drawrule [i] [i2] = 1; tex1 [i] [i2] = texwater; tex2 [i] [i2] = texgrass; }
-      
-      if (isWater (f1) && !isWater (f2) && isWater (f3) && isWater (f4))
-      { drawrule [i] [i2] = 2; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texwater; }
-      if (!isWater (f1) && isWater (f2) && !isWater (f3) && !isWater (f4))
-      { drawrule [i] [i2] = 2; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texgrass; }
-      if (!isWater (f1) && !isWater (f2) && isWater (f3) && !isWater (f4))
-      { drawrule [i] [i2] = 2; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texgrass; }
-      if (isWater (f1) && isWater (f2) && !isWater (f3) && isWater (f4))
-      { drawrule [i] [i2] = 2; tex1 [i] [i2] = texwater; tex2 [i] [i2] = texgrass; }*/
-
-//        if (isWater (f1) || isWater (f2) || isWater (f3) || isWater (f4))
-//        { tex1 [i] [i2] = texwater; }
-
       if (!isGlacier (f1) && isGlacier (f2) && isGlacier (f3) && isGlacier (f4))
       { drawrule [i] [i2] = 1; tex1 [i] [i2] = texrocks->textureID; tex2 [i] [i2] = 0xFF; }
       if (isGlacier (f1) && !isGlacier (f2) && !isGlacier (f3) && !isGlacier (f4))
@@ -437,34 +416,34 @@ void GLLandscape::precalculate ()
 // Get height over landscape/water, no interpolation (fast)
 float GLLandscape::getMinHeight (float x, float z)
 {
-  int mx = GETCOORD((int)x+MAXX2);
-  int mz = GETCOORD(MAXX2-(int)z);
+  int mx = GETCOORD((int)floor (x));
+  int mz = GETCOORD((int)floor (z));
   return (ZOOM * ((float)hcmin[mx/4][mz/4]*zoomz - zoomz2));
 }
 
 // Get height over landscape/water, no interpolation (fast)
 float GLLandscape::getMaxHeight (float x, float z)
 {
-  int mx = GETCOORD((int)x+MAXX2);
-  int mz = GETCOORD(MAXX2-(int)z);
+  int mx = GETCOORD((int)floor (x));
+  int mz = GETCOORD((int)floor (z));
   return (ZOOM * ((float)hcmax[mx/4][mz/4]*zoomz - zoomz2));
 }
 
 // Get height over landscape/water, no interpolation (fast)
 float GLLandscape::getHeight (float x, float z)
 {
-  int mx = GETCOORD((int)x+MAXX2);
-  int mz = GETCOORD(MAXX2-(int)z);
+  int mx = GETCOORD((int)floor (x));
+  int mz = GETCOORD((int)floor (z));
   return (ZOOM * ((float)hw[mx][mz]*zoomz - zoomz2));
 }
 
 // Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight2 (float x, float z)
 {
-  float mx = x+MAXX2;
-  float mz = (float)MAXX2-z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 & 1;
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
@@ -481,10 +460,10 @@ float GLLandscape::getExactHeight2 (float x, float z)
 // Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight3 (float x, float z)
 {
-  float mx = x+MAXX2;
-  float mz = (float)MAXX2-z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 % 3;
   mz1 -= mz1 % 3;
   int mx2 = mx1 + 3;
@@ -501,10 +480,10 @@ float GLLandscape::getExactHeight3 (float x, float z)
 // Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight4 (float x, float z)
 {
-  float mx = x+MAXX2;
-  float mz = (float)MAXX2-z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 & 3;
   mz1 -= mz1 & 3;
   int mx2 = mx1 + 4;
@@ -524,10 +503,10 @@ float GLLandscape::getExactHeight (float x, float z)
   if (gridstep == 2) return getExactHeight2 (x, z);
   else if (gridstep == 3) return getExactHeight3 (x, z);
   else if (gridstep == 4) return getExactHeight4 (x, z);
-  float mx = x+MAXX2;
-  float mz = (float)MAXX2-z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
   int ax1 = GETCOORD(mx1);
@@ -546,8 +525,8 @@ float GLLandscape::getExactLSHeight2 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 & 1;
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
@@ -568,8 +547,8 @@ float GLLandscape::getExactLSHeight3 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 % 3;
   mz1 -= mz1 % 3;
   int mx2 = mx1 + 3;
@@ -590,8 +569,8 @@ float GLLandscape::getExactLSHeight4 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   mx1 -= mx1 & 3;
   mz1 -= mz1 & 3;
   int mx2 = mx1 + 4;
@@ -615,8 +594,8 @@ float GLLandscape::getExactLSHeight (float x, float z)
   else if (gridstep == 4) return getExactLSHeight4 (x, z);
   float mx = x;
   float mz = z;
-  int mx1 = (int) mx;
-  int mz1 = (int) mz;
+  int mx1 = (int) floor (mx);
+  int mz1 = (int) floor (mz);
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
   int ax1 = GETCOORD(mx1);
@@ -631,19 +610,19 @@ float GLLandscape::getExactLSHeight (float x, float z)
 // Get height of lowest sunray, no interpolation
 float GLLandscape::getRayHeight (float x, float z)
 {
-  int mx = GETCOORD((int)x+MAXX2);
-  int mz = GETCOORD(MAXX2-(int)z);
+  int mx = GETCOORD((int)floor (x));
+  int mz = GETCOORD((int)floor (z));
   return (ZOOM * ((float)hray[mx][mz]*zoomz - zoomz2));
 }
 
 // Get height of lowest sunray, linear interpolation
 float GLLandscape::getExactRayHeight (float x, float z)
 {
-  float mx = x+MAXX2;
-  float mz = (float)MAXX2-z;
-  int mx1 = (int) mx;
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) floor (mx);
   int mx2 = mx1 + 1;
-  int mz1 = (int) mz;
+  int mz1 = (int) floor (mz);
   int mz2 = mz1 + 1;
   int ax1 = GETCOORD(mx1);
   int ax2 = GETCOORD(mx2);
@@ -658,6 +637,11 @@ float GLLandscape::getExactRayHeight (float x, float z)
 void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
 {
   float ht = getExactLSHeight (x, y);
+  phi = 359 - phi;
+  if (phi < 0 || phi > 359)
+  {
+    printf ("Test: maybe a problem in drawTree!");
+  }
   // Draw tree using a single rotated quad (low quality, fast)
   float ex1 = cosi [phi] * wtree, ey1 = sine [phi] * wtree;
   float ex2 = -ex1, ey2 = -ey1;
@@ -676,13 +660,13 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
     glBegin (GL_QUADS);
     glColor3ub (treecolor.c [0], treecolor.c [1], treecolor.c [2]);
     glTexCoord2d (0, 1);
-    glVertex3f (hh2*(ex1+x) - 1.0, ht + htree, hh2*(MAXX-(ey1+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex1+x), ht + htree, hh2*((ey1+y+zy)));
     glTexCoord2d (1, 1);
-    glVertex3f (hh2*(ex2+x) - 1.0, ht + htree, hh2*(MAXX-(ey2+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex2+x), ht + htree, hh2*((ey2+y+zy)));
     glTexCoord2d (1, 0);
-    glVertex3f (hh2*(ex2+x) - 1.0, ht, hh2*(MAXX-(ey2+y)) - 1.0);
+    glVertex3f (hh2*(ex2+x), ht, hh2*((ey2+y)));
     glTexCoord2d (0, 0);
-    glVertex3f (hh2*(ex1+x) - 1.0, ht, hh2*(MAXX-(ey1+y)) - 1.0);
+    glVertex3f (hh2*(ex1+x), ht, hh2*((ey1+y)));
     glEnd ();
   }
   if (quality >= 2 && texturetree2 >= 0)
@@ -701,52 +685,16 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
     glBindTexture (GL_TEXTURE_2D, texturetree2);
     glBegin (GL_QUADS);
     glTexCoord2d (0, 1);
-    glVertex3f (hh2*(ex1+x) - 1.0, ht, hh2*(MAXX-(ey1+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex1+x), ht, hh2*((ey1+y+zy)));
     glTexCoord2d (1, 1);
-    glVertex3f (hh2*(ex3+x) - 1.0, ht, hh2*(MAXX-(ey3+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex3+x), ht, hh2*((ey3+y+zy)));
     glTexCoord2d (1, 0);
-    glVertex3f (hh2*(ex2+x) - 1.0, ht, hh2*(MAXX-(ey2+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex2+x), ht, hh2*((ey2+y+zy)));
     glTexCoord2d (0, 0);
-    glVertex3f (hh2*(ex4+x) - 1.0, ht, hh2*(MAXX-(ey4+y+zy)) - 1.0);
+    glVertex3f (hh2*(ex4+x), ht, hh2*((ey4+y+zy)));
     glEnd ();
   }
 }
-
-// currently not implemented
-/*void GLLandscape::drawTreeGrid (float x, float y, float htree, float wtree, int phi)
-{
-  float ht = getExactLSHeight (x, y);
-  int myticker;
-  float zy = 0;
-  if (weather == 1)
-  {
-    myticker = (int) (0.05 / htree * lsticker + 1000 * wtree + (x + y) * 50);
-    if (myticker != 0)
-      myticker %= 360;
-    zy = 0.2 * (2.0 + sine [myticker]);
-  }
-  glBegin (GL_QUADS);
-  glColor3ub (treecolor.c [0], treecolor.c [1], treecolor.c [2]);
-  glTexCoord2d (0, 1);
-  glVertex3f (hh2*(-wtree+x) - 1.0, ht + htree, hh2*(MAXX-(y+zy)) - 1.0);
-  glTexCoord2d (1, 1);
-  glVertex3f (hh2*(wtree+x) - 1.0, ht + htree, hh2*(MAXX-(y+zy)) - 1.0);
-  glTexCoord2d (1, 0);
-  glVertex3f (hh2*(wtree+x) - 1.0, ht, hh2*(MAXX-(y)) - 1.0);
-  glTexCoord2d (0, 0);
-  glVertex3f (hh2*(-wtree+x) - 1.0, ht, hh2*(MAXX-(y)) - 1.0);
-  glEnd ();
-  glBegin (GL_QUADS);
-  glTexCoord2d (0, 1);
-  glVertex3f (hh2*(x) - 1.0, ht + htree, hh2*(MAXX-(-wtree+y+zy)) - 1.0);
-  glTexCoord2d (1, 1);
-  glVertex3f (hh2*(x) - 1.0, ht + htree, hh2*(MAXX-(wtree+y+zy)) - 1.0);
-  glTexCoord2d (1, 0);
-  glVertex3f (hh2*(x) - 1.0, ht, hh2*(MAXX-(wtree+y)) - 1.0);
-  glTexCoord2d (0, 0);
-  glVertex3f (hh2*(x) - 1.0, ht, hh2*(MAXX-(-wtree+y)) - 1.0);
-  glEnd ();
-}*/
 
 int visibility = 0;
 
@@ -769,12 +717,11 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 
   for (xs = x1; xs < x2;)
   {
-//    glBegin (GL_QUAD_STRIP);
     x = GETCOORD(xs);
     for (ys = y1; ys < y2;)
     {
       y = GETCOORD(ys);
-      if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*4*step))
+      if (gl->isSphereInFrustum (hh2*(xs), (float)hw[x][y]*zoomz - zoomz2, hh2*((ys)), hh2*4*step))
       {
         int xstep = GETCOORD(x + step);
         int a = selectColor (x, y);
@@ -786,7 +733,6 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 		    if (!(h [x] [y] < hw [x] [y] && h [x2] [y] < hw [x2] [y] &&
               h [x] [y2] < hw [x] [y2] && h [x2] [y2] < hw [x2] [y2] &&
               h [x] [y0] < hw [x] [y0] && h [x2] [y0] < hw [x2] [y0]))
-//        if (a != 6 && a != 9)
         {
           if (!last)
           {
@@ -794,16 +740,6 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             glBegin (GL_QUAD_STRIP);
           }
           tex = texmap [a];
-/*          if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
-            tex = texgrass;
-          else if (a == 2 || a == 7)
-            tex = texrocks;
-          else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-            tex = texgrass; // not texwater!
-          else if (a == 11)
-            tex = texredstone;
-          else if (a == 13)
-            tex = texsand;*/
           if (tex == NULL)
           {
             texred = 1.0F;
@@ -824,7 +760,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
           if (cg >= texgreen) cg = texgreen;
           if (cb >= texblue) cb = texblue;
           glColor3f (cr, cg, cb);
-          glVertex3f (hh2*xs - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
+          glVertex3f (hh2*xs, (float)h[x][y]*zoomz - zoomz2, hh2*(ys));
           fac = 0.001F * (nl [xstep] [y] + (short) dl [xstep] [y] * 16) * sunlight / 256.0F;
           cr = (float) r [x + step] [y] * fac * texred;
           cg = (float) g [x + step] [y] * fac * texgreen;
@@ -833,7 +769,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
           if (cg >= texgreen) cg = texgreen;
           if (cb >= texblue) cb = texblue;
           glColor3f (cr, cg, cb);
-          glVertex3f (hh2*(xs+step) - 1.0, (float)h[xstep][y]*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
+          glVertex3f (hh2*(xs+step), (float)h[xstep][y]*zoomz - zoomz2, hh2*(ys));
         }
         else
         {
@@ -861,7 +797,6 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
     for (xs = x1; xs < x2;)
     {
       x = GETCOORD(xs);
-//      glBegin (GL_QUAD_STRIP);
       for (ys = y1; ys < y2;)
       {
         y = GETCOORD(ys);
@@ -877,7 +812,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
           if (hw [x] [ystep] < h1) h1 = hw [x] [ystep];
           if (hw [x] [ymstep] < h1) h1 = hw [x] [ymstep];
           if (hw [xstep] [ymstep] < h1) h1 = hw [xstep] [ymstep];
-          if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h1*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2*step))
+          if (gl->isSphereInFrustum (hh2*(xs), (float)h1*zoomz - zoomz2, hh2*((ys)), hh2*2*step))
           {
             if (!last)
             {
@@ -915,7 +850,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             if (cg > texlight) cg = texlight;
             if (cb > texlight) cb = texlight;
             glColor3f (cr, cg, cb);
-            glVertex3f (hh2*xs - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
+            glVertex3f (hh2*xs, h1*zoomz - zoomz2, hh2*(ys));
 
             d = watergreen * (h1 - h [xstep] [y]);
             if (d > 0.75) d = 0.75;
@@ -946,7 +881,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             if (cg > texlight) cg = texlight;
             if (cb > texlight) cb = texlight;
             glColor3f (cr, cg, cb);
-            glVertex3f (hh2*(xs+step) - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
+            glVertex3f (hh2*(xs+step), h1*zoomz - zoomz2, hh2*(ys));
           }
           else
           {
@@ -997,20 +932,11 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2 * step)
     size = hh2 / 2 * step;
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), midh, hh2*((0.5+ys)), size * 2))
     return;
+
   int a = selectColor (x, y);
   tex = texmap [a];
-  /*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
-    tex = texgrass;
-  else if (a == 2 || a == 7)
-    tex = texrocks;
-  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-    tex = texgrass; // not texwater!
-  else if (a == 11)
-    tex = texredstone;
-  else if (a == 13)
-    tex = texsand;*/
   if (tex == NULL)
   {
     texred = 1.0F;
@@ -1035,9 +961,9 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
     if (col [j] [0] >= texred) col [j] [0] = texred;
     if (col [j] [1] >= texgreen) col [j] [1] = texgreen;
     if (col [j] [2] >= texblue) col [j] [2] = texblue;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   glBegin (GL_QUADS);
   for (j = 0; j < 4; j ++)
@@ -1077,20 +1003,11 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2 * step)
     size = hh2 / 2 * step;
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), midh, hh2*((0.5+ys)), size * 2))
     return;
+
   int a = selectColor (x, y);
   tex = texmap [a];
-/*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
-    tex = texgrass;
-  else if (a == 2 || a == 7)
-    tex = texrocks;
-  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-    tex = texgrass; // not texwater!
-  else if (a == 11)
-    tex = texredstone;
-  else if (a == 13)
-    tex = texsand;*/
   if (tex == NULL)
   {
     texred = 1.0F;
@@ -1115,9 +1032,9 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
     if (col [j] [0] >= texred) col [j] [0] = texred;
     if (col [j] [1] >= texgreen) col [j] [1] = texgreen;
     if (col [j] [2] >= texblue) col [j] [2] = texblue;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   glBegin (GL_TRIANGLES);
   for (j = 0; j < 3; j ++)
@@ -1158,7 +1075,7 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2 * step)
     size = hh2 / 2 * step;
-  if (!gl->isSphereInFrustum (hh2*(0.5+x2) - 1.0, midh, hh2*(MAXX-(0.5+y2)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+x2), midh, hh2*((0.5+y2)), size * 2))
     return;
   if (tex1 [x] [y] == 0xFF)
   {
@@ -1195,9 +1112,9 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   for (j = 0; j < 4; j ++)
   {
@@ -1252,7 +1169,7 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2 * step)
     size = hh2 / 2 * step;
-  if (!gl->isSphereInFrustum (hh2*(0.5+x2) - 1.0, midh, hh2*(MAXX-(0.5+y2)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+x2), midh, hh2*((0.5+y2)), size * 2))
     return;
   if (tex1 [x] [y] == 0xFF)
   {
@@ -1289,9 +1206,9 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   for (j = 0; j < 3; j ++)
   {
@@ -1353,10 +1270,8 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2 * step)
     size = hh2 / 2 * step;
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), midh, hh2*((0.5+ys)), size * 2))
     return;
-//  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, h [x] [y] * zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
-//    return;
   if (tex1 [x] [y] == 0xFF)
   {
     texture = false;
@@ -1392,9 +1307,9 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   for (j = 0; j < 4; j ++)
   {
@@ -1425,9 +1340,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 {
   int i, j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [4] [4];
   float pos [4] [3];
@@ -1450,25 +1362,23 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   {
     int mx = GETCOORD(px [i]);
     int my = GETCOORD(py [i]);
-    if (hw [mx] [my] < h1/* && isWater (f [px [i]] [py [i]])*/)
+    if (hw [mx] [my] < h1)
     {
       h1 = hw [mx] [my];
-//      for (i2 = 0; i2 <= 3; i2 ++)
- //       li [i2] = li [i];
     }
   }
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float) h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), (float) h1*zoomz - zoomz2, hh2*((0.5+ys)), hh2 * step))
     return;
 
-  float quadglittering = 0;
   // glittering is obsolete, does not achieve the desired effect
+  float quadglittering = 0;
   float glitter [4] = { 1, 1, 1, 1 };
   if (quality >= 2)
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
-    float dz1 = fabs ((float) MAXX2 + camx - xs);
-    float dz2 = fabs ((float) MAXX2 + camx - xs - step);
+    float dz1 = fabs ((float) camx - xs);
+    float dz2 = fabs ((float) camx - xs - step);
     float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
     float dtheta1 = fabs (atan (dy / dz1) * 180.0 / PI - 90);
     float dtheta2 = fabs (atan (dy / dz2) * 180.0 / PI - 90);
@@ -1476,8 +1386,8 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 //    if (lz1 <= 5 || lz2 <= 5)
     {
       float divdy = 1.0F / dy * 200;
-      float dx1 = -((float) MAXX2 - camz - ys);
-      float dx2 = -((float) MAXX2 - camz - ys - step);
+      float dx1 = ((float) camz - ys);
+      float dx2 = ((float) camz - ys - step);
 //      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
       float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
       float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
@@ -1526,21 +1436,15 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
           if (test > quadglittering) quadglittering = test;
         }
       }
-/*      li [0] *= glitter [0];
-      li [1] *= glitter [1];
-      li [2] *= glitter [2];
-      li [3] *= glitter [3];*/
     }
   }
 
   texture = true;
-//  glActiveTextureARB(100);
   gl->enableTextures (texwater->textureID);
-//  texlight = texwater->texlight;
   texzoom = 0.5;
   float watergreen = 0.00025;
   if (day) watergreen = 0.0004;
-  float fac2 = 0.001 * sunlight/* * texlight*/;
+  float fac2 = 0.001 * sunlight;
   for (j = 0; j < 4; j ++)
   {
     int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
@@ -1565,16 +1469,13 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
       col [j] [1] = (0.7 - d/2) * fac;
       col [j] [2] = (0.7 + d / 2) * fac;
     }
-//    col [j] [3] = (float) abs (h1 - h [px [j]] [py [j]]) / 200 + 0.5;
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] <= 0.1) col [j] [1] = 0.1;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-//    if (col [j] [3] >= 1.0) col [j] [3] = 1.0;
-//    col [j] [3] = 0.5;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h1*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
   for (j = 0; j < 4; j ++)
   {
@@ -1589,16 +1490,12 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   {
     if (texture)
     {
-//            glMultiTexCoord2fARB(100, tf [j] [0], tf [j] [1]);
-//            glMultiTexCoord2fARB(101, tf [j] [0], tf [j] [1]);
       glTexCoord2fv (tf [j]);
     }
     glColor4fv (col [j]);
     glVertex3fv (pos [j]);
   }
   glEnd();
-
-//  glDisable (GL_DEPTH_TEST);
 
   if (quality >= 2 && quadglittering > 1.2)
   {
@@ -1629,7 +1526,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable (GL_ALPHA_TEST);
     glDisable (GL_BLEND);
-//  glEnable (GL_DEPTH_TEST);
   }
 
   if (quality >= 2 && quadglittering > 1.02)
@@ -1640,8 +1536,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.02);
     glDisable (GL_TEXTURE_2D);
-//    gl->enableTextures (texglitter1->textureID);
-//    gl->enableLinearTexture (texglitter1->textureID);
     glBegin (GL_QUADS);
     for (j = 0; j < 4; j ++)
     {
@@ -1656,7 +1550,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable (GL_ALPHA_TEST);
     glDisable (GL_BLEND);
-//  glEnable (GL_DEPTH_TEST);
   }
 
 }
@@ -1666,9 +1559,6 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
 {
   int j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1683,7 +1573,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2*step))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), (float)h[x][y]*zoomz - zoomz2, hh2*((0.5+ys)), hh2*2*step))
     return;
 
   if (tex1 [x] [y] == 0xFF)
@@ -1717,9 +1607,9 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
 
   for (j = 0; j < 4; j ++)
@@ -1784,9 +1674,6 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
 {
   int j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1801,7 +1688,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2*step))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs), (float)h[x][y]*zoomz - zoomz2, hh2*((0.5+ys)), hh2*2*step))
     return;
 
   if (tex1 [x] [y] == 0xFF)
@@ -1835,9 +1722,9 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [0] = hh2*px[j];
     pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+    pos [j] [2] = hh2*(py[j]);
   }
 
   for (j = 0; j < 4; j ++)
@@ -1897,41 +1784,11 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   glEnd();
 }
 
-//bool hb [100] [100];
-//float hdeg [360];
-
-// in construction, enable some lines at #1
-/*void GLLandscape::viewculling ()
-{
-  memset (hb, 0, sizeof (bool) * 10000);
-  for (int s = 1; s < 50; s ++)
-  {
-    for (int i = -s; i < s; i ++)
-    {
-      int x, y, dx, dy;
-      x = 50 + i; y = 50 + s;
-      dx = x - 50; dy = y - 50;
-      float phi;
-      if (dx != 0) phi = atan ((float) dy / dx);
-      else phi = PI;
-      if (dx < 0) phi += 2.0F * PI;
-      float dist = sqrt (dx * dx + dy * dy);
-      float h = getHeight (camx + dx, camy + y);
-      hb [y] [x] = true;
-//      hb [50 - s] [50 + i]
-//      hb [50 + i] [50 + s]
-//      hb [50 - i] [50 + s]
-    }
-  }
-}*/
-    
 void GLLandscape::draw (int phi, int gamma)
 {
   char buf [STDSIZE];
   int i, i2, x, y;
   int xs, ys;
-
-//  viewculling ();
 
   float fac;
 
@@ -1973,75 +1830,30 @@ void GLLandscape::draw (int phi, int gamma)
   glPushMatrix ();
 
   float z2 = ZOOM; // that's wrong if one would change MAXX
-//  float z2 = ZOOM;
   glScalef(z2, ZOOM, z2);
-//  glScalef(1, 1, 1);
 
   gl->extractFrustum ();
     
   float pseudoview = getView ();
   float radius = pseudoview / cosi [45];
 
-/*  int w = (int) phi;
-  float qx [4], qy [4];
-  int addw [4] = { 45, 90, 45, 0 };
-
-  int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000;
-  if (gamma >= 90 && gamma < 270)
-  {
-    for (i = 0; i < 4; i ++)
-    {
-      if (w < 0) w += 360;
-      if (w >= 360) w -= 360;
-      qx [i] = radius * cosi [w] + camx + MAXX2;
-      qy [i] = radius * sine [w] + MAXX2 - camz;
-      w += addw [i];
-    }
-  }
-  else
-  {
-    w += 180;
-    for (i = 0; i < 4; i ++)
-    {
-      if (w >= 360) w -= 360;
-      qx [i] = radius * cosi [w] + camx + MAXX2;
-      qy [i] = radius * sine [w] + MAXX2 - camz;
-      w += addw [i];
-    }
-  }
-  for (i = 0; i < 4; i ++)
-  {
-    if ((int) qx [i] < minx) minx = (int) qx [i];
-    if ((int) qx [i] > maxx) maxx = (int) qx [i];
-    if ((int) qy [i] < miny) miny = (int) qy [i];
-    if ((int) qy [i] > maxy) maxy = (int) qy [i];
-  }
-  minx -= 20; maxx += 20; miny -= 20; maxy += 20;
-*/
-
-  int minx = (int) (camx + MAXX2 - radius);
-  int miny = (int) (MAXX2 - camz - radius);
+  int minx = (int) (camx - radius);
+  int miny = (int) (camz - radius);
   int maxx = (int) (minx + radius * 2);
   int maxy = (int) (miny + radius * 2);
 
-/*  if (minx < 0) minx = 0;
-  if (maxx >= MAXX) maxx = MAXX;
-  if (miny < 0) miny = 0;
-  if (maxy >= MAXX) maxy = MAXX;*/
-
   space->z1->x = minx - MAXX2;
   space->z1->y = -MAXX2;
-  space->z1->z = MAXX2 - maxy;
+  space->z1->z = maxy - MAXX2;
   space->z2->x = maxx - MAXX2;
   space->z2->y = MAXX2;
-  space->z2->z = MAXX2 - miny;
+  space->z2->z = miny - MAXX2;
 
   if (camera == 50)
   {
     minx = 0; maxx = MAXX;
     miny = 0; maxy = MAXX;
   }
-//    printf ("\nx=%d, y=%d", minx, miny); fflush (stdout);
 
   int parts = (int) (view / 13);
   parts *= 2;
@@ -2063,23 +1875,6 @@ void GLLandscape::draw (int phi, int gamma)
   // This is currently not completely correct (needs two comparisons of inner fields), but
   // it already works very well, so I negligate the second comparison, as it would double the code
 
-  // precalculate min and max values in the grid parts
-/*  for (i = 0; i < parts; i ++)
-    for (i2 = 0; i2 < parts; i2 ++)
-    {
-      int ax = getCoord (minx + (int) (dx * (float) i2));
-      int ay = getCoord (miny + (int) (dy * (float) i));
-      int zx = getCoord (minx + (int) (dx * (float) (i2 + 1)));
-      int zy = getCoord (miny + (int) (dy * (float) (i + 1)));
-      vmin [i] [i2] = hw [ax] [ay];
-      if (hw [ax] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [ax] [zy];
-      if (hw [zx] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [zx] [zy];
-      if (hw [zx] [ay] < vmin [i] [i2]) vmin [i] [i2] = hw [zx] [ay];
-      vmax [i] [i2] = hw [ax] [ay];
-      if (hw [ax] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [ax] [zy];
-      if (hw [zx] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [zy];
-      if (hw [zx] [ay] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [ay];
-    }*/
   for (i = 0; i < parts; i ++)
     for (i2 = 0; i2 < parts; i2 ++)
     {
@@ -2115,14 +1910,14 @@ void GLLandscape::draw (int phi, int gamma)
       int lastx = 0;
       if (i2 < cx) lastx = -1;
       if (i2 > cx) lastx = 1;
-/*      if (i2 == cx - 1 && i2 > parts - i - 1) lastx = 0;
-      if (i2 == cx + 1 && i2 < i - 1) lastx = 0;*/
-      int vminref = vh [i - lasty] [i2 - lastx];
+//      if (i2 == cx - 1 && i2 > parts - i - 1) lastx = 0;
+//      if (i2 == cx + 1 && i2 < i - 1) lastx = 0;
+      int vminref = (int) vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
       float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
       float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-      int dh1 = vminref - ch;
+      int dh1 = vminref - (int) ch;
       int dhp;
       if (dist1 > 1E-4)
         dhp = (int) (dist2 * dh1 / dist1);
@@ -2147,12 +1942,12 @@ void GLLandscape::draw (int phi, int gamma)
         }
         if (secondtest)
         {
-          vminref = vh [i - lasty] [i2 - lastx];
+          vminref = (int) vh [i - lasty] [i2 - lastx];
           deltax = cx - i2 + lastx;
           deltay = cy - i + lasty;
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-          dh1 = vminref - ch;
+          dh1 = vminref - (int) ch;
           dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
@@ -2178,12 +1973,12 @@ void GLLandscape::draw (int phi, int gamma)
       if (i2 > cx) lastx = 1;
       if (i2 == cx - 1 && i2 > i) lastx = 0;
       if (i2 == cx + 1 && i2 < parts - 1) lastx = 0;
-      int vminref = vh [i - lasty] [i2 - lastx];
+      int vminref = (int) vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
       float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
       float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-      int dh1 = vminref - ch;
+      int dh1 = vminref - (int) ch;
       int dhp;
       if (dist1 > 1E-4)
         dhp = (int) (dist2 * dh1 / dist1);
@@ -2208,12 +2003,12 @@ void GLLandscape::draw (int phi, int gamma)
         }
         if (secondtest)
         {
-          vminref = vh [i - lasty] [i2 - lastx];
+          vminref = (int) vh [i - lasty] [i2 - lastx];
           deltax = cx - i2 + lastx;
           deltay = cy - i + lasty;
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-          dh1 = vminref - ch;
+          dh1 = vminref - (int) ch;
           dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
@@ -2239,12 +2034,12 @@ void GLLandscape::draw (int phi, int gamma)
       if (i > cy) lasty = 1;
       if (i == cy - 1 && i > parts - i2) lasty = 0;
       if (i == cy + 1 && i < i2) lasty = 0;
-      int vminref = vh [i - lasty] [i2 - lastx];
+      int vminref = (int) vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
       float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
       float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-      int dh1 = vminref - ch;
+      int dh1 = vminref - (int) ch;
       int dhp;
       if (dist1 > 1E-4)
         dhp = (int) (dist2 * dh1 / dist1);
@@ -2269,12 +2064,12 @@ void GLLandscape::draw (int phi, int gamma)
         }
         if (secondtest)
         {
-          vminref = vh [i - lasty] [i2 - lastx];
+          vminref = (int) vh [i - lasty] [i2 - lastx];
           deltax = cx - i2 + lastx;
           deltay = cy - i + lasty;
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-          dh1 = vminref - ch;
+          dh1 = vminref - (int) ch;
           dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
@@ -2300,12 +2095,12 @@ void GLLandscape::draw (int phi, int gamma)
       if (i > cy) lasty = 1;
       if (i == cy - 1 && i > i2 - 1) lasty = 0;
       if (i == cy + 1 && i < parts - i2 - 1) lasty = 0;
-      int vminref = vh [i - lasty] [i2 - lastx];
+      int vminref = (int) vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
       float dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
       float dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-      int dh1 = vminref - ch;
+      int dh1 = vminref - (int) ch;
       int dhp;
       if (dist1 > 1E-4)
         dhp = (int) (dist2 * dh1 / dist1);
@@ -2330,12 +2125,12 @@ void GLLandscape::draw (int phi, int gamma)
         }
         if (secondtest)
         {
-          vminref = vh [i - lasty] [i2 - lastx];
+          vminref = (int) vh [i - lasty] [i2 - lastx];
           deltax = cx - i2 + lastx;
           deltay = cy - i + lasty;
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
-          dh1 = vminref - ch;
+          dh1 = vminref - (int) ch;
           dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
@@ -2353,265 +2148,21 @@ void GLLandscape::draw (int phi, int gamma)
       { vis [i] [i2] = !set; count ++; }
     }
 //  printf ("c=%d ", count);
-//  memset (vis, 1, PARTS * PARTS * sizeof (bool));
-
-/*  float fx, fy;
-  for (i = 0; i < parts; i ++)
-    for (i2 = 0; i2 < parts; i2 ++)
-    {
-      fx = (float) minx + (float) (dx * (0.5 + (float) i2));
-      fy = (float) miny + (float) (dy * (0.5 + (float) i));
-      float d = dist (camx + MAXX2 - fx, (float) MAXX2 - camz - fy);
-      detail [i] [i2] = (int) ((d - dx/2) / 8.0);
-      if (detail [i] [i2] < 0) detail [i] [i2] = 0;
-    }*/
-
-/*    float zoomz2 = 32768.0 * zoomz;
-    int step = 1;
-    for (i = 0; i < 4; i ++)
-      for (i2 = 0; i2 < 4; i2 ++)
-      {
-    step = detail [i] [i2];
-    for (x = minx + (int) (dx * (float) i2); x < minx + (int) (dx * (float) (i2 + 1)); x += step)
-    {
-      glBegin (GL_QUAD_STRIP);
-      for (y = miny + (int) (dy * (float) i); y <= miny + (int) (dy * (float) (i + 1)) + step; y += step)
-      {
-        int a;
-        a = selectColor (x, y);
-        glColor3f (mat [a] [0] * nl [x] [y], mat [a] [1] * nl [x] [y], mat [a] [2] * nl [x] [y]);
-        glVertex3f (2*hh*x - 1.0, (float)h[x][y]*zoomz - zoomz2, 2*hh*(MAXX-y) - 1.0);
-        a = selectColor (x+step, y);
-        glColor3f (mat [a] [0] * nl [x+step] [y], mat [a] [1] * nl [x+step] [y], mat [a] [2] * nl [x+step] [y]);
-        glVertex3f (2*hh*(x+step) - 1.0, (float)h[x+step][y]*zoomz - zoomz2, 2*hh*(MAXX-y) - 1.0);
-      }
-      glEnd();
-    }
-  }*/
-
-//  float cr, cg, cb;
-//  int step = 1;
 
   int zz1 = 0, zz2 = 0, zz = 0;
-
-/*  if (quality == 0)
-  {
-    minx -= (minx & 1); // modulo 2
-    miny -= (miny & 1);
-  }*/
-
-/*  if (camera == 50)
-  {
-    if (quality == 0)
-      step = 8;
-    else if (quality == 1)
-      step = 4;
-    else
-      step = 2;
-  }*/
-
-/*  unsigned char done [400] [400];
-  for (x = 0; x < 400; x ++)
-  memset (&done [x], 0, 400*sizeof (unsigned char));*/
 
   if (quality <= 0 || camera == 50)
   {
 
     drawQuadStrip (minx, miny, maxx, maxy);
 
-//gl->shadeFlat ();
-/*
-// Quadtrees
-    for (x = minx; x < maxx;)
-    {
-//      y = miny + 20;
-      zz = 0;
-      for (y = miny; y < maxy;)
-      {
-    if (!done [x-minx] [y-miny])
-//        if (isCubeInFrustum (hh2*(x) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(y)) - 1.0, hh2*2))
-        {
-        glBegin (GL_QUADS);
-      int mystep = rect[x][y];
-      int rx = x - (x % mystep);
-      int ry = y - (y % mystep);
-        zz1 ++;
-        cr = r [rx] [ry];
-        cg = g [rx] [ry];
-        cb = b [rx] [ry];
-        float fac = 0.001 * nl [rx] [ry] * sunlight / 256.0;
-        cr = (float) cr * fac;
-        cg = (float) cg * fac;
-        cb = (float) cb * fac;
-        if (cr >= 1.0) cr = 1.0;
-        if (cg >= 1.0) cg = 1.0;
-        if (cb >= 1.0) cb = 1.0;
-//        printf ("r=%f, g=%f, b=%f\n", cr, cg, cb); fflush (stdout);
-        glColor3f (cr, cg, cb);
-        glVertex3f (hh2*rx - 1.0, (float)h[rx][ry]*zoomz - zoomz2, hh2*(MAXX-ry) - 1.0);
-        cr = r [rx+mystep] [ry];
-        cg = g [rx+mystep] [ry];
-        cb = b [rx+mystep] [ry];
-        fac = 0.001 * nl [rx+mystep] [ry] * sunlight / 256.0;
-        cr = (float) cr * fac;
-        cg = (float) cg * fac;
-        cb = (float) cb * fac;
-        if (cr >= 1.0) cr = 1.0;
-        if (cg >= 1.0) cg = 1.0;
-        if (cb >= 1.0) cb = 1.0;
-        glColor3f (cr, cg, cb);
-        glVertex3f (hh2*(rx+mystep) - 1.0, (float)h[rx+mystep][ry]*zoomz - zoomz2, hh2*(MAXX-ry) - 1.0);
-        cr = r [rx+mystep] [ry+mystep];
-        cg = g [rx+mystep] [ry+mystep];
-        cb = b [rx+mystep] [ry+mystep];
-        fac = 0.001 * nl [rx+mystep] [ry+mystep] * sunlight / 256.0;
-        cr = (float) cr * fac;
-        cg = (float) cg * fac;
-        cb = (float) cb * fac;
-        if (cr >= 1.0) cr = 1.0;
-        if (cg >= 1.0) cg = 1.0;
-        if (cb >= 1.0) cb = 1.0;
-        glColor3f (cr, cg, cb);
-        glVertex3f (hh2*(rx+mystep) - 1.0, (float)h[rx+mystep][ry+mystep]*zoomz - zoomz2, hh2*(MAXX-(ry+mystep)) - 1.0);
-        cr = r [rx] [ry+mystep];
-        cg = g [rx] [ry+mystep];
-        cb = b [rx] [ry+mystep];
-        fac = 0.001 * nl [rx] [ry+mystep] * sunlight / 256.0;
-        cr = (float) cr * fac;
-        cg = (float) cg * fac;
-        cb = (float) cb * fac;
-        if (cr >= 1.0) cr = 1.0;
-        if (cg >= 1.0) cg = 1.0;
-        if (cb >= 1.0) cb = 1.0;
-        glColor3f (cr, cg, cb);
-        glVertex3f (hh2*(rx) - 1.0, (float)h[rx][ry+mystep]*zoomz - zoomz2, hh2*(MAXX-(ry+mystep)) - 1.0);
-        glEnd();
-    for (i=(rx-minx>0?rx-minx:0);i<rx-minx+mystep;i++)
-        for (i2=(ry-miny>0?ry-miny:0);i2<ry-miny+mystep;i2++)
-      done [i] [i2] = 1;
-        }
-        else zz2 ++;
-        y += step;
-        zz ++;
-      }
-      x += step;
-    }*/
-
-
-/*
-// ROAM
-    glDisable (GL_CULL_FACE);
-    int j, k;
-
-    int trix [3], triy [3];
-    float vert [3] [3];
-
-    visibility ++;
-    if (visibility == 0xFFFF)
-      visibility = 1; // visibility auf 0 setzen !!!
-
-    for (x = minx; x < maxx;)
-    {
-      zz = 0;
-      for (y = miny; y < maxy;)
-      {
-        if (trimatrix->t [y] [x] != NULL)
-        {
-          for (j = 0; j < 8; j ++)
-            if (trimatrix->t [y] [x] [j] != NULL)
-              if (!trimatrix->t [y] [x] [j]->visibility != visibility)
-              {
-                trimatrix->t [y] [x] [j]->visibility = visibility;
-                trix[0]=trimatrix->t [y] [x] [j]->xh;
-                triy[0]=trimatrix->t [y] [x] [j]->yh;
-                trix[1]=trimatrix->t [y] [x] [j]->x1;
-                triy[1]=trimatrix->t [y] [x] [j]->y1;
-                trix[2]=trimatrix->t [y] [x] [j]->x2;
-                triy[2]=trimatrix->t [y] [x] [j]->y2;
-                for (k = 0; k < 3; k ++)
-                {
-                  vert[k][0]=hh2*trix[k] - 1.0;
-                  vert[k][1]=(float)h[trix[k]][triy[k]]*zoomz - zoomz2;
-                  vert[k][2]=hh2*(MAXX-triy[k]) - 1.0;
-                }
-
-                if (isPointInFrustum (vert[0][0],vert[0][1],vert[0][2]) ||
-                    isPointInFrustum (vert[1][0],vert[1][1],vert[1][2]) ||
-                    isPointInFrustum (vert[2][0],vert[2][1],vert[2][2]))
-                {
-                  glBegin (GL_TRIANGLES);
-                  zz1 ++;
-                  for (k = 0; k < 3; k ++)
-                  {
-                    cr = r [trix[k]] [triy[k]];
-                    cg = g [trix[k]] [triy[k]];
-                    cb = b [trix[k]] [triy[k]];
-                    float fac = 0.001 * nl [trix[k]] [triy[k]] * sunlight / 256.0;
-                    cr = (float) cr * fac;
-                    cg = (float) cg * fac;
-                    cb = (float) cb * fac;
-                    if (cr >= 1.0) cr = 1.0;
-                    if (cg >= 1.0) cg = 1.0;
-                    if (cb >= 1.0) cb = 1.0;
-                    glColor3f (cr, cg, cb);
-                    glVertex3f (vert[k][0],vert[k][1],vert[k][2]);
-                  }
-                  zz ++;
-        glEnd();
-                }
-                else
-                  zz2 ++;
-              }
-        }
-        y += step;
-      }
-      x += step;
-    }
-*/
-
   }
   else
   {
-//    gl->enableTextures (texgrass);
-/*    if (quality >= 5)
-    {
-      gl->enableLinearTexture (texgrass->textureID);
-      gl->enableLinearTexture (texrocks->textureID);
-      gl->enableLinearTexture (texwater->textureID);
-    }
-    else
-    {
-      gl->disableLinearTexture (texgrass->textureID);
-      gl->disableLinearTexture (texrocks->textureID);
-      gl->disableLinearTexture (texwater->textureID);
-    }*/
-//    glDisable (GL_DITHER);
-
 
     if (mode == 0)
     {
 
-//      if (quality == 1 || quality == 2) step = 2;
-//      else step = 1;
-/*int j;
-
-    for (x = minx; x < maxx; x += step)
-    {
-      for (y = miny; y < maxy; y += step)
-      {
-        if (trimatrix->t [y] [x] != NULL)
-        for (j = 0; j < 8; j ++)
-          if (trimatrix->t [y] [x] [j] != NULL)
-          {
-            trimatrix->t [y] [x] [j]->setDirty ();
-          }
-      }
-    }*/
-
-
-//    int stepmask = 0xFFFF - step + 1;
-
-//    glDisable (GL_CULL_FACE); // Why ???
       for (i = 0; i < parts; i ++)
         for (i2 = 0; i2 < parts; i2 ++)
         if (vis [i] [i2])
@@ -2640,7 +2191,7 @@ void GLLandscape::draw (int phi, int gamma)
           if (detail [i] [i2] > fardetail)
           {
             zy += fargridstep;
-            if (gl->isSphereInFrustum (hh2*(ax+zx)/2 - 1.0, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)]*zoomz - zoomz2, hh2*((float)MAXX-(ay+zy)/2) - 1.0, hh2*(zx-ax)*1.5))
+            if (gl->isSphereInFrustum (hh2*(ax+zx)/2, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)]*zoomz - zoomz2, hh2*((float)(ay+zy)/2), hh2*(zx-ax)*1.5))
               drawQuadStrip (ax, ay, zx, zy);
           }
           else
@@ -2774,19 +2325,11 @@ void GLLandscape::draw (int phi, int gamma)
               {
                 y = GETCOORD(ys);
                 zz1 ++;
-//                int a;
-//                a = selectColor (x, y);
-                // construction #1
-/*                int testx = (int) GETCOORD((minx + maxx) / 2) - x + 100;
-                int testz = (int) GETCOORD((miny + maxy) / 2) - y + 100;
-                testx /= 2; testz /= 2;
-                if (hb [testz] [testx])*/
 				        int x2 = GETCOORD(xs+gridstep);
 				        int y2 = GETCOORD(ys+gridstep);
 				        if (h [x] [y] < hw [x] [y] && h [x2] [y] < hw [x2] [y] && h [x] [y2] < hw [x] [y2] && h [x2] [y2] < hw [x2] [y2])
 			              ; // water
                 else
-//				if (a != 6 && a != 9)
                 {
                   if (drawrule [x] [y] == 0)
                     drawTexturedQuad (xs, ys);
@@ -2799,10 +2342,8 @@ void GLLandscape::draw (int phi, int gamma)
                 ys += gridstep;
                 zz ++;
               }
-//glEnd ();
               xs += gridstep;
             }
-//    gl->enableAlphaBlending ();
             for (xs = ax; xs < zx;)
             {
               x = GETCOORD(xs);
@@ -2812,173 +2353,23 @@ void GLLandscape::draw (int phi, int gamma)
                 zz1 ++;
                 int xstep = GETCOORD(xs + gridstep);
                 int ystep = GETCOORD(ys + gridstep);
-        //        int a = 0;
                 if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]))
-        //          a = selectColor (x, y);
-        //        if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
                 {
                   drawWaterTexturedQuad (xs, ys);
                 }
                 ys += gridstep;
                 zz ++;
               }
-        //glEnd ();
               xs += gridstep;
             }
-//  gl->disableAlphaBlending ();
           }
 
         } // for i2
 
     } // if mode
 
-/*
-    if (mode == 1) // ROAM mode, currently not used
-    {
-
-      int j, k;
-
-      int trix [3], triy [3];
-      float vert [3] [3];
-
-//  glEnable (GL_NORMALIZE);
-//  glDisable (GL_CULL_FACE);
-
-      visibility ++;
-      if (visibility == 0xFFFF)
-        visibility = 1; // visibility auf 0 setzen !!!
-
-//    int tx, ty;
-      float tfx, tfy; //, tfinc;
-      float texlight = 1.0;
-      bool texture = false;
-      float col [4] [3];
-      float pos [4] [3];
-      float tf [4] [2];
-      for (i = 0; i < PARTS; i ++)
-        for (i2 = 0; i2 < PARTS; i2 ++)
-        {
-          for (x = minx + (int) (dx * (float) i2); x < minx + (int) (dx * (float) (i2 + 1));)
-          {
-            for (y = miny + (int) (dy * (float) i); y <= miny + (int) (dy * (float) (i + 1)) + step;)
-            {
-              if (trimatrix->t [y] [x] != NULL)
-              {
-                for (j = 0; j < 8; j ++)
-                  if (trimatrix->t [y] [x] [j] != NULL)
-                    if (!trimatrix->t [y] [x] [j]->visibility != visibility)
-                    {
-                      trimatrix->t [y] [x] [j]->visibility = visibility;
-                      trix[0]=trimatrix->t [y] [x] [j]->xh;
-                      triy[0]=trimatrix->t [y] [x] [j]->yh;
-                      trix[1]=trimatrix->t [y] [x] [j]->x1;
-                      triy[1]=trimatrix->t [y] [x] [j]->y1;
-                      trix[2]=trimatrix->t [y] [x] [j]->x2;
-                      triy[2]=trimatrix->t [y] [x] [j]->y2;
-                      for (k = 0; k < 3; k ++)
-                      {
-                        vert[k][0]=hh2*trix[k] - 1.0;
-                        vert[k][1]=(float)h[trix[k]][triy[k]]*zoomz - zoomz2;
-                        vert[k][2]=hh2*(MAXX-triy[k]) - 1.0;
-                      }
-
-                      if (gl->isPointInFrustum (vert[0][0],vert[0][1],vert[0][2]) ||
-                          gl->isPointInFrustum (vert[1][0],vert[1][1],vert[1][2]) ||
-                          gl->isPointInFrustum (vert[2][0],vert[2][1],vert[2][2]))
-                      {
-  //                      trimatrix->t [y] [x] [j]->setClean ();
-  //      glBegin (GL_TRIANGLES);
-                        int mx, my;
-                        mx = trimatrix->t [y] [x] [j]->xh; my = trimatrix->t [y] [x] [j]->yh;
-                        zz1 ++;
-                        int a;
-                        a = selectColor (mx, my);
-                        if (detail [i] [i2] <= quality + 1)
-                        {
-                          texture = true;
-                          texlight = 1.0;
-                          if (a == 0 || a == 1)
-                            gl->enableTextures (texgrass->textureID);
-                          else if (a == 2 || a == 7)
-                            gl->enableTextures (texrocks->textureID);
-                          else if (a == 4 || a == 5 || a == 6)
-                          {
-                            int a2 = selectColor (mx, my);
-                            if (a2 < 4 || a2 > 6) gl->enableTextures (texgrass->textureID);
-                            else
-                            {
-                              gl->enableTextures (texwater->textureID);
-  //  else glDisable (GL_TEXTURE_2D);
-                            }
-                          }
-                          else if (a == 11)
-                            gl->enableTextures (texredstone->textureID);
-                          else
-                            glDisable (GL_TEXTURE_2D);
-                        }
-                        else
-                        {
-                          texlight = 0.9;
-                          texture = false;
-                          glDisable (GL_TEXTURE_2D);
-                        }
-                      
-                        for (k = 0; k < 3; k ++)
-                        {
-                          if (a > 1)
-                          {
-                            tfx = 0.5 * trix[k]; tfy = 0.5 * triy[k];
-                          }
-                          else
-                          {
-                            tfx = 0.25 * trix[k]; tfy = 0.25 * triy[k];
-                          }
-                          float fac2 = 0.001 * sunlight / 256.0 * texlight;
-                          col [k] [0] = r [trix[k]] [triy[k]];
-                          col [k] [1] = g [trix[k]] [triy[k]];
-                          col [k] [2] = b [trix[k]] [triy[k]];
-                          fac = fac2 * (nl [trix[k]] [triy[k]] + (short) dl [trix[k]] [triy[k]]);
-                          col [k] [0] *= fac;
-                          col [k] [1] *= fac;
-                          col [k] [2] *= fac;
-                          if (col [k] [0] >= 1.0) col [k] [0] = 1.0;
-                          if (col [k] [1] >= 1.0) col [k] [1] = 1.0;
-                          if (col [k] [2] >= 1.0) col [k] [2] = 1.0;
-                          pos [k] [0] = hh2*trix[k] - 1.0;
-                          pos [k] [1] = (float)h[trix[k]][triy[k]]*zoomz - zoomz2;
-                          pos [k] [2] = hh2*(MAXX-triy[k]) - 1.0;
-                          tf [k] [0] = tfx;
-                          tf [k] [1] = tfy;
-                        }
-                    
-                        glBegin (GL_TRIANGLES);
-                        for (int j = 0; j < 3; j ++)
-                        {
-                          if (texture)
-                            glTexCoord2fv (tf [j]);
-                          glColor3fv (col [j]);
-                          glVertex3fv (pos [j]);
-                        }
-                        glEnd();
-
-                      }
-                      else
-                        zz2 ++;
-                    } // if infrustum
-                zz ++;
-              } // if trimatrix
-              y += step;
-            }
-  //glEnd ();
-            x += step;
-          }
-        }
-
-    } // end of ROAM
-*/
   }
 
-//  if (quality == 2) step = 1;
   int treestep = 2;
   if (quality >= 2) treestep = 1;
 
@@ -2986,7 +2377,6 @@ void GLLandscape::draw (int phi, int gamma)
   if (quality >= 1)
   {
     glPushMatrix ();
-//  glRotatef (camphi, 0, 1, 0);
     glDisable (GL_CULL_FACE);
     if (quality >= 6)
     {
@@ -2999,16 +2389,6 @@ void GLLandscape::draw (int phi, int gamma)
       glEnable (GL_ALPHA_TEST);
       glAlphaFunc (GL_GEQUAL, 0.5);
     }
-/*      if (quality >= 5)
-      {
-        gl->enableLinearTexture (textree->textureID);
-        gl->enableLinearTexture (textree2->textureID);
-      }
-      else
-      {
-        gl->disableLinearTexture (textree->textureID);
-        gl->disableLinearTexture (textree2->textureID);
-      }*/
     gl->enableTextures (textree->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (textree2->textureID);
@@ -3026,7 +2406,7 @@ void GLLandscape::draw (int phi, int gamma)
     else if (quality == 4) mydep = 3200;
     else if (quality == 5) mydep = 3800;
     if (mydep > view * view) mydep = view * view;
-    int cutdep = 1500;
+    int cutdep = 1000;
 
     int lineartree = -1;
     if (quality >= 3) lineartree = 0;
@@ -3077,26 +2457,24 @@ void GLLandscape::draw (int phi, int gamma)
         int ay = miny + (int) (dy * (float) i);
         int ex = minx + (int) (dx * (float) (i2 + 1));
         int ey = miny + (int) (dy * (float) (i + 1)) + treestep;
+        float dep;
         if (treestep == 2)
         {
           ax -= ax & 1; ay -= ay & 1;
         }
         for (xs = ax; xs < ex;)
-//      for (x = maxx; x >= minx;)
         {
           x = GETCOORD(xs);
           zz = 0;
           for (ys = ay; ys <= ey;)
-//        for (y = maxy; y >= miny;)
           {
             y = GETCOORD(ys);
-//            if (detail [i] [i2] <= fardetail + 1)
-            float tdx = camx + MAXX2 - xs;
-            float tdy = MAXX2 - camz - ys;
-            float dep = tdx * tdx + tdy * tdy;
+            float tdx = camx - xs;
+            float tdy = camz - ys;
+            dep = tdx * tdx + tdy * tdy;
             if (dep < mydep)
               if (isWoods (f [x] [y]) || isType (f [x] [y], REDTREE0) || isType (f [x] [y], CACTUS0))
-                if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
+                if (gl->isSphereInFrustum (hh2*(xs), (float)h[x][y]*zoomz - zoomz2, hh2*((ys)), hh2*2))
                 {
                   float cg = g [x] [y];
                   fac = 0.0007 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;
@@ -3177,6 +2555,7 @@ void GLLandscape::draw (int phi, int gamma)
                     texturetree2 = textreeu3->textureID;
                     if (dep > cutdep) texturetree2 = -1;
                     drawTree (xs + x41, ys + y41, 0.002, 0.28, phi);
+
                     drawTree (xs + x42, ys + y42, 0.0023, 0.34, phi);
                     drawTree (xs + x43, ys + y43, 0.0025, 0.37, phi);
                     drawTree (xs + x44, ys + y44, 0.0018, 0.26, phi);
@@ -3277,12 +2656,7 @@ void GLLandscape::draw (int phi, int gamma)
 
   glDisable (GL_TEXTURE_2D);
 
-//    } // mode
-
-//    }
-    
   glPopMatrix ();
-//    printf ("\n%d, %d + %d", zz, zz1, zz2);
 
   gridstep = neargridstep; // set to finer grid for ground collision detection
 }
@@ -3509,7 +2883,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
     else if (type == LANDSCAPE_CANYON_TRENCH)
     {
       genCanyonSurface (10);
-      genTrench (20, 3800);
+      genTrench (22, 3800);
     }
     else if (type == LANDSCAPE_DESERT)
     {
@@ -3545,13 +2919,10 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   
   }
 #endif*/
+
   lv [0] = 0.0; lv [1] = 1.0; lv [2] = 1.0;
   mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
   mat [1] [0] = 0.3; mat [1] [1] = 0.55; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
-/*  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
-/*  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
   mat [2] [0] = 0.7; mat [2] [1] = 0.7; mat [2] [2] = 0.7; mat [2] [3] = 1.0;
   mat [3] [0] = 1.0; mat [3] [1] = 1.0; mat [3] [2] = 1.0; mat [3] [3] = 1.0;
   mat [4] [0] = 0.25; mat [4] [1] = 1.0; mat [4] [2] = 0.25; mat [4] [3] = 1.0;
@@ -3566,35 +2937,22 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
   mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
   mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
-/*  for (i = 0; i < 7; i ++)
-    for (i2 = 0; i2 < 4; i2 ++)
-      mata [i] [i2] = mat [i] [i2] / 2.0;*/
+
   texmap [0] = texmap [1] = texmap [10] = texmap [12] = texmap [13] = texgrass;
   texmap [2] = texmap [7] = texrocks;
   texmap [4] = texmap [5] = texmap [6] = texmap [8] = texmap [9] = texwater;
   texmap [11] = texredstone;
   texmap [13] = texsand;
   texmap [3] = texmap [14] = texmap [15] = NULL;
-/*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
-    tex = texgrass;
-  else if (a == 2 || a == 7)
-    tex = texrocks;
-  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-    tex = texgrass; // not texwater!
-  else if (a == 11)
-    tex = texredstone;
-  else if (a == 13)
-    tex = texsand;*/
+
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
       if (hw [i] [i2] == 0)
       {
         hw [i] [i2] = h [i] [i2];
       }
+
   precalculate ();
-//  printf ("h: %d %d %d %d %d\n", h[0][0],h[100][50],h[200][200],h[350][300],h[400][400]);
-//  printf ("f: %d %d %d %d %d\n", f[0][0],f[100][50],f[200][200],f[350][300],f[400][400]);
-//  printf ("randptr = %d\n", randptr);
 }
 
 #endif

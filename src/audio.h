@@ -24,10 +24,9 @@
 #ifndef IS_AUDIO_H
 #define IS_AUDIO_H
 
-#include "common.h"
-
 #include <stdlib.h>
 
+#include "common.h"
 #include "dirs.h"
 
 class WaveFile
@@ -45,6 +44,7 @@ class WaveFile
 #endif
 #endif
   int volume;
+
   WaveFile ();
   WaveFile (char *filename);
   ~WaveFile ();

@@ -243,12 +243,6 @@ void Space::drawGL ()
           if (o [i]->draw)
             o [i]->drawGL (z1, z2, tl, alpha, lum, false, false);
     }
-/*    for (int i = 0; i < no; i ++)
-    {
-      if (&o [i] != NULL)
-        if (o [i]->draw)
-          o [i]->drawGL (z1, z2, tl, alpha, lum, false, false);
-    }*/
   }
 }
 

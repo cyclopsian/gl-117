@@ -29,7 +29,7 @@
 OpenGL
 ****************************************************************************/
 
-GL::GL () // (GLfloat clipback, GLfloat clipfront)
+GL::GL ()
 {
   antialiasing = false;
   zbuffer = false;
@@ -37,22 +37,14 @@ GL::GL () // (GLfloat clipback, GLfloat clipfront)
   shading = 0;
   gllistnr = 0;
   gllightnr = 0;
-//  glclipback = clipback;
-//  glclipfront = clipfront;
   texnum = -1;
   aktlist = 0;
   fogcolor [0] = 0.5; fogcolor [1] = 0.5; fogcolor [2] = 0.5;
   foglum = 1.0;
-/*    gluPerspective (90.0, 1.0, clipback, clipfront);
-  glMatrixMode (GL_MATRIXMODE);
-  glClearColor (0.0, 0.0, 0.0, 0.0);*/
 }
 
 GL::~GL ()
 {
-/*  int i;
-  for (i = 0; i <= texnum; i ++)
-    delete tex [i];*/
 }
 
 void GL::clearScreen ()
@@ -170,8 +162,6 @@ void GL::enableAntiAliasing ()
   glHint (GL_LINE_SMOOTH_HINT, GL_FASTEST);
   glHint (GL_POINT_SMOOTH_HINT, GL_FASTEST);
   glHint (GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-//    glLineWidth (2.0);
-//    glPointSize (2.0);
   antialiasing = true;
 }
 
@@ -246,6 +236,7 @@ void GL::enableFog (float view)
   glFogfv (GL_FOG_COLOR, fcol);
   glFogf (GL_FOG_DENSITY, 0.1);
   glFogi (GL_FOG_MODE, GL_LINEAR);
+// possible alternatives:
 //  glFogf (GL_FOG_DENSITY, 0.017 * 100 / view);
 //  glFogi (GL_FOG_MODE, GL_EXP2);
   if (quality <= 5)
@@ -258,7 +249,7 @@ void GL::enableFog (float view)
 
 
 
-/* Frustum Culling according to OpenGL Page */
+// Frustum Culling according to OpenGL Page
 void GL::extractFrustum()
 {
   float proj[16];
@@ -266,7 +257,7 @@ void GL::extractFrustum()
   float clip[16];
   float t;
 
-  /* extract transformation matrices */
+  // extract transformation matrices
   glGetFloatv( GL_PROJECTION_MATRIX, proj );
   glGetFloatv( GL_MODELVIEW_MATRIX, modl );
 
@@ -288,78 +279,78 @@ void GL::extractFrustum()
   clip[14] = modl[12] * proj[2] + modl[13] * proj[6] + modl[14] * proj[10] + modl[15] * proj[14];
   clip[15] = modl[12] * proj[3] + modl[13] * proj[7] + modl[14] * proj[11] + modl[15] * proj[15];
 
-  /* extract numbers for the RIGHT plane */
+  // extract numbers for the RIGHT plane
   frustum[0][0] = clip[3] - clip[0];
   frustum[0][1] = clip[7] - clip[4];
   frustum[0][2] = clip[11] - clip[8];
   frustum[0][3] = clip[15] - clip[12];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[0][0] * frustum[0][0] + frustum[0][1] * frustum[0][1] + frustum[0][2] * frustum[0][2]);
   frustum[0][0] /= t;
   frustum[0][1] /= t;
   frustum[0][2] /= t;
   frustum[0][3] /= t;
 
-  /* extract the numbers for the LEFT plane */
+  // extract the numbers for the LEFT plane
   frustum[1][0] = clip[3] + clip[0];
   frustum[1][1] = clip[7] + clip[4];
   frustum[1][2] = clip[11] + clip[8];
   frustum[1][3] = clip[15] + clip[12];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[1][0] * frustum[1][0] + frustum[1][1] * frustum[1][1] + frustum[1][2] * frustum[1][2]);
   frustum[1][0] /= t;
   frustum[1][1] /= t;
   frustum[1][2] /= t;
   frustum[1][3] /= t;
 
-  /* extract the BOTTOM plane */
+  // extract the BOTTOM plane
   frustum[2][0] = clip[3] + clip[1];
   frustum[2][1] = clip[7] + clip[5];
   frustum[2][2] = clip[11] + clip[9];
   frustum[2][3] = clip[15] + clip[13];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[2][0] * frustum[2][0] + frustum[2][1] * frustum[2][1] + frustum[2][2] * frustum[2][2]);
   frustum[2][0] /= t;
   frustum[2][1] /= t;
   frustum[2][2] /= t;
   frustum[2][3] /= t;
 
-  /* extract the TOP plane */
+  // extract the TOP plane
   frustum[3][0] = clip[3] - clip[1];
   frustum[3][1] = clip[7] - clip[5];
   frustum[3][2] = clip[11] - clip[9];
   frustum[3][3] = clip[15] - clip[13];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[3][0] * frustum[3][0] + frustum[3][1] * frustum[3][1] + frustum[3][2] * frustum[3][2]);
   frustum[3][0] /= t;
   frustum[3][1] /= t;
   frustum[3][2] /= t;
   frustum[3][3] /= t;
 
-  /* extract the FAR plane */
+  // extract the FAR plane
   frustum[4][0] = clip[3] - clip[2];
   frustum[4][1] = clip[7] - clip[6];
   frustum[4][2] = clip[11] - clip[10];
   frustum[4][3] = clip[15] - clip[14];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[4][0] * frustum[4][0] + frustum[4][1] * frustum[4][1] + frustum[4][2] * frustum[4][2]);
   frustum[4][0] /= t;
   frustum[4][1] /= t;
   frustum[4][2] /= t;
   frustum[4][3] /= t;
 
-  /* extract the NEAR plane */
+  // extract the NEAR plane
   frustum[5][0] = clip[3] + clip[2];
   frustum[5][1] = clip[7] + clip[6];
   frustum[5][2] = clip[11] + clip[10];
   frustum[5][3] = clip[15] + clip[14];
 
-  /* normalize the result */
+  // normalize the result
   t = sqrt(frustum[5][0] * frustum[5][0] + frustum[5][1] * frustum[5][1] + frustum[5][2] * frustum[5][2]);
   frustum[5][0] /= t;
   frustum[5][1] /= t;

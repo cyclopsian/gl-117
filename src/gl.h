@@ -38,7 +38,6 @@ class GL
   private:
   GLint texnum; // highest used texture number
   int akttex; // current texture number
-//  GLfloat glclipback, glclipfront; // clipping coordinates
   CTexture *tex [200]; // support max 200 textures
   GLuint gllistnr, gllightnr; // highest used list number
   int aktlist; // current list number
@@ -84,4 +83,3 @@ class GL
 extern GL *gl;
 
 #endif
-

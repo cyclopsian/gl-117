@@ -19,7 +19,7 @@
 #undef HAVE_SDL_MIXER
 #endif
 
-// 2002/12/18 Minami >>>>>>
+// APPLE path is different (thanks Minami)
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #include "SDL/SDL.h"
@@ -31,7 +31,6 @@
 #include "SDL/SDL_net.h"
 #endif
 #endif
-// 2002/12/18 Minami <<<<<<
 #ifndef __APPLE__
 #ifdef USE_GLUT
 #include <GL/glut.h>
@@ -47,11 +46,10 @@
 #endif
 #endif
 #endif // __APPLE__
-// 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "GL-117 V. 0.9 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.9.2 (BETA) BY THOMAS A. DREXL"
 
 // data types
 #ifdef USE_GLUT
@@ -202,6 +200,9 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
 // display log/debug message
 void display (char *str, int level);
 
+// display "out of memory" error and exit
+void error_outofmemory ();
+
 // current log/debug level (set to constants above)
 extern int debuglevel;
 
@@ -221,6 +222,6 @@ const int maxjaxis = 10;
 const int maxjoysticks = 10;
 
 // global normed timestep (higher values mean slower gameplay)
-const int timestep = 33;
+const int timestep = 34;
 
 #endif

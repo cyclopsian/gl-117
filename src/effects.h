@@ -26,7 +26,7 @@
 
 #include "common.h"
 
-// 2002/12/18 Minami >>>>>>
+// APPLE path differs (thanks Minami)
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #endif
@@ -38,7 +38,6 @@
 #include <GL/glut.h>
 #endif
 #endif // __APPLE__
-// 2002/12/18 Minami <<<<<<
 
 #include "model.h"
 #include "mathtab.h"

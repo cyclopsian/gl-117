@@ -28,7 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifndef _MSC_VER
+#ifndef _MSC_VER // no microsoft?
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>

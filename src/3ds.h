@@ -38,12 +38,13 @@
 class BinaryFile
 {
   public:
-  FILE *in;
-  Uint32 size;
-  Uint32 filepointer;
-  unsigned char *data;
-  unsigned char ret [11];
+  FILE *in; // file struct
+  Uint32 size; // file size
+  Uint32 filepointer; // pointer to char in memory
+  unsigned char *data; // file data in memory
+  unsigned char ret [11]; // big endian swapping buffer
 
+  // data type conversation
   BinaryFile (char *filename);
   ~BinaryFile ();
   int readFloat (float *f);
@@ -53,6 +54,7 @@ class BinaryFile
   int readString (char *ptr, int ptrmax, int n);
   int readString (char *ptr, int n);
   int readString (char *ptr);
+  int skip (int n);
 };
 
 // Primary Chunk (19789)
@@ -103,6 +105,7 @@ class CLoad3DS
   CLoad3DS ();
   bool Import3DS (CModel *model, char *filename);
   
+  // developer specific loading routines
   private:
   int GetString (char *);
   void ReadChunk (Chunk *);
