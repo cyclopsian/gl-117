@@ -78,15 +78,15 @@
 #define VIEW_MAX 150
 
 // preferences
-extern int quality;
-extern float view;
+//extern int quality;
+//extern float view;
 extern int width, height, bpp;
 extern int wantwidth, wantheight, wantfullscreen; // requested values for next restart
 extern int volumesound;
 extern int volumemusic;
 extern int dithering;
-extern int antialiasing;
-extern int specialeffects;
+//extern int antialiasing;
+//extern int specialeffects;
 extern int dynamiclighting;
 
 // current mouse coordinates
@@ -95,18 +95,18 @@ extern int mousex, mousey;
 extern int debug; // debug mode (1=counter measures)
 extern bool multiplayer, isserver;
 extern int fullscreen;
-extern int day;
-extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
-extern float sungamma; // angle of sunrays dropping on horizon
+//extern int day;
+//extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
+//extern float sungamma; // angle of sunrays dropping on horizon
 
 extern int camera; // camera type (0=cockpit, 1=chase, 2=backward, ...)
 //extern float camx, camy, camz; // camera position
-extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: elevation
+//extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: elevation
 //extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
 
 extern int lighting; // 1=on, 0=off (obsolete)
 
-extern float getView (); // return view dependant on weather
+//extern float getView (); // return view dependant on weather
 
 extern int difficulty; // 0=easy, 1=normal, 2=hard
 extern int physics; // 0=action, 1=realistic
@@ -210,45 +210,18 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 #define KEY_ENTER 13
 #define KEY_SPACE 32
 
-// log/debug level, look at common.cpp
-#define LOG_NONE 0 // do not log anything
-#define LOG_FATAL 1 // only show fatal (GL-117 will exit) errors (stderr)
-#define LOG_ERROR 2 // show errors too (stderr)
-#define LOG_WARN 3 // show warnings too (stdout)
-#define LOG_MOST 4 // show important messages too (stdout)
-#define LOG_ALL 5 // log everything (stdout)
-
-// display log/debug message
-extern void display (char *str, int level);
-
-extern void display_exit ();
-
-// display "out of memory" error and exit
-extern void error_outofmemory ();
-
 extern void key2string (int key, char *buf);
 extern void joystick2string (int key, char *buf);
 
-// current log/debug level (set to constants above)
-extern int debuglevel;
-
 #define STDSIZE 256 // typical temporary buffer size
 #define PATHSIZE 4096 // maximum path/directory string size
-
-// exit codes
-#define EXIT_NORMAL 0
-#define EXIT_LOADFILE 1
-#define EXIT_INIT 2
-#define EXIT_COMMAND 3
-#define EXIT_ALLOC 4
-#define EXIT_CONTEXT 5
 
 // joystick constants
 const int maxjaxis = 10;
 const int maxjoysticks = 10;
 
 // global normed timestep (higher values mean slower gameplay)
-const int timestep = 34;
+//const int timestep = 34;
 
 // TODO: write Vector and Map classes, as STL does not work with older compilers
 

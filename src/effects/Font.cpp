@@ -27,17 +27,10 @@
 #include <stdlib.h>
 
 #include "Effects.h"
-//#include "GlLandscape.h"
 #include "opengl/GlPrimitives.h"
-#include "common.h"
+//#include "common.h"
 
 
-
-/* Each font is stored in one bitmap, width=height=2^n!
-   Use GIMP or equiv and put the ASCII letters of your favourite font
-   there, ascending order, start whereever you want. Write as many
-   letters as possible per line, each separated by at least one whitespace.
-   Look at the font*.tga files for examples. The max letter height is fixed. */
 
 bool Font::isPixel (int x, int y)
 {
@@ -110,24 +103,22 @@ void Font::extractLetters (int height, char start, int num)
   }
 }
 
-Font::Font (char *filename, int height, char start, int num)
+Font::Font (const std::string &filename, int height, char start, int num)
 {
-  texture = new Texture (std::string (filename), 0, false, true);
+  texture = new Texture (filename, 0, false, true);
   extractLetters (height, start, num);
   zoom = 0.1F;
-  stdcol = new Color (255, 255, 255, 220);
-  highlightcol = new Color (255, 255, 0, 255);
+  stdcol.set (255, 255, 255, 220);
+  highlightcol.set (255, 255, 0, 255);
 }
 
 Font::~Font ()
 {
-  delete stdcol;
-  delete highlightcol;
 }
 
-void Font::drawText (float x, float y, float z, char *str, Color *c, bool centered, int highlight, Color *highlightcol)
+void Font::drawText (float x, float y, float z, const std::string &str, const Color &c, bool centered, int highlight, const Color &highlightcol)
 {
-  int len = strlen (str);
+  int len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);
@@ -135,7 +126,7 @@ void Font::drawText (float x, float y, float z, char *str, Color *c, bool center
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glBegin (GL_QUADS);
-  glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);
+  glColor4ub (c.c [0], c.c [1], c.c [2], c.c [3]);
   float xz = x * zoom, yz = y * zoom;
 
   if (centered)
@@ -168,9 +159,9 @@ void Font::drawText (float x, float y, float z, char *str, Color *c, bool center
     if (str [i] >= start && str [i] < start + n)
     {
       if (i != highlight)
-        glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);
+        glColor4ub (c.c [0], c.c [1], c.c [2], c.c [3]);
       else
-        glColor4ub (highlightcol->c [0], highlightcol->c [1], highlightcol->c [2], highlightcol->c [3]);
+        glColor4ub (highlightcol.c [0], highlightcol.c [1], highlightcol.c [2], highlightcol.c [3]);
       int c = (int) (str [i] - start);
       float tx = (float) letterx [c] / texture->width;
       float ty = 1.0 - (float) lettery [c] / texture->height;
@@ -211,69 +202,69 @@ void Font::drawText (float x, float y, float z, char *str, Color *c, bool center
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawText (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol)
+void Font::drawText (float x, float y, float z, const std::string &str, const Color &c, int highlight, const Color &highlightcol)
 {
   drawText (x, y, z, str, c, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, Color *c, int highlight)
+void Font::drawText (float x, float y, float z, const std::string &str, const Color &c, int highlight)
 {
   drawText (x, y, z, str, c, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, int highlight, Color *highlightcol)
+void Font::drawText (float x, float y, float z, const std::string &str, int highlight, const Color &highlightcol)
 {
   drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, int highlight)
+void Font::drawText (float x, float y, float z, const std::string &str, int highlight)
 {
   drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, Color *c)
+void Font::drawText (float x, float y, float z, const std::string &str, const Color &c)
 {
   drawText (x, y, z, str, c, false, -1, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str)
+void Font::drawText (float x, float y, float z, const std::string &str)
 {
   drawText (x, y, z, str, stdcol, false, -1, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str, const Color &c, int highlight, const Color &highlightcol)
 {
   drawText (x, y, z, str, c, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str, const Color &c, int highlight)
 {
   drawText (x, y, z, str, c, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, Color *c)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str, const Color &c)
 {
   drawText (x, y, z, str, c, true, -1, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, int highlight, Color *highlightcol)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str, int highlight, const Color &highlightcol)
 {
   drawText (x, y, z, str, stdcol, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, int highlight)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str, int highlight)
 {
   drawText (x, y, z, str, stdcol, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str)
+void Font::drawTextCentered (float x, float y, float z, const std::string &str)
 {
   drawText (x, y, z, str, stdcol, true, -1, highlightcol);
 }
 
-void Font::drawTextRotated (float x, float y, float z, char *str, Color *color, int timer)
+void Font::drawTextRotated (float x, float y, float z, const std::string &str, const Color &color, int timer)
 {
-  int len = strlen (str);
+  int len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);
@@ -296,7 +287,7 @@ void Font::drawTextRotated (float x, float y, float z, char *str, Color *color, 
       glTranslatef (xz + xi / 2, yz + yi / 2, z);
       glRotatef ((float) timer / timestep + i * 20, 1, 0, 0);
       glBegin (GL_QUADS);
-      glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
+      glColor4ub (color.c [0], color.c [1], color.c [2], color.c [3]);
       glTexCoord2f (tx, ty2);
       glVertex3f (-xi / 2, -yi / 2, 0);
       glTexCoord2f (tx, ty);
@@ -326,10 +317,10 @@ void Font::drawTextRotated (float x, float y, float z, char *str, Color *color, 
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight, Color *highlightcol)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, const Color &color, int timer, int highlight, const Color &highlightcol)
 {
   int i;
-  int len = strlen (str);
+  int len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);
@@ -375,9 +366,9 @@ void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, i
       float xi = 0.1 * letterw [c] / height;
       float yi = 0.1;
       if (i != highlight)
-        glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
+        glColor4ub (color.c [0], color.c [1], color.c [2], color.c [3]);
       else
-        glColor4ub (highlightcol->c [0], highlightcol->c [1], highlightcol->c [2], highlightcol->c [3]);
+        glColor4ub (highlightcol.c [0], highlightcol.c [1], highlightcol.c [2], highlightcol.c [3]);
       glPushMatrix ();
       glTranslatef (xz + xi / 2 - xw / 2, yi / 2, 0);
 
@@ -413,27 +404,27 @@ void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, i
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, const Color &color, int timer, int highlight)
 {
   drawTextScaled (x, y, z, str, color, timer, highlight, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, const Color &color, int timer)
 {
   drawTextScaled (x, y, z, str, color, timer, -1, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, Color *highlightcol)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, int timer, int highlight, const Color &highlightcol)
 {
   drawTextScaled (x, y, z, str, stdcol, timer, highlight, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, int timer, int highlight)
 {
   drawTextScaled (x, y, z, str, stdcol, timer, highlight, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, int timer)
+void Font::drawTextScaled (float x, float y, float z, const std::string &str, int timer)
 {
   drawTextScaled (x, y, z, str, stdcol, timer, -1, highlightcol);
 }

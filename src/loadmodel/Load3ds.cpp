@@ -22,6 +22,7 @@
 #ifndef IS_LOAD3DS_H
 
 #include "Load3ds.h"
+#include "logging/Logging.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -63,7 +64,7 @@ void Load3ds::setTextureDir (std::string &texDir)
 // Load the whole 3DS file using the private functions below
 bool Load3ds::import3ds (Model3d *model, const char *filename)
 {
-  char message [255] = {0};
+  char message [4096] = {0};
 
   file = new BinaryFile3ds (filename);
   if (file == NULL)
@@ -74,9 +75,9 @@ bool Load3ds::import3ds (Model3d *model, const char *filename)
   // Make sure this is a 3DS file
   if (currentChunk->ID != PRIMARY)
   {
-/*    sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
-    display (message, LOG_FATAL);
-    exit (EXIT_LOADFILE);*/
+    sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
+    logging.display (message, LOG_FATAL);
+    exit (EXIT_LOADFILE);
   }
   // Load objects recursively
   processNextChunk (model, currentChunk);
@@ -128,8 +129,7 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
         currentChunk->bytesRead += file->readString (version, 10, currentChunk->length - currentChunk->bytesRead);
         if (version [0] > 0x03)
         {
-//          sprintf (buf, "This 3DS file is over version 3 so it may load incorrectly");
-//          display (buf, LOG_WARN);
+          logging.display ("This 3DS file is over version 3 so it may load incorrectly", LOG_WARN);
         }
         if (debug3ds) { fprintf (debugstream3ds, "Version %d\n", version [0]); fflush (debugstream3ds); }
         break;

@@ -176,18 +176,18 @@ void Cockpit::drawCounter ()
   Color blue (0, 100, 255);
   Color red (255, 0, 0);
   sprintf (buf, "CHAFF: %d", fplayer->chaffs);
-  font1->drawTextCentered (xf*10, (yf-0.05)*10, zf, buf, &blue);
+  font1->drawTextCentered (xf*10, (yf-0.05)*10, zf, buf, blue);
   sprintf (buf, "FLARE: %d", fplayer->flares);
-  font1->drawTextCentered (xf*10, (yf2-0.05)*10, zf, buf, &red);
+  font1->drawTextCentered (xf*10, (yf2-0.05)*10, zf, buf, red);
 
   if (mission->id == MISSION_DEATHMATCH1 || mission->id == MISSION_DEATHMATCH3)
   {
     sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->fighterkills);
-    font1->drawText (-30.0F, 15.0F, -3.0F, buf, &blue);
+    font1->drawText (-30.0F, 15.0F, -3.0F, buf, blue);
     for (i = 1; i < 8; i ++)
     {
       sprintf (buf, "PILOT%d: %d", i, fighter [i]->fighterkills);
-      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, &red);
+      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);
     }
   }
   if (mission->id == MISSION_DEATHMATCH2)
@@ -195,7 +195,7 @@ void Cockpit::drawCounter ()
     for (i = 0; i < 4; i ++)
     {
       sprintf (buf, "TEAM%d: %d", i, fighter [i * 2]->fighterkills + fighter [i * 2 + 1]->fighterkills);
-      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, &red);
+      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);
     }
   }
 }
@@ -460,13 +460,13 @@ void Cockpit::drawHeading ()
       glVertex3f (xf * 0.1, yf * 0.1, zf);
       glEnd ();
       if (i == mission->heading)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "S", &color);
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "S", color);
       else if (i == mission->heading + 90 || i == mission->heading - 270)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "E", &color);
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "E", color);
       else if (i == mission->heading + 180 || i == mission->heading - 180)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "N", &color);
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "N", color);
       else if (i == mission->heading + 270 || i == mission->heading - 90)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "W", &color);
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "W", color);
     }
   }
 
@@ -501,10 +501,10 @@ void Cockpit::drawHeading ()
     }
   
   sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 80000.0F));
-  font1->drawTextCentered (-8.0, -8.5, -4.0, str, &color);
+  font1->drawTextCentered (-8.0, -8.5, -4.0, str, color);
 
   sprintf (str, "AMMO %d", fplayer->ammo);
-  font1->drawTextCentered (8.0, -8.5, -4.0, str, &color);
+  font1->drawTextCentered (8.0, -8.5, -4.0, str, color);
 
   gl.enableAlphaBlending ();
 
@@ -577,9 +577,9 @@ void Cockpit::drawTargetedElement ()
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
-      font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->o->name.c_str ()), &color);
+      font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->o->name.c_str ()), color);
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
-      font1->drawText (-24.0, -25.0, -4.0, str, &color);
+      font1->drawText (-24.0, -25.0, -4.0, str, color);
     }
   glDisable (GL_DEPTH_TEST);
 }
@@ -610,9 +610,9 @@ void Cockpit::drawWeapon ()
   missile->draw (n, tl, fplayer->rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), &color);
+  font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), color);
   sprintf (str, "N %d", fplayer->missiles [fplayer->missiletype]);
-  font1->drawText (16.0, -24.0, -4.0, str, &color);
+  font1->drawText (16.0, -24.0, -4.0, str, color);
 }
 
 void Cockpit::drawRadar ()
@@ -736,7 +736,7 @@ void Cockpit::drawRelativeHeightBar()
   setColor(alpha);
   
   sprintf (str, "RHEIGHT");
-  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
+  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, color);
   glEnd();
   gl.disableAlphaBlending ();
 }
@@ -769,7 +769,7 @@ void Cockpit::drawThrustBar()
   glEnd ();
   setColor(alpha);
   sprintf (str, "THRUST");
-  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
+  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, color);
 
   glEnd();
   gl.disableAlphaBlending ();

@@ -27,9 +27,6 @@
 #include <stdlib.h>
 
 #include "Effects.h"
-//#include "GlLandscape.h"
-#include "opengl/GlPrimitives.h"
-#include "common.h"
 
 
 
@@ -54,7 +51,7 @@ void Explosion::setExplosion (float x, float y, float z, float vx, float vy, flo
   v.set (vx, vy, vz);
 }
 
-void Explosion::move (Uint32 dt)
+void Explosion::move (Uint32 dt, float camphi, float camgamma)
 {
   if (ttl > 0)
   {

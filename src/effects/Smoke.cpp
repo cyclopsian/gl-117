@@ -28,7 +28,8 @@
 
 #include "Effects.h"
 #include "opengl/GlPrimitives.h"
-#include "common.h"
+
+
 
 Texture *texsmoke, *texsmoke2, *texsmoke3;
 
@@ -38,7 +39,6 @@ Smoke::Smoke (int type)
   {
     time [i] = 0;
     zoom [i] = 0.1;
-    phi [i] = 0;
   }
   last = 0;
   this->type = type;
@@ -48,7 +48,7 @@ Smoke::~Smoke ()
 {
 }
 
-void Smoke::setSmoke (float x, float y, float z, int myphi, int mytime)
+void Smoke::setSmoke (float x, float y, float z, int mytime)
 {
   last ++;
   if (last >= MAXSMOKEELEM)
@@ -57,7 +57,6 @@ void Smoke::setSmoke (float x, float y, float z, int myphi, int mytime)
   v [last].y = y;
   v [last].z = z;
   time [last] = mytime;
-  phi [last] = myphi;
 }
 
 void Smoke::move (Uint32 dt, int dec)
@@ -70,15 +69,15 @@ void Smoke::move (Uint32 dt, int dec)
     }
 }
 
-void Smoke::drawElem (int n)
+void Smoke::drawElem (int n, float phi, float gamma)
 {
   if (n < 0 || n >= MAXSMOKEELEM) return;
   float myzoom = math.smokezoom [time [n]];
 
   glPushMatrix ();
   glTranslatef (v [n].x, v [n].y, v [n].z);
-  glRotatef (camphi, 0.0, 1.0, 0.0);
-  glRotatef (-camgamma, 1.0, 0.0, 0.0);
+  glRotatef (phi, 0.0, 1.0, 0.0);
+  glRotatef (-gamma, 1.0, 0.0, 0.0);
   glScalef (myzoom, myzoom, myzoom);
 
   glBegin (GL_QUADS);
@@ -122,7 +121,7 @@ void Smoke::drawElemHQ (int n)
   glEnd ();
 }
 
-void Smoke::draw ()
+void Smoke::draw (float phi, float gamma)
 {
   int i;
   Texture *smoketype;
@@ -141,14 +140,14 @@ void Smoke::draw ()
   {
     if (time [i] > 0)
     {
-      drawElem (i);
+      drawElem (i, phi, gamma);
     }
   }
   for (i = MAXSMOKEELEM - 1; i > last; i --)
   {
     if (time [i] > 0)
     {
-      drawElem (i);
+      drawElem (i, phi, gamma);
     }
   }
   glDisable (GL_TEXTURE_2D);

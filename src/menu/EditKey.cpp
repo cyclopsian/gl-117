@@ -86,12 +86,12 @@ void EditKey::draw ()
   font1->zoom = 0.1 * (h - 0.1);
   float yf = (y - h - 0.01) / (h - 0.1);
   float xf = (x + 0.25) / (h - 0.1);
-  font1->drawText (xf, yf, menuZ, text, col);
+  font1->drawText (xf, yf, menuZ, text, *col);
   if (specialActive)
     key2string (special + 256, buf);
   else
     key2string (key, buf);
-  font1->drawText (xf + (w - 2) / h, yf, menuZ, buf, col);
+  font1->drawText (xf + (w - 2) / h, yf, menuZ, buf, *col);
   font1->zoom = 0.1;
 }
 

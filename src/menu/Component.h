@@ -28,6 +28,8 @@ extern Color StandardTextColor;
 extern Color DeactiveTextColor;
 extern Color HiliteTextColor;
 
+extern float view;
+
 extern int menuId;
 extern int menuZ;
 

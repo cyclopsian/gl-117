@@ -376,182 +376,182 @@ void MissionTutorial1::draw ()
   int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
   if (timer >= 0 && timer <= timeroff - 20)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "LEAVE THE JOYSTICK CENTERED.", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THE FIGHTER SHOULD FLY STRAIGHT ON.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "IF NOT, RECALIBRATE YOUR JOYSTICK", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "LEAVE THE JOYSTICK CENTERED.", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "THE FIGHTER SHOULD FLY STRAIGHT ON.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "IF NOT, RECALIBRATE YOUR JOYSTICK", textcolor);
     }
     else if (controls == CONTROLS_MOUSE)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "CURRENTLY, THIS IS THE MOUSE", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "CURRENTLY, THIS IS THE MOUSE", textcolor);
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "CURRENTLY, THIS IS THE KEYBOARD", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "CURRENTLY, THIS IS THE KEYBOARD", textcolor);
     }
   }
   else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "MOVING THE JOYSTICK LEFT OR RIGHT", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE AILERON.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THUS YOU WILL ONLY ROLL", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "MOVING THE JOYSTICK LEFT OR RIGHT", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE AILERON.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THUS YOU WILL ONLY ROLL", textcolor);
     }
     else if (controls == CONTROLS_MOUSE)
     {
       if (!mouse_reverse && !mouse_relative)
       {
-        font1->drawTextCentered (0, 7, -2.5, "THE MOUSE INTERFACE IS VERY EASY.", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "ALWAYS POINT TO WHERE YOU WANT TO FLY.", &textcolor);
-        font1->drawTextCentered (0, 5, -2.5, "YOU'LL HAVE TO MOVE THE MOUSE PERMANENTLY", &textcolor);
+        font1->drawTextCentered (0, 7, -2.5, "THE MOUSE INTERFACE IS VERY EASY.", textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "ALWAYS POINT TO WHERE YOU WANT TO FLY.", textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "YOU'LL HAVE TO MOVE THE MOUSE PERMANENTLY", textcolor);
       }
       else if (mouse_reverse && !mouse_relative)
       {
-        font1->drawTextCentered (0, 7, -2.5, "THE REVERTED MOUSE IS FOR REAL GAMERS ONLY.", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "THE STANDARD MOUSE INTERFACE MAY BE", &textcolor);
-        font1->drawTextCentered (0, 5, -2.5, "EASIER TO LEARN", &textcolor);
+        font1->drawTextCentered (0, 7, -2.5, "THE REVERTED MOUSE IS FOR REAL GAMERS ONLY.", textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "THE STANDARD MOUSE INTERFACE MAY BE", textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "EASIER TO LEARN", textcolor);
       }
       else
       {
-        font1->drawTextCentered (0, 7, -2.5, "MOUSE RELATIVE IS A LOT OF WORK.", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "ONLY THE RELATIVE MOUSE COORDINATES (MOVING)", &textcolor);
-        font1->drawTextCentered (0, 5, -2.5, "WILL HAVE AN EFFECT", &textcolor);
+        font1->drawTextCentered (0, 7, -2.5, "MOUSE RELATIVE IS A LOT OF WORK.", textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "ONLY THE RELATIVE MOUSE COORDINATES (MOVING)", textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "WILL HAVE AN EFFECT", textcolor);
       }
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE KEYBOARD INTERFACE IS NOT THAT EASY.", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "USING THE MOUSE IS STRONLY RECOMMENDED", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THE KEYBOARD INTERFACE IS NOT THAT EASY.", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "USING THE MOUSE IS STRONLY RECOMMENDED", textcolor);
     }
   }
   else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "MOVING UP OR DOWN WILL AFFECT", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THE ELEVATOR.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "YOU'LL START TO FLY A LOOP", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "MOVING UP OR DOWN WILL AFFECT", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "THE ELEVATOR.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "YOU'LL START TO FLY A LOOP", textcolor);
     }
     else if (controls == CONTROLS_MOUSE || controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "MOVING RIGHT OR LEFT WILL AFFECT THE AILERON,", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "MOVING UP OR DOWN WILL AFFECT THE ELEVATOR.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THUS YOU CAN FLY ROLLS AND LOOPS", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "MOVING RIGHT OR LEFT WILL AFFECT THE AILERON,", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "MOVING UP OR DOWN WILL AFFECT THE ELEVATOR.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THUS YOU CAN FLY ROLLS AND LOOPS", textcolor);
     }
   }
   else if (timer > timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "IF YOUR JOYSTICK HAS A SO-CALLED \"RUDDER\",", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "YOU MAY ALTER THE FIGHTER'S RUDDER.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "YOU'LL SLIGHTLY FLY TO THE LEFT OR RIGHT", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "IF YOUR JOYSTICK HAS A SO-CALLED \"RUDDER\",", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "YOU MAY ALTER THE FIGHTER'S RUDDER.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "YOU'LL SLIGHTLY FLY TO THE LEFT OR RIGHT", textcolor);
     }
     else if (controls == CONTROLS_MOUSE)
     {
-      font1->drawTextCentered (0, 7, -2.5, "MOVING THE MOUSE SLIGHTLY LEFT OR RIGHT", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE RUDDER.", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "MOVING THE MOUSE SLIGHTLY LEFT OR RIGHT", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE RUDDER.", textcolor);
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "TO ALTER THE RUDDER", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "USE THE KEYS PGUP AND PGDN", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "TO ALTER THE RUDDER", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "USE THE KEYS PGUP AND PGDN", textcolor);
     }
   }
   else if (timer > timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "YOUR JOYSTICK HAS ALSO A THROTTLE", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "TO SPEEDUP OR DECELERATE.", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "YOUR JOYSTICK HAS ALSO A THROTTLE", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "TO SPEEDUP OR DECELERATE.", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", textcolor);
     }
     else
     {
-      font1->drawTextCentered (0, 7, -2.5, "USE THE KEYS '1' THROUGH '9' TO ALTER", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "YOUR THROTTLE (SPEED).", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "USE THE KEYS '1' THROUGH '9' TO ALTER", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "YOUR THROTTLE (SPEED).", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", textcolor);
     }
   }
   else if (timer > timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE PREDEFINED JOYSTICK BUTTONS:", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "FIRE CANNON, DROP CHAFF/FLARE,", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "FIRE MISSILE, CHOOSE MISSILE", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THE PREDEFINED JOYSTICK BUTTONS:", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "FIRE CANNON, DROP CHAFF/FLARE,", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "FIRE MISSILE, CHOOSE MISSILE", textcolor);
     }
     else if (controls == CONTROLS_MOUSE)
     {
-      font1->drawTextCentered (0, 7, -2.5, "LEFT MOUSE BUTTON: FIRE CANNON", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "RIGHT MOUSE BUTTON: FIRE MISSILE", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "BUT YOU SHOULD REALLY PREFER THE KEYBOARD", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "LEFT MOUSE BUTTON: FIRE CANNON", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "RIGHT MOUSE BUTTON: FIRE MISSILE", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "BUT YOU SHOULD REALLY PREFER THE KEYBOARD", textcolor);
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 6, -2.5, "NOW, LETS HAVE A LOOK AT SOME IMPORTANT KEYS", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "NOW, LETS HAVE A LOOK AT SOME IMPORTANT KEYS", textcolor);
     }
   }
   else if (timer > timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "A SUMMARY OF COMMANDS CAN BE FOUND IN THE MENU.", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "\"ESC\" WILL SHOW THE MENU", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "AND RETURN BACK TO THE ACTION", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "A SUMMARY OF COMMANDS CAN BE FOUND IN THE MENU.", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "\"ESC\" WILL SHOW THE MENU", textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "AND RETURN BACK TO THE ACTION", textcolor);
     }
     else
     {
       key2string (key_firecannon, buf2);
       sprintf (buf, "%s: FIRE CANNON", buf2);
-      font1->drawTextCentered (0, 7, -2.5, buf, &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, buf, textcolor);
       key2string (key_selectmissile, buf2);
       sprintf (buf, "%s: CHOOSE MISSILE", buf2);
-      font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
       key2string (key_firemissile, buf2);
       sprintf (buf, "%s: FIRE MISSILE", buf2);
-      font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
+      font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
     }
   }
   else if (timer > timeroff + 7 * timerdelay && timer <= timeroff + 8 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "LOOK AT THE RADAR ON THE BOTTOM OF YOUR SCREEN.", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "THERE ARE ENEMIES REPRESENTED BY A YELLOW POINT (TARGETED)", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "AND A RED POINT (NOT TARGETED)", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "LOOK AT THE RADAR ON THE BOTTOM OF YOUR SCREEN.", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "THERE ARE ENEMIES REPRESENTED BY A YELLOW POINT (TARGETED)", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AND A RED POINT (NOT TARGETED)", textcolor);
   }
   else if (timer > timeroff + 8 * timerdelay && timer <= timeroff + 9 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY USING THE COOLIE HAT,", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY USING THE COOLIE HAT,", textcolor);
       key2string (key_targetnearest, buf2);
       sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
-      font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", textcolor);
     }
     else
     {
-      font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY PRESSING", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY PRESSING", textcolor);
       key2string (key_targetnearest, buf2);
       sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
-      font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", textcolor);
     }
   }
   else if (timer > timeroff + 9 * timerdelay && timer <= timeroff + 10 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "SHOOT THE TARGETS TO COMPLETE", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "THIS TUTORIAL SUCCESSFULLY", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "SHOOT THE TARGETS TO COMPLETE", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "THIS TUTORIAL SUCCESSFULLY", textcolor);
   }
   if (timer >= timeroff + 7 * timerdelay - timerlag / 2 && state == 0)
   {
@@ -642,34 +642,34 @@ void MissionTutorial2::draw ()
   int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
   if (timer >= 0 && timer <= timeroff - 20)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "FIRSTLY, HAVE A LOOK AT YOUR MISSILES:", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "FIRSTLY, HAVE A LOOK AT YOUR MISSILES:", textcolor);
     key2string (key_selectmissile, buf2);
     sprintf (buf, "PRESS '%s' TO SWITCH BETWEEN", buf2);
-    font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "AGM (AIR-GROUND-MISSILE) AND DF (DUMB FIRE)", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AGM (AIR-GROUND-MISSILE) AND DF (DUMB FIRE)", textcolor);
   }
   else if (timer > timerdelay + timeroff && timer <= timeroff + 2 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "LET'S USE THE AGM: AS SOON AS THE TARGET", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "IS LOCKED (YELLOW), SHOOT THE AGM AT ANY", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "DIRECTION AND WATCH WHERE IT GOES.", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "LET'S USE THE AGM: AS SOON AS THE TARGET", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IS LOCKED (YELLOW), SHOOT THE AGM AT ANY", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "DIRECTION AND WATCH WHERE IT GOES.", textcolor);
   }
   else if (timer > 2 * timerdelay + timeroff && timer <= timeroff + 3 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THEN TRY A DF MISSILE BUT CAREFUL:", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "IT IS QUITE 'DUMB' AND WILL FLY STRAIGHT AHEAD.", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THEN TRY A DF MISSILE BUT CAREFUL:", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IT IS QUITE 'DUMB' AND WILL FLY STRAIGHT AHEAD.", textcolor);
   }
   else if (timer > 3 * timerdelay + timeroff && timer <= timeroff + 4 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 6, -2.5, "HOWEVER, DF MISSILES WILL CAUSE MUCH MORE DAMAGE", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "HOWEVER, DF MISSILES WILL CAUSE MUCH MORE DAMAGE", textcolor);
   }
   else if (timer > 4 * timerdelay + timeroff && timer <= timeroff + 5 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 6, -2.5, "NOW, BLOW UP THE TWO TANKS", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "NOW, BLOW UP THE TWO TANKS", textcolor);
   }
 }
 
@@ -717,74 +717,74 @@ void MissionTutorial3::draw ()
   int timeroff = 100 * timestep, timerdelay = 350 * timestep, timerlag = 120 * timestep;
   if (timer >= 0 && timer <= timeroff - 20)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU DEFINE DIFFICULTY", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "AND REALISM. CHANGING THESE SETTINGS WILL ONLY HAVE", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "EFFECT ON THE NEXT MISSION YOU START", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU DEFINE DIFFICULTY", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "AND REALISM. CHANGING THESE SETTINGS WILL ONLY HAVE", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "EFFECT ON THE NEXT MISSION YOU START", textcolor);
   }
   else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "APART FROM YOUR CURRENT PHYSICS SETTINGS", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "LET'S USE THE SIMULATION MODEL AND DISCUSS", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "THE FOUR FORCES THRUST, DRAG, LIFT, AND WEIGHT", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "APART FROM YOUR CURRENT PHYSICS SETTINGS", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "LET'S USE THE SIMULATION MODEL AND DISCUSS", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "THE FOUR FORCES THRUST, DRAG, LIFT, AND WEIGHT", textcolor);
   }
   else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THRUST IS FORWARD FORCE CREATED BY THE ENGINES.", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "CHANGE THE THRUST TO GAIN OR LOSE SPEED", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THRUST IS FORWARD FORCE CREATED BY THE ENGINES.", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "CHANGE THE THRUST TO GAIN OR LOSE SPEED", textcolor);
   }
   else if (timer > timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "DRAG IS THE RETARDING FORCE THAT LIMITS THE AIRCRAFT'S", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "SPEED. IT IS MAINLY CAUSED BY THE AIRCRAFT'S STRUCTURE", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "THAT PROTUDES INTO THE WIND", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "DRAG IS THE RETARDING FORCE THAT LIMITS THE AIRCRAFT'S", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "SPEED. IT IS MAINLY CAUSED BY THE AIRCRAFT'S STRUCTURE", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "THAT PROTUDES INTO THE WIND", textcolor);
   }
   else if (timer > timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "LIFT IS THE UPWARD FORCE CREATED BY THE AIRFLOW THAT PASSES", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "OVER THE WINGS. IN STRAIGHT UNACCELERATED FLIGHT, IT", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "COMPENSATES THE WEIGHT AND YOUR FIGHTER WON'T CLIMB OR DIVE", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "LIFT IS THE UPWARD FORCE CREATED BY THE AIRFLOW THAT PASSES", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "OVER THE WINGS. IN STRAIGHT UNACCELERATED FLIGHT, IT", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "COMPENSATES THE WEIGHT AND YOUR FIGHTER WON'T CLIMB OR DIVE", textcolor);
   }
   else if (timer > timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THE LIFT FORCE DEPENDS ON THE SPEED:", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "LOW SPEED WILL CAUSE THE AIRPLANE TO DIVE,", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "AT HIGH SPEED IT WILL EVEN CLIMB", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THE LIFT FORCE DEPENDS ON THE SPEED:", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "LOW SPEED WILL CAUSE THE AIRPLANE TO DIVE,", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AT HIGH SPEED IT WILL EVEN CLIMB", textcolor);
   }
   else if (timer > timeroff + 6 * timerdelay && timer <= timeroff + 8 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "NOW TRY THIS EFFECT BY FLYING STRAIGHT AHEAD AT 0 DEGREE", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "ELEVATION WHILE USING THE LOWEST/HIGHEST THRUST SETTINGS", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "NOW TRY THIS EFFECT BY FLYING STRAIGHT AHEAD AT 0 DEGREE", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "ELEVATION WHILE USING THE LOWEST/HIGHEST THRUST SETTINGS", textcolor);
   }
   else if (timer > timeroff + 8 * timerdelay && timer <= timeroff + 10 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "IF YOU FLY A ROLL, THE LIFT WILL NOT OPPOSE THE THRUST", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "AND YOU WILL LOSE HEIGHT. TRY!", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "IF YOU FLY A ROLL, THE LIFT WILL NOT OPPOSE THE THRUST", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "AND YOU WILL LOSE HEIGHT. TRY!", textcolor);
   }
   else if (timer > timeroff + 10 * timerdelay && timer <= timeroff + 12 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "IF YOU ROLL TO THE SIDE, THE LIFT WILL TEAR THE AIRCRAFT", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "FROM STRAIGHT FLIGHT TO A DIAGONAL DIRECTION WHILE", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "LOSING HEIGHT. TRY!", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "IF YOU ROLL TO THE SIDE, THE LIFT WILL TEAR THE AIRCRAFT", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "FROM STRAIGHT FLIGHT TO A DIAGONAL DIRECTION WHILE", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "LOSING HEIGHT. TRY!", textcolor);
   }
   else if (timer > timeroff + 12 * timerdelay && timer <= timeroff + 13 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THE OVERALL FORCE IS GAINED BY ADDING THE FOUR FORCES.", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "IT IS MEASURED IN 'G' WITH 1G MEANING THE EARTH'S GRAVITY", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THE OVERALL FORCE IS GAINED BY ADDING THE FOUR FORCES.", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IT IS MEASURED IN 'G' WITH 1G MEANING THE EARTH'S GRAVITY", textcolor);
   }
   else if (timer > timeroff + 13 * timerdelay && timer <= timeroff + 14 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "YOU ARE MOSTLY OPPOSED TO MORE THAN ONLY 1G. BE CAREFUL:", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "9G OR MORE MAY LEAD TO A BLACKOUT,", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "AT LESS THAN -3G THE BLOOD WILL SHOOT INTO YOUR HEAD", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "YOU ARE MOSTLY OPPOSED TO MORE THAN ONLY 1G. BE CAREFUL:", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "9G OR MORE MAY LEAD TO A BLACKOUT,", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AT LESS THAN -3G THE BLOOD WILL SHOOT INTO YOUR HEAD", textcolor);
   }
   else if (timer > timeroff + 14 * timerdelay && timer <= timeroff + 15 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "NOW ROLL ON THE BACK AND GET RID OF", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "THE TWO TRANSPORTERS AHEAD", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "NOW ROLL ON THE BACK AND GET RID OF", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "THE TWO TRANSPORTERS AHEAD", textcolor);
   }
   if (timer >= timeroff + 14 * timerdelay - timerlag / 2 && state == 0)
   {
@@ -904,70 +904,70 @@ void MissionDogfight1::draw ()
   {
     if (state == 1)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THAT WAS EASY", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "BUT CAN YOU HANDLE TWO ENEMIES?", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THAT WAS EASY", textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "BUT CAN YOU HANDLE TWO ENEMIES?", textcolor);
       return;
     }
     if (state == 2)
     {
-      font1->drawTextCentered (0, 6, -2.5, "OK, LET'S TRY THREE ENEMIES", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "OK, LET'S TRY THREE ENEMIES", textcolor);
       return;
     }
   }
 
   if (timer >= 0 && timer <= timeroff - timerlag)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   else if (timer >= timeroff && timer <= timeroff + timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THERE IS AN ENEMY ATTACKING", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THERE IS AN ENEMY ATTACKING", textcolor);
     key2string (key_selectmissile, buf2);
     sprintf (buf, "PRESS '%s' ON THE KEYBOARD TO", buf2);
-    font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "SELECT A MISSILE", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "SELECT A MISSILE", textcolor);
   }
   else if (timer >= timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "CHOOSE A FRIEND-FOE (FF) MISSILE", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "WHICH DETECTS ENEMIES BY RADAR.", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "SHOOT AS EARLY AS POSSIBLE", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "CHOOSE A FRIEND-FOE (FF) MISSILE", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "WHICH DETECTS ENEMIES BY RADAR.", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "SHOOT AS EARLY AS POSSIBLE", textcolor);
   }
   else if (timer >= timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "YOU CAN ONLY FIRE MISSILES WHEN", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "THE RECTANGULAR LOCK AROUND THE ENEMY", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "APPEARS YELLOW", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "YOU CAN ONLY FIRE MISSILES WHEN", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "THE RECTANGULAR LOCK AROUND THE ENEMY", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "APPEARS YELLOW", textcolor);
   }
   else if (timer >= timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "CHECK THE CHAFF/FLARE DISPLAYS.", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "IF THEY START BLINKING, AN ENEMY HAS", &textcolor);
-    font1->drawTextCentered (0, 5, -2.5, "FIRED A MISSILE TO GET YOU DOWN", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "CHECK THE CHAFF/FLARE DISPLAYS.", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IF THEY START BLINKING, AN ENEMY HAS", textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "FIRED A MISSILE TO GET YOU DOWN", textcolor);
   }
   else if (timer >= timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES,", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "FLARES PROTECT FROM INFRARED MISSILES", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES,", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "FLARES PROTECT FROM INFRARED MISSILES", textcolor);
     key2string (key_dropchaff, buf2);
     key2string (key_dropflare, buf3);
     sprintf (buf, "KEYS: DROP CHAFF = '%s', DROP FLARE = '%s'", buf2, buf3);
-    font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
   }
   else if (timer >= timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THE COUNTER MEASURE ONLY HAD AN EFFECT,", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "IF THE DISPLAYS STOP BLINKING", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THE COUNTER MEASURE ONLY HAD AN EFFECT,", textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IF THE DISPLAYS STOP BLINKING", textcolor);
   }
   else if (timer >= timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "A LITTLE TARGETING HINT:", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "A LITTLE TARGETING HINT:", textcolor);
     key2string (key_targetnearest, buf2);
     sprintf (buf, "'%s' WILL TARGET THE NEAREST ENEMY IN FRONT,", buf2);
-    font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
     key2string (key_targetlocking, buf2);
     sprintf (buf, "'%s' WILL TARGET AN ENEMY WHO HAS LOCKED YOU", buf2);
-    font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
   }
 }
 
@@ -1076,19 +1076,19 @@ void MissionFreeFlight1::draw ()
   {
     if (state == 1)
     {
-      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", textcolor);
       return;
     }
     if (state == 2)
     {
-      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "TRANSPORTERS RESPAWNING", textcolor);
       return;
     }
   }
 
   if (timer >= 0 && timer <= timeroff - timerlag)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1178,7 +1178,7 @@ void MissionDeathmatch1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1290,7 +1290,7 @@ void MissionDeathmatch2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1396,7 +1396,7 @@ void MissionDeathmatch3::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1681,7 +1681,7 @@ void MissionTeamBase1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1800,19 +1800,19 @@ void MissionWaves1::draw ()
   {
     if (state == 1)
     {
-      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", textcolor);
       return;
     }
     if (state == 2)
     {
-      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", textcolor);
       return;
     }
   }
 
   if (timer >= 0 && timer <= timeroff - timerlag)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1882,7 +1882,7 @@ void MissionTest1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -1977,11 +1977,11 @@ void MissionTest2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   else if (state == -1)
   {
-    font1->drawTextCentered (0, 4, -2, "ALMOST! GET CLEARLY BEHIND HIM!", &textcolor);
+    font1->drawTextCentered (0, 4, -2, "ALMOST! GET CLEARLY BEHIND HIM!", textcolor);
   }
 }
 
@@ -2058,7 +2058,7 @@ void MissionTransport::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2142,7 +2142,7 @@ void MissionConvoy::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2222,7 +2222,7 @@ void MissionDogfight2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   if (timer >= 1000 * timestep && state == 0)
   {
@@ -2237,7 +2237,7 @@ void MissionDogfight2::draw ()
     fighter [8]->tl.y = l->getHeight (fighter [8]->tl.x, fighter [8]->tl.z) + 10;
   }
   if (timer >= 1000 * timestep && timer <= 1200 * timestep)
-    font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", &textcolor);
+    font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", textcolor);
 }
 
 
@@ -2329,7 +2329,7 @@ void MissionAirBattle::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2429,7 +2429,7 @@ void MissionGround1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2498,7 +2498,7 @@ void MissionScout::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2678,7 +2678,7 @@ void MissionBase::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2855,7 +2855,7 @@ void MissionDepot::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -2969,7 +2969,7 @@ void MissionDefend1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   if (timer >= 600 * timestep && state == 0)
   {
@@ -2981,7 +2981,7 @@ void MissionDefend1::draw ()
     fighter [15]->activate ();
   }
   if (timer >= 600 * timestep && timer <= 800 * timestep)
-    font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", &textcolor);
+    font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", textcolor);
 }
 
 
@@ -3068,7 +3068,7 @@ void MissionDogfight3::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
   if (timer >= 800 * timestep && state == 0)
   {
@@ -3087,7 +3087,7 @@ void MissionDogfight3::draw ()
     fighter [11]->tl.y = l->getHeight (fighter [11]->tl.x, fighter [11]->tl.z) + 10;
   }
   if (timer >= 800 * timestep && timer <= 1000 * timestep)
-    font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", &textcolor);
+    font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", textcolor);
 }
 
 
@@ -3176,7 +3176,7 @@ void MissionTank1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3271,7 +3271,7 @@ void MissionConvoy2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3354,7 +3354,7 @@ void MissionShip1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3446,7 +3446,7 @@ void MissionShip2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3527,7 +3527,7 @@ void MissionShip3::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3633,7 +3633,7 @@ void MissionCanyon1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3733,7 +3733,7 @@ void MissionCanyon2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3846,7 +3846,7 @@ void MissionCanyon3::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -3933,7 +3933,7 @@ void MissionMoonDefense1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -4031,7 +4031,7 @@ void MissionMoonBattle::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -4120,7 +4120,7 @@ void MissionMoonDogfight1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -4240,7 +4240,7 @@ void MissionTunnel1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 
@@ -4323,7 +4323,7 @@ void MissionMoonBase1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 }
 

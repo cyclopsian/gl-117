@@ -22,6 +22,7 @@
 #ifndef IS_LOAD3DS_H
 
 #include "Load3ds.h"
+#include "logging/Logging.h"
 
 #include <stdio.h>
 
@@ -29,14 +30,13 @@
 
 BinaryFile3ds::BinaryFile3ds (const char *filename)
 {
-//  char buf [4096];
+  char buf [4096];
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "Cannot open file %s", filename);
-    fflush (stderr);
-//    display (buf, LOG_FATAL);
-//    exit (EXIT_LOADFILE);
+    sprintf (buf, "Cannot open file %s", filename);
+    logging.display (buf, LOG_FATAL);
+    exit (EXIT_LOADFILE);
     return;
   }
   fseek (in, 0, SEEK_END);

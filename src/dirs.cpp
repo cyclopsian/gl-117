@@ -35,6 +35,7 @@
 
 #include "dirs.h"
 #include "common.h"
+#include "logging/Logging.h"
 
 char *mystrtok (char *str, int len, char *tok)
 {
@@ -91,8 +92,8 @@ Dirs::Dirs (char *arg)
   }
   else
   {
-    display ("Binary file has no context to the data files", LOG_FATAL);
-    display ("Do not execute from console, just doubleclick", LOG_MOST);
+    logging.display ("Binary file has no context to the data files", LOG_FATAL);
+    logging.display ("Do not execute from console, just doubleclick", LOG_MOST);
     exit (EXIT_CONTEXT);
   }
   strcpy (textures, path);
@@ -154,7 +155,7 @@ Dirs::Dirs (char *arg)
         p = mystrtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
       }
     }
-    display ("Binary file has no context to the data files.", LOG_FATAL);
+    logging.display ("Binary file has no context to the data files.", LOG_FATAL);
     exit (EXIT_CONTEXT);
 
   found:;
@@ -178,7 +179,7 @@ Dirs::Dirs (char *arg)
     }
     else
     {
-      display ("Binary file has no context to the data files.", LOG_FATAL);
+      logging.display ("Binary file has no context to the data files.", LOG_FATAL);
       exit (EXIT_CONTEXT);
     }
 
@@ -215,7 +216,7 @@ Dirs::Dirs (char *arg)
   else
   {
     sprintf (buf, "Found gl-117 data directory %s ", myfile);
-    display (buf, LOG_MOST);
+    logging.display (buf, LOG_MOST);
     strcpy (textures, myfile);
     strcpy (music, myfile);
     strcpy (sound, myfile);

@@ -30,7 +30,7 @@
 
 #include "common.h"
 #include "dirs.h"
-
+/*
 void display_stream (FILE *stream, char *str, int level)
 {
   if (level == LOG_NONE) fprintf (stream, "%s\n", str);
@@ -55,7 +55,7 @@ void display (char *str, int level)
 {
   int len = strlen (str);
   if (!len) return;
-  if (level <= debuglevel)
+  if (level <= loglevel)
   {
     FILE *stream = stdout;
     if (level == LOG_FATAL || level == LOG_ERROR || level == LOG_WARN)
@@ -83,7 +83,7 @@ void error_outofmemory ()
   display ("Out of memory", LOG_FATAL);
   exit (EXIT_ALLOC);
 }
-
+*/
 void key2string (int key, char *buf)
 {
   buf [0] = '\0';

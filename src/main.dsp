@@ -354,6 +354,18 @@ SOURCE=.\math\Math.cpp
 SOURCE=.\math\Math.h
 # End Source File
 # End Group
+# Begin Group "logging"
+
+# PROP Default_Filter "*"
+# Begin Source File
+
+SOURCE=.\logging\Logging.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\logging\Logging.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\aiobject.cpp

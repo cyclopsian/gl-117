@@ -29,6 +29,7 @@
 #include "model3d/Model3d.h"
 #include "opengl/GlPrimitives.h"
 #include "loadbitmap/LoadTga.h"
+#include "logging/Logging.h"
 
 
 
@@ -66,25 +67,24 @@ Texture::~Texture ()
 bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
 {
   int i, i2;
+  char buf [4096];
 
 #ifdef IS_LOADTGA_H
   data = LoadTga::load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
   if (!data)
   {
-//    char buf [256];
-    fprintf (stderr, "%s %d: Texture %s not found", __FILE__, __LINE__, filename.c_str ());
-//    sprintf (buf, "Texture %s not found", filename.c_str ());
-//    display (buf, LOG_FATAL);
-    return 0;
+    sprintf (buf, "Texture %s not found", filename.c_str ());
+    logging.display (buf, LOG_FATAL);
+    exit (-1);
   }
 #else
   unsigned char skip;
   FILE *in = fopen (filename.c_str (), "rb");
   if (!in)
   {
-    fprintf (stderr, "Texture %s not found", filename.c_str ());
+    sprintf (buf, "Texture %s not found", filename.c_str ());
+    logging.display (buf, LOG_FATAL);
     exit (-1);
-//    display (buf, LOG_FATAL);
   }
   fread (&skip, 1, 1, in);
   fseek (in, 12, SEEK_SET);

@@ -102,7 +102,7 @@ void EditField::draw ()
   font1->zoom = 0.1 * (h - 0.1);
   float yf = (y - h - 0.01) / (h - 0.1);
   float xf = (x + 0.25) / (h - 0.1);
-  font1->drawText (xf, yf, menuZ, str, col);
+  font1->drawText (xf, yf, menuZ, str, *col);
   font1->zoom = 0.1;
 }
 

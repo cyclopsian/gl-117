@@ -55,8 +55,9 @@ void BlackSmoke::setBlackSmoke (float x, float y, float z, float myphi, float ma
   zoom = 0;
 }
 
-void BlackSmoke::move (Uint32 dt)
+void BlackSmoke::move (Uint32 dt, float camphi, float camgamma)
 {
+  this->camphi = camphi;
   if (ttl > 0)
   {
     zoom = maxzoom * (maxlen - ttl) / maxlen;
@@ -70,10 +71,12 @@ void BlackSmoke::move (Uint32 dt)
   }
 }
 
-void BlackSmoke::drawGL (Vector3 *z1, Vector3 *z2, Vector3 *tl, float alpha2, float lum2, bool drawLight2, bool istextured2)
+void BlackSmoke::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool istextured2)
 {
-  if (ttl <= 0 || !specialeffects) return;
-  if (draw == 2 || frustum.isSphereInFrustum (tl->x + this->tl.x, tl->y + this->tl.y, tl->z + this->tl.z, this->zoom))
+  if (ttl <= 0 && !specialeffects)
+    return;
+
+  if (draw == 2 || frustum.isSphereInFrustum (tl.x + this->tl.x, tl.y + this->tl.y, tl.z + this->tl.z, this->zoom))
   {
     glDepthMask (GL_FALSE);
     if (antialiasing)
@@ -89,7 +92,8 @@ void BlackSmoke::drawGL (Vector3 *z1, Vector3 *z2, Vector3 *tl, float alpha2, fl
     if (myalpha > 255) myalpha = 255;
     glColor4ub (0, 0, 0, myalpha);
     float myzoom = zoom;
-    float cosphi = COS(camphi), sinphi = SIN(camphi);
+    float cosphi = COS(camphi);
+    float sinphi = SIN(camphi);
     glTexCoord2f (0, 0);
     glVertex3f (this->tl.x - myzoom * cosphi, this->tl.y + myzoom, this->tl.z + myzoom * sinphi);
     glTexCoord2f (1, 0);

@@ -58,9 +58,9 @@ void Button::draw ()
   font1->zoom = 0.1 * (h - 0.1);
   float yf = (y - h - 0.01) / (h - 0.1);
   float xf = (x + 0.25) / (h - 0.1);
-  if (active && !highlight) font1->drawText (xf, yf, menuZ, text, col_active);
-  else if (!active) font1->drawText (xf, yf, menuZ, text, col_deactive);
-  else font1->drawText (xf, yf, menuZ, text, col_highlight);
+  if (active && !highlight) font1->drawText (xf, yf, menuZ, text, *col_active);
+  else if (!active) font1->drawText (xf, yf, menuZ, text, *col_deactive);
+  else font1->drawText (xf, yf, menuZ, text, *col_highlight);
   font1->zoom = 0.1;
 }
 

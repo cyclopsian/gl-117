@@ -447,18 +447,15 @@ class Space
     float alpha;
     float lum;      ///< luminance
     std::vector<SpaceObj *> o; ///< reference to all objects in space
-//    Vector3 z1;    ///< min bounding box for easy preclipping space/cube
-//    Vector3 z2;    ///< max bounding box for easy preclipping space/cube
     Vector3 tl;    ///< translation
   
     Space ();
-//    Space (Vector3 &v, Vector3 &w);
     virtual ~Space ();
 
     void init ();
     void addObject (SpaceObj *o);
     void translate (Vector3 &v);
-    void drawGL ();
+    virtual void drawGL ();
 };
 
 #endif

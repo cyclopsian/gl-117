@@ -28,7 +28,8 @@
 
 #include "Effects.h"
 #include "opengl/GlPrimitives.h"
-#include "common.h"
+
+
 
 Star::Star (int phi, int gamma, float size)
 {
@@ -39,13 +40,13 @@ Star::Star (int phi, int gamma, float size)
 
 void Star::draw ()
 {
-  glPointSize (LINEWIDTH(size));
-//    gl->enableAntiAliasing ();
+  glPointSize (size * 1.5); // TODO: should depend on screen resolution!
+//    gl.enableAntiAliasing ();
   glBegin (GL_POINTS);
   glColor3ub (255, 255, 255);
   glVertex3f (0, 0, 0);
   glEnd ();
-//    gl->disableAntiAliasing ();
+//    gl.disableAntiAliasing ();
 }
 
 #endif

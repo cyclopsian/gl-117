@@ -177,7 +177,7 @@ class DynamicObj : public SpaceObj
   int getAngleH (DynamicObj *o);
   // check for a looping, this is tricky :-)
   bool checkLooping ();
-  void move (Uint32 dt);
+  void move (Uint32 dt, float camphi, float camgamma);
 };
 
 const int missiletypes = 8;
@@ -258,7 +258,7 @@ class AIObj : public DynamicObj
   void targetLockingEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);
-  void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff); // core AI method
+  void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma); // core AI method
 };
 
 #endif

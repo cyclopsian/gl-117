@@ -22,7 +22,7 @@
 #ifndef IS_SOUNDSYSTEM_H
 #define IS_SOUNDSYSTEM_H
 
-#include "common.h" // ok
+#include "opengl/includegl.h"
 
 /**
 * This class loads and plays a Wavefile with SDL or SDL_mixer if available.

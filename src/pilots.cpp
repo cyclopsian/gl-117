@@ -29,6 +29,7 @@
 #include "dirs.h"
 #include "pilots.h"
 #include "mission.h"
+#include "logging/Logging.h"
 
 TeamPilot::TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills)
 {
@@ -155,7 +156,7 @@ void Pilot::load ()
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
-    display ("Could not load pilot", LOG_WARN);
+    logging.display ("Could not load pilot", LOG_WARN);
     return;
   }
   char saveversion [20];
@@ -182,7 +183,7 @@ void Pilot::save ()
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {
-    display ("Could not write pilot", LOG_WARN);
+    logging.display ("Could not write pilot", LOG_WARN);
     return;
   }
   fwrite (SAVEVERSION, sizeof (char), strlen (SAVEVERSION), out);
@@ -293,7 +294,7 @@ void PilotList::load (char *fname)
   FILE *in = fopen (fname, "rb");
   if (in == NULL)
   {
-    display ("Could not load saves/pilots", LOG_WARN);
+    logging.display ("Could not load saves/pilots", LOG_WARN);
     aktpilots = 0;
     add ("PLAYER");
     return;
@@ -322,7 +323,7 @@ void PilotList::save (char *fname)
   FILE *out = fopen (fname, "wb");
   if (out == NULL)
   {
-    display ("Could not write saves/pilots", LOG_WARN);
+    logging.display ("Could not write saves/pilots", LOG_WARN);
     return;
   }
   sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);

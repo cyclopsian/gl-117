@@ -23,6 +23,7 @@
 
 #ifndef IS_AIOBJECT_H
 
+#include "logging/Logging.h"
 #include "aiobject.h"
 #include "gllandscape/GlLandscape.h"
 #include "main.h"
@@ -435,7 +436,7 @@ bool DynamicObj::checkLooping ()
 }
 
 // discrete movement, called about timestep times per second, timer-dependant, currently without extra thread (GLUT)!
-void DynamicObj::move (Uint32 dt)
+void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 {
   if (dt <= 0) return;
   if (realspeed <= 0) realspeed = 1.0F;
@@ -1502,10 +1503,10 @@ void AIObj::fireCannon (DynamicObj **laser)
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
   char buf [STDSIZE];
-  if (debuglevel == LOG_ALL)
+  if (logging.loglevel == LOG_ALL)
   {
     sprintf (buf, "Missile: party=%d, id=%d", party, id);
-    display (buf, LOG_ALL);
+    logging.display (buf, LOG_ALL);
   }
   ttf = 50 * timestep;
   missile->dinit ();
@@ -1536,10 +1537,10 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 void AIObj::fireFlare2 (DynamicObj *flare)
 {
   char buf [STDSIZE];
-  if (debuglevel == LOG_ALL)
+  if (logging.loglevel == LOG_ALL)
   {
     sprintf (buf, "Flare: party=%d", party);
-    display (buf, debuglevel);
+    logging.display (buf, LOG_ALL);
   }
   flare->dinit ();
   flare->thrust = 0;
@@ -1566,7 +1567,7 @@ void AIObj::fireChaff2 (DynamicObj *chaff)
   if (debug == LOG_ALL)
   {
     sprintf (buf, "Chaff: party=%d", party);
-    display (buf, LOG_ALL);
+    logging.display (buf, LOG_ALL);
   }
   chaff->dinit ();
   chaff->thrust = 0;
@@ -1621,7 +1622,7 @@ bool AIObj::haveMissile (int id)
   if (id < 0 || id >= missiletypes)
   {
     sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    display (buf, LOG_ERROR);
+    logging.display (buf, LOG_ERROR);
   }
   if (missiles [id] > 0)
     return true;
@@ -1643,7 +1644,7 @@ void AIObj::decreaseMissile (int id)
   if (id < 0 || id >= missiletypes)
   {
     sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    display (buf, LOG_ERROR);
+    logging.display (buf, LOG_ERROR);
   }
   missiles [id] --;
   int ptrrack = 0, maxrack = 0;
@@ -1730,10 +1731,7 @@ bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             if (hit)
             {
-              if (debuglevel == LOG_ALL)
-              {
-                display ("Missile to flare", LOG_ALL);
-              }
+              logging.display ("Missile to flare", LOG_ALL);
               missile [i2]->target = flare [i];
             }
           }
@@ -1776,10 +1774,7 @@ bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             if (hit)
             {
-              if (debuglevel == LOG_ALL)
-              {
-                display ("Missile to chaff", LOG_ALL);
-              }
+              logging.display ("Missile to chaff", LOG_ALL);
               missile [i2]->target = chaff [i];
             }
           }
@@ -1981,7 +1976,7 @@ void AIObj::targetPrevious (AIObj **f)
 }
 
 // core AI method
-void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff)
+void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
 {
   int i;
 
@@ -1999,7 +1994,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if (smokettl > 0) smokettl -= dt; // time to fire the next chaff
 
   // move object according to our physics
-  move (dt);
+  move (dt, camphi, camgamma);
 
   float timefac = (float) dt / (float) timestep;
 
@@ -2019,7 +2014,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     for (i = 0; i < (int) fg; i ++)
     {
       float fac = (float) i / fg;
-      smoke->setSmoke (tl.x - sx - forcex * fac, tl.y - sy - forcey * fac, tl.z - sz - forcez * fac, (int) phi, 39 - i);
+      smoke->setSmoke (tl.x - sx - forcex * fac, tl.y - sy - forcey * fac, tl.z - sz - forcez * fac, 39 - i);
     }
 /*    smoke->setSmoke (tl.x - sx - forcex * 0.6, tl.y - sy - forcey * 0.6, tl.z - sz - forcez * 0.6, (int) phi, 36);
     smoke->setSmoke (tl.x - sx - forcex * 0.4, tl.y - sy - forcey * 0.4, tl.z - sz - forcez * 0.4, (int) phi, 37);
@@ -2446,7 +2441,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         if (fabs (tl.y - myheight) < minh * 0.3)
         {
           manoeverstate = 10;
-          display ("Manoever: Vertical climb", LOG_ALL);
+          logging.display ("Manoever: Vertical climb", LOG_ALL);
         }
         else
         {
@@ -2653,19 +2648,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         if (aw > 140 && disttarget > 50)
         {
           manoeverstate = 1;
-          display ("Manoever: Immelmann", LOG_ALL);
+          logging.display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw > 160.0F + 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
           manoeverstate = 1;
-          display ("Manoever: Immelmann", LOG_ALL);
+          logging.display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw > 160 && disttarget < 25) // target is at the back
         {
           if (fabs (tl.y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
-            display ("Manoever: Roll", LOG_ALL);
+            logging.display ("Manoever: Roll", LOG_ALL);
           }
           else
           {
@@ -2673,14 +2668,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8)); // turn hard left or right
-              display ("Manoever: Turn", LOG_ALL);
+              logging.display ("Manoever: Turn", LOG_ALL);
             }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
-              display ("Manoever: Height change", LOG_ALL);
+              logging.display ("Manoever: Height change", LOG_ALL);
             } // stay low
           }
         }
@@ -2711,19 +2706,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         if (aw < -140 && disttarget > 50)
         {
           manoeverstate = 1;
-          display ("Manoever: Immelmann", LOG_ALL);
+          logging.display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw < -160.0F - 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
           manoeverstate = 1;
-          display ("Manoever: Immelmann", LOG_ALL);
+          logging.display ("Manoever: Immelmann", LOG_ALL);
         }
         else if (aw < -160 && disttarget < 25)
         {
           if (fabs (tl.y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
-            display ("Manoever: Roll", LOG_ALL);
+            logging.display ("Manoever: Roll", LOG_ALL);
           }
           else
           {
@@ -2731,14 +2726,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8));
-              display ("Manoever: Turn", LOG_ALL);
+              logging.display ("Manoever: Turn", LOG_ALL);
             }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
-              display ("Manoever: Height change", LOG_ALL);
+              logging.display ("Manoever: Height change", LOG_ALL);
             }
           }
         }

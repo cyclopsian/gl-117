@@ -24,6 +24,7 @@
 #include <stdlib.h>
 
 #include "SoundSystem.h"
+#include "logging/Logging.h"
 #include "dirs.h"
 
 WaveFile *wave = NULL;
@@ -122,12 +123,12 @@ WaveFile::~WaveFile () {}
 void WaveFile::load (char *filename)
 {
 #ifndef USE_GLUT
-  char buf [STDSIZE];
+  char buf [4096];
 #ifndef HAVE_SDL_MIXER
   if (SDL_LoadWAV (filename, &spec, &sound, &soundlen) == NULL)
   {
     sprintf (buf, "Couldn't load %s: %s", filename, SDL_GetError ());
-    display (buf, LOG_FATAL);
+    logging.display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
   spec.callback = fillrepeat;
@@ -137,7 +138,7 @@ void WaveFile::load (char *filename)
   if (chunk == NULL)
   {
     sprintf (buf, "SDL_Mixer: %s", Mix_GetError ());
-    display (buf, LOG_FATAL);
+    logging.display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
 #endif

@@ -27,10 +27,7 @@
 #include <stdlib.h>
 
 #include "Effects.h"
-//#include "GlLandscape.h"
 #include "opengl/GlPrimitives.h"
-#include "math/Math.h"
-#include "common.h"
 
 
 
@@ -59,12 +56,13 @@ void Flash::set (float x, float y, float z, int phi)
 void Flash::draw ()
 {
   int i;
-  glDisable (GL_TEXTURE_2D);
-  glBegin (GL_QUAD_STRIP);
-  glColor3ub (255, 255, 255);
   float myzoom = 0.3;
   float cosphi = COS(phi);
   float sinphi = SIN(phi);
+
+  glDisable (GL_TEXTURE_2D);
+  glBegin (GL_QUAD_STRIP);
+  glColor3ub (255, 255, 255);
 
   for (i = 0; i < 10; i ++)
   {
@@ -77,13 +75,14 @@ void Flash::draw ()
 void Flash::drawHQ ()
 {
   int i;
-  glDisable (GL_TEXTURE_2D);
-  gl.enableAlphaBlending ();
-  glBegin (GL_QUADS);
   float myzoom = 0.4;
   float alphawidth = 0.7;
   float cosphi = COS(phi);
   float sinphi = SIN(phi);
+
+  glDisable (GL_TEXTURE_2D);
+  gl.enableAlphaBlending ();
+  glBegin (GL_QUADS);
 
   for (i = 0; i < 9; i ++)
   {

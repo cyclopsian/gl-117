@@ -22,6 +22,7 @@
 #ifndef IS_LOADOBJ_H
 
 #include "LoadObj.h"
+#include "logging/Logging.h"
 
 #include <stdio.h>
 
@@ -29,13 +30,13 @@
 
 TextFileObj::TextFileObj (char *filename)
 {
-//  char buf [4096];
+  char buf [4096];
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "%s %d: Cannot open file %s", __FILE__, __LINE__, filename);
-//    display (buf, LOG_FATAL);
-//    exit (EXIT_LOADFILE);
+    sprintf (buf, "%s %d: Cannot open file %s", __FILE__, __LINE__, filename);
+    logging.display (buf, LOG_FATAL);
+    exit (EXIT_LOADFILE);
     return;
   }
   fseek (in, 0, SEEK_END);

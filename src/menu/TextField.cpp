@@ -60,7 +60,7 @@ void TextField::draw ()
   font1->zoom = 0.1 * (fonth - 0.1);
   float yf = (y - fonth - 0.1) / (fonth - 0.1);
   float xf = (x + 0.25) / (fonth - 0.1);
-  font1->drawText (xf, yf, menuZ, text, col);
+  font1->drawText (xf, yf, menuZ, text, *col);
   font1->zoom = 0.1;
 }
 

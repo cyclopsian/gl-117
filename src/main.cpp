@@ -25,6 +25,7 @@
 
 /*
 TODO:
+- BlackSmoke is not drawn!
 - joystick update (mail)
 - joystick in menu
 - mig29 model
@@ -51,8 +52,11 @@ TODO:
 #include "mission.h"
 #include "gllandscape/GlLandscape.h"
 #include "common.h"
+#include "logging/Logging.h"
 
 #include <ctype.h>
+
+const int timestep = 34;
 
 int mousex, mousey;
 
@@ -63,7 +67,8 @@ int weather = WEATHER_SUNNY;
 float sungamma = 45.0;
 
 int camera = 0;
-//float cam.x = 0, cam.y = 0, cam.z = 0, camphi = 0, camgamma = 0, camtheta = 0;
+//float cam.x = 0, cam.y = 0, cam.z = 0
+float camphi = 0, camgamma = 0, camtheta = 0;
 Vector3 cam;
 float view_x = 0, view_y = 0;
 float sunlight = 1.0, sunlight_dest = 1.0;
@@ -93,7 +98,7 @@ SDL_Thread *threadnet = NULL;
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_MOST;
+int loglevel = LOG_MOST;
 int brightness = 0;
 int contrast = 10;
 
@@ -131,7 +136,7 @@ Uint32 lasttime = 0;
 
 
 
-Load3ds g_Load3ds;
+Load3ds load3ds;
 Model3d model_fig;
 Model3d model_figa;
 Model3d model_figb;
@@ -663,7 +668,7 @@ int game_levelInit ()
     {
       if (((MissionCustom *) mission)->reterror)
       {
-        display ("Could not startup mission", LOG_ERROR);
+        logging.display ("Could not startup mission", LOG_ERROR);
         delete mission;
         mission = missionold;
         return 0;
@@ -959,7 +964,7 @@ void game_reshape ()
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
 
-  float v = getView ();
+  float v = l->getView ();
   if (camera == 50) v = 100000.0;
   gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
@@ -979,7 +984,7 @@ void menu_reshape ()
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
 
-  float v = getView ();
+  float v = l->getView ();
   if (camera == 50) v = 100000.0;
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
@@ -996,7 +1001,7 @@ void credits_reshape ()
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
 
-  float v = getView ();
+  float v = l->getView ();
   if (camera == 50) v = 100000.0;
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
@@ -1013,7 +1018,7 @@ void stats_reshape ()
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
 
-  float v = getView ();
+  float v = l->getView ();
   if (camera == 50) v = 100000.0;
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
@@ -1170,7 +1175,7 @@ void switch_mission (int missionid)
   {
     if (((MissionCustom *) missionnew)->reterror)
     {
-      display ("Could not init mission", LOG_ERROR);
+      logging.display ("Could not init mission", LOG_ERROR);
       // play error sound
       switch_menu ();
       return;
@@ -1952,7 +1957,7 @@ void pleaseWait ()
   glVertex3f (-xf, -yf, zf);
   glEnd ();
 
-  font1->drawTextCentered (0, -0.5, -1.5, "PLEASE WAIT...", &colorwhite);
+  font1->drawTextCentered (0, -0.5, -1.5, "PLEASE WAIT...", colorwhite);
   game_view ();
 }
 
@@ -1961,7 +1966,7 @@ void stats_key (unsigned char key, int x, int y)
   if (key == 27)
   {
     pleaseWait ();
-    display ("Initing new mission", LOG_MOST);
+    logging.display ("Initing new mission", LOG_MOST);
     missionactive = false;
     createMission (MISSION_DEMO);
     game_levelInit ();
@@ -2253,62 +2258,62 @@ void mission_display ()
   font1->zoom = 0.105;
   font2->zoom = 0.105;
   float fontscale = 1.05;
-  font1->drawTextCentered (0, texty / fontscale, -2, missionnew->name, col);
+  font1->drawTextCentered (0, texty / fontscale, -2, missionnew->name, *col);
   texty -= 1.1;
   font1->zoom = 0.05;
   font2->zoom = 0.05;
   fontscale = 0.5;
-  font1->drawText (textx / fontscale, texty / fontscale, -2, "BRIEFING:", col);
+  font1->drawText (textx / fontscale, texty / fontscale, -2, "BRIEFING:", *col);
   texty -= 1;
-  font1->drawText (textx / fontscale, texty / fontscale, -2, missionnew->briefing, col);
+  font1->drawText (textx / fontscale, texty / fontscale, -2, missionnew->briefing, *col);
 
   float xstats = 0.8, ystats = 5;
   float xstatstab = 5;
-  font1->drawText (xstats / fontscale, ystats / fontscale, -2, "STATUS:", col);
+  font1->drawText (xstats / fontscale, ystats / fontscale, -2, "STATUS:", *col);
   if (p->mission_state [missionnew->id] == 1)
-    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "SUCCESS", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "SUCCESS", *colorstd);
   else if (p->mission_state [missionnew->id] == 2)
-    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "FAILED", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "FAILED", *colorstd);
   else
-    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "EMPTY", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "EMPTY", *colorstd);
   if (missionnew->id >= MISSION_CAMPAIGN1 && missionnew->id <= MISSION_CAMPAIGN2)
   {
     texty = ystats - 0.7;
-    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", col);
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", *col);
     int score = p->mission_score [missionnew->id];
     if (score < -10000 || score > 100000) score = 0;
     sprintf (buf, "%d", score);
-    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, colorstd);
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, *colorstd);
     texty -= 0.7;
-    font1->drawText (xstats / fontscale, texty / fontscale, -2, "KILLS:", col);
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "KILLS:", *col);
     sprintf (buf, "%d AIRCRAFTS", p->mission_fighterkills [missionnew->id]);
-    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, colorstd);
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, *colorstd);
 //    drawMedal (xstatstab + 2, ystats - 3, -2, getMedal (p->mission_score [missionnew->id]), 2, mission->id);
   }
   else
   {
     texty = ystats - 0.7;
-    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", col);
-    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, "TRAINING", col);
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", *col);
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, "TRAINING", *col);
   }
   
-  font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", col);
+  font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", *col);
   strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank ());
   strcat (buf, " ");
   strcat (buf, pilots->pilot [pilots->aktpilot]->name);
-  font2->drawText ((textx + 1.5) / fontscale, (piloty - 0.8) / fontscale, -2, buf, col);
+  font2->drawText ((textx + 1.5) / fontscale, (piloty - 0.8) / fontscale, -2, buf, *col);
   drawRank (textx, piloty - 0.8, -2, pilots->pilot [pilots->aktpilot]->ranking, 0.5);
   for (i = 1; i < missionnew->alliedfighters; i ++)
     if (missionnew->alliedpilot [i - 1] >= 0 && missionnew->alliedpilot [i - 1] < 100)
     {
       drawRank (textx, piloty - 1 - 0.6 * i, -2, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->ranking, 0.5);
-      font2->drawText ((textx + 1.5) / fontscale, (piloty - 1 - 0.6 * i) / fontscale, -2, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->getShortName (), col);
+      font2->drawText ((textx + 1.5) / fontscale, (piloty - 1 - 0.6 * i) / fontscale, -2, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->getShortName (), *col);
     }
 
-  font1->drawText (textx / fontscale, -1 / fontscale, -2, "CHOOSE FIGHTER:", col);
-  font1->drawText (xstats / fontscale, -1 / fontscale, -2, "CHOOSE WEAPON PACK:", col);
-  font2->drawText (textx / fontscale, -6 / fontscale, -2, getModelName (missionnew->selfighter [missionnew->wantfighter]), col);
-  font2->drawText (xstats / fontscale, -6 / fontscale, -2, getModelName (missionnew->selweapon [missionnew->wantweapon]), col);
+  font1->drawText (textx / fontscale, -1 / fontscale, -2, "CHOOSE FIGHTER:", *col);
+  font1->drawText (xstats / fontscale, -1 / fontscale, -2, "CHOOSE WEAPON PACK:", *col);
+  font2->drawText (textx / fontscale, -6 / fontscale, -2, getModelName (missionnew->selfighter [missionnew->wantfighter]), *col);
+  font2->drawText (xstats / fontscale, -6 / fontscale, -2, getModelName (missionnew->selweapon [missionnew->wantweapon]), *col);
   font1->zoom = 0.1;
   font2->zoom = 0.1;
 
@@ -2363,7 +2368,7 @@ void create_display ()
   font1->drawTextCentered (0, 9, -1.5, "CREATE GAME");
 
   if (missionmenuitemselected == 0)
-    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (-2, -12, -2, "BACK", *colorstd, -missionmenutimer * 5);
   else
     font1->drawText (-2, -12, -2, "BACK");
 
@@ -2407,7 +2412,7 @@ void join_display ()
   font1->drawTextCentered (0, 9, -1.5, "JOIN GAME");
 
   if (missionmenuitemselected == 0)
-    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (-2, -12, -2, "BACK", *colorstd, -missionmenutimer * 5);
   else
     font1->drawText (-2, -12, -2, "BACK");
 
@@ -2468,7 +2473,7 @@ void fighter_display ()
   float fontzoom = 0.7;
   float textx = -9.5;
   font1->zoom = 0.07;
-  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), col);
+  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), *col);
   float yf = 9.6 - 1.35;
   strcpy (buf, "TYPE: ");
   if (ffighter.id == FIGHTER_FALCON || ffighter.id == FIGHTER_CROW || ffighter.id == FIGHTER_BUZZARD || ffighter.id == FIGHTER_REDARROW || ffighter.id == FIGHTER_BLACKBIRD)
@@ -2477,29 +2482,29 @@ void fighter_display ()
     strcat (buf, "FIGHTER-BOMBER");
   else
     strcat (buf, "BOMBER");
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   yf -= 1;
   strcpy (buf, "SPEED: ");
   int stars = (int) ((ffighter.maxthrust - 0.2) * 40);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "NIMBILITY: ");
   stars = (int) ((ffighter.manoeverability - 0.3) * 20 + 1);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "SHIELD: ");
   stars = (int) ((ffighter.maxshield - 30) / 30);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "FIREPOWER: ");
   stars = ffighter.statfirepower;
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   font1->zoom = 0.1;
@@ -2544,9 +2549,9 @@ void fame_display ()
     font1->zoom = 0.07;
     drawRank (textx + 0.2, i - 3.7, -2, p->tp [index [i]]->ranking, 0.7);
     sprintf (buf, "%s %s", p->tp [index [i]]->getRank (), p->tp [index [i]]->name);
-    font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, col);
+    font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, *col);
     sprintf (buf, "%d", p->tp [index [i]]->fighterkills);
-    font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, col);
+    font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, *col);
     font1->zoom = 0.1;
   }
 
@@ -2564,7 +2569,7 @@ void game_quit ()
   save_config ();
   save_configInterface ();
   pilots->save (dirs->getSaves ("pilots"));
-  display ("Pilots saved", LOG_MOST);
+  logging.display ("Pilots saved", LOG_MOST);
   for (i = 0; i < maxlaser; i ++)
     delete (laser [i]);
   for (i = 0; i < maxmissile; i ++)
@@ -2677,81 +2682,81 @@ void stats_display ()
   color = &StandardTextColor;
   if (missionstate == 1)
   {
-    font1->drawTextCentered (0, 7, -2, "SUCCESS", &colorblue);
+    font1->drawTextCentered (0, 7, -2, "SUCCESS", colorblue);
   }
   else
   {
-    font1->drawTextCentered (0, 7, -2, "FAILED", &colorred);
+    font1->drawTextCentered (0, 7, -2, "FAILED", colorred);
   }
 
-  font1->drawText (xf1, yf, zf, "SCORE:", color);
+  font1->drawText (xf1, yf, zf, "SCORE:", *color);
   sprintf (buf, "%d", fplayer->score);
-  font1->drawText (xf3, yf, zf, buf, color);
+  font1->drawText (xf3, yf, zf, buf, *color);
   yf -= linedist * 1.2;
 
-  font1->drawText (xf1, yf, zf, "DIFFICULTY:", color);
-  if (mission->difficulty == 0) font1->drawText (xf2, yf, zf, "EASY", color);
-  else if (mission->difficulty == 1) font1->drawText (xf2, yf, zf, "NORMAL", color);
-  else if (mission->difficulty == 2) font1->drawText (xf2, yf, zf, "HARD", color);
-  if (mission->difficulty == 0) font1->drawText (xf3, yf, zf, "-25", color);
-  else if (mission->difficulty == 1) font1->drawText (xf3, yf, zf, "+25", color);
-  else if (mission->difficulty == 2) font1->drawText (xf3, yf, zf, "+75", color);
+  font1->drawText (xf1, yf, zf, "DIFFICULTY:", *color);
+  if (mission->difficulty == 0) font1->drawText (xf2, yf, zf, "EASY", *color);
+  else if (mission->difficulty == 1) font1->drawText (xf2, yf, zf, "NORMAL", *color);
+  else if (mission->difficulty == 2) font1->drawText (xf2, yf, zf, "HARD", *color);
+  if (mission->difficulty == 0) font1->drawText (xf3, yf, zf, "-25", *color);
+  else if (mission->difficulty == 1) font1->drawText (xf3, yf, zf, "+25", *color);
+  else if (mission->difficulty == 2) font1->drawText (xf3, yf, zf, "+75", *color);
   yf -= linedist;
 
-  font1->drawText (xf1, yf, zf, "FLIGHT MODEL:", color);
-  if (!fplayer->realism) font1->drawText (xf2, yf, zf, "ACTION", color);
-  else font1->drawText (xf2, yf, zf, "SIM", color);
-  if (!fplayer->realism) font1->drawText (xf3, yf, zf, "-25", color);
-  else font1->drawText (xf3, yf, zf, "+25", color);
+  font1->drawText (xf1, yf, zf, "FLIGHT MODEL:", *color);
+  if (!fplayer->realism) font1->drawText (xf2, yf, zf, "ACTION", *color);
+  else font1->drawText (xf2, yf, zf, "SIM", *color);
+  if (!fplayer->realism) font1->drawText (xf3, yf, zf, "-25", *color);
+  else font1->drawText (xf3, yf, zf, "+25", *color);
 
   int timebonus = 0;
   if (mission->timer < mission->maxtime)
     timebonus = (mission->maxtime - mission->timer) * 100 / mission->maxtime;
   yf -= linedist;
-  font1->drawText (xf1, yf, zf, "TIME BONUS:", color);
+  font1->drawText (xf1, yf, zf, "TIME BONUS:", *color);
   sprintf (buf, "%d%%", timebonus);
-  font1->drawText (xf2, yf, zf, buf, color);
+  font1->drawText (xf2, yf, zf, buf, *color);
   sprintf (buf, "+%d", timebonus);
-  font1->drawText (xf3, yf, zf, buf, color);
+  font1->drawText (xf3, yf, zf, buf, *color);
   int shieldbonus = (int) (fplayer->shield * 100 / fplayer->maxshield);
   yf -= linedist;
-  font1->drawText (xf1, yf, zf, "SHIELD BONUS:", color);
+  font1->drawText (xf1, yf, zf, "SHIELD BONUS:", *color);
   sprintf (buf, "%d%%", shieldbonus);
-  font1->drawText (xf2, yf, zf, buf, color);
+  font1->drawText (xf2, yf, zf, buf, *color);
   sprintf (buf, "+%d", shieldbonus);
-  font1->drawText (xf3, yf, zf, buf, color);
+  font1->drawText (xf3, yf, zf, buf, *color);
   yf -= linedist;
-  font1->drawText (xf1, yf, zf, "KILLS:", color);
+  font1->drawText (xf1, yf, zf, "KILLS:", *color);
   if (fplayer->fighterkills > 0)
   {
     sprintf (buf, "%d AIR", fplayer->fighterkills);
-    font1->drawText (xf2, yf, zf, buf, color);
+    font1->drawText (xf2, yf, zf, buf, *color);
     sprintf (buf, "+%d", fplayer->fighterkills * 20);
-    font1->drawText (xf3, yf, zf, buf, color);
+    font1->drawText (xf3, yf, zf, buf, *color);
     yf -= linedist2;
   }
   if (fplayer->tankkills > 0)
   {
     sprintf (buf, "%d TANKS", fplayer->tankkills);
-    font1->drawText (xf2, yf, zf, buf, color);
+    font1->drawText (xf2, yf, zf, buf, *color);
     sprintf (buf, "+%d", fplayer->tankkills * 10);
-    font1->drawText (xf3, yf, zf, buf, color);
+    font1->drawText (xf3, yf, zf, buf, *color);
     yf -= linedist2;
   }
   if (fplayer->shipkills > 0)
   {
     sprintf (buf, "%d SHIPS", fplayer->shipkills);
-    font1->drawText (xf2, yf, zf, buf, color);
+    font1->drawText (xf2, yf, zf, buf, *color);
     sprintf (buf, "+%d", fplayer->shipkills * 12);
-    font1->drawText (xf3, yf, zf, buf, color);
+    font1->drawText (xf3, yf, zf, buf, *color);
     yf -= linedist2;
   }
   if (fplayer->otherkills > 0)
   {
     sprintf (buf, "%d OTHERS", fplayer->otherkills);
-    font1->drawText (xf2, yf, zf, buf, color);
+    font1->drawText (xf2, yf, zf, buf, *color);
     sprintf (buf, "+%d", fplayer->otherkills * 5);
-    font1->drawText (xf3, yf, zf, buf, color);
+    font1->drawText (xf3, yf, zf, buf, *color);
     yf -= linedist2;
   }
   yf -= (linedist - linedist2);
@@ -2759,10 +2764,10 @@ void stats_display ()
   if (ispromoted)
   {
     yf = -6;
-    font1->drawTextCentered (0, yf, zf, "PROMOTED TO", color);
+    font1->drawTextCentered (0, yf, zf, "PROMOTED TO", *color);
     yf -= 1.5;
     sprintf (buf, "%s", p->getRank ());
-    font1->drawTextCentered (0, yf, zf, buf, color);
+    font1->drawTextCentered (0, yf, zf, buf, *color);
     drawRank (-11, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
     drawRank (7, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
   }
@@ -2905,7 +2910,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 
   char buf [STDSIZE];
   sprintf (buf, "selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift);
-  display (buf, LOG_ALL);
+  logging.display (buf, LOG_ALL);
   return pickz2;
 }
 
@@ -2915,7 +2920,7 @@ void pause_display ()
   glLoadIdentity ();
   glPushMatrix ();
 
-  font1->drawText (-3, -1, -1, "PAUSED", &colorwhite);
+  font1->drawText (-3, -1, -1, "PAUSED", colorwhite);
 
   glPopMatrix ();
 }
@@ -2937,48 +2942,48 @@ void credits_display ()
   float fontzoom = 1.0;
   font1->zoom = 0.1;
   font2->zoom = 0.1;
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "MONEY VERSUS DEMOCRACY", col2);
-  font1->drawTextCentered (0, (yt -= 3 * ydist) / fontzoom, zf, "PATENTS ON SOFTWARE", col2);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "MONEY VERSUS DEMOCRACY", *col2);
+  font1->drawTextCentered (0, (yt -= 3 * ydist) / fontzoom, zf, "PATENTS ON SOFTWARE", *col2);
   fontzoom = 0.8;
   font1->zoom = 0.08;
   font2->zoom = 0.08;
 
-  font1->drawText (xt, (yt -= 5 * ydist) / fontzoom, zf, "WHAT ARE PATENTS?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "PATENTS IN EUROPE COST ABOUT 30000-50000 EURO (= US$).", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "THEY GRANT PROPERTY FOR SOMETHING, THAT NOONE CAN PUBLISH", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EXCEPT THE PATENT OWNER.", col);
+  font1->drawText (xt, (yt -= 5 * ydist) / fontzoom, zf, "WHAT ARE PATENTS?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "PATENTS IN EUROPE COST ABOUT 30000-50000 EURO (= US$).", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "THEY GRANT PROPERTY FOR SOMETHING, THAT NOONE CAN PUBLISH", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EXCEPT THE PATENT OWNER.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHO CAN AFFORD PATENTS?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "ONLY HUGE COMPANIES.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHO CAN AFFORD PATENTS?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "ONLY HUGE COMPANIES.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT CAN BE PATENTED?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "CURRENTLY EVERYTHING. AMAZON HAS A PATENT TO SELL PRODUCTS", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "WITH ONE MOUSE CLICK. THERE ARE EUROPEAN PATENTS ON THE", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PROGRESS BAR, ON THE UNDO FUNCTION, ETC.", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CURRENTLY EURO SOFTWARE PATENTS ARE STOPPED UNTIL THE END", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "OF SUMMER 2004.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT CAN BE PATENTED?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "CURRENTLY EVERYTHING. AMAZON HAS A PATENT TO SELL PRODUCTS", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "WITH ONE MOUSE CLICK. THERE ARE EUROPEAN PATENTS ON THE", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PROGRESS BAR, ON THE UNDO FUNCTION, ETC.", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CURRENTLY EURO SOFTWARE PATENTS ARE STOPPED UNTIL THE END", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "OF SUMMER 2004.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "AN EXAMPLE FOR PATENTS ON COURT?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "IN 2001 MICROSOFT HAD TO PAY 500000000 US$, BECAUSE ANOTHER", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "COMPANY HAD A PATENT ON BROWSER PLUGINS (US).", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "AN EXAMPLE FOR PATENTS ON COURT?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "IN 2001 MICROSOFT HAD TO PAY 500000000 US$, BECAUSE ANOTHER", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "COMPANY HAD A PATENT ON BROWSER PLUGINS (US).", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS SOFTWARE?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "SOFTWARE IS BASED ON ABSTRACT DESCRIPTIONS, WHICH EVERYONE", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CAN FORMULATE IN PROSE LANGUAGE. CODE IS JUST A MIRROR", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "IMAGE OF THE DESCRIPTION.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS SOFTWARE?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "SOFTWARE IS BASED ON ABSTRACT DESCRIPTIONS, WHICH EVERYONE", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CAN FORMULATE IN PROSE LANGUAGE. CODE IS JUST A MIRROR", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "IMAGE OF THE DESCRIPTION.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY DOES MICROSOFT WANT PATENTS?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "TO PATENT CONCEPTS, AND DICTATE WHICH SYSTEMS MAY USE THEM.", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EVENTUALLY TO ELIMINATE LINUX AND OPEN SOURCE.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY DOES MICROSOFT WANT PATENTS?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "TO PATENT CONCEPTS, AND DICTATE WHICH SYSTEMS MAY USE THEM.", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EVENTUALLY TO ELIMINATE LINUX AND OPEN SOURCE.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY CAN EVERYTHING BE PATENTED?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "HUGE COMPANIES ARE PUSHING FOR EXECUTIVE POWERS.", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PATENT LAWYERS ARE TAKING THE MONEY.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY CAN EVERYTHING BE PATENTED?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "HUGE COMPANIES ARE PUSHING FOR EXECUTIVE POWERS.", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PATENT LAWYERS ARE TAKING THE MONEY.", *col);
 
-  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS DEMOCRACY?", col2);
-  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "YOUR POWER TO STOP THIS ABUSE.", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "VOTE AGAINST SOFTWARE PATENTS ON HTTP://PETITION.EUROLINUX.ORG.", col);
-  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "TELL YOUR FRIENDS AND SEARCH THE INTERNET FOR MORE INSANITY.", col);
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS DEMOCRACY?", *col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "YOUR POWER TO STOP THIS ABUSE.", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "VOTE AGAINST SOFTWARE PATENTS ON HTTP://PETITION.EUROLINUX.ORG.", *col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "TELL YOUR FRIENDS AND SEARCH THE INTERNET FOR MORE INSANITY.", *col);
 #else
   float yt = 12, zf = -2.4, ydist = 0.7;
   glPushMatrix ();
@@ -2986,39 +2991,39 @@ void credits_display ()
   Color *col = &colorwhite;
   Color *col2 = &coloryellow;
   float fontzoom = 1;
-  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GAME PROGRAMMING,", col);
-  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "THOMAS A. DREXL", col2);
+  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GAME PROGRAMMING,", *col);
+  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GRAPHICS, MODELS, SOUND & MUSIC", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "THOMAS A. DREXL", *col2);
   font1->zoom = 0.08;
   font2->zoom = 0.08;
   fontzoom = 0.8;
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "SPECIAL THANKS TO...", col);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "LENS FLARES & FURTHER DEBUGGING", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "PIOTR PAWLOW", col2);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "LOURENS VEEN", col2);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PUBLISHING & FURTHER GAME IDEAS", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "BERNHARD KAINDL", col2);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOON TERRAIN", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "NORBERT DREXL", col2);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PHYSICAL MODEL (ACTION) & COCKPIT IMPROVEMENTS", col);
-  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "ARNE REINERS", col2);
-  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "...AND THANKS TO ALL PEOPLE GIVING FEEDBACK AND ADVICE", col);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "SPECIAL THANKS TO...", *col);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "LENS FLARES & FURTHER DEBUGGING", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "PIOTR PAWLOW", *col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "LOURENS VEEN", *col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PUBLISHING & FURTHER GAME IDEAS", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "BERNHARD KAINDL", *col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOON TERRAIN", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "NORBERT DREXL", *col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PHYSICAL MODEL (ACTION) & COCKPIT IMPROVEMENTS", *col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "ARNE REINERS", *col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "...AND THANKS TO ALL PEOPLE GIVING FEEDBACK AND ADVICE", *col);
   float xf = -10;
   font1->zoom = 0.1;
   font2->zoom = 0.1;
   fontzoom = 1;
-  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "***********************", col);
-  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "DO YOU WANT TO CONTRIBUTE?", col);
+  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "***********************", *col);
+  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "DO YOU WANT TO CONTRIBUTE?", *col);
   font1->zoom = 0.08;
   font2->zoom = 0.08;
   fontzoom = 0.8;
-  font2->drawText (xf / fontzoom, (yt -= 4 * ydist) / fontzoom, zf, "LOTS OF THINGS ARE STILL NEEDED:", col);
-  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DRAW TEXTURES OF TREES, BUILDINGS, ETC", col);
-  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DESIGN 3D MODELS", col);
-  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- CREATE SOUNDTRACKS", col);
-  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- MAKE MISSION SUGGESTIONS", col);
-  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- GIVE FEEDBACK AND ADVICE", col);
+  font2->drawText (xf / fontzoom, (yt -= 4 * ydist) / fontzoom, zf, "LOTS OF THINGS ARE STILL NEEDED:", *col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DRAW TEXTURES OF TREES, BUILDINGS, ETC", *col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DESIGN 3D MODELS", *col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- CREATE SOUNDTRACKS", *col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- MAKE MISSION SUGGESTIONS", *col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- GIVE FEEDBACK AND ADVICE", *col);
   font1->zoom = 0.1;
   font2->zoom = 0.1;
   glPopMatrix ();
@@ -3029,21 +3034,21 @@ void finish_display ()
 {
   glTranslatef (0, -3.5 + 0.01 * (float) finishtimer / timestep, 0);
   Color *col = &colorwhite;
-  font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", col);
-  font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", col);
-  font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", col);
-  font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", col);
-  font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", col);
-  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", col);
-  font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", col);
-  font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", col);
-  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUNDS, MUSIC,", col);
-  font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", col);
-  font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", col);
-  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", col);
-  font1->drawTextCentered (0, -14, -3, "PROGRAMMERS JOINED (LISTED IN THE CREDITS SECTION).", col);
-  font1->drawTextCentered (0, -16, -3, "SPECIAL THANKS TO JOSEF DREXL FOR THE MODELING IDEAS,", col);
-  font1->drawTextCentered (0, -18, -3, "AND THE UNIX AWARD GOES TO WOLFGANG HOMMEL ;-)", col);
+  font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", *col);
+  font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", *col);
+  font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", *col);
+  font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", *col);
+  font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", *col);
+  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", *col);
+  font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", *col);
+  font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", *col);
+  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUNDS, MUSIC,", *col);
+  font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", *col);
+  font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", *col);
+  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", *col);
+  font1->drawTextCentered (0, -14, -3, "PROGRAMMERS JOINED (LISTED IN THE CREDITS SECTION).", *col);
+  font1->drawTextCentered (0, -16, -3, "SPECIAL THANKS TO JOSEF DREXL FOR THE MODELING IDEAS,", *col);
+  font1->drawTextCentered (0, -18, -3, "AND THE UNIX AWARD GOES TO WOLFGANG HOMMEL ;-)", *col);
 }
 
 void quit_display ()
@@ -3052,7 +3057,7 @@ void quit_display ()
   quitmenu.setVisible (true);
   quitmenu.draw ();
 
-  font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", &StandardTextColor);
+  font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", StandardTextColor);
 
   drawMouseCursor ();
 }
@@ -3075,7 +3080,7 @@ void game_display ()
   else glDisable (GL_DITHER);
 
   bool sunvisible = false;
-  float pseudoview = getView ();
+  float pseudoview = l->getView ();
 
   float mycamtheta = camtheta, mycamphi = camphi + view_x , mycamgamma = camgamma + view_y;
 
@@ -3221,7 +3226,7 @@ void game_display ()
     highclouds->zoom = 400;
     float ch2 = -382 - fplayer->tl.y / 10.0;
     Vector3 tlsphere2 (0, ch2, 0);
-    highclouds->drawGL (&tlsphere2, &fplayer->tl);
+    highclouds->drawGL (tlsphere2, fplayer->tl);
 
     glDisable (GL_FOG);
   }
@@ -3393,7 +3398,7 @@ void game_display ()
               if ((dobj->id >= MISSILE1 && dobj->id <= MISSILE2) || (dobj->id >= FIGHTER1 && dobj->id <= FIGHTER2))
                 if (!(dobj->ttl == 0 && dobj->id >= MISSILE1 && dobj->id <= MISSILE2))
                 {
-                  dobj->smoke->draw ();
+                  dobj->smoke->draw (camphi, camgamma);
                 }
           }
       }
@@ -3565,7 +3570,7 @@ void game_display ()
   glPopMatrix ();
   char buf [25];
   sprintf (buf, "FPS: %d", (int) fps);
-  font1->drawText (-25, 25, -3.5, buf, &colorwhite);
+  font1->drawText (-25, 25, -3.5, buf, colorwhite);
 
   bool write = false;
   if (firststart)
@@ -3579,22 +3584,22 @@ void game_display ()
     if (akttime - starttime < 20000)
       if ((akttime - starttime) / 300 % 3)
       {
-        font1->drawTextCentered (0, 0, -1.8, "PLEASE WAIT WHILE", &colorred);
-        font1->drawTextCentered (0, -1, -1.8, "ADJUSTING QUALITY", &colorred);
+        font1->drawTextCentered (0, 0, -1.8, "PLEASE WAIT WHILE", colorred);
+        font1->drawTextCentered (0, -1, -1.8, "ADJUSTING QUALITY", colorred);
         write = true;
       }
   }
   if (fps >= 5 && fps <= 20 && !write)
   {
-    font1->drawTextCentered (0, -8, -2, "FPS TOO LOW", &colorred);
-    font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
+    font1->drawTextCentered (0, -8, -2, "FPS TOO LOW", colorred);
+    font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", colorred);
   }
 
   if (fps < 5 && !write)
   {
-    font1->drawTextCentered (0, -8, -2, "FPS FAR TOO LOW", &colorred);
-    font1->drawTextCentered (0, -9, -2, "SEE \"README\" OR \"FAQ\" FILES", &colorred);
-    font1->drawTextCentered (0, -10, -2, "HIT \"ESC\" AND 'Y' TO EXIT THE GAME", &colorred);
+    font1->drawTextCentered (0, -8, -2, "FPS FAR TOO LOW", colorred);
+    font1->drawTextCentered (0, -9, -2, "SEE \"README\" OR \"FAQ\" FILES", colorred);
+    font1->drawTextCentered (0, -10, -2, "HIT \"ESC\" AND 'Y' TO EXIT THE GAME", colorred);
   }
 
   if (controls == CONTROLS_MOUSE && !mouse_relative)
@@ -3670,7 +3675,7 @@ void game_timer (int dt)
     int fphi = (int) camphi + math.random (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
-    float pseudoview = getView ();
+    float pseudoview = l->getView ();
     float fdist = math.random ((int) pseudoview - 20) + 10;
     float fx = fplayer->tl.x - SIN(fphi) * fdist;
     float fz = fplayer->tl.z - COS(fphi) * fdist;
@@ -3726,7 +3731,7 @@ void game_timer (int dt)
   // move objects
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff);
+    fighter [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff, camphi, camgamma);
     float lev;
     if (fighter [i]->explode == 1 && (lev = fplayer->distance (fighter [i])) < 32)
     {
@@ -3739,25 +3744,25 @@ void game_timer (int dt)
   }
   for (i = 0; i < maxlaser; i ++)
   {
-    laser [i]->move (dt);
+    laser [i]->move (dt, camphi, camgamma);
   }
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff);
+    missile [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff, camphi, camgamma);
   }
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i]->move (dt);
+    flare [i]->move (dt, camphi, camgamma);
   }
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i]->move (dt);
+    chaff [i]->move (dt, camphi, camgamma);
   }
 
   for (i = 0; i < maxexplosion; i ++)
-    explosion [i]->move (dt);
+    explosion [i]->move (dt, camphi, camgamma);
   for (i = 0; i < maxblacksmoke; i ++)
-    blacksmoke [i]->move (dt);
+    blacksmoke [i]->move (dt, camphi, camgamma);
 
   // show blackout/redout
   if (blackout > 0) blackout -= 3.0F * dt / timestep;
@@ -4291,16 +4296,16 @@ void init_reshape ()
 // load game data (this method does not really belong to the intro itself)
 void myFirstInit ()
 {
-  display ("Creating calculation tables", LOG_ALL);
+  logging.display ("Creating calculation tables", LOG_ALL);
 //  mathtab_init ();
 
-  display ("Creating advanced OpenGL methods", LOG_ALL);
+  logging.display ("Creating advanced OpenGL methods", LOG_ALL);
 //  gl = new GlPrimitives ();
 //  frustum = new Frustum ();
 
   // create textures (OpenGL)
-  display ("Loading textures", LOG_ALL);
-  g_Load3ds.setTextureDir (std::string (dirs->getTextures ("")));
+  logging.display ("Loading textures", LOG_ALL);
+  load3ds.setTextureDir (std::string (dirs->getTextures ("")));
   texgrass = new Texture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
   texrocks = new Texture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
   texwater = new Texture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
@@ -4343,62 +4348,62 @@ void myFirstInit ()
   texradar2 = new Texture (std::string (dirs->getTextures ("radar1.tga")), -1, 0, true);
   texarrow = new Texture (std::string (dirs->getTextures ("arrow.tga")), -1, 0, true);
 
-  display ("Loading Fonts", LOG_ALL);
+  logging.display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
 //  font1 = new Font (dirs->getTextures ("font3.tga"), 37, '!', 100);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 
-  display ("Loading 3ds models:", LOG_ALL);
-  display (" * gl-16.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_fig, dirs->getModels ("gl-16.3ds"));
+  logging.display ("Loading 3ds models:", LOG_ALL);
+  logging.display (" * gl-16.3ds", LOG_ALL);
+  load3ds.import3ds (&model_fig, dirs->getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
-  display (" * gl-15.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figa, dirs->getModels ("gl-15.3ds"));
+  logging.display (" * gl-15.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figa, dirs->getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
-  display (" * gl-14c.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figb, dirs->getModels ("gl-14c.3ds"));
+  logging.display (" * gl-14c.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figb, dirs->getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
-  display (" * gl-14d.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figc, dirs->getModels ("gl-14d.3ds"));
+  logging.display (" * gl-14d.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figc, dirs->getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
-  display (" * gl-21b.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figd, dirs->getModels ("gl-21b.3ds"));
+  logging.display (" * gl-21b.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figd, dirs->getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
-  display (" * gl-21.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_fige, dirs->getModels ("gl-21.3ds"));
+  logging.display (" * gl-21.3ds", LOG_ALL);
+  load3ds.import3ds (&model_fige, dirs->getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
-  display (" * gl-14b.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figf, dirs->getModels ("gl-14b.3ds"));
+  logging.display (" * gl-14b.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figf, dirs->getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
-  display (" * gl-14.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figg, dirs->getModels ("gl-14.3ds"));
+  logging.display (" * gl-14.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figg, dirs->getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
-  display (" * gl-29.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figh, dirs->getModels ("gl-29.3ds"));
+  logging.display (" * gl-29.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figh, dirs->getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
   model_figh.scaleTexture (0.3, 0.3);
-  display (" * gl-50.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figi, dirs->getModels ("gl-50.3ds"));
+  logging.display (" * gl-50.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figi, dirs->getModels ("gl-50.3ds"));
   model_figi.setName ("STORM");
-  display (" * transp2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figt, dirs->getModels ("transp2.3ds"));
+  logging.display (" * transp2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figt, dirs->getModels ("transp2.3ds"));
   model_figt.setName ("TRANSPORT");
-  display (" * transp4.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_figu, dirs->getModels ("transp4.3ds"));
+  logging.display (" * transp4.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figu, dirs->getModels ("transp4.3ds"));
   model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
   float cannoncube = 0.025;
-  display (" * cannon1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+  logging.display (" * cannon1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_cannon1, dirs->getModels ("cannon1.3ds"));
   model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
-  display (" * cannon1b.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
+  logging.display (" * cannon1b.3ds", LOG_ALL);
+  load3ds.import3ds (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
   model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
 
   // cannon at night
-  display (" * cannon2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_cannon2, dirs->getModels ("cannon2.3ds"));
+  logging.display (" * cannon2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_cannon2, dirs->getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
   model_cannon2.alpha = true;
   for (i = 0; i < 4; i ++)
@@ -4412,8 +4417,8 @@ void myFirstInit ()
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
   model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
 
-  display (" * cannon2b.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
+  logging.display (" * cannon2b.3ds", LOG_ALL);
+  load3ds.import3ds (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
   model_cannon2b.nolight = true;
   model_cannon2b.alpha = true;
   for (int i2 = 0; i2 < 2; i2 ++)
@@ -4430,126 +4435,126 @@ void myFirstInit ()
   }
   model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
 
-  display (" * flare1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_flare1, dirs->getModels ("flare1.3ds"));
+  logging.display (" * flare1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_flare1, dirs->getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
   model_flare1.nolight = true;
-  display (" * chaff1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_chaff1, dirs->getModels ("chaff1.3ds"));
+  logging.display (" * chaff1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_chaff1, dirs->getModels ("chaff1.3ds"));
   model_chaff1.setName ("CHAFF");
   model_chaff1.alpha = true;
   model_chaff1.nolight = true;
-  display (" * missile1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile1, dirs->getModels ("missile1.3ds"));
+  logging.display (" * missile1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile1, dirs->getModels ("missile1.3ds"));
   model_missile1.setName ("AAM HS MK1");
-  display (" * missile2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile2, dirs->getModels ("missile2.3ds"));
+  logging.display (" * missile2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile2, dirs->getModels ("missile2.3ds"));
   model_missile2.setName ("AAM HS MK2");
-  display (" * missile3.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile3, dirs->getModels ("missile3.3ds"));
+  logging.display (" * missile3.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile3, dirs->getModels ("missile3.3ds"));
   model_missile3.setName ("AAM HS MK3");
-  display (" * missile4.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile4, dirs->getModels ("missile4.3ds"));
+  logging.display (" * missile4.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile4, dirs->getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
-  display (" * missile5.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile5, dirs->getModels ("missile5.3ds"));
+  logging.display (" * missile5.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile5, dirs->getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
-  display (" * missile6.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile6, dirs->getModels ("missile6.3ds"));
+  logging.display (" * missile6.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile6, dirs->getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
-  display (" * missile7.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile7, dirs->getModels ("missile7.3ds"));
+  logging.display (" * missile7.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile7, dirs->getModels ("missile7.3ds"));
   model_missile7.setName ("AAM FF MK1");
-  display (" * missile8.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_missile8, dirs->getModels ("missile8.3ds"));
+  logging.display (" * missile8.3ds", LOG_ALL);
+  load3ds.import3ds (&model_missile8, dirs->getModels ("missile8.3ds"));
   model_missile8.setName ("AAM FF MK2");
-  display (" * flak2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_flak1, dirs->getModels ("flak2.3ds"));
+  logging.display (" * flak2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_flak1, dirs->getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
-  display (" * flarak1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_flarak1, dirs->getModels ("flarak1.3ds"));
+  logging.display (" * flarak1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_flarak1, dirs->getModels ("flarak1.3ds"));
   model_flarak1.setName ("SAM");
-  display (" * ship1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_ship1, dirs->getModels ("ship1.3ds"));
+  logging.display (" * ship1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_ship1, dirs->getModels ("ship1.3ds"));
   model_ship1.setName ("CRUISER");
-  display (" * tent1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_tent1, dirs->getModels ("tent1.3ds"));
+  logging.display (" * tent1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_tent1, dirs->getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
-  display (" * gl-117.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_gl117, dirs->getModels ("gl-117.3ds"));
+  logging.display (" * gl-117.3ds", LOG_ALL);
+  load3ds.import3ds (&model_gl117, dirs->getModels ("gl-117.3ds"));
   model_gl117.displaylist = false;
-  display (" * tank1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_tank1, dirs->getModels ("tank1.3ds"));
+  logging.display (" * tank1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_tank1, dirs->getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
-  display (" * container1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_container1, dirs->getModels ("container1.3ds"));
+  logging.display (" * container1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_container1, dirs->getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
-  display (" * ship2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_ship2, dirs->getModels ("ship2.3ds"));
+  logging.display (" * ship2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_ship2, dirs->getModels ("ship2.3ds"));
   model_ship2.setName ("LIGHT DESTROYER");
-  display (" * truck1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_truck1, dirs->getModels ("truck1.3ds"));
+  logging.display (" * truck1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_truck1, dirs->getModels ("truck1.3ds"));
   model_truck1.setName ("TRUCK");
-  display (" * truck2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_truck2, dirs->getModels ("truck2.3ds"));
+  logging.display (" * truck2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_truck2, dirs->getModels ("truck2.3ds"));
   model_truck2.setName ("TRUCK");
-  display (" * trsam.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_trsam, dirs->getModels ("trsam.3ds"));
+  logging.display (" * trsam.3ds", LOG_ALL);
+  load3ds.import3ds (&model_trsam, dirs->getModels ("trsam.3ds"));
   model_trsam.setName ("MOBILE SAM");
-  display (" * pickup1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_pickup1, dirs->getModels ("pickup1.3ds"));
+  logging.display (" * pickup1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_pickup1, dirs->getModels ("pickup1.3ds"));
   model_pickup1.setName ("PICKUP");
-  display (" * pickup2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_pickup2, dirs->getModels ("pickup2.3ds"));
+  logging.display (" * pickup2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_pickup2, dirs->getModels ("pickup2.3ds"));
   model_pickup2.setName ("PICKUP");
-  display (" * tank2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_tank2, dirs->getModels ("tank2.3ds"));
+  logging.display (" * tank2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_tank2, dirs->getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
   model_tank2.scaleTexture (0.5, 0.5);
-  display (" * tent4.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_tent4, dirs->getModels ("tent4.3ds"));
+  logging.display (" * tent4.3ds", LOG_ALL);
+  load3ds.import3ds (&model_tent4, dirs->getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
-  display (" * hall1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_hall1, dirs->getModels ("hall1.3ds"));
+  logging.display (" * hall1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_hall1, dirs->getModels ("hall1.3ds"));
   model_hall1.setName ("HALL");
-  display (" * hall2.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_hall2, dirs->getModels ("hall2.3ds"));
+  logging.display (" * hall2.3ds", LOG_ALL);
+  load3ds.import3ds (&model_hall2, dirs->getModels ("hall2.3ds"));
   model_hall2.setName ("HALL");
-  display (" * oilrig.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_oilrig, dirs->getModels ("oilrig.3ds"));
+  logging.display (" * oilrig.3ds", LOG_ALL);
+  load3ds.import3ds (&model_oilrig, dirs->getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
   model_oilrig.alpha = true;
-  display (" * egg.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_egg, dirs->getModels ("egg.3ds"));
+  logging.display (" * egg.3ds", LOG_ALL);
+  load3ds.import3ds (&model_egg, dirs->getModels ("egg.3ds"));
   model_egg.scaleTexture (0.08, 0.08);
   model_egg.setName ("COMPLEX");
-  display (" * radar.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_radar, dirs->getModels ("radar.3ds"));
+  logging.display (" * radar.3ds", LOG_ALL);
+  load3ds.import3ds (&model_radar, dirs->getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
-  display (" * mine1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_mine1, dirs->getModels ("mine1.3ds"));
+  logging.display (" * mine1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_mine1, dirs->getModels ("mine1.3ds"));
   model_mine1.setName ("MINE");
-  display (" * aster1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_aster1, dirs->getModels ("aster1.3ds"));
+  logging.display (" * aster1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_aster1, dirs->getModels ("aster1.3ds"));
   model_aster1.setName ("ASTEROID");
-  display (" * base1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_base1, dirs->getModels ("base1.3ds"));
+  logging.display (" * base1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_base1, dirs->getModels ("base1.3ds"));
   model_base1.setName ("MOON BASE");
-  display (" * barrier.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_barrier1, dirs->getModels ("barrier.3ds"));
+  logging.display (" * barrier.3ds", LOG_ALL);
+  load3ds.import3ds (&model_barrier1, dirs->getModels ("barrier.3ds"));
   model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
-  display (" * rubble.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_rubble1, dirs->getModels ("rubble.3ds"));
+  logging.display (" * rubble.3ds", LOG_ALL);
+  load3ds.import3ds (&model_rubble1, dirs->getModels ("rubble.3ds"));
   model_base1.setName ("RUBBLE");
-  display (" * depot1.3ds", LOG_ALL);
-  g_Load3ds.import3ds (&model_depot1, dirs->getModels ("depot1.3ds"));
+  logging.display (" * depot1.3ds", LOG_ALL);
+  load3ds.import3ds (&model_depot1, dirs->getModels ("depot1.3ds"));
   model_depot1.setName ("DEPOT");
   model_depot1.scaleTexture (2, 2);
-  g_Load3ds.import3ds (&model_house1, dirs->getModels ("house1.3ds"));
+  load3ds.import3ds (&model_house1, dirs->getModels ("house1.3ds"));
   model_house1.setName ("HOUSE");
 
   setMissiles (&model_fig);
@@ -4569,7 +4574,7 @@ void myFirstInit ()
   // fill polygons (GL_LINE for wireframe models)
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-  display ("Setting up world geometry", LOG_ALL);
+  logging.display ("Setting up world geometry", LOG_ALL);
   space = new Space ();
   space->drawLight = true;
 //  space->z1.set (-ZOOM, -ZOOM, -ZOOM);
@@ -4715,7 +4720,7 @@ void init_display ()
   glPopMatrix ();
   glDisable (GL_BLEND);
 
-  font2->drawText (20, -20, -3, VERSIONSTRING, &color);
+  font2->drawText (20, -20, -3, VERSIONSTRING, color);
 }
 
 void genFireLine ()
@@ -5217,7 +5222,7 @@ static void myTimerFunc (int value)
     dt = 1;
     if (game == GAME_PLAY && multiplayer)
     {
-      display ("Out of sync", LOG_ERROR);
+      logging.display ("Out of sync", LOG_ERROR);
       switch_menu ();
     }
   }
@@ -5570,21 +5575,21 @@ bool configinit = false; // has GLUT/SDL already been inited?
 // test screen settings automatically
 void config_test (int argc, char **argv)
 {
-  display ("No configuration file found. Testing...", LOG_MOST);
+  logging.display ("No configuration file found. Testing...", LOG_MOST);
   int bppi [4];
 
 #ifdef USE_GLUT // GLUT ONLY
-  display ("Using GLUT only", LOG_MOST);
+  logging.display ("Using GLUT only", LOG_MOST);
   glutInit (&argc, argv);
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
 #else // SDL
   char buf [STDSIZE];
-  display ("Using SDL and GLUT", LOG_MOST);
+  logging.display ("Using SDL and GLUT", LOG_MOST);
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
     sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
-    display (buf, LOG_FATAL);
+    logging.display (buf, LOG_FATAL);
     exit (EXIT_INIT);
   }
   configinit = true;
@@ -5609,7 +5614,7 @@ void config_test (int argc, char **argv)
 
   if (valids == -1)
   {
-    display ("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.", LOG_FATAL);
+    logging.display ("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.", LOG_FATAL);
     exit (EXIT_INIT);
   }
 
@@ -5628,13 +5633,13 @@ void config_test (int argc, char **argv)
 // get startup help screen
 void viewParameters ()
 {
-  display (" ", LOG_NONE);
-  display ("Usage: gl-117 [-h -v -dLEVEL]", LOG_NONE);
-  display (" ", LOG_NONE);
-  display ("-h: Display this help screen and quit", LOG_NONE);
-  display ("-v: Display version string and quit", LOG_NONE);
-  display ("-dLEVEL: Set debug LEVEL to 0=silent...5=log all", LOG_NONE);
-  display (" ", LOG_NONE);
+  logging.display (" ", LOG_NONE);
+  logging.display ("Usage: gl-117 [-h -v -dLEVEL]", LOG_NONE);
+  logging.display (" ", LOG_NONE);
+  logging.display ("-h: Display this help screen and quit", LOG_NONE);
+  logging.display ("-v: Display version string and quit", LOG_NONE);
+  logging.display ("-dLEVEL: Set debug LEVEL to 0=silent...5=log all", LOG_NONE);
+  logging.display (" ", LOG_NONE);
 }
 
 void checkargs (int argc, char **argv)
@@ -5647,22 +5652,22 @@ void checkargs (int argc, char **argv)
     if (argv [i] [1] == 'd') // change log/debug level
     {
       char *ptr = &argv [i] [2];
-      debuglevel = atoi (ptr);
-      if (debuglevel < LOG_NONE || debuglevel > LOG_ALL) // look at common.h for the constants
+      loglevel = atoi (ptr);
+      if (loglevel < LOG_NONE || loglevel > LOG_ALL) // look at common.h for the constants
       {
-        display ("Invalid debug level", LOG_FATAL);
+        logging.display ("Invalid debug level", LOG_FATAL);
         viewParameters ();
         exit (EXIT_COMMAND);
       }
       else
       {
-        sprintf (buf, "Entering debug level %d", debuglevel);
-        display (buf, LOG_MOST);
+        sprintf (buf, "Entering debug level %d", loglevel);
+        logging.display (buf, LOG_MOST);
       }
     }
     else if (argv [i] [1] == 'v') // display version string
     {
-      display (VERSIONSTRING, LOG_NONE);
+      logging.display (VERSIONSTRING, LOG_NONE);
       exit (EXIT_NORMAL);
     }
     else if (argv [i] [1] == 'h') // display startup help screen
@@ -5672,7 +5677,7 @@ void checkargs (int argc, char **argv)
     }
     else
     {
-      display ("Invalid command line parameter", LOG_FATAL);
+      logging.display ("Invalid command line parameter", LOG_FATAL);
       viewParameters ();
       exit (EXIT_COMMAND);
     }
@@ -7406,20 +7411,22 @@ int main (int argc, char **argv)
 
   dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
 
+  logging.setFile (dirs->getSaves ("logfile.txt"));
+  logging.setLevel (loglevel);
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
 
 #ifdef _MSC_VER
-  display ("Windows detected ", LOG_MOST);
+  logging.display ("Windows detected ", LOG_MOST);
 #endif
 
-  display ("Getting directory locations", LOG_ALL);
+  logging.display ("Getting directory locations", LOG_ALL);
   
   if (!load_config ()) // try to load conf file (conf.cpp) and validate settings
   {
     // no conf file found => create new one
-    display ("Creating new configuration", LOG_ALL);
+    logging.display ("Creating new configuration", LOG_ALL);
     config_test (argc, argv); // do screen test
     firststart = true; // enable adjusting quality/view/graphics automatically by the game
   }
@@ -7437,13 +7444,13 @@ int main (int argc, char **argv)
   server = NULL;
   client = NULL;
 
-  display ("Creating/Loading pilots list", LOG_ALL);
+  logging.display ("Creating/Loading pilots list", LOG_ALL);
   pilots = new PilotList (dirs->getSaves ("pilots")); // look at pilots.h
 
 // NO SDL FOUND => USE GLUT ONLY
 #ifdef USE_GLUT
 
-  display ("Using GLUT only", LOG_MOST);
+  logging.display ("Using GLUT only", LOG_MOST);
   if (!configinit)
   {
     glutInit (&argc, argv);
@@ -7454,21 +7461,21 @@ int main (int argc, char **argv)
       if (!setScreen (width, height, bpp, fullscreen))
       {
         sprintf (buf, "No working display mode %dx%d found", width, height);
-        display (buf, LOG_FATAL);
+        logging.display (buf, LOG_FATAL);
         exit (EXIT_INIT);
       }
     }
   }
 
-  display ("Calling main initialization method", LOG_ALL);
+  logging.display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
 
-  display ("Creating dummy sound system, install SDL to enable sound", LOG_ALL);
+  logging.display ("Creating dummy sound system, install SDL to enable sound", LOG_ALL);
   sound = new SoundSystem ();
 
   createMenu ();
 
-  display ("Registering GLUT callbacks", LOG_ALL);
+  logging.display ("Registering GLUT callbacks", LOG_ALL);
   glutReshapeFunc (myReshapeFunc);
   glutDisplayFunc (myDisplayFunc);
   glutKeyboardFunc (myKeyboardFunc);
@@ -7485,18 +7492,18 @@ int main (int argc, char **argv)
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
 
-  display ("Entering GLUT main loop", LOG_ALL);
+  logging.display ("Entering GLUT main loop", LOG_ALL);
   glutMainLoop(); // give controls to GLUT
 
 // SDL FOUND
 #else
 
-  display ("Using SDL and GLUT", LOG_MOST);
+  logging.display ("Using SDL and GLUT", LOG_MOST);
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
       sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
-      display (buf, LOG_FATAL);
+      logging.display (buf, LOG_FATAL);
       exit (EXIT_INIT);
     }
   atexit (SDL_Quit);
@@ -7506,10 +7513,10 @@ int main (int argc, char **argv)
   if (SDLNet_Init () == -1) // initialize SDL_net
   {
     sprintf (buf, "SDLNet_Init: %s", SDLNet_GetError ());
-    display (buf, LOG_FATAL);
+    logging.display (buf, LOG_FATAL);
     exit (EXIT_INIT);
   }
-  display ("Using SDL_net", LOG_MOST);
+  logging.display ("Using SDL_net", LOG_MOST);
 #endif
 
   if (!configinit)
@@ -7520,35 +7527,35 @@ int main (int argc, char **argv)
       if (!setScreen (width, height, bpp, fullscreen))
       {
         sprintf (buf, "No working display mode %dx%d found.", width, height);
-        display (buf, LOG_FATAL);
+        logging.display (buf, LOG_FATAL);
         exit (EXIT_INIT);
       }
     }
   }
 
-  display ("Setting SDL caption", LOG_ALL);
+  logging.display ("Setting SDL caption", LOG_ALL);
   SDL_WM_SetCaption ("GL-117", "GL-117"); // window name
 
   SDL_ShowCursor (0);
 
-  display ("Creating sound system", LOG_ALL);
+  logging.display ("Creating sound system", LOG_ALL);
   sound = new SoundSystem (); // look at audio.cpp
   sound->volumesound = volumesound;
   sound->volumemusic = volumemusic;
   sound->setVolume (); // set all sound volumes
   sound->setVolumeMusic (); // set all music volumes
 
-  display ("Playing startup music", LOG_ALL);
+  logging.display ("Playing startup music", LOG_ALL);
   sound->playMusic (1);
 #ifdef HAVE_SDL_MIXER
   Mix_HookMusicFinished (playRandomMusic);
 #endif
 
-  display ("Calling main initialization method", LOG_ALL);
+  logging.display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
   myReshapeFunc (width, height);
 
-  display ("Querying joystick", LOG_ALL);
+  logging.display ("Querying joystick", LOG_ALL);
   joysticks = SDL_NumJoysticks ();
   memset (jaxis, 0, maxjaxis * maxjoysticks * sizeof (int));
   if (joysticks > 0)
@@ -7559,12 +7566,12 @@ int main (int argc, char **argv)
       sdljoystick [i] = SDL_JoystickOpen (i);
       sdljoystickaxes [i] = SDL_JoystickNumAxes (sdljoystick [i]);
       sprintf (buf, "Joystick \"%s\" detected", SDL_JoystickName (i));
-      display (buf, LOG_MOST);
+      logging.display (buf, LOG_MOST);
     }
   }
   else
   {
-    display ("No joystick found", LOG_MOST);
+    logging.display ("No joystick found", LOG_MOST);
 //    sdljoystick [0] = NULL;
     if (controls == CONTROLS_JOYSTICK) // no joystick available, so switch to mouse controls
       controls = CONTROLS_MOUSE;
@@ -7585,7 +7592,7 @@ int main (int argc, char **argv)
 
   createMenu ();
 
-  display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
+  logging.display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
   sdlMainLoop (); // simulate GLUT's main loop (above)
 
 #endif

@@ -31,6 +31,7 @@
 #include "conf.h"
 #include "common.h"
 #include "dirs.h"
+#include "logging/Logging.h"
 
 // initialization
 int quality = 3;
@@ -83,7 +84,7 @@ ConfigFile::ConfigFile (char *fname)
   else
   {
     sprintf (buf2, "Could not load %s", fname);
-    display (buf2, LOG_WARN);
+    logging.display (buf2, LOG_WARN);
     buf [0] = 0;
   }
   for (int i = 0; i < length; i ++)
@@ -203,11 +204,11 @@ void save_config ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("conf");
   sprintf (buf, "Saving %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    display ("Could not save configuration", LOG_ERROR);
+    logging.display ("Could not save configuration", LOG_ERROR);
     fflush (stderr);
     return;
   }
@@ -260,11 +261,11 @@ void save_saveconfig ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("saveconf");
   sprintf (buf, "Saving %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    display ("Could not save working graphics mode configuration", LOG_ERROR);
+    logging.display ("Could not save working graphics mode configuration", LOG_ERROR);
     fflush (stderr);
     return;
   }
@@ -285,7 +286,7 @@ int load_config ()
   char *str;
   char *confname = dirs->getSaves ("conf");
   sprintf (buf, "Loading %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -427,7 +428,7 @@ int load_saveconfig ()
   char *str;
   char *confname = dirs->getSaves ("saveconf");
   sprintf (buf, "Loading %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -484,11 +485,11 @@ void save_configInterface ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("conf.interface");
   sprintf (buf, "Saving %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    display ("Could not save interface configuration", LOG_ERROR);
+    logging.display ("Could not save interface configuration", LOG_ERROR);
     return;
   }
   cf->writeText ("# Interface configuration\n");
@@ -604,7 +605,7 @@ int load_configInterface ()
   char *str;
   char *confname = dirs->getSaves ("conf.interface");
   sprintf (buf, "Loading %s ", confname);
-  display (buf, LOG_MOST);
+  logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "key_firecannon");

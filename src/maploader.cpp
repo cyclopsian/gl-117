@@ -33,6 +33,7 @@
 #include "filetokenizer/FileTokenizer.h"
 #include "dirs.h"
 #include "gllandscape/GlLandscape.h"
+#include "logging/Logging.h"
 
 int mapPilotname2Num (char *str)
 {
@@ -118,7 +119,7 @@ void MissionCustom::error (char *msg)
   char buf [TOKENLEN];
   reterror = 1;
   sprintf (buf, "Line %d: %s", maploader->file.getLine (), msg);
-  display (buf, LOG_ERROR);
+  logging.display (buf, LOG_ERROR);
 }
 
 void MissionCustom::toUpper (char *str)
@@ -868,7 +869,7 @@ void MissionCustom::start ()
     map = LoadTga::load (dirs->getMaps (mapfile), &mapx, &mapy);
     if (map == NULL)
     {
-      display ("Map has a valid bpp entry but seems to be corrupt", LOG_FATAL);
+      logging.display ("Map has a valid bpp entry but seems to be corrupt", LOG_FATAL);
       exit (1);
     }
 
@@ -1133,13 +1134,13 @@ void MissionCustom::draw ()
 
   if (timer >= 0 && timer <= 50 * timestep)
   {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+    font1->drawTextCentered (0, 4, -2, name, textcolor);
   }
 
   for (i = 0; i < numtext; i ++)
   {
     if (textstart [i] <= timer && textstart [i] + textdelay [i] >= timer)
-      font1->drawTextCentered (0, 7, -3, text [i], &textcolor);
+      font1->drawTextCentered (0, 7, -3, text [i], textcolor);
   }
 }
 

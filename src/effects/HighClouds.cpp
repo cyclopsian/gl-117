@@ -68,14 +68,14 @@ void HighClouds::setTexture (Texture *texture)
   sphere->object [0]->material->texture = texture;
 }
 
-void HighClouds::drawGL (Vector3 *tl, Vector3 *textl)
+void HighClouds::drawGL (Vector3 &tl, Vector3 &textl)
 {
   int j;
   Object3d *cm = o->object [0];
   for (int i2 = 0; i2 < cm->numVertices; i2 ++)
   {
-    cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl->x / zoom;
-    cm->vertex [i2].tex.y = cm->vertex [i2].vector.y * 4 - textl->z / zoom;
+    cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl.x / zoom;
+    cm->vertex [i2].tex.y = cm->vertex [i2].vector.y * 4 - textl.z / zoom;
   }
 
   glEnable (GL_BLEND);
@@ -85,7 +85,7 @@ void HighClouds::drawGL (Vector3 *tl, Vector3 *textl)
   glDisable (GL_DEPTH_TEST);
 
   glPushMatrix ();
-  glTranslatef (tl->x, tl->y, tl->z);
+  glTranslatef (tl.x, tl.y, tl.z);
   glRotatef (90, 0, -1, 0);
   glRotatef (270, 1, 0, 0);
   glRotatef (90, 0, 0, 1);

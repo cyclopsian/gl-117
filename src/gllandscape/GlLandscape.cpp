@@ -22,10 +22,9 @@
 #ifndef IS_GLLANDSCAPE_H
 
 #include "GlLandscape.h"
-//#include "main.h"
 #include "math/Math.h"
 #include "opengl/GlPrimitives.h"
-//#include "common.h"
+#include "logging/Logging.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -1966,7 +1965,7 @@ void GlLandscape::drawTexturedTriangle2 (int xs, int ys)
 //  glEnd();
 }
 
-void GlLandscape::draw (Vector3 &cam, int phi, int gamma)
+void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 {
   char buf [4096];
   int i, i2, i3, x, y;
@@ -2014,13 +2013,13 @@ void GlLandscape::draw (Vector3 &cam, int phi, int gamma)
   if (phi < 0 || phi >= 360)
   {
     sprintf (buf, "Phi exceeds in file %s, line %d, val %d", __FILE__, __LINE__, phi);
-    display (buf, LOG_ERROR);
+    logging.display (buf, LOG_ERROR);
   }
 
   if (gamma < 0 || gamma >= 360)
   {
     sprintf (buf, "Gamma exceeds in file %s, line %d, val %d", __FILE__, __LINE__, gamma);
-    display (buf, LOG_ERROR);
+    logging.display (buf, LOG_ERROR);
   }
 
   glPushMatrix ();
@@ -2058,7 +2057,7 @@ void GlLandscape::draw (Vector3 &cam, int phi, int gamma)
   parts ++;
   if (parts >= PARTS)
   {
-    display ("view exceeds ray casting blocks - not implemented", LOG_FATAL);
+    logging.display ("view exceeds ray casting blocks - not implemented", LOG_FATAL);
     exit (6);
   }
 
