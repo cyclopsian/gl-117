@@ -25,6 +25,7 @@
 #define IS_COCKPIT_H
 
 #include "main.h"
+#include "pilots.h"
 
 class Cockpit
 {

@@ -24,6 +24,7 @@
 #ifndef IS_PILOTS_H
 
 #include "pilots.h"
+#include "mission.h"
 
 TeamPilot::TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills)
 {
@@ -110,16 +111,16 @@ void Pilot::load ()
   if (tp == NULL)
   {
     tp = new TeamPilot *[11];
-    tp [0] = new TeamPilot (5, "PRIMETIME", 200, 20, 100, 25);
-    tp [1] = new TeamPilot (2, "HEPTARGON", 80, 200, 300, 5);
-    tp [2] = new TeamPilot (2, "LARA", 200, 100, 0, 10);
-    tp [3] = new TeamPilot (7, "SHARK", 20, 20, 50, 35);
-    tp [4] = new TeamPilot (3, "BOSS", 250, 150, 100, 12);
-    tp [5] = new TeamPilot (1, "DR DOOM", 300, 150, 0, 2);
-    tp [6] = new TeamPilot (4, "SHADOW", 100, 200, 300, 16);
-    tp [7] = new TeamPilot (6, "MATRIX", 0, 0, 60, 28);
-    tp [8] = new TeamPilot (3, "FIREBIRD", 250, 50, 100, 8);
-    tp [9] = new TeamPilot (5, "THUNDER", 150, 100, 50, 20);
+    tp [0] = new TeamPilot (5, "PRIMETIME", 200, 100, 150, 25);
+    tp [1] = new TeamPilot (2, "HEPTARGON", 80, 220, 300, 5);
+    tp [2] = new TeamPilot (2, "LARA", 180, 160, 50, 10);
+    tp [3] = new TeamPilot (7, "SHARK", 70, 90, 120, 35);
+    tp [4] = new TeamPilot (3, "BOSS", 250, 180, 80, 12);
+    tp [5] = new TeamPilot (1, "DR DOOM", 320, 210, 20, 2);
+    tp [6] = new TeamPilot (4, "SHADOW", 130, 200, 320, 16);
+    tp [7] = new TeamPilot (6, "MATRIX", 40, 80, 180, 28);
+    tp [8] = new TeamPilot (3, "FIREBIRD", 250, 140, 100, 8);
+    tp [9] = new TeamPilot (5, "THUNDER", 150, 170, 60, 20);
     tp [10] = new TeamPilot (0, "PLAYER", 0, 0, 0, 0);
   }
 
@@ -178,7 +179,7 @@ void Pilot::save ()
 char *Pilot::getRank ()
 {
   int i, sum = 0;
-  for (i = 0; i < 100; i ++)
+  for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
   {
     if (mission_score [i] > 0 && mission_score [i] < 2000)
       sum += mission_score [i];

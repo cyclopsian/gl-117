@@ -73,7 +73,7 @@ int net_thread_main (void *data);
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_MOST;
+int debuglevel = LOG_ALL;
 int brightness = 0;
 
 SoundSystem *sound = NULL;
@@ -500,7 +500,6 @@ int setGlutScreen (int w, int h, int b, int f)
 
 int setScreen (int w, int h, int b, int f)
 {
-  int ret = 0;
 #ifdef USE_GLUT
   if (!setGlutScreen (w, h, b, f))
   {
@@ -1025,7 +1024,7 @@ void stats_reshape ()
 
 void playRandomMusic ()
 {
-  int r = myrandom (5);
+  int r = myrandom (6);
   if (r == 0)
     sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
@@ -1034,8 +1033,10 @@ void playRandomMusic ()
     sound->loadMusic (MUSIC_ELECTRO1);
   else if (r == 3)
     sound->loadMusic (MUSIC_STARS1);
-  else
+  else if (r == 4)
     sound->loadMusic (MUSIC_SOFTTEC1);
+  else
+    sound->loadMusic (MUSIC_AMBIENT1);
   sound->playMusic ();
 }
 
@@ -1091,10 +1092,8 @@ void createMission (int missionid)
   }
   if (missionnew != NULL) delete missionnew;
   if (missionid == MISSION_DEMO) missionnew = new MissionDemo1 ();
-  else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
-  else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
-  else if (missionid == MISSION_MOON) missionnew = new MissionMoon1 ();
-  else if (missionid == MISSION_CANYON) missionnew = new MissionCanyon1 ();
+  else if (missionid == MISSION_TEST1) missionnew = new MissionTest1 ();
+  else if (missionid == MISSION_TEST2) missionnew = new MissionTest2 ();
   else if (missionid == MISSION_TRANSPORT) missionnew = new MissionTransport ();
   else if (missionid == MISSION_CONVOY) missionnew = new MissionConvoy ();
   else if (missionid == MISSION_DOGFIGHT2) missionnew = new MissionDogfight2 ();
@@ -1114,6 +1113,11 @@ void createMission (int missionid)
   else if (missionid == MISSION_MOON1) missionnew = new MissionMoonDefense1 ();
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
+  else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
+  else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
+  else if (missionid == MISSION_DEATHMATCH1) missionnew = new MissionDeathmatch1 ();
+  else if (missionid == MISSION_DEATHMATCH2) missionnew = new MissionDeathmatch2 ();
+  else if (missionid == MISSION_TEAMBASE1) missionnew = new MissionTeamBase1 ();
   else if (missionid == MISSION_MULTIPLAYER_DOGFIGHT) missionnew = new MissionMultiDogfight1 ();
   if (mission != NULL)
   {
@@ -1239,6 +1243,7 @@ void event_fireCannon ()
 {
   if (!fplayer->active) return;
   if (fplayer->firecannonttl > 0) return;
+  if (fplayer->ammo == 0) return;
 #ifdef USE_GLUT
   fplayer->fireCannon (laser);
   sound->play (SOUND_CANNON1);
@@ -1661,8 +1666,8 @@ void game_mouserelmotion (int xrel, int yrel)
 
 void game_mousemotion2 (int x, int y)
 {
-  float dx = mousex - lastmx;
-  float dy = mousey - lastmy;
+//  float dx = mousex - lastmx;
+//  float dy = mousey - lastmy;
 
   fplayer->rolleffect = (float) -(mousex - width / 2) * 0.02;
 
@@ -1684,7 +1689,7 @@ void game_mousemotion (int x, int y)
 //  game_mouserelmotion (x, y);
 //  return;
 
-  float f = (float) width / 240.0;
+//  float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
   float dx = x - mx, dy = my - y;
   if (controls == CONTROLS_MOUSE_REVERSE)
@@ -2039,7 +2044,7 @@ void mission_mouse (int button, int state, int x, int y)
   float rx = (float) x / width;
   float ry = (float) y / height;
   int lastitemselected = missionmenuitemselected;
-  int lastitem = menuitem;
+//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   if (ry >= 0.88 && ry <= 0.93)
@@ -2362,8 +2367,8 @@ void fame_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-  int lastitemselected = missionmenuitemselected;
-  int lastitem = menuitem;
+//  int lastitemselected = missionmenuitemselected;
+//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   if (ry >= 0.75 && ry <= 0.82)
@@ -2385,8 +2390,8 @@ void fighter_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-  int lastitemselected = missionmenuitemselected;
-  int lastitem = menuitem;
+//  int lastitemselected = missionmenuitemselected;
+//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   int maxfighter = 5;
@@ -2436,7 +2441,7 @@ void fighter_display ()
   char buf [256];
   int i;
   CColor colorblue (100, 150, 255, 255);
-  Pilot *p = pilots->pilot [pilots->aktpilot];
+//  Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorblue;
 
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -2611,7 +2616,7 @@ void fame_display ()
 
   font1->drawTextCentered (0, 8, -1.5, "TOP PILOTS");
   int sum = 0;
-  for (i = 0; i < 100; i ++)
+  for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
     sum += p->mission_fighterkills [i];
   p->tp [10]->fighterkills = sum;
   strcpy (p->tp [10]->name, p->name);
@@ -2718,8 +2723,8 @@ void quit_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-  int lastitemselected = missionmenuitemselected;
-  int lastitem = menuitem;
+//  int lastitemselected = missionmenuitemselected;
+//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   if (ry >= 0.5 && ry <= 0.55)
@@ -2766,13 +2771,13 @@ void menu_mouse (int button, int state, int x, int y)
       if (state == MOUSE_DOWN)
         menuitem = 1;
     }
-#ifdef HAVE_SDL_NET
     else if (ry >= 0.28 && ry <= 0.33)
     {
       menuitemselected = 2;
       if (state == MOUSE_DOWN)
         menuitem = 2;
     }
+#ifdef HAVE_SDL_NET
 #endif
     else if (ry >= 0.34 && ry <= 0.39)
     {
@@ -2852,7 +2857,7 @@ void menu_mouse (int button, int state, int x, int y)
 
   if (menuitem == 1)
   {
-    Pilot *p = pilots->pilot [pilots->aktpilot];
+//    Pilot *p = pilots->pilot [pilots->aktpilot];
     if (rx >= 0.48 && rx <= 0.85)
     {
       if (ry >= 0.12 && ry <= 0.14)
@@ -2871,7 +2876,71 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT);
         }
       }
-      if (ry >= 0.18 && ry <= 0.20)
+      if (ry >= 0.24 && ry <= 0.26)
+      {
+        menuitemselected = 14;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_DEATHMATCH1);
+        }
+      }
+      if (ry >= 0.27 && ry <= 0.29)
+      {
+        menuitemselected = 15;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_DEATHMATCH2);
+        }
+      }
+      if (ry >= 0.30 && ry <= 0.32)
+      {
+        menuitemselected = 16;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_TEAMBASE1);
+        }
+      }
+/*      if (ry >= 0.18 && ry <= 0.20)
+      {
+        menuitemselected = 10;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_TUTORIAL);
+        }
+      }
+      if (ry >= 0.21 && ry <= 0.23)
+      {
+        menuitemselected = 11;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_DOGFIGHT);
+        }
+      }*/
+    }
+  }
+
+  if (menuitem == 2)
+  {
+    Pilot *p = pilots->pilot [pilots->aktpilot];
+    if (rx >= 0.48 && rx <= 0.85)
+    {
+      if (ry >= 0.12 && ry <= 0.14)
+      {
+        menuitemselected = 10;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_TEST1);
+        }
+      }
+      if (ry >= 0.15 && ry <= 0.17 && p->mission_state [MISSION_TEST1] == 1)
+      {
+        menuitemselected = 11;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_TEST2);
+        }
+      }
+      if (ry >= 0.18 && ry <= 0.20 && p->mission_state [MISSION_TEST2] == 1)
       {
         menuitemselected = 12;
         if (state == MOUSE_DOWN)
@@ -3483,7 +3552,7 @@ void menu_display ()
   CColor coloryellow (255, 255, 0, 200);
 
   int textx = -14, textx2 = 0;
-  float normtimef = -menutimer * 5;
+  int normtimef = -menutimer * 5;
 
   if (menuitemselected == 0)
     font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, normtimef);
@@ -3493,6 +3562,10 @@ void menu_display ()
     font1->drawTextScaled (textx, 8, -2, "MISSIONS", &color2, normtimef);
   else
     font1->drawText (textx, 8, -2, "MISSIONS");
+  if (menuitemselected == 2)
+    font1->drawTextScaled (textx, 6, -2, "CAMPAIGN", &color2, normtimef);
+  else
+    font1->drawText (textx, 6, -2, "CAMPAIGN");
 #ifdef HAVE_SDL_NET
   if (menuitemselected == 2)
     font1->drawTextScaled (textx, 6, -2, "MULTIPLAYER", &color2, normtimef);
@@ -3572,12 +3645,37 @@ void menu_display ()
     else
       font1->drawText (textx2, yf, zf, "TUTORIAL: DOGFIGHT");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DOGFIGHT]), 1.0);
-    yf -= 1.5;
-    if (menuitemselected == 12)
-      font1->drawTextScaled (textx2, yf, zf, "TRANSPORT", &color2, -menutimer * 5);
+    yf -= 3.0 * 1.5;
+    if (menuitemselected == 14)
+      font1->drawTextScaled (textx2, yf, zf, "DEATHMATCH", &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, yf, zf, "TRANSPORT");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TRANSPORT]), 1.0);
+      font1->drawText (textx2, yf, zf, "DEATHMATCH");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH1]), 1.0);
+    yf -= 1.5;
+    if (menuitemselected == 15)
+      font1->drawTextScaled (textx2, yf, zf, "TEAM DEATHMATCH", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yf, zf, "TEAM DEATHMATCH");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH2]), 1.0);
+    yf -= 1.5;
+    if (menuitemselected == 16)
+      font1->drawTextScaled (textx2, yf, zf, "TEAM BASE", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yf, zf, "TEAM BASE");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEAMBASE1]), 1.0);
+    yf -= 1.5;
+  }
+  else if (menuitem == 2)
+  {
+    Pilot *p = pilots->pilot [pilots->aktpilot];
+    float zf = -3.0, yf = 18;
+    if (menuitemselected == 10)
+      font1->drawTextScaled (textx2, yf, zf, "EAGLE TEST1", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yf, zf, "EAGLE TEST1");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEST1]), 1.0);
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
@@ -3824,7 +3922,7 @@ void finish_display ()
 void quit_display ()
 {
   float xf = 1.0, yf = 0.5, zf = -2.5;
-  int c1 = 100, c2 = 10, c3 = 100, c4 = 180;
+  int c1 = 100, c2 = 10, c4 = 180;
   glBegin (GL_QUADS);
   glColor4ub (c2, c2, c2, 255);
   glVertex3f (-xf, -yf, zf);
@@ -4046,7 +4144,7 @@ void game_display ()
 
 // draw sun or moon (or earth)
 //  glPushMatrix ();
-  float r = 10.0;
+//  float r = 10.0;
 //  float p = -fplayer->phi, t = -fplayer->gamma;
   float fac = view, zfac = view * 0.2;
 //  if (camera != 1 && camera != 5)
@@ -4628,7 +4726,7 @@ void game_display ()
 float lastthrust;
 int gametimer;
 
-void game_timer (float dt)
+void game_timer (int dt)
 {
   if (multiplayer) return;
 
@@ -4647,8 +4745,11 @@ void game_timer (float dt)
 
   if (fplayer->autofire && fplayer->active)
   {
-    fplayer->fireCannon (laser);
-    sound->play (SOUND_CANNON1);
+    if (fplayer->ammo != 0)
+    {
+      fplayer->fireCannon (laser);
+      sound->play (SOUND_CANNON1);
+    }
   }
 
   if (lastshield > fplayer->shield && !fplayer->ai)
@@ -6303,7 +6404,7 @@ int joystickbutton = -1;
 void sdlMainLoop ()
 {
   SDL_Event event;
-  while (1)
+  while (true)
   {
     while (SDL_PollEvent (&event))
     {

@@ -135,6 +135,7 @@ class DynamicObj : public CSpaceObj
   bool killed; // statistics
   Space *space; // in which space is this object, there is only one ;-)
   DynamicObj *source; // missiles must keep track of the object they have been fired from -> statistics
+  int bomber; // act as bomber and prefer groud targets
   char net [100];
 //  GLLandscape *l;
   
@@ -203,6 +204,7 @@ class AIObj : public DynamicObj
   int chaffs;
   int fireflarettl;
   int firechaffttl;
+  int ammo;
   int ttf; // time to fire missile, targeting mechanism
   CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
   Uint32 timer;
@@ -238,6 +240,7 @@ class AIObj : public DynamicObj
   bool selectMissileAirFF (AIObj **missile);
   bool fireMissileGround (AIObj **missile);
   bool selectMissileGround (AIObj **missile);
+  void targetNearestGroundEnemy (AIObj **f);
   void targetNearestEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);

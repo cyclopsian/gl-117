@@ -189,8 +189,15 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
           if (i == alliedpilot [i2])
           { b = true; break; }
         }
-        if (b) p->tp [i]->fighterkills += fighter [i + 1]->fighterkills;
-        else p->tp [i]->flyMission (myrandom (5));
+        if (b)
+        {
+          p->tp [i]->fighterkills += fighter [i + 1]->fighterkills;
+        }
+        else
+        {
+          if (id >= MISSION_CAMPAIGN1 && id <= MISSION_CAMPAIGN2)
+            p->tp [i]->flyMission (myrandom (4));
+        }
       }
     }
     p->mission_state [id] = missionstate;
@@ -565,7 +572,7 @@ void MissionDogfight1::start ()
     fighter [i]->o = &model_fige;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400);
+    fighter [i]->newinit (FIGHTER_CROW, 0, 380);
     fighter [i]->deactivate ();
   }
   fighter [1]->activate ();
@@ -691,6 +698,640 @@ void MissionDogfight1::draw ()
 
 
 
+MissionDeathmatch1::MissionDeathmatch1 ()
+{
+  id = MISSION_DEATHMATCH1;
+  strcpy (name, "DEATHMATCH");
+  strcpy (briefing, "THIS IS A SHORT TEAM DEATHMATCH - 8 OPPONENTS AND 10 KILLS TO WIN. THE DIFFICULTY STILL DETERMINES THE OPPONENTS STRENGTH.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  selweapons = 1;
+  selfighters = 1;
+  maxtime = 20000 * timestep;
+}
+  
+void MissionDeathmatch1::start ()
+{
+  int i;
+  day = 1;
+  clouds = 1;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 25;
+  heading = 220;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 50;
+  for (i = 1; i <= 7; i ++)
+  {
+    fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
+    fighter [i]->party = i + 1;
+    fighter [i]->target = fighter [i - 1];
+    fighter [i]->o = &model_fig;
+    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+  }
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionDeathmatch1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  for (i = 0; i <= 7; i ++)
+  {
+    if (fighter [i]->fighterkills >= 10)
+    {
+      fplayer->shield = 1;
+      if (i == 0) return 1;
+      else return 2;
+    }
+    if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
+    {
+      fighter [i]->explode = 0;
+      int temp = fighter [i]->fighterkills;
+      fighter [i]->aiinit ();
+      if (i == 0)
+      {
+        playerInit ();
+      }
+      else
+      {
+        fighter [i]->newinit (FIGHTER_FALCON, i + 1, 200);
+      }
+      fighter [i]->party = i + 1;
+      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->immunity = 50 * timestep;
+      fighter [i]->activate ();
+//      fighter [i]->killed = false;
+      fighter [i]->fighterkills = temp;
+      fighter [i]->killed = false;
+      camera = 0;
+    }
+  }
+  return 0;
+}
+
+void MissionDeathmatch1::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionDeathmatch2::MissionDeathmatch2 ()
+{
+  id = MISSION_DEATHMATCH2;
+  strcpy (name, "TEAM DEATHMATCH");
+  strcpy (briefing, "THIS IS A SHORT TEAM DEATHMATCH - 8 OPPONENTS IN 4 TEAMS AND 12 KILLS TO WIN. THE DIFFICULTY STILL DETERMINES THE OPPONENTS STRENGTH.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  selweapons = 1;
+  selfighters = 1;
+  maxtime = 10000 * timestep;
+}
+  
+void MissionDeathmatch2::start ()
+{
+  int i;
+  day = 1;
+  clouds = 2;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 45;
+  heading = 220;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 50;
+  for (i = 1; i <= 7; i ++)
+  {
+    if (i <= 1)
+    {
+      fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
+      fighter [i]->o = &model_fig;
+    }
+    else if (i <= 3)
+    {
+      fighter [i]->newinit (FIGHTER_CROW, 0, 200);
+      fighter [i]->o = &model_fige;
+    }
+    else if (i <= 5)
+    {
+      fighter [i]->newinit (FIGHTER_BUZZARD, 0, 200);
+      fighter [i]->o = &model_figd;
+    }
+    else
+    {
+      fighter [i]->newinit (FIGHTER_SWALLOW, 0, 200);
+      fighter [i]->o = &model_figa;
+    }
+    fighter [i]->party = i / 2 + 1;
+    fighter [i]->target = fighter [(i + 4) % 8];
+    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+  }
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionDeathmatch2::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  for (i = 0; i <= 3; i ++)
+  {
+    if (fighter [i * 2]->fighterkills + fighter [i * 2 + 1]->fighterkills >= 12)
+    {
+      fplayer->shield = 1;
+      if (i == 0) return 1;
+      else return 2;
+    }
+  }
+  for (i = 0; i <= 7; i ++)
+  {
+    if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
+    {
+      fighter [i]->explode = 0;
+      int temp = fighter [i]->fighterkills;
+      fighter [i]->aiinit ();
+      if (i == 0)
+      {
+        playerInit ();
+      }
+      else
+      {
+        fighter [i]->newinit (FIGHTER_FALCON, i + 1, 200);
+      }
+      fighter [i]->party = i / 2 + 1;
+      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->immunity = 50 * timestep;
+      fighter [i]->activate ();
+//      fighter [i]->killed = false;
+      fighter [i]->fighterkills = temp;
+      fighter [i]->killed = false;
+      camera = 0;
+    }
+  }
+  return 0;
+}
+
+void MissionDeathmatch2::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionTeamBase1::MissionTeamBase1 ()
+{
+  id = MISSION_TEAMBASE1;
+  strcpy (name, "TEAM BASE");
+  strcpy (briefing, "ATTACK YOUR OPPONENTS BASE AND DEFEND YOUR OWN ONE. TWO TEAMS - ONE FIGHTER AND ONE BOMBER EACH.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  selweapons = 2;
+  maxtime = 10000 * timestep;
+}
+  
+void MissionTeamBase1::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  heading = 180;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  int px, py;
+  l->searchPlain (1, 1, &px, &py);
+  px = px - MAXX / 2;
+  py = MAXX / 2 - py;
+  team1x = px; team1y = py + 50;
+  playerInit ();
+  fplayer->tl->x = px;
+  fplayer->tl->z = py;
+  if (fplayer->id == FIGHTER_FALCON)
+  {
+    fighter [1]->newinit (FIGHTER_HAWK, 0, 200);
+    fighter [1]->o = &model_figb;
+    fighter [1]->target = NULL;
+  }
+  else
+  {
+    fighter [1]->newinit (FIGHTER_FALCON, 0, 200);
+    fighter [1]->o = &model_fig;
+    fighter [1]->target = fighter [3];
+  }
+  fighter [1]->party = 1;
+  fighter [1]->tl->x = px + 5;
+  fighter [1]->tl->z = py + 5;
+
+  int n = 4;
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py + 5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall2;
+  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px - 1.5;
+  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 90;
+  fighter [n]->maxtheta = 0;
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py - 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 0;
+  fighter [n]->maxtheta = 0;
+  fighter [n]->party = 1;
+  n ++;
+  fighter [n]->tl->x = px;
+  fighter [n]->tl->z = py - 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 400);
+  fighter [n]->party = 1;
+
+  l->searchPlain (1, 2, &px, &py);
+  px = px - MAXX / 2;
+  py = MAXX / 2 - py;
+  team2x = px; team2y = py - 50;
+  fighter [2]->newinit (FIGHTER_BUZZARD, 0, 200);
+  fighter [2]->o = &model_figd;
+  fighter [2]->tl->x = px;
+  fighter [2]->tl->z = py;
+  if (fplayer->id == FIGHTER_FALCON)
+    fighter [2]->target = fighter [1];
+  else
+    fighter [2]->target = fighter [0];
+  fighter [2]->party = 2;
+  fighter [3]->newinit (FIGHTER_SWALLOW, 0, 200);
+  fighter [3]->o = &model_figa;
+  fighter [3]->tl->x = px + 5;
+  fighter [3]->tl->z = py + 5;
+  fighter [3]->target = NULL;
+  fighter [3]->party = 2;
+
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py + 5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall2;
+  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px - 1.5;
+  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 90;
+  fighter [n]->maxtheta = 0;
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py - 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 0;
+  fighter [n]->maxtheta = 0;
+  fighter [n]->party = 2;
+  n ++;
+  fighter [n]->tl->x = px;
+  fighter [n]->tl->z = py + 20;
+  fighter [n]->target = NULL;
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 400);
+  fighter [n]->party = 2;
+
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionTeamBase1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+
+  if (fplayer->id == FIGHTER_FALCON)
+  {
+    fighter [2]->target = fighter [1];
+  }
+  else
+  {
+    fighter [2]->target = fighter [0];
+    fighter [1]->target = fighter [3];
+  }
+
+  bool testb1 = false, testb2 = false;
+  for (i = 4; i <= 25; i ++)
+  {
+    if (fighter [i]->active)
+    {
+      if (fighter [i]->party == 1)
+        testb1 = true;
+      if (fighter [i]->party == 2)
+        testb2 = true;
+    }
+  }
+  if (!testb1) return 2;
+  if (!testb2) return 1;
+  
+  for (i = 0; i <= 3; i ++)
+  {
+    if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
+    {
+      fighter [i]->explode = 0;
+      int temp = fighter [i]->fighterkills;
+      int tempid = fighter [i]->id;
+      fighter [i]->aiinit ();
+      if (i == 0)
+      {
+        playerInit ();
+      }
+      else
+      {
+        fighter [i]->newinit (tempid, 0, 200);
+      }
+      fighter [i]->party = i / 2 + 1;
+      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->immunity = 50 * timestep;
+      fighter [i]->activate ();
+//      fighter [i]->killed = false;
+      fighter [i]->fighterkills = temp;
+      fighter [i]->killed = false;
+      if (i <= 1)
+      {
+        fighter [i]->tl->x = team1x;
+        fighter [i]->tl->z = team1y;
+      }
+      else
+      {
+        fighter [i]->tl->x = team2x;
+        fighter [i]->tl->z = team2y;
+      }
+      camera = 0;
+    }
+  }
+  return 0;
+}
+
+void MissionTeamBase1::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionTest1::MissionTest1 ()
+{
+  id = MISSION_TEST1;
+  strcpy (name, "EAGLE TEST1");
+  strcpy (briefing, "WELCOME TO THE EAGLE SQUADRON. BEFORE YOU CAN FLY SERIOUS MISSIONS YOU HAVE TO SHOW YOUR SKILLS. FIRST DESTROY ALL DUMMY GROUND TARGETS IN THE DESIGNED REGION USING THE CANNON ONLY.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  maxtime = 5000 * timestep;
+//  alliedpilot [0] = PILOT_PRIMETIME;
+}
+
+void MissionTest1::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 55;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  int px, py;
+  l->searchPlain (-1, -1, &px, &py);
+  px = px - MAXX / 2;
+  py = MAXX / 2 - py;
+//    if (px < 0) px += MAXX;
+//    if (py < 0) py += MAXX;
+  playerInit ();
+  fplayer->tl->x = px;
+  fplayer->tl->z = py + 100;
+  for (i = 0; i < missiletypes; i ++)
+  {
+    fplayer->missiles [i] = 0;
+  }
+  for (i = 1; i <= 6; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_pickup1;
+    fighter [i]->tl->x = px + 4 - ((i - 1) / 2) * 4;
+    fighter [i]->tl->z = py + 4 - ((i - 1) & 1) * 8;
+    fighter [i]->newinit (TANK_PICKUP1, 0, 400);
+  }
+}
+
+int MissionTest1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 6; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionTest1::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionTest2::MissionTest2 ()
+{
+  id = MISSION_TEST2;
+  strcpy (name, "EAGLE TEST2");
+  strcpy (briefing, "NOW SHOW YOUR PILOTING SKILLS AND GET DOWN YOUR \"ENEMY\". JUST GET AT HIS BACK - NO MISSILES, NO CANNON.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  maxtime = 3500 * timestep;
+//  alliedpilot [0] = PILOT_PRIMETIME;
+}
+
+void MissionTest2::start ()
+{
+  int i;
+  day = 1;
+  clouds = 1;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 55;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 50;
+  for (i = 0; i < missiletypes; i ++)
+  {
+    fplayer->missiles [i] = 0;
+  }
+  fplayer->ammo = 0;
+  fighter [1]->party = 0;
+  fighter [1]->target = fighter [0];
+  fighter [1]->o = &model_fig;
+  fighter [1]->tl->x = 0;
+  fighter [1]->tl->z = 0;
+  fighter [1]->newinit (FIGHTER_HAWK, 0, 160);
+  fighter [1]->aggressivity = 0;
+//  fighter [1]->intelligence = 0;
+//  fighter [1]->precision = 0;
+  for (i = 0; i < missiletypes; i ++)
+  {
+    fighter [1]->missiles [i] = 0;
+  }
+  fighter [1]->ammo = 0;
+  fighter [1]->shield = 100000;
+  fighter [1]->phi = 180;
+}
+
+int MissionTest2::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 1; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  fplayer->aw = fplayer->getAngle (fighter [1]);
+  state = 0;
+  float fplayerh = fplayer->getAngleH (fighter [1]);
+  if (fabs (fplayer->aw) < 10 && fabs (fighter [1]->aw) <= 130)
+  {
+    if (fabs (fplayerh) < 10)
+      state = -1;
+  }
+  if (fabs (fplayer->aw) < 10 && fabs (fighter [1]->aw) > 130)
+  {
+    if (fabs (fplayerh) < 10 && fplayer->distance (fighter [1]) < 20)
+      return 1;
+  }
+  if (fabs (fighter [1]->aw) < 10 && fabs (fplayer->aw) > 130)
+  {
+    if (fabs (fighter [1]->getAngleH (fplayer)) < 10 && fighter [1]->distance (fplayer) < 20)
+      return 2;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionTest2::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+  else if (state == -1)
+  {
+    font1->drawTextCentered (0, 4, -2, "ALMOST! GET CLEARLY BEHIND HIM!", &textcolor);
+  }
+}
+
+
+
 MissionTransport::MissionTransport ()
 {
   id = MISSION_TRANSPORT;
@@ -718,16 +1359,16 @@ void MissionTransport::start ()
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
   fighter [1]->tl->x = 5;
   fighter [1]->tl->z = 105;
-  for (i = 2; i <= 3; i ++)
+  for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fige;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400);
+    fighter [i]->newinit (FIGHTER_CROW, 0, 340);
   }
-  for (i = 4; i <= 5; i ++)
+  for (i = 5; i <= 6; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
@@ -747,7 +1388,7 @@ int MissionTransport::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 8; i ++)
+  for (i = 0; i <= 6; i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -861,10 +1502,10 @@ MissionDogfight2::MissionDogfight2 ()
   strcpy (name, "DOGFIGHT");
   strcpy (briefing, "SOME ENEMY FIGHTERS ARE ON THEIR WAY ATTACKING ONE OF OUR OUTPOSTS. STOP THEM BEFORE THEY CAN REACH IT!");
   autoLFBriefing ();
-  alliedfighters = 3;
+  alliedfighters = 2;
   maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
-  alliedpilot [1] = PILOT_SHADOW;
+//  alliedpilot [1] = PILOT_SHADOW;
 }
 
 void MissionDogfight2::start ()
@@ -884,25 +1525,25 @@ void MissionDogfight2::start ()
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
   fighter [1]->tl->x = 5;
   fighter [1]->tl->z = 105;
-  alliedInit (FIGHTER_FALCON, alliedpilot [1], fighter [2]);
+/*  alliedInit (FIGHTER_FALCON, alliedpilot [1], fighter [2]);
   fighter [2]->tl->x = 10;
-  fighter [2]->tl->z = 110;
-  for (i = 3; i <= 6; i ++)
+  fighter [2]->tl->z = 110;*/
+  for (i = 2; i <= 6; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
+    fighter [i]->target = fighter [myrandom (2)];
     fighter [i]->o = &model_fige;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
+    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   for (i = 7; i <= 8; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
+    fighter [i]->target = fighter [myrandom (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = -i * 10;
-    fighter [i]->tl->z = -i * 10;
+    fighter [i]->tl->x = -i * 10 - 100;
+    fighter [i]->tl->z = -i * 10 - 100;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
@@ -917,7 +1558,7 @@ int MissionDogfight2::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 8; i ++)
+  for (i = 0; i <= 7; i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -990,7 +1631,7 @@ void MissionAirBattle::start ()
     fighter [i]->tl->z = 100 + i * 5;
     fighter [i]->target = fighter [7 + i];
   }
-  for (i = 7; i <= 22; i ++)
+  for (i = 7; i <= 25; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [myrandom (7)];
@@ -1000,12 +1641,17 @@ void MissionAirBattle::start ()
       fighter [i]->tl->x = -i * 5;
       fighter [i]->tl->z = -i * 5;
     }
-    else
+    else if (i <= 25)
     {
       fighter [i]->tl->x = -i * 8 - 150;
       fighter [i]->tl->z = -i * 8 - 150;
     }
-    fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 14);
+    else
+    {
+      fighter [i]->tl->x = -i * 8 - 350;
+      fighter [i]->tl->z = -i * 8 - 350;
+    }
+    fighter [i]->newinit (FIGHTER_CROW, 0, 440 - i * 10);
   }
 }
 
@@ -1018,7 +1664,7 @@ int MissionAirBattle::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 22; i ++)
+  for (i = 0; i <= 25; i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -1168,14 +1814,14 @@ void MissionScout::start ()
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
   fighter [1]->tl->x = 5;
   fighter [1]->tl->z = 105;
-  for (i = 2; i <= 3; i ++)
+  for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [myrandom (2)];
     fighter [i]->o = &model_figd;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_BUZZARD, 0, 100 + myrandom (50));
+    fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);
   }
 }
 
@@ -1188,7 +1834,7 @@ int MissionScout::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 8; i ++)
+  for (i = 0; i <= 4; i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -1564,7 +2210,7 @@ void MissionDogfight3::start ()
     fighter [i]->o = &model_figa;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 25);
+    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
 }
@@ -1843,7 +2489,7 @@ void MissionShip2::start ()
     fighter [i]->o = &model_figa;
     fighter [i]->tl->x = -80 - i * 10;
     fighter [i]->tl->z = 0;
-    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 150);
+    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);
   }
 }
 
@@ -2117,14 +2763,14 @@ void MissionCanyon2::start ()
       fighter [i]->tl->x = -i * 5;
       fighter [i]->tl->z = -i * 5;
       fighter [i]->o = &model_fige;
-      fighter [i]->newinit (FIGHTER_CROW, 0, myrandom (120) + 250);
+      fighter [i]->newinit (FIGHTER_CROW, 0, myrandom (120) + 260);
     }
     else if (i <= 19)
     {
       fighter [i]->tl->x = -i * 8 - 160;
       fighter [i]->tl->z = -i * 8 - 160;
       fighter [i]->o = &model_figd;
-      fighter [i]->newinit (FIGHTER_BUZZARD, 0, myrandom (120) + 150);
+      fighter [i]->newinit (FIGHTER_BUZZARD, 0, myrandom (120) + 160);
     }
     else
     {
@@ -2371,7 +3017,7 @@ MissionMoonDogfight1::MissionMoonDogfight1 ()
   alliedpilot [0] = PILOT_MATRIX;
   id = MISSION_MOON2;
   strcpy (name, "ELITE DOGFIGHT");
-  strcpy (briefing, "ENEMY FIGHTERS HAVE APPEARED IN THIS REGION.");
+  strcpy (briefing, "ENEMY FIGHTERS HAVE APPEARED IN THIS REGION. CAREFUL, THERE MIGHT BE SOME ELITE PILOTS AMONG THEM.");
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 3000 * timestep;
@@ -2413,7 +3059,7 @@ void MissionMoonDogfight1::start ()
   fighter [4]->target = fighter [0];
   fighter [4]->phi = 200;
   fighter [4]->o = &model_figh;
-  fighter [4]->newinit (FIGHTER_BLACKBIRD, 0, 40);
+  fighter [4]->newinit (FIGHTER_BLACKBIRD, 0, 60);
   fighter [5]->tl->x = 210;
   fighter [5]->tl->z = 210;
   fighter [5]->target = fighter [1];
@@ -2496,7 +3142,7 @@ void MissionMoonBase1::start ()
     fighter [i]->target = fighter [0];
     fighter [i]->phi = 50;
     fighter [i]->o = &model_figh;
-    fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 100);
+    fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
   }
   fighter [29]->tl->x = 50 + difficulty * 15;
   fighter [29]->tl->z = 180 + difficulty * 30;
@@ -2533,7 +3179,7 @@ void MissionMoonBase1::draw ()
 
 
 
-MissionMoon1::MissionMoon1 ()
+/*MissionMoon1::MissionMoon1 ()
 {
   id = MISSION_MOON;
   strcpy (name, "MOON");
@@ -2588,7 +3234,7 @@ void MissionMoon1::draw ()
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-}
+}*/
 
 
 

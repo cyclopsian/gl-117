@@ -254,14 +254,6 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
-  if (music1 == NULL)
-  {
-    sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
-    display (buf, LOG_FATAL);
-    exit (EXIT_LOADFILE);
-  }
-  Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
   if (music1 == NULL)
   {
@@ -270,10 +262,10 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+  music1 = Mix_LoadMUS (dirs->getMusic ("ambient.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
+    sprintf (buf, "Cannot open ambient.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
@@ -282,6 +274,22 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
+    exit (EXIT_LOADFILE);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
+  if (music1 == NULL)
+  {
+    sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
+    exit (EXIT_LOADFILE);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+  if (music1 == NULL)
+  {
+    sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
@@ -481,6 +489,9 @@ void SoundSystem::loadMusic (int sample)
       break;
     case MUSIC_SOFTTEC1:
       music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+      break;
+    case MUSIC_AMBIENT1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("ambient.s3m"));
       break;
   }
 #endif

@@ -33,10 +33,11 @@
 #include "main.h"
 
 #define MISSION_DEMO 0
-#define MISSION_TUTORIAL 1
-#define MISSION_DOGFIGHT 2
-#define MISSION_MOON 5
-#define MISSION_CANYON 6
+#define MISSION_CAMPAIGN1 1
+#define MISSION_TEST1 1
+#define MISSION_TEST2 2
+//#define MISSION_MOON 5
+//#define MISSION_CANYON 6
 #define MISSION_TRANSPORT 10
 #define MISSION_CONVOY 11
 #define MISSION_DOGFIGHT2 12
@@ -56,6 +57,12 @@
 #define MISSION_MOON1 33
 #define MISSION_MOON2 34
 #define MISSION_MOON3 35
+#define MISSION_CAMPAIGN2 40
+#define MISSION_TUTORIAL 80
+#define MISSION_DOGFIGHT 81
+#define MISSION_DEATHMATCH1 85
+#define MISSION_DEATHMATCH2 86
+#define MISSION_TEAMBASE1 87
 #define MISSION_MULTIPLAYER 1000
 #define MISSION_MULTIPLAYER_DOGFIGHT 1000
 
@@ -119,6 +126,55 @@ class MissionDogfight1 : public Mission
   public:
   int laststate, texttimer;
   MissionDogfight1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionDeathmatch1 : public Mission
+{
+  public:
+  int laststate, texttimer;
+  MissionDeathmatch1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionDeathmatch2 : public Mission
+{
+  public:
+  int laststate, texttimer;
+  MissionDeathmatch2 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionTeamBase1 : public Mission
+{
+  public:
+  int laststate, texttimer;
+  int team1x, team1y, team2x, team2y;
+  MissionTeamBase1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionTest1 : public Mission
+{
+  public:
+  MissionTest1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionTest2 : public Mission
+{
+  public:
+  MissionTest2 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

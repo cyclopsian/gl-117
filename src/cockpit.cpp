@@ -77,7 +77,8 @@ void Cockpit::setColor (CColor *color, int alpha)
 void Cockpit::drawCounter ()
 {
   int i;
-  float xf = 7.0F, yf = -3.0F, zf = -11.0F;
+  char buf [STDSIZE];
+  float xf = 2.8F, yf = -1.0F, zf = -4.0F, yf2 = -1.3F, xfl = 0.4F, yfl = 0.1F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   bool flarewarn = false, chaffwarn = false;
   for (i = 0; i < maxmissile; i ++)
@@ -101,10 +102,10 @@ void Cockpit::drawCounter ()
     {
       glColor3ub (200, 0, 0);
       glBegin (GL_QUADS);
-      glVertex3f (xf - 1.0F, yf - 1.0F, zf);
-      glVertex3f (xf + 1.0F, yf - 1.0F, zf);
-      glVertex3f (xf + 1.0F, yf - 0.25F, zf);
-      glVertex3f (xf - 1.0F, yf - 0.25F, zf);
+      glVertex3f (xf - xfl, yf2 - yfl, zf);
+      glVertex3f (xf + xfl, yf2 - yfl, zf);
+      glVertex3f (xf + xfl, yf2 + yfl, zf);
+      glVertex3f (xf - xfl, yf2 + yfl, zf);
       glEnd ();
     }
   }
@@ -120,34 +121,55 @@ void Cockpit::drawCounter ()
     {
       glColor3ub (0, 0, 200);
       glBegin (GL_QUADS);
-      glVertex3f (xf - 1.0F, yf + 0.25F, zf);
-      glVertex3f (xf + 1.0F, yf + 0.25F, zf);
-      glVertex3f (xf + 1.0F, yf + 1.0F, zf);
-      glVertex3f (xf - 1.0F, yf + 1.0F, zf);
+      glVertex3f (xf - xfl, yf - yfl, zf);
+      glVertex3f (xf + xfl, yf - yfl, zf);
+      glVertex3f (xf + xfl, yf + yfl, zf);
+      glVertex3f (xf - xfl, yf + yfl, zf);
       glEnd ();
     }
   }
   glLineWidth (1.0F);
   glColor3ub (255, 0, 0);
   glBegin (GL_LINE_STRIP);
-  glVertex3f (xf - 1.0F, yf - 1.0F, zf);
-  glVertex3f (xf + 1.0F, yf - 1.0F, zf);
-  glVertex3f (xf + 1.0F, yf - 0.25F, zf);
-  glVertex3f (xf - 1.0F, yf - 0.25F, zf);
-  glVertex3f (xf - 1.0F, yf - 1.0F, zf);
+  glVertex3f (xf - xfl, yf2 - yfl, zf);
+  glVertex3f (xf + xfl, yf2 - yfl, zf);
+  glVertex3f (xf + xfl, yf2 + yfl, zf);
+  glVertex3f (xf - xfl, yf2 + yfl, zf);
+  glVertex3f (xf - xfl, yf2 - yfl, zf);
   glEnd ();
   glColor3ub (0, 100, 255);
   glBegin (GL_LINE_STRIP);
-  glVertex3f (xf - 1.0F, yf + 0.25F, zf);
-  glVertex3f (xf + 1.0F, yf + 0.25F, zf);
-  glVertex3f (xf + 1.0F, yf + 1.0F, zf);
-  glVertex3f (xf - 1.0F, yf + 1.0F, zf);
-  glVertex3f (xf - 1.0F, yf + 0.25F, zf);
+  glVertex3f (xf - xfl, yf - yfl, zf);
+  glVertex3f (xf + xfl, yf - yfl, zf);
+  glVertex3f (xf + xfl, yf + yfl, zf);
+  glVertex3f (xf - xfl, yf + yfl, zf);
+  glVertex3f (xf - xfl, yf - yfl, zf);
   glEnd ();
   CColor blue (0, 100, 255);
   CColor red (255, 0, 0);
-  font1->drawText (17.0F, -7.1F, -3.0F, "CHAFF", &blue);
-  font1->drawText (17.0F, -10.45F, -3.0F, "FLARE", &red);
+  sprintf (buf, "CHAFF: %d", fplayer->chaffs);
+  font1->drawTextCentered (xf*10, (yf-0.05)*10, zf, buf, &blue);
+  sprintf (buf, "FLARE: %d", fplayer->flares);
+  font1->drawTextCentered (xf*10, (yf2-0.05)*10, zf, buf, &red);
+
+  if (mission->id == MISSION_DEATHMATCH1)
+  {
+    sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->fighterkills);
+    font1->drawText (-30.0F, 15.0F, -3.0F, buf, &blue);
+    for (i = 1; i < 8; i ++)
+    {
+      sprintf (buf, "PILOT%d: %d", i, fighter [i]->fighterkills);
+      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, &red);
+    }
+  }
+  if (mission->id == MISSION_DEATHMATCH2)
+  {
+    for (i = 0; i < 4; i ++)
+    {
+      sprintf (buf, "TEAM%d: %d", i, fighter [i * 2]->fighterkills + fighter [i * 2 + 1]->fighterkills);
+      font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, &red);
+    }
+  }
 /*  glColor3ub (255, 255, 255);
   gl->enableTextures (texcounter->textureID);
   glEnable (GL_BLEND);
@@ -182,6 +204,7 @@ void Cockpit::drawTargeter ()
     {
       if (fplayer->ttf <= 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
       {
+//  printf ("t%d ", fplayer->ttf);
         glColor4ub (255, 255, 0, 255); full = true;
       }
       else
@@ -355,7 +378,7 @@ void Cockpit::drawHeading ()
       }
     }
 
-  zf = -3.5;
+  zf = -4.0F;
   for (i = 0; i < 360; i += 5)
   {
     float p = (float) i - fplayer->gamma;
@@ -371,14 +394,16 @@ void Cockpit::drawHeading ()
         g = 0.1;
       xf = p / 6.0;
       gl->enableAlphaBlending ();
-      yf = -7;
+      yf = -8;
       setColor (alpha);
       glBegin (GL_LINES);
       glVertex3f ((yf - g) * 0.1, xf * 0.1, zf);
       glVertex3f (yf * 0.1, xf * 0.1, zf);
       glEnd ();
-      yf = -8.5;
-      if (i == 120)
+      yf = -9.5;
+      if (i == 90)
+        font1->drawText (yf - 2.0, xf - 0.5, zf, "-90", &color);
+      else if (i == 120)
         font1->drawText (yf - 2.0, xf - 0.5, zf, "-60", &color);
       else if (i == 150)
         font1->drawText (yf - 2.0, xf - 0.5, zf, "-30", &color);
@@ -388,11 +413,16 @@ void Cockpit::drawHeading ()
         font1->drawText (yf - 2.0, xf - 0.5, zf, "30", &color);
       else if (i == 240)
         font1->drawText (yf - 2.0, xf - 0.5, zf, "60", &color);
+      else if (i == 270)
+        font1->drawText (yf - 2.0, xf - 0.5, zf, "90", &color);
     }
   }
   
   sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
-  font1->drawText (-12.0, -8.5, -4.0, str, &color);
+  font1->drawTextCentered (-8.0, -8.5, -4.0, str, &color);
+
+  sprintf (str, "AMMO %d", fplayer->ammo);
+  font1->drawTextCentered (8.0, -8.5, -4.0, str, &color);
 
   gl->enableAlphaBlending ();
   int t1 = (int) (fplayer->theta - 135.0);
