@@ -35,7 +35,7 @@ CTexture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
 {
-  for (int i = 0; i < maxsmokeelem; i ++)
+  for (int i = 0; i < MAXSMOKEELEM; i ++)
   {
     time [i] = 0;
     zoom [i] = 0.1;
@@ -52,7 +52,7 @@ CSmoke::~CSmoke ()
 void CSmoke::setSmoke (float x, float y, float z, int myphi, int mytime)
 {
   last ++;
-  if (last >= maxsmokeelem)
+  if (last >= MAXSMOKEELEM)
     last = 0;
   v [last].x = x;
   v [last].y = y;
@@ -63,7 +63,7 @@ void CSmoke::setSmoke (float x, float y, float z, int myphi, int mytime)
 
 void CSmoke::move (Uint32 dt, int dec)
 {
-  for (int i = 0; i < maxsmokeelem; i ++)
+  for (int i = 0; i < MAXSMOKEELEM; i ++)
     if (time [i] > 0)
     {
       time [i] -= dec;
@@ -73,7 +73,7 @@ void CSmoke::move (Uint32 dt, int dec)
 
 void CSmoke::drawElem (int n)
 {
-  if (n < 0 || n >= maxsmokeelem) return;
+  if (n < 0 || n >= MAXSMOKEELEM) return;
   float myzoom = smokezoom [time [n]];
 
   glPushMatrix ();
@@ -99,7 +99,7 @@ void CSmoke::drawElem (int n)
 
 void CSmoke::drawElemHQ (int n)
 {
-  if (n < 0 || n >= maxsmokeelem) return;
+  if (n < 0 || n >= MAXSMOKEELEM) return;
 
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, time [n] * 10 + 55);
@@ -145,7 +145,7 @@ void CSmoke::draw ()
       drawElem (i);
     }
   }
-  for (i = maxsmokeelem - 1; i > last; i --)
+  for (i = MAXSMOKEELEM - 1; i > last; i --)
   {
     if (time [i] > 0)
     {

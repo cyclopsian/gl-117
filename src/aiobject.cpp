@@ -2015,7 +2015,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     
     // some smoke elements per discrete movement
     float fg = sqrt (forcex * forcex + forcey * forcey + forcez * forcez) * 13;
-    if (fg >= maxsmokeelem) fg = (float) maxsmokeelem - 0.5;
+    if (fg >= MAXSMOKEELEM) fg = (float) MAXSMOKEELEM - 0.5;
     for (i = 0; i < (int) fg; i ++)
     {
       float fac = (float) i / fg;

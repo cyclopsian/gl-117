@@ -28,19 +28,16 @@
 #include "object.h" // ok
 #include "mathtab.h" // ok
 
-//const int maxsmokeelem = 40;
-
 extern CTexture *texsmoke, *texsmoke2, *texsmoke3;
-//extern const float smokezoom[];
 
 // Smoke of missiles and fighters
 class CSmoke
 {
   public:
-  CVector3 v [maxsmokeelem];
-  float zoom [maxsmokeelem];
-  int time [maxsmokeelem];
-  int phi [maxsmokeelem]; // player's view angle (for low quality smoke), obsolete since v0.8.5
+  CVector3 v [MAXSMOKEELEM];
+  float zoom [MAXSMOKEELEM];
+  int time [MAXSMOKEELEM];
+  int phi [MAXSMOKEELEM]; // player's view angle (for low quality smoke), obsolete since v0.8.5
   int last;
   int type;
   

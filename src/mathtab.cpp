@@ -36,8 +36,7 @@ float cosi [360];
 int randommaster [64] [64];
 int randptr = 0;
 
-//const int maxsmokeelem = 40;
-float smokezoom [maxsmokeelem];
+float smokezoom [MAXSMOKEELEM];
 
 void mathtab_init ()
 {
@@ -54,8 +53,8 @@ void mathtab_init ()
     for (i2 = 0; i2 < 63; i2 ++)
       randommaster [i] [i2] = (i * i2 * 2000) % 32678;
   
-  for (i = 0; i < maxsmokeelem; i ++)
-    smokezoom [i] = (2.0 - 1.8 * i / maxsmokeelem) * 0.15;
+  for (i = 0; i < MAXSMOKEELEM; i ++)
+    smokezoom [i] = (2.0 - 1.8 * i / MAXSMOKEELEM) * 0.15;
 /*  float smokezoom[] = { 2.0, 0.198, 0.195, 0.193, 0.19, 0.188, 0.185, 0.182, 0.18, 0.177,
                             0.174, 0.171, 0.168, 0.165, 0.162, 0.159, 0.156, 0.153, 0.15, 0.149,
                             0.146, 0.143, 0.14, 0.136, 0.132, 0.128, 0.124, 0.12, 0.115, 0.11,
