@@ -499,7 +499,9 @@ void DynamicObj::move (Uint32 dt)
     if (rolleffect)
     {
 //      rectheta += rolleffect;
-      rectheta += rolleffect * (0.5 + 1.5 * realspeed) * timefac;
+//      rectheta += rolleffect * (0.5 + 1.5 * realspeed) * timefac;
+      theta += rolleffect * (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
+      rectheta = theta;
     }
   }
   if (phi < 0) phi += 360.0; // validate heading
@@ -1170,6 +1172,12 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     shield = maxshield = 5500;
     zoom = 4.0;
     impact = 20;
+  }
+  if (id == STATIC_BARRIER1)
+  {
+    shield = maxshield = 1000;
+    zoom = 8.0;
+    impact = 2000;
   }
 
   if (difficulty == 0) // easy
@@ -1854,7 +1862,8 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  int lsdist = 30;
+  int lsdist = 20;
+//  if (id == 200) printf ("%1.2f, %1.2F  ", lsdist * forcex, lsdist * forcez);
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
   int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);

@@ -57,6 +57,7 @@
 #define MISSION_MOON1 33
 #define MISSION_MOON2 34
 #define MISSION_MOON3 35
+#define MISSION_MOON4 36
 #define MISSION_CAMPAIGN2 40
 #define MISSION_TUTORIAL 80
 #define MISSION_DOGFIGHT 81
@@ -359,6 +360,15 @@ class MissionMoonDogfight1 : public Mission
 {
   public:
   MissionMoonDogfight1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionMoonTunnel1 : public Mission
+{
+  public:
+  MissionMoonTunnel1 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

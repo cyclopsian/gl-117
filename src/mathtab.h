@@ -35,6 +35,8 @@ extern float PI;
 extern void mathtab_init (); // calculate tables
 extern int myrandom (int n); // random integer number [0;n-1]
 extern int extremerandom (int n); // random integer number [0;n-1], prefer extremely low/high values
+extern int myrandom (int n, int x, int y); // random integer number [0;n-1]
+extern int extremerandom (int n, int x, int y); // random integer number [0;n-1], prefer extremely low/high values
 extern float dist (float dx, float dy); // distance (Euklidean norm, 2D vector)
 extern int randptr;
 

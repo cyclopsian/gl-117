@@ -93,6 +93,7 @@
 #define STATIC_COMPLEX1 10301
 #define STATIC_RADAR1 10302
 #define STATIC_BASE1 10303
+#define STATIC_BARRIER1 10400
 
 //extern GLLandscape *l;
 

@@ -297,6 +297,7 @@ CModel model_radar;
 CModel model_mine1;
 CModel model_aster1;
 CModel model_base1;
+CModel model_barrier1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -708,6 +709,10 @@ void game_levelInit ()
     {
       fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.5 * fighter [i]->zoom;
     }
+    else if (fighter [i]->id == STATIC_BARRIER1)
+    {
+      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.3 * fighter [i]->zoom;
+    }
     else if (fighter [i]->id == MISSILE_MINE1)
     {
       fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 5 + myrandom (20);
@@ -1058,6 +1063,7 @@ void createMission (int missionid)
   else if (missionid == MISSION_MOON1) missionnew = new MissionMoonDefense1 ();
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
+  else if (missionid == MISSION_MOON4) missionnew = new MissionMoonTunnel1 ();
   else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
   else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
   else if (missionid == MISSION_FREEFLIGHT1) missionnew = new MissionFreeFlight1 ();
@@ -1467,10 +1473,10 @@ void game_keyspecial (int key, int x, int y)
     fplayer->elevatoreffect = 1.0;
     break;
   case KEY_LEFT:
-    fplayer->rolleffect = 5;
+    fplayer->rolleffect = 1.0;
     break;
   case KEY_RIGHT:
-    fplayer->rolleffect = -5;
+    fplayer->rolleffect = -1.0;
     break;
   case KEY_PGUP:
 #ifndef USE_GLUT
@@ -1557,14 +1563,12 @@ void game_mouserelmotion (int xrel, int yrel)
   if (controls != CONTROLS_MOUSE_EXP) return;
   float xr = (float) xrel / width, yr = (float) yrel / height;
   
-  float roll = (float) -xr * 120;
-  if (fabs (roll) < 1.0F) roll = 1.0F;
-  if (roll > 0) roll -= 1.0F;
-  else roll += 1.0F;
+  float roll = (float) -xr * 20;
 
-  if (roll > 6.0F) roll = 6.0F;
-  else if (roll < -6.0F) roll = -6.0F;
-  fplayer->rectheta += roll;
+  if (roll > 1.0F) roll = 1.0F;
+  else if (roll < -1.0F) roll = -1.0F;
+//  fplayer->rectheta += roll;
+  fplayer->rolleffect = roll;
   if (roll < 1E-3)
     fplayer->ruddereffect = (float) xr * 200;
   else 
@@ -1572,7 +1576,7 @@ void game_mouserelmotion (int xrel, int yrel)
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
 
-  fplayer->elevatoreffect = (float) yr * fabs (yr) * 5000;
+  fplayer->elevatoreffect = (float) yr * fabs (yr) * 20000;
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
   else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
 }
@@ -1618,14 +1622,18 @@ void game_mousemotion (int x, int y)
     else nx += roll_deadarea; 
 
     if (nx > 0) 
-      fplayer->rolleffect = -(exp(log(nx) * 1.3f)) * 20.0f; 
+      fplayer->rolleffect = -(exp(log(nx) * 1.3f)) * 3.0f; 
     else 
-      fplayer->rolleffect = (exp(log(-nx) * 1.3f)) * 20.0f; 
+      fplayer->rolleffect = (exp(log(-nx) * 1.3f)) * 3.0f;
+
+    if (fplayer->rolleffect < -1.0F) fplayer->rolleffect = -1.0F;
+    if (fplayer->rolleffect > 1.0F) fplayer->rolleffect = 1.0F;
+//    printf ("%2.2f ", fplayer->rolleffect);
   } 
   else 
     fplayer->rolleffect = 0.0f; 
-  if (fplayer->rolleffect > 70) fplayer->rolleffect = 70; 
-  if (fplayer->rolleffect < -70) fplayer->rolleffect = -70; 
+/*  if (fplayer->rolleffect > 70) fplayer->rolleffect = 70; 
+  if (fplayer->rolleffect < -70) fplayer->rolleffect = -70; */
 
   fplayer->elevatoreffect = dy / height * 2.5; 
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
@@ -1656,7 +1664,8 @@ void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
   float ry = x * sine [t] + y * cosi [t];*/
   float xx = x / 32768.0;
   xx *= fabs (xx);
-  fplayer->rectheta -= (float) xx * 6.0F;
+  fplayer->rolleffect = (float) -xx;
+//  fplayer->rectheta -= (float) xx * 6.0F;
 /*  fplayer->recgamma += (float) ry / 5000;
   if (fplayer->recgamma > 225) fplayer->recgamma = 225;
   if (fplayer->recgamma < 135) fplayer->recgamma = 135;*/
@@ -3141,6 +3150,14 @@ void menu_mouse (int button, int state, int x, int y)
         menuitemselected = 35;
         if (state == MOUSE_DOWN)
         {
+          switch_mission (MISSION_MOON4);
+        }
+      }
+      if (ry >= 0.75 && ry <= 0.77 && p->mission_state [MISSION_MOON4] == 1)
+      {
+        menuitemselected = 36;
+        if (state == MOUSE_DOWN)
+        {
           switch_mission (MISSION_MOON3);
         }
       }
@@ -3715,7 +3732,8 @@ void menu_display ()
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON3, MISSION_CANYON2, 32, "MAIN BASE");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON2, MISSION_MOON1, 34, "ELITE DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON4, MISSION_MOON2, 35, "TUNNEL");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON4, 36, "SNEAKING");
     zf = -2;
     if (menuitemselected == 100)
       font1->drawTextScaled (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
@@ -4494,7 +4512,7 @@ void game_timer (int dt)
   // create flash during thunderstorm
   if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !myrandom (2000 / dt))
   {
-    flash = 15 * timestep;
+    flash = 18 * timestep;
     int fphi = (int) camphi + myrandom (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
@@ -5243,6 +5261,9 @@ void myFirstInit ()
   model_radar.setName ("ASTEROID");
   g_Load3ds.Import3DS (&model_base1, dirs->getModels ("base1.3ds"));
   model_radar.setName ("MOON BASE");
+  g_Load3ds.Import3DS (&model_barrier1, dirs->getModels ("barrier.3ds"));
+  model_barrier1.scaleTexture (10, 10);
+  model_barrier1.alpha = true;
 
   setMissiles (&model_fig);
   setMissiles (&model_figa);

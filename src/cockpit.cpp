@@ -336,16 +336,28 @@ void Cockpit::drawHeading ()
         if (dphi > 0) delta -= 180;
 //        printf ("delta=%f, dgamma=%f, dphi=%f\n",delta, dgamma, dphi);
         delta += fplayer->theta;
-        while (delta < 0) delta += 360;
-        while (delta >= 360) delta -= 360;
-        float xs = cosi [(int) delta] * 3;
-        float ys = -sine [(int) delta] * 3;
+//        while (delta < 0) delta += 360;
+//        while (delta >= 360) delta -= 360;
+        float xs = COS(delta) * 3;
+        float ys = -SIN(delta) * 3;
+        float delta1 = delta + 5;
+        float xs1 = COS(delta1) * 2.8;
+        float ys1 = -SIN(delta1) * 2.8;
+        float delta2 = delta - 5;
+        float xs2 = COS(delta2) * 2.8;
+        float ys2 = -SIN(delta2) * 2.8;
 /*        if (xs > 3) xs = 3;
         else if (xs < -3) xs = -3;
         if (ys > 3) ys = 3;
         else if (ys < -3) ys = -3;*/
         zf = -4;
         glBegin (GL_LINE_STRIP);
+        glColor4ub (255, 0, 0, alpha);
+        glVertex3f (xs2, ys2, zf);
+        glVertex3f (xs, ys, zf);
+        glVertex3f (xs1, ys1, zf);
+        glEnd ();
+/*        glBegin (GL_LINE_STRIP);
         glColor4ub (255, 0, 0, alpha);
         glVertex3f (xs - 0.12, ys - 0.12, zf);
         glVertex3f (xs + 0.12, ys - 0.12, zf);
@@ -358,7 +370,7 @@ void Cockpit::drawHeading ()
         glVertex3f (xs + 0.15, ys + 0.15, zf);
         glVertex3f (xs + 0.15, ys - 0.15, zf);
         glVertex3f (xs - 0.15, ys + 0.15, zf);
-        glEnd ();
+        glEnd ();*/
       }
     }
 

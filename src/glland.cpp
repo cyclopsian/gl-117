@@ -1425,10 +1425,11 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float) h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
     return;
 
-//  glittering = 0;
+  float quadglittering = 0;
   // glittering is obsolete, does not achieve the desired effect
   float glitter [4] = { 1, 1, 1, 1 };
   if (quality >= 2)
+  if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
     float dz1 = fabs ((float) MAXX/2 + camx - xs);
     float dz2 = fabs ((float) MAXX/2 + camx - xs - step);
@@ -1438,6 +1439,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     dtheta1 /= 4; dtheta2 /= 4;
 //    if (lz1 <= 5 || lz2 <= 5)
     {
+      float divdy = 1.0F / dy * 200;
       float dx1 = -((float) MAXX/2 - camz - ys);
       float dx2 = -((float) MAXX/2 - camz - ys - step);
 //      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
@@ -1446,40 +1448,46 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
       dgamma1 /= 4; dgamma2 /= 4;
       float sc = 1.0;
       float test;
+      if (dx1 < 0) dgamma1 += 90;
+      if (dx2 < 0) dgamma2 += 90;
       if (h1 >= hray [x] [y])
       {
-        test = sc * exp ((-dgamma1 * dgamma1 - dtheta1 * dtheta1) / 8.0) + 0.98;
+        test = sc * exp ((-dgamma1 * dgamma1 - dtheta1 * dtheta1) / divdy) + 0.98;
         if (test > 1.0)
         {
           glitter [0] = test;
           if (test > glittering) glittering = test;
+          if (test > quadglittering) quadglittering = test;
         }
       }
       if (h1 >= hray [xstep] [y])
       {
-        test = sc * exp ((-dgamma1 * dgamma1 - dtheta2 * dtheta2) / 8.0) + 0.98;
+        test = sc * exp ((-dgamma1 * dgamma1 - dtheta2 * dtheta2) / divdy) + 0.98;
         if (test > 1.0)
         {
           glitter [1] = test;
           if (test > glittering) glittering = test;
+          if (test > quadglittering) quadglittering = test;
         }
       }
       if (h1 >= hray [x] [ystep])
       {
-        test = sc * exp ((-dgamma2 * dgamma2 - dtheta1 * dtheta1) / 8.0) + 0.98;
+        test = sc * exp ((-dgamma2 * dgamma2 - dtheta1 * dtheta1) / divdy) + 0.98;
         if (test > 1.0)
         {
           glitter [3] = test;
           if (test > glittering) glittering = test;
+          if (test > quadglittering) quadglittering = test;
         }
       }
       if (h1 >= hray [xstep] [ystep])
       {
-        test = sc * exp ((-dgamma2 * dgamma2 - dtheta2 * dtheta2) / 8.0) + 0.98;
+        test = sc * exp ((-dgamma2 * dgamma2 - dtheta2 * dtheta2) / divdy) + 0.98;
         if (test > 1.0)
         {
           glitter [2] = test;
           if (test > glittering) glittering = test;
+          if (test > quadglittering) quadglittering = test;
         }
       }
 /*      li [0] *= glitter [0];
@@ -1550,7 +1558,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 
 //  glDisable (GL_DEPTH_TEST);
 
-  if (quality >= 2 && glittering > 0)
+  if (quality >= 2 && quadglittering > 1.2)
   {
     glEnable (GL_BLEND);
     glDepthFunc (GL_LEQUAL);
@@ -1568,6 +1576,33 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
         tf [j] [1] = (py [j] * texzoom) + (float) ((lsticker / timestep / 2) & 7) * 0.6;
         glTexCoord2fv (tf [j]);
       }
+      col [j] [3] = glitter [j] - 1.0;
+      col [j] [0] = 1.0;
+      col [j] [1] = 1.0;
+      col [j] [2] = 1.0;
+      glColor4fv (col [j]);
+      glVertex3fv (pos [j]);
+    }
+    glEnd();
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable (GL_ALPHA_TEST);
+    glDisable (GL_BLEND);
+//  glEnable (GL_DEPTH_TEST);
+  }
+
+  if (quality >= 2 && quadglittering > 1.02)
+  {
+    glEnable (GL_BLEND);
+    glDepthFunc (GL_LEQUAL);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable (GL_ALPHA_TEST);
+    glAlphaFunc (GL_GEQUAL, 0.02);
+    glDisable (GL_TEXTURE_2D);
+//    gl->enableTextures (texglitter1->textureID);
+//    gl->enableLinearTexture (texglitter1->textureID);
+    glBegin (GL_QUADS);
+    for (j = 0; j < 4; j ++)
+    {
       col [j] [3] = glitter [j] - 1.0;
       col [j] [0] = 1.0;
       col [j] [1] = 1.0;

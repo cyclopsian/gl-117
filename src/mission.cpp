@@ -3228,6 +3228,7 @@ void MissionMoonDefense1::start ()
   sungamma = 50;
   if (l != NULL) delete l;
   l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+//  l->genTrench (12, 5000);
   playerInit ();
   fplayer->tl->x = 100;
   fplayer->tl->z = 100;
@@ -3367,6 +3368,115 @@ int MissionMoonDogfight1::processtimer (Uint32 dt)
 }
 
 void MissionMoonDogfight1::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionMoonTunnel1::MissionMoonTunnel1 ()
+{
+  selfighter [0] = FIGHTER_REDARROW;
+  selfighter [1] = FIGHTER_PHOENIX;
+  id = MISSION_MOON4;
+  strcpy (name, "TURRETS");
+  strcpy (briefing, "THE FIRST STEP TO MOVE FURTHER TOWARDS THE ENEMY BASE IS A TRENCH YOU HAVE TO PROTUDE.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  maxtime = 5000 * timestep;
+}
+
+void MissionMoonTunnel1::start ()
+{
+  int i;
+  day = 0;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+  l->genTrench (16, 4000);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 0;
+  fplayer->phi = 90;
+  fplayer->target = fighter [6];
+  for (i = 1; i <= 9; i ++)
+  {
+    int ix = (i / 2) * 8 - 200;
+    int iy = (i & 1) * 4 - 2;
+    fighter [i]->tl->x = ix;
+    fighter [i]->tl->z = iy;
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_flak1;
+    fighter [i]->newinit (FLAK_AIR1, 0, 200);
+  }
+  fighter [i]->tl->x = -200;
+  fighter [i]->tl->z = 0;
+  fighter [i]->target = fighter [0];
+  fighter [i]->o = &model_flarak1;
+  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  for (i = 11; i <= 15; i ++)
+  {
+    int ix = (i - 11) * 5 - 40;
+    int iy = 0;
+    fighter [i]->tl->x = ix;
+    fighter [i]->tl->z = iy;
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_mine1;
+    fighter [i]->newinit (MISSILE_MINE1, 0, 220);
+  }
+  fighter [i]->tl->x = -250;
+  fighter [i]->tl->z = -2;
+  fighter [i]->target = fighter [0];
+  fighter [i]->o = &model_flarak1;
+  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  i ++;
+  fighter [i]->tl->x = -250;
+  fighter [i]->tl->z = 2;
+  fighter [i]->target = fighter [0];
+  fighter [i]->o = &model_flarak1;
+  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  i ++;
+  fighter [i]->tl->x = -350;
+  fighter [i]->tl->z = 0;
+  fighter [i]->o = &model_barrier1;
+  fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
+}
+
+int MissionMoonTunnel1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (timer <= 0) fplayer->tl->y = l->getHeight (fplayer->tl->x, fplayer->tl->z) + 5;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+//  if (timer > 40 * timestep)
+  {
+    if (fplayer->tl->y - l->getHeight (fplayer->tl->x, fplayer->tl->z) > 15)
+      return 2;
+  }
+  if (fplayer->tl->x < -380)
+    return 1;
+  return 0;
+/*  for (i = 0; i <= 10; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;*/
+}
+
+void MissionMoonTunnel1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {

@@ -850,6 +850,47 @@ void Landscape::genDesertSurface (int hoehepc)
     }
 }
 
+void Landscape::genTrench (int width, int height)
+{
+  int i, i2;
+  int midleft = MAXX / 2 - width / 2, midright = MAXX / 2 + width / 2;
+  int left = 0, right = 0;
+  for (i = 0; i <= MAXX; i ++)
+  {
+    if (i != 148 && i != 52)
+    {
+    for (i2 = midleft + left; i2 < midright + right; i2 ++)
+    {
+      int height1 = height;
+/*      if (i2 - midleft - left < 3)
+      {
+        height1 = height1 * (i2 - midleft - left + 1) / 4;
+      }
+      if (i2 > midright + right - 3)
+      {
+        height1 = height1 * (midright + right - i2) / 4;
+      }*/
+      h [i] [i2] -= height1;
+      hw [i] [i2] -= height1;
+    }
+    if (i & 1)
+    {
+      left += myrandom (5) - 2;
+      right += myrandom (5) - 2;
+      if (left < -5) left = -5;
+      if (left > 5) left = 5;
+      if (right < -5) right = -5;
+      if (right > 5) right = 5;
+    }
+    }
+    else
+    {
+      h [i] [MAXX / 2] -= height;
+      hw [i] [MAXX / 2] -= height;
+    }
+  }
+}
+
 
 
 /****************************************************************************

@@ -110,6 +110,7 @@ extern CModel model_radar;
 extern CModel model_mine1;
 extern CModel model_aster1;
 extern CModel model_base1;
+extern CModel model_barrier1;
 
 extern DynamicObj *flare [maxflare];
 extern DynamicObj *chaff [maxchaff];

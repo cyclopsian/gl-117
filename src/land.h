@@ -131,6 +131,7 @@ class Landscape
   void genCanyonSurface (int hoehepc); // canyon
   void genMoonSurface (int height); // moon
   void genDesertSurface (int hoehepc); // desert
+  void genTrench (int width, int height);
   void genRocks (int diffmin, int percent);
   int calcLake (int ys, int xs, unsigned short level, int num, int maxextent);
   void genLake (int depthpc);
