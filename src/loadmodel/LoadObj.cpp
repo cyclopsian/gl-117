@@ -151,6 +151,7 @@ void LoadObj::normalize (Model3d *model)
 
 bool LoadObj::importObj (Model3d *model, char *filename)
 {
+  TextFileObj *file;
   file = new TextFileObj (filename);
   int32 i = 0;
   int i2;
