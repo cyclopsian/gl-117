@@ -309,9 +309,9 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
   if (explode > 0 || sink > 0) return;
   
   bool collide = false;
-  if (tl->x + o->cubex >= d->tl->x - d->o->cubex && tl->x - o->cubex <= d->tl->x + d->o->cubex &&
-      tl->y + o->cubey >= d->tl->y - d->o->cubey && tl->y - o->cubey <= d->tl->y + d->o->cubey &&
-      tl->z + o->cubez >= d->tl->z - d->o->cubez && tl->z - o->cubez <= d->tl->z + d->o->cubez)
+  if (tl->x + o->cube.x >= d->tl->x - d->o->cube.x && tl->x - o->cube.x <= d->tl->x + d->o->cube.x &&
+      tl->y + o->cube.y >= d->tl->y - d->o->cube.y && tl->y - o->cube.y <= d->tl->y + d->o->cube.y &&
+      tl->z + o->cube.z >= d->tl->z - d->o->cube.z && tl->z - o->cube.z <= d->tl->z + d->o->cube.z)
   {
     collide = true;
   }
@@ -821,7 +821,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams
   o = getModel (id);
-  o->cubex = zoom; o->cubey = zoom; o->cubez = zoom;
+  o->cube.set (zoom, zoom, zoom);
   
   if (id == FIGHTER_FALCON)
   {
@@ -1029,7 +1029,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     smoke->type = 1;
     impact = 2;
     forcez = recthrust;
-    o->cubex = zoom * cubefac; o->cubey = zoom * cubefac; o->cubez = zoom * cubefac;
+    o->cube.set (zoom * cubefac, zoom * cubefac, zoom * cubefac);
   }
 
   if (id == FLAK_AIR1)
@@ -1055,7 +1055,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id >= FLAK1 && id <= FLAK2)
   {
-    o->cubex = zoom * cubefac1; o->cubey = zoom * cubefac1; o->cubez = zoom * cubefac1;
+    o->cube.set (zoom * cubefac1, zoom * cubefac1, zoom * cubefac1);
   }
 
   if (id == TANK_AIR1)
@@ -1068,7 +1068,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 8.0;
     shield = maxshield = 160;
     zoom = 0.35;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.45; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.45, zoom * 0.7);
   }
   else if (id == TANK_GROUND1)
   {
@@ -1080,7 +1080,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 8.0;
     shield = maxshield = 200;
     zoom = 0.4;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.5; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
   else if (id == TANK_PICKUP1)
   {
@@ -1091,7 +1091,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 30;
     zoom = 0.25;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.55; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.55, zoom * 0.7);
   }
   else if (id == TANK_TRUCK1)
   {
@@ -1102,7 +1102,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 20;
     zoom = 0.45;
-    o->cubex = zoom * 0.6; o->cubey = zoom * 0.35; o->cubez = zoom * 0.6;
+    o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
   else if (id == TANK_TRUCK2)
   {
@@ -1113,7 +1113,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 40;
     zoom = 0.4;
-    o->cubex = zoom * 0.6; o->cubey = zoom * 0.35; o->cubez = zoom * 0.6;
+    o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
   else if (id == TANK_TRSAM1)
   {
@@ -1125,7 +1125,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     shield = maxshield = 50;
     zoom = 0.35;
     missiles [6] = 200;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.6; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.6, zoom * 0.7);
   }
   if (id >= TANK1 && id <= TANK2)
   {
@@ -1142,7 +1142,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 20;
     shield = maxshield = 5500;
     missiles [6] = 200;
-    o->cubex = zoom * 0.35; o->cubey = zoom * 0.1; o->cubez = zoom * 0.35;
+    o->cube.set (zoom * 0.35, zoom * 0.1, zoom * 0.35);
   }
   else if (id == SHIP_DESTROYER1)
   {
@@ -1154,7 +1154,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 6.0;
     impact = 20;
     shield = maxshield = 2800;
-    o->cubex = zoom * 0.4; o->cubey = zoom * 0.12; o->cubez = zoom * 0.4;
+    o->cube.set (zoom * 0.4, zoom * 0.12, zoom * 0.4);
   }
 
   float missilethrustbase = 1.2F;
@@ -1248,7 +1248,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id >= MISSILE1 && id <= MISSILE2)
   {
-    o->cubex = zoom; o->cubey = zoom; o->cubez = zoom;
+    o->cube.set (zoom, zoom, zoom);
   }
 
   if (id >= STATIC_PASSIVE)
@@ -1265,55 +1265,55 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     shield = maxshield = 80;
     zoom = 0.5;
-    o->cubex = zoom * 0.9; o->cubey = zoom; o->cubez = zoom * 0.9;
+    o->cube.set (zoom * 0.9, zoom, zoom * 0.9);
   }
   if (id == STATIC_TENT4)
   {
     shield = maxshield = 160;
     zoom = 1.2;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.42; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.42, zoom * 0.7);
   }
   if (id == STATIC_CONTAINER1)
   {
     shield = maxshield = 30;
     zoom = 1.0;
     impact = 20;
-    o->cubex = zoom * 0.4; o->cubey = zoom * 0.35; o->cubez = zoom * 0.9;
+    o->cube.set (zoom * 0.4, zoom * 0.35, zoom * 0.9);
   }
   if (id == STATIC_HALL1)
   {
     shield = maxshield = 450;
     zoom = 1.8;
     impact = 20;
-    o->cubex = zoom * 0.45; o->cubey = zoom * 0.42; o->cubez = zoom;
+    o->cube.set (zoom * 0.45, zoom * 0.42, zoom);
   }
   if (id == STATIC_HALL2)
   {
     shield = maxshield = 900;
     zoom = 2.5;
     impact = 20;
-    o->cubex = zoom; o->cubey = zoom * 0.45; o->cubez = zoom;
+    o->cube.set (zoom, zoom * 0.45, zoom);
   }
   if (id == STATIC_OILRIG1)
   {
     shield = maxshield = 1400;
     zoom = 3.5;
     impact = 20;
-    o->cubex = zoom * 0.95; o->cubey = zoom * 0.5; o->cubez = zoom * 0.95;
+    o->cube.set (zoom * 0.95, zoom * 0.5, zoom * 0.95);
   }
   if (id == STATIC_COMPLEX1)
   {
     shield = maxshield = 5000;
     zoom = 2.0;
     impact = 20;
-    o->cubex = zoom * 0.75; o->cubey = zoom * 0.6; o->cubez = zoom * 0.75;
+    o->cube.set (zoom * 0.75, zoom * 0.6, zoom * 0.75);
   }
   if (id == STATIC_RADAR1)
   {
     shield = maxshield = 500;
     zoom = 1.3;
     impact = 20;
-    o->cubex = zoom * 0.5; o->cubey = zoom * 0.7; o->cubez = zoom * 0.5;
+    o->cube.set (zoom * 0.5, zoom * 0.7, zoom * 0.5);
   }
   if (id == ASTEROID)
   {
@@ -1324,28 +1324,28 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.25;
     forcez = 0.12;
     ai = false;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.7; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.7, zoom * 0.7);
   }
   if (id == STATIC_BASE1)
   {
     shield = maxshield = 5500;
     zoom = 4.0;
     impact = 20;
-    o->cubex = zoom * 0.7; o->cubey = zoom * 0.5; o->cubez = zoom * 0.7;
+    o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
   if (id == STATIC_DEPOT1)
   {
     shield = maxshield = 3000;
     zoom = 1.5;
     impact = 20;
-    o->cubex = zoom; o->cubey = zoom * 0.5; o->cubez = zoom;
+    o->cube.set (zoom, zoom * 0.5, zoom);
   }
   if (id == STATIC_BARRIER1)
   {
     shield = maxshield = 1000;
     zoom = 12.0;
     impact = 2000;
-    o->cubex = 0.8; o->cubey = 11; o->cubez = 11;
+    o->cube.set (0.8, 11, 11);
   }
   if (id >= STATIC_PASSIVE)
   {

@@ -265,14 +265,15 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case MATERIAL:
-        model->addMaterial (&newTexture);
+        model->addMaterial (newTexture);
         ProcessNextMaterialChunk (model, currentChunk);
         break;
 
       case OBJECT:
-        model->addObject (&newObject);
+        model->addObject (newObject);
         memset (&newObject, 0, sizeof (CObject));
-        currentChunk->bytesRead += GetString (model->object [model->numObjects - 1]->name);
+        currentChunk->bytesRead += GetString (buf);
+        model->object [model->numObjects - 1]->name = buf;
         ProcessNextObjectChunk (model, (model->object [model->numObjects - 1]), currentChunk);
         break;
 
@@ -348,6 +349,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
 
 void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 {
+  char buf [256];
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
 
@@ -359,7 +361,8 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
     switch (currentChunk->ID)
     {
       case MAT_NAME:
-        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->name, 255, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->readString (buf, 255, currentChunk->length - currentChunk->bytesRead);
+        model->material [model->numMaterials - 1]->name = buf;
         break;
 
       case MAT_DIFFUSE:
@@ -371,9 +374,9 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case MAT_MAPFILE:
-        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->filename, 255, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->readString (buf, 255, currentChunk->length - currentChunk->bytesRead);
         {
-          char *str = model->material [model->numMaterials - 1]->filename;
+          char *str = buf;
           while (*str)
           {
             if (*str >= 'A' && *str <= 'Z')
@@ -381,6 +384,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
             str++;
           }
         }
+        model->material [model->numMaterials - 1]->filename = buf;
         break;
     
       case MAT_USCALE:
@@ -542,10 +546,10 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
 
   for (int i = 0; i < model->numMaterials; i ++)
   {
-    if (strcmp (materialName, model->material [i]->name) == 0)
+    if (strcmp (materialName, model->material [i]->name.c_str ()) == 0)
     {
       object->material = model->material [i];
-      if (strlen (model->material [i]->filename) > 0)
+      if (model->material [i]->filename.length ())
         if ((model->material [i]->filename [0] >= 'A' && model->material [i]->filename [0] <= 'Z') ||
             (model->material [i]->filename [0] >= 'a' && model->material [i]->filename [0] <= 'z'))
         {
@@ -649,7 +653,7 @@ void CLoad3DS::LoadTextures (CModel *model)
   {
     if (model->object [i]->hasTexture)
     {
-      strcpy (str, dirs->getTextures (model->object [i]->material->filename));
+      strcpy (str, dirs->getTextures (const_cast<char *>(model->object [i]->material->filename.c_str ())));
 			for (i2 = (int) strlen (str) - 1; i2 >= 0; i2 --)
 			{
         if (i2 > 2 && str [i2] == '.')
@@ -739,11 +743,11 @@ void CLoad3DS::Normalize (CModel *model)
   float tlx = (maxx + minx) / 2.0;
   float tly = (maxy + miny) / 2.0;
   float tlz = (maxz + minz) / 2.0;
-  model->scalex = (maxx - minx) * 0.5;
-  model->scaley = (maxy - miny) * 0.5;
-  model->scalez = (maxz - minz) * 0.5;
-  float sc = model->scalex > model->scaley ? model->scalex : model->scaley;
-  sc = model->scalez > sc ? model->scalez : sc;
+  model->vscale.x = (maxx - minx) * 0.5;
+  model->vscale.y = (maxy - miny) * 0.5;
+  model->vscale.z = (maxz - minz) * 0.5;
+  float sc = model->vscale.x > model->vscale.y ? model->vscale.x : model->vscale.y;
+  sc = model->vscale.z > sc ? model->vscale.z : sc;
 
   for (i = 0; i < model->numObjects; i ++)
   {

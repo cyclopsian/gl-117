@@ -837,12 +837,12 @@ int game_levelInit ()
     if (sungamma < 35)
     {
       skycolor.setColor ((unsigned short) (127 + 70 - 2 * sungamma), 127, 127);
-      objsphere->setColor (&skycolor);
+      objsphere->setColor (skycolor);
     }
     else
     {
       skycolor.setColor (127, 127, 127 + 5);
-      objsphere->setColor (&skycolor);
+      objsphere->setColor (skycolor);
     }
     if (sungamma < 35)
     {
@@ -857,62 +857,62 @@ int game_levelInit ()
       gl->fogcolor [2] = 0.52;
     }
     skycolor.setColor (50, 200, 255);
-    objsphere->setNorthPoleColor (&skycolor, 1.8);
+    objsphere->setNorthPoleColor (skycolor, 1.8);
     if (sungamma < 35)
     {
       skycolor.setColor ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180);
-      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
     else
     {
       skycolor.setColor (200, 200, 200);
-      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
   }
   else if (!day && weather == WEATHER_SUNNY)
   {
     skycolor.setColor (64, 64, 64);
-    objsphere->setColor (&skycolor);
+    objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.25;
     gl->fogcolor [1] = 0.25;
     gl->fogcolor [2] = 0.25;
     if (l->type != LAND_MOON)
     {
       skycolor.setColor (0, 0, 170);
-      objsphere->setNorthPoleColor (&skycolor, 1.8);
+      objsphere->setNorthPoleColor (skycolor, 1.8);
       skycolor.setColor (64, 64, 64);
-      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
     else
     {
       skycolor.setColor (0, 0, 0);
-      objsphere->setNorthPoleColor (&skycolor, 1.8);
+      objsphere->setNorthPoleColor (skycolor, 1.8);
     }
   }
   else if (day && weather == WEATHER_THUNDERSTORM)
   {
     skycolor.setColor (102, 102, 102);
-    objsphere->setColor (&skycolor);
+    objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.4;
     gl->fogcolor [1] = 0.4;
     gl->fogcolor [2] = 0.4;
     skycolor.setColor (102, 102, 102);
-    objsphere->setNorthPoleColor (&skycolor, 1.8);
+    objsphere->setNorthPoleColor (skycolor, 1.8);
   }
   else if (!day && weather == WEATHER_THUNDERSTORM)
   {
     skycolor.setColor (40, 40, 40);
-    objsphere->setColor (&skycolor);
+    objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.16;
     gl->fogcolor [1] = 0.16;
     gl->fogcolor [2] = 0.16;
     skycolor.setColor (40, 40, 40);
-    objsphere->setNorthPoleColor (&skycolor, 1.8);
+    objsphere->setNorthPoleColor (skycolor, 1.8);
   }
   else if (weather == WEATHER_CLOUDY)
   {
     skycolor.setColor (20, 20, 20);
-    objsphere->setColor (&skycolor);
+    objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.08;
     gl->fogcolor [1] = 0.08;
     gl->fogcolor [2] = 0.08;
@@ -4161,7 +4161,7 @@ void setMissiles (CModel *model)
       tlmissile.z = sumz / 4.0F;
 
       tlmissile.y = maxy;
-      model->addRefPoint (&tlmissile);
+      model->addRefPoint (tlmissile);
     }
   }
 }
@@ -4190,7 +4190,7 @@ void myInit ()
   explsphere = new CSphere ();
   ((CSphere *) explsphere)->init (1, 9);
   CColor explcolor (255, 255, 1);
-  explsphere->setColor (&explcolor);
+  explsphere->setColor (explcolor);
   explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
   {
@@ -4392,10 +4392,10 @@ void myFirstInit ()
   float cannoncube = 0.025;
   display (" * cannon1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon1, dirs->getModels ("cannon1.3ds"));
-  model_cannon1.cubex = cannoncube; model_cannon1.cubey = cannoncube; model_cannon1.cubez = cannoncube;
+  model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
   display (" * cannon1b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
-  model_cannon1b.cubex = cannoncube; model_cannon1b.cubey = cannoncube; model_cannon1b.cubez = cannoncube;
+  model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
 
   // cannon at night
   display (" * cannon2.3ds", LOG_ALL);
@@ -4411,7 +4411,7 @@ void myFirstInit ()
   }
   model_cannon2.object [0]->vertex [1].color.c [3] = 50;
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
-  model_cannon2.cubex = cannoncube; model_cannon2.cubey = cannoncube; model_cannon2.cubez = cannoncube;
+  model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
 
   display (" * cannon2b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
@@ -4429,7 +4429,7 @@ void myFirstInit ()
     model_cannon2b.object [i2]->vertex [1].color.c [3] = 50;
     model_cannon2b.object [i2]->vertex [2].color.c [3] = 50;
   }
-  model_cannon2b.cubex = cannoncube; model_cannon2b.cubey = cannoncube; model_cannon2b.cubez = cannoncube;
+  model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
 
   display (" * flare1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));

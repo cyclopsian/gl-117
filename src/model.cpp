@@ -52,8 +52,6 @@ CColor::CColor (int red, int green, int blue, int alpha)
   setColor (red, green, blue, alpha);
 }
 
-CColor::~CColor () {}
-
 void CColor::setColor (const CColor &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
@@ -244,10 +242,6 @@ CVector3::CVector3 (const CVector3 &v)
   set (v);
 }
 
-CVector3::~CVector3 ()
-{
-}
-
 void CVector3::set (const CVector3 &v)
 {
   x = v.x;
@@ -348,10 +342,6 @@ CVector2::CVector2 (const CVector2 &v)
   set (v);
 }
 
-CVector2::~CVector2 ()
-{
-}
-
 void CVector2::set (const CVector2 &v)
 {
   x = v.x;
@@ -393,10 +383,6 @@ CVertex::CVertex (const CVertex &v)
   take (v);
 }
 
-CVertex::~CVertex ()
-{
-}
-
 void CVertex::addNormal (const CVector3 &n)
 {
   triangles ++;
@@ -434,10 +420,6 @@ CRotation::CRotation ()
   b = 0;
   c = 0;
   calcRotation ();
-}
-
-CRotation::~CRotation ()
-{
 }
 
 void CRotation::setAngles (float a, float b, float c)
@@ -498,10 +480,6 @@ CTriangle::CTriangle ()
   v [2] = NULL;
 }
 
-CTriangle::~CTriangle ()
-{
-}
-
 void CTriangle::calcNormal (CVector3 *n)
 {
   CVector3 dummy;
@@ -537,10 +515,6 @@ CQuad::CQuad ()
   v [1] = NULL;
   v [2] = NULL;
   v [3] = NULL;
-}
-
-CQuad::~CQuad ()
-{
 }
 
 void CQuad::calcNormal (CVector3 *n)
@@ -580,9 +554,8 @@ CMaterial::CMaterial ()
   uoffset = 0;
   voffset = 0;
   wrot = 0;
-  char tmp [255] = {0};
-  strcpy (filename, tmp);
-  strcpy (name, tmp);
+  filename = "";
+  name = "";
 }
 
 
@@ -597,25 +570,21 @@ CObject::CObject ()
   hasTexture = false;
 }
 
-CObject::~CObject ()
-{
-}
-
-int CObject::addVertex (CVertex *w)
+int CObject::addVertex (const CVertex &w)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    if (w->vector.isEqual (vertex [i].vector, 1e-3F) && w->color.isEqual (vertex [i].color)) break;
+    if (w.vector.isEqual (vertex [i].vector, 1e-3F) && w.color.isEqual (vertex [i].color)) break;
   if (i == numVertices)
-  vertex [numVertices ++].take (*w);
+  vertex [numVertices ++].take (w);
   return i;
 }
 
-void CObject::setColor (CColor *col)
+void CObject::setColor (const CColor &col)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    memcpy (vertex [i].color.c, col, 4 * sizeof (unsigned char));
+    memcpy (vertex [i].color.c, (const void *) &col, 4 * sizeof (unsigned char));
 }
 
 
@@ -630,41 +599,43 @@ CModel::CModel ()
   list2 = -1;
   list3 = -1;
   scale = 1.0F;
-  name [0] = '0';
+  name = "";
   nolight = false;
   alpha = false;
-  light_ambient [0] = 0.3; light_ambient [1] = 0.3; light_ambient [2] = 0.3; light_ambient [3] = 1;
+/*  light_ambient [0] = 0.3; light_ambient [1] = 0.3; light_ambient [2] = 0.3; light_ambient [3] = 1;
   light_diffuse [0] = 0.9; light_diffuse [1] = 0.9; light_diffuse [2] = 0.9; light_diffuse [3] = 1;
   light_ambient2 [0] = 0.2; light_ambient2 [1] = 0.2; light_ambient2 [2] = 0.2; light_ambient2 [3] = 1;
-  light_diffuse2 [0] = 0.1; light_diffuse2 [1] = 0.1; light_diffuse2 [2] = 0.1; light_diffuse [3] = 1;
+  light_diffuse2 [0] = 0.1; light_diffuse2 [1] = 0.1; light_diffuse2 [2] = 0.1; light_diffuse [3] = 1;*/
   numRefpoints = 0;
   refpoint = NULL;
   va = new VertexArray (VERTEXARRAY_V3N3C4T2);
 }
 
-void CModel::setName (char *name)
+void CModel::setName (const std::string name)
 {
-  strcpy (this->name, name);
+  this->name = name;
 }
 
-void CModel::addMaterial (CMaterial *material)
+void CModel::addMaterial (const CMaterial &material)
 {
   this->material [numMaterials] = new CMaterial;
   if (this->material [numMaterials] == NULL) exit (100);
-  if (material != NULL) memcpy (this->material [numMaterials], material, sizeof (CMaterial));
+//  if (material != NULL)
+  memcpy (this->material [numMaterials], &material, sizeof (CMaterial));
   numMaterials ++;
 }
 
-void CModel::addObject (CObject *object)
+void CModel::addObject (const CObject &object)
 {
   this->object [numObjects] = new CObject;
   if (this->object [numObjects] == NULL) exit (101);
-  if (object != NULL) memcpy (this->object [numObjects], object, sizeof (CObject));
+//  if (object != NULL)
+  memcpy (this->object [numObjects], &object, sizeof (CObject));
   numObjects ++;
   rotcol = 0;
 }
 
-void CModel::addRefPoint (CVector3 *tl)
+void CModel::addRefPoint (const CVector3 &tl)
 {
   int i, i2;
   if (refpoint == NULL)
@@ -673,17 +644,17 @@ void CModel::addRefPoint (CVector3 *tl)
   }
   for (i = 0; i < numRefpoints; i ++)
   {
-    if (tl->z < refpoint [i].z)
+    if (tl.z < refpoint [i].z)
     {
       for (i2 = numRefpoints; i2 > i; i2 --)
       {
         refpoint [i2].take (refpoint [i2 - 1]);
       }
-      refpoint [i].take (*tl);
+      refpoint [i].take (tl);
       goto fertigref1;
     }
   }
-  refpoint [numRefpoints].take (*tl);
+  refpoint [numRefpoints].take (tl);
 fertigref1:;
   numRefpoints ++;
 }
@@ -701,7 +672,7 @@ CModel::~CModel ()
   }
 }
 
-void CModel::setColor (CColor *col)
+void CModel::setColor (const CColor &col)
 {
   int i;
   for (i = 0; i < numObjects; i++)
@@ -710,15 +681,15 @@ void CModel::setColor (CColor *col)
   }
 }
 
-void CModel::drawVertexNormals (CObject *cm, float zoom)
+void CModel::drawVertexNormals (const CObject &cm, float zoom)
 {
   glColor3ub (255, 0, 0);
   glBegin (GL_LINES);
-  for (int j = 0; j < cm->numVertices; j++)
-  if (cm->vertex [j].triangles > 0)
+  for (int j = 0; j < cm.numVertices; j++)
+  if (cm.vertex [j].triangles > 0)
   {
-    glVertex3f (cm->vertex [j].vector.x*zoom, cm->vertex [j].vector.y*zoom, cm->vertex [j].vector.z*zoom);
-    glVertex3f ((cm->vertex [j].vector.x + cm->vertex [j].normal.x / 5)*zoom, (cm->vertex [j].vector.y + cm->vertex [j].normal.y / 5)*zoom, (cm->vertex [j].vector.z + cm->vertex [j].normal.z / 5)*zoom);
+    glVertex3f (cm.vertex [j].vector.x*zoom, cm.vertex [j].vector.y*zoom, cm.vertex [j].vector.z*zoom);
+    glVertex3f ((cm.vertex [j].vector.x + cm.vertex [j].normal.x / 5)*zoom, (cm.vertex [j].vector.y + cm.vertex [j].normal.y / 5)*zoom, (cm.vertex [j].vector.z + cm.vertex [j].normal.z / 5)*zoom);
   }
   glEnd ();
 }
@@ -806,7 +777,7 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   if (showcollision)
   {
     glPushMatrix ();
-    glScalef (cubex, cubey, cubez);
+    glScalef (cube.x, cube.y, cube.z);
     glColor3ub (255, 0, 0);
     glBegin (GL_LINE_STRIP);
     glVertex3f (1, 1, 1);
@@ -986,7 +957,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   if (showcollision)
   {
     glPushMatrix ();
-    glScalef (cubex, cubey, cubez);
+    glScalef (cube.x, cube.y, cube.z);
     glColor3ub (255, 0, 0);
     glBegin (GL_LINE_STRIP);
     glVertex3f (1, 1, 1);
@@ -1143,7 +1114,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   if (showcollision)
   {
     glPushMatrix ();
-    glScalef (cubex, cubey, cubez);
+    glScalef (cube.x, cube.y, cube.z);
     glColor3ub (255, 0, 0);
     glBegin (GL_LINE_STRIP);
     glVertex3f (1, 1, 1);
@@ -1264,7 +1235,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   if (showcollision)
   {
     glPushMatrix ();
-    glScalef (cubex, cubey, cubez);
+    glScalef (cube.x, cube.y, cube.z);
     glColor3ub (255, 0, 0);
     glBegin (GL_LINE_STRIP);
     glVertex3f (1, 1, 1);
@@ -1416,11 +1387,6 @@ int CSphere::random (int n)
   return rand () % n;
 }
 
-void CSphere::init (float radius, int segments)
-{
-  init (radius, segments, 1, 1, 1, 0);
-}
-
 void CSphere::init (float radius, int segments, float dx, float dy, float dz, int randomized)
 {
   CObject *co = new CObject;
@@ -1440,30 +1406,30 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
   float step = 180.0 / segments;
   CRotation *rot = new CRotation ();
   if (rot == NULL) exit (100);
-  CVertex *w = new CVertex ();
-  if (w == NULL) exit (100);
+  CVertex w; // = new CVertex ();
+//  if (w == NULL) exit (100);
   for (float i = 0; i < 180; i += step)
     for (float i2 = 0; i2 < 360; i2 += step)
     {
       int a = ((int) i) % 360, b = ((int) i2) % 360;
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       p [0] = co->addVertex (w);
       a = ((int) (i + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step - 1)
       {
@@ -1480,9 +1446,8 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
       }
     }
   delete rot;
-  delete w;
-  addObject (co);
-  setColor (new CColor (128, 128, 128, 255));
+  addObject (*co);
+  setColor (CColor (128, 128, 128, 255));
   for (int i2 = 0; i2 < object [0]->numVertices / 2; i2 ++)
   {
     object [0]->vertex [i2].normal.neg ();
@@ -1497,11 +1462,11 @@ void CSphere::invertNormals ()
   }
 }
 
-void CSphere::setNorthPoleColor (CColor *c, float w)
+void CSphere::setNorthPoleColor (const CColor &c, float w)
 {
   int i, i2;
   for (i = 0; i < 4; i ++)
-    object [0]->vertex [0].color.c [i] = c->c [i];
+    object [0]->vertex [0].color.c [i] = c.c [i];
   int num = (int) (w * segments * segments / 2);
   num /= (segments * 2);
   num *= (segments * 2);
@@ -1509,16 +1474,16 @@ void CSphere::setNorthPoleColor (CColor *c, float w)
   {
     float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * segments * 2) / (float) num;
     for (i2 = 0; i2 < 4; i2 ++)
-      object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
+      object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c.c [i2]);
   }
 }
 
-void CSphere::setSouthPoleColor (CColor *c, float w)
+void CSphere::setSouthPoleColor (const CColor &c, float w)
 {
   int i, i2;
   int max = (segments - 1) * segments * 2 + 1;
   for (i = 0; i < 4; i ++)
-    object [0]->vertex [max].color.c [i] = c->c [i];
+    object [0]->vertex [max].color.c [i] = c.c [i];
   int num = (int) (w * segments * segments / 2);
   num /= (segments * 2);
   num *= (segments * 2);
@@ -1526,11 +1491,11 @@ void CSphere::setSouthPoleColor (CColor *c, float w)
   {
     float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * segments * 2) / (float) num;
     for (i2 = 0; i2 < 4; i2 ++)
-      object [0]->vertex [max - i].color.c [i] = (short) ((1.0F - weight) * object [0]->vertex [max - i].color.c [i2] + weight * c->c [i2]);
+      object [0]->vertex [max - i].color.c [i] = (short) ((1.0F - weight) * object [0]->vertex [max - i].color.c [i2] + weight * c.c [i2]);
   }
 }
 
-void CSphere::setPoleColor (int phi, int theta, CColor *c, float w)
+void CSphere::setPoleColor (int phi, int theta, const CColor &c, float w)
 {
   int i, i2;
   for (i = 0; i < object [0]->numVertices; i ++)
@@ -1549,7 +1514,7 @@ void CSphere::setPoleColor (int phi, int theta, CColor *c, float w)
     {
       float weight = 1.0 - alpha / 180.0 / w;
       for (i2 = 0; i2 < 4; i2 ++)
-        object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
+        object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c.c [i2]);
     }
   }
 }
@@ -1565,11 +1530,6 @@ CSpherePart::CSpherePart (float radius, int segments, float phi)
 
 CSpherePart::~CSpherePart () {}
 
-void CSpherePart::init (float radius, int segments)
-{
-  init (radius, segments, 10);
-}
-
 void CSpherePart::init (float radius, int segments, float phi)
 {
   CObject *co = new CObject;
@@ -1583,29 +1543,29 @@ void CSpherePart::init (float radius, int segments, float phi)
   float step = 360.0 / segments;
   float step2 = phi / 4;
   CRotation *rot = new CRotation ();
-  CVertex *w = new CVertex ();
+  CVertex w;// = new CVertex ();
   for (float i = 0; i < phi; i += step2)
     for (float i2 = 0; i2 < 360; i2 += step)
     {
       int a = ((int) i) % 360, b = ((int) i2) % 360;
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       p [0] = co->addVertex (w);
       a = ((int) (i + step2)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
-      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
       p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step2 - 0.2)
       {
@@ -1618,16 +1578,15 @@ void CSpherePart::init (float radius, int segments, float phi)
       }
     }
   delete rot;
-  delete w;
-  addObject (co);
-  setColor (new CColor (128, 128, 128, 255));
+  addObject (*co);
+  setColor (CColor (128, 128, 128, 255));
 }
 
-void CSpherePart::setNorthPoleColor (CColor *c, float w)
+void CSpherePart::setNorthPoleColor (const CColor &c, float w)
 {
   int i, i2;
   for (i = 0; i < 4; i ++)
-    object [0]->vertex [0].color.c [i] = c->c [i];
+    object [0]->vertex [0].color.c [i] = c.c [i];
   int num = (int) (w * segments * 4 / 2);
   num /= (segments * 2);
   num *= (segments * 2);
@@ -1635,15 +1594,15 @@ void CSpherePart::setNorthPoleColor (CColor *c, float w)
   {
     float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * 4 * 2) / (float) num;
     for (i2 = 0; i2 < 4; i2 ++)
-      object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
+      object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c.c [i2]);
   }
 }
 
-void CSpherePart::setSouthPoleColor (CColor *c, float w)
+void CSpherePart::setSouthPoleColor (const CColor &c, float w)
 {
 }
 
-void CSpherePart::setPoleColor (int phi, int theta, CColor *c, float w)
+void CSpherePart::setPoleColor (int phi, int theta, const CColor &c, float w)
 {
 }
 

@@ -577,7 +577,7 @@ void Cockpit::drawTargetedElement ()
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.setColor (0, 0, 255);
-      font1->drawText (-24.0, -23.0, -4.0, fplayer->target->o->name, &color);
+      font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->o->name.c_str ()), &color);
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
       font1->drawText (-24.0, -25.0, -4.0, str, &color);
     }
@@ -610,7 +610,7 @@ void Cockpit::drawWeapon ()
   missile->draw (&n, &tl, fplayer->rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  font1->drawText (16.0, -22.0, -4.0, missile->name, &color);
+  font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), &color);
   sprintf (str, "N %d", fplayer->missiles [fplayer->missiletype]);
   font1->drawText (16.0, -24.0, -4.0, str, &color);
 }
