@@ -249,9 +249,9 @@ void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
     glPopMatrix ();
   }
 
-  glRotatef (rot.c+90, 0, -1, 0);
-  glRotatef (-rot.a+90, 0, 0, 1);
-  glRotatef (rot.b+180, 1, 0, 0);
+  glRotatef (rot.phi+90, 0, -1, 0);
+  glRotatef (-rot.gamma+90, 0, 0, 1);
+  glRotatef (rot.theta+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   if (shading == 1)
@@ -430,9 +430,9 @@ void Model3d::drawNoLight (const Vector3 &tl, const Vector3 &tl2, const Rotation
     glPopMatrix ();
   }
 
-  glRotatef (rot.c+90, 0, -1, 0);
-  glRotatef (-rot.a+90, 0, 0, 1);
-  glRotatef (rot.b+180, 1, 0, 0);
+  glRotatef (rot.phi+90, 0, -1, 0);
+  glRotatef (-rot.gamma+90, 0, 0, 1);
+  glRotatef (rot.theta+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
@@ -588,9 +588,9 @@ void Model3d::drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotati
     glPopMatrix ();
   }
 
-  glRotatef (rot.c+90, 0, -1, 0);
-  glRotatef (-rot.a+90, 0, 0, 1);
-  glRotatef (rot.b+180, 1, 0, 0);
+  glRotatef (rot.phi+90, 0, -1, 0);
+  glRotatef (-rot.gamma+90, 0, 0, 1);
+  glRotatef (rot.theta+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   if (alpha)

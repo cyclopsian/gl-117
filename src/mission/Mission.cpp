@@ -199,7 +199,7 @@ void Mission::invertZ ()
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i]->tl.z = -fighter [i]->tl.z;
-    fighter [i]->phi += 180;
+    fighter [i]->currot.phi += 180;
   }
 }
 
@@ -223,7 +223,7 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
         }
         if (b)
         {
-          p->tp [i]->fighterkills += fighter [i + 1]->fighterkills;
+          p->tp [i]->fighterkills += fighter [i + 1]->stat.fighterkills;
         }
         else
         {
@@ -267,8 +267,8 @@ int Mission::getScore (int missionstate)
   int timebonus = 0;
   if (timer < maxtime)
     timebonus = (maxtime - timer) * 100 / maxtime;
-  checkScore (missionstate, timebonus, fplayer->fighterkills, fplayer->shipkills, fplayer->tankkills, fplayer->otherkills, shieldbonus, fplayer->points);
-  return getScore (missionstate, timebonus, fplayer->fighterkills, fplayer->shipkills, fplayer->tankkills, fplayer->otherkills, shieldbonus, fplayer->points);
+  checkScore (missionstate, timebonus, fplayer->stat.fighterkills, fplayer->stat.shipkills, fplayer->stat.tankkills, fplayer->stat.otherkills, shieldbonus, fplayer->stat.points);
+  return getScore (missionstate, timebonus, fplayer->stat.fighterkills, fplayer->stat.shipkills, fplayer->stat.tankkills, fplayer->stat.otherkills, shieldbonus, fplayer->stat.points);
 }
 
 #endif

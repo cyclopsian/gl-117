@@ -55,7 +55,7 @@ void HighClouds::init (int theta)
   co->hasTexture = true;
   sphere->displaylist = false;
   o = sphere;
-  rot.b = 90;
+  rot.theta = 90;
   draw = 2;
   drawLight = false;
   zoom = 300;

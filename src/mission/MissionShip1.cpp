@@ -57,11 +57,11 @@ void MissionShip1::start ()
   playerInit ();
   fplayer->tl.x = 80;
   fplayer->tl.z = 0;
-  fplayer->phi = 90;
+  fplayer->currot.phi = 90;
   alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
   fighter [1]->tl.x = 85;
   fighter [1]->tl.z = 5;
-  fighter [1]->phi = 90;
+  fighter [1]->currot.phi = 90;
   fighter [1]->target = fighter [6];
   for (i = 2; i <= 3; i ++)
   {

@@ -101,9 +101,9 @@ void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, b
       {
         glPushMatrix ();
         glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode / timestep / timestep, tl1.z);
-        glRotatef (rot.c+90, 0, -1, 0);
-        glRotatef (-rot.a+90, 0, 0, 1);
-        glRotatef (rot.b+180, 1, 0, 0);
+        glRotatef (rot.phi+90, 0, -1, 0);
+        glRotatef (-rot.gamma+90, 0, 0, 1);
+        glRotatef (rot.theta+180, 1, 0, 0);
         glScalef (zoom, zoom, zoom);
         if (o->refpoint)
           for (i = 0; i < numRefModels; i ++)

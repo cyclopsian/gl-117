@@ -80,7 +80,7 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
   timer += dt;
   for (i = 0; i <= 7; i ++)
   {
-    if (fighter [i]->fighterkills >= 10)
+    if (fighter [i]->stat.fighterkills >= 10)
     {
 //      fplayer->shield = 1;
       if (i == 0) return 1;
@@ -89,7 +89,7 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
       fighter [i]->explode = 0;
-      int temp = fighter [i]->fighterkills;
+      int temp = fighter [i]->stat.fighterkills;
       fighter [i]->aiinit ();
       if (i == 0)
       {
@@ -104,8 +104,8 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
       fighter [i]->immunity = 50 * timestep;
       fighter [i]->activate ();
 //      fighter [i]->killed = false;
-      fighter [i]->fighterkills = temp;
-      fighter [i]->killed = false;
+      fighter [i]->stat.fighterkills = temp;
+      fighter [i]->stat.killed = false;
       camera = 0;
     }
   }

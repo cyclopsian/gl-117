@@ -861,8 +861,8 @@ void GlLandscape::drawTown (int x, int y)
   {
     Vector3 tl;
     Rotation rot;
-    rot.a = 270;
-    rot.c = 90 * ((xs + ys / 3) & 3);
+    rot.gamma = 270;
+    rot.phi = 90 * ((xs + ys / 3) & 3);
     tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
     glPushMatrix ();
     model_house1.draw (tl, Vector3 (), rot, 0.3, 1, 0);

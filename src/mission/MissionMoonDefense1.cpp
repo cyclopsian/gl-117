@@ -60,13 +60,13 @@ void MissionMoonDefense1::start ()
   playerInit ();
   fplayer->tl.x = 100;
   fplayer->tl.z = 100;
-  fplayer->phi = 45;
+  fplayer->currot.phi = 45;
   fplayer->target = fighter [6];
   alliedInit (FIGHTER_PHOENIX, alliedpilot [0], fighter [1]);
   fighter [1]->tl.x = 105;
   fighter [1]->tl.z = 105;
   fighter [1]->target = fighter [6];
-  fighter [1]->phi = 45;
+  fighter [1]->currot.phi = 45;
   for (i = 2; i <= 10; i ++)
   {
     int ix = (i - 2) % 3;

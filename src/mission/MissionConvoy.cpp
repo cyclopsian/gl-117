@@ -70,7 +70,7 @@ void MissionConvoy::start ()
     fighter [i]->newinit (TANK_AIR1, 0, 200);
     fighter [i]->tl.x = px + SIN(phi) * 3.0;
     fighter [i]->tl.z = py + COS(phi) * 3.0;
-    fighter [i]->phi = 359 - phi;
+    fighter [i]->currot.phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->maxthrust = 0;
   }

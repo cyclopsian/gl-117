@@ -58,7 +58,7 @@ void MissionMoonBase1::start ()
   playerInit ();
   fplayer->tl.x = -20;
   fplayer->tl.z = -40;
-  fplayer->phi = 200;
+  fplayer->currot.phi = 200;
   fplayer->target = fighter [29];
   for (i = 1; i < 21; i ++)
   {
@@ -66,7 +66,7 @@ void MissionMoonBase1::start ()
     fighter [i]->tl.z = i * 0.6;
     fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
-    fighter [i]->phi = 200;
+    fighter [i]->currot.phi = 200;
     fighter [i]->o = &model_aster1;
     fighter [i]->newinit (ASTEROID, 0, 150);
     fighter [i]->party = 0;
@@ -76,7 +76,7 @@ void MissionMoonBase1::start ()
     fighter [i]->tl.x = (i - 20) * 4;
     fighter [i]->tl.z = 210;
     fighter [i]->target = fighter [0];
-    fighter [i]->phi = 50;
+    fighter [i]->currot.phi = 50;
     fighter [i]->o = &model_figh;
     fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
   }

@@ -60,7 +60,7 @@ void MissionTeamBase1::start ()
   playerInit ();
   fplayer->tl.x = px;
   fplayer->tl.z = py;
-  fplayer->phi = 180;
+  fplayer->currot.phi = 180;
   if (fplayer->id == FIGHTER_FALCON)
   {
     fighter [1]->newinit (FIGHTER_HAWK, 0, 200);
@@ -111,8 +111,8 @@ void MissionTeamBase1::start ()
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
-  fighter [n]->phi = 90;
-  fighter [n]->maxtheta = 0;
+  fighter [n]->currot.phi = 90;
+  fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 1;
   n ++;
   fighter [n]->tl.x = px - 6;
@@ -120,8 +120,8 @@ void MissionTeamBase1::start ()
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
-  fighter [n]->phi = 0;
-  fighter [n]->maxtheta = 0;
+  fighter [n]->currot.phi = 0;
+  fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 1;
   n ++;
   fighter [n]->tl.x = px - 15;
@@ -197,8 +197,8 @@ void MissionTeamBase1::start ()
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
-  fighter [n]->phi = 90;
-  fighter [n]->maxtheta = 0;
+  fighter [n]->currot.phi = 90;
+  fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 2;
   n ++;
   fighter [n]->tl.x = px - 6;
@@ -206,8 +206,8 @@ void MissionTeamBase1::start ()
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_flak1;
   fighter [n]->newinit (FLAK1, 0, 200);
-  fighter [n]->phi = 0;
-  fighter [n]->maxtheta = 0;
+  fighter [n]->currot.phi = 0;
+  fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 2;
   n ++;
   fighter [n]->tl.x = px - 15;
@@ -273,7 +273,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
       fighter [i]->explode = 0;
-      int temp = fighter [i]->fighterkills;
+      int temp = fighter [i]->stat.fighterkills;
       int tempid = fighter [i]->id;
       fighter [i]->aiinit ();
       if (i == 0)
@@ -289,8 +289,8 @@ int MissionTeamBase1::processtimer (Uint32 dt)
       fighter [i]->immunity = 50 * timestep;
       fighter [i]->activate ();
 //      fighter [i]->killed = false;
-      fighter [i]->fighterkills = temp;
-      fighter [i]->killed = false;
+      fighter [i]->stat.fighterkills = temp;
+      fighter [i]->stat.killed = false;
       if (i <= 1)
       {
         fighter [i]->tl.x = team1x;

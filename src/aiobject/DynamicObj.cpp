@@ -83,40 +83,40 @@ void DynamicObj::deactivate ()
 
 void DynamicObj::dinit ()
 {
-  rot.a = 90;
-  phi = 0; theta = 0; gamma = 180;
-  rectheta = 0;
+  rot.gamma = 90;
+  currot.phi = 0; currot.theta = 0; currot.gamma = 180;
+  recrot.theta = 0;
   tl.z = 0; tl.x = 0;
-  forcex = 0; forcez = 0; forcey = 0;
+  force.x = 0; force.z = 0; force.y = 0;
   maxthrust = 0.3; braking = 0/*0.99*/; manoeverability = 0.5;
   thrust = maxthrust; recthrust = thrust; recheight = 5.0;
   ttl = -1;
   shield = 0.01F; maxshield = 0.01F;
   immunity = 0;
-  recgamma = 180;
+  recrot.gamma = 180;
   id = CANNON1;
   impact = 7;
   source = NULL;
-  points = 0;
+  stat.points = 0;
   party = 0;
   easymodel = 1; // easy model
   elevatoreffect = 0;
   ruddereffect = 0;
   rolleffect = 0;
-  maxgamma = 70;
-  maxtheta = 90;
-  gamma = 180;
-  theta = 0;
+  maxrot.gamma = 70;
+  maxrot.theta = 90;
+  currot.gamma = 180;
+  currot.theta = 0;
   explode = 0;
   sink = 0;
   nimbility = 1.0;
-  fighterkills = 0;
-  shipkills = 0;
-  tankkills = 0;
-  otherkills = 0;
-  killed = false;
+  stat.fighterkills = 0;
+  stat.shipkills = 0;
+  stat.tankkills = 0;
+  stat.otherkills = 0;
+  stat.killed = false;
   realism = false;
-  accx = accy = accz = 0;
+  acc.x = acc.y = acc.z = 0;
 }
 
 DynamicObj::DynamicObj ()
@@ -273,7 +273,7 @@ void DynamicObj::crashGround (Uint32 dt)
   if (height < zoom)
   {
     tl.y -= (height - zoom);
-    gamma += 10;
+    currot.gamma += 10;
     if (shield > 0)
     {
       if (id >= MISSILE1 && id <= MISSILE2)
@@ -336,26 +336,26 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
       if (d->source->party != party) // calculate points
       {
         if (maxshield < 2000)
-          d->source->points += (int) impact; // extra points for shooting an enemy object
+          d->source->stat.points += (int) impact; // extra points for shooting an enemy object
       }
       else
       {
-        d->source->points -= (int) impact; // subtract points for shooting an own object
+        d->source->stat.points -= (int) impact; // subtract points for shooting an own object
       }
 
       if (shield <= 0)
-        if (d->source->party != party && active && draw && !killed)
+        if (d->source->party != party && active && draw && !stat.killed)
           if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
           {
-            killed = true;
+            stat.killed = true;
             if (id >= FIGHTER1 && id <= FIGHTER2)
-              d->source->fighterkills ++;
+              d->source->stat.fighterkills ++;
             else if (id >= SHIP1 && id <= SHIP2)
-              d->source->shipkills ++;
+              d->source->stat.shipkills ++;
             else if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
-              d->source->tankkills ++;
+              d->source->stat.tankkills ++;
             else
-              d->source->otherkills ++;
+              d->source->stat.otherkills ++;
           }
     }
     setExplosion (0.2, 20 * timestep);
@@ -370,7 +370,7 @@ void DynamicObj::setExplosion (float maxzoom, int len)
     if (explosion [i]->ttl <= 0)
       break;
   if (i >= maxexplosion) i = 0;
-  explosion [i]->setExplosion (tl.x, tl.y, tl.z, forcex, forcey, forcez, maxzoom, len);
+  explosion [i]->setExplosion (tl.x, tl.y, tl.z, force.x, force.y, force.z, maxzoom, len);
 }
 
 void DynamicObj::setBlackSmoke (float maxzoom, int len)
@@ -380,14 +380,14 @@ void DynamicObj::setBlackSmoke (float maxzoom, int len)
     if (blacksmoke [i]->ttl <= 0)
       break;
   if (i >= maxblacksmoke) i = 0;
-  blacksmoke [i]->setBlackSmoke (tl.x, tl.y, tl.z, phi, maxzoom, len);
+  blacksmoke [i]->setBlackSmoke (tl.x, tl.y, tl.z, currot.phi, maxzoom, len);
 }
 
 // return heading difference towards enemy
 int DynamicObj::getAngle (DynamicObj *o)
 {
   float dx2 = o->tl.x - tl.x, dz2 = o->tl.z - tl.z;
-  int a, w = (int) phi;
+  int a, w = (int) currot.phi;
   if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
   a = (int) (atan (dx2 / dz2) * 180 / PI);
@@ -406,32 +406,32 @@ int DynamicObj::getAngle (DynamicObj *o)
 int DynamicObj::getAngleH (DynamicObj *o)
 {
   float disttarget = distance (o);
-  return (int) (atan ((o->tl.y - tl.y) / disttarget) * 180 / PI - (gamma - 180));
+  return (int) (atan ((o->tl.y - tl.y) / disttarget) * 180 / PI - (currot.gamma - 180));
 }
 
 // check for a looping, this is tricky :-)
 bool DynamicObj::checkLooping ()
 {
-  if (gamma > 270)
+  if (currot.gamma > 270)
   {
-    gamma = 540 - gamma;
-    theta += 180;
-    phi += 180;
-    rectheta += 180;
-    if (theta >= 360) theta -= 360;
-    if (rectheta >= 360) rectheta -= 360;
-    if (phi >= 360) phi -= 360;
+    currot.gamma = 540 - currot.gamma;
+    currot.theta += 180;
+    currot.phi += 180;
+    recrot.theta += 180;
+    if (currot.theta >= 360) currot.theta -= 360;
+    if (recrot.theta >= 360) recrot.theta -= 360;
+    if (currot.phi >= 360) currot.phi -= 360;
     return true;
   }
-  else if (gamma < 90)
+  else if (currot.gamma < 90)
   {
-    gamma = 180 - gamma;
-    theta += 180;
-    phi += 180;
-    rectheta += 180;
-    if (theta >= 360) theta -= 360;
-    if (rectheta >= 360) rectheta -= 360;
-    if (phi >= 360) phi -= 360;
+    currot.gamma = 180 - currot.gamma;
+    currot.theta += 180;
+    currot.phi += 180;
+    recrot.theta += 180;
+    if (currot.theta >= 360) currot.theta -= 360;
+    if (recrot.theta >= 360) recrot.theta -= 360;
+    if (currot.phi >= 360) currot.phi -= 360;
     return true;
   }
   return false;
@@ -450,16 +450,16 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   if (sink > 0) // only ships (they will not explode)
   {
     tl.y -= 0.02 * timefac; // sink down
-    gamma = recgamma = 180.0 + 0.5 * (float) sink / timestep; // change angle when sinking
+    currot.gamma = recrot.gamma = 180.0 + 0.5 * (float) sink / timestep; // change angle when sinking
     return; // and exit move()
   }
   if (!active && !draw) return; // exit if not active
 
   if (id >= STATIC_PASSIVE) // only buildings, static objects
   {
-    if (id == STATIC_TENT1) theta = 178;
+    if (id == STATIC_TENT1) currot.theta = 178;
     // set the correct angles to diplay
-    rot.set ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
+    rot.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
     checkShield ();
     return; // and exit this function
   }
@@ -468,25 +468,25 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   {
     tl.y -= 0.04 * timefac; // fall down (gravity, constant)
     zoom = 0.12F + 0.03F * sin ((float) ttl / (float) timestep / 15); // blink (high frequency)
-    phi = camphi; // angles to viewer (player)
-    theta = 0;
-    gamma = camgamma;
+    currot.phi = camphi; // angles to viewer (player)
+    currot.theta = 0;
+    currot.gamma = camgamma;
   }
 
   if (id == CHAFF1) // only chaff
   {
     tl.y -= 0.04 * timefac; // fall down (gravity, constant)
     zoom = 0.12F + 0.01F * (80 * timestep - ttl) / timestep; // spread out
-    phi = camphi; // angles to viewer (player)
-    theta = 0;
-    gamma = camgamma;
+    currot.phi = camphi; // angles to viewer (player)
+    currot.theta = 0;
+    currot.gamma = camgamma;
   }
 
   // check maximum gamma
   if (easymodel == 1)
   {
-    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
-    else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
+    if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
+    else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
   }
   else if (easymodel == 2) // otherwise check for value overflow due to loops
   {
@@ -501,53 +501,53 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   {
     if (id >= MOVING_GROUND)
     {
-      phi += SIN(theta) * manoeverability * 667 * timefac; //10.0 * maxthrust / div;
+      currot.phi += SIN(currot.theta) * manoeverability * 667 * timefac; //10.0 * maxthrust / div;
     }
     else
     {
-      phi += SIN(theta) * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      gamma -= fabs (SIN(theta) * COS(gamma) / realspeed / 20) * timefac; // realistic modification
-      if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
+      currot.phi += SIN(currot.theta) * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.gamma -= fabs (SIN(currot.theta) * COS(currot.gamma) / realspeed / 20) * timefac; // realistic modification
+      if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
     }
   }
   else if (easymodel == 2) // now this is much more general, however simplified:
   {
     int vz = 1;
-    if (gamma < 90 || gamma > 270)
+    if (currot.gamma < 90 || currot.gamma > 270)
       vz = -1;
     // change heading and elevation due to ailerons and rudder
     if (maxthrust + thrust <= -0.00001 || maxthrust + thrust >= 0.00001)
     {
-      phi += vz * SIN(theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      gamma += COS(theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      phi += -vz * COS(theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
-      gamma += SIN(theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
+      currot.phi += vz * SIN(currot.theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.gamma += COS(currot.theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.phi += -vz * COS(currot.theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
+      currot.gamma += SIN(currot.theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
       if (!realism)
-        gamma -= fabs (SIN(theta) * COS(gamma) / realspeed / 20) * timefac; // realistic modification
+        currot.gamma -= fabs (SIN(currot.theta) * COS(currot.gamma) / realspeed / 20) * timefac; // realistic modification
     }
     // change roll due to roll ;-)
     if (rolleffect)
     {
-      theta += rolleffect * (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
-      rectheta = theta;
+      currot.theta += rolleffect * (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
+      recrot.theta = currot.theta;
     }
   }
-  if (phi < 0) phi += 360.0; // validate heading
-  else if (phi >= 360.0) phi -= 360.0;
+  if (currot.phi < 0) currot.phi += 360.0; // validate heading
+  else if (currot.phi >= 360.0) currot.phi -= 360.0;
 
   if (easymodel == 1) // easy model restrictions
   {
-    if (rectheta > maxtheta) rectheta = maxtheta;
-    else if (rectheta < -maxtheta) rectheta = -maxtheta;
-    if (recgamma > 180 + maxgamma) recgamma = 180 + maxgamma;
-    else if (recgamma < 180 - maxgamma) recgamma = 180 - maxgamma;
+    if (recrot.theta > maxrot.theta) recrot.theta = maxrot.theta;
+    else if (recrot.theta < -maxrot.theta) recrot.theta = -maxrot.theta;
+    if (recrot.gamma > 180 + maxrot.gamma) recrot.gamma = 180 + maxrot.gamma;
+    else if (recrot.gamma < 180 - maxrot.gamma) recrot.gamma = 180 - maxrot.gamma;
   }
   else if (easymodel == 2)
   {
-    if (theta < -180 && rectheta < -180)
-    { rectheta += 360; theta += 360; }
-    else if (theta >= 180 && rectheta >= 180)
-    { rectheta -= 360; theta -= 360; }
+    if (currot.theta < -180 && recrot.theta < -180)
+    { recrot.theta += 360; currot.theta += 360; }
+    else if (currot.theta >= 180 && recrot.theta >= 180)
+    { recrot.theta -= 360; currot.theta -= 360; }
   }
 
   if (recthrust > maxthrust) // check maximum throttle
@@ -573,22 +573,22 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   if (id <= CANNON2)
   {
-    tl.x += forcex * timefac; // add our vector to the translation
-    tl.z += forcez * timefac;
-    tl.y += forcey * timefac;
+    tl.x += force.x * timefac; // add our vector to the translation
+    tl.z += force.z * timefac;
+    tl.y += force.y * timefac;
     goto cannondone; // jump down to decrease ttl and test collision
   }
 
   // axis pointing through the fighter's nose
-  vaxis.set (COS(gamma) * SIN(phi), SIN(gamma), COS(gamma) * COS(phi));
+  vaxis.set (COS(currot.gamma) * SIN(currot.phi), SIN(currot.gamma), COS(currot.gamma) * COS(currot.phi));
 
   if (realism)
   {
 
     // axis pointing upwards through the cockpit
-    gammaup = gamma + 90;
-    thetaup = -theta;
-    phiup = phi;
+    gammaup = currot.gamma + 90;
+    thetaup = -currot.theta;
+    phiup = currot.phi;
     uaxis.set (COS(gammaup) * SIN(phiup), SIN(gammaup), COS(gammaup) * COS(phiup)); // upward axis (theta = 0)
     // now rotate around vaxis using theta
     utemp.set (uaxis);
@@ -604,7 +604,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   }
 
-  realspeed = sqrt (forcex * forcex + forcez * forcez + forcey * forcey);
+  realspeed = sqrt (force.x * force.x + force.z * force.z + force.y * force.y);
 
   if (realism) // sim model
   {
@@ -613,29 +613,29 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     braking = (fabs (ruddereffect) + fabs (elevatoreffect) * 4 + fabs (rolleffect)) * realspeed / 50;
     brakepower = pow (0.93 - braking, timefac);
 
-    accx *= brakepower;
-    accy *= brakepower;
-    accz *= brakepower;
+    acc.x *= brakepower;
+    acc.y *= brakepower;
+    acc.z *= brakepower;
 
     // add throttle force
-    accz += thrust * vaxis.z * 0.3 * timefac;
-    accx += thrust * vaxis.x * 0.3 * timefac;
-    accy -= thrust * vaxis.y * 0.3 * timefac;
+    acc.z += thrust * vaxis.z * 0.3 * timefac;
+    acc.x += thrust * vaxis.x * 0.3 * timefac;
+    acc.y -= thrust * vaxis.y * 0.3 * timefac;
     // add elevation force
-    accz += thrust * uaxis.z * 0.067 * timefac;
-    accx += thrust * uaxis.x * 0.067 * timefac;
-    accy -= thrust * uaxis.y * 0.067 * timefac;
+    acc.z += thrust * uaxis.z * 0.067 * timefac;
+    acc.x += thrust * uaxis.x * 0.067 * timefac;
+    acc.y -= thrust * uaxis.y * 0.067 * timefac;
     // add gravity force
-    accy -= 0.015 * timefac;
+    acc.y -= 0.015 * timefac;
     // add our vector to the translation
     float stepfac = 0.24;
-    tl.x += accx * timefac * stepfac;
-    tl.z += accz * timefac * stepfac;
-    tl.y += accy * timefac * stepfac;
+    tl.x += acc.x * timefac * stepfac;
+    tl.z += acc.z * timefac * stepfac;
+    tl.y += acc.y * timefac * stepfac;
     float scalef = 1.1;
-    forcex = accx * stepfac * scalef;
-    forcey = accy * stepfac * scalef;
-    forcez = accz * stepfac * scalef;
+    force.x = acc.x * stepfac * scalef;
+    force.y = acc.y * stepfac * scalef;
+    force.z = acc.z * stepfac * scalef;
 
   }
   else // action model
@@ -643,36 +643,36 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
     // and correct the speedvector
 
-    forcez = vaxis.z * realspeed;
-    forcex = vaxis.x * realspeed;
-    forcey = -vaxis.y * realspeed;
+    force.z = vaxis.z * realspeed;
+    force.x = vaxis.x * realspeed;
+    force.y = -vaxis.y * realspeed;
 
     // add throttle force
 
-    forcez += thrust * vaxis.z * 0.01 * timefac; //0.03 and braking=0.97 by try and error
-    forcex += thrust * vaxis.x * 0.01 * timefac;
-    forcey -= thrust * vaxis.y * 0.01 * timefac;
+    force.z += thrust * vaxis.z * 0.01 * timefac; //0.03 and braking=0.97 by try and error
+    force.x += thrust * vaxis.x * 0.01 * timefac;
+    force.y -= thrust * vaxis.y * 0.01 * timefac;
 
     gravityforce = sqrt (realspeed) * vaxis.y * 0.0012 * timefac;
-    forcez += gravityforce * vaxis.z;
-    forcex += gravityforce * vaxis.x;
-    forcey -= gravityforce * vaxis.y;
+    force.z += gravityforce * vaxis.z;
+    force.x += gravityforce * vaxis.x;
+    force.y -= gravityforce * vaxis.y;
 
     // drag force simulated by adjusting the vector
 
     if (easymodel == 2)
       braking = (fabs (ruddereffect) + fabs (elevatoreffect)) * realspeed / 50;
     else
-      braking = (fabs (theta / 45)) * realspeed / 50;
+      braking = (fabs (currot.theta / 45)) * realspeed / 50;
     brakepower = pow (0.9915 - braking, timefac);
-    forcex *= brakepower; forcez *= brakepower; forcey *= brakepower;
+    force.x *= brakepower; force.z *= brakepower; force.y *= brakepower;
 
   }
 
   stop = false;
   if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
   {
-    float newy = l->getExactHeight (tl.x + forcex, tl.z + forcez) + zoom / 2;
+    float newy = l->getExactHeight (tl.x + force.x, tl.z + force.z) + zoom / 2;
     if (fabs (newy - tl.y) > 0.05)
       stop = true;
     else if (fabs (newy - tl.y) > 2)
@@ -682,31 +682,31 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   if (!realism)
     if (!stop)
     {
-      tl.x += forcex * timefac; // add our vector to the translation
-      tl.z += forcez * timefac;
-      tl.y += forcey * timefac;
+      tl.x += force.x * timefac; // add our vector to the translation
+      tl.z += force.z * timefac;
+      tl.y += force.y * timefac;
     }
 
   // calculate the objects real thrust only once
-  realspeed = sqrt (forcex * forcex + forcez * forcez + forcey * forcey);
+  realspeed = sqrt (force.x * force.x + force.z * force.z + force.y * force.y);
 
   // objects moving on the ground should always change their elevation due to the surface
   if (id >= TANK1 && id <= TANK2 && thrust > 0 && !stop)
   {
     float newy = l->getExactHeight (tl.x, tl.z) + zoom / 2;
-    float dy = newy - tl.y + forcey;
-    float dx = fabs (forcex) + fabs (forcez);
+    float dy = newy - tl.y + force.y;
+    float dx = fabs (force.x) + fabs (force.z);
     float gamma2 = 0;
     if (fabs (dx) > 0.0001)
       gamma2 = atan (dy / dx);
-    gamma = 180.0 + 180.0 / PI * gamma2;
+    currot.gamma = 180.0 + 180.0 / PI * gamma2;
     tl.y = newy;
   }
 
   if (id != ASTEROID)
   {
     // set angles to correctly display the object
-    rot.set ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
+    rot.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
   }
   else // asteroids should rotate around their center of weight, as we must not change theta/gamma, we do this here
   {
@@ -714,7 +714,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     if (ttl <= -360 * timestep) ttl = -1;
     int rot1 = (int) (sin ((zoom - 1.3) * 8) * 4);
     int rot2 = (int) (cos ((zoom - 1.3) * 8) * 4);
-    rot.set ((short) (90 + gamma + ttl * rot1 / timestep - 180), (short) theta + ttl * rot2 / timestep + 180, (short) -phi);
+    rot.set ((short) (90 + currot.gamma + ttl * rot1 / timestep - 180), (short) currot.theta + ttl * rot2 / timestep + 180, (short) -currot.phi);
   }
 
 cannondone:;

@@ -631,7 +631,31 @@ SOURCE=.\aiobject\DynamicObj.cpp
 # PROP Default_Filter "*"
 # Begin Source File
 
+SOURCE=.\game\Callbacks.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\Callbacks.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\Events.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\game\Game.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\Game.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\GameState.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\game\GameState.h
 # End Source File
 # Begin Source File
 

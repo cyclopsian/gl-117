@@ -78,7 +78,7 @@ void Cockpit::drawBlip(int shape, float x, float y, float z, unsigned char r, un
 
 void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup projection
 {
-  float fpt = -fplayer->theta + 180;
+  float fpt = -fplayer->currot.theta + 180;
   float sinfpt = SIN(fpt), cosfpt = COS(fpt);
   float x = cosfpt * phi + sinfpt * gamma + 180;
   float y = sinfpt * phi - cosfpt * gamma + 180;
@@ -185,11 +185,11 @@ void Cockpit::drawCounter ()
 
   if (mission->id == MISSION_DEATHMATCH1 || mission->id == MISSION_DEATHMATCH3)
   {
-    sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->fighterkills);
+    sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->stat.fighterkills);
     font1->drawText (-30.0F, 15.0F, -3.0F, buf, blue);
     for (i = 1; i < 8; i ++)
     {
-      sprintf (buf, "PILOT%d: %d", i, fighter [i]->fighterkills);
+      sprintf (buf, "PILOT%d: %d", i, fighter [i]->stat.fighterkills);
       font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);
     }
   }
@@ -197,7 +197,7 @@ void Cockpit::drawCounter ()
   {
     for (i = 0; i < 4; i ++)
     {
-      sprintf (buf, "TEAM%d: %d", i, fighter [i * 2]->fighterkills + fighter [i * 2 + 1]->fighterkills);
+      sprintf (buf, "TEAM%d: %d", i, fighter [i * 2]->stat.fighterkills + fighter [i * 2 + 1]->stat.fighterkills);
       font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, red);
     }
   }
@@ -331,7 +331,7 @@ void Cockpit::drawTargeter ()
   if (fplayer->target->active)
   {
     DynamicObj *o = fplayer->target;
-    float myphi = fplayer->phi;
+    float myphi = fplayer->currot.phi;
     if (myphi < 0) myphi += 360;
     float ex1 = COS((int) myphi) * o->zoom, ey1 = -SIN((int) myphi) * o->zoom;
     float ex2 = -ex1, ey2 = -ey1;
@@ -444,7 +444,7 @@ void Cockpit::drawHeading ()
   float g = 0.5;
   for (i = 0; i < 360; i += 5)
   {
-    float p = (float) i - fplayer->phi;
+    float p = (float) i - fplayer->currot.phi;
     if (p < -180) p += 360;
     if (p > 180) p -= 360;
     if (p >= -40 && p <= 40)
@@ -484,7 +484,7 @@ void Cockpit::drawHeading ()
         else if (dphi > 90) dphi = 90;
         float delta = atan (dgamma / dphi) * 180 / PI;
         if (dphi > 0) delta -= 180;
-        delta += fplayer->theta;
+        delta += fplayer->currot.theta;
         float xs = COS(delta) * 3;
         float ys = -SIN(delta) * 3;
         float delta1 = delta + 5;
@@ -511,14 +511,14 @@ void Cockpit::drawHeading ()
 
   gl.enableAlphaBlending ();
 
-  float dgamma = fplayer->gamma - (int) fplayer->gamma;
+  float dgamma = fplayer->currot.gamma - (int) fplayer->currot.gamma;
   float innerx = 5, outerx = 10, widthx = 1;
   int step = 15;
 
   glLineWidth (LINEWIDTH(1.2F));
 
   glBegin (GL_LINES);
-  float tmp = fplayer->gamma - 180;
+  float tmp = fplayer->currot.gamma - 180;
   cockpitvertex (-innerx,tmp);
   cockpitvertex (-15,tmp);
   cockpitvertex (innerx,tmp);
@@ -526,7 +526,7 @@ void Cockpit::drawHeading ()
 
   for (i = -180 + step; i < 0; i += step)
   {
-    float tmp=int(-i+fplayer->gamma+540)%360-180;
+    float tmp=int(-i+fplayer->currot.gamma+540)%360-180;
     tmp += dgamma;
     cockpitvertex (-innerx,tmp+1);
     cockpitvertex (-innerx,tmp);
@@ -540,7 +540,7 @@ void Cockpit::drawHeading ()
 
   for (i = step; i < 180; i += step)
   {
-    float tmp=int(-i+fplayer->gamma+540)%360-180;
+    float tmp=int(-i+fplayer->currot.gamma+540)%360-180;
     tmp += dgamma;
     cockpitvertex (-innerx,tmp+1);
     cockpitvertex (-innerx,tmp);

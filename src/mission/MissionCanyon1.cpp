@@ -60,7 +60,7 @@ void MissionCanyon1::start ()
   playerInit ();
   fplayer->tl.x = px + 130;
   fplayer->tl.z = py + 130;
-  fplayer->phi = 45;
+  fplayer->currot.phi = 45;
   fplayer->target = fighter [1];
   fighter [1]->o = &model_egg;
   fighter [1]->newinit (STATIC_COMPLEX1, 0, 0);
@@ -82,7 +82,7 @@ void MissionCanyon1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_figd;
-    fighter [i]->phi = 180;
+    fighter [i]->currot.phi = 180;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 50 + i * 20);
     fighter [i]->tl.x = px - 15 - i * 3;
     fighter [i]->tl.z = py - 15 - i * 3;
@@ -97,7 +97,7 @@ void MissionCanyon1::start ()
     fighter [i]->tl.z = py + i * 3 - 30;
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
-    fighter [i]->phi = 220;
+    fighter [i]->currot.phi = 220;
   }
 }
 

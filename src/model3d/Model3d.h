@@ -189,17 +189,17 @@ class Rotation
 {
   public:
   
-    float a; ///< rotation angle for a plane of the coordinate system
-    float b; ///< rotation angle for a plane of the coordinate system
-    float c; ///< rotation angle for a plane of the coordinate system
+    float gamma; ///< rotation angle for a plane of the coordinate system
+    float theta; ///< rotation angle for a plane of the coordinate system
+    float phi;   ///< rotation angle for a plane of the coordinate system
   
     Rotation ();
-    Rotation (float a, float b, float c);
+    Rotation (float gamma, float theta, float phi);
   
     void set (const Rotation &r);
-    void set (float a, float b, float c);
+    void set (float gamma, float theta, float phi);
     void add (const Rotation &r);
-    void add (float a, float b, float c);
+    void add (float gamma, float theta, float phi);
 /*    void calculate (); // calculate the rotation matrix
     float rotateX (const Vector3 &v) const;
     float rotateY (const Vector3 &v) const;

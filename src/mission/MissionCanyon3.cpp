@@ -62,7 +62,7 @@ void MissionCanyon3::start ()
   playerInit ();
   fplayer->tl.x = px + 100;
   fplayer->tl.z = py + 100;
-  fplayer->phi = 45;
+  fplayer->currot.phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
@@ -73,7 +73,7 @@ void MissionCanyon3::start ()
       fighter [i]->tl.x = px + 100 - ((i + 1) / 2) * 5;
     fighter [i]->tl.z = py + 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
-    fighter [i]->phi = 45;
+    fighter [i]->currot.phi = 45;
   }
   fighter [5]->o = &model_egg;
   fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
@@ -100,7 +100,7 @@ void MissionCanyon3::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (5)];
-    fighter [i]->phi = 180;
+    fighter [i]->currot.phi = 180;
     if (i <= 15)
     {
       fighter [i]->o = &model_figb;

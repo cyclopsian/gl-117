@@ -59,11 +59,11 @@ void MissionShip2::start ()
   playerInit ();
   fplayer->tl.x = 80;
   fplayer->tl.z = 0;
-  fplayer->phi = 90;
+  fplayer->currot.phi = 90;
   alliedInit (FIGHTER_REDARROW, alliedpilot [0], fighter [1]);
   fighter [1]->tl.x = 85;
   fighter [1]->tl.z = 5;
-  fighter [1]->phi = 90;
+  fighter [1]->currot.phi = 90;
   fighter [1]->target = fighter [6];
   fighter [2]->o = &model_oilrig;
   fighter [2]->tl.x = 20;

@@ -76,7 +76,7 @@ void MissionTest2::start ()
   }
   fighter [1]->ammo = 0;
   fighter [1]->shield = 100000;
-  fighter [1]->phi = 180;
+  fighter [1]->currot.phi = 180;
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

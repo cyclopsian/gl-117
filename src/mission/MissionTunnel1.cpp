@@ -57,7 +57,7 @@ void MissionTunnel1::start ()
   playerInit ();
   fplayer->tl.x = 256;
   fplayer->tl.z = 256;
-  fplayer->phi = 90;
+  fplayer->currot.phi = 90;
   fplayer->target = fighter [6];
   for (i = 1; i <= 9; i ++)
   {

@@ -60,16 +60,16 @@ void AIObj::aiinit ()
   flares = 0;
   aw = 0;
   source = NULL;
-  points = 0;
+  stat.points = 0;
   easymodel = 1;
   elevatoreffect = 0;
   ruddereffect = 0;
-  gamma = 180;
-  recgamma = 180;
+  currot.gamma = 180;
+  recrot.gamma = 180;
   dgamma = 0;
-  theta = 0;
-  maxgamma = 70;
-  maxtheta = 90;
+  currot.theta = 0;
+  maxrot.gamma = 70;
+  maxrot.theta = 90;
   missiletype = 0;
   autofire = false;
   ttl = -1;
@@ -129,8 +129,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.48;
     maxshield = 85;
     zoom = 0.35;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
     missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
     flares = 20;
@@ -145,8 +145,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.35;
     maxshield = 110;
     zoom = 0.43;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
     missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
     flares = 20;
@@ -162,8 +162,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.42;
     maxshield = 120;
     zoom = 0.43;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
     missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
     flares = 20;
@@ -179,8 +179,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.44;
     maxshield = 140;
     zoom = 0.45;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
     missilerack [0] = 6; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 6;
     flares = 20;
@@ -199,8 +199,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.05;
     impact = 5;
     zoom = 1.5;
-    maxgamma = 25;
-    maxtheta = 30;
+    maxrot.gamma = 25;
+    maxrot.theta = 30;
     flares = 0;
     chaffs = 0;
     ammo = 0;
@@ -214,8 +214,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.04;
     impact = 5;
     zoom = 1.5;
-    maxgamma = 25;
-    maxtheta = 30;
+    maxrot.gamma = 25;
+    maxrot.theta = 30;
     flares = 0;
     chaffs = 0;
     ammo = 0;
@@ -227,8 +227,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.46;
     maxshield = 75;
     zoom = 0.44;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
     missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
     flares = 20;
@@ -243,8 +243,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.4;
     maxshield = 60;
     zoom = 0.41;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
     missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
     flares = 20;
@@ -259,8 +259,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.34;
     maxshield = 160;
     zoom = 0.45;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
     missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
     flares = 25;
@@ -275,8 +275,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.34;
     maxshield = 180;
     zoom = 0.47;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 3; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 3;
     missilerack [0] = 4; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 4;
     flares = 25;
@@ -293,8 +293,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.52;
     maxshield = 120;
     zoom = 0.4;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
     missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
     flares = 25;
@@ -310,8 +310,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0.54;
     maxshield = 85;
     zoom = 0.33;
-    maxtheta = 90.0;
-    maxgamma = 70.0;
+    maxrot.theta = 90.0;
+    maxrot.gamma = 70.0;
     missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
     missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
     flares = 25;
@@ -327,7 +327,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     thrust = recthrust = maxthrust / 2;
     smoke->type = 1;
     impact = 2;
-    forcez = recthrust;
+    force.z = recthrust;
     o->cube.set (zoom * cubefac, zoom * cubefac, zoom * cubefac);
   }
 
@@ -335,8 +335,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 12.0;
     shield = maxshield = 80;
     zoom = 0.35;
@@ -345,8 +345,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 6.0;
     shield = maxshield = 70;
     zoom = 0.3;
@@ -361,9 +361,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0.04;
     thrust = 0;
-    gamma = 180; theta = 0; phi = 0;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    currot.gamma = 180; currot.theta = 0; currot.phi = 0;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 8.0;
     shield = maxshield = 160;
     zoom = 0.35;
@@ -373,9 +373,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0.04;
     thrust = 0;
-    gamma = 180; theta = 0; phi = 0;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    currot.gamma = 180; currot.theta = 0; currot.phi = 0;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 8.0;
     shield = maxshield = 200;
     zoom = 0.4;
@@ -385,8 +385,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0.02;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 0;
     shield = maxshield = 30;
     zoom = 0.25;
@@ -396,8 +396,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0.02;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 0;
     shield = maxshield = 20;
     zoom = 0.45;
@@ -407,8 +407,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0.02;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 0;
     shield = maxshield = 40;
     zoom = 0.4;
@@ -418,8 +418,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     maxthrust = 0;
     thrust = 0.02;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 0;
     shield = maxshield = 50;
     zoom = 0.35;
@@ -435,8 +435,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 5.0;
     maxthrust = 0.05;
     thrust = 0.05;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 4.0;
     impact = 20;
     shield = maxshield = 5500;
@@ -448,8 +448,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 2.5;
     maxthrust = 0.05;
     thrust = 0.05;
-    maxgamma = 0;
-    maxtheta = 0.03;
+    maxrot.gamma = 0;
+    maxrot.theta = 0.03;
     manoeverability = 6.0;
     impact = 20;
     shield = maxshield = 2800;
@@ -557,8 +557,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 0;
     manoeverability = 0;
     impact = 5;
-    maxtheta = 0;
-    maxgamma = 0;
+    maxrot.theta = 0;
+    maxrot.gamma = 0;
   }
   if (id == STATIC_TENT1)
   {
@@ -621,7 +621,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 5;
     thrust = 0.25;
     maxthrust = 0.25;
-    forcez = 0.12;
+    force.z = 0.12;
     ai = false;
     o->cube.set (zoom * 0.7, zoom * 0.7, zoom * 0.7);
   }
@@ -710,18 +710,16 @@ void AIObj::initValues (DynamicObj *dobj, float phi)
   float fac = zoom / 8;
   if (dobj->id == FLARE1 || dobj->id == CHAFF1) fac = -fac;
   // use the exact polar coordinates because of gamma and theta
-  float cgamma = gamma;
+  float cgamma = currot.gamma;
   dobj->tl.x = tl.x + COS(cgamma) * SIN(phi) * fac;
   dobj->tl.y = tl.y - SIN(cgamma) * fac;
   if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
     dobj->tl.y += fac;
   dobj->tl.z = tl.z + COS(cgamma) * COS(phi) * fac;
-  dobj->phi = phi;
-  dobj->rectheta = dobj->theta;
-  dobj->forcex = forcex;
-  dobj->forcey = forcey;
-  dobj->forcez = forcez;
-  dobj->rot.set ((short) (90 + dobj->gamma - 180), (short) dobj->theta + 180, (short) -dobj->phi);
+  dobj->currot.phi = phi;
+  dobj->recrot.theta = dobj->currot.theta;
+  dobj->force.set (force);
+  dobj->rot.set ((short) (90 + dobj->currot.gamma - 180), (short) dobj->currot.theta + 180, (short) -dobj->currot.phi);
 }
 
 void AIObj::fireCannon (DynamicObj *laser, float phi)
@@ -739,25 +737,25 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
     {
       // exact calculation to hit enemy (non-static turret!)
       if (id >= FIGHTER1 && id <= FIGHTER2)
-        laser->gamma = gamma;
+        laser->currot.gamma = currot.gamma;
       else
-        laser->gamma = 180.0 + atan ((target->tl.y - tl.y) / distance (target)) * 180.0 / PI;
+        laser->currot.gamma = 180.0 + atan ((target->tl.y - tl.y) / distance (target)) * 180.0 / PI;
     }
   }
   else
-    laser->gamma = gamma; // + 90.0;
+    laser->currot.gamma = currot.gamma; // + 90.0;
   laser->party = party;
   laser->ttl = 80 * timestep;
   laser->shield = 1;
   laser->immunity = (int) (zoom * 12) * timestep;
   laser->source = this;
-  laser->phi = phi;
-  laser->theta = theta;
+  laser->currot.phi = phi;
+  laser->currot.theta = currot.theta;
   initValues (laser, phi);
   float fac = 0.7F;
-  laser->forcex += COS(laser->gamma) * SIN(laser->phi) * fac;
-  laser->forcey -= SIN(laser->gamma) * fac;
-  laser->forcez += COS(laser->gamma) * COS(laser->phi) * fac;
+  laser->force.x += COS(laser->currot.gamma) * SIN(laser->currot.phi) * fac;
+  laser->force.y -= SIN(laser->currot.gamma) * fac;
+  laser->force.z += COS(laser->currot.gamma) * COS(laser->currot.phi) * fac;
   laser->activate ();
   firecannonttl += 45;
   if (day)
@@ -795,7 +793,7 @@ void AIObj::fireCannon (DynamicObj **laser)
 {
   if (firecannonttl > 0) return;
   if (ammo == 0) return;
-  fireCannon (laser, phi);
+  fireCannon (laser, currot.phi);
 }
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
@@ -810,14 +808,14 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
   missile->dinit ();
   missile->aiinit ();
   missile->newinit (id, party, 0);
-  initValues (missile, phi);
+  initValues (missile, currot.phi);
   missile->id = id;
   missile->explode = 0;
   missile->thrust = thrust + 0.001;
   missile->recthrust = missile->maxthrust;
-  missile->gamma = gamma;
+  missile->currot.gamma = currot.gamma;
   missile->target = target;
-  missile->recgamma = gamma;
+  missile->recrot.gamma = currot.gamma;
   missile->shield = 1;
   missile->party = party;
   missile->immunity = (45 + (int) (zoom * 6.0)) * timestep;
@@ -846,15 +844,15 @@ void AIObj::fireFlare2 (DynamicObj *flare)
   flare->recthrust = 0;
   flare->manoeverability = 0.0;
   flare->maxthrust = 1.0;
-  flare->gamma = 0;
+  flare->currot.gamma = 0;
   flare->party = party;
   flare->ttl = 80 * timestep;
   flare->shield = 1;
   flare->immunity = (int) (zoom * 12) * timestep;
   flare->source = this;
-  flare->phi = phi;
+  flare->currot.phi = currot.phi;
   flare->id = FLARE1;
-  initValues (flare, phi);
+  initValues (flare, currot.phi);
   flare->activate ();
   flare->explode = 0;
 }
@@ -870,15 +868,15 @@ void AIObj::fireChaff2 (DynamicObj *chaff)
   chaff->recthrust = 0;
   chaff->manoeverability = 0.0;
   chaff->maxthrust = 1.0;
-  chaff->gamma = 0;
+  chaff->currot.gamma = 0;
   chaff->party = party;
   chaff->ttl = 80 * timestep;
   chaff->shield = 1;
   chaff->immunity = (int) (zoom * 12) * timestep;
   chaff->source = this;
-  chaff->phi = phi;
+  chaff->currot.phi = currot.phi;
   chaff->id = CHAFF1;
-  initValues (chaff, phi);
+  initValues (chaff, currot.phi);
   chaff->activate ();
   chaff->explode = 0;
   chaff->zoom = 0.12F;
@@ -1018,7 +1016,7 @@ bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             bool hit = false;
             if (easymodel == 1)
             {
-              if (math.random ((int) (theta + 20)) > 50) hit = true;
+              if (math.random ((int) (currot.theta + 20)) > 50) hit = true;
             }
             else if (easymodel == 2)
             {
@@ -1061,7 +1059,7 @@ bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             bool hit = false;
             if (easymodel == 1)
             {
-              if (math.random ((int) (theta + 20)) > 50) hit = true;
+              if (math.random ((int) (currot.theta + 20)) > 50) hit = true;
             }
             else if (easymodel == 2)
             {
@@ -1299,21 +1297,21 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // set smoke
   if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2)) // missile or fighter
   {
-    float sz = COS(gamma) * COS(phi) * zoom * 1.1; // polar (spherical) coordinates
-    float sy = -SIN(gamma) * zoom * 1.1;
-    float sx = COS(gamma) * SIN(phi) * zoom * 1.1;
+    float sz = COS(currot.gamma) * COS(currot.phi) * zoom * 1.1; // polar (spherical) coordinates
+    float sy = -SIN(currot.gamma) * zoom * 1.1;
+    float sx = COS(currot.gamma) * SIN(currot.phi) * zoom * 1.1;
     
     // some smoke elements per discrete movement
-    float fg = sqrt (forcex * forcex + forcey * forcey + forcez * forcez) * 13;
+    float fg = sqrt (force.x * force.x + force.y * force.y + force.z * force.z) * 13;
     if (fg >= MAXSMOKEELEM) fg = (float) MAXSMOKEELEM - 0.5;
     for (i = 0; i < (int) fg; i ++)
     {
       float fac = (float) i / fg;
-      smoke->setSmoke (tl.x - sx - forcex * fac, tl.y - sy - forcey * fac, tl.z - sz - forcez * fac, 39 - i);
+      smoke->setSmoke (tl.x - sx - force.x * fac, tl.y - sy - force.y * fac, tl.z - sz - force.z * fac, 39 - i);
     }
-/*    smoke->setSmoke (tl.x - sx - forcex * 0.6, tl.y - sy - forcey * 0.6, tl.z - sz - forcez * 0.6, (int) phi, 36);
-    smoke->setSmoke (tl.x - sx - forcex * 0.4, tl.y - sy - forcey * 0.4, tl.z - sz - forcez * 0.4, (int) phi, 37);
-    smoke->setSmoke (tl.x - sx - forcex * 0.2, tl.y - sy - forcey * 0.2, tl.z - sz - forcez * 0.2, (int) phi, 38);
+/*    smoke->setSmoke (tl.x - sx - force.x * 0.6, tl.y - sy - force.y * 0.6, tl.z - sz - force.z * 0.6, (int) phi, 36);
+    smoke->setSmoke (tl.x - sx - force.x * 0.4, tl.y - sy - force.y * 0.4, tl.z - sz - force.z * 0.4, (int) phi, 37);
+    smoke->setSmoke (tl.x - sx - force.x * 0.2, tl.y - sy - force.y * 0.2, tl.z - sz - force.z * 0.2, (int) phi, 38);
     smoke->setSmoke (tl.x - sx, tl.y - sy, tl.z - sz, (int) phi, 39);
     smoke->move (dt, 5);*/
     smoke->move (dt, (int) fg + 1);
@@ -1369,7 +1367,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   {
     if (haveMissile () && target != NULL)
     {
-      float dgamma = atan ((target->tl.y - tl.y) / disttarget) * 180 / PI - (gamma - 180);
+      float dgamma = atan ((target->tl.y - tl.y) / disttarget) * 180 / PI - (currot.gamma - 180);
       float dphi = getAngle (target);
       if (missiletype == MISSILE_DF1 - MISSILE1)
       {
@@ -1385,7 +1383,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
             {
               if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
               {
-                float dphi = fabs (phi - target->phi);
+                float dphi = fabs (currot.phi - target->currot.phi);
                 if (dphi > 270) dphi = 360 - dphi;
                 if (dphi < 45)
                   ttf -= 2 * dt;
@@ -1431,13 +1429,13 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     targetvec.set (target->tl);
     float disttarget = distance (&targetvec);
     if (disttarget > 30) disttarget = 30;
-    targetvec.x += target->forcex * disttarget / 5;
-    targetvec.y += target->forcey * disttarget / 5;
-    targetvec.z += target->forcez * disttarget / 5;
+    targetvec.x += target->force.x * disttarget / 5;
+    targetvec.y += target->force.y * disttarget / 5;
+    targetvec.z += target->force.z * disttarget / 5;
   }
   int lsdst = 5;
-  float flyx1 = tl.x + forcex * lsdst, flyz1 = tl.z + forcez * lsdst;
-  float flyx2 = tl.x + forcex * lsdst * 4, flyz2 = tl.z + forcez * lsdst * 4;
+  float flyx1 = tl.x + force.x * lsdst, flyz1 = tl.z + force.z * lsdst;
+  float flyx2 = tl.x + force.x * lsdst * 4, flyz2 = tl.z + force.z * lsdst * 4;
   float h1 = tl.y - l->getMaxHeight (flyx1, flyz1);
   float h2 = tl.y - l->getMaxHeight (flyx2, flyz2);
   if (h1 < 5 || h1 > 25)
@@ -1455,39 +1453,39 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if (fabs (dphi) < 1E-5) dphi = 1E-5;
   float delta = atan (dgamma / dphi) * 180 / PI;
   if (dphi > 0) delta -= 180;
-  rectheta = -delta - 90;
-  if (rectheta < -180) rectheta += 360;
-  if (rectheta >= 180) rectheta -= 360;
+  recrot.theta = -delta - 90;
+  if (recrot.theta < -180) recrot.theta += 360;
+  if (recrot.theta >= 180) recrot.theta -= 360;
   recelevatoreffect = 1;
   if (disttarget > 50 && fabs (dphi) < 25)
   {
-    rectheta = 0;
+    recrot.theta = 0;
     recelevatoreffect = 0;
-    if (fabs (theta - rectheta) < 5) recrolleffect = 0;
-    else if (theta - rectheta >= 5) recrolleffect = -1;
-    else if (theta - rectheta <= -5) recrolleffect = 1;
+    if (fabs (theta - recrot.theta) < 5) recrolleffect = 0;
+    else if (theta - recrot.theta >= 5) recrolleffect = -1;
+    else if (theta - recrot.theta <= -5) recrolleffect = 1;
   }
-  else if (fabs (theta - rectheta) > 150 && fabs (dphi) < 30 && fabs (dgamma) < 30)
+  else if (fabs (theta - recrot.theta) > 150 && fabs (dphi) < 30 && fabs (dgamma) < 30)
   {
     recrolleffect = 0;
     recelevatoreffect = -0.5;
   }
-  else if (theta - rectheta > 50)
+  else if (theta - recrot.theta > 50)
   {
     recrolleffect = -1;
     recelevatoreffect = 0;
   }
-  else if (theta - rectheta < -50)
+  else if (theta - recrot.theta < -50)
   {
     recrolleffect = 1;
     recelevatoreffect = 0;
   }
-  else if (theta - rectheta > 20)
+  else if (theta - recrot.theta > 20)
   {
     recrolleffect = -1;
     recelevatoreffect = 1;
   }
-  else if (theta - rectheta < -20)
+  else if (theta - recrot.theta < -20)
   {
     recrolleffect = 1;
     recelevatoreffect = 1;
@@ -1534,7 +1532,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // which height???
   float recheight2; // this is the height, the object wants to achieve
   int lsdist = 15;
-  float flyx = tl.x + forcex * lsdist, flyz = tl.z + forcez * lsdist;
+  float flyx = tl.x + force.x * lsdist, flyz = tl.z + force.z * lsdist;
   int flyxs = GETCOORD((int) flyx), flyzs = GETCOORD((int) flyz);
   {
     if (manoeverheight > 0)
@@ -1548,13 +1546,13 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
           (tl.y - myheight > 8 && target != NULL && tl.y - myheight < 50/* && !manoeverheight*/))
       {
-        recheight2 = target->tl.y - 8 * target->thrust * SIN(target->gamma);
+        recheight2 = target->tl.y - 8 * target->thrust * SIN(target->currot.gamma);
       }
       else
       {
         // precalculated height
-        float flyx2 = tl.x + forcex * lsdist * 3, flyz2 = tl.z + forcez * lsdist * 3;
-        float flyx3 = tl.x + forcex * lsdist * 8, flyz3 = tl.z + forcez * lsdist * 8;
+        float flyx2 = tl.x + force.x * lsdist * 3, flyz2 = tl.z + force.z * lsdist * 3;
+        float flyx3 = tl.x + force.x * lsdist * 8, flyz3 = tl.z + force.z * lsdist * 8;
         float h1 = l->getMaxHeight (flyx, flyz);
         float h2 = l->getMaxHeight (flyx2, flyz2);
         float h3 = l->getMaxHeight (flyx3, flyz3);
@@ -1575,7 +1573,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           {
             if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
             {
-              if ((easymodel == 1 && fabs (theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
+              if ((easymodel == 1 && fabs (currot.theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
               {
                 fireFlare (flare, m);
                 fireflarettl += intelligence / 20 * timestep;
@@ -1584,7 +1582,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
             }
             else
             {
-              if ((easymodel == 1 && fabs (theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
+              if ((easymodel == 1 && fabs (currot.theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
               {
                 fireChaff (chaff, m);
                 firechaffttl += intelligence / 20 * timestep;
@@ -1602,7 +1600,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     if (manoeverstate == 1) // Immelmann
     {
       recelevatoreffect = 0.05;
-      if (fabs (theta) > 10) recrolleffect = -1;
+      if (fabs (currot.theta) > 10) recrolleffect = -1;
       else
       {
         recrolleffect = 0;
@@ -1611,7 +1609,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
     else if (manoeverstate == 2)
     {
-      if (fabs (theta) <= 150)
+      if (fabs (currot.theta) <= 150)
       {
         recrolleffect = 0;
         recelevatoreffect = 1;
@@ -1623,7 +1621,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
     else if (manoeverstate == 3)
     {
-      if (gamma < 170 || gamma > 190)
+      if (currot.gamma < 170 || currot.gamma > 190)
       {
         recrolleffect = 0;
         recelevatoreffect = 1;
@@ -1635,7 +1633,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
     else if (manoeverstate == 4)
     {
-      if (fabs (theta) > 20)
+      if (fabs (currot.theta) > 20)
       {
         recrolleffect = 1;
         recelevatoreffect = 0.05;
@@ -1650,7 +1648,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     {
       recrolleffect = 0;
       recelevatoreffect = 1;
-      if (gamma > 260 || gamma < 90)
+      if (currot.gamma > 260 || currot.gamma < 90)
       {
         recrolleffect = 0;
         recelevatoreffect = 0;
@@ -1667,7 +1665,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     else if (manoeverstate == 12)
     {
       recelevatoreffect = -0.5;
-      if (gamma > 170 && gamma < 190)
+      if (currot.gamma > 170 && currot.gamma < 190)
       {
         recelevatoreffect = 0;
         manoeverstate = 0;
@@ -1678,14 +1676,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     {
       recelevatoreffect = 0.55;
       recrolleffect = 1;
-      if (theta > 80 && theta < 90)
+      if (currot.theta > 80 && currot.theta < 90)
       {
         manoeverstate = 21;
       }
     }
     else if (manoeverstate == 21)
     {
-      if (theta > -10 && theta < 10)
+      if (currot.theta > -10 && currot.theta < 10)
       {
         manoeverstate = 0;
       }
@@ -1752,19 +1750,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   }
   
   if (ttl <= 0 && id >= MISSILE1 && id <= MISSILE2 && id != MISSILE_MINE1)
-  { recheight = -100; recheight2 = -100; recgamma = 90; }
+  { recheight = -100; recheight2 = -100; recrot.gamma = 90; }
   else if (ai)
   {
     if (target != NULL && ((id >= MISSILE1 && id <= MISSILE2) || (id >= FIGHTER1 && id <= FIGHTER2 && manoeverheight <= 0))) // is AGM
     {
       float dgamma = 0;
       if (disttarget <= -0.00001 || disttarget >= 0.00001) // no division by zero
-        dgamma = atan ((target->tl.y - tl.y) / disttarget) * 180 / PI - (gamma - 180);
-      recgamma = gamma + dgamma; // get recommended elevation to target
+        dgamma = atan ((target->tl.y - tl.y) / disttarget) * 180 / PI - (currot.gamma - 180);
+      recrot.gamma = currot.gamma + dgamma; // get recommended elevation to target
     }
     else
     {
-      recgamma = (int) ((recheight2 - tl.y) * 10 - gamma + 360);
+      recrot.gamma = (int) ((recheight2 - tl.y) * 10 - currot.gamma + 360);
     }
   }
 
@@ -1777,7 +1775,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   if (easymodel == 1)
   {
-    deltatheta = rectheta - theta;
+    deltatheta = recrot.theta - currot.theta;
     if (fabs (dtheta) > 30)
     { dtheta = 0; }
     float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
@@ -1802,7 +1800,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
     if (dtheta > (nimbility * (1.0 + realspeed)) * timefac * 5.0F)
       dtheta = (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
-    theta += dtheta;
+    currot.theta += dtheta;
 
     // height changes
     if (easymodel == 1)
@@ -1810,10 +1808,10 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       float nimbility1 = nimbility / 5;
       if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
         nimbility1 = 0.00001;
-      if (theta > maxtheta) theta = maxtheta; // restrict roll angle
-      else if (theta < -maxtheta) theta = -maxtheta;
+      if (currot.theta > maxrot.theta) currot.theta = maxrot.theta; // restrict roll angle
+      else if (currot.theta < -maxrot.theta) currot.theta = -maxrot.theta;
 
-      float deltagamma = recgamma - gamma;
+      float deltagamma = recrot.gamma - currot.gamma;
       if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
       else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility1 * timefac;
       else if (deltagamma > 0)
@@ -1834,12 +1832,12 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
       if (dgamma > manoeverability * (3.33 + 15.0 * realspeed) * timefac)
         dgamma = manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      gamma += dgamma;
+      currot.gamma += dgamma;
     }
   }
 
-  if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
-  else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
+  if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
+  else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
 
   if (id >= MISSILE1 && id <= MISSILE2)
   {
@@ -1891,12 +1889,12 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     float t = 10.0 * disttarget; // generous time to new position
     if (t > 60) t = 60; // higher values will not make sense
     t *= (float) (400 - precision) / 400;
-    int tt = (int) target->theta;
+    int tt = (int) target->currot.theta;
     if (tt < 0) tt += 360;
     float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
     if (newphi > 90) newphi = 90;
     else if (newphi < -90) newphi = -90;
-    newphi += (float) target->phi;
+    newphi += (float) target->currot.phi;
     if (newphi >= 360) newphi -= 360;
     if (newphi < 0) newphi += 360;
     if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
@@ -1915,7 +1913,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   {
     dx2 = dx; dz2 = dz;
   }
-  float a, w = phi;
+  float a, w = currot.phi;
   if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
   // get heading to target
@@ -1952,14 +1950,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         }
         else if (aw > 160 && disttarget < 25) // target is at the back
         {
-          if (fabs (tl.y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
+          if (fabs (tl.y - myheight) > 7 && currot.gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
             logging.display ("Manoever: Roll", LOG_ALL);
           }
           else
           {
-            rectheta = -90;
+            recrot.theta = -90;
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8)); // turn hard left or right
@@ -1976,21 +1974,21 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         }
         else if (aw < 40 && disttarget > 60)
         {
-          rectheta = 0;
+          recrot.theta = 0;
         }
         else if (aw < 20 && disttarget > 30)
         {
-          rectheta = 0;
+          recrot.theta = 0;
         }
         else // otherwise fly to target direction
         {
           int maw = aw > 90 ? 90 : (int) aw;
           int maw2 = 90 - maw;
-          rectheta = 90 - maw2 * intelligence / 400;
-          if (maw < 30) rectheta /= 2;
+          recrot.theta = 90 - maw2 * intelligence / 400;
+          if (maw < 30) recrot.theta /= 2;
           if (maw < 5)
           {
-            rectheta = 0;
+            recrot.theta = 0;
             if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
               ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
@@ -2010,14 +2008,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         }
         else if (aw < -160 && disttarget < 25)
         {
-          if (fabs (tl.y - myheight) > 7 && gamma >= 175 + intelligence / 100) // high enough over ground
+          if (fabs (tl.y - myheight) > 7 && currot.gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
             logging.display ("Manoever: Roll", LOG_ALL);
           }
           else
           {
-            rectheta = 90;
+            recrot.theta = 90;
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8));
@@ -2034,21 +2032,21 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         }
         else if (aw > -40 && disttarget > 60)
         {
-          rectheta = 0;
+          recrot.theta = 0;
         }
         else if (aw > -20 && disttarget > 30)
         {
-          rectheta = 0;
+          recrot.theta = 0;
         }
         else
         {
           int maw = aw < -90 ? -90 : (int) aw;
           int maw2 = -90 - maw;
-          rectheta = -90 - maw2 * intelligence / 400;
-          if (maw > -30) rectheta /= 2;
+          recrot.theta = -90 - maw2 * intelligence / 400;
+          if (maw > -30) recrot.theta /= 2;
           if (maw > -5)
           {
-            rectheta = 0;
+            recrot.theta = 0;
             if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
               ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
@@ -2059,17 +2057,17 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   else if (id >= MISSILE1 && id <= MISSILE2) // for missiles do the following
   {
     if (fabs (aw) < 50 && disttarget > 50) // target in front and minimum distance, then no roll
-      rectheta = 0;
+      recrot.theta = 0;
     else // otherwise chase target
     {
-      if (aw < -90 || aw > 90) rectheta = 0;
+      if (aw < -90 || aw > 90) recrot.theta = 0;
       else if (aw > 0)
       {
-        rectheta = aw > 90 ? 90 : aw;
+        recrot.theta = aw > 90 ? 90 : aw;
       }
       else
       {
-        rectheta = aw < -90 ? -90 : aw;
+        recrot.theta = aw < -90 ? -90 : aw;
       }
     }
   }
@@ -2078,15 +2076,15 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     recthrust = 0; thrust = 0;
     if (aw > 5)
     {
-      rectheta = maxtheta;
+      recrot.theta = maxrot.theta;
     }
     else if (aw < -5)
     {
-      rectheta = -maxtheta;
+      recrot.theta = -maxrot.theta;
     }
     else
     {
-      rectheta = 0;
+      recrot.theta = 0;
     }
   }
   else if (id >= TANK1 && id <= TANK2) // tanks
@@ -2094,26 +2092,26 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     recthrust = maxthrust; thrust = maxthrust; // always at maximum thrust
     if (aw > 5)
     {
-      rectheta = maxtheta;
+      recrot.theta = maxrot.theta;
     }
     else if (aw < -5)
     {
-      rectheta = -maxtheta;
+      recrot.theta = -maxrot.theta;
     }
     else
     {
-      rectheta = 0;
+      recrot.theta = 0;
     }
     if (firecannonttl <= 0)
     {
       if (id == TANK_AIR1)
-        if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->tl.y > tl.y + 2)
+        if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->tl.y > tl.y + 2)
         {
           fireCannon (c);
           firecannonttl += firerate * timestep;
         }
       if (id == TANK_GROUND1)
-        if (fabs (rectheta - theta) < 2 && fabs (aw) < 20 && disttarget < 35 && target->tl.y <= tl.y + 1 && target->tl.y >= tl.y - 1)
+        if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 35 && target->tl.y <= tl.y + 1 && target->tl.y >= tl.y - 1)
         {
           fireCannon (c);
           firecannonttl += firerate * timestep;
@@ -2142,7 +2140,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
     }
     if (disttarget > 50 && fabs (aw) < 20) // high distance and target in front, then fly straight
-      rectheta = 0;
+      recrot.theta = 0;
     if (manoeverthrust <= 0)
       if (disttarget < 25 && fabs (aw) > 160 && target->id >= TANK1) // avoid collisions
       {
@@ -2150,7 +2148,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         recthrust = maxthrust;
         if (difficulty == 0) recthrust = maxthrust * 0.8F;
         manoevertheta = 25 * timestep;
-        rectheta = 0;
+        recrot.theta = 0;
         manoeverheight = 25 * timestep;
         recheight = 10;
       }
@@ -2158,7 +2156,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     float agr = 4.0 - (float) aggressivity / 100;
     if (firecannonttl <= 0)
     {
-      if (fabs (rectheta - theta) < agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
+      if (fabs (recrot.theta - currot.theta) < agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
         fireCannon (c);
       else if (disttarget < 2 + agr && fabs (aw) < 20 + agr * 4)
         fireCannon (c);
@@ -2179,14 +2177,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           {
             manoevertheta = 15 * timestep;
             firemissilettl = 10 * timestep;
-            if (math.random (2)) rectheta = 90;
-            else rectheta = -90;
+            if (math.random (2)) recrot.theta = 90;
+            else recrot.theta = -90;
             targetNextEnemy (f);
           }
         }
         if (firemissilettl <= 0)
         {
-          if (fabs (rectheta - theta) < agr / 2 && fabs (aw) < agr && disttarget < 45)
+          if (fabs (recrot.theta - currot.theta) < agr / 2 && fabs (aw) < agr && disttarget < 45)
           {
             fireMissile (m, (AIObj *) target);
             firemissilettl += aggressivity * timestep;
@@ -2195,7 +2193,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
       else // ground target
       {
-        if (fabs (rectheta - theta) < 5 + agr * 4 && fabs (aw) < 5 + agr * 4 && disttarget < 50)
+        if (fabs (recrot.theta - currot.theta) < 5 + agr * 4 && fabs (aw) < 5 + agr * 4 && disttarget < 50)
           if (!(l->lsticker & 7))
           {
             fireMissileGround (m);
@@ -2208,86 +2206,85 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if ((id >= FLAK1 && id <= FLAK2) || id == SHIP_CRUISER || id == SHIP_DESTROYER1 || id == TANK_TRSAM1)
   {
     if (firecannonttl <= 0)
-    for (int i = 0; i < maxfighter; i ++)
-    if (f [i]->active)
-    if (party != f [i]->party)
-    {
-      disttarget = distance (f [i]); // distance to target
-      ex = f [i]->tl.x; // estimated target position x
-      ez = f [i]->tl.z; // estimated target position z
-      dx2 = ex - tl.x; dz2 = ez - tl.z; // estimated distances
-      w = (int) phi;
-      if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
-      a = (atan (dx2 / dz2) * 180 / PI);
-      if (dz2 > 0)
-      {
-        if (dx2 > 0) a -= 180;
-        else a += 180;
-      }
-      aw = a - w;
-      if (aw < -180) aw += 360;
-      if (aw > 180) aw -= 360;
-      if (id == FLAK_AIR1)
-        if (f [i]->tl.y > tl.y + 2)
+      for (int i = 0; i < maxfighter; i ++)
+        if (f [i]->active && party != f [i]->party)
         {
-          if (fabs (aw) <= 20 && disttarget < 50) // + aggressive
-            fireCannon (c, phi + aw);
-          firecannonttl = firerate * timestep;
-        }
-      if (id == SHIP_DESTROYER1)
-        if (f [i]->tl.y > tl.y + 2)
-        {
-          if (aw >= 0 && aw < 40 && disttarget < 50) // + aggressive
-            fireCannon (c, phi + aw);
-          if (aw >= -40 && aw < 0 && disttarget < 50) // + aggressive
-            fireCannon (c, phi + aw);
-          if (aw >= 120 && aw < 160 && disttarget < 50) // + aggressive
-            fireCannon (c, phi + aw);
-          if (aw >= -160 && aw < -120 && disttarget < 50) // + aggressive
-            fireCannon (c, phi + aw);
-          firecannonttl = firerate * timestep;
-        }
-      if (firemissilettl <= 0)
-        if (id == FLARAK_AIR1)
-          if (fabs (aw) < 25 && disttarget < 45) // + aggressive
+          disttarget = distance (f [i]); // distance to target
+          ex = f [i]->tl.x; // estimated target position x
+          ez = f [i]->tl.z; // estimated target position z
+          dx2 = ex - tl.x; dz2 = ez - tl.z; // estimated distances
+          w = (int) currot.phi;
+          if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
+          a = (atan (dx2 / dz2) * 180 / PI);
+          if (dz2 > 0)
+          {
+            if (dx2 > 0) a -= 180;
+            else a += 180;
+          }
+          aw = a - w;
+          if (aw < -180) aw += 360;
+          if (aw > 180) aw -= 360;
+          if (id == FLAK_AIR1)
             if (f [i]->tl.y > tl.y + 2)
             {
-              ttf = 0;
-              fireMissileAirFF (m, f [i]);
-              firemissilettl += (20 + firerate * 10) * timestep;
+              if (fabs (aw) <= 20 && disttarget < 50) // + aggressive
+                fireCannon (c, currot.phi + aw);
+              firecannonttl = firerate * timestep;
             }
-      if (id == TANK_TRSAM1)
-      {
-        if (firemissilettl <= 0)
-          if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive
+          if (id == SHIP_DESTROYER1)
+            if (f [i]->tl.y > tl.y + 2)
+            {
+              if (aw >= 0 && aw < 40 && disttarget < 50) // + aggressive
+                fireCannon (c, currot.phi + aw);
+              if (aw >= -40 && aw < 0 && disttarget < 50) // + aggressive
+                fireCannon (c, currot.phi + aw);
+              if (aw >= 120 && aw < 160 && disttarget < 50) // + aggressive
+                fireCannon (c, currot.phi + aw);
+              if (aw >= -160 && aw < -120 && disttarget < 50) // + aggressive
+                fireCannon (c, currot.phi + aw);
+              firecannonttl = firerate * timestep;
+            }
+          if (firemissilettl <= 0)
+            if (id == FLARAK_AIR1)
+              if (fabs (aw) < 25 && disttarget < 45) // + aggressive
+                if (f [i]->tl.y > tl.y + 2)
+                {
+                  ttf = 0;
+                  fireMissileAirFF (m, f [i]);
+                  firemissilettl += (20 + firerate * 10) * timestep;
+                }
+          if (id == TANK_TRSAM1)
           {
-            ttf = 0;
-            fireMissileAirFF (m, f [i]);
-            firemissilettl += aggressivity / 5 * timestep;
-            missiles [6] ++; // unlimited ammo
+            if (firemissilettl <= 0)
+              if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive
+              {
+                ttf = 0;
+                fireMissileAirFF (m, f [i]);
+                firemissilettl += aggressivity / 5 * timestep;
+                missiles [6] ++; // unlimited ammo
+              }
           }
-      }
-      if (id == SHIP_CRUISER)
-      {
-        if (firemissilettl <= 0)
-          if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive
+          if (id == SHIP_CRUISER)
           {
-            ttf = 0;
-            fireMissileAirFF (m, f [i]);
-            firemissilettl += aggressivity / 5 * timestep;
-            missiles [6] ++; // unlimited ammo
+            if (firemissilettl <= 0)
+              if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive
+              {
+                ttf = 0;
+                fireMissileAirFF (m, f [i]);
+                firemissilettl += aggressivity / 5 * timestep;
+                missiles [6] ++; // unlimited ammo
+              }
+            if (firecannonttl <= 0)
+            {
+              fireCannon (c, currot.phi + aw);
+            }
           }
-        if (firecannonttl <= 0)
-        {
-          fireCannon (c, phi + aw);
         }
-      }
-    }
   }
   if (id >= FIGHTER1 && id <= FIGHTER2)
   {
-    if (rectheta > 90 - precision / 5) rectheta = 90 - precision / 5;
-    else if (rectheta < -90 + precision / 5) rectheta = -90 + precision / 5;
+    if (recrot.theta > 90 - precision / 5) recrot.theta = 90 - precision / 5;
+    else if (recrot.theta < -90 + precision / 5) recrot.theta = -90 + precision / 5;
   }
 }
 

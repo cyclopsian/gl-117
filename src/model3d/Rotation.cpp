@@ -32,46 +32,46 @@
 
 Rotation::Rotation ()
 {
-  a = 0;
-  b = 0;
-  c = 0;
+  gamma = 0;
+  theta = 0;
+  phi = 0;
 //  calculate ();
 }
 
-Rotation::Rotation (float a, float b, float c)
+Rotation::Rotation (float gamma, float theta, float phi)
 {
-  this->a = a;
-  this->b = b;
-  this->c = c;
+  this->gamma = gamma;
+  this->theta = theta;
+  this->phi = phi;
 //  calculate ();
 }
 
 void Rotation::set (const Rotation &r)
 {
-  a = r.a;
-  b = r.b;
-  c = r.c;
+  gamma = r.gamma;
+  theta = r.theta;
+  phi = r.phi;
 }
 
-void Rotation::set (float a, float b, float c)
+void Rotation::set (float gamma, float theta, float phi)
 {
-  this->a = a;
-  this->b = b;
-  this->c = c;
+  this->gamma = gamma;
+  this->theta = theta;
+  this->phi = phi;
 }
 
 void Rotation::add (const Rotation &r)
 {
-  a += r.a;
-  b += r.b;
-  c += r.c;
+  gamma += r.gamma;
+  theta += r.theta;
+  phi += r.phi;
 }
 
-void Rotation::add (float a, float b, float c)
+void Rotation::add (float gamma, float theta, float phi)
 {
-  this->a += a;
-  this->b += b;
-  this->c += c;
+  this->gamma += gamma;
+  this->theta += theta;
+  this->phi += phi;
 }
 
 /*void Rotation::calculate ()

@@ -61,7 +61,7 @@ void MissionCanyon2::start ()
   playerInit ();
   fplayer->tl.x = 100;
   fplayer->tl.z = 100;
-  fplayer->phi = 45;
+  fplayer->currot.phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
@@ -72,7 +72,7 @@ void MissionCanyon2::start ()
       fighter [i]->tl.x = 100 - ((i + 1) / 2) * 5;
     fighter [i]->tl.z = 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
-    fighter [i]->phi = 45;
+    fighter [i]->currot.phi = 45;
   }
   for (i = 5; i <= 22; i ++)
   {
