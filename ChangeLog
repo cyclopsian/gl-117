@@ -1,3 +1,15 @@
+Version 0.8:
+	- important buffer overflow bugfix
+	- chaff/flare countermeasures
+	- radar and heat seaking missiles
+	- complete interface remapping support by script
+	- one new soundtrack
+	- quit dialog
+	- better air-ground missiles
+	- some mission adjustments
+	- additional cloud layer
+	- game will start if SDL cannot find audio driver
+
 Version 0.7.5:
 	- different HUDs for the fighters
 	- added soundtrack
