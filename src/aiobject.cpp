@@ -1177,6 +1177,7 @@ void AIObj::fireCannon (DynamicObj **laser)
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
   if (debug == 1) { printf ("%d:m=%d\n", party, id); fflush (stdout); }
+  ttf = 50;
   missile->dinit ();
   missile->aiinit ();
   missile->newinit (id, party, 0);
@@ -1761,6 +1762,8 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
     if (!target->active)
       targetNearestEnemy (f);
 
+  if (target == NULL) return;
+
   disttarget = distance (target); // distance to target
 
   // fighter's targeting mechanism for missiles
@@ -1799,7 +1802,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
                 float dphi = fabs (phi - target->phi);
                 if (dphi > 270) dphi = 360 - dphi;
                 if (dphi < 45)
-                  ttf -= 2;
+                  ttf -= 3;
                 else
                   ttf = 50;
               }

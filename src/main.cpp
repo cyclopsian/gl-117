@@ -23,6 +23,7 @@
 
 /*
 TODO:
+- lighted cannon fire using alpha values
 - source code: MissionX => mission.cpp
 - southern seashore landscape (additional missions)
 - torpedo, water
@@ -633,6 +634,7 @@ class MissionTutorial1 : public Mission
     strcpy (briefing, "WELCOME TO THE EAGLE SQUADRON! BEFORE FLYING ANY MISSION YOU SHOULD PLAY THIS TUTORIAL. LEARN TO HANDLE YOUR FIGHTER AND THE BASIC CONTROLS LIKE TARGETING OR FIRING A MISSILE.");
     autoLFBriefing ();
     maxtime = 2500;
+    heading = 210;
   }
 
   virtual void start ()
@@ -1740,9 +1742,9 @@ class MissionDefend1 : public Mission
     }
     for (i = 7; i <= 10; i ++)
     {
-      int off = 40;
+      int off = 35;
       if (difficulty == 0) off = 55;
-      else off = 25;
+      else off = 15;
       fighter [i]->tl->x = i * 5 - 50;
       fighter [i]->tl->z = -i * 5 - off;
       fighter [i]->o = &model_tank2;
@@ -1756,11 +1758,16 @@ class MissionDefend1 : public Mission
       else off = 25;
       fighter [i]->tl->x = i * 5 - 50;
       fighter [i]->tl->z = -i * 5 - off * 2;
-      fighter [i]->o = &model_tank2;
       if (i == 12)
+      {
         fighter [i]->newinit (TANK_AIR1, 0, 300);
+        fighter [i]->o = &model_tank1;
+      }
       else
+      {
         fighter [i]->newinit (TANK_GROUND1, 0, 300);
+        fighter [i]->o = &model_tank2;
+      }
       fighter [i]->target = fighter [i - 4];
       fighter [i]->deactivate ();
     }
@@ -1793,13 +1800,13 @@ class MissionDefend1 : public Mission
     {
       font1->drawTextCentered (0, 4, -2, name, &textcolor);
     }
-    if (timer == 1000)
+    if (timer == 600)
     {
       fighter [11]->activate ();
       fighter [12]->activate ();
       fighter [13]->activate ();
     }
-    if (timer >= 1000 && timer <= 1200)
+    if (timer >= 600 && timer <= 800)
       font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", &textcolor);
   }
 };
@@ -2495,7 +2502,7 @@ class MissionCanyon3 : public Mission
     strcpy (briefing, "THERE IS ONE MAIN BASE IN THE CANYON, CONNECTED TO A BASE ON THE MOON. WE MUST TAKE OUT THIS BASE FIRST!");
     autoLFBriefing ();
     alliedfighters = 4;
-    maxtime = 2500;
+    maxtime = 3000;
   }
 
   virtual void start ()
@@ -2548,7 +2555,7 @@ class MissionCanyon3 : public Mission
     fighter [8]->tl->z = py - 3;
     fighter [9]->tl->x = px + 3;
     fighter [9]->tl->z = py - 3;
-    for (i = 10; i <= 17; i ++)
+    for (i = 10; i <= 19; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [myrandom (5)];
@@ -2577,7 +2584,7 @@ class MissionCanyon3 : public Mission
     {
       return 2;
     }
-    for (i = 0; i <= 17; i ++)
+    for (i = 0; i <= 19; i ++)
     {
       if (fighter [i]->active)
         if (fighter [i]->party == 0)
@@ -3050,7 +3057,7 @@ class Cockpit
   void drawCounter ()
   {
     int i;
-    float xf = 6.5F, yf = -3.0F, zf = -10.0F;
+    float xf = 7.0F, yf = -3.0F, zf = -10.0F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     bool flarewarn = false, chaffwarn = false;
     for (i = 0; i < maxmissile; i ++)
@@ -7732,7 +7739,11 @@ void game_display ()
   if (camera == 0)
   {
     glDisable (GL_DEPTH_TEST);
+    if (quality > 0)
+      glEnable (GL_LINE_SMOOTH);
     cockpit->drawTargeter ();
+    if (quality > 0)
+      glDisable (GL_LINE_SMOOTH);
     glEnable (GL_DEPTH_TEST);
   }
 
@@ -7877,8 +7888,12 @@ if (quality > 0)
 //  glPushMatrix ();
   if (camera == 0)
   {
+    if (quality > 0)
+      glEnable (GL_LINE_SMOOTH);
     cockpit->drawCross ();
     cockpit->drawHeading ();
+    if (quality > 0)
+      glDisable (GL_LINE_SMOOTH);
     cockpit->drawRadar ();
     cockpit->drawTargetedElement ();
     cockpit->drawWeapon ();
