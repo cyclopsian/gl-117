@@ -10,6 +10,16 @@
 #undef HAVE_SDL_MIXER
 #endif
 
+// 2002/12/18 Minami >>>>>>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#include "SDL/SDL.h"
+#include "SDL/SDL_thread.h"
+#include "SDL/SDL_mixer.h"
+#include "SDL/SDL_net.h"
+#endif
+// 2002/12/18 Minami <<<<<<
+#ifndef __APPLE__
 #ifdef USE_GLUT
 #include <GL/glut.h>
 #else
@@ -23,6 +33,8 @@
 #include "SDL/SDL_net.h"
 #endif
 #endif
+#endif // __APPLE__
+// 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
 #define VERSIONSTRING "GL-117 V. 0.8.1 (BETA) BY THOMAS A. DREXL"

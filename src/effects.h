@@ -26,11 +26,19 @@
 
 #include "common.h"
 
+// 2002/12/18 Minami >>>>>>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#endif
+
+#ifndef __APPLE__
 #ifdef USE_GLUT
 #include <GL/glut.h>
 #else
 #include <GL/glut.h>
 #endif
+#endif // __APPLE__
+// 2002/12/18 Minami <<<<<<
 
 #include "model.h"
 #include "mathtab.h"
