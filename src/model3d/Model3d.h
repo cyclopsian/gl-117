@@ -429,6 +429,7 @@ class SpaceObj
 {
   public:
   
+    bool valid;     ///< if not valid, the model is free to be removed
     int draw;       ///< draw/hide
     int explode;    ///< explosion stadium (0=no explosion)
     bool drawLight; ///< draw with/without light

@@ -31,7 +31,7 @@
 
 
 
-bool Model3d::showCollision = false;
+bool Model3d::showCollision = true;
 
 Model3d::Model3d ()
 {

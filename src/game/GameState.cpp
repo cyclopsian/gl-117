@@ -1595,7 +1595,7 @@ void StatePlay::display ()
   // show a short flash when an object explodes
   if (dynamiclighting)
   {
-    for (i = 0; i < maxfighter; i ++)
+    for (unsigned i = 0; i < fighter.size (); i ++)
     {
       if (fighter [i]->draw)
         if (fighter [i]->explode > 0)
@@ -1797,24 +1797,24 @@ void StatePlay::display ()
   if (dynamiclighting)
   {
     memset (l->dl, 0, (MAXX + 1) * (MAXX + 1));
-    for (i = 0; i < maxexplosion; i ++)
+    for (unsigned i = 0; i < explosion.size (); i ++)
     {
       if (explosion [i]->ttl > 0)
         l->calcDynamicLight (explosion [i], 50.0F, 100.0F, 2.0F);
     }
     if (!day)
     {
-      for (i = 0; i < maxlaser; i ++)
+      for (unsigned i = 0; i < laser.size (); i ++)
       {
         if (laser [i]->draw)
           l->calcDynamicLight (laser [i], 15.0F, 75.0F, 5.0F);
       }
-      for (i = 0; i < maxmissile; i ++)
+      for (unsigned i = 0; i < missile.size (); i ++)
       {
         if (missile [i]->draw)
           l->calcDynamicLight (missile [i], 15.0F, 75.0F, 5.0F);
       }
-      for (i = 0; i < maxflare; i ++)
+      for (unsigned i = 0; i < flare.size (); i ++)
       {
         if (flare [i]->draw)
           l->calcDynamicLight (flare [i], 15.0F, 75.0F, 5.0F);
@@ -2084,7 +2084,9 @@ void StatePlay::display ()
 void StatePlay::timer (Uint32 dt)
 {
 //  if (multiplayer) return;
-  int i, i2;
+
+  fighter.cleanUp ();
+  laser.cleanUp ();
 
   sunlight += (sunlight_dest - sunlight) / 10 * dt / timestep;
   l->sunlight = sunlight;
@@ -2166,38 +2168,38 @@ void StatePlay::timer (Uint32 dt)
     }
 
   // collision tests
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
-    for (i2 = 0; i2 < maxlaser; i2 ++)
+    for (unsigned i2 = 0; i2 < laser.size (); i2 ++)
       if (laser [i2]->active)
         fighter [i]->collide (laser [i2], dt);
-    for (i2 = 0; i2 < maxmissile; i2 ++)
+    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         fighter [i]->collide (missile [i2], dt);
-    for (i2 = 0; i2 < i; i2 ++)
+    for (unsigned i2 = 0; i2 < i; i2 ++)
       if (fighter [i2]->active)
         if (i != i2)
           fighter [i]->collide (fighter [i2], dt);
   }
 
-  for (i = 0; i < maxflare; i ++)
+  for (unsigned i = 0; i < flare.size (); i ++)
   {
-    for (i2 = 0; i2 < maxmissile; i2 ++)
+    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         flare [i]->collide (missile [i2], dt);
   }
 
-  for (i = 0; i < maxchaff; i ++)
+  for (unsigned i = 0; i < chaff.size (); i ++)
   {
-    for (i2 = 0; i2 < maxmissile; i2 ++)
+    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         chaff [i]->collide (missile [i2], dt);
   }
 
   // move objects
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
-    fighter [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff, camrot.phi, camrot.gamma);
+    fighter [i]->aiAction (dt, fighter, missile, laser, flare, chaff, camrot.phi, camrot.gamma);
     float lev;
     if (fighter [i]->explode == 1 && (lev = fplayer->distance (fighter [i])) < 32)
     {
@@ -2208,26 +2210,26 @@ void StatePlay::timer (Uint32 dt)
       sound->play (SOUND_EXPLOSION1, false);
     }
   }
-  for (i = 0; i < maxlaser; i ++)
+  for (i = 0; i < laser.size (); i ++)
   {
     laser [i]->move (dt, camrot.phi, camrot.gamma);
   }
-  for (i = 0; i < maxmissile; i ++)
+  for (i = 0; i < missile.size (); i ++)
   {
-    missile [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff, camrot.phi, camrot.gamma);
+    missile [i]->aiAction (dt, fighter, missile, laser, flare, chaff, camrot.phi, camrot.gamma);
   }
-  for (i = 0; i < maxflare; i ++)
+  for (i = 0; i < flare.size (); i ++)
   {
     flare [i]->move (dt, camrot.phi, camrot.gamma);
   }
-  for (i = 0; i < maxchaff; i ++)
+  for (i = 0; i < chaff.size (); i ++)
   {
     chaff [i]->move (dt, camrot.phi, camrot.gamma);
   }
 
-  for (i = 0; i < maxexplosion; i ++)
+  for (i = 0; i < explosion.size (); i ++)
     explosion [i]->move (dt, camrot.phi, camrot.gamma);
-  for (i = 0; i < maxblacksmoke; i ++)
+  for (i = 0; i < blacksmoke.size (); i ++)
     blacksmoke [i]->move (dt, camrot.phi, camrot.gamma);
 
   // show blackout/redout
@@ -2458,7 +2460,7 @@ void StateMenu::timer (Uint32 dt)
     if (camera == 5)
     {
       camera = 1;
-      if (missile [0]->active)
+      if (!missile.empty () && missile [0]->active)
         camera = 4;
     }
     else if (camera == 1 || camera == 4) camera = 2;

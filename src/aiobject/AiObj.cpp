@@ -112,6 +112,7 @@ UnitDescriptor DepotDescriptor (10304, "Depot", "DEPOT");
 UnitDescriptor LaserBarrierDescriptor (10400, "LaserBarrier", "LASER BARRIER");
 UnitDescriptor RubbleDescriptor (11000, "Rubble", "RUBBLE");
 UnitDescriptor HouseDescriptor (11100, "House", "HOUSE");
+UnitDescriptor ExplosionDescriptor (20000, "Explosion", "EXPLOSION");
 
 
 
@@ -132,9 +133,9 @@ AIObj::AIObj (const UnitDescriptor &desc)
   proto = new AiUnitPrototype (id);
 
   init ();
+  initPrototype ();
 
-  o = NULL;
-  trafo.scaling.set (1.0, 1.0, 1.0);
+//  trafo.scaling.set (1.0, 1.0, 1.0);
   smoke = new Smoke (0);
 }
 
@@ -143,13 +144,14 @@ AIObj::AIObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom
 {
   id = desc;
   proto = new AiUnitPrototype (id);
-
-  init ();
-
   space = space2;
   o = o2;
   trafo.scaling.set (zoom2, zoom2, zoom2);
   smoke = new Smoke (0);
+
+  init ();
+  initPrototype ();
+
   space->addObject (this);
 }
 
@@ -166,26 +168,34 @@ AiUnitPrototype *AIObj::getPrototype ()
   return aiproto;
 }
 
+void AIObj::initPrototype ()
+{
+  DynamicObj::initPrototype ();
+
+  ammo = getPrototype ()->maxammo;
+  recthrust = getPrototype ()->maxthrust / 2.0;
+  force.z = recthrust;
+  ttl = getPrototype ()->maxttl * timestep;
+}
+
 void AIObj::init ()
 {
-//  DynamicObj::init ();
-  
   int i;
   acttype = 0;
   intelligence = 100;
   aggressivity = 100;
   precision = 100;
-  shield = 0.01F;
   ai = true;
   active = true;
   draw = true;
   target = NULL;
   dtheta = 0;
   dgamma = 0;
-  id = MissileBeginDescriptor;
+//  id = MissileBeginDescriptor;
   manoevertheta = 0;
   manoeverheight = 0;
   manoeverthrust = 0;
+  manoeverstate = 0;
   idle = 0;
   smokettl = 0;
   firecannonttl = 0;
@@ -212,9 +222,6 @@ void AIObj::init ()
     missiles [i] = 0;
   bomber = 0;
   timer = 0;
-  ammo = -1;
-  manoeverstate = 0;
-  target = 0;
 }
 
 void AIObj::missileCount ()
@@ -238,9 +245,8 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   int i;
   float zoom = trafo.scaling.x;
   ai = true;
-  this->id = id;
+//  this->id = id;
   this->party = party;
-  manoeverstate = 0;
   activate ();
   for (i = 0; i < missileracks; i ++)
     missilerackn [i] = 0;
@@ -260,9 +266,9 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
 //  o->cube.set (trafo.scaling);
   
 //  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
-  o = Model3dRegistry::get (id.name);
+//  o = Model3dRegistry::get (id.name);
 
-  if (id == FalconDescriptor)
+/*  if (id == FalconDescriptor)
   {
     getPrototype ()->maxthrust = 0.31;
     getPrototype ()->nimbility = 0.86;
@@ -594,7 +600,7 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     getPrototype ()->impact = 20;
     shield = getPrototype ()->maxshield = 2800;
     o->cube.set (zoom * 0.4, zoom * 0.12, zoom * 0.4);
-  }
+  } 
 
   float missilethrustbase = 1.2F;
   if (id == AamHs1Descriptor)
@@ -788,7 +794,7 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   if (id >= StaticPassiveBeginDescriptor)
   {
-  }
+  }*/
 
   if (difficulty == 0) // easy
   {
@@ -811,7 +817,7 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   {
   }
 
-  trafo.scaling.set (zoom, zoom, zoom);
+//  trafo.scaling.set (zoom, zoom, zoom);
   this->intelligence = intelligence;
   this->precision = precision;
   this->aggressivity = aggressivity;
@@ -840,105 +846,109 @@ void AIObj::initValues (DynamicObj *dobj, float phi)
   dobj->trafo.rotation.set ((short) (90 + dobj->currot.gamma - 180), (short) dobj->currot.theta + 180, (short) -dobj->currot.phi);
 }
 
-void AIObj::fireCannon (DynamicObj *laser, float phi)
+void AIObj::fireCannon (DynamicObj *l, float phi)
 {
   if (firecannonttl > 0) return;
   if (ammo == 0) return;
+
+  space->addObject (l);
+  l->space = space;
+  laser.push_back (l);
+
   ammo --;
-  laser->thrust = 0;
-  laser->recthrust = laser->thrust;
-  laser->getPrototype ()->manoeverability = 0.0;
-  laser->getPrototype ()->maxthrust = 0;
+  l->thrust = 0;
+  l->recthrust = l->thrust;
+  l->getPrototype ()->manoeverability = 0.0;
+  l->getPrototype ()->maxthrust = 0;
   if (target != NULL && ai)
   {
     if (target->active)
     {
       // exact calculation to hit enemy (non-static turret!)
       if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
-        laser->currot.gamma = currot.gamma;
+        l->currot.gamma = currot.gamma;
       else
-        laser->currot.gamma = 180.0 + atan ((target->trafo.translation.y - trafo.translation.y) / distance (target)) * 180.0 / PI;
+        l->currot.gamma = 180.0 + atan ((target->trafo.translation.y - trafo.translation.y) / distance (target)) * 180.0 / PI;
     }
   }
   else
-    laser->currot.gamma = currot.gamma; // + 90.0;
-  laser->party = party;
-  laser->ttl = 80 * timestep;
-  laser->shield = 1;
-  laser->immunity = (int) (trafo.scaling.x * 12) * timestep;
-  laser->source = this;
-  laser->currot.phi = phi;
-  laser->currot.theta = currot.theta;
-  initValues (laser, phi);
+    l->currot.gamma = currot.gamma; // + 90.0;
+  l->party = party;
+  l->ttl = 80 * timestep;
+  l->shield = 1;
+  l->immunity = (int) (trafo.scaling.x * 12) * timestep;
+  l->source = this;
+  l->currot.phi = phi;
+  l->currot.theta = currot.theta;
+  initValues (l, phi);
   float fac = 0.7F;
-  laser->force.x += COS(laser->currot.gamma) * SIN(laser->currot.phi) * fac;
-  laser->force.y -= SIN(laser->currot.gamma) * fac;
-  laser->force.z += COS(laser->currot.gamma) * COS(laser->currot.phi) * fac;
-  laser->activate ();
+  l->force.x += COS(l->currot.gamma) * SIN(l->currot.phi) * fac;
+  l->force.y -= SIN(l->currot.gamma) * fac;
+  l->force.z += COS(l->currot.gamma) * COS(l->currot.phi) * fac;
+  l->activate ();
   firecannonttl += 45;
   if (day)
   {
     if (getPrototype ()->dualshot)
-      laser->o = Model3dRegistry::get ("Cannon1b");
+      l->o = Model3dRegistry::get ("Cannon1b");
     else
-      laser->o = Model3dRegistry::get ("Cannon1");
+      l->o = Model3dRegistry::get ("Cannon1");
   }
   else
   {
     if (getPrototype ()->dualshot)
-      laser->o = Model3dRegistry::get ("Cannon2b");
+      l->o = Model3dRegistry::get ("Cannon2b");
     else
-      laser->o = Model3dRegistry::get ("Cannon2");
+      l->o = Model3dRegistry::get ("Cannon2");
   }
 }
 
-void AIObj::fireCannon (DynamicObj **laser, float phi)
+void AIObj::fireCannon (std::vector<DynamicObj *> &laser, float phi)
 {
-  int i;
+  unsigned i;
   if (firecannonttl > 0) return;
   if (ammo == 0) return;
-  for (i = 0; i < maxlaser; i ++)
-  {
-    if (!laser [i]->active) break;
-  }
-  if (i < maxlaser)
-  {
-    fireCannon (laser [i], phi);
-  }
+  fireCannon (new DynamicObj (Cannon1Descriptor), phi);
 }
 
-void AIObj::fireCannon (DynamicObj **laser)
+void AIObj::fireCannon (std::vector<DynamicObj *> &laser)
 {
   if (firecannonttl > 0) return;
   if (ammo == 0) return;
   fireCannon (laser, currot.phi);
 }
 
-void AIObj::fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *target)
+void AIObj::fireMissile2 (AIObj *m, AIObj *target)
 {
   DISPLAY_DEBUG(FormatString ("Missile: party=%d, id=%d", party, id.id));
+  space->addObject (m);
+  m->space = space;
+  missile.push_back (m);
+
   ttf = 50 * timestep;
+/*  missile->id = id;
   missile->init ();
-  missile->newinit (id, party, 0);
-  initValues (missile, currot.phi);
-  missile->id = id;
-  missile->explode = 0;
-  missile->thrust = thrust + 0.001;
-  missile->recthrust = missile->getPrototype ()->maxthrust;
-  missile->currot.gamma = currot.gamma;
-  missile->target = target;
-  missile->recrot.gamma = currot.gamma;
-  missile->shield = 1;
-  missile->party = party;
-  missile->immunity = (45 + (int) (trafo.scaling.x * 6.0)) * timestep;
-  missile->dtheta = 0;
-  missile->dgamma = 0;
-  missile->source = this;
-  missile->activate ();
-  if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
+  missile->initPrototype ();
+  missile->newinit (id, party, 0);*/
+  initValues (m, currot.phi);
+//  missile->explode = 0;
+  m->thrust = thrust + 0.001;
+  m->recthrust = m->getPrototype ()->maxthrust;
+  m->currot.gamma = currot.gamma;
+  m->target = target;
+  m->recrot.gamma = currot.gamma;
+//  missile->shield = 1;
+  m->party = party;
+  m->immunity = (45 + (int) (trafo.scaling.x * 6.0)) * timestep;
+  m->dtheta = 0;
+  m->dgamma = 0;
+  m->source = this;
+//  missile->ttl = 300 * timestep;
+  m->activate ();
+  if (this->id >= FighterBeginDescriptor && this->id <= AirEndDescriptor)
   {
-    missile->manoeverheight = 30 * timestep;
-    missile->recheight = missile->trafo.translation.y - l->getHeight (missile->trafo.translation.x, missile->trafo.translation.z) - 4;
+    m->manoeverheight = 30 * timestep;
+    m->recheight = m->trafo.translation.y - l->getHeight (m->trafo.translation.x, m->trafo.translation.z) - 4;
   }
 }
 
@@ -1011,46 +1021,37 @@ void AIObj::decreaseMissile (const UnitDescriptor &id)
   }
 }
 
-bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile, AIObj *target)
+bool AIObj::fireMissile (const UnitDescriptor &id, std::vector<AIObj *> &missile, AIObj *target)
 {
-  int i;
   if (!haveMissile (id)) return false;
   if (ttf > 0) return false;
-  for (i = 0; i < maxmissile; i ++)
-  {
-    if (missile [i]->ttl <= 0) break;
-  }
-  if (i < maxmissile)
-  {
-    fireMissile2 (id, missile [i], target);
-    decreaseMissile (id);
-    firemissilettl = 20 * timestep;
-    return true;
-  }
-  return false;
+  fireMissile2 (new Missile (id), target);
+  decreaseMissile (id);
+  firemissilettl = 20 * timestep;
+  return true;
 }
 
-bool AIObj::fireMissile (AIObj **missile, AIObj *target)
+bool AIObj::fireMissile (std::vector<AIObj *> &missile, AIObj *target)
 {
   if (ttf > 0) return false;
   UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + missiletype);
   return fireMissile (desc, missile, (AIObj *) target);
 }
 
-bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile)
+bool AIObj::fireMissile (const UnitDescriptor &id, std::vector<AIObj *> &missile)
 {
   if (ttf > 0) return false;
   return fireMissile (id, missile, (AIObj *) target);
 }
 
-bool AIObj::fireMissile (AIObj **missile)
+bool AIObj::fireMissile (std::vector<AIObj *> &missile)
 {
   if (ttf > 0) return false;
   UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + missiletype);
   return fireMissile (desc, missile);
 }
 
-bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
+bool AIObj::fireMissileAir (std::vector<AIObj *> &missile, AIObj *target)
 {
   if (ttf > 0) return false;
   if (target->id >= MovingGroundBeginDescriptor) return false;
@@ -1063,7 +1064,7 @@ bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
   return false;
 }
 
-bool AIObj::selectMissileAir (AIObj **missile)
+bool AIObj::selectMissileAir (std::vector<AIObj *> &missile)
 {
   bool sel = false;
   if (haveMissile (AamHs3Descriptor))
@@ -1075,7 +1076,7 @@ bool AIObj::selectMissileAir (AIObj **missile)
   return sel;
 }
 
-bool AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
+bool AIObj::fireMissileAirFF (std::vector<AIObj *> &missile, AIObj *target)
 {
   if (ttf > 0) return false;
   if (target->id >= MovingGroundBeginDescriptor) return false;
@@ -1086,7 +1087,7 @@ bool AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
   return false;
 }
 
-bool AIObj::selectMissileAirFF (AIObj **missile)
+bool AIObj::selectMissileAirFF (std::vector<AIObj *> &missile)
 {
   bool sel = false;
   if (haveMissile (AamFf2Descriptor))
@@ -1096,7 +1097,7 @@ bool AIObj::selectMissileAirFF (AIObj **missile)
   return sel;
 }
 
-bool AIObj::fireMissileGround (AIObj **missile)
+bool AIObj::fireMissileGround (std::vector<AIObj *> &missile)
 {
   if (ttf > 0) return false;
   if (target->id < MovingGroundBeginDescriptor) return false;
@@ -1107,7 +1108,7 @@ bool AIObj::fireMissileGround (AIObj **missile)
   return false;
 }
 
-bool AIObj::selectMissileGround (AIObj **missile)
+bool AIObj::selectMissileGround (std::vector<AIObj *> &missile)
 {
   bool sel = false;
   if (haveMissile (Agm2Descriptor))
@@ -1117,12 +1118,11 @@ bool AIObj::selectMissileGround (AIObj **missile)
   return sel;
 }
 
-void AIObj::targetNearestGroundEnemy (AIObj **f)
+void AIObj::targetNearestGroundEnemy (std::vector<AIObj *> &f)
 {
-  int i;
   float d = 1E12; //10000 is too low
   ttf = 50 * timestep;
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < f.size (); i ++)
   {
     if (this != f [i] && party != f [i]->party && f [i]->active)
     {
@@ -1143,12 +1143,11 @@ void AIObj::targetNearestGroundEnemy (AIObj **f)
     { target = NULL; }
 }
 
-void AIObj::targetNearestEnemy (AIObj **f)
+void AIObj::targetNearestEnemy (std::vector<AIObj *> &f)
 {
-  int i;
   float d = 1E12; //10000 is too low
   ttf = 50 * timestep;
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < f.size (); i ++)
   {
     if (this != f [i] && party != f [i]->party && f [i]->active)
     {
@@ -1166,82 +1165,82 @@ void AIObj::targetNearestEnemy (AIObj **f)
       target = NULL;
 }
 
-void AIObj::targetLockingEnemy (AIObj **f)
+void AIObj::targetLockingEnemy (std::vector<AIObj *> &f)
 {
   int i;
   ttf = 50 * timestep;
   if (target == NULL) target = f [0];
-  for (i = 0; i < maxfighter; i ++)
+  for (i = 0; i < static_cast<int>(f.size ()); i ++)
     if (target == f [i])
       break;
   int z = 0;
   do
   {
     i ++;
-    if (i >= maxfighter) { i = 0; z ++; }
+    if (i >= static_cast<int>(f.size ())) { i = 0; z ++; }
   } while ((!f [i]->active || f [i]->party == party || f [i]->target != this || distance (f [i]) > 200) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
 
-void AIObj::targetNext (AIObj **f)
+void AIObj::targetNext (std::vector<AIObj *> &f)
 {
   int i;
   ttf = 50 * timestep;
   if (target == NULL) target = f [0];
-  for (i = 0; i < maxfighter; i ++)
+  for (i = 0; i < static_cast<int>(f.size ()); i ++)
     if (target == f [i])
       break;
   int z = 0;
   do
   {
     i ++;
-    if (i >= maxfighter) i = 0;
+    if (i >= static_cast<int>(f.size ())) i = 0;
     if (f [i] == this)
     { i ++; z ++; }
-    if (i >= maxfighter) i = 0;
+    if (i >= static_cast<int>(f.size ())) i = 0;
   } while ((!f [i]->active || distance (f [i]) > 400) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
 
-void AIObj::targetNextEnemy (AIObj **f)
+void AIObj::targetNextEnemy (std::vector<AIObj *> &f)
 {
   int i;
   ttf = 50 * timestep;
   if (target == NULL) target = f [0];
-  for (i = 0; i < maxfighter; i ++)
+  for (i = 0; i < static_cast<int>(f.size ()); i ++)
     if (target == f [i])
       break;
   int z = 0;
   do
   {
     i ++;
-    if (i >= maxfighter) i = 0;
+    if (i >= static_cast<int>(f.size ())) i = 0;
     if (f [i] == this)
     { i ++; z ++; }
-    if (i >= maxfighter) i = 0;
+    if (i >= static_cast<int>(f.size ())) i = 0;
   } while ((!f [i]->active || distance (f [i]) > 400 || party == f [i]->party) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
 }
 
-void AIObj::targetPrevious (AIObj **f)
+void AIObj::targetPrevious (std::vector<AIObj *> &f)
 {
   int i;
   ttf = 50 * timestep;
   if (target == NULL) target = f [0];
-  for (i = 0; i < maxfighter; i ++)
+  for (i = 0; i < static_cast<int>(f.size ()); i ++)
     if (target == f [i])
       break;
   int z = 0;
   do
   {
     i --;
-    if (i < 0) i = maxfighter - 1;
+    if (i < 0) i = static_cast<int>(f.size ()) - 1;
     if (f [i] == this)
     { i --; z ++; }
-    if (i < 0) i = maxfighter - 1;
+    if (i < 0) i = static_cast<int>(f.size ()) - 1;
   } while ((!f [i]->active || distance (f [i]) > 400) && z <= 1);
   target = f [i];
   if (z > 1 && !ai) target = NULL;
@@ -1279,7 +1278,7 @@ void AIObj::checkTtl (Uint32 dt)
   if (smokettl > 0) smokettl -= dt; // time to fire the next chaff
 }
 
-void AIObj::selectNewTarget (AIObj **f)
+void AIObj::selectNewTarget (std::vector<AIObj *> &f)
 {
   if (bomber)
     targetNearestGroundEnemy (f);
@@ -1287,7 +1286,7 @@ void AIObj::selectNewTarget (AIObj **f)
     targetNearestEnemy (f);
 }
 
-void AIObj::selectTarget (AIObj **f)
+void AIObj::selectTarget (std::vector<AIObj *> &f)
 {
   if (target == NULL)
   {
@@ -1464,7 +1463,7 @@ int AIObj::getFireRate ()
 }
 
 // core AI method
-void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
+void AIObj::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
 {
   timer += dt;
 
@@ -1751,7 +1750,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || id == CruiserDescriptor || id == LightDestroyerDescriptor || id == MobileSamDescriptor)
   {
     if (firecannonttl <= 0)
-      for (int i = 0; i < maxfighter; i ++)
+      for (unsigned i = 0; i < f.size (); i ++)
         if (f [i]->active && party != f [i]->party)
         {
           estimateFighterHeading (f [i]);

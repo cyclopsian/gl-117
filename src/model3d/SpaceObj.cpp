@@ -28,8 +28,8 @@
 
 SpaceObj::SpaceObj ()
 {
+  valid = true;
   o = 0L;
-//  alpha = 1;
   draw = 1;
   lum = 1;
   drawLight = true;
@@ -38,8 +38,8 @@ SpaceObj::SpaceObj ()
 
 SpaceObj::SpaceObj (const SpaceObj &that)
 {
+  valid = that.valid;
   o = that.o;
-//  alpha = that.alpha;
   draw = that.draw;
   lum = that.lum;
   drawLight = that.drawLight;

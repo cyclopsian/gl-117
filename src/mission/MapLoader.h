@@ -52,6 +52,7 @@ class MapLoader
 extern MapLoader *maploader;
 
 const int maxtext = 30;
+const int maxfighter = 30;
 
 class MissionCustom : public Mission
 {

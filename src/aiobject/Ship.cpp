@@ -47,7 +47,7 @@ Ship::~Ship ()
 }
 
 // core AI method
-void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
+void Ship::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
 {
   timer += dt;
 
@@ -145,7 +145,7 @@ void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
   if (id == CruiserDescriptor || id == LightDestroyerDescriptor)
   {
     if (firecannonttl <= 0)
-      for (int i = 0; i < maxfighter; i ++)
+      for (unsigned i = 0; i < f.size (); i ++)
         if (f [i]->active && party != f [i]->party)
         {
           estimateFighterHeading (f [i]);

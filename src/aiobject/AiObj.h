@@ -151,6 +151,7 @@ extern UnitDescriptor DepotDescriptor;
 extern UnitDescriptor LaserBarrierDescriptor;
 extern UnitDescriptor RubbleDescriptor;
 extern UnitDescriptor HouseDescriptor;
+extern UnitDescriptor ExplosionDescriptor;
 
 
 
@@ -173,6 +174,53 @@ class ObjectStatistics
       tankkills = 0;
       otherkills = 0;
       killed = false;
+    }
+};
+
+
+#include <time.h>
+
+template <typename TSpaceObj>
+class ObjectList : public std::vector<TSpaceObj>
+{
+  public:
+    clock_t timer;
+    
+    void cleanUp ()
+    {
+      clock_t timenow = clock ();
+      if (abs (timer - timenow) < 1000)
+        return;
+      timer = timenow;
+      
+      unsigned removed = 0;
+      for (unsigned i = 0; i < size (); i ++)
+      {
+        if (!operator[](i)->valid)
+        {
+          removed ++;
+        }
+        else if (removed)
+        {
+          operator[](i - removed) = operator[](i);
+        }
+      }
+      
+      for (unsigned i = 0; i < removed; i ++)
+        pop_back ();
+      
+/*      iterator it = begin ();
+      for (; it != end (); it ++)
+      {
+        if (!((*it)->valid))
+        {
+          bool test = space->removeObject (*it);
+          assert (test);
+          delete *it;
+          *it = NULL;
+          erase (it);
+        }
+      }*/
     }
 };
 
@@ -204,6 +252,7 @@ class DynamicUnitPrototype : public UnitPrototype
     float maxshield; ///< maximum shield
     Rotation maxrot; ///< only used for easymodel calculations, no use of getPrototype ()->maxrot.phi
     float maxzoom;
+    Vector3 cube;
 
     DynamicUnitPrototype (const UnitDescriptor &desc)
       : UnitPrototype (desc)
@@ -226,6 +275,20 @@ class DynamicUnitPrototype : public UnitPrototype
       maxrot.phi = 0; // no restriction for the heading
       if (!file->getFloat ("zoom", maxzoom))
         maxzoom = 0.35;
+      float xyzcube;
+      if (!file->getFloat ("cube", xyzcube))
+      {
+        if (!file->getFloat ("cubex", cube.x))
+          cube.x = 1.0;
+        if (!file->getFloat ("cubey", cube.y))
+          cube.y = 1.0;
+        if (!file->getFloat ("cubez", cube.z))
+          cube.z = 1.0;
+      }
+      else
+      {
+        cube.set (xyzcube, xyzcube, xyzcube);
+      }
     }
     
     virtual ~DynamicUnitPrototype ()
@@ -240,6 +303,7 @@ class AiUnitPrototype : public DynamicUnitPrototype
     bool dualshot;      ///< one or two cannons?
     int maxammo;
     int weight;
+    int maxttl;
     
     AiUnitPrototype (const UnitDescriptor &desc)
       : DynamicUnitPrototype (desc)
@@ -251,6 +315,8 @@ class AiUnitPrototype : public DynamicUnitPrototype
         maxammo = 0;
       if (!file->getInteger ("weight", weight))
         weight = 1000;
+      if (!file->getInteger ("ttl", maxttl))
+        maxttl = -1;
     }
 
     virtual ~AiUnitPrototype ()
@@ -337,6 +403,7 @@ class DynamicObj : public SpaceObj
     void activate ();
     void deactivate ();
     DynamicUnitPrototype *getPrototype ();
+    virtual void initPrototype ();
     virtual void init ();
     void thrustUp ();
     void thrustDown ();
@@ -410,39 +477,41 @@ class AIObj : public DynamicObj
     virtual ~AIObj ();
 
     AiUnitPrototype *getPrototype ();
-    virtual void init ();     ///< initialize variables
+    virtual void initPrototype ();     ///< initialize variables from prototype
+    virtual void init ();              ///< initialize variables
     void missileCount ();
     void newinit (const UnitDescriptor &id, int party, int intelligence, int precision, int aggressivity); ///< init new AI object
     void newinit (const UnitDescriptor & id, int party, int intelligence); ///< init new AI object (esp. non-fighter)
     void initValues (DynamicObj *dobj, float phi); ///< init values to shoot cannon or missile
     void fireCannon (DynamicObj *laser, float phi);
-    void fireCannon (DynamicObj **laser, float phi);
-    void fireCannon (DynamicObj **laser);
-    void fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *target);
+    void fireCannon (std::vector<DynamicObj *> &laser, float phi);
+    void fireCannon (std::vector<DynamicObj *> &laser);
+    void fireMissile2 (AIObj *m, AIObj *target);
+//    void fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *target);
     int firstMissile ();           ///< select first missile type
     int nextMissile (int from);    ///< select next missile type (cyclic)
     bool haveMissile (const UnitDescriptor &id);     ///< missile of type id left?
     bool haveMissile ();           ///< missile of type missiletype left?
     void decreaseMissile (const UnitDescriptor &id); ///< decrease missiles by one
-    bool fireMissile (const UnitDescriptor &id, AIObj **missile, AIObj *target);
-    bool fireMissile (AIObj **missile, AIObj *target);
-    bool fireMissile (const UnitDescriptor &id, AIObj **missile);
-    bool fireMissile (AIObj **missile);
-    bool fireMissileAir (AIObj **missile, AIObj *target);
-    bool selectMissileAir (AIObj **missile);
-    bool fireMissileAirFF (AIObj **missile, AIObj *target);
-    bool selectMissileAirFF (AIObj **missile);
-    bool fireMissileGround (AIObj **missile);
-    bool selectMissileGround (AIObj **missile);
-    void targetNearestGroundEnemy (AIObj **f);
-    void targetNearestEnemy (AIObj **f);
-    void targetNextEnemy (AIObj **f);
-    void targetLockingEnemy (AIObj **f);
-    void targetNext (AIObj **f);
-    void targetPrevious (AIObj **f);
+    bool fireMissile (const UnitDescriptor &id, std::vector<AIObj *> &missile, AIObj *target);
+    bool fireMissile (std::vector<AIObj *> &missile, AIObj *target);
+    bool fireMissile (const UnitDescriptor &id, std::vector<AIObj *> &missile);
+    bool fireMissile (std::vector<AIObj *> &missile);
+    bool fireMissileAir (std::vector<AIObj *> &missile, AIObj *target);
+    bool selectMissileAir (std::vector<AIObj *> &missile);
+    bool fireMissileAirFF (std::vector<AIObj *> &missile, AIObj *target);
+    bool selectMissileAirFF (std::vector<AIObj *> &missile);
+    bool fireMissileGround (std::vector<AIObj *> &missile);
+    bool selectMissileGround (std::vector<AIObj *> &missile);
+    void targetNearestGroundEnemy (std::vector<AIObj *> &f);
+    void targetNearestEnemy (std::vector<AIObj *> &f);
+    void targetNextEnemy (std::vector<AIObj *> &f);
+    void targetLockingEnemy (std::vector<AIObj *> &f);
+    void targetNext (std::vector<AIObj *> &f);
+    void targetPrevious (std::vector<AIObj *> &f);
     void setSmoke (Uint32 dt);
-    void selectNewTarget (AIObj **f);
-    void selectTarget (AIObj **f);
+    void selectNewTarget (std::vector<AIObj *> &f);
+    void selectTarget (std::vector<AIObj *> &f);
     void checkTtl (Uint32);
     float getMinimumHeight ();
     void easyPiloting (Uint32 dt);
@@ -452,7 +521,7 @@ class AIObj : public DynamicObj
     void estimateFighterHeading (AIObj *fi);
     void decreaseManoeverCounter (Uint32 dt);
     int getFireRate ();
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma); // core AI method
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma); // core AI method
 };
 
 class Missile : public AIObj
@@ -462,7 +531,7 @@ class Missile : public AIObj
     Missile (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Missile ();
 
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 class Tank : public AIObj
@@ -472,7 +541,7 @@ class Tank : public AIObj
     Tank (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Tank ();
 
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 class StaticAa : public AIObj
@@ -482,7 +551,7 @@ class StaticAa : public AIObj
     StaticAa (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~StaticAa ();
 
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 class StaticPassive : public AIObj
@@ -492,7 +561,7 @@ class StaticPassive : public AIObj
     StaticPassive (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~StaticPassive ();
 
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 class Ship : public AIObj
@@ -502,7 +571,7 @@ class Ship : public AIObj
     Ship (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Ship ();
 
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 class Fighter : public AIObj
@@ -515,13 +584,15 @@ class Fighter : public AIObj
     Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Fighter ();
 
+    FighterPrototype *getPrototype ();
+    virtual void initPrototype ();
     void fireFlare2 (DynamicObj *flare);
     void fireChaff2 (DynamicObj *chaff);
-    bool fireFlare (DynamicObj **flare, AIObj **missile);
-    bool fireChaff (DynamicObj **chaff, AIObj **missile);
+    bool fireFlare (std::vector<DynamicObj *> &flare, std::vector<AIObj *> &missile);
+    bool fireChaff (std::vector<DynamicObj *> &chaff, std::vector<AIObj *> &missile);
     bool performManoevers (float myheight);
     virtual void placeMissiles ();
-    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+    virtual void aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma);
 };
 
 #endif

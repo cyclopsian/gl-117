@@ -115,7 +115,7 @@ void Cockpit::drawCounter ()
   float xf = 2.8F, yf = -1.0F, zf = -4.0F, yf2 = -1.3F, xfl = 0.4F, yfl = 0.1F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   bool flarewarn = false, chaffwarn = false;
-  for (i = 0; i < maxmissile; i ++)
+  for (i = 0; i < missile.size (); i ++)
     if (missile [i]->active)
       if (missile [i]->target == fplayer)
       {
@@ -626,7 +626,6 @@ void Cockpit::drawWeapon ()
 
 void Cockpit::drawRadar ()
 {
-  int i;
   float yf = -4.2, zf = -7.0;
 
   gl.enableAlphaBlending ();
@@ -669,7 +668,7 @@ void Cockpit::drawRadar ()
   glEnd ();
   int radarzoom = 1;
   if (fplayer->disttarget < 40) radarzoom = 2;
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
     if (fighter [i] != fplayer && fighter [i]->active)
     {
       int aw = fplayer->getAngle (fighter [i]);
@@ -693,7 +692,7 @@ void Cockpit::drawRadar ()
         }
       }
     }
-  for (i = 0; i < maxmissile; i ++)
+  for (unsigned i = 0; i < missile.size (); i ++)
   {
     if (missile [i]->target == fplayer && missile [i]->active)
     {

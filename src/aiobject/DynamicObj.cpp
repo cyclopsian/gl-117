@@ -44,18 +44,20 @@ DynamicObj::DynamicObj (const UnitDescriptor &desc)
   proto = new DynamicUnitPrototype (id);
   
   init ();
+  initPrototype ();
 }
 
 DynamicObj::DynamicObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
 {
   id = desc;
   proto = new DynamicUnitPrototype (id);
-
-  init ();
-  
   space = space2;
   o = o2;
   trafo.scaling.set (zoom2, zoom2, zoom2);
+
+  init ();
+  initPrototype ();
+
   space->addObject (this);
 }
 
@@ -73,6 +75,7 @@ void DynamicObj::activate ()
 
 void DynamicObj::deactivate ()
 {
+  valid = false;
   active = false;
   draw = false;
 }
@@ -82,13 +85,17 @@ DynamicUnitPrototype *DynamicObj::getPrototype ()
   return proto;
 }
 
+void DynamicObj::initPrototype ()
+{
+  o = Model3dRegistry::get (id.name);
+  thrust = getPrototype ()->maxthrust;
+  shield = getPrototype ()->maxshield;
+  trafo.scaling.set (getPrototype ()->maxzoom, getPrototype ()->maxzoom, getPrototype ()->maxzoom);
+  o->cube.set (getPrototype ()->cube);
+}
+
 void DynamicObj::init ()
 {
-  if (proto)
-  {
-    thrust = proto->maxthrust;
-    shield = proto->maxshield;
-  }
   trafo.rotation.set (90.0, 0.0, 0.0);
   currot.set (180.0, 0.0, 0.0);
   recrot.set (0.0, 0.0, 0.0);
@@ -100,7 +107,7 @@ void DynamicObj::init ()
   recheight = 5.0;
   ttl = -1;
   immunity = 0;
-  id = Cannon1Descriptor.id;
+//  id = Cannon1Descriptor.id;
   source = NULL;
   party = 0;
   easymodel = 1; // easy model
@@ -345,22 +352,28 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 
 void DynamicObj::setExplosion (float maxzoom, int len)
 {
-  int i;
+  Explosion *expl = new Explosion (space, Model3dRegistry::get (ExplosionDescriptor.name));
+  space->addObject (expl);
+  explosion.push_back (expl);
+/*  int i;
   for (i = 0; i < maxexplosion; i ++) // search a free explosion instance
     if (explosion [i]->ttl <= 0)
       break;
-  if (i >= maxexplosion) i = 0;
-  explosion [i]->setExplosion (trafo.translation.x, trafo.translation.y, trafo.translation.z, force.x, force.y, force.z, maxzoom, len);
+  if (i >= maxexplosion) i = 0; */
+  expl->setExplosion (trafo.translation.x, trafo.translation.y, trafo.translation.z, force.x, force.y, force.z, maxzoom, len);
 }
 
 void DynamicObj::setBlackSmoke (float maxzoom, int len)
 {
-  int i;
+  BlackSmoke *bs = new BlackSmoke (space);
+  space->addObject (bs);
+  blacksmoke.push_back (bs);
+/*  int i;
   for (i = 0; i < maxblacksmoke; i ++) // search a free blacksmoke instance
     if (blacksmoke [i]->ttl <= 0)
       break;
-  if (i >= maxblacksmoke) i = 0;
-  blacksmoke [i]->setBlackSmoke (trafo.translation.x, trafo.translation.y, trafo.translation.z, currot.phi, maxzoom, len);
+  if (i >= maxblacksmoke) i = 0; */
+  bs->setBlackSmoke (trafo.translation.x, trafo.translation.y, trafo.translation.z, currot.phi, maxzoom, len);
 }
 
 // return heading difference towards enemy

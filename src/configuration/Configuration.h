@@ -90,15 +90,15 @@ extern int loglevel;
 
 // TODO: these constants should go somewhere else
 // maximum constants for objects
-const int maxexplosion = 30;
-const int maxfighter = 30;
-const int maxlaser = 150;
-const int maxmissile = 30;
+//const int maxexplosion = 30;
+//const int maxfighter = 30;
+//const int maxlaser = 150;
+//const int maxmissile = 30;
 const int maxstar = 70;
-const int maxgroundobj = 10;
-const int maxblacksmoke = 50;
-const int maxflare = 30;
-const int maxchaff = 30;
+//const int maxgroundobj = 10;
+//const int maxblacksmoke = 50;
+//const int maxflare = 30;
+//const int maxchaff = 30;
 
 // game states
 #define GAME_INIT 0

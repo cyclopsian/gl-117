@@ -70,14 +70,15 @@ Mission::Mission ()
 
 void Mission::playerInit ()
 {
-  space->removeObject (fighter [0]);
-  delete fighter [0];
-  fighter [0] = new Fighter (selfighter [wantfighter]);
-  fighter [0]->space = space;
-  space->addObject (fighter [0]);
+//  space->removeObject (fighter [0]);
+//  delete fighter [0];
+  Fighter *f = new Fighter (selfighter [wantfighter]);
+  f->space = space;
+  space->addObject (f);
+  fighter.push_back (f);
 
   int i;
-  fplayer = fighter [0];
+  fplayer = f;
   if (controls != 100)
     fplayer->easymodel = 2;
   fplayer->target = NULL;
@@ -153,8 +154,8 @@ void Mission::playerInit ()
   fplayer->missileCount ();
 
   // place missiles to racks
-  Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
-  if (f)
+//  Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+//  if (f)
     f->placeMissiles ();
 }
 
@@ -215,13 +216,14 @@ void Mission::selectMissiles (AIObj &aiobj)
 
 void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
 {
-  AIObj *aiobj = fighter [n];
-  space->removeObject (aiobj);
-  delete aiobj;
-  aiobj = new Fighter (fighterid);
+//  AIObj *aiobj = fighter [n];
+//  space->removeObject (aiobj);
+//  delete aiobj;
+  Fighter *aiobj = new Fighter (fighterid);
   aiobj->space = space;
   space->addObject (aiobj);
-  fighter [n] = aiobj;
+  fighter.push_back (aiobj);
+//  fighter [n] = aiobj;
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
   aiobj->easymodel = 1;
@@ -237,21 +239,23 @@ void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
   // place missiles to racks
   if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
-    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
-    if (f)
-      f->placeMissiles ();
+//    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+//    if (f)
+      aiobj->placeMissiles ();
   }
 }
 
 void Mission::objectInit (AIObj *aiobj, int party, int ailevel, int n)
 {
-  space->removeObject (fighter [n]);
-  delete fighter [n];
-  fighter [n] = aiobj;
-  fighter [n]->space = space;
-  space->addObject (fighter [n]);
+//  space->removeObject (aiobj);
+//  delete fighter [n];
+//  fighter [n] = aiobj;
+//  fighter [n]->space = space;
+  fighter.push_back (aiobj);
+  space->addObject (aiobj);
+  aiobj->space = space;
 
-  fighter [n]->newinit (aiobj->id, party, ailevel);
+  aiobj->newinit (aiobj->id, party, ailevel);
   
   selectMissiles (*aiobj);
 
@@ -287,8 +291,7 @@ void Mission::draw ()
 // however this function should let the player fly into the sun in a couple of missions
 void Mission::invertZ ()
 {
-  int i;
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
     fighter [i]->trafo.translation.z = -fighter [i]->trafo.translation.z;
     fighter [i]->currot.phi += 180;

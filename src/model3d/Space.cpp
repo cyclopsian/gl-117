@@ -60,7 +60,16 @@ void Space::addObject (SpaceObj *o)
 
 bool Space::removeObject (SpaceObj *o2)
 {
-  unsigned i, i2;
+  unsigned debugsize = o.size ();
+  std::vector <SpaceObj *>::iterator it = o.begin ();
+  for (; it != o.end (); it ++)
+    if (*it == o2)
+    {
+      o.erase (it);
+      return true;
+    }
+  return false;
+/*  unsigned i, i2;
   for (i = 0; i < o.size (); i ++)
     if (o [i] == o2)
     {
@@ -72,7 +81,7 @@ bool Space::removeObject (SpaceObj *o2)
       o.pop_back ();
       return true;
     }
-  return false;
+  return false;*/
 }
 
 void Space::removeAllObjects ()

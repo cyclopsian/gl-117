@@ -47,22 +47,23 @@ extern Texture *texradar1, *texradar2, *texarrow;
 
 extern PilotList *pilots; // other pilots of the Eagle Squad
 
-extern Explosion *explosion [maxexplosion];
-extern BlackSmoke *blacksmoke [maxblacksmoke];
+extern ObjectList<Explosion *> explosion;
+extern ObjectList<BlackSmoke *> blacksmoke;
 
 // all other models
-extern DynamicObj *flare [maxflare];
-extern DynamicObj *chaff [maxchaff];
-extern AIObj *missile [maxmissile];
-extern DynamicObj *laser [maxlaser];
-extern AIObj *fighter [maxfighter];
-extern Star *star [maxstar]; // the stars at night
-extern DynamicObj *groundobj [maxgroundobj];
+extern ObjectList<DynamicObj *> flare;
+extern ObjectList<DynamicObj *> chaff;
+extern ObjectList<AIObj *> missile;
+extern ObjectList<DynamicObj *> laser;
+extern ObjectList<AIObj *> fighter;
+//extern std::vector<AIObj *> fighter;
+extern ObjectList<Star *> star; // the stars at night
+extern ObjectList<DynamicObj *> groundobj;
 extern Flash *flash1; // the thunderstorm flash
 
 extern Space *space; // the scene (everything) without the landscape
 
-extern AIObj *fplayer; // the player itself
+extern AIObj *fplayer; // the player himself
 
 extern SoundSystem *sound;
 

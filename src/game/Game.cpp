@@ -130,8 +130,8 @@ Texture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
 
-Explosion *explosion [maxexplosion];
-BlackSmoke *blacksmoke [maxblacksmoke];
+ObjectList<Explosion *> explosion;
+ObjectList<BlackSmoke *> blacksmoke;
 GlLandscape *l = NULL;
 Font *font1, *font2;
 
@@ -142,13 +142,14 @@ Uint32 lasttime = 0;
 
 
 
-DynamicObj *flare [maxflare];
-DynamicObj *chaff [maxchaff];
-AIObj *missile [maxmissile];
-DynamicObj *laser [maxlaser];
-AIObj *fighter [maxfighter];
-Star *star [maxstar];
-DynamicObj *groundobj [maxgroundobj];
+ObjectList<DynamicObj *> flare;
+ObjectList<DynamicObj *> chaff;
+ObjectList<AIObj *> missile;
+ObjectList<DynamicObj *> laser;
+//std::vector<AIObj *> fighter;
+ObjectList<AIObj *> fighter;
+ObjectList<Star *> star;
+ObjectList<DynamicObj *> groundobj;
 Flash *flash1;
 
 Space *space;
@@ -566,10 +567,17 @@ void setLightSource (int gamma)
 
 int game_levelInit ()
 {
-  int i;
+  space->removeAllObjects ();
+
+  fighter.clear ();
+  laser.clear ();
+  missile.clear ();
+  flare.clear ();
+  chaff.clear ();
+  groundobj.clear ();
 
   // init all objects
-  for (i = 0; i < maxfighter; i ++)
+/*  for (unsigned i = 0; i < fighter.size (); i ++)
   {
     fighter [i]->init ();
     fighter [i]->explode = 0;
@@ -583,13 +591,13 @@ int game_levelInit ()
     fighter [i]->recrot.theta = 0;
     fighter [i]->o = Model3dRegistry::get (FalconDescriptor.name);
   }
-  for (i = 0; i < maxgroundobj; i ++)
+  for (i = 0; i < groundobj.size (); i ++)
   {
     groundobj [i]->init ();
     groundobj [i]->trafo.scaling.set (1, 1, 1);
     groundobj [i]->id = StaticPassiveBeginDescriptor;
     groundobj [i]->deactivate ();
-  }
+  }*/
 
 //  if (l != NULL) delete l;
   if (!multiplayer || isserver || !isserver) // clients do not need the mission
@@ -650,7 +658,7 @@ int game_levelInit ()
   }*/
 
   // initialize object's height over the surface
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->id >= AntiAircraftBeginDescriptor && fighter [i]->id <= AntiAircraftEndDescriptor)
     {
@@ -726,7 +734,7 @@ int game_levelInit ()
     }
   }
 
-  for (i = 0; i < maxlaser; i ++)
+/*  for (unsigned i = 0; i < laser.size (); i ++)
   {
     laser [i]->deactivate ();
     if (day)
@@ -742,25 +750,25 @@ int game_levelInit ()
     }
   }
 
-  for (i = 0; i < maxmissile; i ++)
+  for (i = 0; i < missile.size (); i ++)
   {
     missile [i]->init ();
     missile [i]->deactivate ();
   }
 
-  for (i = 0; i < maxflare; i ++)
+  for (i = 0; i < flare.size (); i ++)
   {
     flare [i]->init ();
     flare [i]->deactivate ();
   }
 
-  for (i = 0; i < maxchaff; i ++)
+  for (i = 0; i < chaff.size (); i ++)
   {
     chaff [i]->init ();
     chaff [i]->deactivate ();
-  }
+  } */
 
-  for (i = 0; i < maxstar; i ++)
+  for (unsigned i = 0; i < star.size (); i ++)
   {
     star [i]->phi = math.random (360);
     star [i]->gamma = math.random (85);
@@ -1232,28 +1240,28 @@ void Events::selectMissile ()
 void Events::targetNearest ()
 {
   if (!fplayer->active) return;
-  fplayer->targetNearestEnemy ((AIObj **) fighter);
+  fplayer->targetNearestEnemy (fighter);
   sound->play (SOUND_CLICK1, false);
 }
 
 void Events::targetNext ()
 {
   if (!fplayer->active) return;
-  fplayer->targetNext ((AIObj **) fighter);
+  fplayer->targetNext (fighter);
   sound->play (SOUND_CLICK1, false);
 }
 
 void Events::targetPrevious ()
 {
   if (!fplayer->active) return;
-  fplayer->targetPrevious ((AIObj **) fighter);
+  fplayer->targetPrevious (fighter);
   sound->play (SOUND_CLICK1, false);
 }
 
 void Events::targetLocking ()
 {
   if (!fplayer->active) return;
-  fplayer->targetLockingEnemy ((AIObj **) fighter);
+  fplayer->targetLockingEnemy (fighter);
   sound->play (SOUND_CLICK1, false);
 }
 
@@ -1521,36 +1529,36 @@ void drawArrow (float x, float y, float w, float h)
 
 int aktfighter = 0;
 
-Model3d *explsphere;
+//Model3d *explsphere;
 Sphere *mysphere;
 
 void game_quit ()
 {
-  int i;
+  unsigned i;
   volumesound = sound->volumesound;
   volumemusic = sound->volumemusic;
   conf.saveConfig ();
   conf.saveConfigInterface ();
   pilots->save (dirs.getSaves ("pilots"));
   DISPLAY_INFO("Pilots saved");
-  for (i = 0; i < maxlaser; i ++)
+  for (i = 0; i < laser.size (); i ++)
     delete (laser [i]);
-  for (i = 0; i < maxmissile; i ++)
+  for (i = 0; i < missile.size (); i ++)
     delete (missile [i]);
-  for (i = 0; i < maxflare; i ++)
+  for (i = 0; i < flare.size (); i ++)
     delete (flare [i]);
-  for (i = 0; i < maxchaff; i ++)
+  for (i = 0; i < chaff.size (); i ++)
     delete (chaff [i]);
-  for (i = 0; i < maxexplosion; i ++)
+  for (i = 0; i < explosion.size (); i ++)
     delete (explosion [i]);
-  for (i = 0; i < maxstar; i ++)
+  for (i = 0; i < star.size (); i ++)
     delete (star [i]);
-  for (i = 0; i < maxgroundobj; i ++)
+  for (i = 0; i < groundobj.size (); i ++)
     delete (groundobj [i]);
-  for (i = 0; i < maxblacksmoke; i ++)
+  for (i = 0; i < blacksmoke.size (); i ++)
     delete (blacksmoke [i]);
   delete pilots;
-  delete explsphere;
+//  delete explsphere;
   delete objsphere;
   delete sphere;
   delete flash1;
@@ -1700,25 +1708,16 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 // initialize game data
 void myInit ()
 {
-  int i, i2;
+//  int i, i2;
 
   // initialize all global variables
 
-  for (i = 0; i < maxgroundobj; i ++)
+/*  for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i] = new DynamicObj (TentDescriptor, space, Model3dRegistry::get (TentDescriptor.name), 3);
-  }
+  }*/
 
-  explsphere = new Sphere ();
-  ((Sphere *) explsphere)->init (1, 9);
-  Color explcolor (255, 255, 1);
-  explsphere->setColor (explcolor);
-  explsphere->alpha = true;
-  for (i = 0; i < explsphere->object [0]->numVertices; i ++)
-  {
-    explsphere->object [0]->vertex [i].color.set (math.random (100) + 155, math.random (100) + 100, 0, math.random (3) / 2 * 255);
-  }
-  for (i = 0; i < maxexplosion; i ++)
+/*  for (i = 0; i < maxexplosion; i ++)
   {
     explosion [i] = new Explosion (space, explsphere);
   }
@@ -1726,14 +1725,14 @@ void myInit ()
   for (i = 0; i < maxblacksmoke; i ++)
   {
     blacksmoke [i] = new BlackSmoke (space);
-  }
+  } */
 
   // TODO: will be removed
-  for (i = 0; i < maxfighter; i ++)
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
-    fighter [i] = new AIObj (FalconDescriptor, space, Model3dRegistry::get (FalconDescriptor.name), 0.4);
+    fighter.push_back (new AIObj (FalconDescriptor, space, Model3dRegistry::get (FalconDescriptor.name), 0.4));
     fighter [i]->ref.clear ();
-    for (i2 = 0; i2 < 12; i2 ++)
+    for (unsigned i2 = 0; i2 < 12; i2 ++)
       fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
   }
 
@@ -1752,30 +1751,30 @@ void myInit ()
   sphere->drawLight = false;
 
   flash1 = new Flash ();
-
-  for (i = 0; i < maxlaser; i ++)
+/*
+  for (unsigned i = 0; i < laser.size (); i ++)
   {
-    laser [i] = new DynamicObj (Cannon1Descriptor, space, Model3dRegistry::get ("Cannon1"), 0.07);
+    laser.push_back (new DynamicObj (Cannon1Descriptor, space, Model3dRegistry::get ("Cannon1"), 0.07));
   }
 
-  for (i = 0; i < maxmissile; i ++)
+  for (i = 0; i < missile.size (); i ++)
   {
-    missile [i] = new AIObj (AamHs1Descriptor, space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1);
+    missile.push_back (new AIObj (AamHs1Descriptor, space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1));
   }
 
-  for (i = 0; i < maxflare; i ++)
+  for (i = 0; i < flare.size (); i ++)
   {
-    flare [i] = new DynamicObj (FlareDescriptor, space, Model3dRegistry::get (FlareDescriptor.name), 0.1);
+    flare.push_bask (new DynamicObj (FlareDescriptor, space, Model3dRegistry::get (FlareDescriptor.name), 0.1));
   }
 
-  for (i = 0; i < maxchaff; i ++)
+  for (i = 0; i < chaff.size (); i ++)
   {
-    chaff [i] = new DynamicObj (ChaffDescriptor, space, Model3dRegistry::get (ChaffDescriptor.name), 0.1);
-  }
+    chaff.push_back (new DynamicObj (ChaffDescriptor, space, Model3dRegistry::get (ChaffDescriptor.name), 0.1));
+  }*/
 
-  for (i = 0; i < maxstar; i ++)
+  for (unsigned i = 0; i < star.size (); i ++)
   {
-    star [i] = new Star (math.random (360), math.random (85), 0.4 + 0.1 * math.random (8));
+    star.push_back (new Star (math.random (360), math.random (85), 0.4 + 0.1 * math.random (8)));
   }
 
   cockpit = new Cockpit ();
@@ -1999,6 +1998,17 @@ void myFirstInit ()
   model->scaleTexture (2.0, 2.0);
   initModel (RubbleDescriptor, "rubble.3ds");
   initModel (HouseDescriptor, "house1.3ds");
+
+  Sphere *explsphere = new Sphere ();
+  explsphere->init (1, 9);
+  Color explcolor (255, 255, 1);
+  explsphere->setColor (explcolor);
+  explsphere->alpha = true;
+  for (i = 0; i < explsphere->object [0]->numVertices; i ++)
+  {
+    explsphere->object [0]->vertex [i].color.set (math.random (100) + 155, math.random (100) + 100, 0, math.random (3) / 2 * 255);
+  }
+  Model3dRegistry::add (ExplosionDescriptor.name, explsphere);
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);

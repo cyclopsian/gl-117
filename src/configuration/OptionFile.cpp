@@ -98,7 +98,8 @@ bool OptionFile::getInteger (const std::string &name, int &value)
   std::string str;
   if (!getString (name, str)) return false;
   
-  return atoi (str.c_str ());
+  value = atoi (str.c_str ());
+  return true;
 }
 
 bool OptionFile::getFloat (const std::string &name, float &value)

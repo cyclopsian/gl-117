@@ -39,6 +39,7 @@ Fighter::Fighter (const UnitDescriptor &desc)
 {
   id = desc;
   proto = new FighterPrototype (id);
+  initPrototype ();
 }
 
 /*Fighter::Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
@@ -48,6 +49,21 @@ Fighter::Fighter (const UnitDescriptor &desc)
 
 Fighter::~Fighter ()
 {
+}
+
+void Fighter::initPrototype ()
+{
+  AIObj::initPrototype ();
+  
+  flares = getPrototype ()->maxflares;
+  chaffs = getPrototype ()->maxchaffs;
+}
+
+FighterPrototype *Fighter::getPrototype ()
+{
+  FighterPrototype *fproto = dynamic_cast<FighterPrototype *>(proto);
+  assert (fproto);
+  return fproto;
 }
 
 void Fighter::placeMissiles ()
@@ -122,21 +138,21 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
   chaff->trafo.scaling.set (0.12F, 0.12F, 0.12F);
 }
 
-bool Fighter::fireFlare (DynamicObj **flare, AIObj **missile)
+bool Fighter::fireFlare (std::vector<DynamicObj *> &flare, std::vector<AIObj *> &missile)
 {
-  int i, i2;
+  unsigned i, i2;
   if (flares <= 0) return false;
   if (fireflarettl > 0) return false;
-  for (i = 0; i < maxflare; i ++)
+  for (i = 0; i < flare.size (); i ++)
   {
     if (flare [i]->ttl <= 0) break;
   }
-  if (i < maxflare)
+  if (i < flare.size ())
   {
     fireFlare2 (flare [i]);
     flares --;
     fireflarettl = 8 * timestep;
-    for (i2 = 0; i2 < maxmissile; i2 ++)
+    for (i2 = 0; i2 < missile.size (); i2 ++)
     {
       if (missile [i2]->ttl > 0)
       {
@@ -165,21 +181,21 @@ bool Fighter::fireFlare (DynamicObj **flare, AIObj **missile)
   return false;
 }
 
-bool Fighter::fireChaff (DynamicObj **chaff, AIObj **missile)
+bool Fighter::fireChaff (std::vector<DynamicObj *> &chaff, std::vector<AIObj *> &missile)
 {
-  int i, i2;
+  unsigned i, i2;
   if (chaffs <= 0) return false;
   if (firechaffttl > 0) return false;
-  for (i = 0; i < maxchaff; i ++)
+  for (i = 0; i < chaff.size (); i ++)
   {
     if (chaff [i]->ttl <= 0) break;
   }
-  if (i < maxchaff)
+  if (i < chaff.size ())
   {
     fireChaff2 (chaff [i]);
     chaffs --;
     firechaffttl = 8 * timestep;
-    for (i2 = 0; i2 < maxmissile; i2 ++)
+    for (i2 = 0; i2 < missile.size (); i2 ++)
     {
       if (missile [i2]->ttl > 0)
       {
@@ -323,7 +339,7 @@ bool Fighter::performManoevers (float myheight)
 }
 
 // core AI method
-void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
+void Fighter::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
 {
   int i;
 
@@ -551,7 +567,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
 
   // fire flares and chaff
   if (manoevertheta <= 0)
-    for (i = 0; i < maxmissile; i ++)
+    for (unsigned i = 0; i < missile.size (); i ++)
       if (m [i]->ttl > 0)
         if (m [i]->target == this)
         {
@@ -860,7 +876,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
       int z1 = 0;
       if (disttarget < 15 && fabs (aw) < 20)
       {
-        for (i = 0; i < maxfighter; i ++)
+        for (unsigned i = 0; i < f.size (); i ++)
         {
           if (target == f [i]->target && party == f [i]->party) z1 ++;
         }
