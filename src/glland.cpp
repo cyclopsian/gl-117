@@ -710,7 +710,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
           if (hw [x] [ystep] < h1) h1 = hw [x] [ystep];
           if (hw [x] [ymstep] < h1) h1 = hw [x] [ymstep];
           if (hw [xstep] [ymstep] < h1) h1 = hw [xstep] [ymstep];
-          if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h1*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
+          if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h1*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2*step))
           {
             if (!last)
             {
