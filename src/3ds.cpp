@@ -211,6 +211,13 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 
       case MATMAPFILE:
         currentChunk->bytesRead += fread (model->material [model->numMaterials - 1]->filename, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        {
+          char* str=model->material [model->numMaterials - 1]->filename;
+          while (*str) {
+            if (*str >= 'A' && *str <= 'Z') *str = tolower (*str);
+            str++;
+          }
+        }
         break;
     
       default:  
@@ -401,11 +408,6 @@ void CLoad3DS::LoadTextures (CModel *model)
     {
       strcpy (str, dirs->getTextures (model->object [i]->material->filename));
 //			strcat (str, model->object [i]->material->filename);
-			for (i2 = 0; i2 < (int) strlen (str); i2 ++)
-      {
-        if (str [i2] >= 'A' && str [i2] <= 'Z')
-          str [i2] = tolower (str [i2]);
-			}
 			for (i2 = (int) strlen (str) - 1; i2 >= 0; i2 --)
 			{
         if (i2 > 2 && str [i2] == '.')
