@@ -532,7 +532,7 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 
 //  gl->shadeSmooth ();
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
@@ -681,7 +681,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   }
 
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
@@ -806,7 +806,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
@@ -886,7 +886,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
