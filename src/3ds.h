@@ -34,6 +34,7 @@
 #include "gl.h"
 #include "dirs.h"
 
+// abstract binary file representation in memory
 class BinaryFile
 {
   public:

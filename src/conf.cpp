@@ -19,9 +19,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/* This file contains all configuration parsing code. */
+
 #ifndef IS_CONF_H
 
 #include "conf.h"
+#include "dirs.h"
 
 int quality = 3;
 float view = 50.0;
@@ -150,6 +153,399 @@ void ConfigFile::writeText (char *str)
 void ConfigFile::close ()
 {
   fclose (out);
+}
+
+
+
+void save_config ()
+{
+  ConfigFile *cf = new ConfigFile ();
+  char *confname = dirs->getSaves ("conf");
+  fprintf (stdout, "\nSaving %s ", confname); fflush (stdout);
+  int ret1 = cf->openOutput (confname);
+  if (ret1 == 0)
+  {
+    fprintf (stderr, "\nCould not save configuration.");
+    fflush (stderr);
+    return;
+  }
+  cf->writeText ("# Configuration\n");
+  cf->writeText ("# Some possible width x height values for fullscreen mode:");
+  cf->writeText ("#  640x480, 800x600, 1024x768");
+  cf->write (" width", width);
+  cf->write (" height", height);
+  cf->writeText ("# Possible bits per pixel values (color depth):");
+  cf->writeText ("#  8 (not recommended), 16, 24, 32");
+  cf->write (" bpp", bpp);
+  cf->writeText ("# Try to go fullscreen = 1, game in window = 0");
+  cf->write (" fullscreen", fullscreen);
+  cf->writeText ("# Quality: 0=software rendered up to 5=best (default=2)");
+  cf->write (" quality", quality);
+  cf->writeText ("# Far clipping plane: 20..100 (default=50)");
+  cf->write (" view", (int) view);
+  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
+  cf->write (" dithering", dithering);
+#ifdef HAVE_SDL_MIXER
+  cf->writeText ("# Sound volume: 0..100 (default=100) per cent");
+  cf->write (" sound", (int) volumesound);
+  cf->writeText ("# Music volume: 0..100 (default=100) per cent");
+  cf->write (" music", (int) volumemusic);
+#endif
+  cf->writeText ("# Piloting controls: 0=keyboard, 1=mouse easy, 2=joystick, 3=mouse reverse");
+  cf->write (" controls", controls);
+  cf->writeText ("# Difficulty level: 0=easy, 1=medium, 2=hard");
+  cf->write (" difficulty", difficulty);
+  cf->writeText ("\n# This file is meant to give sensible startup settings");
+  cf->writeText ("# as graphic cards and drivers may differ some 100 times in speed");
+  cf->writeText ("\n# To get back to default settings, just delete this file!");
+  cf->close ();
+  delete cf;
+}
+
+int load_config ()
+{
+  char ret [256];
+  char *str;
+  char *confname = dirs->getSaves ("conf");
+  fprintf (stdout, "\nLoading %s ", confname); fflush (stdout);
+  ConfigFile *cf = new ConfigFile (confname);
+
+  str = cf->getString (ret, "width");
+  if (str == NULL)
+  { width = 800; }
+  else
+  { width = atoi (str); }
+  if (width < 100) width = 100;
+  else if (width > 3000) width = 3000;
+
+  str = cf->getString (ret, "height");
+  if (str == NULL)
+  { height = 600; }
+  else
+  { height = atoi (str); }
+  if (height < 100) height = 100;
+  else if (height > 2000) height = 2000;
+
+  str = cf->getString (ret, "bpp");
+  if (str == NULL)
+  { bpp = 32; }
+  else
+  { bpp = atoi (str); }
+  if (bpp != 8 && bpp != 16 && bpp != 24 && bpp != 32)
+    bpp = 32;
+
+  str = cf->getString (ret, "fullscreen");
+  if (str == NULL)
+  { fullscreen = 1; }
+  else
+  { fullscreen = atoi (str); }
+  if (fullscreen) fullscreen = 1;
+
+  str = cf->getString (ret, "quality");
+  if (str == NULL)
+  { quality = 2; }
+  else
+  { quality = atoi (str); }
+  if (quality < 0) quality = 0;
+  else if (quality > 5) quality = 5;
+
+  str = cf->getString (ret, "view");
+  if (str == NULL)
+  { view = 50; }
+  else
+  { view = atoi (str); }
+  if (view < 20)
+  {
+    view = 20;
+//    firststart = true;
+  }
+  else if (view > 100)
+  {
+    view = 100;
+  }
+
+  str = cf->getString (ret, "dithering");
+  dithering = (str == NULL) ? 1 : atoi (str);
+  if (dithering) dithering = 1;
+
+#ifdef HAVE_SDL_MIXER
+  str = cf->getString (ret, "sound");
+  if (str == NULL)
+  { volumesound = 100; }
+  else
+  { volumesound = atoi (str); }
+  if (volumesound < 0) volumesound = 0;
+  else if (volumesound > 100) volumesound = 100;
+
+  str = cf->getString (ret, "music");
+  if (str == NULL)
+  { volumemusic = 100; }
+  else
+  { volumemusic = atoi (str); }
+  if (volumemusic < 0) volumemusic = 0;
+  else if (volumemusic > 100) volumemusic = 100;
+#endif
+
+  str = cf->getString (ret, "controls");
+  if (str == NULL)
+  { controls = CONTROLS_MOUSE; }
+  else
+  { controls = atoi (str); }
+  if (controls < 0) controls = 0;
+  else if (controls > 4) controls = 0;
+
+  str = cf->getString (ret, "difficulty");
+  if (str == NULL)
+  { difficulty = 1; }
+  else
+  { difficulty = atoi (str); }
+  if (difficulty < 0) difficulty = 0;
+  else if (difficulty > 2) difficulty = 0;
+
+  if (cf->buf [0] == 0) // no file found
+  {
+    delete cf;
+    return 0;
+  }
+
+  delete cf;
+  return 1;
+}
+
+void save_configInterface ()
+{
+  ConfigFile *cf = new ConfigFile ();
+  char *confname = dirs->getSaves ("conf.interface");
+  fprintf (stdout, "\nSaving %s ", confname); fflush (stdout);
+  int ret1 = cf->openOutput (confname);
+  if (ret1 == 0)
+  {
+    fprintf (stderr, "\nCould not save interface configuration.");
+    fflush (stderr);
+    return;
+  }
+  cf->writeText ("# Interface configuration\n");
+  cf->writeText ("# ---------------------------------------------------------------------");
+  cf->writeText ("# Keyboard section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# Use ASCII-Code values to remap");
+  cf->writeText ("#  8=BACKSPACE, 13=ENTER, 32=SPACE, 65=A...90=Z (NOT case sensitive)");
+  cf->write (" key_firecannon", key_firecannon);
+  cf->write (" key_firemissile", key_firemissile);
+  cf->write (" key_dropflare", key_dropflare);
+  cf->write (" key_dropchaff", key_dropchaff);
+  cf->write (" key_selectmissile", key_selectmissile);
+  cf->write (" key_targetnearest", key_targetnearest);
+  cf->write (" key_targetnext", key_targetnext);
+  cf->write (" key_targetprevious", key_targetprevious);
+  cf->writeText ("# All other piloting keys (CURSORS, PGUP/DN) are fixed.");
+  cf->writeText ("\n# ---------------------------------------------------------------------");
+  cf->writeText ("# Mouse section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# Buttons: 1=Left, 2=Middle, 3=Right");
+  int mousebutton = 1;
+  if (mouse_firecannon == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_firecannon == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_firecannon", mousebutton);
+  if (mouse_firemissile == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_firemissile == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_firemissile", mousebutton);
+  if (mouse_selectmissile == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_selectmissile == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_selectmissile", mousebutton);
+  cf->writeText ("\n# ---------------------------------------------------------------------");
+  cf->writeText ("# Joystick section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# The number of axis, buttons, and the coolie hat depends on your joystick!");
+  cf->writeText ("# Axis: 0...MAX-1 (maybe 0=aileron 1=elevator 2=throttle 3=rudder)");
+  cf->write (" joystick_aileron", joystick_aileron);
+  cf->write (" joystick_elevator", joystick_elevator);
+  cf->write (" joystick_throttle", joystick_throttle);
+  cf->write (" joystick_rudder", joystick_rudder);
+  cf->writeText ("\n# Buttons: 0...MAX-1");
+  cf->write (" joystick_firecannon", joystick_firecannon);
+  cf->write (" joystick_firemissile", joystick_firemissile);
+  cf->writeText ("# Dropping chaff AND flare may be preferred");
+  cf->write (" joystick_dropflare", joystick_dropflare);
+  cf->write (" joystick_dropchaff", joystick_dropchaff);
+  cf->writeText ("\n# Buttons: 0...MAX-1, Coolie: 100=Right, 101=Up, 102=Left, 103=Down");
+  cf->write (" joystick_selectmissile", joystick_selectmissile);
+  cf->write (" joystick_targetnearest", joystick_targetnearest);
+  cf->write (" joystick_targetnext", joystick_targetnext);
+  cf->write (" joystick_targetprevious", joystick_targetprevious);
+  cf->writeText ("\n# This file is meant to give sensible custom interface settings");
+  cf->writeText ("\n# To get back to default settings, just delete this file!");
+  cf->close ();
+  delete cf;
+}
+
+int load_configInterface ()
+{
+  char ret [256];
+  char *str;
+  char *confname = dirs->getSaves ("conf.interface");
+  fprintf (stdout, "\nLoading %s ", confname); fflush (stdout);
+  ConfigFile *cf = new ConfigFile (confname);
+
+  str = cf->getString (ret, "key_firecannon");
+  if (str == NULL)
+  { key_firecannon = 32; }
+  else
+  { key_firecannon = atoi (str); }
+
+  str = cf->getString (ret, "key_firemissile");
+  if (str == NULL)
+  { key_firemissile = 13; }
+  else
+  { key_firemissile = atoi (str); }
+
+  str = cf->getString (ret, "key_dropchaff");
+  if (str == NULL)
+  { key_dropchaff = 'C'; }
+  else
+  { key_dropchaff = atoi (str); }
+
+  str = cf->getString (ret, "key_dropflare");
+  if (str == NULL)
+  { key_dropflare = 'F'; }
+  else
+  { key_dropflare = atoi (str); }
+
+  str = cf->getString (ret, "key_selectmissile");
+  if (str == NULL)
+  { key_selectmissile = 'M'; }
+  else
+  { key_selectmissile = atoi (str); }
+
+  str = cf->getString (ret, "key_targetnearest");
+  if (str == NULL)
+  { key_targetnearest = 'E'; }
+  else
+  { key_targetnearest = atoi (str); }
+
+  str = cf->getString (ret, "key_targetnext");
+  if (str == NULL)
+  { key_targetnext = 'T'; }
+  else
+  { key_targetnext = atoi (str); }
+
+  str = cf->getString (ret, "key_targetprevious");
+  if (str == NULL)
+  { key_targetprevious = 'P'; }
+  else
+  { key_targetprevious = atoi (str); }
+
+  int mousebutton = 1;
+  str = cf->getString (ret, "mouse_firecannon");
+  if (str == NULL)
+  { mousebutton = 1; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_firecannon = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_firecannon = MOUSE_BUTTON_RIGHT;
+  else mouse_firecannon = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "mouse_firemissile");
+  if (str == NULL)
+  { mousebutton = 3; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_firemissile = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_firemissile = MOUSE_BUTTON_RIGHT;
+  else mouse_firemissile = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "mouse_selectmissile");
+  if (str == NULL)
+  { mousebutton = 2; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_selectmissile = MOUSE_BUTTON_RIGHT;
+  else mouse_selectmissile = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "joystick_aileron");
+  if (str == NULL)
+  { joystick_aileron = 0; }
+  else
+  { joystick_aileron = atoi (str); }
+
+  str = cf->getString (ret, "joystick_elevator");
+  if (str == NULL)
+  { joystick_elevator = 1; }
+  else
+  { joystick_elevator = atoi (str); }
+
+  str = cf->getString (ret, "joystick_throttle");
+  if (str == NULL)
+  { joystick_throttle = 2; }
+  else
+  { joystick_throttle = atoi (str); }
+
+  str = cf->getString (ret, "joystick_rudder");
+  if (str == NULL)
+  { joystick_rudder = 3; }
+  else
+  { joystick_rudder = atoi (str); }
+
+  str = cf->getString (ret, "joystick_firecannon");
+  if (str == NULL)
+  { joystick_firecannon = 0; }
+  else
+  { joystick_firecannon = atoi (str); }
+
+  str = cf->getString (ret, "joystick_firemissile");
+  if (str == NULL)
+  { joystick_firemissile = 2; }
+  else
+  { joystick_firemissile = atoi (str); }
+
+  str = cf->getString (ret, "joystick_dropchaff");
+  if (str == NULL)
+  { joystick_dropchaff = 3; }
+  else
+  { joystick_dropchaff = atoi (str); }
+
+  str = cf->getString (ret, "joystick_dropflare");
+  if (str == NULL)
+  { joystick_dropflare = 3; }
+  else
+  { joystick_dropflare = atoi (str); }
+
+  str = cf->getString (ret, "joystick_selectmissile");
+  if (str == NULL)
+  { joystick_selectmissile = 1; }
+  else
+  { joystick_selectmissile = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetnearest");
+  if (str == NULL)
+  { joystick_targetnearest = 101; }
+  else
+  { joystick_targetnearest = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetnext");
+  if (str == NULL)
+  { joystick_targetnext = 100; }
+  else
+  { joystick_targetnext = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetprevious");
+  if (str == NULL)
+  { joystick_targetprevious = 102; }
+  else
+  { joystick_targetprevious = atoi (str); }
+
+  if (cf->buf [0] == 0) // no file found
+  {
+    delete cf;
+    return 0;
+  }
+
+  delete cf;
+  return 1;
 }
 
 #endif

@@ -29,6 +29,7 @@
 #include "model.h"
 #include "effects.h"
 
+// id values of objects
 #define CANNON1 0
 #define FLARE1 80
 #define CHAFF1 85

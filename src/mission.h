@@ -19,6 +19,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/* This file contains all mission data and definitions. */
+
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
 
@@ -63,28 +65,28 @@ class Mission
   void autoLFBriefing ();
 
   public:
-  int timer;
-  int maxtime;
-  int alliedfighters;
-  char briefing [1000];
-  char name [64];
-  int id;
-  int selfighter [3];
-  int selfighters, wantfighter;
-  int selweapon [3];
-  int selweapons, wantweapon;
-  int alliedpilot [10];
-  CColor textcolor;
-  int difficulty;
-  int heading;
+  int timer; // mission timer
+  int maxtime; // maximum time to get a time bonus
+  int alliedfighters; // number of allied fighters
+  char briefing [1000]; // briefing text
+  char name [64]; // mission title
+  int id; // mission id
+  int selfighter [3]; // fighter to choose
+  int selfighters, wantfighter; // selected fighter
+  int selweapon [3]; // weapon pack to choose
+  int selweapons, wantweapon; // selected weapon pack
+  int alliedpilot [10]; // id of allied pilots
+  CColor textcolor; // standard text color to blend in during flight
+  int difficulty; // difficulty level for THIS mission
+  int heading; // define northern direction (the sun is at 0 degree)
 
   Mission ();
   void playerInit ();
   void alliedInit (int fighterid, int pilotid, AIObj *aiobj);
   void init ();
-  virtual void start ();
-  virtual int processtimer ();
-  virtual void draw ();
+  virtual void start (); // custom definitions for a mission
+  virtual int processtimer (); // custom definitions controlled by the timer, mission success/failure
+  virtual void draw (); // custom definitions that have to be drawn
   void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate);
@@ -309,5 +311,8 @@ class MissionMultiDogfight1 : public Mission
   virtual int processtimer ();
   virtual void draw ();
 };
+
+extern Mission *mission;
+extern Mission *missionnew;
 
 #endif

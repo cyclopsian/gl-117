@@ -1370,7 +1370,7 @@ bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             if (hit)
             {
-              if (debug == 1) printf ("\n missile to flare");
+              if (debug == 1) { printf ("\n missile to flare"); fflush (stdout); }
               missile [i2]->target = flare [i];
             }
           }
@@ -1413,7 +1413,7 @@ bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             if (hit)
             {
-              if (debug == 1) printf ("\n missile to chaff");
+              if (debug == 1) { printf ("\n missile to chaff"); fflush (stdout); }
               missile [i2]->target = chaff [i];
             }
           }

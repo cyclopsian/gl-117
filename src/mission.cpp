@@ -19,6 +19,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/* This file contains all mission data and definitions. */
+
 #ifndef IS_MISSION_H
 
 #include "mission.h"

@@ -1,7 +1,9 @@
 %define name gl-117
 %define version 0.8
 
-Summary: An Action Flight Simulation
+Summary: An OpenGL and SDL based action flight simulator
+Summary(de): Ein OpenGL- und SDL-basierter Flugsimulator
+Summary(pl): Zrêczno¶ciowy symulator lotu u¿ywaj±cy OpenGL i SDL
 Name: %{name}
 Version: %{version}
 Release: 1
@@ -14,7 +16,25 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: /var/tmp/%{name}-%{version}
 
 %description
-GL-117 is an action flight simulator for Linux/Unix and MSWindows. Enter the Eagle Squadron and succeed in several challanging missions leading though different landscapes. Five predefined levels of video quality and an amount of viewing ranges let you perfectly adjust the game to the performance of your system. Joystick, mouse, sound effects, music... 
+GL-117 is an OpenGL and SDL-based action flight simulator written in
+C++. It provides a random terrain generator, lighting effects, sounds,
+and joystick support. Predefined levels of video quality and an amount
+of viewing ranges let you perfectly adjust the game to the performance
+of your system.
+
+%description -l de
+GL-117 ist ein in C++ entwickelter, OpenGL- und SDL-basierter
+Action-Flugsimulator. Neben per Zufall erzeugten Landschaften besticht
+das Spiel durch Lichteffekte, Sound und Joystickunterstützung. Anhand
+vordefinierter Qualitätsstufen lässt sich die Grafik optimal an die
+Leistung des eigenen Systems anpassen.
+
+%description -l pl
+GL-117 jest zrêczno¶ciowym symulatorem lotu napisanym w C++,
+wykorzystuj±cym biblioteki OpenGL i SDL. Posiada obs³ugê joysticka,
+d¼wiêk, losowo generowany teren, efekty ¶wietlne. Predefiniowane
+poziomy jako¶ci obrazu oraz szeroki zakres ustawieñ widoczno¶ci
+pozwalaj± idealnie dopasowaæ grê do wydajno¶ci systemu.
 
 %prep
 %setup
@@ -44,8 +64,6 @@ rm -rf $RPM_BUILD_DIR/gl-117
 rm -rf ../file.list.gl-117
 
 %files -f ../file.list.gl-117
-
-
 
 
 

@@ -47,11 +47,13 @@ const int maxpilotdata = 100;
 class TeamPilot
 {
   public:
-  int ranking;
-  char name [100];
-  char fullname [100];
-  int intelligence, precision, aggressivity;
-  int fighterkills;
+  int ranking; // 0=lowest ranking
+  char name [100]; // pilot nickname
+  char fullname [100]; // pilot full name
+  int intelligence; // intelligence, knowledge on piloting and manoevers
+  int precision; // precision, reaction
+  int aggressivity; // stay close behind the enemy, more firing tolerance
+  int fighterkills; // number of fighter kills for the pilot ranking
   TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills);
   void flyMission (int averagekills);
   char *getRank ();
@@ -64,17 +66,17 @@ class Pilot
 {
   public:
   char name [16];
-  int mission_state [maxpilotdata];
-  int mission_time [maxpilotdata];
+  int mission_state [maxpilotdata]; // success/failure
+  int mission_time [maxpilotdata]; // time spent on the mission
   int mission_fighterkills [maxpilotdata];
   int mission_shipkills [maxpilotdata];
   int mission_tankkills [maxpilotdata];
   int mission_otherkills [maxpilotdata];
-  int mission_shield [maxpilotdata];
-  int mission_points [maxpilotdata];
-  int mission_score [maxpilotdata];
-  int ranking;
-  TeamPilot **tp;
+  int mission_shield [maxpilotdata]; // shield left
+  int mission_points [maxpilotdata]; // extra points for hitting a target
+  int mission_score [maxpilotdata]; // overall score (calculated)
+  int ranking; // current ranking (calculated due to all scores)
+  TeamPilot **tp; // team pilots
 
   void load ();
   void save ();

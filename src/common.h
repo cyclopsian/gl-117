@@ -68,19 +68,19 @@ extern int volumesound;
 extern int volumemusic;
 extern int dithering;
 
-// mouse coordinates
+// current mouse coordinates
 extern int mousex, mousey;
 
-extern int debug;
+extern int debug; // debug mode (1=counter measures)
 extern bool multiplayer, isserver;
 extern int fullscreen;
 extern int day;
 extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
 extern float sungamma; // angle of sunrays dropping on horizon
 
-extern int camera;
-extern float camx, camy, camz;
-extern float camphi, camgamma, camtheta; // phi: x-z, theta: x-y, gamma: y-z
+extern int camera; // camera type (0=cockpit, 1=chase, 2=backward, ...)
+extern float camx, camy, camz; // camera translation
+extern float camphi, camgamma, camtheta; // phi: x-z, theta: roll, gamma: y-z
 extern float sunlight;
 
 extern int lighting; // 1=on, 0=off
@@ -91,19 +91,22 @@ extern float getView (); // return view dependant on weather
 // maximum allocation values
 //extern const int maxexplosion, maxfighter, maxlaser, maxmissile, maxstar, maxgroundobj;
 
-extern int difficulty;
+extern int difficulty; // 0=easy, 1=normal, 2=hard
 
 extern bool sunblinding;
 
 extern int clouds;
 
-extern int controls;
+extern int controls; // see CONTROLS-constants
+
+extern int game; // see GAME-constants
 
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
 //#define SIN(x) sine[(int)x]
 //#define COS(x) cosi[(int)x]
 
+// exact sine, cosine functions
 #define SIN(x) sin(x*PI/180.0)
 #define COS(x) cos(x*PI/180.0)
 

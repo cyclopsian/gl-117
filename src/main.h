@@ -54,20 +54,22 @@
 #include "pilots.h"
 #include "conf.h"
 #include "mission.h"
+#include "cockpit.h"
 
 extern Server *server;
 extern Client *client;
 
 extern CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+extern CTexture *texradar1, *texradar2, *texcounter;
 
-extern PilotList *pilots;
+extern PilotList *pilots; // other pilots of the Eagle Squad
 
 extern CExplosion *explosion [maxexplosion];
 extern CBlackSmoke *blacksmoke [maxblacksmoke];
 extern Font *font1, *font2;
 
 extern CLoad3DS g_Load3ds;
-extern CModel model_fig;
+extern CModel model_fig; // fighter models
 extern CModel model_figa;
 extern CModel model_figb;
 extern CModel model_figc;
@@ -77,6 +79,7 @@ extern CModel model_figf;
 extern CModel model_figg;
 extern CModel model_figh;
 extern CModel model_figt;
+
 extern CModel model_cannon1;
 extern CModel model_cannon2;
 extern CModel model_flare1;
@@ -116,14 +119,17 @@ extern DynamicObj *chaff [maxchaff];
 extern AIObj *missile [maxmissile];
 extern DynamicObj *laser [maxlaser];
 extern AIObj *fighter [maxfighter];
-extern Star *star [maxstar];
+extern Star *star [maxstar]; // the stars at night
 extern DynamicObj *groundobj [maxgroundobj];
-extern Flash *flash1;
+extern Flash *flash1; // the thunderstorm flash
 
-extern Space *space;
+extern Space *space; // the scene (everything) without the landscape
 
-extern AIObj *fplayer;
+extern AIObj *fplayer; // the player itself
 
+extern SoundSystem *sound;
+
+// get name of a keyboard's key (ENTER, SPACE)
 extern char *getKeyString (int key, char *str);
 
 #endif

@@ -44,10 +44,10 @@ class Dirs
   char sound [4096];
   char models [4096];
 
-  void append (char *target, char *str);
+  void append (char *target, char *str); // append subdir/file to path using (back-)slashes
   Dirs (char *arg);
   ~Dirs ();
-  char *getSaves (char *name);
+  char *getSaves (char *name); // get dir name containing the saves, ...
   char *getTextures (char *name);
   char *getSounds (char *name);
   char *getMusic (char *name);

@@ -77,7 +77,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 AUTOMAKE_OPTIONS = gnu
 bin_PROGRAMS = gl-117
-gl_117_SOURCES = main.cpp gl.cpp model.cpp 3ds.cpp audio.cpp land.cpp glland.cpp aiobject.cpp effects.cpp roam.cpp net.cpp mathtab.cpp dirs.cpp objload.cpp pilots.cpp loader_tga.cpp object.cpp conf.cpp mission.cpp
+gl_117_SOURCES = main.cpp gl.cpp model.cpp 3ds.cpp audio.cpp land.cpp glland.cpp aiobject.cpp effects.cpp roam.cpp net.cpp mathtab.cpp dirs.cpp objload.cpp pilots.cpp loader_tga.cpp object.cpp conf.cpp mission.cpp cockpit.cpp
 noinst_HEADERS = 
 DEFS = -I. -I..
 subdir = src
@@ -92,7 +92,8 @@ am_gl_117_OBJECTS = main.$(OBJEXT) gl.$(OBJEXT) model.$(OBJEXT) \
 	aiobject.$(OBJEXT) effects.$(OBJEXT) roam.$(OBJEXT) \
 	net.$(OBJEXT) mathtab.$(OBJEXT) dirs.$(OBJEXT) \
 	objload.$(OBJEXT) pilots.$(OBJEXT) loader_tga.$(OBJEXT) \
-	object.$(OBJEXT) conf.$(OBJEXT) mission.$(OBJEXT)
+	object.$(OBJEXT) conf.$(OBJEXT) mission.$(OBJEXT) \
+	cockpit.$(OBJEXT)
 gl_117_OBJECTS = $(am_gl_117_OBJECTS)
 gl_117_LDADD = $(LDADD)
 gl_117_DEPENDENCIES =
@@ -104,15 +105,15 @@ LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/3ds.Po ./$(DEPDIR)/aiobject.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/audio.Po ./$(DEPDIR)/conf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/dirs.Po ./$(DEPDIR)/effects.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/gl.Po ./$(DEPDIR)/glland.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/land.Po ./$(DEPDIR)/loader_tga.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/mathtab.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mission.Po ./$(DEPDIR)/model.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/net.Po ./$(DEPDIR)/object.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/objload.Po ./$(DEPDIR)/pilots.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/roam.Po
+@AMDEP_TRUE@	./$(DEPDIR)/audio.Po ./$(DEPDIR)/cockpit.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conf.Po ./$(DEPDIR)/dirs.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/effects.Po ./$(DEPDIR)/gl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/glland.Po ./$(DEPDIR)/land.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/loader_tga.Po ./$(DEPDIR)/main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mathtab.Po ./$(DEPDIR)/mission.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/model.Po ./$(DEPDIR)/net.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/object.Po ./$(DEPDIR)/objload.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/pilots.Po ./$(DEPDIR)/roam.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -171,6 +172,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3ds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aiobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/audio.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cockpit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dirs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/effects.Po@am__quote@

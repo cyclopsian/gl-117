@@ -19,6 +19,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/* This file contains all configuration parsing code. */
+
 #ifndef IS_CONF_H
 #define IS_CONF_H
 
@@ -29,6 +31,7 @@
 
 #include "common.h"
 
+// interface definitions
 extern unsigned char key_firecannon, key_firemissile, key_dropchaff, key_dropflare;
 extern unsigned char key_selectmissile;
 extern unsigned char key_targetnearest, key_targetnext, key_targetprevious;
@@ -41,6 +44,7 @@ extern unsigned char joystick_aileron, joystick_elevator, joystick_rudder, joyst
 extern unsigned char mouse_firecannon, mouse_firemissile;
 extern unsigned char mouse_selectmissile;
 
+// the abstract config file as text file in memory
 class ConfigFile
 {
   public:
@@ -58,5 +62,11 @@ class ConfigFile
   void writeText (char *str);
   void close ();
 };
+
+// special config files of GL-117
+extern void save_config ();
+extern int load_config ();
+extern void save_configInterface ();
+extern int load_configInterface ();
 
 #endif

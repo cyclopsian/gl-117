@@ -23,6 +23,8 @@
 
 /* Look at http://tom.4president.de for an explanation of this algorithm! */
 
+/* This algorithm is currently NOT used! */
+
 #ifndef IS_ROAM_H
 
 #include "roam.h"
