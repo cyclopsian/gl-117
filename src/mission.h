@@ -97,10 +97,10 @@ class Mission
   virtual ~Mission () {}
   void playerInit ();
   void alliedInit (int fighterid, int pilotid, AIObj *aiobj);
-  void init ();
-  virtual void start (); // custom definitions for a mission
-  virtual int processtimer (Uint32 dt); // custom definitions controlled by the timer, mission success/failure
-  virtual void draw (); // custom definitions that have to be drawn
+//  virtual void init () = 0;
+  virtual void start () = 0; // custom definitions for a mission
+  virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure
+  virtual void draw () = 0; // custom definitions that have to be drawn
   void invertZ (); // invert Z coordinate of all fighters and objects
   void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);

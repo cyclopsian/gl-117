@@ -172,7 +172,7 @@ void Mission::alliedInit (int fighterid, int pilotid, AIObj *aiobj)
   aiobj->ai = true;
 }
 
-void Mission::init ()
+/*void Mission::init ()
 {
 }
 
@@ -187,7 +187,7 @@ int Mission::processtimer (Uint32 dt)
 
 void Mission::draw ()
 {
-}
+}*/
 
 // invert y values of all fighters for this mission, only possible if no static buildings are placed on flat ground
 // missions were designed to fly towards the sun but since v1.0 the rendering coords have been mapped to the OpenGL coords

@@ -71,7 +71,7 @@ ConfigFile::ConfigFile () {}
 
 ConfigFile::ConfigFile (char *fname)
 {
-  char buf2 [STDSIZE];
+  char buf2 [4096];
   bool commentmode = false;
   FILE *in;
   length = 0;
@@ -200,7 +200,7 @@ void ConfigFile::close ()
 
 void save_config ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("conf");
   sprintf (buf, "Saving %s ", confname);

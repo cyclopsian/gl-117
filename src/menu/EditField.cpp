@@ -28,7 +28,8 @@
 
 EditField::EditField ()
 {
-  memset (text, 0, 64);
+//  memset (text, 0, 64);
+  text = "";
   ptr = 0;
 
 #ifndef USE_GLUT
@@ -40,7 +41,8 @@ EditField::EditField ()
 
 EditField::EditField (int maxlen)
 {
-  memset (this->text, 0, 64);
+//  memset (this->text, 0, 64);
+  text = "";
   ptr = 0;
   if (maxlen > 62) maxlen = 62;
   else if (maxlen < 0) maxlen = 0;
@@ -53,23 +55,24 @@ EditField::EditField (int maxlen)
 #endif
 }
 
-void EditField::setText (char *text)
+void EditField::setText (const std::string &text)
 {
-  if (strlen (text) > (unsigned int) maxlen) return;
-  memset (this->text, 0, 64);
-  strcpy (this->text, text);
-  ptr = strlen (this->text);
+//  if (strlen (text) > (unsigned int) maxlen) return;
+//  memset (this->text, 0, 64);
+//  strcpy (this->text, text);
+  this->text = text;
+  ptr = this->text.length ();
 }
 
 void EditField::draw ()
 {
-  char str [64];
+  std::string str;
   int akttime;
 
   if (!visible) return;
   Color *col = &DeactiveTextColor;
 
-  strcpy (str, text);
+  str = text;
   if (highlight)
   {
 #ifndef USE_GLUT
@@ -80,8 +83,7 @@ void EditField::draw ()
 
     if (((akttime - timer) & 0xff) > 128)
     {
-      str [ptr] = 'I';
-      str [ptr + 1] = 0;
+      str += "I";
     }
   }
 
@@ -115,7 +117,7 @@ void EditField::triggerMouse (int id, int button)
 void EditField::eventKey (unsigned char key)
 {
   if (!highlight) return;
-  if (ptr >= 62) return;
+//  if (ptr >= 62) return;
   if (key >= 32)
   {
     text [ptr] = key;

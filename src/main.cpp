@@ -5896,7 +5896,7 @@ void callbackPilotsAdd (Component *comp, int key)
   char buf [64];
   if (key == MOUSE_BUTTON_LEFT)
   {
-    strcpy (buf, ((EditField *) submenu [0]->components [9])->text);
+    strcpy (buf, ((EditField *) submenu [0]->components [9])->text.c_str ());
     if (strlen (buf) > 0 && pilots->aktpilots < 5)
     {
       pilots->add (buf);

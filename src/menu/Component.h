@@ -81,7 +81,7 @@ class Container : public Component
   public:
 
     int numcomponents;
-    Component *components [128];
+    std::vector<Component *> components;
 
     Container ();
     virtual ~Container ();
@@ -107,14 +107,14 @@ class Label : public Component
 {
   public:
   
-    char text [256];
+    std::string text;
     bool transparent; ///< no background
 
     Label ();
-    Label (char *text);
+    Label (const std::string &text);
 
     void setTransparent (bool transparent);
-    void setText (char *text);
+    void setText (const std::string &text);
     void draw ();
     void triggerMouse (int id, int button);
 };
@@ -126,10 +126,10 @@ class Button : public Component
 {
   public:
 
-    char text [256];
+    std::string text;
 
     Button ();
-    Button (char *text);
+    Button (const std::string &text);
 
     void draw ();
     void triggerMouse (int id, int button);
@@ -142,13 +142,13 @@ class TextField : public Component
 {
   public:
 
-    char text [8192];
+    std::string text;
     float fonth;
 
     TextField ();
-    TextField (char *text, float fontheight);
+    TextField (const std::string &text, float fontheight);
 
-    void setText (char *text);
+    void setText (const std::string &text);
     void draw ();
     void triggerMouse (int id, int button);
 };
@@ -160,15 +160,15 @@ class EditKey : public Component
 {
   public:
 
-    char text [256];
+    std::string text;
     char key;
     int special;
     bool specialActive;    ///< key or special valid?
 
     EditKey ();
-    EditKey (char *text);
+    EditKey (const std::string &text);
   
-    void setText (char *text);
+    void setText (const std::string &text);
     void setKey (int key); ///< please add 0xFF to two byte keys to distinguish from one byte keys
     int getKey ();         ///< returns special+256 for two byte keys ('+' is special=13, ENTER is key=13)
     void draw ();
@@ -184,13 +184,13 @@ class EditJoystick : public Component
 {
   public:
 
-    char text [256];
+    std::string text;
     int button;
 
     EditJoystick ();
-    EditJoystick (char *text);
+    EditJoystick (const std::string &text);
 
-    void setText (char *text);
+    void setText (const std::string &text);
     void setButton (int key); ///< button 0..99, hat 100..
     int getButton ();         ///< returns button 0..99, hat 100..
     void draw ();
@@ -205,7 +205,7 @@ class EditField : public Component
 {
   public:
 
-    char text [256];
+    std::string text;
     int timer;
     int ptr;
     int maxlen;
@@ -213,7 +213,7 @@ class EditField : public Component
     EditField ();
     EditField (int maxlen);
 
-    void setText (char *text);
+    void setText (const std::string &text);
     void draw ();
     void triggerMouse (int id, int button);
     void eventKey (unsigned char key);

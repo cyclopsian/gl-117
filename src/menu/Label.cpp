@@ -30,16 +30,16 @@ Label::Label ()
 {
 }
 
-Label::Label (char *text)
+Label::Label (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
   transparent = false;
   colback.set (140, 140, 140, 180);
 }
 
-void Label::setText (char *text)
+void Label::setText (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
 }
 
 void Label::setTransparent (bool transparent)

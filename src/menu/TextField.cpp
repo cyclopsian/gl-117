@@ -30,16 +30,16 @@ TextField::TextField ()
 {
 }
 
-TextField::TextField (char *text, float fontheight)
+TextField::TextField (const std::string &text, float fontheight)
 {
-  strcpy (this->text, text);
+  this->text = text;
   fonth = fontheight;
   colback.set (140, 140, 140, 180);
 }
 
-void TextField::setText (char *text)
+void TextField::setText (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
 }
 
 void TextField::draw ()

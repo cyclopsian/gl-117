@@ -38,8 +38,8 @@ Container::~Container ()
 void Container::add (Component *component)
 {
   component->parent = this;
-  components [numcomponents] = component;
-  numcomponents ++;
+  components.push_back (component);
+//  numcomponents ++;
 }
 
 void Container::draw ()
@@ -47,7 +47,7 @@ void Container::draw ()
   int i;
   if (active && visible)
   {
-    for (i = 0; i < numcomponents; i ++)
+    for (i = 0; i < components.size (); i ++)
     {
       components [i]->draw ();
     }
@@ -56,7 +56,7 @@ void Container::draw ()
 
 int Container::getNumberOfComponents ()
 {
-  return numcomponents;
+  return components.size ();
 }
 
 void Container::eventMouse (int x, int y, int button)
@@ -122,7 +122,7 @@ void Container::eventMouse (int x, int y, int button)
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->setHighlight (false);
     for (i2 = 0; i2 < hits; i2 ++)
@@ -138,7 +138,7 @@ void Container::eventMouse (int x, int y, int button)
 void Container::triggerMouse (int id, int button)
 {
   int i;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
     if (components [i]->contains (id))
     {
       components [i]->triggerMouse (id, button);
@@ -149,7 +149,7 @@ void Container::setVisible (bool value)
 {
   int i;
   visible = value;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->setVisible (value);
   }
@@ -159,7 +159,7 @@ void Container::setActive (bool value)
 {
   int i;
   active = value;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->setActive (value);
   }
@@ -169,7 +169,7 @@ void Container::setHighlight (bool value)
 {
   int i;
   highlight = value;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->setHighlight (value);
   }
@@ -179,7 +179,7 @@ bool Container::contains (int id)
 {
   int i;
   bool ret = false;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     ret |= components [i]->contains (id);
   }
@@ -189,7 +189,7 @@ bool Container::contains (int id)
 void Container::eventKey (unsigned char key)
 {
   int i;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->eventKey (key);
   }
@@ -198,7 +198,7 @@ void Container::eventKey (unsigned char key)
 void Container::eventSpecial (int key)
 {
   int i;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->eventSpecial (key);
   }
@@ -207,7 +207,7 @@ void Container::eventSpecial (int key)
 void Container::eventJoystick (int button)
 {
   int i;
-  for (i = 0; i < numcomponents; i ++)
+  for (i = 0; i < components.size (); i ++)
   {
     components [i]->eventJoystick (button);
   }

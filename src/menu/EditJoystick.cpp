@@ -31,15 +31,15 @@ EditJoystick::EditJoystick ()
   button = 0;
 }
 
-EditJoystick::EditJoystick (char *text)
+EditJoystick::EditJoystick (const std::string &text)
 {
   button = 0;
-  strcpy (this->text, text);
+  this->text = text;
 }
 
-void EditJoystick::setText (char *text)
+void EditJoystick::setText (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
 }
 
 void EditJoystick::setButton (int button)

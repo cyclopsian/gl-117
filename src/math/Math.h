@@ -44,11 +44,16 @@ class Math
     
     Math ();
     
-    int random (int n); // random integer number [0;n-1]
-    int random (int n, int x, int y); // random integer number [0;n-1]
-    int extremeRandom (int n); // random integer number [0;n-1], prefer extremely low/high values
-    int extremeRandom (int n, int x, int y); // random integer number [0;n-1], prefer extremely low/high values
-    float dist (float dx, float dy); // distance (Euklidean norm, 2D vector)
+    /// random integer number [0;n-1]
+    int random (int n);
+    /// random integer number [0;n-1]
+    int random (int n, int x, int y);
+    /// random integer number [0;n-1], prefer extremely low/high values
+    int extremeRandom (int n);
+    /// random integer number [0;n-1], prefer extremely low/high values
+    int extremeRandom (int n, int x, int y);
+    /// distance (Euklidean norm, 2D vector)
+    float dist (float dx, float dy);
 
   protected:
 

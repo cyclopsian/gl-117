@@ -31,15 +31,15 @@ EditKey::EditKey ()
   key = 'A';
 }
 
-EditKey::EditKey (char *text)
+EditKey::EditKey (const std::string &text)
 {
   key = 'A';
-  strcpy (this->text, text);
+  this->text = text;
 }
 
-void EditKey::setText (char *text)
+void EditKey::setText (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
 }
 
 void EditKey::setKey (int key)

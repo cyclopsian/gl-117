@@ -101,7 +101,7 @@ Mission *MapLoader::getMission ()
 {
   Mission *m = new MissionCustom ();
   m->id = mapptr;
-  m->init ();
+//  m->init ();
   return m;
 }
 

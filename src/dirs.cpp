@@ -34,7 +34,6 @@
 #endif
 
 #include "dirs.h"
-#include "common.h"
 #include "logging/Logging.h"
 
 char *mystrtok (char *str, int len, char *tok)

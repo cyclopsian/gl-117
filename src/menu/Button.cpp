@@ -30,9 +30,9 @@ Button::Button ()
 {
 }
 
-Button::Button (char *text)
+Button::Button (const std::string &text)
 {
-  strcpy (this->text, text);
+  this->text = text;
 }
 
 void Button::draw ()
