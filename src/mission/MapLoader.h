@@ -73,7 +73,7 @@ class MissionCustom : public Mission
   int minh;
 
   MissionCustom ();
-  void error (char *msg);
+  void error (const char *msg);
   int readAttribute (char *attribute, char *value, char *casevalue);
   void toUpper (char *str);
   int isInteger (char *str);

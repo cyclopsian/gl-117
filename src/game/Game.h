@@ -132,7 +132,7 @@ extern int getCampaignIdFromValue (int n);
 extern int getCampaignValueFromId (int n);
 extern void setPlaneVolume ();
 extern void setLightSource (int gamma);
-extern Model3d *getModel (int id);
+//extern Model3d *getModel (int id);
 
 extern int game_levelInit ();
 
@@ -180,8 +180,8 @@ extern void drawCircles (Color *colorstd);
 extern void drawQuads (Color *colorstd);
 extern void drawPlasma (Color *colorstd);
 extern void pleaseWait ();
-extern char *getModelText (int id);
-extern char *getModelName (int id);
+extern char *getModelText (const UnitDescriptor &id);
+//extern char *getModelName (const UnitDescriptor &id);
 extern void drawArrow (float x, float y, float w, float h);
 
 extern void game_quit ();

@@ -62,19 +62,19 @@ void MissionDeathmatch2::start ()
   {
     if (i <= 1)
     {
-      fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
+      fighter [i]->newinit (FalconDescriptor, 0, 200);
     }
     else if (i <= 3)
     {
-      fighter [i]->newinit (FIGHTER_CROW, 0, 200);
+      fighter [i]->newinit (CrowDescriptor, 0, 200);
     }
     else if (i <= 5)
     {
-      fighter [i]->newinit (FIGHTER_BUZZARD, 0, 200);
+      fighter [i]->newinit (BuzzardDescriptor, 0, 200);
     }
     else
     {
-      fighter [i]->newinit (FIGHTER_SWALLOW, 0, 200);
+      fighter [i]->newinit (SwallowDescriptor, 0, 200);
     }
     fighter [i]->party = i / 2 + 1;
     fighter [i]->target = fighter [(i + 4) % 8];
@@ -115,7 +115,7 @@ int MissionDeathmatch2::processtimer (Uint32 dt)
       }
       else
       {
-        fighter [i]->newinit (FIGHTER_FALCON, i + 1, 200);
+        fighter [i]->newinit (FalconDescriptor, i + 1, 200);
       }
       fighter [i]->party = i / 2 + 1;
       fighter [i]->shield = fighter [i]->maxshield;

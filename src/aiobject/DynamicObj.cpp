@@ -76,7 +76,7 @@ void DynamicObj::init ()
   shield = 0.01F; maxshield = 0.01F;
   immunity = 0;
   recrot.gamma = 180;
-  id = CANNON1;
+  id = Cannon1Descriptor.id;
   impact = 7;
   source = NULL;
   stat.points = 0;
@@ -136,20 +136,20 @@ void DynamicObj::checkExplosion (Uint32 dt)
     if (explode == 1)
     {
       ttl = -1;
-      if (id == STATIC_CONTAINER1 || id == STATIC_RADAR1 || id == STATIC_COMPLEX1)
+      if (id == ContainerDescriptor || id == RadarDescriptor || id == ComplexDescriptor)
       {
         setExplosion (1.5, 40 * timestep);
         setBlackSmoke (3.0, 80 * timestep);
       }
-      else if (id == STATIC_OILRIG1)
+      else if (id == OilrigDescriptor)
       {
         setExplosion (3.0, 40 * timestep);
         setBlackSmoke (5.5, 80 * timestep);
       }
-      else if (id == STATIC_TENT1)
+      else if (id == TentDescriptor)
       {
       }
-      else if (id == TANK1)
+      else if (id == TankBeginDescriptor)
       {
       }
       else
@@ -160,7 +160,7 @@ void DynamicObj::checkExplosion (Uint32 dt)
         setBlackSmoke (1.0, 60 * timestep);
       }
     }
-    if (id >= STATIC_GROUND || (id >= MOVING_GROUND && id <= MOVING_WATER))
+    if (id >= StaticGroundBeginDescriptor || (id >= MovingGroundBeginDescriptor && id <= WaterBeginDescriptor))
     {
       if (explode >= 25 * timestep && ttl == -1)
       {
@@ -180,11 +180,11 @@ void DynamicObj::checkExplosion (Uint32 dt)
       deactivate ();
       ttl = -1;
       explode += dt; // must be > 35*timestep to end mission
-      if (id >= STATIC_GROUND || (id >= MOVING_GROUND && id <= MOVING_WATER))
+      if (id >= StaticGroundBeginDescriptor || (id >= MovingGroundBeginDescriptor && id <= WaterBeginDescriptor))
       {
         explode = 0;
         draw = true;
-        id = STATIC_PASSIVE;
+        id = StaticPassiveBeginDescriptor;
         shield = 100000;
         o = Model3dRegistry::get ("Rubble");
         trafo.scaling.x *= 0.7F;
@@ -215,19 +215,19 @@ void DynamicObj::checkShield ()
     shield = 0;
     if (explode <= 0)
     {
-      if (id >= MISSILE1 && id <= MISSILE2)
+      if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
       { explode = 1; active = false; }
-      if (id >= FIGHTER1 && id <= FIGHTER2)
+      if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
       { explode = 1; active = false; }
-      if (id >= TANK1 && id <= TANK2)
+      if (id >= TankBeginDescriptor && id <= TankEndDescriptor)
       { explode = 1; active = false; }
-      if (id >= FLAK1 && id <= FLAK2)
+      if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor)
       { explode = 1; active = false; }
-      if (id >= STATIC_PASSIVE)
+      if (id >= StaticPassiveBeginDescriptor)
       { explode = 1; active = false; }
     }
     if (sink <= 0)
-      if (id >= SHIP1 && id <= SHIP2)
+      if (id >= ShipBeginDescriptor && id <= ShipEndDescriptor)
       { sink = 1; }
   }
 }
@@ -235,7 +235,7 @@ void DynamicObj::checkShield ()
 // check whether the object collides on the ground and alter gamma and y-translation
 void DynamicObj::crashGround (Uint32 dt)
 {
-  if (id >= MOVING_GROUND)
+  if (id >= MovingGroundBeginDescriptor)
     return;
   float height = trafo.translation.y - l->getExactHeight (trafo.translation.x, trafo.translation.z);
   if (height < trafo.scaling.x)
@@ -244,18 +244,18 @@ void DynamicObj::crashGround (Uint32 dt)
     currot.gamma += 10;
     if (shield > 0)
     {
-      if (id >= MISSILE1 && id <= MISSILE2)
+      if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
       {
         setExplosion (1.2, 30 * timestep);
         setBlackSmoke (1.2, 30 * timestep);
       }
-      if (id >= FIGHTER1 && id <= FIGHTER2)
+      if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
       {
         setExplosion (0.2, 25 * timestep);
         setBlackSmoke (0.5, 25 * timestep);
       }
     }
-    if (id >= CANNON1 && id <= CANNON2)
+    if (id >= CannonBeginDescriptor && id <= CannonEndDescriptor)
       deactivate ();
     float decfac = 3.0F;
     if (this == (DynamicObj *) fplayer && game == GAME_PLAY)
@@ -289,12 +289,12 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 
   if (collide)
   {
-    if (this == (DynamicObj *) fplayer && game == GAME_PLAY && realism && d->id >= AIR && d->id < MOVING_GROUND)
+    if (this == (DynamicObj *) fplayer && game == GAME_PLAY && realism && d->id >= AirBeginDescriptor && d->id < MovingGroundBeginDescriptor)
 	  {
       shield = -1.0F; // player collision vs another plane in SIM mode, boom
 	    d->shield = -1.0F;
 	  }
-    if (id < STATIC_PASSIVE || (id >= STATIC_PASSIVE && d->id >= MISSILE1 && d->id <= MISSILE2))
+    if (id < StaticPassiveBeginDescriptor || (id >= StaticPassiveBeginDescriptor && d->id >= MissileBeginDescriptor && d->id <= MissileEndDescriptor))
       shield -= (float) d->impact;
     else
       shield -= 2.0F;
@@ -313,14 +313,14 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 
       if (shield <= 0)
         if (d->source->party != party && active && draw && !stat.killed)
-          if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
+          if (d->source->id >= FighterBeginDescriptor && d->source->id <= AirEndDescriptor)
           {
             stat.killed = true;
-            if (id >= FIGHTER1 && id <= FIGHTER2)
+            if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
               d->source->stat.fighterkills ++;
-            else if (id >= SHIP1 && id <= SHIP2)
+            else if (id >= ShipBeginDescriptor && id <= ShipEndDescriptor)
               d->source->stat.shipkills ++;
-            else if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+            else if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
               d->source->stat.tankkills ++;
             else
               d->source->stat.otherkills ++;
@@ -423,16 +423,16 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   }
   if (!active && !draw) return; // exit if not active
 
-  if (id >= STATIC_PASSIVE) // only buildings, static objects
+  if (id >= StaticPassiveBeginDescriptor) // only buildings, static objects
   {
-    if (id == STATIC_TENT1) currot.theta = 178;
+    if (id == TentDescriptor) currot.theta = 178;
     // set the correct angles to diplay
     trafo.rotation.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
     checkShield ();
     return; // and exit this function
   }
 
-  if (id == FLARE1) // only flares
+  if (id == FlareDescriptor) // only flares
   {
     trafo.translation.y -= 0.04 * timefac; // fall down (gravity, constant)
     trafo.scaling.x = 0.12F + 0.03F * sin ((float) ttl / (float) timestep / 15); // blink (high frequency)
@@ -441,7 +441,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     currot.gamma = camgamma;
   }
 
-  if (id == CHAFF1) // only chaff
+  if (id == ChaffDescriptor) // only chaff
   {
     trafo.translation.y -= 0.04 * timefac; // fall down (gravity, constant)
     trafo.scaling.x = 0.12F + 0.01F * (80 * timestep - ttl) / timestep; // spread out
@@ -467,7 +467,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   // angle / aileron = constant, thats enough for a simple AI
   if (easymodel == 1)
   {
-    if (id >= MOVING_GROUND)
+    if (id >= MovingGroundBeginDescriptor)
     {
       currot.phi += SIN(currot.theta) * manoeverability * 667 * timefac; //10.0 * maxthrust / div;
     }
@@ -539,7 +539,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   bool stop;
   float gravityforce;
 
-  if (id <= CANNON2)
+  if (id <= CannonEndDescriptor)
   {
     trafo.translation.x += force.x * timefac; // add our vector to the translation
     trafo.translation.z += force.z * timefac;
@@ -638,7 +638,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   }
 
   stop = false;
-  if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
+  if (id >= TankBeginDescriptor && id <= TankEndDescriptor) // tanks cannot climb steep faces
   {
     float newy = l->getExactHeight (trafo.translation.x + force.x, trafo.translation.z + force.z) + trafo.scaling.x / 2;
     if (fabs (newy - trafo.translation.y) > 0.05)
@@ -659,7 +659,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   realspeed = sqrt (force.x * force.x + force.z * force.z + force.y * force.y);
 
   // objects moving on the ground should always change their elevation due to the surface
-  if (id >= TANK1 && id <= TANK2 && thrust > 0 && !stop)
+  if (id >= TankBeginDescriptor && id <= TankEndDescriptor && thrust > 0 && !stop)
   {
     float newy = l->getExactHeight (trafo.translation.x, trafo.translation.z) + trafo.scaling.x / 2;
     float dy = newy - trafo.translation.y + force.y;
@@ -671,7 +671,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     trafo.translation.y = newy;
   }
 
-  if (id != ASTEROID)
+  if (id != AsteroidDescriptor)
   {
     // set angles to correctly display the object
     trafo.rotation.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
@@ -692,7 +692,7 @@ cannondone:;
     if (ttl <= 0)
     {
       ttl = -1;
-      if (id >= MISSILE1 && id <= MISSILE2) recheight = -10; // missiles drop
+      if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor) recheight = -10; // missiles drop
       else deactivate (); // cannon shots vanish
     }
   }

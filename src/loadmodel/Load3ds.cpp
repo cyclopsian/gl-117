@@ -23,6 +23,7 @@
 
 #include "Load3ds.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -63,9 +64,8 @@ bool Load3ds::import3ds (Model3d *model, const char *filename)
   // Make sure this is a 3DS file
   if (currentChunk->ID != PRIMARY)
   {
-    sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
     assert (false);
-    DISPLAY_FATAL(message);
+    DISPLAY_FATAL(FormatString ("Unable to load PRIMARY chuck from file: %s", filename));
     exit (EXIT_LOADFILE);
   }
   // Load objects recursively
@@ -92,7 +92,7 @@ void Load3ds::cleanUp ()
 {
   delete file;
 //  fclose (filepointer);            // Close the current file pointer
-/* Vorsicht: Speicherleck !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/* careful: memleak !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
   //delete currentChunk;            // Free the current chunk
   //delete tempChunk;              // Free our temporary chunk
 }

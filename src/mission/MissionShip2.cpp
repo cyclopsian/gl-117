@@ -42,8 +42,8 @@ MissionShip2::MissionShip2 ()
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 2500 * timestep;
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_SHADOW;
 }
 
@@ -62,7 +62,7 @@ void MissionShip2::start ()
   fplayer->trafo.translation.x = 80;
   fplayer->trafo.translation.z = 0;
   fplayer->currot.phi = 90;
-  alliedInit (FIGHTER_REDARROW, alliedpilot [0], 1);
+  alliedInit (RedArrowDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;
@@ -70,7 +70,7 @@ void MissionShip2::start ()
 //  fighter [2]->o = &model_oilrig;
   fighter [2]->trafo.translation.x = 20;
   fighter [2]->trafo.translation.z = 0;
-  fighter [2]->newinit (STATIC_OILRIG1, 0, 0);
+  fighter [2]->newinit (OilrigDescriptor, 0, 0);
   fighter [2]->maxthrust = 0;
   fighter [2]->thrust = 0;
   fighter [2]->party = 1;
@@ -81,16 +81,16 @@ void MissionShip2::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -50 - i * 10;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 300 - i * 10);
+    fighter [i]->newinit (CrowDescriptor, 0, 300 - i * 10);
   }
   for (i = 6; i <= 7; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [2];
-//    fighter [i]->o = Model3dRegistry::get ("Swallow");
+//    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = -80 - i * 10;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);
+    fighter [i]->newinit (SwallowDescriptor, 0, 160);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

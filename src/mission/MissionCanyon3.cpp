@@ -34,8 +34,8 @@
 
 MissionCanyon3::MissionCanyon3 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_MATRIX;
   alliedpilot [1] = PILOT_PRIMETIME;
   alliedpilot [2] = PILOT_FIREBIRD;
@@ -66,7 +66,7 @@ void MissionCanyon3::start ()
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
-    alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], i);
+    alliedInit (RedArrowDescriptor, alliedpilot [i - 1], i);
     if (i % 2)
       fighter [i]->trafo.translation.x = px + 100 + ((i + 1) / 2) * 5;
     else
@@ -76,7 +76,7 @@ void MissionCanyon3::start ()
     fighter [i]->currot.phi = 45;
   }
 //  fighter [5]->o = &model_egg;
-  fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
+  fighter [5]->newinit (ComplexDescriptor, 0, 0);
   fighter [5]->trafo.translation.x = px;
   fighter [5]->trafo.translation.z = py;
   fighter [5]->maxthrust = 0;
@@ -84,7 +84,7 @@ void MissionCanyon3::start ()
   for (i = 6; i <= 9; i ++)
   {
 //    fighter [i]->o = &model_hall1;
-    fighter [i]->newinit (STATIC_HALL1, 0, 100);
+    fighter [i]->newinit (HallDescriptor, 0, 100);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
@@ -103,13 +103,13 @@ void MissionCanyon3::start ()
     fighter [i]->currot.phi = 180;
     if (i <= 15)
     {
-      fighter [i]->id = FIGHTER_HAWK;
-      fighter [i]->newinit (FIGHTER_CROW, 0, i * 20);
+      fighter [i]->id = HawkDescriptor;
+      fighter [i]->newinit (CrowDescriptor, 0, i * 20);
     }
     else
     {
 //      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 15);
+      fighter [i]->newinit (BuzzardDescriptor, 0, i * 15);
     }
     fighter [i]->trafo.translation.x = px - i * 3;
     fighter [i]->trafo.translation.z = py - i * 3;

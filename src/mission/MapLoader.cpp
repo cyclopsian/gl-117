@@ -30,6 +30,7 @@
 #include "configuration/Dirs.h"
 #include "gllandscape/GlLandscape.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -118,12 +119,10 @@ MissionCustom::MissionCustom ()
   numtext = 0;
 }
 
-void MissionCustom::error (char *msg)
+void MissionCustom::error (const char *msg)
 {
-  char buf [TOKENLEN];
   reterror = 1;
-  sprintf (buf, "Line %d: %s", maploader->file.getLine (), msg);
-  DISPLAY_ERROR(buf);
+  DISPLAY_ERROR(FormatString ("Line %d: %s", maploader->file.getLine (), msg));
 }
 
 void MissionCustom::toUpper (char *str)
@@ -201,7 +200,6 @@ double MissionCustom::toDouble (char *str)
 int MissionCustom::parseMapData ()
 {
   char attr [TOKENLEN], value [TOKENLEN], casevalue [TOKENLEN];
-  char buf [TOKENLEN];
   int ret;
   map_type = LANDSCAPE_ALPINE;
   save_map_type = map_type;
@@ -228,8 +226,7 @@ int MissionCustom::parseMapData ()
       else if (!strcmp (value, "DESERT")) map_type = LANDSCAPE_DESERT;
       else
       {
-        sprintf (buf, "Invalid attribute %s", attr);
-        error (buf);
+        error (FormatString ("Invalid attribute %s", attr).c_str ());
       }
       save_map_type = map_type;
     }
@@ -253,8 +250,7 @@ int MissionCustom::parseMapData ()
       else if (!strcmp (value, "THUNDERSTORM")) { weather = WEATHER_THUNDERSTORM; clouds = 3; }
       else
       {
-        sprintf (buf, "Invalid attribute %s", attr);
-        error (buf);
+        error (FormatString ("Invalid attribute %s", attr).c_str ());
       }
     }
     else if (!strcmp (attr, "TIME"))
@@ -292,8 +288,7 @@ int MissionCustom::parseMapData ()
       FILE *in = fopen (dirs.getMaps (casevalue), "rb");
       if (in == NULL)
       {
-        sprintf (buf, "Cannot open file %s", dirs.getMaps (casevalue));
-        error (buf);
+        error (FormatString ("Cannot open file %s", dirs.getMaps (casevalue)).c_str ());
       }
       else
       {
@@ -365,7 +360,6 @@ int MissionCustom::parseMapData ()
 int MissionCustom::parseObjectData ()
 {
   char attr [TOKENLEN], value [TOKENLEN], casevalue [TOKENLEN];
-  char buf [TOKENLEN];
   int ret;
   AIObj *aiobj = &obj [numobjects];
 
@@ -385,43 +379,42 @@ int MissionCustom::parseObjectData ()
     }
     if (!strcmp (attr, "TYPE"))
     {
-      if (!strcmp (value, "FALCON")) aiobj->id = FIGHTER_FALCON;
-      else if (!strcmp (value, "SWALLOW")) aiobj->id = FIGHTER_SWALLOW;
-      else if (!strcmp (value, "HAWK")) aiobj->id = FIGHTER_HAWK;
-      else if (!strcmp (value, "HAWK2")) aiobj->id = FIGHTER_HAWK2;
-      else if (!strcmp (value, "BUZZARD")) aiobj->id = FIGHTER_BUZZARD;
-      else if (!strcmp (value, "CROW")) aiobj->id = FIGHTER_CROW;
-      else if (!strcmp (value, "PHOENIX")) aiobj->id = FIGHTER_PHOENIX;
-      else if (!strcmp (value, "REDARROW")) aiobj->id = FIGHTER_REDARROW;
-      else if (!strcmp (value, "BLACKBIRD")) aiobj->id = FIGHTER_BLACKBIRD;
-      else if (!strcmp (value, "STORM")) aiobj->id = FIGHTER_STORM;
-      else if (!strcmp (value, "TRANSPORT")) aiobj->id = FIGHTER_TRANSPORT;
-      else if (!strcmp (value, "WIESEL")) aiobj->id = TANK_AIR1;
-      else if (!strcmp (value, "PANTHER")) aiobj->id = TANK_GROUND1;
-      else if (!strcmp (value, "SAMTRUCK")) aiobj->id = TANK_TRSAM1;
-      else if (!strcmp (value, "PICKUP")) aiobj->id = TANK_PICKUP1;
-      else if (!strcmp (value, "TRUCK")) aiobj->id = TANK_TRUCK1;
-      else if (!strcmp (value, "TRUCK2")) aiobj->id = TANK_TRUCK2;
-      else if (!strcmp (value, "CRUISER")) aiobj->id = SHIP_CRUISER;
-      else if (!strcmp (value, "DESTROYER")) aiobj->id = SHIP_DESTROYER1;
-      else if (!strcmp (value, "SAC")) aiobj->id = FLAK_AIR1;
-      else if (!strcmp (value, "SAM")) aiobj->id = FLARAK_AIR1;
-      else if (!strcmp (value, "TENT")) aiobj->id = STATIC_TENT1;
-      else if (!strcmp (value, "BIGTENT")) aiobj->id = STATIC_TENT4;
-      else if (!strcmp (value, "CONTAINER")) aiobj->id = STATIC_CONTAINER1;
-      else if (!strcmp (value, "HALL")) aiobj->id = STATIC_HALL1;
-      else if (!strcmp (value, "HALL2")) aiobj->id = STATIC_HALL2;
-      else if (!strcmp (value, "OILRIG")) aiobj->id = STATIC_OILRIG1;
-      else if (!strcmp (value, "COMPLEX")) aiobj->id = STATIC_COMPLEX1;
-      else if (!strcmp (value, "RADAR")) aiobj->id = STATIC_RADAR1;
-      else if (!strcmp (value, "MOONBASE")) aiobj->id = STATIC_BASE1;
-      else if (!strcmp (value, "DEPOT")) aiobj->id = STATIC_DEPOT1;
-      else if (!strcmp (value, "LASERBARRIER")) aiobj->id = STATIC_BARRIER1;
-      else if (!strcmp (value, "ASTEROID")) aiobj->id = ASTEROID;
+      if (!strcmp (value, "FALCON")) aiobj->id = FalconDescriptor;
+      else if (!strcmp (value, "SWALLOW")) aiobj->id = SwallowDescriptor;
+      else if (!strcmp (value, "HAWK")) aiobj->id = HawkDescriptor;
+      else if (!strcmp (value, "HAWK2")) aiobj->id = Hawk2Descriptor;
+      else if (!strcmp (value, "BUZZARD")) aiobj->id = BuzzardDescriptor;
+      else if (!strcmp (value, "CROW")) aiobj->id = CrowDescriptor;
+      else if (!strcmp (value, "PHOENIX")) aiobj->id = PhoenixDescriptor;
+      else if (!strcmp (value, "REDARROW")) aiobj->id = RedArrowDescriptor;
+      else if (!strcmp (value, "BLACKBIRD")) aiobj->id = BlackBirdDescriptor;
+      else if (!strcmp (value, "STORM")) aiobj->id = StormDescriptor;
+      else if (!strcmp (value, "TRANSPORT")) aiobj->id = TransportDescriptor;
+      else if (!strcmp (value, "WIESEL")) aiobj->id = WieselDescriptor;
+      else if (!strcmp (value, "PANTHER")) aiobj->id = PantherDescriptor;
+      else if (!strcmp (value, "SAMTRUCK")) aiobj->id = MobileSamDescriptor;
+      else if (!strcmp (value, "PICKUP")) aiobj->id = PickupDescriptor;
+      else if (!strcmp (value, "TRUCK")) aiobj->id = TruckDescriptor;
+      else if (!strcmp (value, "TRUCK2")) aiobj->id = Truck2Descriptor;
+      else if (!strcmp (value, "CRUISER")) aiobj->id = CruiserDescriptor;
+      else if (!strcmp (value, "DESTROYER")) aiobj->id = LightDestroyerDescriptor;
+      else if (!strcmp (value, "SAC")) aiobj->id = SacDescriptor;
+      else if (!strcmp (value, "SAM")) aiobj->id = SamDescriptor;
+      else if (!strcmp (value, "TENT")) aiobj->id = TentDescriptor;
+      else if (!strcmp (value, "BIGTENT")) aiobj->id = BigTentDescriptor;
+      else if (!strcmp (value, "CONTAINER")) aiobj->id = ContainerDescriptor;
+      else if (!strcmp (value, "HALL")) aiobj->id = HallDescriptor;
+      else if (!strcmp (value, "HALL2")) aiobj->id = Hall2Descriptor;
+      else if (!strcmp (value, "OILRIG")) aiobj->id = OilrigDescriptor;
+      else if (!strcmp (value, "COMPLEX")) aiobj->id = ComplexDescriptor;
+      else if (!strcmp (value, "RADAR")) aiobj->id = RadarDescriptor;
+      else if (!strcmp (value, "MOONBASE")) aiobj->id = MoonBaseDescriptor;
+      else if (!strcmp (value, "DEPOT")) aiobj->id = DepotDescriptor;
+      else if (!strcmp (value, "LASERBARRIER")) aiobj->id = LaserBarrierDescriptor;
+      else if (!strcmp (value, "ASTEROID")) aiobj->id = AsteroidDescriptor;
       else
       {
-        sprintf (buf, "Invalid attribute %s", attr);
-        error (buf);
+        error (FormatString ("Invalid attribute %s", attr).c_str ());
       }
     }
     else if (!strcmp (attr, "PARTY"))
@@ -565,7 +558,6 @@ int MissionCustom::parseTextData ()
 int MissionCustom::parseRelCoords ()
 {
   char attr [TOKENLEN], value [TOKENLEN], casevalue [TOKENLEN];
-  char buf [TOKENLEN];
   int ret;
 
   while (true)
@@ -602,8 +594,7 @@ int MissionCustom::parseRelCoords ()
       }
       else
       {
-        sprintf (buf, "Invalid attribute %s", attr);
-        error (buf);
+        error (FormatString ("Invalid attribute %s", attr).c_str());
       }
     }
     else if (!strcmp (attr, "QUADRANT"))
@@ -639,7 +630,6 @@ int MissionCustom::isGlobal (char *token)
 int MissionCustom::parseInfoData ()
 {
   char attr [TOKENLEN], value [TOKENLEN], casevalue [TOKENLEN];
-  char buf [TOKENLEN];
   int ret;
 
   while (true)
@@ -683,12 +673,12 @@ int MissionCustom::parseInfoData ()
       }
       else
       {
-        if (!strcmp (value, "FALCON")) selfighter [num - 1] = FIGHTER_FALCON;
-        else if (!strcmp (value, "HAWK")) selfighter [num - 1] = FIGHTER_HAWK;
-        else if (!strcmp (value, "HAWK2")) selfighter [num - 1] = FIGHTER_HAWK2;
-        else if (!strcmp (value, "STORM")) selfighter [num - 1] = FIGHTER_STORM;
-        else if (!strcmp (value, "REDARROW")) selfighter [num - 1] = FIGHTER_REDARROW;
-        else if (!strcmp (value, "PHOENIX")) selfighter [num - 1] = FIGHTER_PHOENIX;
+        if (!strcmp (value, "FALCON")) selfighter [num - 1] = FalconDescriptor;
+        else if (!strcmp (value, "HAWK")) selfighter [num - 1] = HawkDescriptor;
+        else if (!strcmp (value, "HAWK2")) selfighter [num - 1] = Hawk2Descriptor;
+        else if (!strcmp (value, "STORM")) selfighter [num - 1] = StormDescriptor;
+        else if (!strcmp (value, "REDARROW")) selfighter [num - 1] = RedArrowDescriptor;
+        else if (!strcmp (value, "PHOENIX")) selfighter [num - 1] = PhoenixDescriptor;
         else
         {
           error ("Invalid fighter type");
@@ -704,9 +694,9 @@ int MissionCustom::parseInfoData ()
       }
       else
       {
-        if (!strcmp (value, "AAMPACK")) selweapon [num - 1] = MISSILE_AIR1;
-        else if (!strcmp (value, "AGMPACK")) selweapon [num - 1] = MISSILE_GROUND1;
-        else if (!strcmp (value, "DFPACK")) selweapon [num - 1] = MISSILE_DF1;
+        if (!strcmp (value, "AAMPACK")) selweapon [num - 1] = AamHs1Descriptor;
+        else if (!strcmp (value, "AGMPACK")) selweapon [num - 1] = Agm1Descriptor;
+        else if (!strcmp (value, "DFPACK")) selweapon [num - 1] = DfmDescriptor;
         else
         {
           error ("Invalid weapon type");
@@ -727,8 +717,7 @@ int MissionCustom::parseInfoData ()
     }
     else
     {
-      sprintf (buf, "Invalid attribute %s", attr);
-      error (buf);
+      error (FormatString ( "Invalid attribute %s", attr).c_str());
     }
   }
   return 1;
@@ -737,7 +726,6 @@ int MissionCustom::parseInfoData ()
 void MissionCustom::init ()
 {
   int i;
-  char buf [TOKENLEN];
   bool readtoken = true;
 
   reterror = 0;
@@ -814,8 +802,7 @@ void MissionCustom::init ()
     {
       if (strlen (token))
       {
-        sprintf (buf, "Unknown token %s", token);
-        error (buf);
+        error (FormatString ("Unknown token %s", token).c_str());
       }
       // error in map file, must be closed, mission freed
     }
@@ -1044,8 +1031,8 @@ void MissionCustom::start ()
   for (i = 1; i < numobjects; i ++)
   {
 //    fighter [i]->o = getModel (obj [i].id);
-    if (obj [i].id < FIGHTER1) obj [i].id = FIGHTER_FALCON;
-    if (obj [i].id >= FIGHTER1 && obj [i].id <= FIGHTER_PILOTED2 && fplayer->party == obj [i].party)
+    if (obj [i].id < FighterBeginDescriptor) obj [i].id = FalconDescriptor;
+    if (obj [i].id >= FighterBeginDescriptor && obj [i].id <= FighterEndDescriptor && fplayer->party == obj [i].party)
     {
       alliedInit (obj [i].id, alliedpilot [alliedz], i);
       if (alliedz < maxpilots - 1)

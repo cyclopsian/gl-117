@@ -65,7 +65,7 @@ void MissionTest2::start ()
   fighter [1]->target = fighter [0];
   fighter [1]->trafo.translation.x = 0;
   fighter [1]->trafo.translation.z = 0;
-  fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
+  fighter [1]->newinit (HawkDescriptor, 0, 170);
   fighter [1]->aggressivity = 0;
 //  fighter [1]->intelligence = 0;
 //  fighter [1]->precision = 0;

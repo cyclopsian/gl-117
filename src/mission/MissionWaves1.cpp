@@ -66,18 +66,18 @@ void MissionWaves1::start ()
     if (i <= 2)
     {
 //      fighter [i]->o = &model_fige;
-      fighter [i]->newinit (FIGHTER_CROW, 0, 395);
+      fighter [i]->newinit (CrowDescriptor, 0, 395);
     }
     else if (i <= 5)
     {
-//      fighter [i]->o = Model3dRegistry::get ("Swallow");
-      fighter [i]->newinit (FIGHTER_SWALLOW, 0, 395);
+//      fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
+      fighter [i]->newinit (SwallowDescriptor, 0, 395);
       fighter [i]->deactivate ();
     }
     else if (i <= 9)
     {
 //      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (FIGHTER_BUZZARD, 0, 395);
+      fighter [i]->newinit (BuzzardDescriptor, 0, 395);
       fighter [i]->deactivate ();
     }
   }

@@ -36,7 +36,7 @@ MissionGround1::MissionGround1 ()
 {
   id = MISSION_SADEFENSE;
   strcpy (name, "SA DEFENSE");
-  strcpy (briefing, "OUR ENEMY HAS BUILT UP A BASE WITH SOME AIR DEFENCES AROUND. THE PILOTS OF OUR SQUADRON HAVE TO TAKE OUT THESE AIR DEFENCES.");
+  strcpy (briefing, "OUR ENEMY HAS BUILT UP A BASE WITH SOME AIR DEFENCES AROUND. THE PILOTS OF OUR SQUADRON HAVE TO TAKE OUT THESE AirBeginDescriptor DEFENCES.");
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_PRIMETIME;
@@ -63,7 +63,7 @@ void MissionGround1::start ()
   fplayer->trafo.translation.x = px + 10;
   fplayer->trafo.translation.z = py + 80;
   fplayer->target = fighter [2];
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = px + 20;
   fighter [1]->trafo.translation.z = py + 90;
   fighter [1]->target = fighter [2];
@@ -75,12 +75,12 @@ void MissionGround1::start ()
     if (i == 2)
     {
 //      fighter [i]->o = &model_flarak1;
-      fighter [i]->newinit (FLARAK_AIR1, 0, 220);
+      fighter [i]->newinit (SamDescriptor, 0, 220);
     }
     else
     {
 //      fighter [i]->o = &model_flak1;
-      fighter [i]->newinit (FLAK_AIR1, 0, 200);
+      fighter [i]->newinit (SacDescriptor, 0, 200);
     }
   }
   l->searchPlain (2, 1, &px, &py);
@@ -91,16 +91,16 @@ void MissionGround1::start ()
     fighter [i]->trafo.translation.z = py;
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (FLAK_AIR1, 0, 200);
+    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
   fighter [7]->trafo.translation.x = px + 1;
   fighter [7]->trafo.translation.z = py - 1;
 //  fighter [7]->o = &model_tent1;
-  fighter [7]->newinit (STATIC_TENT1, 0, 200);
+  fighter [7]->newinit (TentDescriptor, 0, 200);
   fighter [8]->trafo.translation.x = px - 1;
   fighter [8]->trafo.translation.z = py - 1;
 //  fighter [8]->o = &model_tent1;
-  fighter [8]->newinit (STATIC_TENT1, 0, 200);
+  fighter [8]->newinit (TentDescriptor, 0, 200);
 }
 
 int MissionGround1::processtimer (Uint32 dt)

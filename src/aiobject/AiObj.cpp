@@ -29,8 +29,90 @@
 #include "game/globals.h"
 #include "math/Math.h"
 #include "loadmodel/Model3dRegistry.h"
+#include "util/Util.h"
 
 #include <cassert>
+
+
+// id values of objects
+// non-AI air objects
+UnitDescriptor CannonBeginDescriptor (0);
+UnitDescriptor Cannon1Descriptor (0, "Cannon1", "CANNON");
+UnitDescriptor Cannon1bDescriptor (0, "Cannon1b", "CANNON");
+UnitDescriptor Cannon2Descriptor (0, "Cannon2", "CANNON");
+UnitDescriptor Cannon2bDescriptor (0, "Cannon2b", "CANNON");
+UnitDescriptor AsteroidDescriptor (50, "Asteroid", "ASTEROID");
+UnitDescriptor FlareDescriptor (80, "Flare", "FLARE");
+UnitDescriptor ChaffDescriptor (85, "Chaff", "CHAFF");
+UnitDescriptor CannonEndDescriptor (99);
+// missiles
+UnitDescriptor MissileBeginDescriptor (100);
+UnitDescriptor AamHs1Descriptor (100, "AamHs1", "AAM HS MK1");
+UnitDescriptor AamHs2Descriptor (101, "AamHs2", "AAM HS MK2");
+UnitDescriptor AamHs3Descriptor (102, "AamHs3", "AAM HS MK3");
+UnitDescriptor Agm1Descriptor (103, "Agm1", "AGM MK1");
+UnitDescriptor Agm2Descriptor (104, "Agm2", "AGM MK2");
+UnitDescriptor DfmDescriptor (105, "Dfm", "DFM");
+UnitDescriptor AamFf1Descriptor (106, "AamFf1", "AAM FF MK1");
+UnitDescriptor AamFf2Descriptor (107, "AamFf2", "AAM FF MK2");
+UnitDescriptor MineDescriptor (150, "Mine", "MINE");
+UnitDescriptor MissileEndDescriptor (199);
+// air units
+UnitDescriptor AirBeginDescriptor (200);
+UnitDescriptor FighterBeginDescriptor (200);
+UnitDescriptor FalconDescriptor (200, "Falcon", "FALCON");
+UnitDescriptor SwallowDescriptor (201, "Swallow", "SWALLOW");
+UnitDescriptor HawkDescriptor (202, "Hawk", "HAWK");
+UnitDescriptor Hawk2Descriptor (203, "Hawk2", "HAWK II");
+UnitDescriptor BuzzardDescriptor (204, "Buzzard", "BUZZARD");
+UnitDescriptor CrowDescriptor (205, "Crow", "CROW");
+UnitDescriptor PhoenixDescriptor (206, "Phoenix", "PHOENIX");
+UnitDescriptor RedArrowDescriptor (207, "RedArrow", "RED ARROW");
+UnitDescriptor BlackBirdDescriptor (208, "BlackBird", "BLACKBIRD");
+UnitDescriptor StormDescriptor (209, "Storm", "STORM");
+UnitDescriptor FighterEndDescriptor (249);
+UnitDescriptor TransportDescriptor (280, "Transport", "TRANSPORT");
+UnitDescriptor Transport2Descriptor (281, "Transport2", "TRANSPORT");
+UnitDescriptor AirEndDescriptor (299);
+// moving ground units from here
+UnitDescriptor MovingGroundBeginDescriptor (500);
+UnitDescriptor TankBeginDescriptor (700);
+UnitDescriptor WieselDescriptor (700, "Wiesel", "WIESEL");
+UnitDescriptor PantherDescriptor (710, "Panther", "PANTHER");
+UnitDescriptor MobileSamDescriptor (711, "MobileSam", "MOBILE SAM");
+UnitDescriptor PickupDescriptor (780, "Pickup", "PICKUP");
+UnitDescriptor Pickup2Descriptor (781, "Pickup2", "PICKUP");
+UnitDescriptor TruckDescriptor (790, "Truck", "TRUCK");
+UnitDescriptor Truck2Descriptor (791, "Truck2", "TRUCK");
+UnitDescriptor TankEndDescriptor (799);
+// moving water units from here
+UnitDescriptor WaterBeginDescriptor (800);
+UnitDescriptor ShipBeginDescriptor (800);
+UnitDescriptor CruiserDescriptor (800, "Cruiser", "CRUISER");
+UnitDescriptor LightDestroyerDescriptor (810, "LightDestroyer", "LIGHT DESTROYER");
+UnitDescriptor ShipEndDescriptor (899);
+// static ground units from here
+UnitDescriptor StaticGroundBeginDescriptor (1000);
+UnitDescriptor AntiAircraftBeginDescriptor (1000);
+UnitDescriptor SacDescriptor (1000, "Sac", "SA CANNON");
+UnitDescriptor SamDescriptor (1010, "Sam", "SAM");
+UnitDescriptor AntiAircraftEndDescriptor (1099);
+// passive static units from here
+UnitDescriptor StaticPassiveBeginDescriptor (10000);
+UnitDescriptor TentDescriptor (10000, "Tent", "TENT");
+UnitDescriptor BigTentDescriptor (10003, "BigTent", "BIG TENT");
+UnitDescriptor ContainerDescriptor (10100, "Container", "CONTAINER");
+UnitDescriptor HallDescriptor (10200, "Hall", "HALL");
+UnitDescriptor Hall2Descriptor (10201, "Hall2", "HALL");
+UnitDescriptor OilrigDescriptor (10300, "Oilrig", "OILRIG");
+UnitDescriptor ComplexDescriptor (10301, "Complex", "COMPLEX");
+UnitDescriptor RadarDescriptor (10302, "Radar", "RADAR");
+UnitDescriptor MoonBaseDescriptor (10303, "MoonBase", "MOONBASE");
+UnitDescriptor DepotDescriptor (10304, "Depot", "DEPOT");
+UnitDescriptor LaserBarrierDescriptor (10400, "LaserBarrier", "LASER BARRIER");
+UnitDescriptor RubbleDescriptor (11000, "Rubble", "RUBBLE");
+UnitDescriptor HouseDescriptor (11100, "House", "HOUSE");
+
 
 
 AIObj::AIObj ()
@@ -73,7 +155,7 @@ void AIObj::init ()
   target = NULL;
   dtheta = 0;
   dgamma = 0;
-  id = MISSILE1;
+  id = MissileBeginDescriptor;
   impact = 30;
   manoevertheta = 0;
   manoeverheight = 0;
@@ -118,7 +200,7 @@ void AIObj::init ()
 
 void AIObj::missileCount ()
 {
-  if (id < FIGHTER1 || id > FIGHTER2) return;
+  if (id < FighterBeginDescriptor || id > AirEndDescriptor) return;
   
   int i;
   for (i = 0; i < missiletypes; i ++)
@@ -132,7 +214,7 @@ void AIObj::missileCount ()
   }
 }
 
-void AIObj::newinit (int id, int party, int intelligence, int precision, int aggressivity)
+void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int precision, int aggressivity)
 {
   int i;
   float zoom = trafo.scaling.x;
@@ -159,9 +241,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
 //  o->cube.set (trafo.scaling);
   
 //  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
-  o = Model3dRegistry::get ("Falcon");
+  o = Model3dRegistry::get (id.name);
 
-  if (id == FIGHTER_FALCON)
+  if (id == FalconDescriptor)
   {
     maxthrust = 0.31;
     nimbility = 0.86;
@@ -177,7 +259,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 1;
     ammo = 1200;
   }
-  else if (id == FIGHTER_SWALLOW)
+  else if (id == SwallowDescriptor)
   {
     maxthrust = 0.24;
     nimbility = 0.64;
@@ -194,7 +276,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 3;
     ammo = 1200;
   }
-  else if (id == FIGHTER_HAWK)
+  else if (id == HawkDescriptor)
   {
     maxthrust = 0.26;
     nimbility = 0.72;
@@ -211,7 +293,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 2;
     ammo = 1200;
   }
-  else if (id == FIGHTER_HAWK2)
+  else if (id == Hawk2Descriptor)
   {
     maxthrust = 0.28;
     nimbility = 0.75;
@@ -229,7 +311,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ammo = 1400;
     dualshot = true;
   }
-  else if (id == FIGHTER_TRANSPORT)
+  else if (id == TransportDescriptor)
   {
     maxthrust = 0.14;
     maxshield = 45;
@@ -244,7 +326,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 0;
     ammo = 0;
   }
-  else if (id == FIGHTER_TRANSPORT2)
+  else if (id == Transport2Descriptor)
   {
     maxthrust = 0.16;
     maxshield = 35;
@@ -259,7 +341,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 0;
     ammo = 0;
   }
-  else if (id == FIGHTER_BUZZARD)
+  else if (id == BuzzardDescriptor)
   {
     maxthrust = 0.31;
     nimbility = 0.82;
@@ -275,7 +357,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 2;
     ammo = 1200;
   }
-  else if (id == FIGHTER_CROW)
+  else if (id == CrowDescriptor)
   {
     maxthrust = 0.25;
     nimbility = 0.72;
@@ -291,7 +373,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 1;
     ammo = 1000;
   }
-  else if (id == FIGHTER_STORM)
+  else if (id == StormDescriptor)
   {
     maxthrust = 0.25;
     nimbility = 0.52;
@@ -307,7 +389,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     statfirepower = 4;
     ammo = 1800;
   }
-  else if (id == FIGHTER_PHOENIX)
+  else if (id == PhoenixDescriptor)
   {
     maxthrust = 0.3;
     nimbility = 0.54;
@@ -325,7 +407,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ammo = 2000;
     dualshot = true;
   }
-  else if (id == FIGHTER_REDARROW)
+  else if (id == RedArrowDescriptor)
   {
     maxthrust = 0.33;
     nimbility = 0.95;
@@ -342,7 +424,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ammo = 1400;
     dualshot = true;
   }
-  else if (id == FIGHTER_BLACKBIRD)
+  else if (id == BlackBirdDescriptor)
   {
     maxthrust = 0.3;
     nimbility = 1.0;
@@ -359,7 +441,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ammo = 1400;
     dualshot = true;
   }
-  if (id >= FIGHTER1 && id <= FIGHTER2)
+  if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
   {
     recthrust = maxthrust / 2.0;
     shield = maxshield;
@@ -370,7 +452,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     o->cube.set (zoom * cubefac, zoom * cubefac, zoom * cubefac);
   }
 
-  if (id == FLAK_AIR1)
+  if (id == SacDescriptor)
   {
     maxthrust = 0;
     thrust = 0;
@@ -380,7 +462,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     shield = maxshield = 80;
     zoom = 0.35;
   }
-  if (id == FLARAK_AIR1)
+  if (id == SamDescriptor)
   {
     maxthrust = 0;
     thrust = 0;
@@ -391,12 +473,12 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.3;
     missiles [6] = 100;
   }
-  if (id >= FLAK1 && id <= FLAK2)
+  if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor)
   {
     o->cube.set (zoom * cubefac1, zoom * cubefac1, zoom * cubefac1);
   }
 
-  if (id == TANK_AIR1)
+  if (id == WieselDescriptor)
   {
     maxthrust = 0.04;
     thrust = 0;
@@ -408,7 +490,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.35;
     o->cube.set (zoom * 0.7, zoom * 0.45, zoom * 0.7);
   }
-  else if (id == TANK_GROUND1)
+  else if (id == PantherDescriptor)
   {
     maxthrust = 0.04;
     thrust = 0;
@@ -420,7 +502,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.4;
     o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
-  else if (id == TANK_PICKUP1)
+  else if (id == PickupDescriptor)
   {
     maxthrust = 0;
     thrust = 0.02;
@@ -431,7 +513,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.25;
     o->cube.set (zoom * 0.7, zoom * 0.55, zoom * 0.7);
   }
-  else if (id == TANK_TRUCK1)
+  else if (id == TruckDescriptor)
   {
     maxthrust = 0;
     thrust = 0.02;
@@ -442,7 +524,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.45;
     o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
-  else if (id == TANK_TRUCK2)
+  else if (id == Truck2Descriptor)
   {
     maxthrust = 0;
     thrust = 0.02;
@@ -453,7 +535,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.4;
     o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
-  else if (id == TANK_TRSAM1)
+  else if (id == MobileSamDescriptor)
   {
     maxthrust = 0;
     thrust = 0.02;
@@ -465,11 +547,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     missiles [6] = 200;
     o->cube.set (zoom * 0.7, zoom * 0.6, zoom * 0.7);
   }
-  if (id >= TANK1 && id <= TANK2)
+  if (id >= TankBeginDescriptor && id <= TankEndDescriptor)
   {
   }
 
-  if (id == SHIP_CRUISER)
+  if (id == CruiserDescriptor)
   {
     zoom = 5.0;
     maxthrust = 0.05;
@@ -482,7 +564,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     missiles [6] = 200;
     o->cube.set (zoom * 0.35, zoom * 0.1, zoom * 0.35);
   }
-  else if (id == SHIP_DESTROYER1)
+  else if (id == LightDestroyerDescriptor)
   {
     zoom = 2.5;
     maxthrust = 0.05;
@@ -496,7 +578,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
 
   float missilethrustbase = 1.2F;
-  if (id == MISSILE_AIR1)
+  if (id == AamHs1Descriptor)
   {
     intelligence = 100;
     maxthrust = 0.7 * missilethrustbase;
@@ -505,7 +587,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 300 * timestep;
     impact = 35;
   }
-  else if (id == MISSILE_AIR2)
+  else if (id == AamHs2Descriptor)
   {
     intelligence = 50;
     maxthrust = 0.75 * missilethrustbase;
@@ -514,7 +596,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 320 * timestep;
     impact = 45;
   }
-  else if (id == MISSILE_AIR3)
+  else if (id == AamHs3Descriptor)
   {
     intelligence = 0;
     maxthrust = 0.8 * missilethrustbase;
@@ -523,7 +605,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 340 * timestep;
     impact = 55;
   }
-  else if (id == MISSILE_GROUND1)
+  else if (id == Agm1Descriptor)
   {
     intelligence = 50;
     maxthrust = 0.75 * missilethrustbase;
@@ -533,7 +615,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 300 * timestep;
     impact = 400;
   }
-  else if (id == MISSILE_GROUND2)
+  else if (id == Agm2Descriptor)
   {
     intelligence = 0;
     maxthrust = 0.8 * missilethrustbase;
@@ -543,7 +625,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 400 * timestep;
     impact = 500;
   }
-  else if (id == MISSILE_DF1)
+  else if (id == DfmDescriptor)
   {
     intelligence = 0;
     maxthrust = 0.75 * missilethrustbase;
@@ -553,7 +635,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 350 * timestep;
     impact = 920;
   }
-  else if (id == MISSILE_FF1)
+  else if (id == AamFf1Descriptor)
   {
     intelligence = 0;
     maxthrust = 0.8 * missilethrustbase;
@@ -562,7 +644,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 300 * timestep;
     impact = 40;
   }
-  else if (id == MISSILE_FF2)
+  else if (id == AamFf2Descriptor)
   {
     intelligence = 0;
     maxthrust = 0.85 * missilethrustbase;
@@ -571,7 +653,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ttl = 320 * timestep;
     impact = 50;
   }
-  else if (id == MISSILE_MINE1)
+  else if (id == MineDescriptor)
   {
     intelligence = 0;
     maxthrust = 0.1;
@@ -584,12 +666,12 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 500;
     zoom = 0.3;
   }
-  if (id >= MISSILE1 && id <= MISSILE2)
+  if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
   {
     o->cube.set (zoom, zoom, zoom);
   }
 
-  if (id >= STATIC_PASSIVE)
+  if (id >= StaticPassiveBeginDescriptor)
   {
     intelligence = 0;
     maxthrust = 0;
@@ -599,61 +681,61 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxrot.theta = 0;
     maxrot.gamma = 0;
   }
-  if (id == STATIC_TENT1)
+  if (id == TentDescriptor)
   {
     shield = maxshield = 80;
     zoom = 0.5;
     o->cube.set (zoom * 0.9, zoom, zoom * 0.9);
   }
-  if (id == STATIC_TENT4)
+  if (id == BigTentDescriptor)
   {
     shield = maxshield = 160;
     zoom = 1.2;
     o->cube.set (zoom * 0.7, zoom * 0.42, zoom * 0.7);
   }
-  if (id == STATIC_CONTAINER1)
+  if (id == ContainerDescriptor)
   {
     shield = maxshield = 30;
     zoom = 1.0;
     impact = 20;
     o->cube.set (zoom * 0.4, zoom * 0.35, zoom * 0.9);
   }
-  if (id == STATIC_HALL1)
+  if (id == HallDescriptor)
   {
     shield = maxshield = 450;
     zoom = 1.8;
     impact = 20;
     o->cube.set (zoom * 0.45, zoom * 0.42, zoom);
   }
-  if (id == STATIC_HALL2)
+  if (id == Hall2Descriptor)
   {
     shield = maxshield = 900;
     zoom = 2.5;
     impact = 20;
     o->cube.set (zoom, zoom * 0.45, zoom);
   }
-  if (id == STATIC_OILRIG1)
+  if (id == OilrigDescriptor)
   {
     shield = maxshield = 1400;
     zoom = 3.5;
     impact = 20;
     o->cube.set (zoom * 0.95, zoom * 0.5, zoom * 0.95);
   }
-  if (id == STATIC_COMPLEX1)
+  if (id == ComplexDescriptor)
   {
     shield = maxshield = 5000;
     zoom = 2.0;
     impact = 20;
     o->cube.set (zoom * 0.75, zoom * 0.6, zoom * 0.75);
   }
-  if (id == STATIC_RADAR1)
+  if (id == RadarDescriptor)
   {
     shield = maxshield = 500;
     zoom = 1.3;
     impact = 20;
     o->cube.set (zoom * 0.5, zoom * 0.7, zoom * 0.5);
   }
-  if (id == ASTEROID)
+  if (id == AsteroidDescriptor)
   {
     shield = maxshield = 100000;
     zoom = 0.01 * math.random (60) + 1.0;
@@ -664,28 +746,28 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ai = false;
     o->cube.set (zoom * 0.7, zoom * 0.7, zoom * 0.7);
   }
-  if (id == STATIC_BASE1)
+  if (id == MoonBaseDescriptor)
   {
     shield = maxshield = 5500;
     zoom = 4.0;
     impact = 20;
     o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
-  if (id == STATIC_DEPOT1)
+  if (id == DepotDescriptor)
   {
     shield = maxshield = 3000;
     zoom = 1.5;
     impact = 20;
     o->cube.set (zoom, zoom * 0.5, zoom);
   }
-  if (id == STATIC_BARRIER1)
+  if (id == LaserBarrierDescriptor)
   {
     shield = maxshield = 1000;
     zoom = 12.0;
     impact = 2000;
     o->cube.set (0.8, 11, 11);
   }
-  if (id >= STATIC_PASSIVE)
+  if (id >= StaticPassiveBeginDescriptor)
   {
   }
 
@@ -717,7 +799,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   missileCount ();
 }
 
-void AIObj::newinit (int id, int party, int intelligence)
+void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence)
 {
   newinit (id, party, intelligence, intelligence, intelligence);
 }
@@ -725,12 +807,12 @@ void AIObj::newinit (int id, int party, int intelligence)
 void AIObj::initValues (DynamicObj *dobj, float phi)
 {
   float fac = trafo.scaling.x / 8;
-  if (dobj->id == FLARE1 || dobj->id == CHAFF1) fac = -fac;
+  if (dobj->id == FlareDescriptor || dobj->id == ChaffDescriptor) fac = -fac;
   // use the exact polar coordinates because of gamma and theta
   float cgamma = currot.gamma;
   dobj->trafo.translation.x = trafo.translation.x + COS(cgamma) * SIN(phi) * fac;
   dobj->trafo.translation.y = trafo.translation.y - SIN(cgamma) * fac;
-  if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+  if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
     dobj->trafo.translation.y += fac;
   dobj->trafo.translation.z = trafo.translation.z + COS(cgamma) * COS(phi) * fac;
   dobj->currot.phi = phi;
@@ -753,7 +835,7 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
     if (target->active)
     {
       // exact calculation to hit enemy (non-static turret!)
-      if (id >= FIGHTER1 && id <= FIGHTER2)
+      if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
         laser->currot.gamma = currot.gamma;
       else
         laser->currot.gamma = 180.0 + atan ((target->trafo.translation.y - trafo.translation.y) / distance (target)) * 180.0 / PI;
@@ -813,14 +895,9 @@ void AIObj::fireCannon (DynamicObj **laser)
   fireCannon (laser, currot.phi);
 }
 
-void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
+void AIObj::fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *target)
 {
-  char buf [4096];
-  if (logging.loglevel == LOG_DEBUG)
-  {
-    sprintf (buf, "Missile: party=%d, id=%d", party, id);
-    DISPLAY_DEBUG(buf);
-  }
+  DISPLAY_DEBUG(FormatString ("Missile: party=%d, id=%d", party, id.id));
   ttf = 50 * timestep;
   missile->init ();
   missile->newinit (id, party, 0);
@@ -839,7 +916,7 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
   missile->dgamma = 0;
   missile->source = this;
   missile->activate ();
-  if (id >= FIGHTER1 && id <= FIGHTER2)
+  if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
   {
     missile->manoeverheight = 30 * timestep;
     missile->recheight = missile->trafo.translation.y - l->getHeight (missile->trafo.translation.x, missile->trafo.translation.z) - 4;
@@ -872,16 +949,14 @@ int AIObj::nextMissile (int from)
   return i;
 }
 
-bool AIObj::haveMissile (int id)
+bool AIObj::haveMissile (const UnitDescriptor &id)
 {
-  char buf [4096];
-  id -= MISSILE1;
-  if (id < 0 || id >= missiletypes)
+  int value = id - MissileBeginDescriptor;
+  if (value < 0 || value >= missiletypes)
   {
-    sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    DISPLAY_ERROR(buf);
+    DISPLAY_ERROR("Wrong missile ID");
   }
-  if (missiles [id] > 0)
+  if (missiles [value] > 0)
     return true;
   return false;
 }
@@ -893,20 +968,18 @@ bool AIObj::haveMissile () // due to missiletype
   return false;
 }
 
-void AIObj::decreaseMissile (int id)
+void AIObj::decreaseMissile (const UnitDescriptor &id)
 {
-  char buf [4096];
   int i;
-  id -= MISSILE1;
-  if (id < 0 || id >= missiletypes)
+  int value = id - MissileBeginDescriptor;
+  if (value < 0 || value >= missiletypes)
   {
-    sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    DISPLAY_ERROR(buf);
+    DISPLAY_ERROR("Wrong missile ID");
   }
-  missiles [id] --;
+  missiles [value] --;
   int ptrrack = 0, maxrack = 0;
   for (i = 0; i < missileracks; i ++)
-    if (missilerack [i] == id)
+    if (missilerack [i] == id.id)
       if (missilerackn [i] > maxrack)
       {
         ptrrack = i;
@@ -919,7 +992,7 @@ void AIObj::decreaseMissile (int id)
   }
 }
 
-bool AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
+bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile, AIObj *target)
 {
   int i;
   if (!haveMissile (id)) return false;
@@ -941,10 +1014,19 @@ bool AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
 bool AIObj::fireMissile (AIObj **missile, AIObj *target)
 {
   if (ttf > 0) return false;
-  return fireMissile (missiletype + MISSILE1, missile, (AIObj *) target);
+  UnitDescriptor desc;
+  if (missiletype == 0) desc = AamHs1Descriptor;
+  else if (missiletype == 1) desc = AamHs2Descriptor;
+  else if (missiletype == 2) desc = AamHs3Descriptor;
+  else if (missiletype == 3) desc = Agm1Descriptor;
+  else if (missiletype == 4) desc = Agm2Descriptor;
+  else if (missiletype == 5) desc = DfmDescriptor;
+  else if (missiletype == 6) desc = AamFf1Descriptor;
+  else if (missiletype == 7) desc = AamFf1Descriptor;
+  return fireMissile (desc, missile, (AIObj *) target); // TODO: lookup in descriptor registry: MissileBeginDescriptor + missiletype
 }
 
-bool AIObj::fireMissile (int id, AIObj **missile)
+bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile)
 {
   if (ttf > 0) return false;
   return fireMissile (id, missile, (AIObj *) target);
@@ -953,66 +1035,82 @@ bool AIObj::fireMissile (int id, AIObj **missile)
 bool AIObj::fireMissile (AIObj **missile)
 {
   if (ttf > 0) return false;
-  return fireMissile (missiletype + MISSILE1, missile);
+  UnitDescriptor desc;
+  if (missiletype == 0) desc = AamHs1Descriptor;
+  else if (missiletype == 1) desc = AamHs2Descriptor;
+  else if (missiletype == 2) desc = AamHs3Descriptor;
+  else if (missiletype == 3) desc = Agm1Descriptor;
+  else if (missiletype == 4) desc = Agm2Descriptor;
+  else if (missiletype == 5) desc = DfmDescriptor;
+  else if (missiletype == 6) desc = AamFf1Descriptor;
+  else if (missiletype == 7) desc = AamFf1Descriptor;
+  return fireMissile (desc, missile); // TODO: lookup in descriptor registry: MissileBeginDescriptor + missiletype
 }
 
 bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
 {
   if (ttf > 0) return false;
-  if (target->id >= MOVING_GROUND) return false;
-  if (haveMissile (MISSILE_AIR3))
-    return fireMissile (MISSILE_AIR3, missile, (AIObj *) target);
-  else if (haveMissile (MISSILE_AIR2))
-    return fireMissile (MISSILE_AIR2, missile, (AIObj *) target);
-  else if (haveMissile (MISSILE_AIR1))
-    return fireMissile (MISSILE_AIR1, missile, (AIObj *) target);
+  if (target->id >= MovingGroundBeginDescriptor) return false;
+  if (haveMissile (AamHs3Descriptor))
+    return fireMissile (AamHs3Descriptor, missile, (AIObj *) target);
+  else if (haveMissile (AamHs2Descriptor))
+    return fireMissile (AamHs2Descriptor, missile, (AIObj *) target);
+  else if (haveMissile (AamHs1Descriptor))
+    return fireMissile (AamHs1Descriptor, missile, (AIObj *) target);
   return false;
 }
 
 bool AIObj::selectMissileAir (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_AIR3)) { missiletype = MISSILE_AIR3 - MISSILE1; sel = true; }
-  else if (haveMissile (MISSILE_AIR2)) { missiletype = MISSILE_AIR2 - MISSILE1; sel = true; }
-  else if (haveMissile (MISSILE_AIR1)) { missiletype = MISSILE_AIR1 - MISSILE1; sel = true; }
+  if (haveMissile (AamHs3Descriptor))
+  { missiletype = AamHs3Descriptor - MissileBeginDescriptor; sel = true; }
+  else if (haveMissile (AamHs2Descriptor))
+  { missiletype = AamHs2Descriptor - MissileBeginDescriptor; sel = true; }
+  else if (haveMissile (AamHs1Descriptor))
+  { missiletype = AamHs1Descriptor - MissileBeginDescriptor; sel = true; }
   return sel;
 }
 
 bool AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
 {
   if (ttf > 0) return false;
-  if (target->id >= MOVING_GROUND) return false;
-  if (haveMissile (MISSILE_FF2))
-    return fireMissile (MISSILE_FF2, missile, (AIObj *) target);
-  else if (haveMissile (MISSILE_FF1))
-    return fireMissile (MISSILE_FF1, missile, (AIObj *) target);
+  if (target->id >= MovingGroundBeginDescriptor) return false;
+  if (haveMissile (AamFf2Descriptor))
+    return fireMissile (AamFf2Descriptor, missile, (AIObj *) target);
+  else if (haveMissile (AamFf1Descriptor))
+    return fireMissile (AamFf1Descriptor, missile, (AIObj *) target);
   return false;
 }
 
 bool AIObj::selectMissileAirFF (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_FF2)) { missiletype = MISSILE_FF2 - MISSILE1; sel = true; }
-  else if (haveMissile (MISSILE_FF1)) { missiletype = MISSILE_FF1 - MISSILE1; sel = true; }
+  if (haveMissile (AamFf2Descriptor))
+  { missiletype = AamFf2Descriptor - MissileBeginDescriptor; sel = true; }
+  else if (haveMissile (AamFf1Descriptor))
+  { missiletype = AamFf1Descriptor - MissileBeginDescriptor; sel = true; }
   return sel;
 }
 
 bool AIObj::fireMissileGround (AIObj **missile)
 {
   if (ttf > 0) return false;
-  if (target->id < MOVING_GROUND) return false;
-  if (haveMissile (MISSILE_GROUND2))
-    return fireMissile (MISSILE_GROUND2, missile, (AIObj *) target);
-  else if (haveMissile (MISSILE_GROUND1))
-    return fireMissile (MISSILE_GROUND1, missile, (AIObj *) target);
+  if (target->id < MovingGroundBeginDescriptor) return false;
+  if (haveMissile (Agm2Descriptor))
+    return fireMissile (Agm2Descriptor, missile, (AIObj *) target);
+  else if (haveMissile (Agm1Descriptor))
+    return fireMissile (Agm1Descriptor, missile, (AIObj *) target);
   return false;
 }
 
 bool AIObj::selectMissileGround (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_GROUND2)) { missiletype = MISSILE_GROUND2 - MISSILE1; sel = true; }
-  else if (haveMissile (MISSILE_GROUND1)) { missiletype = MISSILE_GROUND1 - MISSILE1; sel = true; }
+  if (haveMissile (Agm2Descriptor))
+  { missiletype = Agm2Descriptor - MissileBeginDescriptor; sel = true; }
+  else if (haveMissile (Agm1Descriptor))
+  { missiletype = Agm1Descriptor - MissileBeginDescriptor; sel = true; }
   return sel;
 }
 
@@ -1028,7 +1126,7 @@ void AIObj::targetNearestGroundEnemy (AIObj **f)
       float phi = getAngle (f [i]);
       float d2 = distance (f [i]) * (60 + fabs (phi)); // prefer enemies in front
       if (bomber)
-        if (f [i]->id < MOVING_GROUND)
+        if (f [i]->id < MovingGroundBeginDescriptor)
           d2 += 1E10; // only use this target if no ground targets exist
       if (d2 < d)
       {
@@ -1297,7 +1395,7 @@ void AIObj::estimateTargetPosition (float *dx2, float *dz2)
   newphi += (float) target->currot.phi;
   if (newphi >= 360) newphi -= 360;
   if (newphi < 0) newphi += 360;
-  if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
   {
     ex = target->trafo.translation.x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
     ez = target->trafo.translation.z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
@@ -1377,11 +1475,11 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // move object according to our physics
   move (dt, camphi, camgamma);
 
-  if (id >= STATIC_PASSIVE) // no AI for static ground objects (buildings)
+  if (id >= StaticPassiveBeginDescriptor) // no AI for static ground objects (buildings)
     return;
 
   // set smoke
-  if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2)) // missile or fighter
+  if ((id >= MissileBeginDescriptor && id < MineDescriptor) || (id >= FighterBeginDescriptor && id <= AirEndDescriptor)) // missile or fighter
   {
     setSmoke (dt);
   }
@@ -1407,7 +1505,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     disttarget = 1;
 
   // get a new target if necessary
-  if (id >= MISSILE1 && id <= MISSILE2)
+  if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
   {
     if (target == NULL)
       ttl = 0;
@@ -1431,7 +1529,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   else
   {
      // missiles and non intelligent objects will not change their height due to the surface
-    if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
+    if ((id >= MissileBeginDescriptor && id <= MissileEndDescriptor && target != NULL) ||
         (trafo.translation.y - myheight > 8 && target != NULL && trafo.translation.y - myheight < 50/* && !manoeverheight*/))
     {
       recheight2 = target->trafo.translation.y - 8 * target->thrust * SIN(target->currot.gamma);
@@ -1451,17 +1549,17 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // calculate the recommended height, recheight2 depends on it
   if (manoeverheight <= 0)
   {
-    if (!(id >= FIGHTER1 && id <= FIGHTER2) && target != NULL) // no fighter, has target (missile, mine)
+    if (!(id >= FighterBeginDescriptor && id <= AirEndDescriptor) && target != NULL) // no fighter, has target (missile, mine)
     {
       recheight = target->trafo.translation.y - targetheight;
     }
-    else if (id == FIGHTER_TRANSPORT || id == FIGHTER_TRANSPORT2) // transporters have to stay higher
+    else if (id == TransportDescriptor || id == Transport2Descriptor) // transporters have to stay higher
     {
       recheight = 40; manoeverheight = 1;
     }
-    else if (id >= FIGHTER1 && id <= FIGHTER2 && target != NULL) // fighter, has target
+    else if (id >= FighterBeginDescriptor && id <= AirEndDescriptor && target != NULL) // fighter, has target
     {
-      if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+      if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
         recheight = target->trafo.translation.y - targetheight;  // target is a fighter
       else
         recheight = target->trafo.translation.y - targetheight + 5; // target is no fighter
@@ -1498,11 +1596,11 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   }
   
   // get recommended elevation to target
-  if (ttl <= 0 && id >= MISSILE1 && id <= MISSILE2 && id != MISSILE_MINE1)
+  if (ttl <= 0 && id >= MissileBeginDescriptor && id <= MissileEndDescriptor && id != MineDescriptor)
   { recheight = -100; recheight2 = -100; recrot.gamma = 90; }
   else if (ai)
   {
-    if (target != NULL && ((id >= MISSILE1 && id <= MISSILE2) || (id >= FIGHTER1 && id <= FIGHTER2 && manoeverheight <= 0))) // is AGM
+    if (target != NULL && ((id >= MissileBeginDescriptor && id <= MissileEndDescriptor) || (id >= FighterBeginDescriptor && id <= AirEndDescriptor && manoeverheight <= 0))) // is AGM
     {
       float dgamma = 0;
       if (disttarget <= -0.00001 || disttarget >= 0.00001) // no division by zero
@@ -1527,7 +1625,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   limitRotation ();
 
-  if (id >= MISSILE1 && id <= MISSILE2)
+  if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
   {
     if (target == NULL)
     {
@@ -1544,11 +1642,11 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if (target == NULL) return;
 
   // fighter's targeting mechanism for missiles
-  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  if (id >= FighterBeginDescriptor && id <= AirEndDescriptor) // for fighters do the following
   {
     if (ai)
     {
-      if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+      if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
       {
         if (!selectMissileAirFF (m))
           selectMissileAir (m);
@@ -1567,7 +1665,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   float dx2, dz2;
   float dx = target->trafo.translation.x - trafo.translation.x, dz = target->trafo.translation.z - trafo.translation.z; // current distances
-  if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+  if ((id >= FighterBeginDescriptor && id <= AirEndDescriptor) || (id >= MissileBeginDescriptor && id <= MissileEndDescriptor) || (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || (id >= TankBeginDescriptor && id <= TankEndDescriptor))
   {
     estimateTargetPosition (&dx2, &dz2);
   }
@@ -1581,7 +1679,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // heading calculations
   int firerate = getFireRate ();
 
-  if (id >= MISSILE1 && id <= MISSILE2) // for missiles do the following
+  if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor) // for missiles do the following
   {
     if (fabs (aw) < 50 && disttarget > 50) // target in front and minimum distance, then no roll
       recrot.theta = 0;
@@ -1598,7 +1696,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
     }
   }
-  else if (id >= FLAK1 && id <= FLAK2) // ground-air-cannon
+  else if (id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) // ground-air-cannon
   {
     recthrust = 0; thrust = 0;
     if (aw > 5)
@@ -1614,7 +1712,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       recrot.theta = 0;
     }
   }
-  else if (id >= TANK1 && id <= TANK2) // tanks
+  else if (id >= TankBeginDescriptor && id <= TankEndDescriptor) // tanks
   {
     recthrust = maxthrust; thrust = maxthrust; // always at maximum thrust
     if (aw > 5)
@@ -1631,13 +1729,13 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
     if (firecannonttl <= 0)
     {
-      if (id == TANK_AIR1)
+      if (id == WieselDescriptor)
         if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->trafo.translation.y > trafo.translation.y + 2)
         {
           fireCannon (c);
           firecannonttl += firerate * timestep;
         }
-      if (id == TANK_GROUND1)
+      if (id == PantherDescriptor)
         if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 35 && target->trafo.translation.y <= trafo.translation.y + 1 && target->trafo.translation.y >= trafo.translation.y - 1)
         {
           fireCannon (c);
@@ -1647,7 +1745,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   }
 
   // thrust and manoever calculations
-  if ((id >= FLAK1 && id <= FLAK2) || id == SHIP_CRUISER || id == SHIP_DESTROYER1 || id == TANK_TRSAM1)
+  if ((id >= AntiAircraftBeginDescriptor && id <= AntiAircraftEndDescriptor) || id == CruiserDescriptor || id == LightDestroyerDescriptor || id == MobileSamDescriptor)
   {
     if (firecannonttl <= 0)
       for (int i = 0; i < maxfighter; i ++)
@@ -1655,14 +1753,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         {
           estimateFighterHeading (f [i]);
 
-          if (id == FLAK_AIR1)
+          if (id == SacDescriptor)
             if (f [i]->trafo.translation.y > trafo.translation.y + 2)
             {
               if (fabs (aw) <= 20 && disttarget < 50) // + aggressive
                 fireCannon (c, currot.phi + aw);
               firecannonttl = firerate * timestep;
             }
-          if (id == SHIP_DESTROYER1)
+          if (id == LightDestroyerDescriptor)
             if (f [i]->trafo.translation.y > trafo.translation.y + 2)
             {
               if (aw >= 0 && aw < 40 && disttarget < 50) // + aggressive
@@ -1676,7 +1774,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
               firecannonttl = firerate * timestep;
             }
           if (firemissilettl <= 0)
-            if (id == FLARAK_AIR1)
+            if (id == SamDescriptor)
               if (fabs (aw) < 25 && disttarget < 45) // + aggressive
                 if (f [i]->trafo.translation.y > trafo.translation.y + 2)
                 {
@@ -1684,7 +1782,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
                   fireMissileAirFF (m, f [i]);
                   firemissilettl += (20 + firerate * 10) * timestep;
                 }
-          if (id == TANK_TRSAM1)
+          if (id == MobileSamDescriptor)
           {
             if (firemissilettl <= 0)
               if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive
@@ -1695,7 +1793,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
                 missiles [6] ++; // unlimited ammo
               }
           }
-          if (id == SHIP_CRUISER)
+          if (id == CruiserDescriptor)
           {
             if (firemissilettl <= 0)
               if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive

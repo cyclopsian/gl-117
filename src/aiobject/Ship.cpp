@@ -140,7 +140,7 @@ void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
   int firerate = getFireRate ();
 
   // thrust and manoever calculations
-  if (id == SHIP_CRUISER || id == SHIP_DESTROYER1)
+  if (id == CruiserDescriptor || id == LightDestroyerDescriptor)
   {
     if (firecannonttl <= 0)
       for (int i = 0; i < maxfighter; i ++)
@@ -148,7 +148,7 @@ void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
         {
           estimateFighterHeading (f [i]);
 
-          if (id == SHIP_DESTROYER1)
+          if (id == LightDestroyerDescriptor)
             if (f [i]->trafo.translation.y > trafo.translation.y + 2)
             {
               if (aw >= 0 && aw < 40 && disttarget < 50) // + aggressive
@@ -162,7 +162,7 @@ void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
               firecannonttl = firerate * timestep;
             }
           if (firemissilettl <= 0)
-            if (id == FLARAK_AIR1)
+            if (id == SamDescriptor)
               if (fabs (aw) < 25 && disttarget < 45) // + aggressive
                 if (f [i]->trafo.translation.y > trafo.translation.y + 2)
                 {
@@ -170,7 +170,7 @@ void Ship::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
                   fireMissileAirFF (m, f [i]);
                   firemissilettl += (20 + firerate * 10) * timestep;
                 }
-          if (id == SHIP_CRUISER)
+          if (id == CruiserDescriptor)
           {
             if (firemissilettl <= 0)
               if (aw >= -30 && aw < 30 && disttarget < 60) // + aggressive

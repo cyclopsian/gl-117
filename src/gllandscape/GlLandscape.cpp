@@ -2028,14 +2028,14 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 
   if (phi < 0 || phi >= 360)
   {
-    sprintf (buf, "Phi exceeds in file %s, line %d, val %d", __FILE__, __LINE__, phi);
-    DISPLAY_ERROR(buf);
+    assert (false);
+    DISPLAY_ERROR("Phi exeeds valid values");
   }
 
   if (gamma < 0 || gamma >= 360)
   {
-    sprintf (buf, "Gamma exceeds in file %s, line %d, val %d", __FILE__, __LINE__, gamma);
-    DISPLAY_ERROR(buf);
+    assert (false);
+    DISPLAY_ERROR("Gamma exceeds valid values");
   }
 
   glPushMatrix ();

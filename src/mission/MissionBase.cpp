@@ -75,7 +75,7 @@ void MissionBase::start ()
   fplayer->target = fighter [4];
   for (i = 1; i <= 3; i ++)
   {
-    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], i);
+    alliedInit (FalconDescriptor, alliedpilot [i - 1], i);
     fighter [i]->trafo.translation.x = px + 10 + i * 5;
     fighter [i]->trafo.translation.z = py + 100 + i * 5;
   }
@@ -84,67 +84,67 @@ void MissionBase::start ()
   fighter [n]->trafo.translation.z = py;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->newinit (Hall2Descriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py + 5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->newinit (Hall2Descriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px + 4;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px - 1.5;
   fighter [n]->trafo.translation.z = py - 4.5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px + 1.5;
   fighter [n]->trafo.translation.z = py - 4.5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px - 3;
   fighter [n]->trafo.translation.z = py + 4;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px - 5.5;
   fighter [n]->trafo.translation.z = py + 4;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px - 4;
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
   fighter [n]->maxrot.theta = 0;
   n ++;
@@ -152,7 +152,7 @@ void MissionBase::start ()
   fighter [n]->trafo.translation.z = py - 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
   fighter [n]->maxrot.theta = 0;
   n ++;
@@ -160,7 +160,7 @@ void MissionBase::start ()
   fighter [n]->trafo.translation.z = py - 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 270;
   fighter [n]->maxrot.theta = 0;
   n ++;
@@ -168,7 +168,7 @@ void MissionBase::start ()
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 180;
   fighter [n]->maxrot.theta = 0;
   n ++;
@@ -179,7 +179,7 @@ void MissionBase::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = px + i * 5 - 60;
     fighter [i]->trafo.translation.z = py + i * 5 - 60;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 180 + math.random (200));
+    fighter [i]->newinit (CrowDescriptor, 0, 180 + math.random (200));
   }
 }
 

@@ -41,7 +41,7 @@ MissionDefend1::MissionDefend1 ()
   alliedfighters = 2;
   alliedpilot [0] = PILOT_SHADOW;
   maxtime = 3500 * timestep;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [1] = Hawk2Descriptor;
 }
 
 void MissionDefend1::start ()
@@ -59,7 +59,7 @@ void MissionDefend1::start ()
   fplayer->trafo.translation.x = 10;
   fplayer->trafo.translation.z = 90;
   fplayer->target = fighter [7];
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  alliedInit (Hawk2Descriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 20;
   fighter [1]->trafo.translation.z = 100;
   fighter [1]->target = fighter [8];
@@ -70,13 +70,13 @@ void MissionDefend1::start ()
     if (i == 3 || i == 4 || i == 5)
     {
 //      fighter [i]->o = &model_flarak1;
-      fighter [i]->newinit (FLARAK_AIR1, 0, 400);
+      fighter [i]->newinit (SamDescriptor, 0, 400);
       fighter [i]->target = fighter [0];
     }
     else
     {
 //      fighter [i]->o = &model_flak1;
-      fighter [i]->newinit (FLAK_AIR1, 0, 400);
+      fighter [i]->newinit (SacDescriptor, 0, 400);
       fighter [i]->target = fighter [0];
     }
     fighter [i]->party = 1;
@@ -89,7 +89,7 @@ void MissionDefend1::start ()
     fighter [i]->trafo.translation.x = i * 5 - 50;
     fighter [i]->trafo.translation.z = -i * 5 - off;
 //    fighter [i]->o = &model_tank2;
-    fighter [i]->newinit (TANK_GROUND1, 0, 300);
+    fighter [i]->newinit (PantherDescriptor, 0, 300);
     fighter [i]->target = fighter [i - 4];
   }
   for (i = 11; i <= 15; i ++)
@@ -101,12 +101,12 @@ void MissionDefend1::start ()
     fighter [i]->trafo.translation.z = -i * 5 - off * 2;
     if (i == 12)
     {
-      fighter [i]->newinit (TANK_AIR1, 0, 300);
+      fighter [i]->newinit (WieselDescriptor, 0, 300);
 //      fighter [i]->o = &model_tank1;
     }
     else
     {
-      fighter [i]->newinit (TANK_GROUND1, 0, 300);
+      fighter [i]->newinit (PantherDescriptor, 0, 300);
 //      fighter [i]->o = &model_tank2;
     }
     fighter [i]->target = fighter [i - 4];

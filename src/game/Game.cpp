@@ -517,52 +517,52 @@ void setLightSource (int gamma)
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
-Model3d *getModel (int id)
+/*Model3d *getModel (const UnitDescriptor &id)
 {
-  if (id == FIGHTER_FALCON) return Model3dRegistry::get ("Falcon");
-  else if (id == FIGHTER_SWALLOW) return Model3dRegistry::get ("Swallow");
-  else if (id == FIGHTER_HAWK) return Model3dRegistry::get ("Hawk");
-  else if (id == FIGHTER_HAWK2) return Model3dRegistry::get ("Hawk2");
-  else if (id == FIGHTER_BUZZARD) return Model3dRegistry::get ("Buzzard");
-  else if (id == FIGHTER_CROW) return Model3dRegistry::get ("Crow");
-  else if (id == FIGHTER_PHOENIX) return Model3dRegistry::get ("Phoenix");
-  else if (id == FIGHTER_REDARROW) return Model3dRegistry::get ("RedArrow");
-  else if (id == FIGHTER_BLACKBIRD) return Model3dRegistry::get ("BlackBird");
-  else if (id == FIGHTER_STORM) return Model3dRegistry::get ("Storm");
-  else if (id == FIGHTER_TRANSPORT) return Model3dRegistry::get ("Transport");
-  else if (id == FIGHTER_TRANSPORT2) return Model3dRegistry::get ("Transport2");
-  else if (id == MISSILE_AIR1) return Model3dRegistry::get ("AamHs1");
-  else if (id == MISSILE_AIR2) return Model3dRegistry::get ("AamHs2");
-  else if (id == MISSILE_AIR3) return Model3dRegistry::get ("AamHs3");
-  else if (id == MISSILE_GROUND1) return Model3dRegistry::get ("Agm1");
-  else if (id == MISSILE_GROUND2) return Model3dRegistry::get ("Agm2");
-  else if (id == MISSILE_DF1) return Model3dRegistry::get ("Dfm");
-  else if (id == MISSILE_FF1) return Model3dRegistry::get ("AamFf1");
-  else if (id == MISSILE_FF2) return Model3dRegistry::get ("AamFf2");
-  else if (id == TANK_AIR1) return Model3dRegistry::get ("Wiesel");
-  else if (id == TANK_GROUND1) return Model3dRegistry::get ("Panther");
-  else if (id == TANK_TRSAM1) return Model3dRegistry::get ("MobileSam");
-  else if (id == TANK_PICKUP1) return Model3dRegistry::get ("Pickup");
-  else if (id == TANK_TRUCK1) return Model3dRegistry::get ("Truck");
-  else if (id == TANK_TRUCK2) return Model3dRegistry::get ("Truck2");
-  else if (id == SHIP_CRUISER) return Model3dRegistry::get ("Cruiser");
-  else if (id == SHIP_DESTROYER1) return Model3dRegistry::get ("LightDestroyer");
-  else if (id == FLAK_AIR1) return Model3dRegistry::get ("Sac");
-  else if (id == FLARAK_AIR1) return Model3dRegistry::get ("Sam");
-  else if (id == STATIC_TENT1) return Model3dRegistry::get ("Tent");
-  else if (id == STATIC_TENT4) return Model3dRegistry::get ("BigTent");
-  else if (id == STATIC_CONTAINER1) return Model3dRegistry::get ("Container");
-  else if (id == STATIC_HALL1) return Model3dRegistry::get ("Hall");
-  else if (id == STATIC_HALL2) return Model3dRegistry::get ("Hall2");
-  else if (id == STATIC_OILRIG1) return Model3dRegistry::get ("Oilrig");
-  else if (id == STATIC_COMPLEX1) return Model3dRegistry::get ("Complex");
-  else if (id == STATIC_RADAR1) return Model3dRegistry::get ("Radar");
-  else if (id == STATIC_BASE1) return Model3dRegistry::get ("MoonBase");
-  else if (id == STATIC_DEPOT1) return Model3dRegistry::get ("Depot");
-  else if (id == STATIC_BARRIER1) return Model3dRegistry::get ("LaserBarrier");
-  else if (id == ASTEROID) return Model3dRegistry::get ("Asteroid");
-  return Model3dRegistry::get ("Falcon");
-}
+  if (id == FalconDescriptor) return Model3dRegistry::get ("FalconDescriptor");
+  else if (id == SwallowDescriptor) return Model3dRegistry::get ("SwallowDescriptor");
+  else if (id == HawkDescriptor) return Model3dRegistry::get ("HawkDescriptor");
+  else if (id == Hawk2Descriptor) return Model3dRegistry::get ("Hawk2Descriptor");
+  else if (id == BuzzardDescriptor) return Model3dRegistry::get ("BuzzardDescriptor");
+  else if (id == CrowDescriptor) return Model3dRegistry::get ("CrowDescriptor");
+  else if (id == PhoenixDescriptor) return Model3dRegistry::get ("PhoenixDescriptor");
+  else if (id == RedArrowDescriptor) return Model3dRegistry::get ("RedArrowDescriptor");
+  else if (id == BlackBirdDescriptor) return Model3dRegistry::get ("BlackBirdDescriptor");
+  else if (id == StormDescriptor) return Model3dRegistry::get ("StormDescriptor");
+  else if (id == TransportDescriptor) return Model3dRegistry::get ("TransportDescriptor");
+  else if (id == Transport2Descriptor) return Model3dRegistry::get ("Transport2Descriptor");
+  else if (id == AamHs1Descriptor) return Model3dRegistry::get ("AamHs1Descriptor");
+  else if (id == AamHs2Descriptor) return Model3dRegistry::get ("AamHs2Descriptor");
+  else if (id == AamHs3Descriptor) return Model3dRegistry::get ("AamHs3Descriptor");
+  else if (id == Agm1Descriptor) return Model3dRegistry::get ("Agm1Descriptor");
+  else if (id == Agm2Descriptor) return Model3dRegistry::get ("Agm2Descriptor");
+  else if (id == DfmDescriptor) return Model3dRegistry::get ("DfmDescriptor");
+  else if (id == AamFf1Descriptor) return Model3dRegistry::get ("AamFf1Descriptor");
+  else if (id == AamFf2Descriptor) return Model3dRegistry::get ("AamFf2Descriptor");
+  else if (id == WieselDescriptor) return Model3dRegistry::get ("WieselDescriptor");
+  else if (id == PantherDescriptor) return Model3dRegistry::get ("PantherDescriptor");
+  else if (id == MobileSamDescriptor) return Model3dRegistry::get ("MobileSamDescriptor");
+  else if (id == PickupDescriptor) return Model3dRegistry::get ("PickupDescriptor");
+  else if (id == TruckDescriptor) return Model3dRegistry::get ("TruckDescriptor");
+  else if (id == Truck2Descriptor) return Model3dRegistry::get ("Truck2Descriptor");
+  else if (id == CruiserDescriptor) return Model3dRegistry::get ("CruiserDescriptor");
+  else if (id == LightDestroyerDescriptor) return Model3dRegistry::get ("LightDestroyerDescriptor");
+  else if (id == SacDescriptor) return Model3dRegistry::get ("SacDescriptor");
+  else if (id == SamDescriptor) return Model3dRegistry::get ("SamDescriptor");
+  else if (id == TentDescriptor) return Model3dRegistry::get ("TentDescriptor");
+  else if (id == BigTentDescriptor) return Model3dRegistry::get ("BigTentDescriptor");
+  else if (id == ContainerDescriptor) return Model3dRegistry::get ("Container");
+  else if (id == HallDescriptor) return Model3dRegistry::get ("HallDescriptor");
+  else if (id == Hall2Descriptor) return Model3dRegistry::get ("Hall2Descriptor");
+  else if (id == OilrigDescriptor) return Model3dRegistry::get ("OilrigDescriptor");
+  else if (id == ComplexDescriptor) return Model3dRegistry::get ("ComplexDescriptor");
+  else if (id == RadarDescriptor) return Model3dRegistry::get ("RadarDescriptor");
+  else if (id == MoonBaseDescriptor) return Model3dRegistry::get ("MoonBaseDescriptor");
+  else if (id == DepotDescriptor) return Model3dRegistry::get ("DepotDescriptor");
+  else if (id == LaserBarrierDescriptor) return Model3dRegistry::get ("LaserBarrierDescriptor");
+  else if (id == AsteroidDescriptor) return Model3dRegistry::get ("AsteroidDescriptor");
+  return Model3dRegistry::get ("FalconDescriptor");
+}*/
 
 int game_levelInit ()
 {
@@ -581,13 +581,13 @@ int game_levelInit ()
     fighter [i]->recheight = 15;
     fighter [i]->recthrust = 0.2;
     fighter [i]->recrot.theta = 0;
-    fighter [i]->o = Model3dRegistry::get ("Falcon");
+    fighter [i]->o = Model3dRegistry::get (FalconDescriptor.name);
   }
   for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i]->init ();
     groundobj [i]->trafo.scaling.set (1, 1, 1);
-    groundobj [i]->id = STATIC_PASSIVE;
+    groundobj [i]->id = StaticPassiveBeginDescriptor;
     groundobj [i]->deactivate ();
   }
 
@@ -629,11 +629,11 @@ int game_levelInit ()
   // place missiles to racks
 /*  for (i = 0; i < maxfighter; i ++)
   {
-    if (fighter [i]->id >= FIGHTER1 && fighter [i]->id <= FIGHTER2)
+    if (fighter [i]->id >= FighterBeginDescriptor && fighter [i]->id <= AirEndDescriptor)
       for (i2 = 0; i2 < 4; i2 ++)
       {
         int type = fighter [i]->missilerack [i2];
-        Model3d *rm = getModel (MISSILE1 + type);
+        Model3d *rm = getModel (MissileBeginDescriptor + type);
         fighter [i]->refModel [i2 * 3] = rm;
         fighter [i]->refModel [i2 * 3 + 1] = rm;
         fighter [i]->refModel [i2 * 3 + 2] = rm;
@@ -652,71 +652,71 @@ int game_levelInit ()
   // initialize object's height over the surface
   for (i = 0; i < maxfighter; i ++)
   {
-    if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
+    if (fighter [i]->id >= AntiAircraftBeginDescriptor && fighter [i]->id <= AntiAircraftEndDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == SHIP_DESTROYER1)
+    else if (fighter [i]->id == LightDestroyerDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 4;
     }
-    else if (fighter [i]->id == SHIP_CRUISER)
+    else if (fighter [i]->id == CruiserDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 4;
     }
-    else if (fighter [i]->id >= TANK1 && fighter [i]->id <= TANK2)
+    else if (fighter [i]->id >= TankBeginDescriptor && fighter [i]->id <= TankEndDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x * 0.55;
     }
-    else if (fighter [i]->id == STATIC_TENT1)
+    else if (fighter [i]->id == TentDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z);
     }
-    else if (fighter [i]->id == STATIC_CONTAINER1)
+    else if (fighter [i]->id == ContainerDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 2;
     }
-    else if (fighter [i]->id == STATIC_HALL1)
+    else if (fighter [i]->id == HallDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
-    else if (fighter [i]->id == STATIC_HALL2)
+    else if (fighter [i]->id == Hall2Descriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
-    else if (fighter [i]->id == STATIC_TENT4)
+    else if (fighter [i]->id == BigTentDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
-    else if (fighter [i]->id == STATIC_OILRIG1)
+    else if (fighter [i]->id == OilrigDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 5;
     }
-    else if (fighter [i]->id == STATIC_COMPLEX1)
+    else if (fighter [i]->id == ComplexDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.55 * fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == STATIC_RADAR1)
+    else if (fighter [i]->id == RadarDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.7 * fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == STATIC_BASE1)
+    else if (fighter [i]->id == MoonBaseDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.5 * fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == STATIC_DEPOT1)
+    else if (fighter [i]->id == DepotDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.5 * fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == STATIC_BARRIER1)
+    else if (fighter [i]->id == LaserBarrierDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.3 * fighter [i]->trafo.scaling.x;
     }
-    else if (fighter [i]->id == MISSILE_MINE1)
+    else if (fighter [i]->id == MineDescriptor)
     {
       fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 5 + math.random (20);
     }
-    else if (fighter [i]->id == ASTEROID)
+    else if (fighter [i]->id == AsteroidDescriptor)
     {
       ;
     }
@@ -981,7 +981,7 @@ void createMission (int missionid)
   if (missionid == MISSION_DEMO) missionnew = new MissionDemo1 ();
   else if (missionid == MISSION_TEST1) missionnew = new MissionTest1 ();
   else if (missionid == MISSION_TEST2) missionnew = new MissionTest2 ();
-  else if (missionid == MISSION_TRANSPORT) missionnew = new MissionTransport ();
+  else if (missionid == MISSION_TRANSPORT) missionnew = new MissionTransportDescriptor ();
   else if (missionid == MISSION_CONVOY) missionnew = new MissionConvoy ();
   else if (missionid == MISSION_DOGFIGHT2) missionnew = new MissionDogfight2 ();
   else if (missionid == MISSION_AIRBATTLE) missionnew = new MissionAirBattle ();
@@ -1200,7 +1200,7 @@ void Events::fireMissile ()
 {
   if (!fplayer->active) return;
   if (fplayer->firemissilettl > 0) return;
-  if (fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile))
+  if (fplayer->fireMissile (MissileBeginDescriptor + fplayer->missiletype, missile)) // TODO: lookup in descriptor registry!
     sound->play (SOUND_MISSILE1, false);
 }
 
@@ -1440,47 +1440,47 @@ void pleaseWait ()
   stateplay.view ();
 }
 
-char *getModelText (int id)
+char *getModelText (const UnitDescriptor &id)
 {
-  if (id == FIGHTER_FALCON)
+  if (id == FalconDescriptor)
     return "THE FALCON IS A NIMBLE AND\nFAST FIGHTER PROVIDING\nBOTH AIR-AIR AND\nAIR-GROUND-MISSILES.";
-  else if (id == FIGHTER_HAWK)
+  else if (id == HawkDescriptor)
     return "THE HAWK IS A TYPICAL\nALLROUNDER AND DESIGNED\nFOR GROUND ATTACKS.";
-  else if (id == FIGHTER_HAWK2)
+  else if (id == Hawk2Descriptor)
     return "THE HAWK II IS A ...";
   return "NO INFO";
 }
 
-char *getModelName (int id)
+/*char *getModelName (int id)
 {
-  if (id == FIGHTER_FALCON)
+  if (id == FalconDescriptor)
     return "GL-16 FALCON";
-  else if (id == FIGHTER_HAWK)
+  else if (id == HawkDescriptor)
     return "GL-22 HAWK";
-  else if (id == FIGHTER_HAWK2)
+  else if (id == Hawk2Descriptor)
     return "GL-23 HAWK II";
-  else if (id == FIGHTER_REDARROW)
+  else if (id == RedArrowDescriptor)
     return "GL-15 REDARROW";
-  else if (id == FIGHTER_PHOENIX)
+  else if (id == PhoenixDescriptor)
     return "GL-117 PHOENIX";
-  else if (id == FIGHTER_STORM)
+  else if (id == StormDescriptor)
     return "GL-50 STORM";
-  else if (id == FIGHTER_CROW)
+  else if (id == CrowDescriptor)
     return "CROW";
-  else if (id == FIGHTER_BUZZARD)
+  else if (id == BuzzardDescriptor)
     return "BUZZARD";
-  else if (id == FIGHTER_SWALLOW)
+  else if (id == SwallowDescriptor)
     return "SWALLOW";
-  else if (id == FIGHTER_BLACKBIRD)
+  else if (id == BlackBirdDescriptor)
     return "BLACKBIRD";
-  else if (id == MISSILE_AIR1)
-    return "AIR-AIR MISSILE PACK";
-  else if (id == MISSILE_GROUND1)
-    return "AIR-GROUND MISSILE PACK";
-  else if (id == MISSILE_DF1)
+  else if (id == AamHs1Descriptor)
+    return "AirBeginDescriptor-AirBeginDescriptor MISSILE PACK";
+  else if (id == Agm1Descriptor)
+    return "AirBeginDescriptor-GROUND MISSILE PACK";
+  else if (id == DfmDescriptor)
     return "DUMB FIRE MISSILE PACK";
   return "NO INFO";
-}
+} */
 
 void drawArrow (float x, float y, float w, float h)
 {
@@ -1656,9 +1656,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 
-  char buf [4096];
-  sprintf (buf, "selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift);
-  DISPLAY_DEBUG(buf);
+  DISPLAY_DEBUG(FormatString ("selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift));
   return pickz2;
 }
 
@@ -1707,7 +1705,7 @@ void myInit ()
 
   for (i = 0; i < maxgroundobj; i ++)
   {
-    groundobj [i] = new DynamicObj (space, Model3dRegistry::get ("Tent"), 3);
+    groundobj [i] = new DynamicObj (space, Model3dRegistry::get (TentDescriptor.name), 3);
   }
 
   explsphere = new Sphere ();
@@ -1732,10 +1730,10 @@ void myInit ()
   // TODO: will be removed
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i] = new AIObj (space, Model3dRegistry::get ("Falcon"), 0.4);
+    fighter [i] = new AIObj (space, Model3dRegistry::get (FalconDescriptor.name), 0.4);
     fighter [i]->ref.clear ();
     for (i2 = 0; i2 < 12; i2 ++)
-      fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get ("AamHs1"), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
+      fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
   }
 
   highclouds = new HighClouds (25);
@@ -1761,17 +1759,17 @@ void myInit ()
 
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i] = new AIObj (space, Model3dRegistry::get ("AamHs1"), 0.1);
+    missile [i] = new AIObj (space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1);
   }
 
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i] = new DynamicObj (space, Model3dRegistry::get ("Flare"), 0.1);
+    flare [i] = new DynamicObj (space, Model3dRegistry::get (FlareDescriptor.name), 0.1);
   }
 
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i] = new DynamicObj (space, Model3dRegistry::get ("Chaff"), 0.1);
+    chaff [i] = new DynamicObj (space, Model3dRegistry::get (ChaffDescriptor.name), 0.1);
   }
 
   for (i = 0; i < maxstar; i ++)
@@ -1804,12 +1802,11 @@ int i;
 int inittimer = 0;
 int inittimer_gl117 = 0;
 
-void initModel (const std::string &name, const std::string &displayedname, const std::string &filename)
+void initModel (const UnitDescriptor &desc, const std::string &filename)
 {
-  DISPLAY_DEBUG(std::string (" * ").append (name));
+  DISPLAY_DEBUG(std::string (" * ").append (desc.name));
   Model3d *model = Model3dFactory::getModel (dirs.getModels (filename.c_str ()));
-  model->setName (displayedname);
-  Model3dRegistry::add (name, model);
+  Model3dRegistry::add (desc.name, model);
 }
 
 // load game data (this method does not really belong to the intro itself)
@@ -1875,32 +1872,32 @@ void myFirstInit ()
 
   DISPLAY_DEBUG("Loading 3ds models:");
   
-  initModel ("Falcon", "FALCON", "falcon.3ds");
-  initModel ("Hawk", "HAWK", "hawk.3ds");
-  initModel ("Swallow", "SWALLOW", "swallow.3ds");
-  initModel ("Hawk2", "HAWK II", "hawk2.3ds");
-  initModel ("Buzzard", "BUZZARD", "buzzard.3ds");
-  initModel ("Crow", "CROW", "crow.3ds");
-  initModel ("Phoenix", "PHOENIX", "phoenix.3ds");
-  initModel ("RedArrow", "RED ARROW", "redarrow.3ds");
-  initModel ("BlackBird", "BLACKBIRD", "blackbird.3ds");
-  Model3d *model = Model3dRegistry::get ("BlackBird");
+  initModel (FalconDescriptor, "falcon.3ds");
+  initModel (HawkDescriptor, "hawk.3ds");
+  initModel (SwallowDescriptor, "swallow.3ds");
+  initModel (Hawk2Descriptor, "hawk2.3ds");
+  initModel (BuzzardDescriptor, "buzzard.3ds");
+  initModel (CrowDescriptor, "crow.3ds");
+  initModel (PhoenixDescriptor, "phoenix.3ds");
+  initModel (RedArrowDescriptor, "redarrow.3ds");
+  initModel (BlackBirdDescriptor, "blackbird.3ds");
+  Model3d *model = Model3dRegistry::get (BlackBirdDescriptor.name);
   model->scaleTexture (0.3, 0.3);
-  initModel ("Storm", "STORM", "storm.3ds");
-  initModel ("Transport", "TRANSPORT", "transport.3ds");
-  initModel ("Transport2", "TRANSPORT", "transport2.3ds");
+  initModel (StormDescriptor, "storm.3ds");
+  initModel (TransportDescriptor, "transport.3ds");
+  initModel (Transport2Descriptor, "transport2.3ds");
   
   // cannon at daylight
   float cannoncube = 0.025;
   DISPLAY_DEBUG(" * cannon1.3ds");
   model = Model3dFactory::getModel (dirs.getModels ("cannon1.3ds"));
-  model->setName ("CANNON");
+//  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1", model);
   
   DISPLAY_DEBUG(" * cannon1b.3ds");
   model = Model3dFactory::getModel (dirs.getModels ("cannon1b.3ds"));
-  model->setName ("CANNON");
+//  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1b", model);
 
@@ -1918,7 +1915,7 @@ void myFirstInit ()
   }
   model->object [0]->vertex [1].color.c [3] = 50;
   model->object [0]->vertex [2].color.c [3] = 50;
-  model->setName ("CANNON");
+//  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon2", model);
 
@@ -1939,67 +1936,67 @@ void myFirstInit ()
     model->object [i2]->vertex [2].color.c [3] = 50;
   }
   model->cube.set (cannoncube, cannoncube, cannoncube);
-  model->setName ("CANNON");
+//  model->setName ("CANNON");
   Model3dRegistry::add ("Cannon2b", model);
 
-  initModel ("Flare", "FLARE", "flare1.3ds");
-  model = Model3dRegistry::get ("Flare");
+  initModel (FlareDescriptor, "flare1.3ds");
+  model = Model3dRegistry::get (FlareDescriptor.name);
   model->alpha = true;
   model->nolight = true;
-  initModel ("Chaff", "CHAFF", "chaff1.3ds");
-  model = Model3dRegistry::get ("Chaff");
+  initModel (ChaffDescriptor, "chaff1.3ds");
+  model = Model3dRegistry::get (ChaffDescriptor.name);
   model->alpha = true;
   model->nolight = true;
 
-  initModel ("AamHs1", "AAM HS MK1", "missile1.3ds");
-  initModel ("AamHs2", "AAM HS MK2", "missile2.3ds");
-  initModel ("AamHs3", "AAM HS MK3", "missile3.3ds");
-  initModel ("Agm1", "AGM MK1", "missile4.3ds");
-  initModel ("Agm2", "AGM MK2", "missile5.3ds");
-  initModel ("Dfm", "CHAFF", "missile6.3ds");
-  initModel ("AamFf1", "AAM FF MK1", "missile7.3ds");
-  initModel ("AamFf2", "AAM FF MK2", "missile8.3ds");
+  initModel (AamHs1Descriptor, "missile1.3ds");
+  initModel (AamHs2Descriptor, "missile2.3ds");
+  initModel (AamHs3Descriptor, "missile3.3ds");
+  initModel (Agm1Descriptor, "missile4.3ds");
+  initModel (Agm2Descriptor, "missile5.3ds");
+  initModel (DfmDescriptor, "missile6.3ds");
+  initModel (AamFf1Descriptor, "missile7.3ds");
+  initModel (AamFf2Descriptor, "missile8.3ds");
 
-  initModel ("Sac", "SA CANNON", "flak2.3ds");
-  initModel ("Sam", "SAM", "flarak1.3ds");
-  initModel ("Cruiser", "CRUISER", "ship1.3ds");
-  initModel ("Tent", "TENT", "tent1.3ds");
+  initModel (SacDescriptor, "flak2.3ds");
+  initModel (SamDescriptor, "flarak1.3ds");
+  initModel (CruiserDescriptor, "ship1.3ds");
+  initModel (TentDescriptor, "tent1.3ds");
 //  initModel ("Gl-117 Logo", "gl-117.3ds");
-  initModel ("Wiesel", "WIESEL", "tank1.3ds");
-  model = Model3dRegistry::get ("Wiesel");
+  initModel (WieselDescriptor, "tank1.3ds");
+  model = Model3dRegistry::get (WieselDescriptor.name);
   model->scaleTexture (0.5, 0.5);
-  initModel ("Container", "CONTAINER", "container1.3ds");
-  initModel ("LightDestroyer", "LIGHT DESTROYER", "ship2.3ds");
-  initModel ("Truck", "TRUCK", "truck1.3ds");
-  initModel ("Truck2", "TRUCK", "truck2.3ds");
-  initModel ("MobileSam", "MOBILE SAM", "trsam.3ds");
-  initModel ("Pickup", "PICKUP", "pickup1.3ds");
-  initModel ("Pickup2", "PICKUP", "pickup2.3ds");
-  initModel ("Panther", "PANTHER", "tank2.3ds");
-  model = Model3dRegistry::get ("Panther");
+  initModel (ContainerDescriptor, "container1.3ds");
+  initModel (LightDestroyerDescriptor, "ship2.3ds");
+  initModel (TruckDescriptor, "truck1.3ds");
+  initModel (Truck2Descriptor, "truck2.3ds");
+  initModel (MobileSamDescriptor, "trsam.3ds");
+  initModel (PickupDescriptor, "pickup1.3ds");
+  initModel (Pickup2Descriptor, "pickup2.3ds");
+  initModel (PantherDescriptor, "tank2.3ds");
+  model = Model3dRegistry::get (PantherDescriptor.name);
   model->scaleTexture (0.5, 0.5);
-  initModel ("BigTent", "BIG TENT", "tent4.3ds");
-  initModel ("Hall", "HALL", "hall1.3ds");
-  initModel ("Hall2", "HALL", "hall2.3ds");
-  initModel ("Oilrig", "OILRIG", "oilrig.3ds");
-  model = Model3dRegistry::get ("Oilrig");
+  initModel (BigTentDescriptor, "tent4.3ds");
+  initModel (HallDescriptor, "hall1.3ds");
+  initModel (Hall2Descriptor, "hall2.3ds");
+  initModel (OilrigDescriptor, "oilrig.3ds");
+  model = Model3dRegistry::get (OilrigDescriptor.name);
   model->alpha = true;
-  initModel ("Complex", "COMPLEX", "complex.3ds");
-  model = Model3dRegistry::get ("Complex");
+  initModel (ComplexDescriptor, "complex.3ds");
+  model = Model3dRegistry::get (ComplexDescriptor.name);
   model->scaleTexture (0.08, 0.08);
-  initModel ("Oilrig", "OILRIG", "radar.3ds");
-  initModel ("Mine", "MINE", "mine1.3ds");
-  initModel ("Asteroid", "ASTEROID", "aster1.3ds");
-  initModel ("MoonBase", "MOON BASE", "base1.3ds");
-  initModel ("LaserBarrier", "LASER BARRIER", "barrier.3ds");
-  model = Model3dRegistry::get ("LaserBarrier");
+  initModel (OilrigDescriptor, "radar.3ds");
+  initModel (MineDescriptor, "mine1.3ds");
+  initModel (AsteroidDescriptor, "aster1.3ds");
+  initModel (MoonBaseDescriptor, "base1.3ds");
+  initModel (LaserBarrierDescriptor, "barrier.3ds");
+  model = Model3dRegistry::get (LaserBarrierDescriptor.name);
   model->scaleTexture (10.0, 10.0);
   model->alpha = true;
-  initModel ("Rubble", "RUBBLE", "rubble.3ds");
-  initModel ("Depot", "DEPOT", "depot1.3ds");
-  model = Model3dRegistry::get ("Depot");
+  initModel (DepotDescriptor, "depot1.3ds");
+  model = Model3dRegistry::get (DepotDescriptor.name);
   model->scaleTexture (2.0, 2.0);
-  initModel ("House", "HOUSE", "house1.3ds");
+  initModel (RubbleDescriptor, "rubble.3ds");
+  initModel (HouseDescriptor, "house1.3ds");
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);
@@ -2770,18 +2767,16 @@ void config_test (int argc, char **argv)
   int bppi [4];
 
 #ifdef USE_GLUT // GLUT ONLY
-  logging.display ("Using GLUT only", LOG_MOST);
+  DISPLAY_INFO("Using GLUT only");
   glutInit (&argc, argv);
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
 #else // SDL
-  char buf [4096];
   DISPLAY_INFO("Using SDL and GLUT");
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
-    sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Couldn't initialize SDL: %s", SDL_GetError ()));
     exit (EXIT_INIT);
   }
   configinit = true;
@@ -2837,7 +2832,6 @@ void viewParameters ()
 
 void checkargs (int argc, char **argv)
 {
-  char buf [4096]; // temp buffer
   int i; // temp counter
 
   for (i = 1; i < argc; i ++) // for each arg (argument/parameter)
@@ -2854,8 +2848,7 @@ void checkargs (int argc, char **argv)
       }
       else
       {
-        sprintf (buf, "Entering debug level %d", loglevel);
-        DISPLAY_INFO(buf);
+        DISPLAY_INFO(FormatString ("Entering debug level %d", loglevel));
       }
     }
     else if (argv [i] [1] == 'v') // display version string
@@ -3090,8 +3083,8 @@ void createMenu ()
   strcpy (submenu2names [z ++], "TRANSPORT");
   strcpy (submenu2names [z ++], "CONVOY");
   strcpy (submenu2names [z ++], "DOGFIGHT");
-  strcpy (submenu2names [z ++], "AIR BATTLE");
-  strcpy (submenu2names [z ++], "SURFACE-AIR DEFENSE");
+  strcpy (submenu2names [z ++], "AirBeginDescriptor BATTLE");
+  strcpy (submenu2names [z ++], "SURFACE-AirBeginDescriptor DEFENSE");
   strcpy (submenu2names [z ++], "VETERAN DOGFIGHT");
   strcpy (submenu2names [z ++], "BASE ATTACK");
   strcpy (submenu2names [z ++], "DEPOTS");
@@ -3893,7 +3886,7 @@ int main (int argc, char **argv)
 // NO SDL FOUND => USE GLUT ONLY
 #ifdef USE_GLUT
 
-  logging.display ("Using GLUT only", LOG_MOST);
+  DISPLAY_INFO("Using GLUT only");
   if (!configinit)
   {
     glutInit (&argc, argv);
@@ -3903,22 +3896,21 @@ int main (int argc, char **argv)
       load_saveconfig ();
       if (!setScreen (width, height, bpp, fullscreen))
       {
-        sprintf (buf, "No working display mode %dx%d found", width, height);
-        logging.display (buf, LOG_FATAL);
+        DISPLAY_FATAL(FormatString ("No working display mode %dx%d found", width, height));
         exit (EXIT_INIT);
       }
     }
   }
 
-  logging.display ("Calling main initialization method", LOG_ALL);
+  DISPLAY_DEBUG("Calling main initialization method");
   myFirstInit ();
 
-  logging.display ("Creating dummy sound system, install SDL to enable sound", LOG_ALL);
+  DISPLAY_DEBUG("Creating dummy sound system, install SDL to enable sound");
   sound = new SoundSystem ();
 
   createMenu ();
 
-  logging.display ("Registering GLUT callbacks", LOG_ALL);
+  DISPLAY_DEBUG("Registering GLUT callbacks");
   glutReshapeFunc (myReshapeFunc);
   glutDisplayFunc (myDisplayFunc);
   glutKeyboardFunc (myKeyboardFunc);
@@ -3935,7 +3927,7 @@ int main (int argc, char **argv)
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
 
-  logging.display ("Entering GLUT main loop", LOG_ALL);
+  DISPLAY_DEBUG("Entering GLUT main loop");
   glutMainLoop(); // give controls to GLUT
 
 // SDL FOUND
@@ -3956,11 +3948,10 @@ int main (int argc, char **argv)
 #ifdef HAVE_SDL_NET
   if (SDLNet_Init () == -1) // initialize SDL_net
   {
-    sprintf (buf, "SDLNet_Init: %s", SDLNet_GetError ());
-    logging.display (buf, LOG_FATAL);
+    DISPLAY_FATAL(FormatString ("SDLNet_Init: %s", SDLNet_GetError ()));
     exit (EXIT_INIT);
   }
-  logging.display ("Using SDL_net", LOG_MOST);
+  DISPLAY_INFO("Using SDL_net");
 #endif
 
   if (!configinit)
@@ -3970,9 +3961,8 @@ int main (int argc, char **argv)
       conf.loadSaveConfig ();
       if (!setScreen (width, height, bpp, fullscreen))
       {
-        sprintf (buf, "No working display mode %dx%d found.", width, height);
         assert (false);
-        DISPLAY_FATAL(buf);
+        DISPLAY_FATAL(FormatString ("No working display mode %dx%d found.", width, height));
         exit (EXIT_INIT);
       }
     }

@@ -34,9 +34,9 @@
 
 MissionMoonDogfight1::MissionMoonDogfight1 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
-  selfighter [2] = FIGHTER_PHOENIX;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
+  selfighter [2] = PhoenixDescriptor;
   alliedpilot [0] = PILOT_MATRIX;
   id = MISSION_MOON2;
   strcpy (name, "ELITE DOGFIGHT");
@@ -64,31 +64,31 @@ void MissionMoonDogfight1::start ()
   fighter [1]->trafo.translation.z = -110;
   fighter [1]->currot.phi = 200;
   fighter [1]->target = fighter [3];
-  alliedInit (FIGHTER_REDARROW, alliedpilot [0], 1);
+  alliedInit (RedArrowDescriptor, alliedpilot [0], 1);
   fighter [2]->trafo.translation.x = 0;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->target = fighter [0];
   fighter [2]->currot.phi = 200;
 //  fighter [2]->o = &model_figh;
-  fighter [2]->newinit (FIGHTER_BLACKBIRD, 0, 150);
+  fighter [2]->newinit (BlackBirdDescriptor, 0, 150);
   fighter [3]->trafo.translation.x = 10;
   fighter [3]->trafo.translation.z = 10;
   fighter [3]->target = fighter [1];
   fighter [3]->currot.phi = 200;
 //  fighter [3]->o = &model_figh;
-  fighter [3]->newinit (FIGHTER_BLACKBIRD, 0, 200);
+  fighter [3]->newinit (BlackBirdDescriptor, 0, 200);
   fighter [4]->trafo.translation.x = 200;
   fighter [4]->trafo.translation.z = 200;
   fighter [4]->target = fighter [0];
   fighter [4]->currot.phi = 200;
 //  fighter [4]->o = &model_figh;
-  fighter [4]->newinit (FIGHTER_BLACKBIRD, 0, 60);
+  fighter [4]->newinit (BlackBirdDescriptor, 0, 60);
   fighter [5]->trafo.translation.x = 210;
   fighter [5]->trafo.translation.z = 210;
   fighter [5]->target = fighter [1];
   fighter [5]->currot.phi = 200;
 //  fighter [5]->o = &model_figh;
-  fighter [5]->newinit (FIGHTER_BLACKBIRD, 0, 140);
+  fighter [5]->newinit (BlackBirdDescriptor, 0, 140);
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

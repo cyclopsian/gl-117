@@ -30,77 +30,165 @@
 #include "model3d/Model3d.h" // ok
 #include "effects/Effects.h" // ok
 
+class UnitDescriptor
+{
+  public:
+    int id;
+    std::string name;
+    std::string displayedName;
+    
+    UnitDescriptor ()
+    {
+      this->id = -1;
+      this->name = "";
+      this->displayedName = "";
+    }
+
+    UnitDescriptor (int id)
+    {
+      this->id = id;
+      this->name = "";
+      this->displayedName = "";
+    }
+
+    UnitDescriptor (int id, const std::string &name, const std::string &displayedName)
+    {
+      this->id = id;
+      this->name = name;
+      this->displayedName = displayedName;
+    }
+    
+    bool operator == (const UnitDescriptor &desc) const
+    {
+      return id == desc.id;
+    }
+
+    bool operator < (const UnitDescriptor &desc) const
+    {
+      return id < desc.id;
+    }
+
+    bool operator <= (const UnitDescriptor &desc) const
+    {
+      return id <= desc.id;
+    }
+
+    bool operator > (const UnitDescriptor &desc) const
+    {
+      return id > desc.id;
+    }
+
+    bool operator >= (const UnitDescriptor &desc) const
+    {
+      return id >= desc.id;
+    }
+
+    bool operator != (const UnitDescriptor &desc) const
+    {
+      return id != desc.id;
+    }
+
+    int operator + (const UnitDescriptor &desc) const
+    {
+      return id + desc.id;
+    }
+
+    int operator + (int value) const
+    {
+      return id + value;
+    }
+
+    int operator - (const UnitDescriptor &desc) const
+    {
+      return id - desc.id;
+    }
+
+    int operator - (int value) const
+    {
+      return id - value;
+    }
+};
+
 // id values of objects
 // non-AI air objects
-#define CANNON1 0
-#define ASTEROID 50
-#define FLARE1 80
-#define CHAFF1 85
-#define CANNON2 99
+extern UnitDescriptor CannonBeginDescriptor;
+extern UnitDescriptor Cannon1Descriptor;
+extern UnitDescriptor Cannon1bDescriptor;
+extern UnitDescriptor Cannon2Descriptor;
+extern UnitDescriptor Cannon2bDescriptor;
+extern UnitDescriptor AsteroidDescriptor;
+extern UnitDescriptor FlareDescriptor;
+extern UnitDescriptor ChaffDescriptor;
+extern UnitDescriptor CannonEndDescriptor;
 // missiles
-#define MISSILE1 100
-#define MISSILE_AIR1 100
-#define MISSILE_AIR2 101
-#define MISSILE_AIR3 102
-#define MISSILE_GROUND1 103
-#define MISSILE_GROUND2 104
-#define MISSILE_DF1 105
-#define MISSILE_FF1 106
-#define MISSILE_FF2 107
-#define MISSILE_MINE1 180
-#define MISSILE2 199
+extern UnitDescriptor MissileBeginDescriptor;
+extern UnitDescriptor AamHs1Descriptor;
+extern UnitDescriptor AamHs2Descriptor;
+extern UnitDescriptor AamHs3Descriptor;
+extern UnitDescriptor Agm1Descriptor;
+extern UnitDescriptor Agm2Descriptor;
+extern UnitDescriptor DfmDescriptor;
+extern UnitDescriptor AamFf1Descriptor;
+extern UnitDescriptor AamFf2Descriptor;
+extern UnitDescriptor MineDescriptor;
+extern UnitDescriptor MissileEndDescriptor;
 // air units
-#define AIR 200
-#define FIGHTER1 200
-#define FIGHTER_FALCON 200
-#define FIGHTER_SWALLOW 201
-#define FIGHTER_HAWK 202
-#define FIGHTER_HAWK2 203
-#define FIGHTER_BUZZARD 204
-#define FIGHTER_CROW 205
-#define FIGHTER_PHOENIX 206
-#define FIGHTER_REDARROW 207
-#define FIGHTER_BLACKBIRD 208
-#define FIGHTER_STORM 209
-#define FIGHTER_PILOTED2 249
-#define FIGHTER_TRANSPORT 280
-#define FIGHTER_TRANSPORT2 281
-#define FIGHTER2 299
+extern UnitDescriptor AirBeginDescriptor;
+extern UnitDescriptor FighterBeginDescriptor;
+extern UnitDescriptor FalconDescriptor;
+extern UnitDescriptor SwallowDescriptor;
+extern UnitDescriptor HawkDescriptor;
+extern UnitDescriptor Hawk2Descriptor;
+extern UnitDescriptor BuzzardDescriptor;
+extern UnitDescriptor CrowDescriptor;
+extern UnitDescriptor PhoenixDescriptor;
+extern UnitDescriptor RedArrowDescriptor;
+extern UnitDescriptor BlackBirdDescriptor;
+extern UnitDescriptor StormDescriptor;
+extern UnitDescriptor FighterEndDescriptor;
+extern UnitDescriptor TransportDescriptor;
+extern UnitDescriptor Transport2Descriptor;
+extern UnitDescriptor AirEndDescriptor;
 // moving ground units from here
-#define MOVING_GROUND 500
-#define TANK1 700
-#define TANK_AIR1 700
-#define TANK_GROUND1 710
-#define TANK_TRSAM1 711
-#define TANK_PICKUP1 780
-#define TANK_TRUCK1 790
-#define TANK_TRUCK2 791
-#define TANK2 799
+extern UnitDescriptor MovingGroundBeginDescriptor;
+extern UnitDescriptor TankBeginDescriptor;
+extern UnitDescriptor WieselDescriptor;
+extern UnitDescriptor PantherDescriptor;
+extern UnitDescriptor MobileSamDescriptor;
+extern UnitDescriptor PickupDescriptor;
+extern UnitDescriptor Pickup2Descriptor;
+extern UnitDescriptor TruckDescriptor;
+extern UnitDescriptor Truck2Descriptor;
+extern UnitDescriptor TankEndDescriptor;
 // moving water units from here
-#define MOVING_WATER 800
-#define SHIP1 800
-#define SHIP_CRUISER 800
-#define SHIP_DESTROYER1 810
-#define SHIP2 899
+extern UnitDescriptor WaterBeginDescriptor;
+extern UnitDescriptor ShipBeginDescriptor;
+extern UnitDescriptor CruiserDescriptor;
+extern UnitDescriptor LightDestroyerDescriptor;
+extern UnitDescriptor ShipEndDescriptor;
 // static ground units from here
-#define STATIC_GROUND 1000
-#define FLAK1 1000
-#define FLAK_AIR1 1000
-#define FLARAK_AIR1 1010
-#define FLAK2 1099
+extern UnitDescriptor StaticGroundBeginDescriptor;
+extern UnitDescriptor AntiAircraftBeginDescriptor;
+extern UnitDescriptor SacDescriptor;
+extern UnitDescriptor SamDescriptor;
+extern UnitDescriptor AntiAircraftEndDescriptor;
 // passive static units from here
-#define STATIC_PASSIVE 10000
-#define STATIC_TENT1 10000
-#define STATIC_TENT4 10003
-#define STATIC_CONTAINER1 10100
-#define STATIC_HALL1 10200
-#define STATIC_HALL2 10201
-#define STATIC_OILRIG1 10300
-#define STATIC_COMPLEX1 10301
-#define STATIC_RADAR1 10302
-#define STATIC_BASE1 10303
-#define STATIC_DEPOT1 10304
-#define STATIC_BARRIER1 10400
+extern UnitDescriptor StaticPassiveBeginDescriptor;
+extern UnitDescriptor TentDescriptor;
+extern UnitDescriptor BigTentDescriptor;
+extern UnitDescriptor ContainerDescriptor;
+extern UnitDescriptor HallDescriptor;
+extern UnitDescriptor Hall2Descriptor;
+extern UnitDescriptor OilrigDescriptor;
+extern UnitDescriptor ComplexDescriptor;
+extern UnitDescriptor RadarDescriptor;
+extern UnitDescriptor MoonBaseDescriptor;
+extern UnitDescriptor DepotDescriptor;
+extern UnitDescriptor LaserBarrierDescriptor;
+extern UnitDescriptor RubbleDescriptor;
+extern UnitDescriptor HouseDescriptor;
+
+
 
 class ObjectStatistics
 {
@@ -121,7 +209,7 @@ class DynamicObj : public SpaceObj
 {
   public:
 
-    int id;          ///< object type: FLARAK_AIR1, STATIC_TENT1, FIGHTER_SWALLOW, ...
+    UnitDescriptor id;          ///< object type: SamDescriptor, TentDescriptor, SwallowDescriptor, ...
   //  bool controls;
     bool active;  ///< deactivated means no AI, no collision control and so on
     /// easymodel==1 is the ancient core of the game ;-)
@@ -253,21 +341,21 @@ class AIObj : public DynamicObj
 
     virtual void init ();     ///< initialize variables
     void missileCount ();
-    void newinit (int id, int party, int intelligence, int precision, int aggressivity); ///< init new AI object
-    void newinit (int id, int party, int intelligence); ///< init new AI object (esp. non-fighter)
+    void newinit (const UnitDescriptor &id, int party, int intelligence, int precision, int aggressivity); ///< init new AI object
+    void newinit (const UnitDescriptor & id, int party, int intelligence); ///< init new AI object (esp. non-fighter)
     void initValues (DynamicObj *dobj, float phi); ///< init values to shoot cannon or missile
     void fireCannon (DynamicObj *laser, float phi);
     void fireCannon (DynamicObj **laser, float phi);
     void fireCannon (DynamicObj **laser);
-    void fireMissile2 (int id, AIObj *missile, AIObj *target);
+    void fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *target);
     int firstMissile ();           ///< select first missile type
     int nextMissile (int from);    ///< select next missile type (cyclic)
-    bool haveMissile (int id);     ///< missile of type id left?
+    bool haveMissile (const UnitDescriptor &id);     ///< missile of type id left?
     bool haveMissile ();           ///< missile of type missiletype left?
-    void decreaseMissile (int id); ///< decrease missiles by one
-    bool fireMissile (int id, AIObj **missile, AIObj *target);
+    void decreaseMissile (const UnitDescriptor &id); ///< decrease missiles by one
+    bool fireMissile (const UnitDescriptor &id, AIObj **missile, AIObj *target);
     bool fireMissile (AIObj **missile, AIObj *target);
-    bool fireMissile (int id, AIObj **missile);
+    bool fireMissile (const UnitDescriptor &id, AIObj **missile);
     bool fireMissile (AIObj **missile);
     bool fireMissileAir (AIObj **missile, AIObj *target);
     bool selectMissileAir (AIObj **missile);

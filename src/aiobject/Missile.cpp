@@ -83,7 +83,7 @@ void Missile::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
     disttarget = 1;
 
   // get a new target if necessary
-  if (id >= MISSILE1 && id <= MISSILE2)
+  if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
   {
     if (target == NULL)
       ttl = 0;
@@ -129,7 +129,7 @@ void Missile::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   }
   
   // get recommended elevation to target
-  if (ttl <= 0 && id != MISSILE_MINE1)
+  if (ttl <= 0 && id != MineDescriptor)
   { recheight = -100; recheight2 = -100; recrot.gamma = 90; }
   else if (ai)
   {

@@ -40,7 +40,7 @@ MissionTank1::MissionTank1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 4500 * timestep;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_SHADOW;
 }
 
@@ -58,7 +58,7 @@ void MissionTank1::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  alliedInit (Hawk2Descriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 7; i ++)
@@ -68,7 +68,7 @@ void MissionTank1::start ()
 //    fighter [i]->o = &model_tank2;
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
-    fighter [i]->newinit (TANK_GROUND1, 0, 400 - i * 25);
+    fighter [i]->newinit (PantherDescriptor, 0, 400 - i * 25);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
@@ -79,7 +79,7 @@ void MissionTank1::start ()
 //    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = i * 3;
-    fighter [i]->newinit (TANK_AIR1, 0, 80);
+    fighter [i]->newinit (WieselDescriptor, 0, 80);
   }
   for (i = 11; i <= 13; i ++)
   {
@@ -88,7 +88,7 @@ void MissionTank1::start ()
 //    fighter [i]->o = &model_container1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = 60;
-    fighter [i]->newinit (STATIC_CONTAINER1, 0, 0);
+    fighter [i]->newinit (ContainerDescriptor, 0, 0);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

@@ -153,7 +153,7 @@ createShaders(GlLandscape& _land)
   }
   g_shaders_count ++;
   TreeShader * shader = new TreeShader(_land);
-  logging.display("Tree shader ready", LOG_MOST);
+  DISPLAY_INFO("Tree shader ready");
   return shader;
 }
 

@@ -63,14 +63,14 @@ void MissionTeamBase1::start ()
   fplayer->trafo.translation.x = px;
   fplayer->trafo.translation.z = py;
   fplayer->currot.phi = 180;
-  if (fplayer->id == FIGHTER_FALCON)
+  if (fplayer->id == FalconDescriptor)
   {
-    fighter [1]->newinit (FIGHTER_HAWK, 0, 200);
+    fighter [1]->newinit (HawkDescriptor, 0, 200);
     fighter [1]->target = NULL;
   }
   else
   {
-    fighter [1]->newinit (FIGHTER_FALCON, 0, 200);
+    fighter [1]->newinit (FalconDescriptor, 0, 200);
     fighter [1]->target = fighter [3];
   }
   fighter [1]->party = 1;
@@ -82,35 +82,35 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py + 5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->newinit (Hall2Descriptor, 0, 400);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px - 1.5;
   fighter [n]->trafo.translation.z = py - 4.5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
   fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 1;
@@ -119,7 +119,7 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py - 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
   fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 1;
@@ -128,37 +128,37 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py - 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px + 0;
   fighter [n]->trafo.translation.z = py - 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px + 15;
   fighter [n]->trafo.translation.z = py - 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 1;
 
   l->searchPlain (1, 2, &px, &py);
   l->flatten (px, py, 8, 8);
   team2x = px; team2y = py - 50;
-  fighter [2]->newinit (FIGHTER_BUZZARD, 0, 200);
+  fighter [2]->newinit (BuzzardDescriptor, 0, 200);
 //  fighter [2]->o = &model_figd;
   fighter [2]->trafo.translation.x = px;
   fighter [2]->trafo.translation.z = py;
-  if (fplayer->id == FIGHTER_FALCON)
+  if (fplayer->id == FalconDescriptor)
     fighter [2]->target = fighter [1];
   else
     fighter [2]->target = fighter [0];
   fighter [2]->party = 2;
-  fighter [3]->newinit (FIGHTER_SWALLOW, 0, 200);
-//  fighter [3]->o = Model3dRegistry::get ("Swallow");
+  fighter [3]->newinit (SwallowDescriptor, 0, 200);
+//  fighter [3]->o = Model3dRegistry::get ("SwallowDescriptor");
   fighter [3]->trafo.translation.x = px + 5;
   fighter [3]->trafo.translation.z = py + 5;
   fighter [3]->target = NULL;
@@ -168,35 +168,35 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py + 5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (STATIC_HALL2, 0, 400);
+  fighter [n]->newinit (Hall2Descriptor, 0, 400);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  fighter [n]->newinit (HallDescriptor, 0, 400);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px - 1.5;
   fighter [n]->trafo.translation.z = py - 4.5;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  fighter [n]->newinit (BigTentDescriptor, 0, 400);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
   fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 2;
@@ -205,7 +205,7 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py - 6;
   fighter [n]->target = fighter [0];
 //  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
   fighter [n]->maxrot.theta = 0;
   fighter [n]->party = 2;
@@ -214,21 +214,21 @@ void MissionTeamBase1::start ()
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px + 0;
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px + 15;
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
 //  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (FLARAK_AIR1, 0, 300);
+  fighter [n]->newinit (SamDescriptor, 0, 300);
   fighter [n]->party = 2;
 
   state = 0;
@@ -244,7 +244,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
   if (texttimer > 0) texttimer += dt;
   timer += dt;
 
-  if (fplayer->id == FIGHTER_FALCON)
+  if (fplayer->id == FalconDescriptor)
   {
     fighter [2]->target = fighter [1];
   }
@@ -274,7 +274,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
     {
       fighter [i]->explode = 0;
       int temp = fighter [i]->stat.fighterkills;
-      int tempid = fighter [i]->id;
+      UnitDescriptor tempid = fighter [i]->id;
       fighter [i]->init ();
       if (i == 0)
       {

@@ -43,7 +43,7 @@ Model3d::Model3d ()
   list2 = -1;
   list3 = -1;*/
   scale = 1.0F;
-  name = "";
+//  name = "";
   nolight = false;
   alpha = false;
 /*  light_ambient [0] = 0.3; light_ambient [1] = 0.3; light_ambient [2] = 0.3; light_ambient [3] = 1;
@@ -55,10 +55,10 @@ Model3d::Model3d ()
 //  va = new VertexArray (VERTEXARRAY_V3N3C4T2);
 }
 
-void Model3d::setName (const std::string &name)
+/*void Model3d::setName (const std::string &name)
 {
   this->name = name;
-}
+} */
 
 void Model3d::addMaterial (const Material &material)
 {

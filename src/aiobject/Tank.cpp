@@ -154,13 +154,13 @@ void Tank::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
   }
   if (firecannonttl <= 0)
   {
-    if (id == TANK_AIR1)
+    if (id == WieselDescriptor)
       if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->trafo.translation.y > trafo.translation.y + 2)
       {
         fireCannon (c);
         firecannonttl += firerate * timestep;
       }
-    if (id == TANK_GROUND1)
+    if (id == PantherDescriptor)
       if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 35 && target->trafo.translation.y <= trafo.translation.y + 1 && target->trafo.translation.y >= trafo.translation.y - 1)
       {
         fireCannon (c);
@@ -169,7 +169,7 @@ void Tank::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
   }
 
   // thrust and manoever calculations
-  if (id == TANK_TRSAM1)
+  if (id == MobileSamDescriptor)
   {
     if (firecannonttl <= 0)
       for (int i = 0; i < maxfighter; i ++)

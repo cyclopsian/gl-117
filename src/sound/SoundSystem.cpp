@@ -26,6 +26,8 @@
 #include "SoundSystem.h"
 #include "logging/Logging.h"
 #include "configuration/Dirs.h"
+#include "util/Util.h"
+
 #include <cassert>
 
 
@@ -44,8 +46,7 @@ SoundSystem::SoundSystem ()
   waveclick1 = new WaveFile (dirs.getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
   {
-    sprintf (buf, "Couldn't open audio: %s, no sound available", SDL_GetError ());
-    logging.display (buf, LOG_ERROR);
+    DISPLAY_ERROR(FormatString ("Couldn't open audio: %s, no sound available", SDL_GetError ()));
     audio = false;
     delete waveclick1;
     return;
@@ -70,81 +71,72 @@ SoundSystem::SoundSystem ()
   music1 = Mix_LoadMUS (dirs.getMusic ("winner.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open winner.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open winner.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("loser.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open loser.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open loser.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("dark.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open dark.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open dark.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("stars.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open stars.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open stars.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open ambient.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open ambient.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("standby.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open standby.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("electro.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open electro.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("computa2.xm"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open computa2.xm: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open computa2.xm: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs.getMusic ("softtec.s3m"));
   if (music1 == NULL)
   {
-    sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open softtec.s3m: %s", Mix_GetError ()));
     exit (EXIT_LOADFILE);
   }
   playtime = 0;

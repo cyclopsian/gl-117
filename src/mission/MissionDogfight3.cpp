@@ -42,7 +42,7 @@ MissionDogfight3::MissionDogfight3 ()
   autoLFBriefing ();
   alliedfighters = 4;
   maxtime = 3500 * timestep;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_LARA;
@@ -62,13 +62,13 @@ void MissionDogfight3::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
-  alliedInit (FIGHTER_FALCON, alliedpilot [1], 2);
+  alliedInit (FalconDescriptor, alliedpilot [1], 2);
   fighter [2]->trafo.translation.x = 10;
   fighter [2]->trafo.translation.z = 110;
-  alliedInit (FIGHTER_FALCON, alliedpilot [2], 3);
+  alliedInit (FalconDescriptor, alliedpilot [2], 3);
   fighter [3]->trafo.translation.x = 15;
   fighter [3]->trafo.translation.z = 115;
   for (i = 4; i <= 8; i ++)
@@ -78,16 +78,16 @@ void MissionDogfight3::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 25);
+    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 25);
   }
   for (i = 9; i <= 11; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (4)];
-//    fighter [i]->o = Model3dRegistry::get ("Swallow");
+//    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
+    fighter [i]->newinit (SwallowDescriptor, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

@@ -23,6 +23,7 @@
 
 #include "LoadObj.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <stdio.h>
 #include <cassert>
@@ -35,9 +36,8 @@ TextFileObj::TextFileObj (char *filename)
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    sprintf (buf, "%s %d: Cannot open file %s", __FILE__, __LINE__, filename);
     assert (false);
-    DISPLAY_FATAL(buf);
+    DISPLAY_FATAL(FormatString ("Cannot open file %s", filename));
     exit (EXIT_LOADFILE);
     return;
   }

@@ -34,9 +34,9 @@
 
 MissionMoonDefense1::MissionMoonDefense1 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
-  selfighter [2] = FIGHTER_PHOENIX;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
+  selfighter [2] = PhoenixDescriptor;
   alliedpilot [0] = PILOT_LARA;
   id = MISSION_MOON1;
   strcpy (name, "TURRETS");
@@ -62,7 +62,7 @@ void MissionMoonDefense1::start ()
   fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [6];
-  alliedInit (FIGHTER_PHOENIX, alliedpilot [0], 1);
+  alliedInit (PhoenixDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 105;
   fighter [1]->trafo.translation.z = 105;
   fighter [1]->target = fighter [6];
@@ -75,7 +75,7 @@ void MissionMoonDefense1::start ()
     fighter [i]->trafo.translation.z = iy * 10;
     fighter [i]->target = fighter [math.random (2)];
 //    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (FLAK_AIR1, 0, 200);
+    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
   for (i = 11; i <= 20; i ++)
   {
@@ -85,7 +85,7 @@ void MissionMoonDefense1::start ()
     fighter [i]->trafo.translation.z = iy * 20 + 40;
     fighter [i]->target = fighter [math.random (2)];
 //    fighter [i]->o = &model_mine1;
-    fighter [i]->newinit (MISSILE_MINE1, 0, 220);
+    fighter [i]->newinit (MineDescriptor, 0, 220);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

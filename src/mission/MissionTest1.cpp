@@ -69,7 +69,7 @@ void MissionTest1::start ()
 //    fighter [i]->o = &model_pickup1;
     fighter [i]->trafo.translation.x = px + 4 - ((i - 1) / 2) * 4;
     fighter [i]->trafo.translation.z = py + 4 - ((i - 1) & 1) * 8;
-    fighter [i]->newinit (TANK_PICKUP1, 0, 400);
+    fighter [i]->newinit (PickupDescriptor, 0, 400);
   }
 }
 

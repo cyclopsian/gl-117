@@ -328,7 +328,7 @@ class Model3d
 
     static bool showCollision; ///< show collision cube of the model
 
-    std::string name;    ///< unique model name like "GL-117"
+//    std::string name;    ///< unique model name like "GL-117"
     int shading;         ///< shading can be set to FLAT (0) or SMOOTH/GOURAUD (1)
     Uint16 numObjects;   ///< number of objects (which have a unique material)
     Uint16 numMaterials; ///< number of materials (should be the same as the number of objects)
@@ -349,7 +349,7 @@ class Model3d
     ~Model3d ();
   
     void calcMissiles ();
-    void setName (const std::string &name);
+//    void setName (const std::string &name);
     void addMaterial (const Material &material);
     void addObject (const Object3d &object);
     void addRefPoint (const Vector3 &tl);

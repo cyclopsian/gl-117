@@ -38,9 +38,9 @@ MissionMoonBattle::MissionMoonBattle ()
   strcpy (name, "MOON BATTLE");
   strcpy (briefing, "THERE ARE HEAVY AIR FORCES ATTACKING. WE HAVE TO FACE THEM BEFORE THEY CAN REACH OUR HEADQUARTERS.");
   autoLFBriefing ();
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
-  selfighter [2] = FIGHTER_PHOENIX;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
+  selfighter [2] = PhoenixDescriptor;
   alliedfighters = 7;
   maxtime = 6000 * timestep;
   alliedpilot [0] = PILOT_MATRIX;
@@ -66,7 +66,7 @@ void MissionMoonBattle::start ()
   fplayer->trafo.translation.z = 100;
   for (i = 1; i <= 6; i ++)
   {
-    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], i);
+    alliedInit (FalconDescriptor, alliedpilot [i - 1], i);
     if (i % 2)
       fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
     else
@@ -79,7 +79,7 @@ void MissionMoonBattle::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (7)];
 //    fighter [i]->o = &model_fige;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 10);
+    fighter [i]->newinit (CrowDescriptor, 0, 450 - i * 10);
     if (i <= 16)
     {
       fighter [i]->trafo.translation.x = -i * 5;
@@ -90,7 +90,7 @@ void MissionMoonBattle::start ()
       fighter [i]->trafo.translation.x = -i * 8 - 150;
       fighter [i]->trafo.translation.z = -i * 8 - 150;
 //      fighter [i]->o = &model_figh;
-      fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 450 - i * 10);
+      fighter [i]->newinit (BlackBirdDescriptor, 0, 450 - i * 10);
     }
     else
     {

@@ -834,7 +834,7 @@ void StateMission::display ()
   // Draw dummy missile
   glEnable (GL_LIGHTING);
   Model3dRealizer mr;
-  mr.draw (*Model3dRegistry::get ("AamHs1"), Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
+  mr.draw (*Model3dRegistry::get (AamHs1Descriptor.name), Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
 //  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   
@@ -852,7 +852,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*getModel (missionnew->selfighter [i]), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selfighter [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
 //    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
 
@@ -867,7 +867,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*getModel (missionnew->selweapon [i]), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selweapon [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
 //    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
@@ -932,8 +932,8 @@ void StateMission::display ()
 
   font1->drawText (textx / fontscale, -1 / fontscale, -2, "CHOOSE FIGHTER:", *col);
   font1->drawText (xstats / fontscale, -1 / fontscale, -2, "CHOOSE WEAPON PACK:", *col);
-  font2->drawText (textx / fontscale, -6 / fontscale, -2, getModelName (missionnew->selfighter [missionnew->wantfighter]), *col);
-  font2->drawText (xstats / fontscale, -6 / fontscale, -2, getModelName (missionnew->selweapon [missionnew->wantweapon]), *col);
+  font2->drawText (textx / fontscale, -6 / fontscale, -2, missionnew->selfighter [missionnew->wantfighter].displayedName, *col);
+  font2->drawText (xstats / fontscale, -6 / fontscale, -2, missionnew->selweapon [missionnew->wantweapon].displayedName, *col);
   font1->zoom = 0.1;
   font2->zoom = 0.1;
 
@@ -1066,17 +1066,18 @@ void StateFighter::display ()
   rot.theta = 0;
   rot.phi = (5 + missionmenutimer * 4 / timestep) % 360;
   Model3d *model = NULL;
-  int id = 0;
-  if (aktfighter == 0) { model = Model3dRegistry::get ("Falcon"); id = FIGHTER_FALCON; }
-  else if (aktfighter == 1) { model = Model3dRegistry::get ("Crow"); id = FIGHTER_CROW; }
-  else if (aktfighter == 2) { model = Model3dRegistry::get ("Hawk"); id = FIGHTER_HAWK; }
-  else if (aktfighter == 3) { model = Model3dRegistry::get ("Storm"); id = FIGHTER_STORM; }
-  else if (aktfighter == 4) { model = Model3dRegistry::get ("Swallow"); id = FIGHTER_SWALLOW; }
-  else if (aktfighter == 5) { model = Model3dRegistry::get ("Buzzard"); id = FIGHTER_BUZZARD; }
-  else if (aktfighter == 6) { model = Model3dRegistry::get ("Hawk2"); id = FIGHTER_HAWK2; }
-  else if (aktfighter == 7) { model = Model3dRegistry::get ("RedArrow"); id = FIGHTER_REDARROW; }
-  else if (aktfighter == 8) { model = Model3dRegistry::get ("Phoenix"); id = FIGHTER_PHOENIX; }
-  else if (aktfighter == 9) { model = Model3dRegistry::get ("BlackBird"); id = FIGHTER_BLACKBIRD; }
+  UnitDescriptor id;
+  if (aktfighter == 0) { id = FalconDescriptor; }
+  else if (aktfighter == 1) { id = CrowDescriptor; }
+  else if (aktfighter == 2) { id = HawkDescriptor; }
+  else if (aktfighter == 3) { id = StormDescriptor; }
+  else if (aktfighter == 4) { id = SwallowDescriptor; }
+  else if (aktfighter == 5) { id = BuzzardDescriptor; }
+  else if (aktfighter == 6) { id = Hawk2Descriptor; }
+  else if (aktfighter == 7) { id = RedArrowDescriptor; }
+  else if (aktfighter == 8) { id = PhoenixDescriptor; }
+  else if (aktfighter == 9) { id = BlackBirdDescriptor; }
+  model = Model3dRegistry::get (id.name); 
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
@@ -1093,12 +1094,12 @@ void StateFighter::display ()
   float fontzoom = 0.7;
   float textx = -9.5;
   font1->zoom = 0.07;
-  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), *col);
+  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, id.displayedName, *col);
   float yf = 9.6 - 1.35;
   strcpy (buf, "TYPE: ");
-  if (ffighter.id == FIGHTER_FALCON || ffighter.id == FIGHTER_CROW || ffighter.id == FIGHTER_BUZZARD || ffighter.id == FIGHTER_REDARROW || ffighter.id == FIGHTER_BLACKBIRD)
+  if (ffighter.id == FalconDescriptor || ffighter.id == CrowDescriptor || ffighter.id == BuzzardDescriptor || ffighter.id == RedArrowDescriptor || ffighter.id == BlackBirdDescriptor)
     strcat (buf, "FIGHTER");
-  else if (ffighter.id == FIGHTER_HAWK || ffighter.id == FIGHTER_HAWK2)
+  else if (ffighter.id == HawkDescriptor || ffighter.id == Hawk2Descriptor)
     strcat (buf, "FIGHTER-BOMBER");
   else
     strcat (buf, "BOMBER");
@@ -1868,12 +1869,12 @@ void StatePlay::display ()
       for (unsigned i = 0; i < space->o.size (); i ++)
       {
         AIObj *dobj = (AIObj *) space->o [i];
-        if (dobj->id >= MISSILE1)
+        if (dobj->id >= MissileBeginDescriptor)
           if (dobj->draw && dobj->drawLight && dobj->active)
           {
             if (dobj->smoke)
-              if ((dobj->id >= MISSILE1 && dobj->id <= MISSILE2) || (dobj->id >= FIGHTER1 && dobj->id <= FIGHTER2))
-                if (!(dobj->ttl == 0 && dobj->id >= MISSILE1 && dobj->id <= MISSILE2))
+              if ((dobj->id >= MissileBeginDescriptor && dobj->id <= MissileEndDescriptor) || (dobj->id >= FighterBeginDescriptor && dobj->id <= AirEndDescriptor))
+                if (!(dobj->ttl == 0 && dobj->id >= MissileBeginDescriptor && dobj->id <= MissileEndDescriptor))
                 {
                   dobj->smoke->draw (camrot.phi, camrot.gamma);
                 }
@@ -2661,7 +2662,7 @@ void StateInit::display ()
   glPushMatrix ();
   glTranslatef (0, 0, -5);
   Model3dRealizer mr;
-  Model3d *model = Model3dRegistry::get ("Falcon");
+  Model3d *model = Model3dRegistry::get (FalconDescriptor.name);
   mr.draw (*model, Transformation(tl, rot, Vector3(1.0)), 2.0, initexplode1);
   glPopMatrix ();
 

@@ -58,13 +58,13 @@ void MissionDogfight1::start ()
   fplayer->trafo.translation.z = 70;
   for (i = 1; i <= 6; i ++)
   {
-    objectInit (new Fighter (), FIGHTER_CROW, 0, 395, i);
+    objectInit (new Fighter (), CrowDescriptor, 0, 395, i);
 //    fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-//    fighter [i]->newinit (FIGHTER_CROW, 0, 395);
+//    fighter [i]->newinit (CrowDescriptor, 0, 395);
     fighter [i]->deactivate ();
   }
   fighter [1]->activate ();

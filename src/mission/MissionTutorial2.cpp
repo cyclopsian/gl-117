@@ -40,11 +40,11 @@ MissionTutorial2::MissionTutorial2 ()
   autoLFBriefing ();
   alliedfighters = 1;
   maxtime = 5000 * timestep;
-  selfighter [0] = FIGHTER_STORM;
+  selfighter [0] = StormDescriptor;
   selfighters = 1;
   wantfighter = 0;
   selweapons = 1;
-  selweapon [0] = MISSILE_DF1;
+  selweapon [0] = DfmDescriptor;
   wantweapon = 0;
 //  alliedpilot [0] = PILOT_PRIMETIME;
 }
@@ -71,7 +71,7 @@ void MissionTutorial2::start ()
 //    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = px + 6 - i * 4;
     fighter [i]->trafo.translation.z = py + 6 - i * 4;
-    fighter [i]->newinit (TANK_GROUND1, 0, 400);
+    fighter [i]->newinit (PantherDescriptor, 0, 400);
     fighter [i]->maxthrust = 0;
   }
 }

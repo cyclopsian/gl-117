@@ -32,7 +32,7 @@
 
 
 
-MissionTransport::MissionTransport ()
+MissionTransportDescriptor::MissionTransportDescriptor ()
 {
   id = MISSION_TRANSPORT;
   strcpy (name, "TRANSPORT");
@@ -43,7 +43,7 @@ MissionTransport::MissionTransport ()
   alliedpilot [0] = PILOT_PRIMETIME;
 }
 
-void MissionTransport::start ()
+void MissionTransportDescriptor::start ()
 {
   int i;
   day = 1;
@@ -56,7 +56,7 @@ void MissionTransport::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 4; i ++)
@@ -66,7 +66,7 @@ void MissionTransport::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 340);
+    fighter [i]->newinit (CrowDescriptor, 0, 340);
   }
   for (i = 5; i <= 6; i ++)
   {
@@ -75,12 +75,12 @@ void MissionTransport::start ()
 //    fighter [i]->o = &model_figt;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 200);
+    fighter [i]->newinit (TransportDescriptor, 0, 200);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionTransport::processtimer (Uint32 dt)
+int MissionTransportDescriptor::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -99,7 +99,7 @@ int MissionTransport::processtimer (Uint32 dt)
   return 1;
 }
 
-void MissionTransport::draw ()
+void MissionTransportDescriptor::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {

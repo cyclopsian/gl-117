@@ -164,7 +164,7 @@ void Dirs::init (char *arg)
         p = strtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
       }
     }
-    logging.display ("Binary file has no context to the data files.", LOG_FATAL);
+    DISPLAY_FATAL("Binary file has no context to the data files.");
     exit (EXIT_CONTEXT);
 
   found:;
@@ -188,7 +188,7 @@ void Dirs::init (char *arg)
     }
     else
     {
-      logging.display ("Binary file has no context to the data files.", LOG_FATAL);
+      DISPLAY_FATAL("Binary file has no context to the data files.");
       exit (EXIT_CONTEXT);
     }
 
@@ -225,8 +225,7 @@ void Dirs::init (char *arg)
   }
   else
   {
-    sprintf (buf, "Found gl-117 data directory %s ", myfile);
-    logging.display (buf, LOG_MOST);
+    DISPLAY_INFO(FormatString("Found gl-117 data directory %s ", myfile));
     strcpy (textures, myfile);
     strcpy (music, myfile);
     strcpy (sound, myfile);

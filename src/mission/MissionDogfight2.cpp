@@ -58,7 +58,7 @@ void MissionDogfight2::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 6; i ++)
@@ -68,7 +68,7 @@ void MissionDogfight2::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
+    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 10);
   }
   for (i = 7; i <= 8; i ++)
   {
@@ -77,7 +77,7 @@ void MissionDogfight2::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10 - 100;
     fighter [i]->trafo.translation.z = -i * 10 - 100;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
+    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

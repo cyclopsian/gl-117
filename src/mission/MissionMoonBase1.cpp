@@ -34,12 +34,12 @@
 
 MissionMoonBase1::MissionMoonBase1 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
-  selfighter [2] = FIGHTER_PHOENIX;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
+  selfighter [2] = PhoenixDescriptor;
   id = MISSION_MOON3;
   strcpy (name, "SNEAKING");
-  strcpy (briefing, "TIME TO ATTACK. THE BASE IS HEAVILY GUARDED BY BLACKBIRDS. USE AN ASTEROID FIELD TO GET NEAR THE BASE AND DESTROY IT.");
+  strcpy (briefing, "TIME TO ATTACK. THE BASE IS HEAVILY GUARDED BY BLACKBIRDS. USE AN AIR FIELD TO GET NEAR THE BASE AND DESTROY IT.");
   autoLFBriefing ();
   alliedfighters = 1;
   maxtime = 3500 * timestep;
@@ -68,7 +68,7 @@ void MissionMoonBase1::start ()
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 200;
 //    fighter [i]->o = &model_aster1;
-    fighter [i]->newinit (ASTEROID, 0, 150);
+    fighter [i]->newinit (AsteroidDescriptor, 0, 150);
     fighter [i]->party = 0;
   }
   for (i = 21; i < 29; i ++)
@@ -78,12 +78,12 @@ void MissionMoonBase1::start ()
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 50;
 //    fighter [i]->o = &model_figh;
-    fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
+    fighter [i]->newinit (BlackBirdDescriptor, 0, 200);
   }
   fighter [29]->trafo.translation.x = 50 + difficulty * 15;
   fighter [29]->trafo.translation.z = 180 + difficulty * 30;
 //  fighter [29]->o = &model_base1;
-  fighter [29]->newinit (STATIC_BASE1, 0, 100);
+  fighter [29]->newinit (MoonBaseDescriptor, 0, 100);
 }
 
 int MissionMoonBase1::processtimer (Uint32 dt)

@@ -57,7 +57,7 @@ void MissionScout::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 4; i ++)
@@ -67,7 +67,7 @@ void MissionScout::start ()
 //    fighter [i]->o = &model_figd;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);
+    fighter [i]->newinit (BuzzardDescriptor, 0, 170);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

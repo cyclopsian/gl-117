@@ -161,7 +161,7 @@ void StaticAa::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynami
       {
         estimateFighterHeading (f [i]);
 
-        if (id == FLAK_AIR1)
+        if (id == SacDescriptor)
           if (f [i]->trafo.translation.y > trafo.translation.y + 2)
           {
             if (fabs (aw) <= 20 && disttarget < 50) // + aggressive
@@ -169,7 +169,7 @@ void StaticAa::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynami
             firecannonttl = firerate * timestep;
           }
         if (firemissilettl <= 0)
-          if (id == FLARAK_AIR1)
+          if (id == SamDescriptor)
             if (fabs (aw) < 25 && disttarget < 45) // + aggressive
               if (f [i]->trafo.translation.y > trafo.translation.y + 2)
               {

@@ -22,12 +22,13 @@
 #ifndef IS_CONFIGURATION_H
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #include "configuration/Configuration.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 
 
@@ -47,8 +48,7 @@ ConfigFile::ConfigFile (char *fname)
   }
   else
   {
-    sprintf (buf2, "Could not load %s", fname);
-    DISPLAY_WARN(buf2);
+    DISPLAY_WARN(FormatString ("Could not load %s", fname));
     buf [0] = 0;
   }
   for (int i = 0; i < length; i ++)

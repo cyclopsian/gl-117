@@ -90,10 +90,12 @@ class Mission
   char briefing [1024]; // briefing text
   char name [1024]; // mission title
   int id; // mission id
-  int selfighter [3]; // fighter to choose
-  int selfighters, wantfighter; // selected fighter
-  int selweapon [3]; // weapon pack to choose
-  int selweapons, wantweapon; // selected weapon pack
+  UnitDescriptor selfighter [3]; // fighter to choose
+  int selfighters;
+  int wantfighter; // selected fighter
+  UnitDescriptor selweapon [3]; // weapon pack to choose
+  int selweapons;
+  int wantweapon; // selected weapon pack
   int alliedpilot [10]; // id of allied pilots
   Color textcolor; // standard text color to blend in during flight
   int difficulty; // difficulty level for THIS mission
@@ -104,8 +106,8 @@ class Mission
   Mission ();
   virtual ~Mission () {}
   void playerInit ();
-  void alliedInit (int fighterid, int pilotid, int i);
-  void objectInit (AIObj *aiobj, int objectid, int party, int ailevel, int n);
+  void alliedInit (const UnitDescriptor &fighterid, int pilotid, int i);
+  void objectInit (AIObj *aiobj, const UnitDescriptor &objectid, int party, int ailevel, int n);
 //  virtual void init () = 0;
   virtual void start () = 0; // custom definitions for a mission
   virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure
@@ -241,10 +243,10 @@ class MissionTest2 : public Mission
   virtual void draw ();
 };
 
-class MissionTransport : public Mission
+class MissionTransportDescriptor : public Mission
 {
   public:
-  MissionTransport ();
+  MissionTransportDescriptor ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

@@ -60,7 +60,7 @@ void MissionDeathmatch1::start ()
   fplayer->trafo.translation.z = 50;
   for (i = 1; i <= 7; i ++)
   {
-    fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
+    fighter [i]->newinit (FalconDescriptor, 0, 200);
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
     fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
@@ -96,7 +96,7 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
       }
       else
       {
-        fighter [i]->newinit (FIGHTER_FALCON, i + 1, 200);
+        fighter [i]->newinit (FalconDescriptor, i + 1, 200);
       }
       fighter [i]->party = i + 1;
       fighter [i]->shield = fighter [i]->maxshield;

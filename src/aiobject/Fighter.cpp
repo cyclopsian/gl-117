@@ -29,6 +29,7 @@
 #include "game/globals.h"
 #include "math/Math.h"
 #include "loadmodel/Model3dRegistry.h"
+#include "util/Util.h"
 
 #include <cassert>
 
@@ -53,7 +54,7 @@ void Fighter::placeMissiles ()
   Vector3 scale (0.2F, 0.2F, 0.2F);
   ref.clear ();
   for (i2 = 0; i2 < 12; i2 ++)
-    addRefModel (SpaceObj (Model3dRegistry::get ("AamHs1"), Transformation (tlnull, rotmissile, scale)));
+    addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, scale)));
   for (i2 = 0; i2 < 4; i2 ++)
   {
     int type = missilerack [i2];
@@ -74,12 +75,7 @@ void Fighter::placeMissiles ()
 
 void Fighter::fireFlare2 (DynamicObj *flare)
 {
-  char buf [4096];
-  if (logging.loglevel == LOG_DEBUG)
-  {
-    sprintf (buf, "Flare: party=%d", party);
-    DISPLAY_DEBUG(buf);
-  }
+  DISPLAY_DEBUG(FormatString ("FlareDescriptor: party=%d", party));
   flare->init ();
   flare->thrust = 0;
   flare->realspeed = 0;
@@ -93,7 +89,7 @@ void Fighter::fireFlare2 (DynamicObj *flare)
   flare->immunity = (int) (trafo.scaling.x * 12) * timestep;
   flare->source = this;
   flare->currot.phi = currot.phi;
-  flare->id = FLARE1;
+  flare->id = FlareDescriptor;
   initValues (flare, currot.phi);
   flare->activate ();
   flare->explode = 0;
@@ -101,9 +97,7 @@ void Fighter::fireFlare2 (DynamicObj *flare)
 
 void Fighter::fireChaff2 (DynamicObj *chaff)
 {
-  char buf [4096];
-  sprintf (buf, "Chaff: party=%d", party);
-  DISPLAY_DEBUG(buf);
+  DISPLAY_DEBUG(FormatString ("ChaffDescriptor: party=%d", party));
   chaff->init ();
   chaff->thrust = 0;
   chaff->realspeed = 0;
@@ -117,7 +111,7 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
   chaff->immunity = (int) (trafo.scaling.x * 12) * timestep;
   chaff->source = this;
   chaff->currot.phi = currot.phi;
-  chaff->id = CHAFF1;
+  chaff->id = ChaffDescriptor;
   initValues (chaff, currot.phi);
   chaff->activate ();
   chaff->explode = 0;
@@ -142,7 +136,7 @@ bool Fighter::fireFlare (DynamicObj **flare, AIObj **missile)
     {
       if (missile [i2]->ttl > 0)
       {
-        if (missile [i2]->id >= MISSILE_AIR1 && missile [i2]->id <= MISSILE_AIR3) // only heat seeking missiles
+        if (missile [i2]->id >= AamHs1Descriptor && missile [i2]->id <= AamHs3Descriptor) // only heat seeking missiles
           if (missile [i2]->target == this) // only change target if angle is good
           {
             bool hit = false;
@@ -185,7 +179,7 @@ bool Fighter::fireChaff (DynamicObj **chaff, AIObj **missile)
     {
       if (missile [i2]->ttl > 0)
       {
-        if (missile [i2]->id > MISSILE_AIR3) // only radar seeking missiles
+        if (missile [i2]->id > AamHs3Descriptor) // only radar seeking missiles
           if (missile [i2]->target == this) // only change target if angle is good
           {
             bool hit = false;
@@ -370,7 +364,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   {
     float dgamma = atan ((target->trafo.translation.y - trafo.translation.y) / disttarget) * 180 / PI - (currot.gamma - 180);
     float dphi = getAngle (target);
-    if (missiletype == MISSILE_DF1 - MISSILE1)
+    if (missiletype == DfmDescriptor.id - MissileBeginDescriptor.id)
     {
       ttf = 0;
     }
@@ -382,7 +376,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
         {
           if (missiletype >= 0 && missiletype <= 2)
           {
-            if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+            if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
             {
               float dphi = fabs (currot.phi - target->currot.phi);
               if (dphi > 270) dphi = 360 - dphi;
@@ -394,14 +388,14 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           }
           else if (missiletype == 6 || missiletype == 7)
           {
-            if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+            if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
             {
               ttf -= 2 * dt;
             }
           }
           else
           {
-            if (target->id > FIGHTER2)
+            if (target->id > AirEndDescriptor)
             {
               ttf -= 2 * dt;
             }
@@ -557,7 +551,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
       if (m [i]->ttl > 0)
         if (m [i]->target == this)
         {
-          if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
+          if (m [i]->id >= 0 && m [i]->id <= AamHs3Descriptor)
           {
             if ((easymodel == 1 && fabs (currot.theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
             {
@@ -588,7 +582,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   {
     if (target != NULL) // fighter, has target
     {
-      if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+      if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
         recheight = target->trafo.translation.y - targetheight;  // target is a fighter
       else
         recheight = target->trafo.translation.y - targetheight + 5; // target is no fighter
@@ -653,7 +647,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   // fighter's targeting mechanism for missiles
   if (ai)
   {
-    if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+    if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
     {
       if (!selectMissileAirFF (m))
         selectMissileAir (m);
@@ -679,7 +673,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   // heading calculations
   int firerate = getFireRate ();
 
-  if (id < FIGHTER_TRANSPORT) // for fighters (not transproters) do the following
+  if (id < TransportDescriptor) // for fighters (not transproters) do the following
   {
     if (!acttype && disttarget <= 1000 && manoevertheta <= 0) // no special action, near distance, no roll manoever
     {
@@ -742,7 +736,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (maw < 5)
           {
             recrot.theta = 0;
-            if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
+            if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor && disttarget < 20)
               ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
         }
@@ -806,7 +800,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (maw > -5)
           {
             recrot.theta = 0;
-            if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
+            if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor && disttarget < 20)
               ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
         }
@@ -835,7 +829,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   if (disttarget > 50 && fabs (aw) < 20) // high distance and target in front, then fly straight
     recrot.theta = 0;
   if (manoeverthrust <= 0)
-    if (disttarget < 25 && fabs (aw) > 160 && target->id >= TANK1) // avoid collisions
+    if (disttarget < 25 && fabs (aw) > 160 && target->id >= TankBeginDescriptor) // avoid collisions
     {
       manoeverthrust = 25 * timestep;
       recthrust = maxthrust;
@@ -857,7 +851,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   // fire missile?
   if (firemissilettl <= 0)
   {
-    if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+    if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor)
     {
       int z1 = 0;
       if (disttarget < 15 && fabs (aw) < 20)

@@ -34,8 +34,8 @@
 
 MissionCanyon1::MissionCanyon1 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_SHADOW;
   id = MISSION_CANYON1;
   strcpy (name, "RADAR");
@@ -63,7 +63,7 @@ void MissionCanyon1::start ()
   fplayer->currot.phi = 45;
   fplayer->target = fighter [1];
 //  fighter [1]->o = &model_egg;
-  fighter [1]->newinit (STATIC_COMPLEX1, 0, 0);
+  fighter [1]->newinit (ComplexDescriptor, 0, 0);
   fighter [1]->trafo.translation.x = px + 1;
   fighter [1]->trafo.translation.z = py + 1;
   fighter [1]->maxthrust = 0;
@@ -71,7 +71,7 @@ void MissionCanyon1::start ()
   for (i = 2; i < 4; i ++)
   {
 //    fighter [i]->o = &model_radar;
-    fighter [i]->newinit (STATIC_RADAR1, 0, 0);
+    fighter [i]->newinit (RadarDescriptor, 0, 0);
     fighter [i]->trafo.translation.x = px - 2 - (i - 2) * 2;
     fighter [i]->trafo.translation.z = py - 2 - (i - 2) * 2;
     fighter [i]->maxthrust = 0;
@@ -83,7 +83,7 @@ void MissionCanyon1::start ()
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_figd;
     fighter [i]->currot.phi = 180;
-    fighter [i]->newinit (FIGHTER_BUZZARD, 0, 50 + i * 20);
+    fighter [i]->newinit (BuzzardDescriptor, 0, 50 + i * 20);
     fighter [i]->trafo.translation.x = px - 15 - i * 3;
     fighter [i]->trafo.translation.z = py - 15 - i * 3;
     fighter [i]->deactivate ();
@@ -92,7 +92,7 @@ void MissionCanyon1::start ()
   {
 //    fighter [i]->o = &model_flarak1;
     fighter [i]->target = fighter [0];
-    fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+    fighter [i]->newinit (SamDescriptor, 0, 200);
     fighter [i]->trafo.translation.x = px + 4;
     fighter [i]->trafo.translation.z = py + i * 3 - 30;
     fighter [i]->maxthrust = 0;

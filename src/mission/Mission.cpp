@@ -52,15 +52,15 @@ Mission::Mission ()
   timer = 0;
   for (i = 0; i < 3; i ++)
     selfighter [i] = 0;
-  selfighter [0] = FIGHTER_FALCON;
-  selfighter [1] = FIGHTER_HAWK;
-  selfighter [2] = FIGHTER_STORM;
+  selfighter [0] = FalconDescriptor;
+  selfighter [1] = HawkDescriptor;
+  selfighter [2] = StormDescriptor;
   selfighters = 3;
   wantfighter = 0;
   selweapons = 3;
-  selweapon [0] = MISSILE_AIR1;
-  selweapon [1] = MISSILE_GROUND1;
-  selweapon [2] = MISSILE_DF1;
+  selweapon [0] = AamHs1Descriptor;
+  selweapon [1] = Agm1Descriptor;
+  selweapon [2] = DfmDescriptor;
   wantweapon = 0;
   textcolor.set (255, 255, 0, 180);
   clouds = 0;
@@ -87,66 +87,66 @@ void Mission::playerInit ()
     fplayer->missiles [i] = 0;
   for (i = 0; i < missileracks; i ++)
     fplayer->missilerack [i] = -1;
-  if (selweapon [wantweapon] == MISSILE_AIR1)
+  if (selweapon [wantweapon] == AamHs1Descriptor)
   {
-    if (selfighter [wantfighter] == FIGHTER_FALCON)
+    if (selfighter [wantfighter] == FalconDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK)
+    if (selfighter [wantfighter] == HawkDescriptor)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
-    if (selfighter [wantfighter] == FIGHTER_STORM)
+    if (selfighter [wantfighter] == StormDescriptor)
     { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
       fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 0; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK2)
+    if (selfighter [wantfighter] == Hawk2Descriptor)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 1; }
-    if (selfighter [wantfighter] == FIGHTER_PHOENIX)
+    if (selfighter [wantfighter] == PhoenixDescriptor)
     { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
       fplayer->missilerack [0] = 2; fplayer->missilerack [1] = 7; fplayer->missilerack [2] = 7; fplayer->missilerack [3] = 2; }
-    if (selfighter [wantfighter] == FIGHTER_REDARROW)
+    if (selfighter [wantfighter] == RedArrowDescriptor)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 7; fplayer->missilerack [1] = 1; fplayer->missilerack [2] = 1; fplayer->missilerack [3] = 7; }
   }
-  if (selweapon [wantweapon] == MISSILE_GROUND1)
+  if (selweapon [wantweapon] == Agm1Descriptor)
   {
-    if (selfighter [wantfighter] == FIGHTER_FALCON)
+    if (selfighter [wantfighter] == FalconDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 0; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK)
+    if (selfighter [wantfighter] == HawkDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 6; }
-    if (selfighter [wantfighter] == FIGHTER_STORM)
+    if (selfighter [wantfighter] == StormDescriptor)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 3; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK2)
+    if (selfighter [wantfighter] == Hawk2Descriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 6; }
-    if (selfighter [wantfighter] == FIGHTER_PHOENIX)
+    if (selfighter [wantfighter] == PhoenixDescriptor)
     { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
       fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 4; }
-    if (selfighter [wantfighter] == FIGHTER_REDARROW)
+    if (selfighter [wantfighter] == RedArrowDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 1; }
   }
-  if (selweapon [wantweapon] == MISSILE_DF1)
+  if (selweapon [wantweapon] == DfmDescriptor)
   {
-    if (selfighter [wantfighter] == FIGHTER_FALCON)
+    if (selfighter [wantfighter] == FalconDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK)
+    if (selfighter [wantfighter] == HawkDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
-    if (selfighter [wantfighter] == FIGHTER_STORM)
+    if (selfighter [wantfighter] == StormDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 3; }
-    if (selfighter [wantfighter] == FIGHTER_HAWK2)
+    if (selfighter [wantfighter] == Hawk2Descriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
-    if (selfighter [wantfighter] == FIGHTER_PHOENIX)
+    if (selfighter [wantfighter] == PhoenixDescriptor)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 4; }
-    if (selfighter [wantfighter] == FIGHTER_REDARROW)
+    if (selfighter [wantfighter] == RedArrowDescriptor)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
   }
@@ -158,7 +158,7 @@ void Mission::playerInit ()
     f->placeMissiles ();
 }
 
-void Mission::alliedInit (int fighterid, int pilotid, int n)
+void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
 {
   AIObj *aiobj = fighter [n];
   space->removeObject (aiobj);
@@ -178,7 +178,7 @@ void Mission::alliedInit (int fighterid, int pilotid, int n)
   aiobj->ai = true;
 
   // place missiles to racks
-  if (aiobj->id >= FIGHTER1 && aiobj->id <= FIGHTER2)
+  if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
     Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
     if (f)
@@ -186,7 +186,7 @@ void Mission::alliedInit (int fighterid, int pilotid, int n)
   }
 }
 
-void Mission::objectInit (AIObj *aiobj, int objectid, int party, int ailevel, int n)
+void Mission::objectInit (AIObj *aiobj, const UnitDescriptor &objectid, int party, int ailevel, int n)
 {
   space->removeObject (fighter [n]);
   delete fighter [n];
@@ -197,7 +197,7 @@ void Mission::objectInit (AIObj *aiobj, int objectid, int party, int ailevel, in
   fighter [n]->newinit (objectid, party, ailevel);
 
   // place missiles to racks
-  if (aiobj->id >= FIGHTER1 && aiobj->id <= FIGHTER2)
+  if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
     Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
     if (f)

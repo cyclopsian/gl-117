@@ -90,21 +90,21 @@ void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup proje
 
 void Cockpit::setColor (int alpha)
 {
-  if (fplayer->id == FIGHTER_FALCON) glColor4ub (255, 255, 0, alpha);
-  else if (fplayer->id == FIGHTER_HAWK) glColor4ub (255, 150, 100, alpha);
-  else if (fplayer->id == FIGHTER_HAWK2) glColor4ub (200, 200, 100, alpha);
-  else if (fplayer->id == FIGHTER_REDARROW) glColor4ub (255, 0, 0, alpha);
-  else if (fplayer->id == FIGHTER_STORM) glColor4ub (200, 200, 100, alpha);
+  if (fplayer->id == FalconDescriptor) glColor4ub (255, 255, 0, alpha);
+  else if (fplayer->id == HawkDescriptor) glColor4ub (255, 150, 100, alpha);
+  else if (fplayer->id == Hawk2Descriptor) glColor4ub (200, 200, 100, alpha);
+  else if (fplayer->id == RedArrowDescriptor) glColor4ub (255, 0, 0, alpha);
+  else if (fplayer->id == StormDescriptor) glColor4ub (200, 200, 100, alpha);
   else glColor4ub (100, 100, 255, alpha);
 }
 
 void Cockpit::setColor (Color *color, int alpha)
 {
-  if (fplayer->id == FIGHTER_FALCON) color->set (255, 255, 0, alpha);
-  else if (fplayer->id == FIGHTER_HAWK) color->set (255, 150, 100, alpha);
-  else if (fplayer->id == FIGHTER_HAWK2) color->set (200, 200, 100, alpha);
-  else if (fplayer->id == FIGHTER_REDARROW) color->set (255, 0, 0, alpha);
-  else if (fplayer->id == FIGHTER_STORM) color->set (200, 200, 100, alpha);
+  if (fplayer->id == FalconDescriptor) color->set (255, 255, 0, alpha);
+  else if (fplayer->id == HawkDescriptor) color->set (255, 150, 100, alpha);
+  else if (fplayer->id == Hawk2Descriptor) color->set (200, 200, 100, alpha);
+  else if (fplayer->id == RedArrowDescriptor) color->set (255, 0, 0, alpha);
+  else if (fplayer->id == StormDescriptor) color->set (200, 200, 100, alpha);
   else color->set (100, 100, 255, alpha);
 }
 
@@ -119,7 +119,7 @@ void Cockpit::drawCounter ()
     if (missile [i]->active)
       if (missile [i]->target == fplayer)
       {
-        if (missile [i]->id <= MISSILE_AIR1)
+        if (missile [i]->id <= AamHs1Descriptor)
           flarewarn = true;
         else
           chaffwarn = true;
@@ -261,7 +261,7 @@ void Cockpit::drawCounter ()
       bool full = false;
       if (static_cast <AIObj*> (fplayer->target)->party != fplayer->party)
       {
-        if (fplayer->ttf < 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
+        if (fplayer->ttf < 0 && fplayer->missiletype != DfmDescriptor - MissileBeginDescriptor)
         {
           glColor4ub (255, 255, 0, 255); full = true;
         }
@@ -343,7 +343,7 @@ void Cockpit::drawTargeter ()
     bool full = false;
     if (((AIObj *) fplayer->target)->party != fplayer->party)
     {
-      if (fplayer->ttf <= 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
+      if (fplayer->ttf <= 0 && fplayer->missiletype != DfmDescriptor.id - MissileBeginDescriptor.id)
       {
         glColor4ub (255, 255, 0, 255); full = true;
       }
@@ -406,7 +406,7 @@ void Cockpit::drawCross ()
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_REDARROW)
+  if (fplayer->id == FalconDescriptor || fplayer->id == RedArrowDescriptor)
   {
     gl.enableTexture (texcross->textureID);
   }
@@ -588,7 +588,7 @@ void Cockpit::drawTargetedElement ()
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
-      font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->o->name.c_str ()), color);
+      font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->id.displayedName.c_str ()), color);
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
       font1->drawText (-24.0, -25.0, -4.0, str, color);
     }
@@ -609,21 +609,23 @@ void Cockpit::drawWeapon ()
   gl.disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
   Model3d *missile = NULL;
-  if (fplayer->missiletype == 0) missile = Model3dRegistry::get ("AamHs1");
-  else if (fplayer->missiletype == 1) missile = Model3dRegistry::get ("AamHs2");
-  else if (fplayer->missiletype == 2) missile = Model3dRegistry::get ("AamHs3");
-  else if (fplayer->missiletype == 3) missile = Model3dRegistry::get ("Agm1");
-  else if (fplayer->missiletype == 4) missile = Model3dRegistry::get ("Agm2");
-  else if (fplayer->missiletype == 5) missile = Model3dRegistry::get ("Dfm");
-  else if (fplayer->missiletype == 6) missile = Model3dRegistry::get ("AamFf1");
-  else if (fplayer->missiletype == 7) missile = Model3dRegistry::get ("AamFf1");
+  UnitDescriptor desc;
+  if (fplayer->missiletype == 0) desc = AamHs1Descriptor; // TODO: lookup in descriptor registry!
+  else if (fplayer->missiletype == 1) desc = AamHs2Descriptor;
+  else if (fplayer->missiletype == 2) desc = AamHs3Descriptor;
+  else if (fplayer->missiletype == 3) desc = Agm1Descriptor;
+  else if (fplayer->missiletype == 4) desc = Agm2Descriptor;
+  else if (fplayer->missiletype == 5) desc = DfmDescriptor;
+  else if (fplayer->missiletype == 6) desc = AamFf1Descriptor;
+  else if (fplayer->missiletype == 7) desc = AamFf1Descriptor;
+  missile = Model3dRegistry::get (desc.name);
   glEnable (GL_LIGHTING);
   Model3dRealizer mr;
   mr.draw (*missile, Transformation(tl, fplayer->trafo.rotation, Vector3(0.05)), 1.0, 0);
 //  missile->draw (n, tl, fplayer->trafo.rotation, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), color);
+  font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(desc.name.c_str ()), color);
   sprintf (str, "N %d", fplayer->missiles [fplayer->missiletype]);
   font1->drawText (16.0, -24.0, -4.0, str, color);
 }
@@ -640,7 +642,7 @@ void Cockpit::drawRadar ()
   setColor (150);
   float xl, yl;
   int type;
-  if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_REDARROW)
+  if (fplayer->id == FalconDescriptor || fplayer->id == RedArrowDescriptor)
   {
     gl.enableTexture (texradar2->textureID);
     xl = 1.4; yl = 1.3;

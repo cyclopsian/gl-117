@@ -29,6 +29,7 @@
 #include "configuration/Configuration.h"
 #include "configuration/Dirs.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 
 
@@ -98,11 +99,9 @@ Configuration::Configuration ()
 
 void Configuration::saveConfig ()
 {
-  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("conf");
-  sprintf (buf, "Saving %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Saving %s ", confname));
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
@@ -155,11 +154,9 @@ void Configuration::saveConfig ()
 
 void Configuration::saveSaveConfig ()
 {
-  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("saveconf");
-  sprintf (buf, "Saving %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Saving %s ", confname));
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
@@ -179,12 +176,10 @@ void Configuration::saveSaveConfig ()
 
 int Configuration::loadConfig ()
 {
-  char buf [4096];
   char ret [256];
   char *str;
   char *confname = dirs.getSaves ("conf");
-  sprintf (buf, "Loading %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Loading %s ", confname));
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -321,12 +316,10 @@ int Configuration::loadConfig ()
 
 int Configuration::loadSaveConfig ()
 {
-  char buf [4096];
   char ret [256];
   char *str;
   char *confname = dirs.getSaves ("saveconf");
-  sprintf (buf, "Loading %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Loading %s ", confname));
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -379,11 +372,9 @@ void Configuration::writeJoystick (ConfigFile *cf, char *str, int jn)
 
 void Configuration::saveConfigInterface ()
 {
-  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("conf.interface");
-  sprintf (buf, "Saving %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Saving %s ", confname));
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
@@ -498,12 +489,10 @@ int Configuration::getJoystick (char *str, int n)
 
 int Configuration::loadConfigInterface ()
 {
-  char buf [4096];
   char ret [256];
   char *str;
   char *confname = dirs.getSaves ("conf.interface");
-  sprintf (buf, "Loading %s ", confname);
-  DISPLAY_INFO(buf);
+  DISPLAY_INFO(FormatString ("Loading %s ", confname));
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "key_firecannon");

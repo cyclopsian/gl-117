@@ -67,7 +67,7 @@ extern AIObj *fplayer; // the player itself
 extern SoundSystem *sound;
 
 // own export: main.h may be included in the cpp files
-extern Model3d *getModel (int id);
+//extern Model3d *getModel (int id);
 
 #endif
 

@@ -40,7 +40,7 @@ MissionShip1::MissionShip1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 4000 * timestep;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_SHADOW;
 }
 
@@ -58,7 +58,7 @@ void MissionShip1::start ()
   fplayer->trafo.translation.x = 80;
   fplayer->trafo.translation.z = 0;
   fplayer->currot.phi = 90;
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  alliedInit (Hawk2Descriptor, alliedpilot [0], 1);
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;
@@ -70,7 +70,7 @@ void MissionShip1::start ()
 //    fighter [i]->o = &model_ship2;
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
-    fighter [i]->newinit (SHIP_DESTROYER1, 0, 50);
+    fighter [i]->newinit (LightDestroyerDescriptor, 0, 50);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
@@ -81,7 +81,7 @@ void MissionShip1::start ()
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
+    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 20);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

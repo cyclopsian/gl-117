@@ -34,8 +34,8 @@
 
 MissionTunnel1::MissionTunnel1 ()
 {
-  selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [0] = RedArrowDescriptor;
+  selfighter [1] = Hawk2Descriptor;
   id = MISSION_TUNNEL1;
   strcpy (name, "TUNNEL");
   strcpy (briefing, "THE TERRAIN TO GET NEAR THE ENEMY'S HQ IS GUARDED BY ELITE BUZZARD FIGHTERS. BUT THERE IS A TRENCH WE CAN PROTUDE TO GET NEAR THEIR BASE WITHOUT BEING SIGHTED. FLY AHEAD TO SCOUT THE TRENCH. JUST MAKE YOUR WAY THROUGH!");
@@ -67,13 +67,13 @@ void MissionTunnel1::start ()
     fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (FLAK_AIR1, 0, 200);
+    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
   fighter [i]->trafo.translation.x = -200 + 256;
   fighter [i]->trafo.translation.z = 0 + 256;
   fighter [i]->target = fighter [0];
 //  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [i]->newinit (SamDescriptor, 0, 200);
   for (i = 11; i <= 15; i ++)
   {
     int ix = (i - 11) * 10 - 100 + 256;
@@ -82,27 +82,27 @@ void MissionTunnel1::start ()
     fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (FLAK_AIR1, 0, 300);
+    fighter [i]->newinit (SacDescriptor, 0, 300);
   }
   fighter [i]->trafo.translation.x = -250 + 256;
   fighter [i]->trafo.translation.z = -2 + 256;
   fighter [i]->target = fighter [0];
 //  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [i]->newinit (SamDescriptor, 0, 200);
   i ++;
   fighter [i]->trafo.translation.x = -250 + 256;
   fighter [i]->trafo.translation.z = 2 + 256;
   fighter [i]->target = fighter [0];
 //  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [i]->newinit (SamDescriptor, 0, 200);
   i ++;
   fighter [i]->trafo.translation.x = -350 + 256;
   fighter [i]->trafo.translation.z = 0 + 256;
 //  fighter [i]->o = &model_barrier1;
-  fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
+  fighter [i]->newinit (LaserBarrierDescriptor, 0, 100);
   for (i = 19; i < 26; i ++)
   {
-    fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 8);
+    fighter [i]->newinit (BuzzardDescriptor, 0, i * 8);
     fighter [i]->target = fighter [0];
 //    fighter [i]->o = &model_figd;
     fighter [i]->trafo.translation.x = 256;
