@@ -39,6 +39,7 @@ int mousex, mousey;
 int quality = 3;
 float view = 50.0;
 int width = 800, height = 600, bpp = 32;
+int dithering = 0;
 int volumesound = 100;
 int volumemusic = 100;
 
@@ -3641,6 +3642,8 @@ void save_config ()
   cf->write (" quality", quality);
   cf->writeText ("# Far clipping plane: 20..100 (default=50)");
   cf->write (" view", (int) view);
+  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
+  cf->write (" dithering", dithering);
 #ifdef HAVE_SDL_MIXER
   cf->writeText ("# Sound volume: 0..100 (default=100) per cent");
   cf->write (" sound", (int) volumesound);
@@ -3679,7 +3682,7 @@ int load_config ()
   if (width < 100) width = 100;
   else if (width > 3000) width = 3000;
 
-  cf->getString (ret, "height");
+  str = cf->getString (ret, "height");
   if (str == NULL)
   { height = 600; }
   else
@@ -3687,7 +3690,7 @@ int load_config ()
   if (height < 100) height = 100;
   else if (height > 2000) height = 2000;
 
-  cf->getString (str, "bpp");
+  str = cf->getString (ret, "bpp");
   if (str == NULL)
   { bpp = 32; }
   else
@@ -3695,14 +3698,14 @@ int load_config ()
   if (bpp != 8 && bpp != 16 && bpp != 24 && bpp != 32)
     bpp = 32;
 
-  cf->getString (str, "fullscreen");
+  str = cf->getString (ret, "fullscreen");
   if (str == NULL)
   { fullscreen = 1; }
   else
   { fullscreen = atoi (str); }
   if (fullscreen) fullscreen = 1;
 
-  cf->getString (str, "quality");
+  str = cf->getString (ret, "quality");
   if (str == NULL)
   { quality = 2; }
   else
@@ -3710,7 +3713,7 @@ int load_config ()
   if (quality < 0) quality = 0;
   else if (quality > 5) quality = 5;
 
-  cf->getString (str, "view");
+  str = cf->getString (ret, "view");
   if (str == NULL)
   { view = 50; }
   else
@@ -3725,8 +3728,12 @@ int load_config ()
     view = 100;
   }
 
+  str = cf->getString (ret, "dithering");
+  dithering = (str == NULL)? 0 : atoi(str);
+  if (dithering) dithering = 1;
+
 #ifdef HAVE_SDL_MIXER
-  cf->getString (str, "sound");
+  str = cf->getString (ret, "sound");
   if (str == NULL)
   { volumesound = 100; }
   else
@@ -3734,7 +3741,7 @@ int load_config ()
   if (volumesound < 0) volumesound = 0;
   else if (volumesound > 100) volumesound = 100;
 
-  cf->getString (str, "music");
+  str = cf->getString (ret, "music");
   if (str == NULL)
   { volumemusic = 100; }
   else
@@ -3743,7 +3750,7 @@ int load_config ()
   else if (volumemusic > 100) volumemusic = 100;
 #endif
 
-  cf->getString (str, "controls");
+  str = cf->getString (ret, "controls");
   if (str == NULL)
   { controls = CONTROLS_MOUSE; }
   else
@@ -3751,7 +3758,7 @@ int load_config ()
   if (controls < 0) controls = 0;
   else if (controls > 2) controls = 0;
 
-  cf->getString (str, "difficulty");
+  str = cf->getString (ret, "difficulty");
   if (str == NULL)
   { difficulty = 1; }
   else
@@ -4336,7 +4343,7 @@ void game_levelInit ()
   glEnable (GL_COLOR_MATERIAL);            // Allow color
 
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-  glDisable (GL_DITHER);
+//  glDisable (GL_DITHER);
 
 //  mission = new MissionDemo1 (space);
   initing = false;
@@ -6911,6 +6918,8 @@ void game_display ()
   if (debug)
     printf ("\nentering myDisplayFunc()"); fflush (stdout);
 
+  if (dithering) glEnable(GL_DITHER); else glDisable(GL_DITHER);
+
   bool sunvisible = false;
   float pseudoview = getView ();
 
@@ -8449,7 +8458,7 @@ void myFirstInit ()
   glEnable (GL_COLOR_MATERIAL);
 
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-  glDisable (GL_DITHER);
+//  glDisable (GL_DITHER);
 }
 
 void init_key (int key, int x, int y)

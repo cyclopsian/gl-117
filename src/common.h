@@ -42,6 +42,7 @@ extern float view;
 extern int width, height, bpp;
 extern int volumesound;
 extern int volumemusic;
+extern int dithering;
 
 // mouse coordinates
 extern int mousex, mousey;
