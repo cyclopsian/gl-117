@@ -4,6 +4,9 @@ AM_CONFIG_HEADER(config.h)
 
 AH_TEMPLATE([HAVE_SDL],[Use SDL library])
 AH_TEMPLATE([HAVE_SDL_MIXER],[Use SDL mixer library])
+AH_TEMPLATE([HAVE_GL],[Use GL library])
+AH_TEMPLATE([HAVE_GLU],[Use GLU library])
+AH_TEMPLATE([HAVE_GLUT],[Use GLUT library])
 
 LDFLAGS="$LDFLAGS -lm"
 
