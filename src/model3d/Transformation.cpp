@@ -30,32 +30,32 @@
 
 
 
-Material::Material ()
+Transformation::Transformation ()
 {
-  uscale = 1;
-  vscale = 1;
-  utile = 1;
-  vtile = 1;
-  uoffset = 0;
-  voffset = 0;
-  wrot = 0;
-  texture = 0;
-  filename = "";
-  name = "";
 }
 
-Material::Material (const Material &material)
+Transformation::Transformation (const Transformation &trafo)
 {
-  uscale = material.uscale;
-  vscale = material.vscale;
-  utile = material.utile;
-  vtile = material.vtile;
-  uoffset = material.uoffset;
-  voffset = material.voffset;
-  wrot = material.wrot;
-  texture = material.texture; // careful: pointer copy!
-  filename = material.filename;
-  name = material.name;
+  set (trafo);
+}
+
+Transformation::Transformation (const Vector3 &tl, const Rotation &rot, const Vector3 &scaling)
+{
+  set (tl, rot, scaling);
+}
+
+void Transformation::set (const Transformation &trafo)
+{
+  translation.set (trafo.translation);
+  rotation.set (trafo.rotation);
+  scaling.set (trafo.scaling);
+}
+
+void Transformation::set (const Vector3 &tl, const Rotation &rot, const Vector3 &scaling)
+{
+  this->translation.set (tl);
+  this->rotation.set (rot);
+  this->scaling.set (scaling);
 }
 
 #endif

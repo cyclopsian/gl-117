@@ -456,7 +456,7 @@ int MissionCustom::parseObjectData ()
       }
       else
       {
-        aiobj->tl.x = -toDouble (value);
+        aiobj->trafo.translation.x = -toDouble (value);
       }
     }
     else if (!strcmp (attr, "Y"))
@@ -467,7 +467,7 @@ int MissionCustom::parseObjectData ()
       }
       else
       {
-        aiobj->tl.z = -toDouble (value);
+        aiobj->trafo.translation.z = -toDouble (value);
       }
     }
     else if (!strcmp (attr, "INITTIME"))
@@ -1031,8 +1031,8 @@ void MissionCustom::start ()
       int addr = obj [0].idle - 101;
       l->searchPlain (addr % 4, addr / 4, &relx, &rely);
     }
-    fplayer->tl.x = obj [0].tl.x + relx;
-    fplayer->tl.z = obj [0].tl.z + rely;
+    fplayer->trafo.translation.x = obj [0].trafo.translation.x + relx;
+    fplayer->trafo.translation.z = obj [0].trafo.translation.z + rely;
   }
 
   int alliedz = 0;
@@ -1042,7 +1042,7 @@ void MissionCustom::start ()
     if (obj [i].id < FIGHTER1) obj [i].id = FIGHTER_FALCON;
     if (obj [i].id >= FIGHTER1 && obj [i].id <= FIGHTER_PILOTED2 && fplayer->party == obj [i].party)
     {
-      alliedInit (obj [i].id, alliedpilot [alliedz], fighter [i]);
+      alliedInit (obj [i].id, alliedpilot [alliedz], i);
       if (alliedz < maxpilots - 1)
         alliedz ++;
     }
@@ -1057,13 +1057,13 @@ void MissionCustom::start ()
     }
     if (obj [i].idle == 1)
     {
-      relx = (int) fighter [i - 1]->tl.x;
-      rely = (int) fighter [i - 1]->tl.y;
+      relx = (int) fighter [i - 1]->trafo.translation.x;
+      rely = (int) fighter [i - 1]->trafo.translation.y;
     }
     else if (obj [i].idle == 2)
     {
-      relx = (int) fighter [0]->tl.x;
-      rely = (int) fighter [0]->tl.y;
+      relx = (int) fighter [0]->trafo.translation.x;
+      rely = (int) fighter [0]->trafo.translation.y;
     }
     else if (obj [i].idle == 100)
     {
@@ -1074,8 +1074,8 @@ void MissionCustom::start ()
       int addr = obj [i].idle - 101;
       l->searchPlain (addr % 4, addr / 4, &relx, &rely);
     }
-    fighter [i]->tl.x = obj [i].tl.x + relx;
-    fighter [i]->tl.z = obj [i].tl.z + rely;
+    fighter [i]->trafo.translation.x = obj [i].trafo.translation.x + relx;
+    fighter [i]->trafo.translation.z = obj [i].trafo.translation.z + rely;
     if (obj [i].ttl > 0)
     {
       fighter [i]->deactivate ();
@@ -1097,13 +1097,13 @@ int MissionCustom::processtimer (Uint32 dt)
       fighter [i]->activate ();
       if (obj [i].idle == 1)
       {
-        fighter [i]->tl.x = obj [i].tl.x + fighter [i - 1]->tl.x;
-        fighter [i]->tl.z = obj [i].tl.z + fighter [i - 1]->tl.z;
+        fighter [i]->trafo.translation.x = obj [i].trafo.translation.x + fighter [i - 1]->trafo.translation.x;
+        fighter [i]->trafo.translation.z = obj [i].trafo.translation.z + fighter [i - 1]->trafo.translation.z;
       }
       else if (obj [i].idle == 2)
       {
-        fighter [i]->tl.x = obj [i].tl.x + fighter [0]->tl.x;
-        fighter [i]->tl.z = obj [i].tl.z + fighter [0]->tl.z;
+        fighter [i]->trafo.translation.x = obj [i].trafo.translation.x + fighter [0]->trafo.translation.x;
+        fighter [i]->trafo.translation.z = obj [i].trafo.translation.z + fighter [0]->trafo.translation.z;
       }
     }
   }

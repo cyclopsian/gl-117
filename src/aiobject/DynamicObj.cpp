@@ -31,42 +31,24 @@
 
 
 
-// disabled
-int DynamicObj::net_write ()
+
+DynamicObj::DynamicObj ()
 {
-//  net [0] = '.';
-  int z = 1;
-/*  memcpy (&net [z], &tl.x, sizeof (&tl.x));
-  z += sizeof (&tl.x);
-  memcpy (&net [z], &tl.y, sizeof (&tl.y));
-  z += sizeof (&tl.y);
-  memcpy (&net [z], &tl.z, sizeof (&tl.z));
-  z += sizeof (&tl.z);
-  memcpy (&net [z], &phi, sizeof (&phi));
-  z += sizeof (&phi);
-  memcpy (&net [z], &theta, sizeof (&theta));
-  z += sizeof (&theta);
-  memcpy (&net [z], &gamma, sizeof (&gamma));
-  z += sizeof (&gamma);*/
-  return z;
+  dinit ();
 }
 
-// disabled
-void DynamicObj::net_read ()
+DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
 {
-  int z = 1;
-/*  memcpy (&tl.x, &net [z], sizeof (&tl.x));
-  z += sizeof (&tl.x);
-  memcpy (&tl.y, &net [z], sizeof (&tl.y));
-  z += sizeof (&tl.y);
-  memcpy (&tl.z, &net [z], sizeof (&tl.z));
-  z += sizeof (&tl.z);
-  memcpy (&phi, &net [z], sizeof (&phi));
-  z += sizeof (&phi);
-  memcpy (&theta, &net [z], sizeof (&theta));
-  z += sizeof (&theta);
-  memcpy (&gamma, &net [z], sizeof (&gamma));
-  z += sizeof (&gamma);*/
+  dinit ();
+  
+  space = space2;
+  o = o2;
+  trafo.scaling.set (zoom2, zoom2, zoom2);
+  space->addObject (this);
+}
+
+DynamicObj::~DynamicObj ()
+{
 }
 
 void DynamicObj::activate ()
@@ -83,10 +65,10 @@ void DynamicObj::deactivate ()
 
 void DynamicObj::dinit ()
 {
-  rot.gamma = 90;
+  trafo.rotation.gamma = 90;
   currot.phi = 0; currot.theta = 0; currot.gamma = 180;
   recrot.theta = 0;
-  tl.z = 0; tl.x = 0;
+  trafo.translation.z = 0; trafo.translation.x = 0;
   force.x = 0; force.z = 0; force.y = 0;
   maxthrust = 0.3; braking = 0/*0.99*/; manoeverability = 0.5;
   thrust = maxthrust; recthrust = thrust; recheight = 5.0;
@@ -119,20 +101,6 @@ void DynamicObj::dinit ()
   acc.x = acc.y = acc.z = 0;
 }
 
-DynamicObj::DynamicObj ()
-{
-  dinit ();
-}
-
-DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
-{
-  this->space = space2;
-  o = o2;
-  zoom = zoom2;
-  dinit ();
-  space->addObject (this);
-}
-
 void DynamicObj::thrustUp ()
 {
   recthrust += maxthrust / 12;
@@ -147,16 +115,16 @@ void DynamicObj::thrustDown ()
 
 float DynamicObj::distance (DynamicObj *target)
 {
-  float dx = target->tl.x - tl.x;
-  float dz = target->tl.z - tl.z;
-  float dy = target->tl.y - tl.y;
+  float dx = target->trafo.translation.x - trafo.translation.x;
+  float dz = target->trafo.translation.z - trafo.translation.z;
+  float dy = target->trafo.translation.y - trafo.translation.y;
   return sqrt (dx * dx + dz * dz + dy * dy);
 }
 
 float DynamicObj::distanceXZ (DynamicObj *target)
 {
-  float dx = target->tl.x - tl.x;
-  float dz = target->tl.z - tl.z;
+  float dx = target->trafo.translation.x - trafo.translation.x;
+  float dz = target->trafo.translation.z - trafo.translation.z;
   return sqrt (dx * dx + dz * dz);
 }
 
@@ -186,7 +154,7 @@ void DynamicObj::checkExplosion (Uint32 dt)
       }
       else
       {
-        float zoom2 = zoom * 2;
+        float zoom2 = trafo.scaling.x * 2;
         if (zoom2 > 2) zoom2 = 2;
         setExplosion (zoom2, 35 * timestep);
         setBlackSmoke (1.0, 60 * timestep);
@@ -196,13 +164,13 @@ void DynamicObj::checkExplosion (Uint32 dt)
     {
       if (explode >= 25 * timestep && ttl == -1)
       {
-        setExplosion (zoom * 2, 35 * timestep);
+        setExplosion (trafo.scaling.x * 2, 35 * timestep);
         setBlackSmoke (1.0, 60 * timestep);
         ttl = -2;
       }
       if (explode >= 30 * timestep && ttl == -2)
       {
-        setExplosion (zoom * 2, 35 * timestep);
+        setExplosion (trafo.scaling.x * 2, 35 * timestep);
         setBlackSmoke (1.0, 60 * timestep);
         ttl = -3;
       }
@@ -219,9 +187,9 @@ void DynamicObj::checkExplosion (Uint32 dt)
         id = STATIC_PASSIVE;
         shield = 100000;
         o = &model_rubble1;
-        zoom *= 0.7F;
-        if (zoom > 1) zoom = 1;
-        tl.y = l->getExactHeight (tl.x, tl.z) + zoom / 4;
+        trafo.scaling.x *= 0.7F;
+        if (trafo.scaling.x > 1) trafo.scaling.x = 1;
+        trafo.translation.y = l->getExactHeight (trafo.translation.x, trafo.translation.z) + trafo.scaling.x / 4;
       }
     }
     else
@@ -269,10 +237,10 @@ void DynamicObj::crashGround (Uint32 dt)
 {
   if (id >= MOVING_GROUND)
     return;
-  float height = tl.y - l->getExactHeight (tl.x, tl.z);
-  if (height < zoom)
+  float height = trafo.translation.y - l->getExactHeight (trafo.translation.x, trafo.translation.z);
+  if (height < trafo.scaling.x)
   {
-    tl.y -= (height - zoom);
+    trafo.translation.y -= (height - trafo.scaling.x);
     currot.gamma += 10;
     if (shield > 0)
     {
@@ -301,7 +269,7 @@ void DynamicObj::crashGround (Uint32 dt)
 	  shield -= decfac * dt / timestep;
   }
   // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 80
-  if (height > 80) tl.y = l->getHeight (tl.x, tl.z) + 80;
+  if (height > 80) trafo.translation.y = l->getHeight (trafo.translation.x, trafo.translation.z) + 80;
 }
 
 // check for collision, simplified model, each model is surrounded by a cube
@@ -312,9 +280,9 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
   if (explode > 0 || sink > 0) return;
   
   bool collide = false;
-  if (tl.x + o->cube.x >= d->tl.x - d->o->cube.x && tl.x - o->cube.x <= d->tl.x + d->o->cube.x &&
-      tl.y + o->cube.y >= d->tl.y - d->o->cube.y && tl.y - o->cube.y <= d->tl.y + d->o->cube.y &&
-      tl.z + o->cube.z >= d->tl.z - d->o->cube.z && tl.z - o->cube.z <= d->tl.z + d->o->cube.z)
+  if (trafo.translation.x + o->cube.x >= d->trafo.translation.x - d->o->cube.x && trafo.translation.x - o->cube.x <= d->trafo.translation.x + d->o->cube.x &&
+      trafo.translation.y + o->cube.y >= d->trafo.translation.y - d->o->cube.y && trafo.translation.y - o->cube.y <= d->trafo.translation.y + d->o->cube.y &&
+      trafo.translation.z + o->cube.z >= d->trafo.translation.z - d->o->cube.z && trafo.translation.z - o->cube.z <= d->trafo.translation.z + d->o->cube.z)
   {
     collide = true;
   }
@@ -370,7 +338,7 @@ void DynamicObj::setExplosion (float maxzoom, int len)
     if (explosion [i]->ttl <= 0)
       break;
   if (i >= maxexplosion) i = 0;
-  explosion [i]->setExplosion (tl.x, tl.y, tl.z, force.x, force.y, force.z, maxzoom, len);
+  explosion [i]->setExplosion (trafo.translation.x, trafo.translation.y, trafo.translation.z, force.x, force.y, force.z, maxzoom, len);
 }
 
 void DynamicObj::setBlackSmoke (float maxzoom, int len)
@@ -380,13 +348,13 @@ void DynamicObj::setBlackSmoke (float maxzoom, int len)
     if (blacksmoke [i]->ttl <= 0)
       break;
   if (i >= maxblacksmoke) i = 0;
-  blacksmoke [i]->setBlackSmoke (tl.x, tl.y, tl.z, currot.phi, maxzoom, len);
+  blacksmoke [i]->setBlackSmoke (trafo.translation.x, trafo.translation.y, trafo.translation.z, currot.phi, maxzoom, len);
 }
 
 // return heading difference towards enemy
 int DynamicObj::getAngle (DynamicObj *o)
 {
-  float dx2 = o->tl.x - tl.x, dz2 = o->tl.z - tl.z;
+  float dx2 = o->trafo.translation.x - trafo.translation.x, dz2 = o->trafo.translation.z - trafo.translation.z;
   int a, w = (int) currot.phi;
   if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
@@ -406,7 +374,7 @@ int DynamicObj::getAngle (DynamicObj *o)
 int DynamicObj::getAngleH (DynamicObj *o)
 {
   float disttarget = distance (o);
-  return (int) (atan ((o->tl.y - tl.y) / disttarget) * 180 / PI - (currot.gamma - 180));
+  return (int) (atan ((o->trafo.translation.y - trafo.translation.y) / disttarget) * 180 / PI - (currot.gamma - 180));
 }
 
 // check for a looping, this is tricky :-)
@@ -449,7 +417,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   checkExplosion (dt); // check if this object is exploding
   if (sink > 0) // only ships (they will not explode)
   {
-    tl.y -= 0.02 * timefac; // sink down
+    trafo.translation.y -= 0.02 * timefac; // sink down
     currot.gamma = recrot.gamma = 180.0 + 0.5 * (float) sink / timestep; // change angle when sinking
     return; // and exit move()
   }
@@ -459,15 +427,15 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   {
     if (id == STATIC_TENT1) currot.theta = 178;
     // set the correct angles to diplay
-    rot.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
+    trafo.rotation.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
     checkShield ();
     return; // and exit this function
   }
 
   if (id == FLARE1) // only flares
   {
-    tl.y -= 0.04 * timefac; // fall down (gravity, constant)
-    zoom = 0.12F + 0.03F * sin ((float) ttl / (float) timestep / 15); // blink (high frequency)
+    trafo.translation.y -= 0.04 * timefac; // fall down (gravity, constant)
+    trafo.scaling.x = 0.12F + 0.03F * sin ((float) ttl / (float) timestep / 15); // blink (high frequency)
     currot.phi = camphi; // angles to viewer (player)
     currot.theta = 0;
     currot.gamma = camgamma;
@@ -475,8 +443,8 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   if (id == CHAFF1) // only chaff
   {
-    tl.y -= 0.04 * timefac; // fall down (gravity, constant)
-    zoom = 0.12F + 0.01F * (80 * timestep - ttl) / timestep; // spread out
+    trafo.translation.y -= 0.04 * timefac; // fall down (gravity, constant)
+    trafo.scaling.x = 0.12F + 0.01F * (80 * timestep - ttl) / timestep; // spread out
     currot.phi = camphi; // angles to viewer (player)
     currot.theta = 0;
     currot.gamma = camgamma;
@@ -573,14 +541,16 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   if (id <= CANNON2)
   {
-    tl.x += force.x * timefac; // add our vector to the translation
-    tl.z += force.z * timefac;
-    tl.y += force.y * timefac;
+    trafo.translation.x += force.x * timefac; // add our vector to the translation
+    trafo.translation.z += force.z * timefac;
+    trafo.translation.y += force.y * timefac;
     goto cannondone; // jump down to decrease ttl and test collision
   }
 
   // axis pointing through the fighter's nose
   vaxis.set (COS(currot.gamma) * SIN(currot.phi), SIN(currot.gamma), COS(currot.gamma) * COS(currot.phi));
+
+  realspeed = sqrt (force.x * force.x + force.z * force.z + force.y * force.y);
 
   if (realism)
   {
@@ -602,13 +572,6 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     utemp.add (utemp3);
     uaxis.set (utemp);
 
-  }
-
-  realspeed = sqrt (force.x * force.x + force.z * force.z + force.y * force.y);
-
-  if (realism) // sim model
-  {
-
     // add drag force
     braking = (fabs (ruddereffect) + fabs (elevatoreffect) * 4 + fabs (rolleffect)) * realspeed / 50;
     brakepower = pow (0.93 - braking, timefac);
@@ -621,21 +584,26 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     acc.z += thrust * vaxis.z * 0.3 * timefac;
     acc.x += thrust * vaxis.x * 0.3 * timefac;
     acc.y -= thrust * vaxis.y * 0.3 * timefac;
+
     // add elevation force
     acc.z += thrust * uaxis.z * 0.067 * timefac;
     acc.x += thrust * uaxis.x * 0.067 * timefac;
     acc.y -= thrust * uaxis.y * 0.067 * timefac;
+
     // add gravity force
     acc.y -= 0.015 * timefac;
-    // add our vector to the translation
+
+    // calculate new forces
     float stepfac = 0.24;
-    tl.x += acc.x * timefac * stepfac;
-    tl.z += acc.z * timefac * stepfac;
-    tl.y += acc.y * timefac * stepfac;
     float scalef = 1.1;
     force.x = acc.x * stepfac * scalef;
     force.y = acc.y * stepfac * scalef;
     force.z = acc.z * stepfac * scalef;
+
+    // add our vector to the translation
+    trafo.translation.x += acc.x * timefac * stepfac;
+    trafo.translation.z += acc.z * timefac * stepfac;
+    trafo.translation.y += acc.y * timefac * stepfac;
 
   }
   else // action model
@@ -672,19 +640,19 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   stop = false;
   if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
   {
-    float newy = l->getExactHeight (tl.x + force.x, tl.z + force.z) + zoom / 2;
-    if (fabs (newy - tl.y) > 0.05)
+    float newy = l->getExactHeight (trafo.translation.x + force.x, trafo.translation.z + force.z) + trafo.scaling.x / 2;
+    if (fabs (newy - trafo.translation.y) > 0.05)
       stop = true;
-    else if (fabs (newy - tl.y) > 2)
+    else if (fabs (newy - trafo.translation.y) > 2)
       stop = false;
   }
 
   if (!realism)
     if (!stop)
     {
-      tl.x += force.x * timefac; // add our vector to the translation
-      tl.z += force.z * timefac;
-      tl.y += force.y * timefac;
+      trafo.translation.x += force.x * timefac; // add our vector to the translation
+      trafo.translation.z += force.z * timefac;
+      trafo.translation.y += force.y * timefac;
     }
 
   // calculate the objects real thrust only once
@@ -693,28 +661,28 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   // objects moving on the ground should always change their elevation due to the surface
   if (id >= TANK1 && id <= TANK2 && thrust > 0 && !stop)
   {
-    float newy = l->getExactHeight (tl.x, tl.z) + zoom / 2;
-    float dy = newy - tl.y + force.y;
+    float newy = l->getExactHeight (trafo.translation.x, trafo.translation.z) + trafo.scaling.x / 2;
+    float dy = newy - trafo.translation.y + force.y;
     float dx = fabs (force.x) + fabs (force.z);
     float gamma2 = 0;
     if (fabs (dx) > 0.0001)
       gamma2 = atan (dy / dx);
     currot.gamma = 180.0 + 180.0 / PI * gamma2;
-    tl.y = newy;
+    trafo.translation.y = newy;
   }
 
   if (id != ASTEROID)
   {
     // set angles to correctly display the object
-    rot.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
+    trafo.rotation.set ((short) (90 + currot.gamma - 180), (short) currot.theta + 180, (short) -currot.phi);
   }
   else // asteroids should rotate around their center of weight, as we must not change theta/gamma, we do this here
   {
     ttl -= dt; // we use the ttl value as timer, for other methods ttl<0 is the same as ttl=-1
     if (ttl <= -360 * timestep) ttl = -1;
-    int rot1 = (int) (sin ((zoom - 1.3) * 8) * 4);
-    int rot2 = (int) (cos ((zoom - 1.3) * 8) * 4);
-    rot.set ((short) (90 + currot.gamma + ttl * rot1 / timestep - 180), (short) currot.theta + ttl * rot2 / timestep + 180, (short) -currot.phi);
+    int rot1 = (int) (sin ((trafo.scaling.x - 1.3) * 8) * 4);
+    int rot2 = (int) (cos ((trafo.scaling.x - 1.3) * 8) * 4);
+    trafo.rotation.set ((short) (90 + currot.gamma + ttl * rot1 / timestep - 180), (short) currot.theta + ttl * rot2 / timestep + 180, (short) -currot.phi);
   }
 
 cannondone:;

@@ -19,44 +19,47 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef IS_MODEL3D_H
+/* This file includes all AI objects instancing models. */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#ifndef IS_AIOBJECT_H
 
-#include "Model3d.h"
+#include "AiObj.h"
+#include "logging/Logging.h"
+#include "gllandscape/GlLandscape.h"
+#include "game/globals.h"
+#include "math/Math.h"
+
+#include "assert.h"
 
 
-
-Material::Material ()
+StaticPassive::StaticPassive () : AIObj ()
 {
-  uscale = 1;
-  vscale = 1;
-  utile = 1;
-  vtile = 1;
-  uoffset = 0;
-  voffset = 0;
-  wrot = 0;
-  texture = 0;
-  filename = "";
-  name = "";
 }
 
-Material::Material (const Material &material)
+StaticPassive::StaticPassive (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
 {
-  uscale = material.uscale;
-  vscale = material.vscale;
-  utile = material.utile;
-  vtile = material.vtile;
-  uoffset = material.uoffset;
-  voffset = material.voffset;
-  wrot = material.wrot;
-  texture = material.texture; // careful: pointer copy!
-  filename = material.filename;
-  name = material.name;
+}
+
+StaticPassive::~StaticPassive ()
+{
+}
+
+// core AI method
+void StaticPassive::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
+{
+  timer += dt;
+
+  if (!active && !draw) // not active, not drawn, then exit
+  {
+    return;
+  }
+
+  checkTtl (dt);
+
+  // move object according to our physics
+  move (dt, camphi, camgamma);
+
+  return;
 }
 
 #endif
-

@@ -37,7 +37,7 @@ BlackSmoke::BlackSmoke (Space *space)
   ttl = 0;
   space->addObject (this);
   draw = false;
-  zoom = 0.1;
+  trafo.scaling.x = 0.1;
   drawLight = false;
   alpha = -1;
 }
@@ -45,12 +45,12 @@ BlackSmoke::BlackSmoke (Space *space)
 void BlackSmoke::setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len)
 {
   this->myphi = myphi;
-  tl.set (x, y, z);
+  trafo.translation.set (x, y, z);
   this->maxzoom = maxzoom;
   ttl = len;
   maxlen = len;
   draw = true;
-  zoom = 0;
+  trafo.scaling.x = 0;
 }
 
 void BlackSmoke::move (Uint32 dt, float camphi, float camgamma)
@@ -58,8 +58,8 @@ void BlackSmoke::move (Uint32 dt, float camphi, float camgamma)
   this->camphi = camphi;
   if (ttl > 0)
   {
-    zoom = maxzoom * (maxlen - ttl) / maxlen;
-    tl.y += 0.04 * dt / timestep;
+    trafo.scaling.x = maxzoom * (maxlen - ttl) / maxlen;
+    trafo.translation.y += 0.04 * dt / timestep;
     ttl -= dt;
     if (ttl <= 0)
     {
@@ -74,7 +74,7 @@ void BlackSmoke::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2,
   if (ttl <= 0 && !specialeffects)
     return;
 
-  if (draw == 2 || frustum.isSphereInFrustum (tl.x + this->tl.x, tl.y + this->tl.y, tl.z + this->tl.z, this->zoom))
+  if (draw == 2 || frustum.isSphereInFrustum (tl.x + this->trafo.translation.x, tl.y + this->trafo.translation.y, tl.z + this->trafo.translation.z, this->trafo.scaling.x))
   {
     glDepthMask (GL_FALSE);
     if (antialiasing)
@@ -89,17 +89,17 @@ void BlackSmoke::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2,
     int myalpha = 255 - (maxlen - ttl) * 255 / maxlen;
     if (myalpha > 255) myalpha = 255;
     glColor4ub (0, 0, 0, myalpha);
-    float myzoom = zoom;
+    float myzoom = trafo.translation.x;
     float cosphi = COS(camphi);
     float sinphi = SIN(camphi);
     glTexCoord2f (0, 0);
-    glVertex3f (this->tl.x - myzoom * cosphi, this->tl.y + myzoom, this->tl.z + myzoom * sinphi);
+    glVertex3f (this->trafo.translation.x - myzoom * cosphi, this->trafo.translation.y + myzoom, this->trafo.translation.z + myzoom * sinphi);
     glTexCoord2f (1, 0);
-    glVertex3f (this->tl.x + myzoom * cosphi, this->tl.y + myzoom, this->tl.z - myzoom * sinphi);
+    glVertex3f (this->trafo.translation.x + myzoom * cosphi, this->trafo.translation.y + myzoom, this->trafo.translation.z - myzoom * sinphi);
     glTexCoord2f (1, 1);
-    glVertex3f (this->tl.x + myzoom * cosphi, this->tl.y - myzoom, this->tl.z - myzoom * sinphi);
+    glVertex3f (this->trafo.translation.x + myzoom * cosphi, this->trafo.translation.y - myzoom, this->trafo.translation.z - myzoom * sinphi);
     glTexCoord2f (0, 1);
-    glVertex3f (this->tl.x - myzoom * cosphi, this->tl.y - myzoom, this->tl.z + myzoom * sinphi);
+    glVertex3f (this->trafo.translation.x - myzoom * cosphi, this->trafo.translation.y - myzoom, this->trafo.translation.z + myzoom * sinphi);
     glEnd ();
     glDisable (GL_TEXTURE_2D);
     glDisable (GL_ALPHA_TEST);

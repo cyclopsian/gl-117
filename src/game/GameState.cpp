@@ -1650,7 +1650,7 @@ void StatePlay::display ()
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
   gl.setFogLuminance (mylight);
-  sphere->drawGL (tlnull, space->alpha, mylight, true, false);
+  sphere->drawGL (tlnull, 1.0/*dummy*/, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
@@ -1680,10 +1680,10 @@ void StatePlay::display ()
     if (cloudfog > 110) cloudfog = 110;
     gl.enableFog (cloudfog * GLOBALSCALE, quality <= 5);
 
-    highclouds->zoom = 400;
-    float ch2 = -382 - fplayer->tl.y / 10.0;
+    highclouds->trafo.scaling.set (400, 400, 400);
+    float ch2 = -382 - fplayer->trafo.translation.y / 10.0;
     Vector3 tlsphere2 (0, ch2, 0);
-    highclouds->drawGL (tlsphere2, fplayer->tl);
+    highclouds->drawGL (tlsphere2, fplayer->trafo.translation);
 
     glDisable (GL_FOG);
   }
@@ -1819,9 +1819,9 @@ void StatePlay::display ()
     if (!day) dayfac = 0.5;
     if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
     {
-      for (i = 0; i < space->no; i ++)
+      for (i = 0; i < space->o.size (); i ++)
       {
-        if (space->o [i]->tl.y < l->getExactRayHeight (space->o [i]->tl.x, space->o [i]->tl.z))
+        if (space->o [i]->trafo.translation.y < l->getExactRayHeight (space->o [i]->trafo.translation.x, space->o [i]->trafo.translation.z))
           space->o [i]->lum = 0.5 * dayfac;
         else
           space->o [i]->lum = 1.0 * dayfac;
@@ -1829,7 +1829,7 @@ void StatePlay::display ()
     }
     else
     {
-      for (i = 0; i < space->no; i ++)
+      for (i = 0; i < space->o.size (); i ++)
         space->o [i]->lum = dayfac;
     }
 //    printf ("%2.1f*%2.1f ", fplayer->lum, sunlight);
@@ -1848,7 +1848,7 @@ void StatePlay::display ()
       space->drawGL (); // draw all objects
       glDisable (GL_LIGHTING);
       glDepthMask (GL_FALSE);
-      for (i = 0; i < space->no; i ++)
+      for (i = 0; i < space->o.size (); i ++)
       {
         AIObj *dobj = (AIObj *) space->o [i];
         if (dobj->id >= MISSILE1)
@@ -2128,8 +2128,8 @@ void StatePlay::timer (Uint32 dt)
     else if (fphi >= 360) fphi -= 360;
     float pseudoview = l->getView ();
     float fdist = math.random ((int) pseudoview - 20) + 10;
-    float fx = fplayer->tl.x - SIN(fphi) * fdist;
-    float fz = fplayer->tl.z - COS(fphi) * fdist;
+    float fx = fplayer->trafo.translation.x - SIN(fphi) * fdist;
+    float fz = fplayer->trafo.translation.z - COS(fphi) * fdist;
     flash1->set (fx, l->getHeight (fx, fz), fz, (int) camrot.phi);
     int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
     sound->setVolume (SOUND_THUNDER1, lev);
@@ -2238,46 +2238,46 @@ void StatePlay::timer (Uint32 dt)
   if (fplayer->shield <= 0)
     camera = 1;
 
-  float cf = -fplayer->zoom / 2;
+  float cf = -fplayer->trafo.scaling.x / 2;
   camrot.theta = fplayer->currot.theta;
   if (camera == 0)  // cockpit
   {
     float cgamma = fplayer->currot.gamma + 25.0F * COS(fplayer->currot.theta);
     float cphi = fplayer->currot.phi + 25.0F * SIN(fplayer->currot.theta);
-    float fac = fplayer->zoom / 2;
-    cam.x = fplayer->tl.x + COS(cgamma) * SIN(cphi) * fac;
-    cam.y = fplayer->tl.y - SIN(cgamma) * fac;
-    cam.z = fplayer->tl.z + COS(cgamma) * COS(cphi) * fac;
+    float fac = fplayer->trafo.scaling.x / 2;
+    cam.x = fplayer->trafo.translation.x + COS(cgamma) * SIN(cphi) * fac;
+    cam.y = fplayer->trafo.translation.y - SIN(cgamma) * fac;
+    cam.z = fplayer->trafo.translation.z + COS(cgamma) * COS(cphi) * fac;
     camrot.phi = fplayer->currot.phi;
     camrot.gamma = -fplayer->currot.gamma + 180;
     fplayer->draw = 0;
   }
   if (camera == 1) // chase
   {
-    cf = fplayer->zoom * 3;
-    cam.x = fplayer->tl.x + cf * SIN(fplayer->currot.phi);
-    cam.y = fplayer->tl.y + fplayer->zoom;
-    cam.z = fplayer->tl.z + cf * COS(fplayer->currot.phi);
+    cf = fplayer->trafo.scaling.x * 3;
+    cam.x = fplayer->trafo.translation.x + cf * SIN(fplayer->currot.phi);
+    cam.y = fplayer->trafo.translation.y + fplayer->trafo.scaling.x;
+    cam.z = fplayer->trafo.translation.z + cf * COS(fplayer->currot.phi);
     camrot.phi = fplayer->currot.phi;
     fplayer->draw = 1;
     camrot.gamma = 20;
   }
   else if (camera == 2) // backwards
   {
-    cf = -fplayer->zoom * 3;
-    cam.x = fplayer->tl.x + cf * SIN(fplayer->currot.phi);
-    cam.y = fplayer->tl.y + fplayer->zoom;
-    cam.z = fplayer->tl.z + cf * COS(fplayer->currot.phi);
+    cf = -fplayer->trafo.scaling.x * 3;
+    cam.x = fplayer->trafo.translation.x + cf * SIN(fplayer->currot.phi);
+    cam.y = fplayer->trafo.translation.y + fplayer->trafo.scaling.x;
+    cam.z = fplayer->trafo.translation.z + cf * COS(fplayer->currot.phi);
     camrot.phi = fplayer->currot.phi + 180.0;
     fplayer->draw = 1;
     camrot.gamma = 20;
   }
   else if (camera == 3) // other players
   {
-    cf = fighter [aktcam]->zoom * 3;
-    cam.x = fighter [aktcam]->tl.x + cf * SIN(fighter [aktcam]->currot.phi);
-    cam.y = fighter [aktcam]->tl.y + fighter [aktcam]->zoom;
-    cam.z = fighter [aktcam]->tl.z + cf * COS(fighter [aktcam]->currot.phi);
+    cf = fighter [aktcam]->trafo.scaling.x * 3;
+    cam.x = fighter [aktcam]->trafo.translation.x + cf * SIN(fighter [aktcam]->currot.phi);
+    cam.y = fighter [aktcam]->trafo.translation.y + fighter [aktcam]->trafo.scaling.x;
+    cam.z = fighter [aktcam]->trafo.translation.z + cf * COS(fighter [aktcam]->currot.phi);
     camrot.phi = fighter [aktcam]->currot.phi;
     camrot.gamma = 20;
     camrot.theta = fighter [aktcam]->currot.theta;
@@ -2285,63 +2285,63 @@ void StatePlay::timer (Uint32 dt)
   }
   else if (camera == 4) // missile
   {
-    cf = missile [0]->zoom * 10;
-    cam.x = missile [0]->tl.x + cf * SIN(missile [0]->currot.phi);
-    cam.y = missile [0]->tl.y + fplayer->zoom * 2;
-    cam.z = missile [0]->tl.z + cf * COS(missile [0]->currot.phi);
+    cf = missile [0]->trafo.scaling.x * 10;
+    cam.x = missile [0]->trafo.translation.x + cf * SIN(missile [0]->currot.phi);
+    cam.y = missile [0]->trafo.translation.y + fplayer->trafo.scaling.x * 2;
+    cam.z = missile [0]->trafo.translation.z + cf * COS(missile [0]->currot.phi);
     camrot.phi = missile [0]->currot.phi;
     fplayer->draw = 1;
   }
   else if (camera == 5) // top
   {
-    cf = fplayer->zoom * 15;
-    cam.x = fplayer->tl.x + cf * SIN(fplayer->currot.phi);
-    cam.y = fplayer->tl.y + 5.5;
-    cam.z = fplayer->tl.z + cf * COS(fplayer->currot.phi);
+    cf = fplayer->trafo.scaling.x * 15;
+    cam.x = fplayer->trafo.translation.x + cf * SIN(fplayer->currot.phi);
+    cam.y = fplayer->trafo.translation.y + 5.5;
+    cam.z = fplayer->trafo.translation.z + cf * COS(fplayer->currot.phi);
     camrot.phi = fplayer->currot.phi;
     fplayer->draw = 1;
     camrot.gamma = 50;
   }
   else if (camera == 6) // left
   {
-    cf = fplayer->zoom * 2;
+    cf = fplayer->trafo.scaling.x * 2;
     camrot.phi = fplayer->currot.phi + 90.0;
     if (camrot.phi >= 360) camrot.phi -= 360;
     else if (camrot.phi < 0) camrot.phi += 360;
-    cam.x = fplayer->tl.x + cf * SIN(camrot.phi);
-    cam.y = fplayer->tl.y + fplayer->zoom;
-    cam.z = fplayer->tl.z + cf * COS(camrot.phi);
+    cam.x = fplayer->trafo.translation.x + cf * SIN(camrot.phi);
+    cam.y = fplayer->trafo.translation.y + fplayer->trafo.scaling.x;
+    cam.z = fplayer->trafo.translation.z + cf * COS(camrot.phi);
     fplayer->draw = 1;
     camrot.gamma = 20;
   }
   else if (camera == 7) // right
   {
-    cf = fplayer->zoom * 2;
+    cf = fplayer->trafo.scaling.x * 2;
     camrot.phi = fplayer->currot.phi + 270.0;
     if (camrot.phi >= 360) camrot.phi -= 360;
     else if (camrot.phi < 0) camrot.phi += 360;
-    cam.x = fplayer->tl.x + cf * SIN(camrot.phi);
-    cam.y = fplayer->tl.y + fplayer->zoom;
-    cam.z = fplayer->tl.z + cf * COS(camrot.phi);
+    cam.x = fplayer->trafo.translation.x + cf * SIN(camrot.phi);
+    cam.y = fplayer->trafo.translation.y + fplayer->trafo.scaling.x;
+    cam.z = fplayer->trafo.translation.z + cf * COS(camrot.phi);
     fplayer->draw = 1;
     camrot.gamma = 20;
   }
   else if (camera == 8) // top near
   {
-    cf = fplayer->zoom * 5;
-    cam.x = fplayer->tl.x + cf * SIN(fplayer->currot.phi);
-    cam.y = fplayer->tl.y + 2.5;
-    cam.z = fplayer->tl.z + cf * COS(fplayer->currot.phi);
+    cf = fplayer->trafo.scaling.x * 5;
+    cam.x = fplayer->trafo.translation.x + cf * SIN(fplayer->currot.phi);
+    cam.y = fplayer->trafo.translation.y + 2.5;
+    cam.z = fplayer->trafo.translation.z + cf * COS(fplayer->currot.phi);
     camrot.phi = fplayer->currot.phi;
     fplayer->draw = 1;
     camrot.gamma = 50;
   }
   else if (camera == 9) // top very near
   {
-    cf = fplayer->zoom * 2;
-    cam.x = fplayer->tl.x + cf * SIN(fplayer->currot.phi);
-    cam.y = fplayer->tl.y + 1.0;
-    cam.z = fplayer->tl.z + cf * COS(fplayer->currot.phi);
+    cf = fplayer->trafo.scaling.x * 2;
+    cam.x = fplayer->trafo.translation.x + cf * SIN(fplayer->currot.phi);
+    cam.y = fplayer->trafo.translation.y + 1.0;
+    cam.z = fplayer->trafo.translation.z + cf * COS(fplayer->currot.phi);
     camrot.phi = fplayer->currot.phi;
     fplayer->draw = 1;
     camrot.gamma = 50;

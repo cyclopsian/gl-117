@@ -27,8 +27,8 @@
 
 Space::Space ()
 {
-  no = 0;
-  alpha = 1;
+//  no = 0;
+//  alpha = 1;
   lum = 1;
   drawLight = true;
 }
@@ -45,32 +45,40 @@ Space::~Space ()
 {
 }
 
-void Space::init ()
+/*void Space::init ()
 {
-  no = 0;
-}
+  removeAllObjects ();
+//  no = 0;
+}*/
 
 void Space::addObject (SpaceObj *o)
 {
   this->o.push_back (o);
-  no ++;
+//  no ++;
 }
 
-/*bool Space::removeObject (SpaceObj *o2)
+bool Space::removeObject (SpaceObj *o2)
 {
   int i, i2;
-  for (i = 0; i < no; i ++)
+  for (i = 0; i < o.size (); i ++)
     if (o [i] == o2)
     {
-      for (i2 = i + 1; i2 < no; i2 ++)
+      for (i2 = i + 1; i2 < o.size (); i2 ++)
       {
         o [i2 - 1] = o [i2];
       }
-      no --;
+//      no --;
+      o.pop_back ();
       return true;
     }
   return false;
-}*/
+}
+
+void Space::removeAllObjects ()
+{
+  o.clear ();
+//  no = 0;
+}
 
 void Space::translate (Vector3 &v)
 {
@@ -84,19 +92,19 @@ void Space::drawGL ()
   
   if (drawLight)
   {
-    for (i = 0; i < no; i ++)
+    for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && !o [i]->o->alpha)
-            o [i]->drawGL (tl, alpha, lum, true, true);
+            o [i]->drawGL (tl, 1.0/*dummy*/, lum, true, true);
     }
-    for (i = 0; i < no; i ++)
+    for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && o [i]->o->alpha)
-            o [i]->drawGL (tl, alpha, lum, true, true);
+            o [i]->drawGL (tl, 1.0/*dummy*/, lum, true, true);
     }
     // TODO: why the following code block???
 /*    for (i = 0; i < no; i ++)
@@ -109,26 +117,26 @@ void Space::drawGL ()
   }
   else /* not yet implemented */
   {
-    for (i = 0; i < no; i ++)
+    for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && !o [i]->o->alpha)
-            o [i]->drawGL (tl, alpha, lum, false, false);
+            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
     }
-    for (i = 0; i < no; i ++)
+    for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && o [i]->o->alpha)
-            o [i]->drawGL (tl, alpha, lum, false, false);
+            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
     }
-    for (i = 0; i < no; i ++)
+    for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o == NULL)
           if (o [i]->draw)
-            o [i]->drawGL (tl, alpha, lum, false, false);
+            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
     }
   }
 }

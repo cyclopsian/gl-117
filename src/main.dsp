@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MD /W3 /GX /ZI /Od /I "c:/cygwin/home/tom/gl-117/gl-117/src" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /ZI /I "c:/cygwin/home/tom/gl-117/gl-117/src" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -132,6 +132,10 @@ SOURCE=.\model3d\SpherePart.cpp
 # Begin Source File
 
 SOURCE=.\model3d\Texture.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Transformation.cpp
 # End Source File
 # Begin Source File
 
@@ -624,6 +628,30 @@ SOURCE=.\aiobject\AiObj.h
 # Begin Source File
 
 SOURCE=.\aiobject\DynamicObj.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\Fighter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\Missile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\Ship.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\StaticAa.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\StaticPassive.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\Tank.cpp
 # End Source File
 # End Group
 # Begin Group "game"

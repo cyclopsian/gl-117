@@ -333,9 +333,9 @@ void Cockpit::drawTargeter ()
     DynamicObj *o = fplayer->target;
     float myphi = fplayer->currot.phi;
     if (myphi < 0) myphi += 360;
-    float ex1 = COS((int) myphi) * o->zoom, ey1 = -SIN((int) myphi) * o->zoom;
+    float ex1 = COS((int) myphi) * o->trafo.scaling.x, ey1 = -SIN((int) myphi) * o->trafo.scaling.y;
     float ex2 = -ex1, ey2 = -ey1;
-    float ez = o->zoom;
+    float ez = o->trafo.scaling.z;
     gl.enableAlphaBlending ();
     bool full = false;
     if (((AIObj *) fplayer->target)->party != fplayer->party)
@@ -353,40 +353,42 @@ void Cockpit::drawTargeter ()
     {
       glColor4ub (0, 0, 255, 255);
     }
+
+    Vector3 *tl = &o->trafo.translation;
     if (!full)
     {
       float dx = (ex2 - ex1) / 4;
       float dy = (ey2 - ey1) / 4;
       float dz = ez / 2;
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl.x + ex1, o->tl.y + ez - dz, o->tl.z + ey1);
-      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
-      glVertex3f (o->tl.x + ex1 + dx, o->tl.y + ez, o->tl.z + ey1 + dy);
+      glVertex3f (tl->x + ex1, tl->y + ez - dz, tl->z + ey1);
+      glVertex3f (tl->x + ex1, tl->y + ez, tl->z + ey1);
+      glVertex3f (tl->x + ex1 + dx, tl->y + ez, tl->z + ey1 + dy);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl.x + ex2 - dx, o->tl.y + ez, o->tl.z + ey2 - dy);
-      glVertex3f (o->tl.x + ex2, o->tl.y + ez, o->tl.z + ey2);
-      glVertex3f (o->tl.x + ex2, o->tl.y + ez - dz, o->tl.z + ey2);
+      glVertex3f (tl->x + ex2 - dx, tl->y + ez, tl->z + ey2 - dy);
+      glVertex3f (tl->x + ex2, tl->y + ez, tl->z + ey2);
+      glVertex3f (tl->x + ex2, tl->y + ez - dz, tl->z + ey2);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl.x + ex2, o->tl.y - ez + dz, o->tl.z + ey2);
-      glVertex3f (o->tl.x + ex2, o->tl.y - ez, o->tl.z + ey2);
-      glVertex3f (o->tl.x + ex2 - dx, o->tl.y - ez, o->tl.z + ey2 - dy);
+      glVertex3f (tl->x + ex2, tl->y - ez + dz, tl->z + ey2);
+      glVertex3f (tl->x + ex2, tl->y - ez, tl->z + ey2);
+      glVertex3f (tl->x + ex2 - dx, tl->y - ez, tl->z + ey2 - dy);
       glEnd ();
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl.x + ex1 + dx, o->tl.y - ez, o->tl.z + ey1 + dy);
-      glVertex3f (o->tl.x + ex1, o->tl.y - ez, o->tl.z + ey1);
-      glVertex3f (o->tl.x + ex1, o->tl.y - ez + dz, o->tl.z + ey1);
+      glVertex3f (tl->x + ex1 + dx, tl->y - ez, tl->z + ey1 + dy);
+      glVertex3f (tl->x + ex1, tl->y - ez, tl->z + ey1);
+      glVertex3f (tl->x + ex1, tl->y - ez + dz, tl->z + ey1);
       glEnd ();
     }
     else
     {
       glBegin (GL_LINE_STRIP);
-      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
-      glVertex3f (o->tl.x + ex2, o->tl.y + ez, o->tl.z + ey2);
-      glVertex3f (o->tl.x + ex2, o->tl.y - ez, o->tl.z + ey2);
-      glVertex3f (o->tl.x + ex1, o->tl.y - ez, o->tl.z + ey1);
-      glVertex3f (o->tl.x + ex1, o->tl.y + ez, o->tl.z + ey1);
+      glVertex3f (tl->x + ex1, tl->y + ez, tl->z + ey1);
+      glVertex3f (tl->x + ex2, tl->y + ez, tl->z + ey2);
+      glVertex3f (tl->x + ex2, tl->y - ez, tl->z + ey2);
+      glVertex3f (tl->x + ex1, tl->y - ez, tl->z + ey1);
+      glVertex3f (tl->x + ex1, tl->y + ez, tl->z + ey1);
       glEnd ();
     }
     gl.disableAlphaBlending ();
@@ -576,7 +578,7 @@ void Cockpit::drawTargetedElement ()
     if (fplayer->target->active)
     {
       glEnable (GL_LIGHTING);
-      fplayer->target->o->draw (n, tl, fplayer->target->rot, 0.05, 0.3, 0);
+      fplayer->target->o->draw (n, tl, fplayer->target->trafo.rotation, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
@@ -610,7 +612,7 @@ void Cockpit::drawWeapon ()
   else if (fplayer->missiletype == 6) missile = &model_missile7;
   else if (fplayer->missiletype == 7) missile = &model_missile8;
   glEnable (GL_LIGHTING);
-  missile->draw (n, tl, fplayer->rot, 0.05, 1.0, 0);
+  missile->draw (n, tl, fplayer->trafo.rotation, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), color);
@@ -718,7 +720,7 @@ void Cockpit::drawRelativeHeightBar()
   gl.enableAlphaBlending ();
   
   float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
-  float px = fplayer->tl.x, py = fplayer->tl.y, pz = fplayer->tl.z;
+  float px = fplayer->trafo.translation.x, py = fplayer->trafo.translation.y, pz = fplayer->trafo.translation.z;
   float lh = l->getExactHeight(px, pz);
   setColor(80); // low alpha for better visibility
   // add 100.0 to each player_y and land_h to avoid values <= 0.0

@@ -54,18 +54,18 @@ void MissionTransport::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 5;
-  fighter [1]->tl.z = 105;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
+  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 5;
+  fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 340);
   }
   for (i = 5; i <= 6; i ++)
@@ -73,8 +73,8 @@ void MissionTransport::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_figt;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 200);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

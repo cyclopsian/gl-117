@@ -55,14 +55,14 @@ void MissionFreeFlight1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 20;
-  fplayer->tl.z = 70;
+  fplayer->trafo.translation.x = 20;
+  fplayer->trafo.translation.z = 70;
   for (i = 1; i <= 9; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->o = &model_figt;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 395);
     if (i >= 3)
@@ -100,9 +100,9 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
     {
       fighter [i]->activate ();
       int phi = 120 * i;
-      fighter [i]->tl.x = fplayer->tl.x + 40 * COS(phi);
-      fighter [i]->tl.z = fplayer->tl.z + 40 * SIN(phi);
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
+      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
+      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 25;
     }
     return 0;
   }
@@ -112,9 +112,9 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
     {
       fighter [i]->activate ();
       int phi = 90 * i;
-      fighter [i]->tl.x = fplayer->tl.x + 40 * COS(phi);
-      fighter [i]->tl.z = fplayer->tl.z + 40 * SIN(phi);
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
+      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
+      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 25;
     }
     return 0;
   }

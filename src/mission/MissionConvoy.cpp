@@ -56,11 +56,11 @@ void MissionConvoy::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl.x = px;
-  fplayer->tl.z = py + 100;
-  alliedInit (FIGHTER_HAWK, alliedpilot [0], fighter [1]); // always match together 0<->1, 1<->2 etc.
-  fighter [1]->tl.x = px + 5;
-  fighter [1]->tl.z = py + 105;
+  fplayer->trafo.translation.x = px;
+  fplayer->trafo.translation.z = py + 100;
+  alliedInit (FIGHTER_HAWK, alliedpilot [0], 1); // always match together 0<->1, 1<->2 etc.
+  fighter [1]->trafo.translation.x = px + 5;
+  fighter [1]->trafo.translation.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
     fighter [i]->party = 0;
@@ -68,8 +68,8 @@ void MissionConvoy::start ()
     fighter [i]->o = &model_tank1;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_AIR1, 0, 200);
-    fighter [i]->tl.x = px + SIN(phi) * 3.0;
-    fighter [i]->tl.z = py + COS(phi) * 3.0;
+    fighter [i]->trafo.translation.x = px + SIN(phi) * 3.0;
+    fighter [i]->trafo.translation.z = py + COS(phi) * 3.0;
     fighter [i]->currot.phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->maxthrust = 0;
@@ -80,8 +80,8 @@ void MissionConvoy::start ()
     fighter [i]->target = fighter [0];
     if (i == 6 || i == 9) fighter [i]->o = &model_pickup1;
     else fighter [i]->o = &model_truck1;
-    fighter [i]->tl.x = px + 7.5 - i;
-    fighter [i]->tl.z = py + 7.5 - i;
+    fighter [i]->trafo.translation.x = px + 7.5 - i;
+    fighter [i]->trafo.translation.z = py + 7.5 - i;
     if (i == 6 || i == 9) fighter [i]->newinit (TANK_PICKUP1, 0, 400);
     else fighter [i]->newinit (TANK_TRUCK1, 0, 400);
   }

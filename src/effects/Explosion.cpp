@@ -37,13 +37,13 @@ Explosion::Explosion (Space *space, Model3d *sphere)
   ttl = 0;
   space->addObject (this);
   draw = false;
-  zoom = 0.1;
+  trafo.scaling.x = 0.1;
   drawLight = false;
 }
 
 void Explosion::setExplosion (float x, float y, float z, float vx, float vy, float vz, float maxzoom, int len)
 {
-  tl.set (x, y, z);
+  trafo.translation.set (x, y, z);
   this->maxzoom = maxzoom;
   ttl = len;
   maxlen = len;
@@ -56,9 +56,9 @@ void Explosion::move (Uint32 dt, float camphi, float camgamma)
   if (ttl > 0)
   {
     float timefac = (float) dt / (float) timestep;
-    zoom = SIN(ttl * 180 / maxlen) * maxzoom;
+    trafo.scaling.x = SIN(ttl * 180 / maxlen) * maxzoom;
     ttl -= dt;
-    tl.y += 0.01 * timefac;
+    trafo.translation.y += 0.01 * timefac;
     if (ttl <= 0)
     {
       ttl = 0;
@@ -66,9 +66,9 @@ void Explosion::move (Uint32 dt, float camphi, float camgamma)
     }
     float brakepower = pow (0.98, timefac);
     v.mul (brakepower);
-    tl.x += v.x * timefac;
-    tl.y += v.y * timefac;
-    tl.z += v.z * timefac;
+    trafo.translation.x += v.x * timefac;
+    trafo.translation.y += v.y * timefac;
+    trafo.translation.z += v.z * timefac;
   }
 }
 

@@ -56,17 +56,17 @@ void MissionDefend1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl.x = 10;
-  fplayer->tl.z = 90;
+  fplayer->trafo.translation.x = 10;
+  fplayer->trafo.translation.z = 90;
   fplayer->target = fighter [7];
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 20;
-  fighter [1]->tl.z = 100;
+  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 20;
+  fighter [1]->trafo.translation.z = 100;
   fighter [1]->target = fighter [8];
   for (i = 2; i <= 6; i ++)
   {
-    fighter [i]->tl.x = 20 + i * 5;
-    fighter [i]->tl.z = 10;
+    fighter [i]->trafo.translation.x = 20 + i * 5;
+    fighter [i]->trafo.translation.z = 10;
     if (i == 3 || i == 4 || i == 5)
     {
       fighter [i]->o = &model_flarak1;
@@ -86,8 +86,8 @@ void MissionDefend1::start ()
     int off = 35;
     if (difficulty == 0) off = 55;
     else off = 15;
-    fighter [i]->tl.x = i * 5 - 50;
-    fighter [i]->tl.z = -i * 5 - off;
+    fighter [i]->trafo.translation.x = i * 5 - 50;
+    fighter [i]->trafo.translation.z = -i * 5 - off;
     fighter [i]->o = &model_tank2;
     fighter [i]->newinit (TANK_GROUND1, 0, 300);
     fighter [i]->target = fighter [i - 4];
@@ -97,8 +97,8 @@ void MissionDefend1::start ()
     int off = 40;
     if (difficulty == 0) off = 55;
     else off = 25;
-    fighter [i]->tl.x = i * 5 - 50;
-    fighter [i]->tl.z = -i * 5 - off * 2;
+    fighter [i]->trafo.translation.x = i * 5 - 50;
+    fighter [i]->trafo.translation.z = -i * 5 - off * 2;
     if (i == 12)
     {
       fighter [i]->newinit (TANK_AIR1, 0, 300);

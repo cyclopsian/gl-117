@@ -56,8 +56,8 @@ void MissionDeathmatch2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 50;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 50;
   for (i = 1; i <= 7; i ++)
   {
     if (i <= 1)
@@ -82,8 +82,8 @@ void MissionDeathmatch2::start ()
     }
     fighter [i]->party = i / 2 + 1;
     fighter [i]->target = fighter [(i + 4) % 8];
-    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
+    fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
   }
   state = 0;
   laststate = 0;

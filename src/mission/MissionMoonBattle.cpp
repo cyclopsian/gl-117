@@ -62,16 +62,16 @@ void MissionMoonBattle::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_MOON, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
   for (i = 1; i <= 6; i ++)
   {
-    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
+    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], i);
     if (i % 2)
-      fighter [i]->tl.x = ((i + 1) / 2) * 5;
+      fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl.x = -((i + 1) / 2) * 5;
-    fighter [i]->tl.z = 100 + i * 5;
+      fighter [i]->trafo.translation.x = -((i + 1) / 2) * 5;
+    fighter [i]->trafo.translation.z = 100 + i * 5;
     fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
@@ -82,20 +82,20 @@ void MissionMoonBattle::start ()
     fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 10);
     if (i <= 16)
     {
-      fighter [i]->tl.x = -i * 5;
-      fighter [i]->tl.z = -i * 5;
+      fighter [i]->trafo.translation.x = -i * 5;
+      fighter [i]->trafo.translation.z = -i * 5;
     }
     else if (i <= 24)
     {
-      fighter [i]->tl.x = -i * 8 - 150;
-      fighter [i]->tl.z = -i * 8 - 150;
+      fighter [i]->trafo.translation.x = -i * 8 - 150;
+      fighter [i]->trafo.translation.z = -i * 8 - 150;
       fighter [i]->o = &model_figh;
       fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 450 - i * 10);
     }
     else
     {
-      fighter [i]->tl.x = -i * 8 - 350;
-      fighter [i]->tl.z = -i * 8 - 350;
+      fighter [i]->trafo.translation.x = -i * 8 - 350;
+      fighter [i]->trafo.translation.z = -i * 8 - 350;
     }
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

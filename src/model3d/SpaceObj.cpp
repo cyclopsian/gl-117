@@ -28,87 +28,96 @@
 
 SpaceObj::SpaceObj ()
 {
-  zoom = 1;
+  o = 0L;
   alpha = 1;
   draw = 1;
   lum = 1;
   drawLight = true;
   explode = 0;
-  numRefModels = 0;
-  o = NULL;
 }
 
-SpaceObj::SpaceObj (Model3d *o, float zoom)
+SpaceObj::SpaceObj (const SpaceObj &that)
+{
+  o = that.o;
+  alpha = that.alpha;
+  draw = that.draw;
+  lum = that.lum;
+  drawLight = that.drawLight;
+  explode = that.explode;
+  trafo.set (that.trafo);
+}
+
+SpaceObj::SpaceObj (Model3d *o, const Transformation &trafo)
 {
   this->o = o;
-  this->zoom = zoom;
   alpha = 1;
   draw = 1;
   lum = 1;
   drawLight = true;
   explode = 0;
-  numRefModels = 0;
+  this->trafo.set (trafo);
 }
 
 SpaceObj::~SpaceObj ()
 {
 }
 
-void SpaceObj::addRefModel (Model3d *model, Vector3 &tl, Rotation &rot, float scale)
+void SpaceObj::addRefModel (const SpaceObj &ref2)
 {
-  refModel.push_back (model);
+  ref.push_back (ref2);
+/*  refModel.push_back (model);
   refTl.push_back (Vector3 (tl));
   refRot.push_back (Rotation (rot));
   refScale.push_back (scale);
-  numRefModels ++;
+  numRefModels ++; */
 }
 
 void SpaceObj::translate (Vector3 &v)
 {
-  tl.set (v);
+  trafo.translation.set (v);
 }
 
 void SpaceObj::translate (float x, float y, float z)
 {
-  tl.set (x, y, z);
+  trafo.translation.set (x, y, z);
 }
 
 void SpaceObj::rotate (short a, short b, short c)
 {
-  rot.set (a, b, c);
+  trafo.rotation.set (a, b, c);
 }
 
 void SpaceObj::rotateOn (short a, short b, short c)
 {
-  rot.add (a, b, c);
+  trafo.rotation.add (a, b, c);
 }
 
 void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool isTextured2)
 {
   int i;
   Vector3 tl1;
-  tl1.x = tl.x + this->tl.x;
-  tl1.y = tl.y + this->tl.y;
-  tl1.z = tl.z + this->tl.z;
+  tl1.x = tl.x + this->trafo.translation.x;
+  tl1.y = tl.y + this->trafo.translation.y;
+  tl1.z = tl.z + this->trafo.translation.z;
   if (draw == 0) return;
-  if (draw == 2 || frustum.isSphereInFrustum (tl1.x, tl1.y, tl1.z, this->zoom * 1.5))
+  if (draw == 2 || frustum.isSphereInFrustum (tl1.x, tl1.y, tl1.z, this->trafo.scaling.x * 1.5))
   {
     if (drawLight && drawLight2)
     {
       glEnable (GL_LIGHTING);
-      o->draw (tl, this->tl, this->rot, this->zoom, lum * lum2, explode);
-      if (!refModel.empty ())
+      o->draw (tl, this->trafo.translation, this->trafo.rotation, this->trafo.scaling.x, lum * lum2, explode);
+      if (!ref.empty ())
       {
         glPushMatrix ();
         glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode / timestep / timestep, tl1.z);
-        glRotatef (rot.phi+90, 0, -1, 0);
-        glRotatef (-rot.gamma+90, 0, 0, 1);
-        glRotatef (rot.theta+180, 1, 0, 0);
-        glScalef (zoom, zoom, zoom);
+        glRotatef (trafo.rotation.phi + 90, 0, -1, 0);
+        glRotatef (-trafo.rotation.gamma + 90, 0, 0, 1);
+        glRotatef (trafo.rotation.theta + 180, 1, 0, 0);
+        glScalef (trafo.scaling.x, trafo.scaling.y, trafo.scaling.z);
         if (o->refpoint)
-          for (i = 0; i < numRefModels; i ++)
-            if (refScale [i] > 0.001)
-              refModel [i]->draw (o->refpoint [i / 3], refTl [i], refRot [i], refScale [i], lum * lum2, explode);
+          for (i = 0; i < ref.size (); i ++)
+            if (ref [i].trafo.scaling.x > 0.001)
+              ref [i].o->draw (o->refpoint [i / 3], ref [i].trafo.translation, ref [i].trafo.rotation, ref [i].trafo.scaling.x, lum * lum2, explode);
         glPopMatrix ();
       }
     }
@@ -117,14 +126,14 @@ void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, b
       glDisable (GL_LIGHTING);
       if (isTextured2)
       {
-        o->drawNoLight (tl, this->tl, this->rot, this->zoom, explode);
+        o->drawNoLight (tl, this->trafo.translation, this->trafo.rotation, this->trafo.scaling.x, explode);
       }
       else
       {
         if (drawLight2)
-          o->drawNoTexture (tl, this->tl, this->rot, this->zoom, lum * lum2, explode);
+          o->drawNoTexture (tl, this->trafo.translation, this->trafo.rotation, this->trafo.scaling.x, lum * lum2, explode);
         else
-          o->drawNoTexture (tl, this->tl, this->rot, this->zoom, 1.0, explode);
+          o->drawNoTexture (tl, this->trafo.translation, this->trafo.rotation, this->trafo.scaling.x, 1.0, explode);
       }
     }
   }

@@ -168,9 +168,8 @@ class DynamicObj : public SpaceObj
 
     DynamicObj ();
     DynamicObj (Space *space2, Model3d *o2, float zoom2);
+    virtual ~DynamicObj ();
 
-    int net_write ();
-    void net_read ();
     void activate ();
     void deactivate ();
     void dinit ();
@@ -248,7 +247,7 @@ class AIObj : public DynamicObj
 
     AIObj ();
     AIObj (Space *space2, Model3d *o2, float zoom2);
-    ~AIObj ();
+    virtual ~AIObj ();
 
     void aiinit ();     ///< initialize variables
     void missileCount ();
@@ -259,8 +258,6 @@ class AIObj : public DynamicObj
     void fireCannon (DynamicObj **laser, float phi);
     void fireCannon (DynamicObj **laser);
     void fireMissile2 (int id, AIObj *missile, AIObj *target);
-    void fireFlare2 (DynamicObj *flare);
-    void fireChaff2 (DynamicObj *chaff);
     int firstMissile ();           ///< select first missile type
     int nextMissile (int from);    ///< select next missile type (cyclic)
     bool haveMissile (int id);     ///< missile of type id left?
@@ -270,8 +267,6 @@ class AIObj : public DynamicObj
     bool fireMissile (AIObj **missile, AIObj *target);
     bool fireMissile (int id, AIObj **missile);
     bool fireMissile (AIObj **missile);
-    bool fireFlare (DynamicObj **flare, AIObj **missile);
-    bool fireChaff (DynamicObj **chaff, AIObj **missile);
     bool fireMissileAir (AIObj **missile, AIObj *target);
     bool selectMissileAir (AIObj **missile);
     bool fireMissileAirFF (AIObj **missile, AIObj *target);
@@ -286,15 +281,83 @@ class AIObj : public DynamicObj
     void targetPrevious (AIObj **f);
     void setSmoke (Uint32 dt);
     void selectNewTarget (AIObj **f);
+    void selectTarget (AIObj **f);
     void checkTtl (Uint32);
     float getMinimumHeight ();
     void easyPiloting (Uint32 dt);
-    bool performManoevers (float myheight);
     void limitRotation ();
     void estimateTargetPosition (float *dx2, float *dz2);
     void estimateHeading (float dx2, float dz2);
     void estimateFighterHeading (AIObj *fi);
-    void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma); // core AI method
+    void decreaseManoeverCounter (Uint32 dt);
+    int getFireRate ();
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma); // core AI method
+};
+
+class Missile : public AIObj
+{
+  public:
+    Missile ();
+    Missile (Space *space2, Model3d *o2, float zoom2);
+    virtual ~Missile ();
+
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+};
+
+class Tank : public AIObj
+{
+  public:
+    Tank ();
+    Tank (Space *space2, Model3d *o2, float zoom2);
+    virtual ~Tank ();
+
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+};
+
+class StaticAa : public AIObj
+{
+  public:
+    StaticAa ();
+    StaticAa (Space *space2, Model3d *o2, float zoom2);
+    virtual ~StaticAa ();
+
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+};
+
+class StaticPassive : public AIObj
+{
+  public:
+    StaticPassive ();
+    StaticPassive (Space *space2, Model3d *o2, float zoom2);
+    virtual ~StaticPassive ();
+
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+};
+
+class Ship : public AIObj
+{
+  public:
+    Ship ();
+    Ship (Space *space2, Model3d *o2, float zoom2);
+    virtual ~Ship ();
+
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
+};
+
+class Fighter : public AIObj
+{
+  public:
+    Fighter ();
+    Fighter (Space *space2, Model3d *o2, float zoom2);
+    virtual ~Fighter ();
+
+    void fireFlare2 (DynamicObj *flare);
+    void fireChaff2 (DynamicObj *chaff);
+    bool fireFlare (DynamicObj **flare, AIObj **missile);
+    bool fireChaff (DynamicObj **chaff, AIObj **missile);
+    bool performManoevers (float myheight);
+    virtual void placeMissiles ();
+    virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
 };
 
 #endif

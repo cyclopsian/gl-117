@@ -56,8 +56,8 @@ void MissionTest1::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl.x = px;
-  fplayer->tl.z = py + 100;
+  fplayer->trafo.translation.x = px;
+  fplayer->trafo.translation.z = py + 100;
   for (i = 0; i < missiletypes; i ++)
   {
     fplayer->missiles [i] = 0;
@@ -67,8 +67,8 @@ void MissionTest1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_pickup1;
-    fighter [i]->tl.x = px + 4 - ((i - 1) / 2) * 4;
-    fighter [i]->tl.z = py + 4 - ((i - 1) & 1) * 8;
+    fighter [i]->trafo.translation.x = px + 4 - ((i - 1) / 2) * 4;
+    fighter [i]->trafo.translation.z = py + 4 - ((i - 1) & 1) * 8;
     fighter [i]->newinit (TANK_PICKUP1, 0, 400);
   }
 }

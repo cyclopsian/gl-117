@@ -31,12 +31,6 @@
 extern int antialiasing;
 extern int timestep;
 
-/*
-TODO list:
-- introduce class Transformation and pack together translation/rotation/scaling
-- SpaceObj: refModels are SpaceObjs itself! Refactor SpaceObj => constructor with more params!
-*/
-
 /* Currently models are normalized to the (-1,-1,-1)-(1,1,1) cube and static!
    The model represents the "class" description of a static model's geometry and colors.
    It is "instanciated" using a DynamicObj which has a reference to the model,
@@ -215,6 +209,25 @@ class Rotation
 
     // the rotation matrix of this rotation
 //    float rot [3] [3];
+};
+
+/**
+* Transformation stores a complete 3D transformation (position, rotation, scaling).
+*/
+class Transformation
+{
+  public:
+
+    Vector3 translation;
+    Rotation rotation;
+    Vector3 scaling;
+
+    Transformation ();
+    Transformation (const Transformation &trafo);
+    Transformation (const Vector3 &tl, const Rotation &rot, const Vector3 &scaling);
+
+    void set (const Transformation &trafo);
+    void set (const Vector3 &tl, const Rotation &rot, const Vector3 &scaling);
 };
 
 /**
@@ -415,25 +428,20 @@ class SpaceObj
     int draw;       ///< draw/hide
     int explode;    ///< explosion stadium (0=no explosion)
     bool drawLight; ///< draw with/without light
-    float zoom;     ///< zoom value of the model
     float alpha;    ///< overall alpha value (should be 1.0)
     float lum;      ///< luminance (default 1.0)
     Model3d *o;     ///< pointer to a model
-    Vector3 tl;     ///< translation
-    Rotation rot;   ///< rotation
+    Transformation trafo; ///< transformation
   
     /// reference models (e.g. missiles for fighters)
-    int numRefModels;
-    std::vector<Model3d *> refModel;
-    std::vector<Vector3> refTl;
-    std::vector<Rotation> refRot;
-    std::vector<float> refScale;
+    std::vector<SpaceObj> ref;
 
     SpaceObj ();
-    SpaceObj (Model3d *o, float zoom);
+    SpaceObj (const SpaceObj &spaceobj);
+    SpaceObj (Model3d *o, const Transformation &trafo);
     virtual ~SpaceObj ();
 
-    void addRefModel (Model3d *model, Vector3 &tl, Rotation &rot, float scale);
+    void addRefModel (const SpaceObj &ref2);
     void translate (Vector3 &v);
     void translate (float x, float y, float z);
     void rotate (short a, short b, short c);
@@ -449,9 +457,9 @@ class Space
 {
   public:
 
-    int no;         ///< number of objects in space
+//    int no;         ///< number of objects in space
     bool drawLight; ///< draw with/without light
-    float alpha;
+//    float alpha;
     float lum;      ///< luminance
     std::vector<SpaceObj *> o; ///< reference to all objects in space
     Vector3 tl;    ///< translation
@@ -459,8 +467,10 @@ class Space
     Space ();
     virtual ~Space ();
 
-    void init ();
+//    void init ();
     void addObject (SpaceObj *o);
+    bool removeObject (SpaceObj *o2);
+    void removeAllObjects ();
     void translate (Vector3 &v);
     virtual void drawGL ();
 };

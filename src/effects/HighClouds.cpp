@@ -55,10 +55,10 @@ void HighClouds::init (int theta)
   co->hasTexture = true;
   sphere->displaylist = false;
   o = sphere;
-  rot.theta = 90;
+  trafo.rotation.theta = 90;
   draw = 2;
   drawLight = false;
-  zoom = 300;
+  trafo.scaling.x = 300;
 }
 
 void HighClouds::setTexture (Texture *texture)
@@ -72,8 +72,8 @@ void HighClouds::drawGL (Vector3 &tl, Vector3 &textl)
   Object3d *cm = o->object [0];
   for (int i2 = 0; i2 < cm->numVertices; i2 ++)
   {
-    cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl.x / zoom;
-    cm->vertex [i2].tex.y = cm->vertex [i2].vector.y * 4 - textl.z / zoom;
+    cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl.x / trafo.scaling.x;
+    cm->vertex [i2].tex.y = cm->vertex [i2].vector.y * 4 - textl.z / trafo.scaling.x;
   }
 
   glEnable (GL_BLEND);
@@ -83,11 +83,11 @@ void HighClouds::drawGL (Vector3 &tl, Vector3 &textl)
   glDisable (GL_DEPTH_TEST);
 
   glPushMatrix ();
-  glTranslatef (tl.x, tl.y, tl.z);
+  glTranslatef (trafo.translation.x, trafo.translation.y, trafo.translation.z);
   glRotatef (90, 0, -1, 0);
   glRotatef (270, 1, 0, 0);
   glRotatef (90, 0, 0, 1);
-  glScalef (zoom, zoom, zoom);
+  glScalef (trafo.scaling.x, trafo.scaling.x, trafo.scaling.x);
 
   glShadeModel (GL_SMOOTH);
 

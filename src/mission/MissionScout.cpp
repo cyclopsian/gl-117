@@ -55,18 +55,18 @@ void MissionScout::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 5;
-  fighter [1]->tl.z = 105;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
+  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 5;
+  fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 4; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_figd;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

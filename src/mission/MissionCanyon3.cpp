@@ -60,25 +60,25 @@ void MissionCanyon3::start ()
   l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl.x = px + 100;
-  fplayer->tl.z = py + 100;
+  fplayer->trafo.translation.x = px + 100;
+  fplayer->trafo.translation.z = py + 100;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
-    alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], fighter [i]);
+    alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], i);
     if (i % 2)
-      fighter [i]->tl.x = px + 100 + ((i + 1) / 2) * 5;
+      fighter [i]->trafo.translation.x = px + 100 + ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl.x = px + 100 - ((i + 1) / 2) * 5;
-    fighter [i]->tl.z = py + 100 + i * 5;
+      fighter [i]->trafo.translation.x = px + 100 - ((i + 1) / 2) * 5;
+    fighter [i]->trafo.translation.z = py + 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
     fighter [i]->currot.phi = 45;
   }
   fighter [5]->o = &model_egg;
   fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
-  fighter [5]->tl.x = px;
-  fighter [5]->tl.z = py;
+  fighter [5]->trafo.translation.x = px;
+  fighter [5]->trafo.translation.z = py;
   fighter [5]->maxthrust = 0;
   fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
@@ -88,14 +88,14 @@ void MissionCanyon3::start ()
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
-  fighter [6]->tl.x = px + 3;
-  fighter [6]->tl.z = py + 3;
-  fighter [7]->tl.x = px - 3;
-  fighter [7]->tl.z = py + 3;
-  fighter [8]->tl.x = px - 3;
-  fighter [8]->tl.z = py - 3;
-  fighter [9]->tl.x = px + 3;
-  fighter [9]->tl.z = py - 3;
+  fighter [6]->trafo.translation.x = px + 3;
+  fighter [6]->trafo.translation.z = py + 3;
+  fighter [7]->trafo.translation.x = px - 3;
+  fighter [7]->trafo.translation.z = py + 3;
+  fighter [8]->trafo.translation.x = px - 3;
+  fighter [8]->trafo.translation.z = py - 3;
+  fighter [9]->trafo.translation.x = px + 3;
+  fighter [9]->trafo.translation.z = py - 3;
   for (i = 10; i <= 19; i ++)
   {
     fighter [i]->party = 0;
@@ -111,8 +111,8 @@ void MissionCanyon3::start ()
       fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 15);
     }
-    fighter [i]->tl.x = px - i * 3;
-    fighter [i]->tl.z = py - i * 3;
+    fighter [i]->trafo.translation.x = px - i * 3;
+    fighter [i]->trafo.translation.z = py - i * 3;
   }
 }
 

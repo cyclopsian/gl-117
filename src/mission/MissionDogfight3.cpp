@@ -58,24 +58,24 @@ void MissionDogfight3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 5;
-  fighter [1]->tl.z = 105;
-  alliedInit (FIGHTER_FALCON, alliedpilot [1], fighter [2]);
-  fighter [2]->tl.x = 10;
-  fighter [2]->tl.z = 110;
-  alliedInit (FIGHTER_FALCON, alliedpilot [2], fighter [3]);
-  fighter [3]->tl.x = 15;
-  fighter [3]->tl.z = 115;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
+  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 5;
+  fighter [1]->trafo.translation.z = 105;
+  alliedInit (FIGHTER_FALCON, alliedpilot [1], 2);
+  fighter [2]->trafo.translation.x = 10;
+  fighter [2]->trafo.translation.z = 110;
+  alliedInit (FIGHTER_FALCON, alliedpilot [2], 3);
+  fighter [3]->trafo.translation.x = 15;
+  fighter [3]->trafo.translation.z = 115;
   for (i = 4; i <= 8; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (4)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 25);
   }
   for (i = 9; i <= 11; i ++)
@@ -83,8 +83,8 @@ void MissionDogfight3::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (4)];
     fighter [i]->o = &model_figa;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
@@ -122,15 +122,15 @@ void MissionDogfight3::draw ()
     fighter [9]->activate ();
     fighter [10]->activate ();
     fighter [11]->activate ();
-    fighter [9]->tl.x = fplayer->tl.x + 55;
-    fighter [9]->tl.z = fplayer->tl.z + 55;
-    fighter [9]->tl.y = l->getHeight (fighter [9]->tl.x, fighter [9]->tl.z) + 10;
-    fighter [10]->tl.x = fplayer->tl.x + 60;
-    fighter [10]->tl.z = fplayer->tl.z + 60;
-    fighter [10]->tl.y = l->getHeight (fighter [10]->tl.x, fighter [10]->tl.z) + 10;
-    fighter [11]->tl.x = fplayer->tl.x + 65;
-    fighter [11]->tl.z = fplayer->tl.z + 65;
-    fighter [11]->tl.y = l->getHeight (fighter [11]->tl.x, fighter [11]->tl.z) + 10;
+    fighter [9]->trafo.translation.x = fplayer->trafo.translation.x + 55;
+    fighter [9]->trafo.translation.z = fplayer->trafo.translation.z + 55;
+    fighter [9]->trafo.translation.y = l->getHeight (fighter [9]->trafo.translation.x, fighter [9]->trafo.translation.z) + 10;
+    fighter [10]->trafo.translation.x = fplayer->trafo.translation.x + 60;
+    fighter [10]->trafo.translation.z = fplayer->trafo.translation.z + 60;
+    fighter [10]->trafo.translation.y = l->getHeight (fighter [10]->trafo.translation.x, fighter [10]->trafo.translation.z) + 10;
+    fighter [11]->trafo.translation.x = fplayer->trafo.translation.x + 65;
+    fighter [11]->trafo.translation.z = fplayer->trafo.translation.z + 65;
+    fighter [11]->trafo.translation.y = l->getHeight (fighter [11]->trafo.translation.x, fighter [11]->trafo.translation.z) + 10;
   }
   if (timer >= 800 * timestep && timer <= 1000 * timestep)
     font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", textcolor);

@@ -54,16 +54,17 @@ void MissionDogfight1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 20;
-  fplayer->tl.z = 70;
+  fplayer->trafo.translation.x = 20;
+  fplayer->trafo.translation.z = 70;
   for (i = 1; i <= 6; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (), FIGHTER_CROW, 0, 395, i);
+//    fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 395);
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
+//    fighter [i]->newinit (FIGHTER_CROW, 0, 395);
     fighter [i]->deactivate ();
   }
   fighter [1]->activate ();
@@ -96,9 +97,9 @@ int MissionDogfight1::processtimer (Uint32 dt)
     for (i = 2; i <= 3; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
-      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
+      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
+      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
     }
     return 0;
   }
@@ -107,9 +108,9 @@ int MissionDogfight1::processtimer (Uint32 dt)
     for (i = 4; i <= 6; i ++)
     {
       fighter [i]->activate ();
-      fighter [i]->tl.x = fplayer->tl.x + 50 + 10 * i;
-      fighter [i]->tl.z = fplayer->tl.z + 50 + 10 * i;
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 15;
+      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
+      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
     }
     return 0;
   }

@@ -62,15 +62,15 @@ void MissionTutorial2::start ()
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
-  fplayer->tl.x = px;
-  fplayer->tl.z = py + 150;
+  fplayer->trafo.translation.x = px;
+  fplayer->trafo.translation.z = py + 150;
   for (i = 1; i <= 2; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_tank1;
-    fighter [i]->tl.x = px + 6 - i * 4;
-    fighter [i]->tl.z = py + 6 - i * 4;
+    fighter [i]->trafo.translation.x = px + 6 - i * 4;
+    fighter [i]->trafo.translation.z = py + 6 - i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400);
     fighter [i]->maxthrust = 0;
   }

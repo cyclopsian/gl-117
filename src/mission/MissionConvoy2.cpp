@@ -57,11 +57,11 @@ void MissionConvoy2::start ()
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   int px = 200, py = 200;
   playerInit ();
-  fplayer->tl.x = px;
-  fplayer->tl.z = py + 100;
-  alliedInit (FIGHTER_HAWK, alliedpilot [0], fighter [1]); // always match together 0<->1, 1<->2 etc.
-  fighter [1]->tl.x = px + 5;
-  fighter [1]->tl.z = py + 105;
+  fplayer->trafo.translation.x = px;
+  fplayer->trafo.translation.z = py + 100;
+  alliedInit (FIGHTER_HAWK, alliedpilot [0], 1); // always match together 0<->1, 1<->2 etc.
+  fighter [1]->trafo.translation.x = px + 5;
+  fighter [1]->trafo.translation.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
     fighter [i]->party = 0;
@@ -69,8 +69,8 @@ void MissionConvoy2::start ()
     fighter [i]->o = &model_trsam;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_TRSAM1, 0, 200);
-    fighter [i]->tl.x = px + SIN(phi) * 5.0;
-    fighter [i]->tl.z = py + COS(phi) * 5.0;
+    fighter [i]->trafo.translation.x = px + SIN(phi) * 5.0;
+    fighter [i]->trafo.translation.z = py + COS(phi) * 5.0;
 //    fighter [i]->phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->maxthrust = 0;
@@ -81,8 +81,8 @@ void MissionConvoy2::start ()
     fighter [i]->target = fighter [0];
     if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
     else fighter [i]->o = &model_truck2;
-    fighter [i]->tl.x = px + (i % 3) * 3 - 4;
-    fighter [i]->tl.z = py + (i / 3) * 3 - 4;
+    fighter [i]->trafo.translation.x = px + (i % 3) * 3 - 4;
+    fighter [i]->trafo.translation.z = py + (i / 3) * 3 - 4;
     if (i == 6 || i == 7) fighter [i]->newinit (TANK_TRUCK1, 0, 400);
     else fighter [i]->newinit (TANK_TRUCK2, 0, 400);
   }
@@ -91,8 +91,8 @@ void MissionConvoy2::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = px - i * 10;
-    fighter [i]->tl.z = py - i * 10;
+    fighter [i]->trafo.translation.x = px - i * 10;
+    fighter [i]->trafo.translation.z = py - i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

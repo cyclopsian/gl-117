@@ -55,12 +55,12 @@ void MissionShip1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl.x = 80;
-  fplayer->tl.z = 0;
+  fplayer->trafo.translation.x = 80;
+  fplayer->trafo.translation.z = 0;
   fplayer->currot.phi = 90;
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 85;
-  fighter [1]->tl.z = 5;
+  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 85;
+  fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;
   fighter [1]->target = fighter [6];
   for (i = 2; i <= 3; i ++)
@@ -68,8 +68,8 @@ void MissionShip1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [i - 2];
     fighter [i]->o = &model_ship2;
-    fighter [i]->tl.x = -i * 4;
-    fighter [i]->tl.z = -i * 4;
+    fighter [i]->trafo.translation.x = -i * 4;
+    fighter [i]->trafo.translation.z = -i * 4;
     fighter [i]->newinit (SHIP_DESTROYER1, 0, 50);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
@@ -79,8 +79,8 @@ void MissionShip1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = 0;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

@@ -58,21 +58,21 @@ void MissionMoonDefense1::start ()
   l = new GlLandscape (LANDSCAPE_MOON, NULL);
 //  l->genTrench (12, 5000);
   playerInit ();
-  fplayer->tl.x = 100;
-  fplayer->tl.z = 100;
+  fplayer->trafo.translation.x = 100;
+  fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [6];
-  alliedInit (FIGHTER_PHOENIX, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 105;
-  fighter [1]->tl.z = 105;
+  alliedInit (FIGHTER_PHOENIX, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 105;
+  fighter [1]->trafo.translation.z = 105;
   fighter [1]->target = fighter [6];
   fighter [1]->currot.phi = 45;
   for (i = 2; i <= 10; i ++)
   {
     int ix = (i - 2) % 3;
     int iy = (i - 2) / 3;
-    fighter [i]->tl.x = ix * 10;
-    fighter [i]->tl.z = iy * 10;
+    fighter [i]->trafo.translation.x = ix * 10;
+    fighter [i]->trafo.translation.z = iy * 10;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
@@ -81,8 +81,8 @@ void MissionMoonDefense1::start ()
   {
     int ix = (i - 11) % 3;
     int iy = (i - 11) / 3;
-    fighter [i]->tl.x = ix * 20 + 40;
-    fighter [i]->tl.z = iy * 20 + 40;
+    fighter [i]->trafo.translation.x = ix * 20 + 40;
+    fighter [i]->trafo.translation.z = iy * 20 + 40;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_mine1;
     fighter [i]->newinit (MISSILE_MINE1, 0, 220);

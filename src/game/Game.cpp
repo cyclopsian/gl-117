@@ -617,7 +617,7 @@ Model3d *getModel (int id)
 
 int game_levelInit ()
 {
-  int i, i2;
+  int i;
 
   // init all objects
   for (i = 0; i < maxfighter; i ++)
@@ -626,10 +626,10 @@ int game_levelInit ()
     fighter [i]->aiinit ();
 //    fighter [i]->fighterinit ();
     fighter [i]->explode = 0;
-    fighter [i]->tl.x = 0;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = 0;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->party = 0;
-    fighter [i]->zoom = 0.35;
+    fighter [i]->trafo.scaling.set (0.35, 0.35, 0.35);
     fighter [i]->deactivate ();
     fighter [i]->recheight = 15;
     fighter [i]->recthrust = 0.2;
@@ -639,7 +639,7 @@ int game_levelInit ()
   for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i]->dinit ();
-    groundobj [i]->zoom = 1;
+    groundobj [i]->trafo.scaling.set (1, 1, 1);
     groundobj [i]->id = STATIC_PASSIVE;
     groundobj [i]->deactivate ();
   }
@@ -680,7 +680,7 @@ int game_levelInit ()
   else if (clouds == 3) highclouds2->setTexture (NULL);
 
   // place missiles to racks
-  for (i = 0; i < maxfighter; i ++)
+/*  for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FIGHTER1 && fighter [i]->id <= FIGHTER2)
       for (i2 = 0; i2 < 4; i2 ++)
@@ -700,74 +700,74 @@ int game_levelInit ()
         if (tmp < 3) fighter [i]->refScale [i2 * 3] = 0;
         if (tmp < 2) fighter [i]->refScale [i2 * 3 + 1] = 0;
       }
-  }
+  }*/
 
   // initialize object's height over the surface
   for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == SHIP_DESTROYER1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 4;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 4;
     }
     else if (fighter [i]->id == SHIP_CRUISER)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 4;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 4;
     }
     else if (fighter [i]->id >= TANK1 && fighter [i]->id <= TANK2)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom * 0.55;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x * 0.55;
     }
     else if (fighter [i]->id == STATIC_TENT1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z);
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z);
     }
     else if (fighter [i]->id == STATIC_CONTAINER1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 2;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 2;
     }
     else if (fighter [i]->id == STATIC_HALL1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
     else if (fighter [i]->id == STATIC_HALL2)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
     else if (fighter [i]->id == STATIC_TENT4)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 3;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 3;
     }
     else if (fighter [i]->id == STATIC_OILRIG1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + fighter [i]->zoom / 5;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + fighter [i]->trafo.scaling.x / 5;
     }
     else if (fighter [i]->id == STATIC_COMPLEX1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.55 * fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.55 * fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == STATIC_RADAR1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.7 * fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.7 * fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == STATIC_BASE1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.5 * fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.5 * fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == STATIC_DEPOT1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.5 * fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.5 * fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == STATIC_BARRIER1)
     {
-      fighter [i]->tl.y = l->getExactHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 0.3 * fighter [i]->zoom;
+      fighter [i]->trafo.translation.y = l->getExactHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 0.3 * fighter [i]->trafo.scaling.x;
     }
     else if (fighter [i]->id == MISSILE_MINE1)
     {
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 5 + math.random (20);
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 5 + math.random (20);
     }
     else if (fighter [i]->id == ASTEROID)
     {
@@ -775,7 +775,7 @@ int game_levelInit ()
     }
     else
     {
-      fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 20;
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 20;
     }
   }
 
@@ -785,13 +785,13 @@ int game_levelInit ()
     if (day)
     {
       laser [i]->o = &model_cannon1;
-      laser [i]->zoom = 0.08;
+      laser [i]->trafo.scaling.set (0.08, 0.08, 0.08);
       laser [i]->drawLight = false;
     }
     else
     {
       laser [i]->o = &model_cannon2;
-      laser [i]->zoom = 0.1;
+      laser [i]->trafo.scaling.set (0.1, 0.1, 0.1);
     }
   }
 
@@ -1261,7 +1261,8 @@ void Events::fireChaff ()
 {
   if (!fplayer->active) return;
   if (fplayer->firechaffttl > 0) return;
-  if (fplayer->fireChaff (chaff, missile))
+  Fighter *f = dynamic_cast<Fighter *>(fplayer);
+  if (f && f->fireChaff (chaff, missile))
     sound->play (SOUND_CHAFF1, false);
 }
 
@@ -1269,7 +1270,8 @@ void Events::fireFlare ()
 {
   if (!fplayer->active) return;
   if (fplayer->fireflarettl > 0) return;
-  if (fplayer->fireFlare (flare, missile))
+  Fighter *f = dynamic_cast<Fighter *>(fplayer);
+  if (f && f->fireFlare (flare, missile))
     sound->play (SOUND_CHAFF1, false);
 }
 
@@ -1780,11 +1782,13 @@ void myInit ()
     blacksmoke [i] = new BlackSmoke (space);
   }
 
+  // TODO: will be removed
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i] = new AIObj (space, &model_fig, 0.4);
+    fighter [i]->ref.clear ();
     for (i2 = 0; i2 < 12; i2 ++)
-      fighter [i]->addRefModel (&model_missile1, tlnull, rotmissile, 0.2);
+      fighter [i]->addRefModel (SpaceObj (&model_missile1, Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
   }
 
   highclouds = new HighClouds (25);
@@ -1794,10 +1798,10 @@ void myInit ()
   highclouds2->setTexture (texclouds3);
 
   objsphere = new Sphere (1, 9, 1, 1, 1);
-  sphere = new SpaceObj (objsphere, 10.0);
-  sphere->rot.gamma = 90;
-  sphere->rot.theta = 90;
-  sphere->rot.phi = 270;
+  sphere = new SpaceObj (objsphere, Transformation (Vector3 (), Rotation (), Vector3 (10.0, 10.0, 10.0)));
+  sphere->trafo.rotation.gamma = 90;
+  sphere->trafo.rotation.theta = 90;
+  sphere->trafo.rotation.phi = 270;
   sphere->draw = 2;
   sphere->drawLight = false;
 

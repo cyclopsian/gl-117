@@ -57,17 +57,17 @@ void MissionShip2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
-  fplayer->tl.x = 80;
-  fplayer->tl.z = 0;
+  fplayer->trafo.translation.x = 80;
+  fplayer->trafo.translation.z = 0;
   fplayer->currot.phi = 90;
-  alliedInit (FIGHTER_REDARROW, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 85;
-  fighter [1]->tl.z = 5;
+  alliedInit (FIGHTER_REDARROW, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 85;
+  fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;
   fighter [1]->target = fighter [6];
   fighter [2]->o = &model_oilrig;
-  fighter [2]->tl.x = 20;
-  fighter [2]->tl.z = 0;
+  fighter [2]->trafo.translation.x = 20;
+  fighter [2]->trafo.translation.z = 0;
   fighter [2]->newinit (STATIC_OILRIG1, 0, 0);
   fighter [2]->maxthrust = 0;
   fighter [2]->thrust = 0;
@@ -77,8 +77,8 @@ void MissionShip2::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -50 - i * 10;
-    fighter [i]->tl.z = 0;
+    fighter [i]->trafo.translation.x = -50 - i * 10;
+    fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 300 - i * 10);
   }
   for (i = 6; i <= 7; i ++)
@@ -86,8 +86,8 @@ void MissionShip2::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [2];
     fighter [i]->o = &model_figa;
-    fighter [i]->tl.x = -80 - i * 10;
-    fighter [i]->tl.z = 0;
+    fighter [i]->trafo.translation.x = -80 - i * 10;
+    fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

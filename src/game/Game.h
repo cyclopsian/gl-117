@@ -99,7 +99,6 @@ extern float view_y;
 extern int flash;
 
 extern Space *space;
-extern AIObj *fplayer;
 extern SpaceObj *sphere;
 extern Sphere *objsphere;
 extern HighClouds *highclouds;

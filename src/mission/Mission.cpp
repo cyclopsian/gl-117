@@ -70,6 +70,12 @@ Mission::Mission ()
 
 void Mission::playerInit ()
 {
+  space->removeObject (fighter [0]);
+  delete fighter [0];
+  fighter [0] = new Fighter ();
+  fighter [0]->space = space;
+  space->addObject (fighter [0]);
+
   int i;
   fplayer = fighter [0];
   if (controls != 100)
@@ -152,10 +158,23 @@ void Mission::playerInit ()
       fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
   }
   fplayer->missileCount ();
+
+  // place missiles to racks
+  Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+  if (f)
+    f->placeMissiles ();
 }
 
-void Mission::alliedInit (int fighterid, int pilotid, AIObj *aiobj)
+void Mission::alliedInit (int fighterid, int pilotid, int n)
 {
+  AIObj *aiobj = fighter [n];
+  space->removeObject (aiobj);
+  delete aiobj;
+  aiobj = new Fighter ();
+  aiobj->space = space;
+  space->addObject (aiobj);
+  fighter [n] = aiobj;
+
   Pilot *p = pilots->pilot [pilots->aktpilot];
   aiobj->easymodel = 1;
   aiobj->target = NULL;
@@ -170,6 +189,33 @@ void Mission::alliedInit (int fighterid, int pilotid, AIObj *aiobj)
   else if (fighterid == FIGHTER_REDARROW) aiobj->o = &model_figg;
   else if (fighterid == FIGHTER_STORM) aiobj->o = &model_figi;
   aiobj->ai = true;
+
+  // place missiles to racks
+  if (aiobj->id >= FIGHTER1 && aiobj->id <= FIGHTER2)
+  {
+    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+    if (f)
+      f->placeMissiles ();
+  }
+}
+
+void Mission::objectInit (AIObj *aiobj, int objectid, int party, int ailevel, int n)
+{
+  space->removeObject (fighter [n]);
+  delete fighter [n];
+  fighter [n] = aiobj;
+  fighter [n]->space = space;
+  space->addObject (fighter [n]);
+
+  fighter [n]->newinit (objectid, party, ailevel);
+
+  // place missiles to racks
+  if (aiobj->id >= FIGHTER1 && aiobj->id <= FIGHTER2)
+  {
+    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+    if (f)
+      f->placeMissiles ();
+  }
 }
 
 /*void Mission::init ()
@@ -198,7 +244,7 @@ void Mission::invertZ ()
   int i;
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->tl.z = -fighter [i]->tl.z;
+    fighter [i]->trafo.translation.z = -fighter [i]->trafo.translation.z;
     fighter [i]->currot.phi += 180;
   }
 }

@@ -56,18 +56,18 @@ void MissionTank1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
-  alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 5;
-  fighter [1]->tl.z = 105;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
+  alliedInit (FIGHTER_HAWK2, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 5;
+  fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 7; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_tank2;
-    fighter [i]->tl.x = -i * 4;
-    fighter [i]->tl.z = -i * 4;
+    fighter [i]->trafo.translation.x = -i * 4;
+    fighter [i]->trafo.translation.z = -i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400 - i * 25);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
@@ -77,8 +77,8 @@ void MissionTank1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_tank1;
-    fighter [i]->tl.x = i * 3;
-    fighter [i]->tl.z = i * 3;
+    fighter [i]->trafo.translation.x = i * 3;
+    fighter [i]->trafo.translation.z = i * 3;
     fighter [i]->newinit (TANK_AIR1, 0, 80);
   }
   for (i = 11; i <= 13; i ++)
@@ -86,8 +86,8 @@ void MissionTank1::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_container1;
-    fighter [i]->tl.x = i * 3;
-    fighter [i]->tl.z = 60;
+    fighter [i]->trafo.translation.x = i * 3;
+    fighter [i]->trafo.translation.z = 60;
     fighter [i]->newinit (STATIC_CONTAINER1, 0, 0);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

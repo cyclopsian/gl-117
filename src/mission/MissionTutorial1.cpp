@@ -53,8 +53,8 @@ void MissionTutorial1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 220;
-  fplayer->tl.z = -30;
+  fplayer->trafo.translation.x = 220;
+  fplayer->trafo.translation.z = -30;
 }
 
 int MissionTutorial1::processtimer (Uint32 dt)
@@ -257,14 +257,14 @@ void MissionTutorial1::draw ()
     fighter [1]->target = fighter [0];
     fighter [1]->o = &model_figt;
     fighter [1]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [1]->tl.x = fplayer->tl.x - 30;
-    fighter [1]->tl.z = fplayer->tl.z - 30;
+    fighter [1]->trafo.translation.x = fplayer->trafo.translation.x - 30;
+    fighter [1]->trafo.translation.z = fplayer->trafo.translation.z - 30;
     fighter [2]->activate ();
     fighter [2]->target = fighter [0];
     fighter [2]->o = &model_figt;
     fighter [2]->newinit (FIGHTER_TRANSPORT, 0, 200);
-    fighter [2]->tl.x = fplayer->tl.x + 30;
-    fighter [2]->tl.z = fplayer->tl.z + 30;
+    fighter [2]->trafo.translation.x = fplayer->trafo.translation.x + 30;
+    fighter [2]->trafo.translation.z = fplayer->trafo.translation.z + 30;
   }
 }
 

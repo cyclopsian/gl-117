@@ -2863,9 +2863,9 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 void GlLandscape::calcDynamicLight (SpaceObj *object, float threshold, float maxintens, float intensfac)
 {
   int x, y;
-  int mx = (int) object->tl.x;
-  int mz = (int) object->tl.z;
-  float h = object->tl.y - getHeight (object->tl.x, object->tl.z);
+  int mx = (int) object->trafo.translation.x;
+  int mz = (int) object->trafo.translation.z;
+  float h = object->trafo.translation.y - getHeight (object->trafo.translation.x, object->trafo.translation.z);
   if (h < 0) h = 0;
   float radius = h / 2 + 3;
   if (h < threshold)
@@ -2880,7 +2880,7 @@ void GlLandscape::calcDynamicLight (SpaceObj *object, float threshold, float max
         float dist = sqrt (dx*dx + dy*dy);
         if (dist < radius)
         {
-          int light = (int) ((radius - dist) * intens / radius * object->zoom) + dl [xn] [yn];
+          int light = (int) ((radius - dist) * intens / radius * object->trafo.scaling.x) + dl [xn] [yn];
           if (light > 255) light = 255;
           dl [xn] [yn] = light;
         }

@@ -59,39 +59,39 @@ void MissionAirBattle::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
   for (i = 1; i <= 6; i ++)
   {
-    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
+    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], i);
+    
     if (i % 2)
-      fighter [i]->tl.x = ((i + 1) / 2) * 5;
+      fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl.x = -((i + 1) / 2) * 5;
-    fighter [i]->tl.z = 100 + i * 5;
+      fighter [i]->trafo.translation.x = -((i + 1) / 2) * 5;
+    fighter [i]->trafo.translation.z = 100 + i * 5;
     fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (), FIGHTER_CROW, 0, 440 - i * 10, i);
     fighter [i]->target = fighter [math.random (7)];
     fighter [i]->o = &model_fige;
     if (i <= 13)
     {
-      fighter [i]->tl.x = -i * 5;
-      fighter [i]->tl.z = -i * 5;
+      fighter [i]->trafo.translation.x = -i * 5;
+      fighter [i]->trafo.translation.z = -i * 5;
     }
     else if (i <= 25)
     {
-      fighter [i]->tl.x = -i * 8 - 150;
-      fighter [i]->tl.z = -i * 8 - 150;
+      fighter [i]->trafo.translation.x = -i * 8 - 150;
+      fighter [i]->trafo.translation.z = -i * 8 - 150;
     }
     else
     {
-      fighter [i]->tl.x = -i * 8 - 350;
-      fighter [i]->tl.z = -i * 8 - 350;
+      fighter [i]->trafo.translation.x = -i * 8 - 350;
+      fighter [i]->trafo.translation.z = -i * 8 - 350;
     }
-    fighter [i]->newinit (FIGHTER_CROW, 0, 440 - i * 10);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

@@ -54,8 +54,8 @@ void MissionTest2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 50;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 50;
   for (i = 0; i < missiletypes; i ++)
   {
     fplayer->missiles [i] = 0;
@@ -64,8 +64,8 @@ void MissionTest2::start ()
   fighter [1]->party = 0;
   fighter [1]->target = fighter [0];
   fighter [1]->o = &model_fig;
-  fighter [1]->tl.x = 0;
-  fighter [1]->tl.z = 0;
+  fighter [1]->trafo.translation.x = 0;
+  fighter [1]->trafo.translation.z = 0;
   fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
   fighter [1]->aggressivity = 0;
 //  fighter [1]->intelligence = 0;

@@ -56,8 +56,8 @@ void MissionDeathmatch3::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 50;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 50;
   fplayer->ammo = 100000;
   for (i2 = 0; i2 < missiletypes; i2 ++)
   {
@@ -70,8 +70,8 @@ void MissionDeathmatch3::start ()
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
+    fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
     fighter [i]->ammo = 100000;
     for (i2 = 0; i2 < missiletypes; i2 ++)
     {

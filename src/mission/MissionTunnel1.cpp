@@ -55,22 +55,22 @@ void MissionTunnel1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_CANYON_TRENCH, NULL);
   playerInit ();
-  fplayer->tl.x = 256;
-  fplayer->tl.z = 256;
+  fplayer->trafo.translation.x = 256;
+  fplayer->trafo.translation.z = 256;
   fplayer->currot.phi = 90;
   fplayer->target = fighter [6];
   for (i = 1; i <= 9; i ++)
   {
     int ix = (i / 2) * 8 - 200 + 256;
     int iy = (i & 1) * 4 - 2 + 256;
-    fighter [i]->tl.x = ix;
-    fighter [i]->tl.z = iy;
+    fighter [i]->trafo.translation.x = ix;
+    fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
-  fighter [i]->tl.x = -200 + 256;
-  fighter [i]->tl.z = 0 + 256;
+  fighter [i]->trafo.translation.x = -200 + 256;
+  fighter [i]->trafo.translation.z = 0 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
@@ -78,26 +78,26 @@ void MissionTunnel1::start ()
   {
     int ix = (i - 11) * 10 - 100 + 256;
     int iy = (i % 2) * 3 - 3 + 256;
-    fighter [i]->tl.x = ix;
-    fighter [i]->tl.z = iy;
+    fighter [i]->trafo.translation.x = ix;
+    fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 300);
   }
-  fighter [i]->tl.x = -250 + 256;
-  fighter [i]->tl.z = -2 + 256;
+  fighter [i]->trafo.translation.x = -250 + 256;
+  fighter [i]->trafo.translation.z = -2 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
   i ++;
-  fighter [i]->tl.x = -250 + 256;
-  fighter [i]->tl.z = 2 + 256;
+  fighter [i]->trafo.translation.x = -250 + 256;
+  fighter [i]->trafo.translation.z = 2 + 256;
   fighter [i]->target = fighter [0];
   fighter [i]->o = &model_flarak1;
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
   i ++;
-  fighter [i]->tl.x = -350 + 256;
-  fighter [i]->tl.z = 0 + 256;
+  fighter [i]->trafo.translation.x = -350 + 256;
+  fighter [i]->trafo.translation.z = 0 + 256;
   fighter [i]->o = &model_barrier1;
   fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
   for (i = 19; i < 26; i ++)
@@ -105,8 +105,8 @@ void MissionTunnel1::start ()
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 8);
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_figd;
-    fighter [i]->tl.x = 256;
-    fighter [i]->tl.z = 256;
+    fighter [i]->trafo.translation.x = 256;
+    fighter [i]->trafo.translation.z = 256;
     fighter [i]->deactivate ();
   }
 }
@@ -115,7 +115,7 @@ int MissionTunnel1::processtimer (Uint32 dt)
 {
 //  bool b = false;
   int i;
-  if (timer <= 0) fplayer->tl.y = l->getHeight (fplayer->tl.x, fplayer->tl.z) + 5;
+  if (timer <= 0) fplayer->trafo.translation.y = l->getHeight (fplayer->trafo.translation.x, fplayer->trafo.translation.z) + 5;
   timer += dt;
   if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
@@ -123,21 +123,21 @@ int MissionTunnel1::processtimer (Uint32 dt)
   }
 //  if (timer > 40 * timestep)
   {
-    if (fplayer->tl.y - l->getHeight (fplayer->tl.x, fplayer->tl.z) > 15)
+    if (fplayer->trafo.translation.y - l->getHeight (fplayer->trafo.translation.x, fplayer->trafo.translation.z) > 15)
     {
       if (!fighter [24]->active && fighter [24]->shield > 0)
       {
         for (i = 19; i < 26; i ++)
         {
           fighter [i]->activate ();
-          fighter [i]->tl.x = fplayer->tl.x - 80 - (i - 18) * 8;
-          fighter [i]->tl.z = fplayer->tl.z - 20;
-          fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + 25;
+          fighter [i]->trafo.translation.x = fplayer->trafo.translation.x - 80 - (i - 18) * 8;
+          fighter [i]->trafo.translation.z = fplayer->trafo.translation.z - 20;
+          fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 25;
         }
       }
     }
   }
-  if (fplayer->tl.x < -450 + 256)
+  if (fplayer->trafo.translation.x < -450 + 256)
     return 1;
   return 0;
 }

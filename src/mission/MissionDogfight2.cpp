@@ -56,18 +56,18 @@ void MissionDogfight2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 100;
-  alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
-  fighter [1]->tl.x = 5;
-  fighter [1]->tl.z = 105;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 100;
+  alliedInit (FIGHTER_FALCON, alliedpilot [0], 1);
+  fighter [1]->trafo.translation.x = 5;
+  fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 6; i ++)
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10;
-    fighter [i]->tl.z = -i * 10;
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
   for (i = 7; i <= 8; i ++)
@@ -75,8 +75,8 @@ void MissionDogfight2::start ()
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
     fighter [i]->o = &model_fige;
-    fighter [i]->tl.x = -i * 10 - 100;
-    fighter [i]->tl.z = -i * 10 - 100;
+    fighter [i]->trafo.translation.x = -i * 10 - 100;
+    fighter [i]->trafo.translation.z = -i * 10 - 100;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
@@ -113,12 +113,12 @@ void MissionDogfight2::draw ()
     state ++;
     fighter [7]->activate ();
     fighter [8]->activate ();
-    fighter [7]->tl.x = fplayer->tl.x + 50;
-    fighter [7]->tl.z = fplayer->tl.z + 50;
-    fighter [7]->tl.y = l->getHeight (fighter [7]->tl.x, fighter [7]->tl.z) + 10;
-    fighter [8]->tl.x = fplayer->tl.x + 60;
-    fighter [8]->tl.z = fplayer->tl.z + 60;
-    fighter [8]->tl.y = l->getHeight (fighter [8]->tl.x, fighter [8]->tl.z) + 10;
+    fighter [7]->trafo.translation.x = fplayer->trafo.translation.x + 50;
+    fighter [7]->trafo.translation.z = fplayer->trafo.translation.z + 50;
+    fighter [7]->trafo.translation.y = l->getHeight (fighter [7]->trafo.translation.x, fighter [7]->trafo.translation.z) + 10;
+    fighter [8]->trafo.translation.x = fplayer->trafo.translation.x + 60;
+    fighter [8]->trafo.translation.z = fplayer->trafo.translation.z + 60;
+    fighter [8]->trafo.translation.y = l->getHeight (fighter [8]->trafo.translation.x, fighter [8]->trafo.translation.z) + 10;
   }
   if (timer >= 1000 * timestep && timer <= 1200 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", textcolor);

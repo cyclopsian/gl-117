@@ -59,18 +59,18 @@ void MissionCanyon2::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   playerInit ();
-  fplayer->tl.x = 100;
-  fplayer->tl.z = 100;
+  fplayer->trafo.translation.x = 100;
+  fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
-    alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], fighter [i]);
+    alliedInit (FIGHTER_REDARROW, alliedpilot [i - 1], i);
     if (i % 2)
-      fighter [i]->tl.x = 100 + ((i + 1) / 2) * 5;
+      fighter [i]->trafo.translation.x = 100 + ((i + 1) / 2) * 5;
     else
-      fighter [i]->tl.x = 100 - ((i + 1) / 2) * 5;
-    fighter [i]->tl.z = 100 + i * 5;
+      fighter [i]->trafo.translation.x = 100 - ((i + 1) / 2) * 5;
+    fighter [i]->trafo.translation.z = 100 + i * 5;
     fighter [i]->target = fighter [5 + i];
     fighter [i]->currot.phi = 45;
   }
@@ -80,22 +80,22 @@ void MissionCanyon2::start ()
     fighter [i]->target = fighter [math.random (5)];
     if (i <= 15)
     {
-      fighter [i]->tl.x = -i * 5;
-      fighter [i]->tl.z = -i * 5;
+      fighter [i]->trafo.translation.x = -i * 5;
+      fighter [i]->trafo.translation.z = -i * 5;
       fighter [i]->o = &model_fige;
       fighter [i]->newinit (FIGHTER_CROW, 0, math.random (120) + 260);
     }
     else if (i <= 19)
     {
-      fighter [i]->tl.x = -i * 8 - 160;
-      fighter [i]->tl.z = -i * 8 - 160;
+      fighter [i]->trafo.translation.x = -i * 8 - 160;
+      fighter [i]->trafo.translation.z = -i * 8 - 160;
       fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, math.random (120) + 160);
     }
     else
     {
-      fighter [i]->tl.x = -i * 8 - 240;
-      fighter [i]->tl.z = -i * 8 - 240;
+      fighter [i]->trafo.translation.x = -i * 8 - 240;
+      fighter [i]->trafo.translation.z = -i * 8 - 240;
       fighter [i]->o = &model_figa;
       fighter [i]->newinit (FIGHTER_SWALLOW, 0, math.random (120) + 200);
     }

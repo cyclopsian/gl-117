@@ -56,15 +56,15 @@ void MissionMoonBase1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_FLAT_MOON, NULL);
   playerInit ();
-  fplayer->tl.x = -20;
-  fplayer->tl.z = -40;
+  fplayer->trafo.translation.x = -20;
+  fplayer->trafo.translation.z = -40;
   fplayer->currot.phi = 200;
   fplayer->target = fighter [29];
   for (i = 1; i < 21; i ++)
   {
-    fighter [i]->tl.x = COS((i * 140) % 360) * 4.5;
-    fighter [i]->tl.z = i * 0.6;
-    fighter [i]->tl.y = l->getHeight (fighter [i]->tl.x, fighter [i]->tl.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
+    fighter [i]->trafo.translation.x = COS((i * 140) % 360) * 4.5;
+    fighter [i]->trafo.translation.z = i * 0.6;
+    fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 200;
     fighter [i]->o = &model_aster1;
@@ -73,15 +73,15 @@ void MissionMoonBase1::start ()
   }
   for (i = 21; i < 29; i ++)
   {
-    fighter [i]->tl.x = (i - 20) * 4;
-    fighter [i]->tl.z = 210;
+    fighter [i]->trafo.translation.x = (i - 20) * 4;
+    fighter [i]->trafo.translation.z = 210;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 50;
     fighter [i]->o = &model_figh;
     fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
   }
-  fighter [29]->tl.x = 50 + difficulty * 15;
-  fighter [29]->tl.z = 180 + difficulty * 30;
+  fighter [29]->trafo.translation.x = 50 + difficulty * 15;
+  fighter [29]->trafo.translation.z = 180 + difficulty * 30;
   fighter [29]->o = &model_base1;
   fighter [29]->newinit (STATIC_BASE1, 0, 100);
 }

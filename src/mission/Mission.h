@@ -102,7 +102,8 @@ class Mission
   Mission ();
   virtual ~Mission () {}
   void playerInit ();
-  void alliedInit (int fighterid, int pilotid, AIObj *aiobj);
+  void alliedInit (int fighterid, int pilotid, int i);
+  void objectInit (AIObj *aiobj, int objectid, int party, int ailevel, int n);
 //  virtual void init () = 0;
   virtual void start () = 0; // custom definitions for a mission
   virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure

@@ -32,7 +32,7 @@
 
 Color::Color ()
 {
-  memset (c, 0xFF, 4 * sizeof (unsigned char));
+  set (255, 255, 255, 255);
 }
 
 Color::Color (const Color &color)
@@ -47,7 +47,10 @@ Color::Color (int red, int green, int blue, int alpha)
 
 void Color::set (const Color &color)
 {
-  memcpy (c, color.c, 4 * sizeof (unsigned char));
+  c [0] = color.c [0];
+  c [1] = color.c [1];
+  c [2] = color.c [2];
+  c [3] = color.c [3];
 }
 
 void Color::set (int red, int green, int blue, int alpha)
@@ -60,7 +63,8 @@ void Color::set (int red, int green, int blue, int alpha)
 
 bool Color::isEqual (const Color &color) const
 {
-  return memcmp (c, color.c, 4 * sizeof (unsigned char)) == 0;
+  return c [0] == color.c [0] && c [1] == color.c [1] &&
+         c [2] == color.c [2] && c [3] == color.c [3];
 }
 
 /* Do NOT use overloaded operators, as we will lose the feeling
@@ -68,7 +72,7 @@ bool Color::isEqual (const Color &color) const
    E.g. a = b; c = d; but first is a pointer copy, second copies a huge data structure! */
 /*void Color::operator = (const Color &color)
 {
-  memcpy (c, color.c, 4 * sizeof (unsigned char));
+  set (...);
 }*/
 
 #endif

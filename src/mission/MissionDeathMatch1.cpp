@@ -56,16 +56,16 @@ void MissionDeathmatch1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
-  fplayer->tl.x = 0;
-  fplayer->tl.z = 50;
+  fplayer->trafo.translation.x = 0;
+  fplayer->trafo.translation.z = 50;
   for (i = 1; i <= 7; i ++)
   {
     fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl.x = 50 * SIN(i * 360 / 8);
-    fighter [i]->tl.z = 50 * COS(i * 360 / 8);
+    fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
+    fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
   }
   state = 0;
   laststate = 0;

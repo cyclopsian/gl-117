@@ -58,8 +58,8 @@ void MissionMultiDogfight1::start ()
     fighter [i]->party = i;
     fighter [i]->target = fighter [0];
     fighter [i]->o = &model_fig;
-    fighter [i]->tl.x = 50 + i * 30;
-    fighter [i]->tl.z = 100;
+    fighter [i]->trafo.translation.x = 50 + i * 30;
+    fighter [i]->trafo.translation.z = 100;
   }
   fighter[1]->ai = true;
   if (isserver)
