@@ -594,4 +594,87 @@ void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color,
   glDisable (GL_TEXTURE_2D);
 }
 
+void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer)
+{
+  int i;
+  int len = strlen (str);
+  glDisable (GL_LIGHTING);
+  glDisable (GL_DEPTH_TEST);
+  gl->enableTextures (texture->textureID);
+  gl->enableAlphaBlending ();
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, 0.1);
+
+  float xw = 0;
+  for (i = 0; i < len; i ++)
+  {
+    if (str [i] >= start && str [i] <= start + n)
+    {
+      int c = (int) (str [i] - start);
+      xw += 0.1 * letterw [c] / height;
+    }
+    else if (str [i] == '\t')
+    {
+      int xzint = (int) (xw * 10.0);
+      xzint -= xzint & 3; // modulo 4
+      xzint += 4;
+      xw = (float) xzint / 10.0;
+    }
+    else
+    {
+      xw += 0.05;
+    }
+  }
+
+  float xz = x * 0.1, yz = y * 0.1;
+  glPushMatrix ();
+  glTranslatef (xz + xw / 2, yz, z);
+  xz = 0;
+  glScalef (1.0 + 0.08 * sine [abs (timer * 8 % 360)], 1, 1);
+  for (i = 0; i < len; i ++)
+  {
+    if (str [i] >= start && str [i] <= start + n)
+    {
+      int c = (int) (str [i] - start);
+      float tx = (float) letterx [c] / texture->width;
+      float ty = 1.0 - (float) lettery [c] / texture->height;
+      float tx2 = (float) tx + (float) letterw [c] / texture->width;
+      float ty2 = (float) ty - (float) height / texture->height;
+      float xi = 0.1 * letterw [c] / height;
+      float yi = 0.1;
+      glPushMatrix ();
+      glTranslatef (xz + xi / 2 - xw / 2, yi / 2, 0);
+//      glScalef (1.0 + 0.25 * sine [abs (timer * 8 % 360)], 1, 1);
+      glBegin (GL_QUADS);
+      glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
+      glTexCoord2f (tx, ty2);
+      glVertex3f (-xi / 2, -yi / 2, 0);
+      glTexCoord2f (tx, ty);
+      glVertex3f (-xi / 2, yi / 2, 0);
+      glTexCoord2f (tx2, ty);
+      glVertex3f (xi / 2, yi / 2, 0);
+      glTexCoord2f (tx2, ty2);
+      glVertex3f (xi / 2, -yi / 2, 0);
+      glEnd ();
+      glPopMatrix ();
+      xz += xi;
+    }
+    else if (str [i] == '\t')
+    {
+      int xzint = (int) (xz * 10.0);
+      xzint -= xzint & 3; // modulo 4
+      xzint += 4;
+      xz = (float) xzint / 10.0;
+    }
+    else
+    {
+      xz += 0.05;
+    }
+  }
+  glPopMatrix ();
+  glDisable (GL_ALPHA_TEST);
+  gl->disableAlphaBlending ();
+  glDisable (GL_TEXTURE_2D);
+}
+
 #endif

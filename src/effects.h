@@ -129,6 +129,7 @@ class Font
   void drawTextCentered (float x, float y, float z, char *str, CColor *c);
   void drawTextCentered (float x, float y, float z, char *str);
   void drawTextRotated (float x, float y, float z, char *str, CColor *color, int timer);
+  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer);
 };
 
 #endif

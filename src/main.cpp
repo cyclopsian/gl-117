@@ -386,7 +386,7 @@ void drawText (float x, float y, float z, char *str)
   drawText (x, y, z, str, &stdcol);
 }
 
-void drawTextRotated (float x, float y, float z, char *str, CColor *col, int timer)
+void drawTextScaled (float x, float y, float z, char *str, CColor *col, int timer)
 {
   int len = strlen (str);
   float zoom = 0.1;
@@ -5580,11 +5580,11 @@ void mission_display ()
   font1->drawText (-22, -5, -3, "CHOOSE FIGHTER:");
   font1->drawText (xstats, -5, -3, "CHOOSE WEAPON PACK:");
   if (missionmenuitemselected == 0)
-    font1->drawTextRotated (2, -14, -2, "START MISSION", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (2, -14, -2, "START MISSION", colorstd, -missionmenutimer * 5);
   else
     font1->drawText (2, -14, -2, "START MISSION");
   if (missionmenuitemselected == 1)
-    font1->drawTextRotated (-12, -14, -2, "CANCEL", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (-12, -14, -2, "CANCEL", colorstd, -missionmenutimer * 5);
   else
     font1->drawText (-12, -14, -2, "CANCEL");
   font2->drawText (-20, -14, -3, getModelName (missionnew->selfighter [missionnew->wantfighter]));
@@ -5802,7 +5802,7 @@ void fighter_display ()
   font1->drawText (-10, yf, -2.5, buf);
 
   if (missionmenuitemselected == 0)
-    font1->drawTextRotated (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
   else
     font1->drawText (-2, -12, -2, "BACK");
 
@@ -5877,7 +5877,7 @@ void fame_display ()
   }
 
   if (missionmenuitemselected == 0)
-    font1->drawTextRotated (-2, -10, -2, "BACK", colorstd, -missionmenutimer * 5);
+    font1->drawTextScaled (-2, -10, -2, "BACK", colorstd, -missionmenutimer * 5);
   else
     font1->drawText (-2, -10, -2, "BACK");
 
@@ -6499,14 +6499,14 @@ void stats_mouse (int button, int state, int x, int y)
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
-  CColor color2 ((int) (255.0 * cosi [menutimer * 5 % 360]), 255, (int) (255.0 * cosi [menutimer * 10 % 360]), 255);
+  CColor color2 (255, 255, (int) (255.0 * cosi [menutimer * 5 % 360]), 255);
   CColor coloryellow (255, 255, 0, 200);
   CColor colorgrey (150, 150, 150, 200);
   Pilot *p = pilots->pilot [pilots->aktpilot];
   if (p->mission_state [missionid] == 1)
   {
     if (menuitemselected == selected)
-      font1->drawTextRotated (x, y, z, string, &color2, -menutimer * 5);
+      font1->drawTextScaled (x, y, z, string, &color2, -menutimer * 5);
     else
       font1->drawText (x, y, z, string);
   }
@@ -6625,7 +6625,7 @@ void stats_display ()
   if (!statsitemselected)
     font1->drawText (-3.5, yf, -2.0, "CONTINUE", &colorwhite);
   else
-    font1->drawTextRotated (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);
+    font1->drawTextScaled (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);
   drawMouseCursor ();
 }
 
@@ -6641,45 +6641,45 @@ void menu_display ()
 /*  if (quality >= 2)
     gl->enableAntiAliasing ();*/
 
-  CColor color2 ((int) (255.0 * cosi [menutimer * 5 % 360]), 255, (int) (255.0 * cosi [menutimer * 10 % 360]), 255);
+  CColor color2 (255, 255, (int) (255.0 * cosi [menutimer * 5 % 360]), 255);
   CColor coloryellow (255, 255, 0, 200);
 
   int textx = -14, textx2 = 0;
 
   if (menuitemselected == 0)
-    font1->drawTextRotated (textx, 10, -2, "PILOTS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 10, -2, "PILOTS");
   if (menuitemselected == 1)
-    font1->drawTextRotated (textx, 8, -2, "MISSIONS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 8, -2, "MISSIONS", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 8, -2, "MISSIONS");
 #ifdef HAVE_SDL_NET
   if (menuitemselected == 2)
-    font1->drawTextRotated (textx, 6, -2, "MULTIPLAYER", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 6, -2, "MULTIPLAYER", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 6, -2, "MULTIPLAYER");
 #endif
   if (menuitemselected == 3)
-    font1->drawTextRotated (textx, 4, -2, "OPTIONS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 4, -2, "OPTIONS", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 4, -2, "OPTIONS");
   if (menuitemselected == 4)
-    font1->drawTextRotated (textx, 2, -2, "HELP", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 2, -2, "HELP", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 2, -2, "HELP");
   if (menuitemselected == 5)
-    font1->drawTextRotated (textx, 0, -2, "CREDITS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 0, -2, "CREDITS", &color2, -menutimer * 5);
   else
     font1->drawText (textx, 0, -2, "CREDITS");
   if (menuitemselected == 6)
-    font1->drawTextRotated (textx, -2, -2, "QUIT", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, -2, -2, "QUIT", &color2, -menutimer * 5);
   else
     font1->drawText (textx, -2, -2, "QUIT");
   if (missionactive)
   {
     if (menuitemselected == 9)
-      font1->drawTextRotated (textx, -6, -2, "RETURN", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx, -6, -2, "RETURN", &color2, -menutimer * 5);
     else
       font1->drawText (textx, -6, -2, "RETURN");
   }
@@ -6696,8 +6696,8 @@ void menu_display ()
       drawRank (textx2 - 1, 12.2 - (float) i * 3, -3, pilots->pilot [i]->ranking, 1.3);
       if (menuitemselected == 20 + i)
       {
-        font1->drawTextRotated (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, -menutimer * 5);
-        font1->drawTextRotated (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, -menutimer * 5);
       }
       else
       {
@@ -6706,11 +6706,11 @@ void menu_display ()
       }
     }
     if (menuitemselected == 10)
-      font1->drawTextRotated (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, -menutimer * 5);
     else
       font1->drawText (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)");
     if (menuitemselected == 11)
-      font1->drawTextRotated (textx2 - 2, -7, -2.5, "CREATE", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, -menutimer * 5);
     else
       font1->drawText (textx2 - 2, -7, -2.5, "CREATE");
     pilotedit.draw (textx2, -9, -2.5, menutimer / 8);
@@ -6723,19 +6723,19 @@ void menu_display ()
     Pilot *p = pilots->pilot [pilots->aktpilot];
     float zf = -3.0, yf = 18;
     if (menuitemselected == 10)
-      font1->drawTextRotated (textx2, yf, zf, "TUTORIAL: PILOTING", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: PILOTING", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TUTORIAL: PILOTING");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TUTORIAL]), 1.0);
     yf -= 1.5;
     if (menuitemselected == 11)
-      font1->drawTextRotated (textx2, yf, zf, "TUTORIAL: DOGFIGHT", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: DOGFIGHT", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TUTORIAL: DOGFIGHT");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DOGFIGHT]), 1.0);
     yf -= 1.5;
     if (menuitemselected == 12)
-      font1->drawTextRotated (textx2, yf, zf, "TRANSPORT", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yf, zf, "TRANSPORT", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "TRANSPORT");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TRANSPORT]), 1.0);
@@ -6759,18 +6759,18 @@ void menu_display ()
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
     zf = -2;
     if (menuitemselected == 100)
-      font1->drawTextRotated (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
+      font1->drawTextScaled (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
     else
       font1->drawText (-2, -12, zf, "PILOTS");
     zf = -2;
     if (menuitemselected == 101)
-      font1->drawTextRotated (6, -12, zf, "FIGHTER", &color2, -menutimer * 5);
+      font1->drawTextScaled (6, -12, zf, "FIGHTER", &color2, -menutimer * 5);
     else
       font1->drawText (6, -12, zf, "FIGHTER");
 /*    if (p->mission_state [MISSION_CONVOY] == 1)
     {
       if (menuitemselected == 14)
-        font1->drawTextRotated (textx2, yf, zf, "DOGFIGHT", &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2, yf, zf, "DOGFIGHT", &color2, -menutimer * 5);
       else
         font1->drawText (textx2, yf, zf, "DOGFIGHT");
     }
@@ -6778,7 +6778,7 @@ void menu_display ()
     if (p->mission_state [MISSION_DOGFIGHT2] == 1)
     {
       if (menuitemselected == 15)
-        font1->drawTextRotated (textx2, yf, zf, "AIR BATTLE", &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2, yf, zf, "AIR BATTLE", &color2, -menutimer * 5);
       else
         font1->drawText (textx2, yf, zf, "AIR BATTLE");
     }
@@ -6786,7 +6786,7 @@ void menu_display ()
     if (p->mission_state [MISSION_AIRBATTLE] == 1)
     {
       if (menuitemselected == 16)
-        font1->drawTextRotated (textx2, yf, zf, "SURFACE-AIR DEFENSE", &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2, yf, zf, "SURFACE-AIR DEFENSE", &color2, -menutimer * 5);
       else
         font1->drawText (textx2, yf, zf, "SURFACE-AIR DEFENSE");
     }
@@ -6794,7 +6794,7 @@ void menu_display ()
     if (p->mission_state [MISSION_SADEFENSE] == 1)
     {
       if (menuitemselected == 17)
-        font1->drawTextRotated (textx2, yf, zf, "DOGFIGHT VETERAN", &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2, yf, zf, "DOGFIGHT VETERAN", &color2, -menutimer * 5);
       else
         font1->drawText (textx2, yf, zf, "DOGFIGHT VETERAN");
     }
@@ -6802,7 +6802,7 @@ void menu_display ()
     if (p->mission_state [MISSION_SCOUT] == 1)
     {
       if (menuitemselected == 18)
-        font1->drawTextRotated (textx2, yf, zf, "BASE ATTACK", &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2, yf, zf, "BASE ATTACK", &color2, -menutimer * 5);
       else
         font1->drawText (textx2, yf, zf, "BASE ATTACK");
     }*/
@@ -6813,19 +6813,19 @@ void menu_display ()
     float yt = 12;
     sprintf (buf, "QUALITY: %d", quality);
     if (menuitemselected == 10)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
     sprintf (buf, "VIEW: %d", (int) view);
     if (menuitemselected == 11)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
     strcpy (buf, "DITHERING: ");
     if (dithering) strcat (buf, "ON");
     else strcat (buf, "OFF");
     if (menuitemselected == 12)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 //    yt -= 2;
@@ -6835,18 +6835,18 @@ void menu_display ()
     else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
     else if (controls == CONTROLS_MOUSE_REVERSE) strcat (buf, "MOUSE REVERSE");
     if (menuitemselected == 13)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 #ifdef HAVE_SDL_MIXER
     sprintf (buf, "SOUND: %d%%", (int) sound->volumesound);
     if (menuitemselected == 14)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
     sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
     if (menuitemselected == 15)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 #else
@@ -6857,12 +6857,12 @@ void menu_display ()
     else if (difficulty == 1) strcat (buf, "MEDIUM");
     else if (difficulty == 2) strcat (buf, "HARD");
     if (menuitemselected == 16)
-      font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 /*    sprintf (buf, "MODE: %d\x%d", width, height);
     if (menuitemselected == 16)
-      font1->drawTextRotated (textx2, -2, -2, buf, &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, -2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, -2, -2, buf);*/
   }
@@ -6870,11 +6870,11 @@ void menu_display ()
   {
 #ifdef HAVE_SDL_NET
     if (menuitemselected == 10)
-      font1->drawTextRotated (textx2, 10, -2, "CREATE GAME", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, 10, -2, "CREATE GAME", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, 10, -2, "CREATE GAME");
     if (menuitemselected == 11)
-      font1->drawTextRotated (textx2, 8, -2, "JOIN GAME", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2, 8, -2, "JOIN GAME", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, 8, -2, "JOIN GAME");
 #endif
