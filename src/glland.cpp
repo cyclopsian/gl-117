@@ -1741,10 +1741,10 @@ void GLLandscape::draw (int phi, int gamma)
   }
   minx -= 20; maxx += 20; miny -= 20; maxy += 20;
 */
-  int minx = camx + MAXX/2 - radius;
-  int miny = MAXX/2 - camz - radius;
-  int maxx = minx + radius * 2;
-  int maxy = miny + radius * 2;
+  int minx = (int) (camx + MAXX/2 - radius);
+  int miny = (int) (MAXX/2 - camz - radius);
+  int maxx = (int) (minx + radius * 2);
+  int maxy = (int) (miny + radius * 2);
 
 /*  if (minx < 0) minx = 0;
   if (maxx >= MAXX) maxx = MAXX;
@@ -1765,7 +1765,7 @@ void GLLandscape::draw (int phi, int gamma)
   }
 //    printf ("\nx=%d, y=%d", minx, miny); fflush (stdout);
 
-  int parts = view / 13;
+  int parts = (int) (view / 13);
   parts *= 2;
   parts ++;
 
