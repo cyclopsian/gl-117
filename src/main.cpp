@@ -64,6 +64,8 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
+bool sunblinding=false;
+
 Dirs *dirs;
 
 Server *server;
@@ -8489,9 +8491,9 @@ void credits_display ()
   font1->drawTextCentered (0, 6, -2, "THOMAS A. DREXL", &col2);
   font2->drawTextCentered (0, 2, -2, "INTRO & MOON", &col);
   font1->drawTextCentered (0, 0, -2, "NORBERT DREXL", &col2);
-// Hi Piotr, please enter your full name or just delete the two lines!
-  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
-  font1->drawTextCentered (0, -6, -2, "P. P.", &col2);
+// Maybe later :)
+//  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
+//  font1->drawTextCentered (0, -6, -2, "PIOTR PAWLOW", &col2);
 }
 
 void finish_display ()
@@ -8520,7 +8522,7 @@ void game_display ()
   if (debug)
     printf ("\nentering myDisplayFunc()"); fflush (stdout);
 
-  bool sunvisible = false, sunblinding = false;
+  bool sunvisible = false;
   float pseudoview = getView ();
 
   float mycamtheta = camtheta, mycamphi = camphi, mycamgamma = camgamma;
@@ -8536,8 +8538,8 @@ void game_display ()
     vibration --;
   }
 
-  if (fplayer->tl->y > l->getRayHeight (fplayer->tl->x, fplayer->tl->z))
-    sunblinding = true;
+//  if (fplayer->tl->y > l->getRayHeight (fplayer->tl->x, fplayer->tl->z))
+//    sunblinding = true;
 
 // calculate light factor
   if (camera == 0 && sunblinding && day && weather == 0)
@@ -8886,7 +8888,7 @@ void game_display ()
   glEnd ();*/
 
 // draw flares
-  if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
+  if (sunblinding && day)
   {
   CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
   double fl_position[]=   {0.2,      1.6,      3.2,      8.1,      -1.4,     -2.2,     -3.5,     0};
@@ -8894,27 +8896,21 @@ void game_display ()
   double proj[16];
   double modl[16];
   int vp[4];
+  double objx,objy,objz;
 
-  glPushMatrix();
-  glLoadIdentity();
   glGetDoublev( GL_PROJECTION_MATRIX, proj );
   glGetDoublev( GL_MODELVIEW_MATRIX, modl );
   glGetIntegerv( GL_VIEWPORT, vp );
 
-//  double objx, objy, objz;
   double cx=vp[2]/2+vp[0];
   double cy=vp[3]/2+vp[1];
 
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   int i=0;
 
-  glGetDoublev( GL_PROJECTION_MATRIX, proj );
-  glGetDoublev( GL_MODELVIEW_MATRIX, modl );
-
   while (CTexture *tex=fl_texture[i]) {
   double position=fl_position[i];
   double flarex,flarey,size=fl_size[i];
-  double objx,objy,objz;
 
   i++;
 
@@ -8929,14 +8925,12 @@ void game_display ()
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_FOG);
 
-//  glDisable (GL_DITHER);
   glBegin (GL_QUADS);
   glColor4f (1.0, 1.0, 1.0, 1.0);
   glTexCoord2d (0, 1);
   glVertex3f (-0.1*size+objx, 0.1*size+objy, objz);
   glTexCoord2d (1, 1);
   glVertex3f (0.1*size+objx, 0.1*size+objy, objz);
-//  glColor4f (0.1, 0.9, 0.9, 1.0);
   glTexCoord2d (1, 0);
   glVertex3f (0.1*size+objx, -0.1*size+objy, objz);
   glTexCoord2d (0, 0);
@@ -8948,8 +8942,15 @@ void game_display ()
   glDisable (GL_TEXTURE_2D);
   gl->disableAlphaBlending ();
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  glPopMatrix();
   }
+
+// sunblinding test
+
+  if (sunvisible) {
+    GLfloat zbuf[1];
+    glReadPixels((int)sunx,(int)suny,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,zbuf);
+    sunblinding=(zbuf[0]<1)?false:true;
+  } else sunblinding=false;
 
 /*  int maxi = 4;
   for (i = maxi - 1; i >= 1; i --)

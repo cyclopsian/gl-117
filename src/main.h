@@ -124,5 +124,7 @@ extern int difficulty;
 extern Server *server;
 extern Client *client;
 
+extern bool sunblinding;
+
 #endif
 
