@@ -95,27 +95,50 @@ int GL::genTexture ()
   return 1;
 }
 
-void GL::enableLinearTexture (int texnum)
+void GL::enableLinearTexture (int texnum, bool mipmap)
 {
   glBindTexture (GL_TEXTURE_2D, texnum);
-  if (!tex [texnum]->mipmap)
+  if (!mipmap)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   else
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void GL::disableLinearTexture (int texnum)
+void GL::disableLinearTexture (int texnum, bool mipmap)
 {
   glBindTexture (GL_TEXTURE_2D, texnum);
-  if (!tex [texnum]->mipmap)
+  if (!mipmap)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   else
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-CTexture *GL::getTextureTGA (char *fname)
+int GL::registerTexture (const std::string &name, const unsigned char *data,
+                         int width, int height, bool mipmap)
+{
+  int i;
+
+  texnum ++;
+  for (i = 0; i < texnum; i ++)
+    if (!texList [i].compare (name))
+      return i;
+  texList [i] = std::string (name);
+
+  glBindTexture (GL_TEXTURE_2D, texnum);
+  if (!antialiasing) disableLinearTexture (texnum, mipmap);
+  else enableLinearTexture (texnum, mipmap);
+
+  if (!mipmap)
+    glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  else
+    gluBuild2DMipmaps (GL_TEXTURE_2D, 4, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  return texnum;
+}
+
+/*CTexture *GL::getTextureTGA (char *fname)
 {
   int i;
   for (i = 0; i <= texnum; i ++)
@@ -142,7 +165,6 @@ CTexture *GL::genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha
   {
     sprintf (buf, "Texture %s not found", fname);
     display (buf, LOG_ERROR);
-//    exit (EXIT_LOADFILE);
     // If texture cannot be loaded, allocate dummy tex buffer
     tex [texnum]->width = 8; tex [texnum]->height = 8;
     int buflen = tex [texnum]->width * tex [texnum]->height * 4;
@@ -159,12 +181,7 @@ CTexture *GL::genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha
   else
     gluBuild2DMipmaps (GL_TEXTURE_2D, 4, tex [texnum]->width, tex [texnum]->height, GL_RGBA, GL_UNSIGNED_BYTE, tex [texnum]->data);
   return tex [texnum];
-}
-
-float GL::getTexLight ()
-{
-  return tex [akttex]->texlight;
-}
+}*/
 
 void GL::enableAntiAliasing ()
 {
@@ -198,9 +215,8 @@ void GL::disableAlphaBlending ()
   alphablending = false;
 }
 
-void GL::enableTextures (int num)
+void GL::enableTexture (int num)
 {
-  akttex = num;
   glBindTexture (GL_TEXTURE_2D, num);
   glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /* GL_CLAMP or GL_REPEAT? */

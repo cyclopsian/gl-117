@@ -269,9 +269,9 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   float ty1 = 0.755 - 0.25 * (rank / 2);
   float ty2 = ty1 + 0.24;
   zoom /= 10;
-  gl->enableTextures (texranks->textureID);
-  if (antialiasing) gl->enableLinearTexture (texranks->textureID);
-  else gl->disableLinearTexture (texranks->textureID);
+  gl->enableTexture (texranks->textureID);
+  if (antialiasing) texranks->shadeLinear ();
+  else texranks->shadeConst ();
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.35);
@@ -328,9 +328,9 @@ void drawMedal (float xp, float yp, float zp, int medal, float zoom, int mission
   float ty1 = 0.5 * (medal / 2);
   float ty2 = ty1 + 0.5;
   zoom /= 10;
-  gl->enableTextures (texmedals->textureID);
-  if (antialiasing) gl->enableLinearTexture (texmedals->textureID);
-  else gl->disableLinearTexture (texmedals->textureID);
+  gl->enableTexture (texmedals->textureID);
+  if (antialiasing) texmedals->shadeLinear ();
+  else texmedals->shadeConst ();
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
@@ -365,7 +365,7 @@ void drawMouseCursor ()
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  gl->enableTextures (texcross2->textureID);
+  gl->enableTexture (texcross2->textureID);
   int crossradius = width / 35;
 
   glTranslatef (mousex, mousey, 0);
@@ -836,12 +836,12 @@ int game_levelInit ()
   {
     if (sungamma < 35)
     {
-      skycolor.setColor ((unsigned short) (127 + 70 - 2 * sungamma), 127, 127);
+      skycolor.set ((unsigned short) (127 + 70 - 2 * sungamma), 127, 127);
       objsphere->setColor (skycolor);
     }
     else
     {
-      skycolor.setColor (127, 127, 127 + 5);
+      skycolor.set (127, 127, 127 + 5);
       objsphere->setColor (skycolor);
     }
     if (sungamma < 35)
@@ -856,62 +856,62 @@ int game_levelInit ()
       gl->fogcolor [1] = 0.5;
       gl->fogcolor [2] = 0.52;
     }
-    skycolor.setColor (50, 200, 255);
+    skycolor.set (50, 200, 255);
     objsphere->setNorthPoleColor (skycolor, 1.8);
     if (sungamma < 35)
     {
-      skycolor.setColor ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180);
+      skycolor.set ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180);
       objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
     else
     {
-      skycolor.setColor (200, 200, 200);
+      skycolor.set (200, 200, 200);
       objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
   }
   else if (!day && weather == WEATHER_SUNNY)
   {
-    skycolor.setColor (64, 64, 64);
+    skycolor.set (64, 64, 64);
     objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.25;
     gl->fogcolor [1] = 0.25;
     gl->fogcolor [2] = 0.25;
     if (l->type != LAND_MOON)
     {
-      skycolor.setColor (0, 0, 170);
+      skycolor.set (0, 0, 170);
       objsphere->setNorthPoleColor (skycolor, 1.8);
-      skycolor.setColor (64, 64, 64);
+      skycolor.set (64, 64, 64);
       objsphere->setPoleColor (270, (int) (90 - sungamma), skycolor, 0.3);
     }
     else
     {
-      skycolor.setColor (0, 0, 0);
+      skycolor.set (0, 0, 0);
       objsphere->setNorthPoleColor (skycolor, 1.8);
     }
   }
   else if (day && weather == WEATHER_THUNDERSTORM)
   {
-    skycolor.setColor (102, 102, 102);
+    skycolor.set (102, 102, 102);
     objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.4;
     gl->fogcolor [1] = 0.4;
     gl->fogcolor [2] = 0.4;
-    skycolor.setColor (102, 102, 102);
+    skycolor.set (102, 102, 102);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
   else if (!day && weather == WEATHER_THUNDERSTORM)
   {
-    skycolor.setColor (40, 40, 40);
+    skycolor.set (40, 40, 40);
     objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.16;
     gl->fogcolor [1] = 0.16;
     gl->fogcolor [2] = 0.16;
-    skycolor.setColor (40, 40, 40);
+    skycolor.set (40, 40, 40);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
   else if (weather == WEATHER_CLOUDY)
   {
-    skycolor.setColor (20, 20, 20);
+    skycolor.set (20, 20, 20);
     objsphere->setColor (skycolor);
     gl->fogcolor [0] = 0.08;
     gl->fogcolor [1] = 0.08;
@@ -1301,24 +1301,24 @@ void event_setAntialiasing ()
 {
   if (antialiasing)
   {
-    gl->enableLinearTexture (font1->texture->textureID);
-    gl->enableLinearTexture (font2->texture->textureID);
+    font1->texture->shadeLinear ();
+    font2->texture->shadeLinear ();
     if (texmoon != NULL)
     {
-      gl->enableLinearTexture (texmoon->textureID);
-      gl->enableLinearTexture (texsun->textureID);
-      gl->enableLinearTexture (texearth->textureID);
+      texmoon->shadeLinear ();
+      texsun->shadeLinear ();
+      texearth->shadeLinear ();
     }
   }
   else
   {
-    gl->disableLinearTexture (font1->texture->textureID);
-    gl->disableLinearTexture (font2->texture->textureID);
+    font1->texture->shadeConst ();
+    font2->texture->shadeConst ();
     if (texmoon != NULL)
     {
-      gl->disableLinearTexture (texmoon->textureID);
-      gl->disableLinearTexture (texsun->textureID);
-      gl->disableLinearTexture (texearth->textureID);
+      texmoon->shadeConst ();
+      texsun->shadeConst ();
+      texearth->shadeConst ();
     }
   }
 }
@@ -2175,7 +2175,7 @@ void mission_mouse (int button, int state, int x, int y)
 void drawArrow (float x, float y, float w, float h)
 {
   float zf = -3;
-  gl->enableTextures (texarrow->textureID);
+  gl->enableTexture (texarrow->textureID);
   gl->enableAlphaBlending ();
   glBegin (GL_QUADS);
   glColor3ub (180, 180, 180);
@@ -2233,7 +2233,7 @@ void mission_display ()
   
   // Draw dummy missile
   glEnable (GL_LIGHTING);
-  model_missile1.draw (&vec, &tl, &rot, 0.05, 1.0, 0);
+  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   
   glEnable (GL_LIGHTING);
@@ -2249,7 +2249,7 @@ void mission_display ()
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
-    getModel (missionnew->selfighter [i])->draw (&vec, &tl, &rot, 0.04, 0.1, 0);
+    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
 
   tl.x = 0; tl.y = -0.075; tl.z = -0.5;
@@ -2262,7 +2262,7 @@ void mission_display ()
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
-    getModel (missionnew->selweapon [i])->draw (&vec, &tl, &rot, 0.04, 0.1, 0);
+    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_LIGHTING);
@@ -2476,7 +2476,7 @@ void fighter_display ()
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
-  model->draw (&vec, &tl, &rot, 0.11, 0.5, 0);
+  model->draw (vec, tl, rot, 0.11, 0.5, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
 
@@ -3265,9 +3265,9 @@ void game_display ()
         gl->isPointInFrustum (1, -1, 0) || gl->isPointInFrustum (1, 1, 0))
     {
       glDisable (GL_DEPTH_TEST);
-      if (day) gl->enableTextures (texsun->textureID);
-      else if (l->type != LAND_MOON) gl->enableTextures (texmoon->textureID);
-      else gl->enableTextures (texearth->textureID);
+      if (day) gl->enableTexture (texsun->textureID);
+      else if (l->type != LAND_MOON) gl->enableTexture (texmoon->textureID);
+      else gl->enableTexture (texearth->textureID);
       if (day && l->type != 1)
         glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       gl->enableAlphaBlending ();
@@ -3454,7 +3454,7 @@ void game_display ()
 
         if (gluUnProject (flarex, flarey, flarez_win, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
         {
-          gl->enableTextures (tex->textureID);
+          gl->enableTexture (tex->textureID);
           gl->enableAlphaBlending ();
           glDisable (GL_ALPHA_TEST);
           glDisable (GL_DEPTH_TEST);
@@ -4194,7 +4194,7 @@ void myInit ()
   explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
   {
-    explsphere->object [0]->vertex [i].color.setColor (myrandom (100) + 155, myrandom (100) + 100, 0, myrandom (3) / 2 * 255);
+    explsphere->object [0]->vertex [i].color.set (myrandom (100) + 155, myrandom (100) + 100, 0, myrandom (3) / 2 * 255);
   }
   for (i = 0; i < maxexplosion; i ++)
   {
@@ -4303,46 +4303,46 @@ void myFirstInit ()
 
   // create textures (OpenGL)
   display ("Loading textures", LOG_ALL);
-  texgrass = gl->genTextureTGA (dirs->getTextures ("grass1.tga"), 0, 1, false);
-  texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 1, false);
-  texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 1, false);
-  texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 1, false);
-  texredsand = gl->genTextureTGA (dirs->getTextures ("redsand1.tga"), 0, 1, false);
-  texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 1, false);
-  texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 1, false);
-  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), -1, 0, true);
-  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), -1, 1, true);
-  textreeu = gl->genTextureTGA (dirs->getTextures ("treeu1.tga"), -1, 1, true);
-  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), -1, 1, true);
-  textreeu2 = gl->genTextureTGA (dirs->getTextures ("treeu2.tga"), -1, 1, true);
-  textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 3, 1, true);
-  textreeu3 = gl->genTextureTGA (dirs->getTextures ("treeu3.tga"), 3, 1, true);
-  textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 3, 1, true);
-  textreeu4 = gl->genTextureTGA (dirs->getTextures ("treeu4.tga"), 3, 1, true);
-  textree5 = gl->genTextureTGA (dirs->getTextures ("tree5.tga"), -1, 1, true);
-  textreeu5 = gl->genTextureTGA (dirs->getTextures ("treeu5.tga"), -1, 1, true);
-  texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 3, 1, true);
-  texcactusu1 = gl->genTextureTGA (dirs->getTextures ("cactusu1.tga"), 3, 1, true);
-  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), -1, 1, true);
-  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), -1, 1, true);
-  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke3.tga"), 5, 1, true);
-  texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), -1, 0, true);
-  texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 2, 0, true);
-  texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 0, 0, true);
-  texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), -1, 0, true);
-  texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), -1, 0, true);
-  texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), -1, 0, true);
-  texflare4 = gl->genTextureTGA (dirs->getTextures ("flare4.tga"), -1, 0, true);
-  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), -1, 1, true);
-  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), -1, 1, true);
-  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, true);
-  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, true);
-  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), -1, 1, true);
-  texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 4, 1, true);
-  texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 6, 1, true);
-  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), -1, 0, true);
-  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), -1, 0, true);
-  texarrow = gl->genTextureTGA (dirs->getTextures ("arrow.tga"), -1, 0, true);
+  texgrass = new CTexture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
+  texrocks = new CTexture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
+  texwater = new CTexture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
+  texsand = new CTexture (std::string (dirs->getTextures ("sand1.tga")), 0, 1, false);
+  texredsand = new CTexture (std::string (dirs->getTextures ("redsand1.tga")), 0, 1, false);
+  texredstone = new CTexture (std::string (dirs->getTextures ("redstone2.tga")), 0, 1, false);
+  texgravel1 = new CTexture (std::string (dirs->getTextures ("gravel1.tga")), 0, 1, false);
+  texglitter1 = new CTexture (std::string (dirs->getTextures ("glitter.tga")), -1, 0, true);
+  textree = new CTexture (std::string (dirs->getTextures ("tree1.tga")), -1, 1, true);
+  textreeu = new CTexture (std::string (dirs->getTextures ("treeu1.tga")), -1, 1, true);
+  textree2 = new CTexture (std::string (dirs->getTextures ("tree2.tga")), -1, 1, true);
+  textreeu2 = new CTexture (std::string (dirs->getTextures ("treeu2.tga")), -1, 1, true);
+  textree3 = new CTexture (std::string (dirs->getTextures ("tree3.tga")), 3, 1, true);
+  textreeu3 = new CTexture (std::string (dirs->getTextures ("treeu3.tga")), 3, 1, true);
+  textree4 = new CTexture (std::string (dirs->getTextures ("tree4.tga")), 3, 1, true);
+  textreeu4 = new CTexture (std::string (dirs->getTextures ("treeu4.tga")), 3, 1, true);
+  textree5 = new CTexture (std::string (dirs->getTextures ("tree5.tga")), -1, 1, true);
+  textreeu5 = new CTexture (std::string (dirs->getTextures ("treeu5.tga")), -1, 1, true);
+  texcactus1 = new CTexture (std::string (dirs->getTextures ("cactus1.tga")), 3, 1, true);
+  texcactusu1 = new CTexture (std::string (dirs->getTextures ("cactusu1.tga")), 3, 1, true);
+  texsmoke = new CTexture (std::string (dirs->getTextures ("smoke1.tga")), -1, 1, true);
+  texsmoke2 = new CTexture (std::string (dirs->getTextures ("smoke2.tga")), -1, 1, true);
+  texsmoke3 = new CTexture (std::string (dirs->getTextures ("smoke3.tga")), 5, 1, true);
+  texsun = new CTexture (std::string (dirs->getTextures ("sun2.tga")), -1, 0, true);
+  texmoon = new CTexture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
+  texearth = new CTexture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
+  texflare1 = new CTexture (std::string (dirs->getTextures ("flare1.tga")), -1, 0, true);
+  texflare2 = new CTexture (std::string (dirs->getTextures ("flare2.tga")), -1, 0, true);
+  texflare3 = new CTexture (std::string (dirs->getTextures ("flare3.tga")), -1, 0, true);
+  texflare4 = new CTexture (std::string (dirs->getTextures ("flare4.tga")), -1, 0, true);
+  texcross = new CTexture (std::string (dirs->getTextures ("cross.tga")), -1, 1, true);
+  texcross2 = new CTexture (std::string (dirs->getTextures ("cross2.tga")), -1, 1, true);
+  texranks = new CTexture (std::string (dirs->getTextures ("ranks.tga")), 0, 0, true);
+  texmedals = new CTexture (std::string (dirs->getTextures ("medals.tga")), 0, 0, true);
+  texclouds1 = new CTexture (std::string (dirs->getTextures ("clouds1.tga")), -1, 1, true);
+  texclouds2 = new CTexture (std::string (dirs->getTextures ("clouds2.tga")), 4, 1, true);
+  texclouds3 = new CTexture (std::string (dirs->getTextures ("clouds3.tga")), 6, 1, true);
+  texradar1 = new CTexture (std::string (dirs->getTextures ("radar2.tga")), -1, 0, true);
+  texradar2 = new CTexture (std::string (dirs->getTextures ("radar1.tga")), -1, 0, true);
+  texarrow = new CTexture (std::string (dirs->getTextures ("arrow.tga")), -1, 0, true);
 
   display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
@@ -4598,8 +4598,7 @@ void myFirstInit ()
   initexplode = 0;
   initexplode1 = 0;
 
-  textitle = new CTexture ();
-  textitle = gl->genTextureTGA (dirs->getTextures ("patents.tga"), 0, 0, true);
+  textitle = new CTexture (std::string (dirs->getTextures ("patents.tga")), 0, false, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -4657,7 +4656,7 @@ void init_display ()
   // draw fighter
   glPushMatrix ();
   glTranslatef (0, 0, -5);
-  model_fig.draw (&vec, &tl, &rot, 1.0, 2.0, initexplode1);
+  model_fig.draw (vec, tl, rot, 1.0, 2.0, initexplode1);
   glPopMatrix ();
 
   glDisable (GL_DEPTH_TEST);
@@ -4671,11 +4670,11 @@ void init_display ()
     glColor3ub (col, col, col);
     glPushMatrix ();
     glTranslatef (0, 0.5F, 0);
-    gl->enableTextures (textitle->textureID);
+    gl->enableTexture (textitle->textureID);
     if (antialiasing)
-      gl->enableLinearTexture (textitle->textureID);
+      textitle->shadeLinear ();
     else
-      gl->disableLinearTexture (textitle->textureID);
+      textitle->shadeConst ();
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin (GL_QUADS);
     glTexCoord2d (0, 1);
@@ -4700,7 +4699,7 @@ void init_display ()
 
   float xf = 1.75F, yf = 1.78F, zf = 2.0F;
   glPushMatrix ();
-  gl->enableTextures (5000);
+  gl->enableTexture (5000);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   glBegin (GL_QUADS);
   glTexCoord2d (0, 1);

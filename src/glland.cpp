@@ -853,7 +853,7 @@ void GLLandscape::drawTown (int x, int y)
     rot.c = 90 * ((xs + ys / 3) & 3);
     tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
     glPushMatrix ();
-    model_house1.draw (&tl, NULL, &rot, 0.3, 1, 0);
+    model_house1.draw (tl, CVector3 (), rot, 0.3, 1, 0);
     glPopMatrix ();
     return;
   }
@@ -1611,7 +1611,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 
   texture = true;
   va = &vertexarrayquad [texwater->textureID + 1];
-  gl->enableTextures (texwater->textureID);
+  gl->enableTexture (texwater->textureID);
   texzoom = 0.5;
   float watergreen = 0.00025;
   if (day) watergreen = 0.0004;
@@ -1674,8 +1674,8 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glBlendFunc (GL_ONE, GL_SRC_ALPHA);
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.2);
-    gl->enableTextures (texglitter1->textureID);
-    gl->enableLinearTexture (texglitter1->textureID);
+    gl->enableTexture (texglitter1->textureID);
+    texglitter1->shadeLinear ();
     for (j = 0; j < 4; j ++)
     {
       if (texture)
@@ -2410,21 +2410,21 @@ void GLLandscape::draw (int phi, int gamma)
           {
             if (detail [i] [i2] <= lineardetail)
             {
-              gl->enableLinearTexture (texgrass->textureID);
-              gl->enableLinearTexture (texgravel1->textureID);
-              gl->enableLinearTexture (texredsand->textureID);
-              gl->enableLinearTexture (texrocks->textureID);
-              gl->enableLinearTexture (texwater->textureID);
-              gl->enableLinearTexture (texredstone->textureID);
+              texgrass->shadeLinear ();
+              texgravel1->shadeLinear ();
+              texredsand->shadeLinear ();
+              texrocks->shadeLinear ();
+              texwater->shadeLinear ();
+              texredstone->shadeLinear ();
             }
             else
             {
-              gl->disableLinearTexture (texgrass->textureID);
-              gl->disableLinearTexture (texgravel1->textureID);
-              gl->disableLinearTexture (texredsand->textureID);
-              gl->disableLinearTexture (texrocks->textureID);
-              gl->disableLinearTexture (texwater->textureID);
-              gl->disableLinearTexture (texredstone->textureID);
+              texgrass->shadeConst ();
+              texgravel1->shadeConst ();
+              texredsand->shadeConst ();
+              texrocks->shadeConst ();
+              texwater->shadeConst ();
+              texredstone->shadeConst ();
             }
             if (detail [i] [i2] <= middetail)
             {
@@ -2589,7 +2589,7 @@ void GLLandscape::draw (int phi, int gamma)
   vertexarraytriangle [0].glEnd ();
   for (i = 1; i < 20; i ++)
   {
-    gl->enableTextures (i - 1);
+    gl->enableTexture (i - 1);
     vertexarrayquad [i].glEnd ();
     vertexarraytriangle [i].glEnd ();
   }
@@ -2600,8 +2600,8 @@ void GLLandscape::draw (int phi, int gamma)
   glBlendFunc (GL_ONE, GL_SRC_ALPHA);
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.2);
-  gl->enableTextures (texglitter1->textureID);
-  gl->enableLinearTexture (texglitter1->textureID);
+  gl->enableTexture (texglitter1->textureID);
+  texglitter1->shadeLinear ();
   vertexarrayglitter [0].glEnd ();
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable (GL_ALPHA_TEST);
@@ -2644,17 +2644,17 @@ void GLLandscape::draw (int phi, int gamma)
       glEnable (GL_ALPHA_TEST);
       glAlphaFunc (GL_GEQUAL, 0.5);
     }
-    gl->enableTextures (textree->textureID);
+    gl->enableTexture (textree->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableTextures (textree2->textureID);
+    gl->enableTexture (textree2->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableTextures (textree3->textureID);
+    gl->enableTexture (textree3->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableTextures (textree4->textureID);
+    gl->enableTexture (textree4->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableTextures (textree5->textureID);
+    gl->enableTexture (textree5->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableTextures (texcactus1->textureID);
+    gl->enableTexture (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     float mydep = 1000;
@@ -2679,33 +2679,33 @@ void GLLandscape::draw (int phi, int gamma)
           gridstep = neargridstep;
         if (detail [i] [i2] <= lineartree)
         {
-          gl->enableLinearTexture (textree->textureID);
-          gl->enableLinearTexture (textree2->textureID);
-          gl->enableLinearTexture (textree3->textureID);
-          gl->enableLinearTexture (textree4->textureID);
-          gl->enableLinearTexture (textree5->textureID);
-          gl->enableLinearTexture (texcactus1->textureID);
-          gl->enableLinearTexture (textreeu->textureID);
-          gl->enableLinearTexture (textreeu2->textureID);
-          gl->enableLinearTexture (textreeu3->textureID);
-          gl->enableLinearTexture (textreeu4->textureID);
-          gl->enableLinearTexture (textreeu5->textureID);
-          gl->enableLinearTexture (texcactusu1->textureID);
+          textree->shadeLinear ();
+          textree2->shadeLinear ();
+          textree3->shadeLinear ();
+          textree4->shadeLinear ();
+          textree5->shadeLinear ();
+          texcactus1->shadeLinear ();
+          textreeu->shadeLinear ();
+          textreeu2->shadeLinear ();
+          textreeu3->shadeLinear ();
+          textreeu4->shadeLinear ();
+          textreeu5->shadeLinear ();
+          texcactusu1->shadeLinear ();
         }
         else
         {
-          gl->disableLinearTexture (textree->textureID);
-          gl->disableLinearTexture (textree2->textureID);
-          gl->disableLinearTexture (textree3->textureID);
-          gl->disableLinearTexture (textree4->textureID);
-          gl->disableLinearTexture (textree5->textureID);
-          gl->disableLinearTexture (texcactus1->textureID);
-          gl->disableLinearTexture (textreeu->textureID);
-          gl->disableLinearTexture (textreeu2->textureID);
-          gl->disableLinearTexture (textreeu3->textureID);
-          gl->disableLinearTexture (textreeu4->textureID);
-          gl->disableLinearTexture (textreeu5->textureID);
-          gl->disableLinearTexture (texcactusu1->textureID);
+          textree->shadeConst ();
+          textree2->shadeConst ();
+          textree3->shadeConst ();
+          textree4->shadeConst ();
+          textree5->shadeConst ();
+          texcactus1->shadeConst ();
+          textreeu->shadeConst ();
+          textreeu2->shadeConst ();
+          textreeu3->shadeConst ();
+          textreeu4->shadeConst ();
+          textreeu5->shadeConst ();
+          texcactusu1->shadeConst ();
         }
         int ax = minx + (int) (dx * (float) i2);
         int ay = miny + (int) (dy * (float) i);

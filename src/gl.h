@@ -27,12 +27,18 @@
 #include "common.h" // ok
 #include "model.h" // ok
 
+#include <iostream>
+
+// TODO: write Vector and Map classes, as STL does not work with older compilers
+
 class GL
 {
   private:
   GLint texnum; // highest used texture number
-  int akttex; // current texture number
-  CTexture *tex [200]; // support max 200 textures
+//  CTexture *tex [200]; // support max 200 textures
+//  std::map<std::string, int> texMap;
+//  std::vector<std::string> texMap;
+  std::string texList [200];
   GLuint gllistnr, gllightnr; // highest used list number
   int aktlist; // current list number
 
@@ -52,16 +58,18 @@ class GL
   void setList (GLuint listnr);
   void genList (int *list);
   int genTexture ();
-  void enableLinearTexture (int texnum);
-  void disableLinearTexture (int texnum);
-  CTexture *getTextureTGA (char *fname);
-  CTexture *genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha);
-  float getTexLight ();
+  void enableLinearTexture (int texnum, bool mipmap);
+  void disableLinearTexture (int texnum, bool mipmap);
+//  CTexture *getTextureTGA (char *fname);
+//  CTexture *genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha);
+  /// return OpenGL texture id
+  int registerTexture (const std::string &name, const unsigned char *data,
+                       int width, int height, bool mipmap);
   void enableAntiAliasing ();
   void disableAntiAliasing ();
   void enableAlphaBlending ();
   void disableAlphaBlending ();
-  void enableTextures (int num);
+  void enableTexture (int num);
   void enableLighting ();
   void enableZBuffer ();
   void disableZBuffer ();

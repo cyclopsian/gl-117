@@ -44,20 +44,20 @@ CColor::CColor ()
 
 CColor::CColor (const CColor &color)
 {
-  setColor (color);
+  set (color);
 }
 
 CColor::CColor (int red, int green, int blue, int alpha)
 {
-  setColor (red, green, blue, alpha);
+  set (red, green, blue, alpha);
 }
 
-void CColor::setColor (const CColor &color)
+void CColor::set (const CColor &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
 
-void CColor::setColor (int red, int green, int blue, int alpha)
+void CColor::set (int red, int green, int blue, int alpha)
 {
   c [0] = (unsigned char) red;
   c [1] = (unsigned char) green;
@@ -101,23 +101,43 @@ CTexture::CTexture ()
   alpha = false;
 }
 
+CTexture::CTexture (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
+{
+  texlight = 1.0F;
+  texred = 1.0F;
+  texgreen = 1.0F;
+  texblue = 1.0F;
+  quality = 0;
+
+  loadFromTGA (filename, alphaprogram, mipmap, alpha);
+}
+
 CTexture::~CTexture ()
 {
   if (data != NULL)
     delete data;
 }
 
-bool CTexture::loadFromTGA (std::string &filename, int alphaprogram, bool mipmap)
+bool CTexture::loadFromTGA (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
 {
   int i, i2;
 
 #ifdef LOADER_TGA_H
   data = tga_load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
-  if (!data) return false;
+  if (!data)
+  {
+    char buf [256];
+    sprintf (buf, "Texture %s not found", filename);
+    display (buf, LOG_FATAL);
+  }
 #else
   unsigned char skip;
   FILE *in = fopen (filename.c_str (), "rb");
-  if (!in) return false;
+  if (!in)
+  {
+    sprintf (buf, "Texture %s not found", filename);
+    display (buf, LOG_FATAL);
+  }
   fread (&skip, 1, 1, in);
   fseek (in, 12, SEEK_SET);
   fread (&width, 2, 1, in);
@@ -205,6 +225,9 @@ bool CTexture::loadFromTGA (std::string &filename, int alphaprogram, bool mipmap
   texblue = (float) texb / width / height / 256; // average blue
   name = filename;
   this->mipmap = mipmap;
+  this->alpha = alpha;
+
+  textureID = gl->registerTexture (filename, data, width, height, mipmap);
   
   return true;
 }
@@ -223,6 +246,16 @@ void CTexture::getColor (CColor *color, int x, int y) const
   color->c [1] = data [offset + 1];
   color->c [2] = data [offset + 2];
   color->c [3] = data [offset + 3];
+}
+
+void CTexture::shadeLinear () const
+{
+  gl->enableLinearTexture (textureID, mipmap);
+}
+
+void CTexture::shadeConst () const
+{
+  gl->disableLinearTexture (textureID, mipmap);
 }
 
 
@@ -318,13 +351,6 @@ bool CVector3::isEqual (const CVector3 &v, float tolerance) const
          z >= v.z - tolerance && z <= v.z + tolerance;
 }
 
-void CVector3::take (const CVector3 &v)
-{
-  x = v.x;
-  y = v.y;
-  z = v.z;
-}
-
 
 
 CVector2::CVector2 ()
@@ -365,12 +391,6 @@ bool CVector2::isEqual (const CVector2 &v, float tolerance) const
          y >= v.y - tolerance && y <= v.y + tolerance;
 }
 
-void CVector2::take (const CVector2 &v)
-{
-  x = v.x;
-  y = v.y;
-}
-
 
 
 CVertex::CVertex ()
@@ -380,7 +400,15 @@ CVertex::CVertex ()
 
 CVertex::CVertex (const CVertex &v)
 {
-  take (v);
+  set (v);
+}
+
+void CVertex::set (const CVertex &v)
+{
+  vector.set (v.vector);
+  normal.set (v.normal);
+  color.set (v.color);
+  triangles = v.triangles;
 }
 
 void CVertex::addNormal (const CVector3 &n)
@@ -401,14 +429,6 @@ void CVertex::addColor (const CColor &color)
   }
 }
 
-void CVertex::take (const CVertex &v)
-{
-  vector.take (v.vector);
-  normal.take (v.normal);
-  color.take (v.color);
-  triangles = v.triangles;
-}
-
 
 
 //double pitab;
@@ -419,24 +439,38 @@ CRotation::CRotation ()
   a = 0;
   b = 0;
   c = 0;
-  calcRotation ();
+//  calculate ();
 }
 
-void CRotation::setAngles (float a, float b, float c)
+void CRotation::set (const CRotation &r)
+{
+  a = r.a;
+  b = r.b;
+  c = r.c;
+}
+
+void CRotation::set (float a, float b, float c)
 {
   this->a = a;
   this->b = b;
   this->c = c;
 }
 
-void CRotation::addAngles (float a, float b, float c)
+void CRotation::add (const CRotation &r)
+{
+  a += r.a;
+  b += r.b;
+  c += r.c;
+}
+
+void CRotation::add (float a, float b, float c)
 {
   this->a += a;
   this->b += b;
   this->c += c;
 }
 
-void CRotation::calcRotation ()
+/*void CRotation::calculate ()
 {
   rot [0] [0] = COS(c) * COS(b);
   rot [0] [1] = SIN(a) * SIN(b) * COS(c) - SIN(c) * COS(a);
@@ -462,14 +496,7 @@ float CRotation::rotateY (const CVector3 &v) const
 float CRotation::rotateZ (const CVector3 &v) const
 {
   return v.x * rot [2] [0] + v.y * rot [2] [1] + v.z * rot [2] [2];
-}
-
-void CRotation::take (const CRotation &r)
-{
-  a = r.a;
-  b = r.b;
-  c = r.c;
-}
+}*/
 
 
 
@@ -483,9 +510,9 @@ CTriangle::CTriangle ()
 void CTriangle::calcNormal (CVector3 *n)
 {
   CVector3 dummy;
-  n->take (v [1]->vector);
+  n->set (v [1]->vector);
   n->sub (v [0]->vector);
-  dummy.take (v [2]->vector);
+  dummy.set (v [2]->vector);
   dummy.sub (v [0]->vector);
   n->crossproduct (dummy);
 }
@@ -520,9 +547,9 @@ CQuad::CQuad ()
 void CQuad::calcNormal (CVector3 *n)
 {
   CVector3 dummy;
-  n->take (v [1]->vector);
+  n->set (v [1]->vector);
   n->sub (v [0]->vector);
-  dummy.take (v [3]->vector);
+  dummy.set (v [3]->vector);
   dummy.sub (v [0]->vector);
   n->crossproduct (dummy);
 }
@@ -576,7 +603,7 @@ int CObject::addVertex (const CVertex &w)
   for (i = 0; i < numVertices; i ++)
     if (w.vector.isEqual (vertex [i].vector, 1e-3F) && w.color.isEqual (vertex [i].color)) break;
   if (i == numVertices)
-  vertex [numVertices ++].take (w);
+  vertex [numVertices ++].set (w);
   return i;
 }
 
@@ -620,7 +647,6 @@ void CModel::addMaterial (const CMaterial &material)
 {
   this->material [numMaterials] = new CMaterial;
   if (this->material [numMaterials] == NULL) exit (100);
-//  if (material != NULL)
   memcpy (this->material [numMaterials], &material, sizeof (CMaterial));
   numMaterials ++;
 }
@@ -629,7 +655,6 @@ void CModel::addObject (const CObject &object)
 {
   this->object [numObjects] = new CObject;
   if (this->object [numObjects] == NULL) exit (101);
-//  if (object != NULL)
   memcpy (this->object [numObjects], &object, sizeof (CObject));
   numObjects ++;
   rotcol = 0;
@@ -648,13 +673,13 @@ void CModel::addRefPoint (const CVector3 &tl)
     {
       for (i2 = numRefpoints; i2 > i; i2 --)
       {
-        refpoint [i2].take (refpoint [i2 - 1]);
+        refpoint [i2].set (refpoint [i2 - 1]);
       }
-      refpoint [i].take (tl);
+      refpoint [i].set (tl);
       goto fertigref1;
     }
   }
-  refpoint [numRefpoints].take (tl);
+  refpoint [numRefpoints].set (tl);
 fertigref1:;
   numRefpoints ++;
 }
@@ -717,19 +742,16 @@ void CModel::scaleTexture (float fx, float fy)
   }
 }
 
-void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, float lum, int explode)
+void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+                   float zoom, float lum, int explode)
 {
   if (nolight) // if model wants to be rendered without light, call draw2
   {
     glDisable (GL_LIGHTING);
-    draw2 (tl, tl2, rot, zoom, explode);
+    drawNoLight (tl, tl2, rot, zoom, explode);
     glEnable (GL_LIGHTING);
     return;
   }
-
-  if (tl == NULL) tl = &tlnull;
-  if (tl2 == NULL) tl2 = &tlnull;
-  if (rot == NULL) rot = &rotnull;
 
   int i, j;
   CObject *cm;
@@ -763,15 +785,15 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     if (cm->hasTexture)
     {
       if (antialiasing)
-        gl->enableLinearTexture (cm->material->texture->textureID);
+        cm->material->texture->shadeLinear ();
       else
-        gl->disableLinearTexture (cm->material->texture->textureID);
+        cm->material->texture->shadeConst ();
     }
   }
 
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.002 * explode * explode / timestep / timestep, tl->z + tl2->z);
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
   float explodefac = (float) explode / 10 / timestep;
 
   if (showcollision)
@@ -806,9 +828,9 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     glPopMatrix ();
   }
 
-  glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (-rot->a+90, 0, 0, 1);
-  glRotatef (rot->b+180, 1, 0, 0);
+  glRotatef (rot.c+90, 0, -1, 0);
+  glRotatef (-rot.a+90, 0, 0, 1);
+  glRotatef (rot.b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   if (shading == 1)
@@ -931,7 +953,8 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   glPopMatrix ();
 }
 
-void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int explode)
+void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+                          float zoom, int explode)
 {
   int i, j;
   CObject *cm;
@@ -943,15 +966,15 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     if (cm->hasTexture)
     {
       if (antialiasing)
-        gl->enableLinearTexture (cm->material->texture->textureID);
+        cm->material->texture->shadeLinear ();
       else
-        gl->disableLinearTexture (cm->material->texture->textureID);
+        cm->material->texture->shadeConst ();
     }
   }
 
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.002 * explode * explode / timestep / timestep, tl->z + tl2->z);
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
   float explodefac = (float) explode / 10 / timestep;
 
   if (showcollision)
@@ -986,9 +1009,9 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     glPopMatrix ();
   }
 
-  glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (-rot->a+90, 0, 0, 1);
-  glRotatef (rot->b+180, 1, 0, 0);
+  glRotatef (rot.c+90, 0, -1, 0);
+  glRotatef (-rot.a+90, 0, 0, 1);
+  glRotatef (rot.b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
@@ -1101,14 +1124,15 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   glPopMatrix ();
 }
 
-void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, float lum, int explode)
+void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+                            float zoom, float lum, int explode)
 {
   int i, j;
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.002 * explode * explode / timestep / timestep, tl->z + tl2->z);
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
   float explodefac = (float) explode / 10 / timestep;
 
   if (showcollision)
@@ -1143,9 +1167,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
     glPopMatrix ();
   }
 
-  glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (-rot->a+90, 0, 0, 1);
-  glRotatef (rot->b+180, 1, 0, 0);
+  glRotatef (rot.c+90, 0, -1, 0);
+  glRotatef (-rot.a+90, 0, 0, 1);
+  glRotatef (rot.b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   if (alpha)
@@ -1222,14 +1246,15 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   glPopMatrix ();
 }
 
-void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int explode)
+/*void CModel::draw3 (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+					float zoom, int explode)
 {
   int i, j;
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.002 * explode * explode / timestep / timestep, tl->z + tl2->z);
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
   float explodefac = (float) explode / 10 / timestep;
 
   if (showcollision)
@@ -1264,9 +1289,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     glPopMatrix ();
   }
 
-  glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (-rot->a+90, 0, 0, 1);
-  glRotatef (rot->b+180, 1, 0, 0);
+  glRotatef (rot.c+90, 0, -1, 0);
+  glRotatef (-rot.a+90, 0, 0, 1);
+  glRotatef (rot.b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
@@ -1368,7 +1393,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   else glCallList (list3);
 
   glPopMatrix ();
-}
+}*/
 
 
 
@@ -1389,25 +1414,24 @@ int CSphere::random (int n)
 
 void CSphere::init (float radius, int segments, float dx, float dy, float dz, int randomized)
 {
-  CObject *co = new CObject;
-  if (co == NULL) exit (100);
-  co->vertex = new CVertex [segments * segments * 2 + 2];
-  if (co->vertex == NULL) exit (100);
-  co->triangle = new CTriangle [segments * 4];
-  if (co->triangle == NULL) exit (100);
-  co->quad = new CQuad [segments * segments * 2];
-  if (co->quad == NULL) exit (100);
+  CObject co;
+  co.vertex = new CVertex [segments * segments * 2 + 2];
+  if (co.vertex == NULL) exit (100);
+  co.triangle = new CTriangle [segments * 4];
+  if (co.triangle == NULL) exit (100);
+  co.quad = new CQuad [segments * segments * 2];
+  if (co.quad == NULL) exit (100);
+
   this->radius = radius;
   this->segments = segments;
   this->dx = dx;
   this->dy = dy;
   this->dz = dz;
+  
   int p [4];
   float step = 180.0 / segments;
-  CRotation *rot = new CRotation ();
-  if (rot == NULL) exit (100);
-  CVertex w; // = new CVertex ();
-//  if (w == NULL) exit (100);
+  CVertex w;
+
   for (float i = 0; i < 180; i += step)
     for (float i2 = 0; i2 < 360; i2 += step)
     {
@@ -1415,38 +1439,38 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      p [0] = co->addVertex (w);
+      p [0] = co.addVertex (w);
       a = ((int) (i + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
+      if (a < 179 || i2 == 0) p [1] = co.addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      if (a < 179) p [2] = co->addVertex (w);
+      if (a < 179) p [2] = co.addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      p [3] = co->addVertex (w);
+      p [3] = co.addVertex (w);
       if (i == 0 || i >= 180 - step - 1)
       {
         if (!random (randomized))
         {
-          if (i == 0) co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]]);
-          else co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [3]]);
+          if (i == 0) co.triangle [co.numTriangles ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [2]]);
+          else co.triangle [co.numTriangles ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [3]]);
         }
       }
       else
       {
         if (!random (randomized))
-          co->quad [co->numQuads ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]], &co->vertex [p [3]]);
+          co.quad [co.numQuads ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [2]], &co.vertex [p [3]]);
       }
     }
-  delete rot;
-  addObject (*co);
+
+  addObject (co);
   setColor (CColor (128, 128, 128, 255));
   for (int i2 = 0; i2 < object [0]->numVertices / 2; i2 ++)
   {
@@ -1532,18 +1556,18 @@ CSpherePart::~CSpherePart () {}
 
 void CSpherePart::init (float radius, int segments, float phi)
 {
-  CObject *co = new CObject;
-  co->vertex = new CVertex [segments * 4 + 1];
-  co->triangle = new CTriangle [segments];
-  co->quad = new CQuad [segments * 3];
+  CObject co;
+  co.vertex = new CVertex [segments * 4 + 1];
+  co.triangle = new CTriangle [segments];
+  co.quad = new CQuad [segments * 3];
   this->radius = radius;
   this->segments = segments;
   float dx = 1, dy = 1, dz = 1;
   int p [4];
   float step = 360.0 / segments;
   float step2 = phi / 4;
-  CRotation *rot = new CRotation ();
-  CVertex w;// = new CVertex ();
+  CVertex w;
+
   for (float i = 0; i < phi; i += step2)
     for (float i2 = 0; i2 < 360; i2 += step)
     {
@@ -1551,34 +1575,34 @@ void CSpherePart::init (float radius, int segments, float phi)
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      p [0] = co->addVertex (w);
+      p [0] = co.addVertex (w);
       a = ((int) (i + step2)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
+      if (a < 179 || i2 == 0) p [1] = co.addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      if (a < 179) p [2] = co->addVertex (w);
+      if (a < 179) p [2] = co.addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w.vector.x = radius * si * ci2 * dx; w.vector.y = radius * si * si2 * dy; w.vector.z = radius * ci * dz;
-      p [3] = co->addVertex (w);
+      p [3] = co.addVertex (w);
       if (i == 0 || i >= 180 - step2 - 0.2)
       {
-        if (i == 0) co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]]);
-        else co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [3]]);
+        if (i == 0) co.triangle [co.numTriangles ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [2]]);
+        else co.triangle [co.numTriangles ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [3]]);
       }
       else
       {
-        co->quad [co->numQuads ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]], &co->vertex [p [3]]);
+        co.quad [co.numQuads ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [2]], &co.vertex [p [3]]);
       }
     }
-  delete rot;
-  addObject (*co);
+  
+  addObject (co);
   setColor (CColor (128, 128, 128, 255));
 }
 

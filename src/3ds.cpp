@@ -23,6 +23,8 @@
 
 #ifndef IS_3DS_H
 
+// #pragma warning(disable:4786) // VC98 bug
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -506,7 +508,7 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
   
   for (int i = 0; i < object->numTexVertex; i ++)
-    object->vertex [i].tex.take (p [i]);
+    object->vertex [i].tex.set (p [i]);
   delete []p;
 }
 
@@ -526,7 +528,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
     
   for (i = 0; i < object->numVertices; i ++)
   {
-    object->vertex [i].vector.take (p [i]);
+    object->vertex [i].vector.set (p [i]);
   }
 
   // Flip the y values with the z values as 3DMAX changed them and negate z
@@ -666,9 +668,9 @@ void CLoad3DS::LoadTextures (CModel *model)
         }
       }
       
-      model->object [i]->material->texture = gl->genTextureTGA (str, -1, 1, false);
-      if (model->object [i]->material->texture == NULL)
-        model->object [i]->hasTexture = false;
+      model->object [i]->material->texture = new CTexture (std::string (str), -1, true, false);
+//      if (model->object [i]->material->texture == NULL)
+//        model->object [i]->hasTexture = false;
     }
   }
 }

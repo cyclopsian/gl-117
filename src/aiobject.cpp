@@ -456,7 +456,7 @@ void DynamicObj::move (Uint32 dt)
   {
     if (id == STATIC_TENT1) theta = 178;
     // set the correct angles to diplay
-    rot->setAngles ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
+    rot->set ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
     checkShield ();
     return; // and exit this function
   }
@@ -588,16 +588,16 @@ void DynamicObj::move (Uint32 dt)
     phiup = phi;
     uaxis.set (COS(gammaup) * SIN(phiup), SIN(gammaup), COS(gammaup) * COS(phiup)); // upward axis (theta = 0)
     // now rotate around vaxis using theta
-    utemp.take (uaxis);
+    utemp.set (uaxis);
     utemp.mul (COS(thetaup));
-    utemp2.take (vaxis);
+    utemp2.set (vaxis);
     utemp2.mul ((1 - COS(thetaup)) * uaxis.dotproduct (vaxis));
-    utemp3.take (uaxis);
+    utemp3.set (uaxis);
     utemp3.crossproduct (vaxis);
     utemp3.mul (SIN(thetaup));
     utemp.add (utemp2);
     utemp.add (utemp3);
-    uaxis.take (utemp);
+    uaxis.set (utemp);
 
   }
 
@@ -703,7 +703,7 @@ void DynamicObj::move (Uint32 dt)
   if (id != ASTEROID)
   {
     // set angles to correctly display the object
-    rot->setAngles ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
+    rot->set ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
   }
   else // asteroids should rotate around their center of weight, as we must not change theta/gamma, we do this here
   {
@@ -711,7 +711,7 @@ void DynamicObj::move (Uint32 dt)
     if (ttl <= -360 * timestep) ttl = -1;
     int rot1 = (int) (sin ((zoom - 1.3) * 8) * 4);
     int rot2 = (int) (cos ((zoom - 1.3) * 8) * 4);
-    rot->setAngles ((short) (90 + gamma + ttl * rot1 / timestep - 180), (short) theta + ttl * rot2 / timestep + 180, (short) -phi);
+    rot->set ((short) (90 + gamma + ttl * rot1 / timestep - 180), (short) theta + ttl * rot2 / timestep + 180, (short) -phi);
   }
 
 cannondone:;
@@ -1422,7 +1422,7 @@ void AIObj::initValues (DynamicObj *dobj, float phi)
   dobj->forcex = forcex;
   dobj->forcey = forcey;
   dobj->forcez = forcez;
-  dobj->rot->setAngles ((short) (90 + dobj->gamma - 180), (short) dobj->theta + 180, (short) -dobj->phi);
+  dobj->rot->set ((short) (90 + dobj->gamma - 180), (short) dobj->theta + 180, (short) -dobj->phi);
 }
 
 void AIObj::fireCannon (DynamicObj *laser, float phi)

@@ -57,8 +57,8 @@ class CColor
     CColor (const CColor &color);
     CColor (int red, int green, int blue, int alpha = 255);
   
-    void setColor (const CColor &color);
-    void setColor (int red, int green, int blue, int alpha = 255);
+    void set (const CColor &color);
+    void set (int red, int green, int blue, int alpha = 255);
     bool isEqual (const CColor &color) const; // compare colors
     void take (const CColor &color);
 };
@@ -87,12 +87,19 @@ class CTexture
     bool alpha;          ///< alpha blending on/off
   
     CTexture ();
+    CTexture (const std::string &filename, int alphaprogram = -1,
+              bool mipmap = true, bool alpha = false); // TODO: alpha really necessary?
     ~CTexture (); // necessary
   
     /// loadFromTGA is called via gl->genTextureTGA() to not load the same texture twice
-    bool loadFromTGA (std::string &filename, int alphatype, bool mipmap);
+    bool loadFromTGA (const std::string &filename, int alphaprogram = -1,
+                      bool mipmap = true, bool alpha = false);
     /// get color of a special pixel
     void getColor (CColor *c, int x, int y) const;
+    /// set to linear shading between texels (expensive esp. on old graphic cards)
+    void shadeLinear () const;
+    /// set to const shading between texels (fast)
+    void shadeConst () const;
 };
 
 /**
@@ -125,7 +132,6 @@ class CVector3
     bool isEqual (const CVector3 &v) const;
     /// numerically equal, use a tolerance like 1E-8
     bool isEqual (const CVector3 &v, float tolerance) const;
-    void take (const CVector3 &v); // copy data from v
 };
 
 /**
@@ -149,8 +155,6 @@ class CVector2
     bool isEqual (const CVector2 &v) const;
     /// numerically equal, use a tolerance like 1E-8
     bool isEqual (const CVector2 &v, float tolerance) const;
-    /// copy data from v
-    void take (const CVector2 &v);
 };
 
 /**
@@ -170,17 +174,16 @@ class CVertex
     CVertex ();
     CVertex (const CVertex &v);
   
+    /// copy data from v
+    void set (const CVertex &v);
     /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
     void addNormal (const CVector3 &n); 
     /// the color of a vertex can be calculated as average of all adjacent plane colors
     void addColor (const CColor &c);
-    /// copy data from v
-    void take (const CVertex &v);
 };
 
 /**
-* CRotation stores one (x,y,z)-rotation which is recalculated when changing the angles
-* using setAngles ().
+* CRotation stores one (x,y,z)-rotation.
 */
 class CRotation
 {
@@ -192,18 +195,19 @@ class CRotation
   
     CRotation ();
   
-    void setAngles (float a, float b, float c);
-    void addAngles (float a, float b, float c);
-    void calcRotation ();
+    void set (const CRotation &r);
+    void set (float a, float b, float c);
+    void add (const CRotation &r);
+    void add (float a, float b, float c);
+/*    void calculate (); // calculate the rotation matrix
     float rotateX (const CVector3 &v) const;
     float rotateY (const CVector3 &v) const;
-    float rotateZ (const CVector3 &v) const;
-    void take (const CRotation &r);
+    float rotateZ (const CVector3 &v) const;*/
 
   protected:
 
-    /// the rotation matrix of this rotation
-    float rot [3] [3];
+    // the rotation matrix of this rotation
+//    float rot [3] [3];
 };
 
 /**
@@ -217,7 +221,7 @@ class CTriangle
   
     CTriangle ();
   
-    void calcNormal (CVector3 *n);
+    void calcNormal (CVector3 *n); ///< return normal n
     void setVertices (CVertex *a, CVertex *b, CVertex *c); // not const as a,b,c may be altered
 };
 
@@ -232,7 +236,7 @@ class CQuad
   
     CQuad ();
 
-    void calcNormal (CVector3 *n);
+    void calcNormal (CVector3 *n); ///< return normal n
     void setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d); // not const as a,b,c,d may be altered
 };
 
@@ -283,7 +287,13 @@ class CObject
 };
 
 /**
-* CModel stores the materials and objects of a model, the data structure is optimized for 3DS files
+* CModel stores the materials and objects of a model.
+* Its data structure is optimized esp. for 3DS files.
+* The drawing methods take the following parameters:
+*   tl+tl2=translation,
+*   rot=rotation,
+*   lum=luminance (default 1.0),
+*   explode=radial translation (default 0)
 */
 class CModel 
 {
@@ -317,23 +327,20 @@ class CModel
     void drawVertexNormals (const CObject &cm, float zoom);
     int rotateColor (int n);
     void scaleTexture (float fx, float fy);
-    // the drawing methods take the following parameters:
-    // tl+tl2=translation, rot=rotation, lum=luminance (default 1.0), explode=radial translation (default 0)
-    // draw everything
-    void draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom = 1.0F, float lum = 1.0F, int explode = 0);
-    // draw without GL lighting
-    void draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom = 1.0F, int explode = 0);
-    // draw without textures
-    void draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom = 1.0F, int explode = 0);
-    // draw without textures, different luminance
-    void draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom = 1.0F, float lum = 1.0F, int explode = 0);
+    /// draw everything
+    void draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+		       float zoom = 1.0F, float lum = 1.0F, int explode = 0);
+    /// draw without GL lighting, no luminance => VERY FAST (uses display list)
+    void drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+		              float zoom = 1.0F, int explode = 0);
+    /// draw without textures, different luminance
+    void drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+		                float zoom = 1.0F, float lum = 1.0F, int explode = 0);
 
   private:
 
     // all private members are only used "temporarily" at runtime!
     int rotcol; ///< very special for flickering light sources, e.g. the engine's bright yellow color is rotated
-    CVector3 tlnull;
-    CRotation rotnull;
     VertexArray *va; ///< using a vertex array means more memory, but better performance
 };
 

@@ -126,17 +126,17 @@ void CSmoke::drawElemHQ (int n)
 void CSmoke::draw ()
 {
   int i;
-  int smoketype = 0;
-  if (type == 0) smoketype = texsmoke->textureID;
-  else if (type == 1) smoketype = texsmoke2->textureID;
+  CTexture *smoketype;
+  if (type == 0) smoketype = texsmoke;
+  else if (type == 1) smoketype = texsmoke2;
   if (antialiasing)
-    gl->enableLinearTexture (smoketype);
+    smoketype->shadeLinear ();
   else
-    gl->disableLinearTexture (smoketype);
+    smoketype->shadeConst ();
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.02);
-  gl->enableTextures (smoketype);
+  gl->enableTexture (smoketype->textureID);
   // draw smoke elements in the best order
   for (i = last; i >= 0; i --)
   {
@@ -328,13 +328,13 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
   {
     glDepthMask (GL_FALSE);
     if (antialiasing)
-      gl->enableLinearTexture (texsmoke3->textureID);
+      texsmoke3->shadeLinear ();
     else
-      gl->disableLinearTexture (texsmoke3->textureID);
+      texsmoke3->shadeConst ();
     gl->enableAlphaBlending ();
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.02);
-    gl->enableTextures (texsmoke3->textureID);
+    gl->enableTexture (texsmoke3->textureID);
     glBegin (GL_QUADS);
     int myalpha = 255 - (maxlen - ttl) * 255 / maxlen;
     if (myalpha > 255) myalpha = 255;
@@ -458,7 +458,7 @@ void Font::extractLetters (int height, char start, int num)
 
 Font::Font (char *filename, int height, char start, int num)
 {
-  texture = gl->genTextureTGA (filename, 1, 0, true);
+  texture = new CTexture (std::string (filename), 0, false, true);
   extractLetters (height, start, num);
   zoom = 0.1F;
   stdcol = new CColor (255, 255, 255, 220);
@@ -476,7 +476,7 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
   int len = strlen (str);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texture->textureID);
+  gl->enableTexture (texture->textureID);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
@@ -622,7 +622,7 @@ void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color,
   int len = strlen (str);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texture->textureID);
+  gl->enableTexture (texture->textureID);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
@@ -678,7 +678,7 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
   int len = strlen (str);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texture->textureID);
+  gl->enableTexture (texture->textureID);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);

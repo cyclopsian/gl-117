@@ -94,12 +94,12 @@ void Cockpit::setColor (int alpha)
 
 void Cockpit::setColor (CColor *color, int alpha)
 {
-  if (fplayer->o == &model_fig) color->setColor (255, 255, 0, alpha);
-  else if (fplayer->o == &model_figb) color->setColor (255, 150, 100, alpha);
-  else if (fplayer->o == &model_figc) color->setColor (200, 200, 100, alpha);
-  else if (fplayer->o == &model_figg) color->setColor (255, 0, 0, alpha);
-  else if (fplayer->o == &model_figi) color->setColor (200, 200, 100, alpha);
-  else color->setColor (100, 100, 255, alpha);
+  if (fplayer->o == &model_fig) color->set (255, 255, 0, alpha);
+  else if (fplayer->o == &model_figb) color->set (255, 150, 100, alpha);
+  else if (fplayer->o == &model_figc) color->set (200, 200, 100, alpha);
+  else if (fplayer->o == &model_figg) color->set (255, 0, 0, alpha);
+  else if (fplayer->o == &model_figi) color->set (200, 200, 100, alpha);
+  else color->set (100, 100, 255, alpha);
 }
 
 void Cockpit::drawCounter ()
@@ -400,11 +400,11 @@ void Cockpit::drawCross ()
   //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   if (fplayer->o == &model_fig || fplayer->o == &model_figg)
   {
-    gl->enableTextures (texcross->textureID);
+    gl->enableTexture (texcross->textureID);
   }
   else
   {
-    gl->enableTextures (texcross2->textureID);
+    gl->enableTexture (texcross2->textureID);
   }
 
   float xf = 0.1, yf = 0.1, zf = 1.0;
@@ -564,7 +564,7 @@ void Cockpit::drawTargetedElement ()
   CColor color;
   CVector3 tl, n;
   CRotation r;
-  color.setColor (255, 0, 0);
+  color.set (255, 0, 0);
   color.c [3] = 255;
   tl.x = -0.35; tl.y = -0.3; tl.z = -0.5;
   gl->disableAlphaBlending ();
@@ -573,10 +573,10 @@ void Cockpit::drawTargetedElement ()
     if (fplayer->target->active)
     {
       glEnable (GL_LIGHTING);
-      fplayer->target->o->draw (&n, &tl, fplayer->target->rot, 0.05, 0.3, 0);
+      fplayer->target->o->draw (n, tl, *fplayer->target->rot, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
-        color.setColor (0, 0, 255);
+        color.set (0, 0, 255);
       font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->o->name.c_str ()), &color);
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
       font1->drawText (-24.0, -25.0, -4.0, str, &color);
@@ -592,7 +592,7 @@ void Cockpit::drawWeapon ()
   CRotation r;
   if (fplayer->missiles [fplayer->missiletype] <= 0)
     return;
-  color.setColor (255, 0, 0);
+  color.set (255, 0, 0);
   color.c [3] = 255;
   tl.x = 0.35; tl.y = -0.3; tl.z = -0.5;
   gl->disableAlphaBlending ();
@@ -607,7 +607,7 @@ void Cockpit::drawWeapon ()
   else if (fplayer->missiletype == 6) missile = &model_missile7;
   else if (fplayer->missiletype == 7) missile = &model_missile8;
   glEnable (GL_LIGHTING);
-  missile->draw (&n, &tl, fplayer->rot, 0.05, 1.0, 0);
+  missile->draw (n, tl, *fplayer->rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), &color);
@@ -629,13 +629,13 @@ void Cockpit::drawRadar ()
   int type;
   if (fplayer->o == &model_fig || fplayer->o == &model_figg)
   {
-    gl->enableTextures (texradar2->textureID);
+    gl->enableTexture (texradar2->textureID);
     xl = 1.4; yl = 1.3;
     type = 0;
   }
   else
   {
-    gl->enableTextures (texradar1->textureID);
+    gl->enableTexture (texradar1->textureID);
     xl = 1.3; yl = 1.2;
     type = 1;
   }

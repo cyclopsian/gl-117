@@ -265,4 +265,53 @@ const int maxjoysticks = 10;
 // global normed timestep (higher values mean slower gameplay)
 const int timestep = 34;
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+class String
+{
+  public:
+
+  String ()
+  {
+    len = 0;
+    max = 0;
+    str = NULL;
+  }
+  String (char *str)
+  {
+    len = strlen (str);
+    max = 0;
+    str = NULL;
+    allocate ();
+    strcpy (this->str, str);
+  }
+
+  const char *c_str ()
+  {
+    return (const char *) str;
+  }
+
+  bool equals (String &string)
+  {
+    return strcmp (str, string.c_str ()) == 0;
+  }
+
+  protected:
+
+  char *str;
+  int len;
+  int max;
+
+  void allocate ()
+  {
+    if (max == 0) max = 4;
+    while (len >= max) max *= 2;
+    str = (char *) realloc (str, max);
+    if (str == NULL)
+      exit (1); // TODO: error
+  }
+};
+
 #endif

@@ -62,7 +62,7 @@ Mission::Mission ()
   selweapon [1] = MISSILE_GROUND1;
   selweapon [2] = MISSILE_DF1;
   wantweapon = 0;
-  textcolor.setColor (255, 255, 0, 180);
+  textcolor.set (255, 255, 0, 180);
   clouds = 0;
   heading = 180;
   state = 0;

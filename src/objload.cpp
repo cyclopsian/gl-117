@@ -148,7 +148,7 @@ void CLoadOBJ::ComputeColors (CModel *model)
     CObject *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      n.take (object->vertex [i2].normal);
+      n.set (object->vertex [i2].normal);
       int lum = (int) (255.0 - 255.0 * acos (n.dotproduct (light)));
       object->vertex [i2].color.c [0] = lum;
       object->vertex [i2].color.c [1] = lum;

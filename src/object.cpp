@@ -73,8 +73,8 @@ void CSpaceObj::addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float 
     refscale = new float [50];
   }
   refmodel [numRefModels] = model;
-  reftl [numRefModels].take (*tl);
-  refrot [numRefModels].take (*rot);
+  reftl [numRefModels].set (*tl);
+  refrot [numRefModels].set (*rot);
   refscale [numRefModels] = scale;
   numRefModels ++;
 }
@@ -90,10 +90,10 @@ void CSpaceObj::translate (float x, float y, float z)
   tl->z = z; }
 
 void CSpaceObj::rotate (short a, short b, short c)
-{ rot->setAngles (a, b, c); }
+{ rot->set (a, b, c); }
 
 void CSpaceObj::rotateOn (short a, short b, short c)
-{ rot->addAngles (a, b, c); }
+{ rot->add (a, b, c); }
 
 void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
@@ -108,7 +108,7 @@ void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, 
     if (drawlight && drawlight2)
     {
       glEnable (GL_LIGHTING);
-      o->draw (tl, this->tl, this->rot, this->zoom, lum * lum2, explode);
+      o->draw (*tl, *this->tl, *this->rot, this->zoom, lum * lum2, explode);
       if (refmodel != NULL)
       {
         glPushMatrix ();
@@ -120,7 +120,7 @@ void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, 
         if (o->refpoint)
           for (i = 0; i < numRefModels; i ++)
             if (refscale [i] > 0.001)
-              refmodel [i]->draw (&o->refpoint [i / 3], &reftl [i], &refrot [i], refscale [i], lum * lum2, explode);
+              refmodel [i]->draw (o->refpoint [i / 3], reftl [i], refrot [i], refscale [i], lum * lum2, explode);
         glPopMatrix ();
       }
     }
@@ -129,14 +129,14 @@ void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, 
       glDisable (GL_LIGHTING);
       if (istextured2)
       {
-        o->draw2 (tl, this->tl, this->rot, this->zoom, explode);
+        o->drawNoLight (*tl, *this->tl, *this->rot, this->zoom, explode);
       }
       else
       {
         if (drawlight2)
-          o->draw3 (tl, this->tl, this->rot, this->zoom, lum * lum2, explode);
+          o->drawNoTexture (*tl, *this->tl, *this->rot, this->zoom, lum * lum2, explode);
         else
-          o->draw3 (tl, this->tl, this->rot, this->zoom, explode);
+          o->drawNoTexture (*tl, *this->tl, *this->rot, this->zoom, 1.0, explode);
       }
     }
   }
