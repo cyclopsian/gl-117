@@ -225,28 +225,31 @@ SoundSystem::SoundSystem ()
          printf("Unable to open audio!\n");
          exit(1);
        }
-  musicdark1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
-  if (musicdark1 == NULL)
-  {
-    fprintf (stderr, "\nCannot open dark.s3m: %s", Mix_GetError ()); fflush (stderr);
-    exit (1);
-  }
-  musicstandby1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
-  if (musicstandby1 == NULL)
-  {
-    fprintf (stderr, "\nCannot open standby.s3m: %s", Mix_GetError ()); fflush (stderr);
-    exit (1);
-  }
-  musicwinner1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
-  if (musicwinner1 == NULL)
+  music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
+  if (music1 == NULL)
   {
     fprintf (stderr, "\nCannot open winner.s3m: %s", Mix_GetError ()); fflush (stderr);
     exit (1);
   }
-  musicelectro1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
-  if (musicelectro1 == NULL)
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
+  if (music1 == NULL)
+  {
+    fprintf (stderr, "\nCannot open dark.s3m: %s", Mix_GetError ()); fflush (stderr);
+    exit (1);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
+  if (music1 == NULL)
   {
     fprintf (stderr, "\nCannot open electro.s3m: %s", Mix_GetError ()); fflush (stderr);
+    exit (1);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
+  if (music1 == NULL)
+  {
+    fprintf (stderr, "\nCannot open standby.s3m: %s", Mix_GetError ()); fflush (stderr);
     exit (1);
   }
   playtime = 0;
@@ -266,6 +269,15 @@ SoundSystem::SoundSystem ()
 
 SoundSystem::~SoundSystem ()
 {
+#ifdef HAVE_SDL_MIXER
+  if (music1)
+    Mix_FreeMusic (music1);
+  Mix_CloseAudio ();
+#else
+#ifdef HAVE_SDL
+  SDL_CloseAudio ();
+#endif
+#endif
   delete waveexplosion1;
   delete waveclick1;
   delete wavecannon1;
@@ -333,7 +345,7 @@ void SoundSystem::playLoop (int sample)
   }
 }
 
-void SoundSystem::playMusic (int sample)
+void SoundSystem::playMusic ()
 {
   if (!music) return;
   if (volumemusic == 0) return;
@@ -350,7 +362,8 @@ void SoundSystem::playMusic (int sample)
   }*/
   musicplaying = true;
 //  haltMusic ();
-  switch (sample)
+  Mix_PlayMusic (music1, -1);
+/*  switch (sample)
   {
     case MUSIC_DARK1:
       Mix_PlayMusic (musicdark1, -1);
@@ -364,7 +377,7 @@ void SoundSystem::playMusic (int sample)
     case MUSIC_ELECTRO1:
       Mix_PlayMusic (musicelectro1, -1);
       break;
-  }
+  }*/
   setVolumeMusic ();
 #endif
 }
@@ -375,6 +388,29 @@ void SoundSystem::haltMusic ()
   musicplaying = false;
   playtime = SDL_GetTicks ();
   Mix_HaltMusic ();
+#endif
+}
+
+void SoundSystem::loadMusic (int sample)
+{
+#ifdef HAVE_SDL_MIXER
+  if (music1)
+    Mix_FreeMusic (music1);
+  switch (sample)
+  {
+    case MUSIC_DARK1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
+      break;
+    case MUSIC_WINNER1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
+      break;
+    case MUSIC_STANDBY1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
+      break;
+    case MUSIC_ELECTRO1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
+      break;
+  }
 #endif
 }
 

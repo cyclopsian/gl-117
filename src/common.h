@@ -35,6 +35,7 @@
 #define CONTROLS_KEYBOARD 0
 #define CONTROLS_MOUSE 1
 #define CONTROLS_JOYSTICK 2
+#define CONTROLS_MOUSE_REVERSE 3
 
 // preferences
 extern int quality;

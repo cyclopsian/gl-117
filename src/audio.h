@@ -86,7 +86,7 @@ class SoundSystem
   int volumesound, volumemusic;
 #ifdef HAVE_SDL_MIXER
   int playtime;
-  Mix_Music *musicstandby1, *musicwinner1, *musicdark1, *musicelectro1;
+  Mix_Music *music1;
 #endif
   WaveFile *waveexplosion1, *waveclick1, *wavecannon1, *wavemissile1;
   WaveFile *wavethunder1, *waveplane1, *wavehit1;
@@ -96,7 +96,8 @@ class SoundSystem
   void playLoop (int sample);
   void stop (int sample);
   void stopAll ();
-  void playMusic (int music);
+  void playMusic ();
+  void loadMusic (int music);
   void haltMusic ();
   void setVolume (int sample, int level);
   void setVolume ();

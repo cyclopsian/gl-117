@@ -801,7 +801,7 @@ class MissionTutorial1 : public Mission
         font1->drawTextCentered (0, 6, -2.5, "THE FIGHTER SHOULD FLY STRAIGHT ON", &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "IF NOT, RECALIBRATE YOUR JOYSTICK", &textcolor);
       }
-      else if (controls == 1)
+      else if (controls == 1 || controls == 3)
       {
         font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", &textcolor);
         font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", &textcolor);
@@ -836,6 +836,12 @@ class MissionTutorial1 : public Mission
         font1->drawTextCentered (0, 7, -2.5, "THE KEYBOARD INTERFACE IS NOT SO EASY", &textcolor);
         font1->drawTextCentered (0, 6, -2.5, "USING THE MOUSE IS STRONLY RECOMMENDED", &textcolor);
       }
+      else if (controls == 3)
+      {
+        font1->drawTextCentered (0, 7, -2.5, "THE REVERTED MOUSE IS FOR REAL GAMERS ONLY", &textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "THE STANDARD MOUSE INTERFACE MAY BE", &textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "EASIER TO LEARN", &textcolor);
+      }
     }
     else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - 20)
     {
@@ -845,7 +851,7 @@ class MissionTutorial1 : public Mission
         font1->drawTextCentered (0, 6, -2.5, "THE ELEVATOR", &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "YOU'LL START TO FLY A LOOP", &textcolor);
       }
-      else if (controls == 1 || controls == 0)
+      else if (controls == 1 || controls == 0 || controls == 3)
       {
         font1->drawTextCentered (0, 7, -2.5, "MOVING RIGHT OR LEFT WILL AFFECT THE AILERON", &textcolor);
         font1->drawTextCentered (0, 6, -2.5, "MOVING UP OR DOWN WILL AFFECT THE ELEVATOR", &textcolor);
@@ -860,7 +866,7 @@ class MissionTutorial1 : public Mission
         font1->drawTextCentered (0, 6, -2.5, "YOU MAY ALTER THE FIGHTER'S RUDDER", &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "YOU'LL SLIGHTLY FLY TO THE LEFT OR RIGHT", &textcolor);
       }
-      else if (controls == 1)
+      else if (controls == 1 || controls == 3)
       {
         font1->drawTextCentered (0, 7, -2.5, "MOVING THE MOUSE SLIGHTLY LEFT OR RIGHT", &textcolor);
         font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE RUDDER.", &textcolor);
@@ -894,7 +900,7 @@ class MissionTutorial1 : public Mission
         font1->drawTextCentered (0, 6, -2.5, "1: FIRE CANNON, 2: TARGET NEAREST ENEMY", &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "3: FIRE MISSILE, 4: CHOOSE MISSILE", &textcolor);
       }
-      else if (controls == 1)
+      else if (controls == 1 || controls == 3)
       {
         font1->drawTextCentered (0, 7, -2.5, "LEFT MOUSE BUTTON: FIRE CANNON", &textcolor);
         font1->drawTextCentered (0, 6, -2.5, "RIGHT MOUSE BUTTON: FIRE MISSILE", &textcolor);
@@ -3651,7 +3657,7 @@ void save_config ()
   cf->writeText ("# Music volume: 0..100 (default=100) per cent");
   cf->write (" music", (int) volumemusic);
 #endif
-  cf->writeText ("# Piloting controls: 0=keyboard, 1=mouse, 2=joystick");
+  cf->writeText ("# Piloting controls: 0=keyboard, 1=mouse easy, 2=joystick, 3=mouse reverse");
   cf->write (" controls", controls);
   cf->writeText ("# Difficulty level: 0=easy, 1=medium, 2=hard");
   cf->write (" difficulty", difficulty);
@@ -3757,7 +3763,7 @@ int load_config ()
   else
   { controls = atoi (str); }
   if (controls < 0) controls = 0;
-  else if (controls > 2) controls = 0;
+  else if (controls > 3) controls = 0;
 
   str = cf->getString (ret, "difficulty");
   if (str == NULL)
@@ -4442,11 +4448,12 @@ void playRandomMusic ()
 {
   int r = myrandom (3);
   if (r == 0)
-    sound->playMusic (MUSIC_DARK1);
+    sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
-    sound->playMusic (MUSIC_STANDBY1);
+    sound->loadMusic (MUSIC_STANDBY1);
   else
-    sound->playMusic (MUSIC_ELECTRO1);
+    sound->loadMusic (MUSIC_ELECTRO1);
+  sound->playMusic ();
 }
 
 void switch_menu ()
@@ -4475,7 +4482,10 @@ void switch_stats ()
   stats_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_WINNER1);
+  {
+    sound->loadMusic (MUSIC_WINNER1);
+    sound->playMusic ();
+  }
 }
 
 void createMission (int missionid)
@@ -4593,7 +4603,8 @@ void switch_finish ()
   credits_reshape ();
   if (sound->musicplaying)
     sound->haltMusic ();
-  sound->playMusic (MUSIC_ELECTRO1);
+  sound->loadMusic (MUSIC_ELECTRO1);
+  sound->playMusic ();
   sound->stop (SOUND_PLANE1);
 }
 
@@ -4984,7 +4995,7 @@ void game_easymouse ()
 
 void game_mousemotion (int x, int y)
 {
-  if (controls != CONTROLS_MOUSE) return;
+  if (controls != CONTROLS_MOUSE && controls != CONTROLS_MOUSE_REVERSE) return;
 
 /* Bernd: Please activate the following return to disable this method! */
 //  return;
@@ -4992,7 +5003,8 @@ void game_mousemotion (int x, int y)
   float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
   float dx = x - mx, dy = my - y;
-
+  if (controls == CONTROLS_MOUSE_REVERSE)
+    dy *= -1;
 /*  int t = (int) fplayer->theta;
   if (t < 0) t += 360;
   float rx = dx * cosi [t] - dy * sine [t];
@@ -6309,8 +6321,11 @@ void menu_mouse (int button, int state, int x, int y)
           if (button == MOUSE_BUTTON_LEFT)
           {
             fplayer->rolleffect = 0;
-            controls ++;
-            if (controls > 2) controls = 0;
+            if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
+            else if (controls == CONTROLS_MOUSE) controls = CONTROLS_MOUSE_REVERSE;
+            else if (controls == CONTROLS_MOUSE_REVERSE) controls = CONTROLS_JOYSTICK;
+            else if (controls == CONTROLS_JOYSTICK) controls = 0;
+            if (controls > 3) controls = 0;
             if (controls == 2 && !joystick) controls = 0;
 #ifdef USE_GLUT
             if (controls == 0) controls = 1;
@@ -6814,10 +6829,11 @@ void menu_display ()
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
 //    yt -= 2;
-    strcpy (buf, "CONTROLS: ");
+    strcpy (buf, "USE: ");
     if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
-    else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE");
+    else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE EASY");
     else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
+    else if (controls == CONTROLS_MOUSE_REVERSE) strcat (buf, "MOUSE REVERSE");
     if (menuitemselected == 13)
       font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
@@ -7547,7 +7563,7 @@ if (quality > 0)
     font1->drawTextCentered (0, -4, -2, buf, &colred);
   }*/
 
-  if (controls == CONTROLS_MOUSE)
+  if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE)
     drawMouseCursor ();
 
   if (debug)
@@ -9078,7 +9094,7 @@ void sdlMainLoop ()
       }
     }
 //    printf ("\nx=%d, y=%d", joystickx, joysticky);
-    if (controls >= CONTROLS_JOYSTICK)
+    if (controls == CONTROLS_JOYSTICK)
     {
       myJoystickAxisFunc (joystickx, joysticky, joystickt, joystickr);
       if (joystickbutton == 0)
@@ -9445,7 +9461,7 @@ printf ("\nEntering mode %dx%d:%d,%d ", width, height, bpp, video_flags); fflush
   sound->setVolumeMusic ();
 
   if (debug) { printf ("\nplay Music"); fflush (stdout); }
-  sound->playMusic (MUSIC_STANDBY1);
+  sound->playMusic ();
 
   if (debug) { printf ("\nfirst init for intro"); fflush (stdout); }
   myFirstInit ();
@@ -9463,7 +9479,7 @@ printf ("\nEntering mode %dx%d:%d,%d ", width, height, bpp, video_flags); fflush
   {
     printf ("\nNo joystick found."); fflush (stdout);
     sdljoystick = NULL;
-    if (controls >= 2)
+    if (controls == 2)
       controls = CONTROLS_MOUSE;
   }
 
