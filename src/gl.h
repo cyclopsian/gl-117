@@ -34,10 +34,13 @@
 #include <GL/gl.h>
 #include <GL/glu.h>*/
 #endif
+
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+#include "common.h"
 #include "model.h"
-#include "main.h"
 
 class GL
 {

@@ -25,10 +25,13 @@
 #define IS_AUDIO_H
 
 #include <stdlib.h>
-#include "main.h"
+
 #ifndef USE_GLUT
 #include "SDL/SDL.h"
 #endif
+
+#include "common.h"
+#include "dirs.h"
 
 class WaveFile
 {

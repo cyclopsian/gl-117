@@ -24,7 +24,9 @@
 #ifndef IS_AIOBJECT_H
 
 #include "aiobject.h"
-#include "gl.h"
+
+#include "glland.h"
+#include "main.h"
 
 int DynamicObj::net_write ()
 {

@@ -23,8 +23,9 @@
 
 #ifndef IS_EFFECTS_H
 
-#include "main.h"
 #include "effects.h"
+
+#include "glland.h"
 
 const float smokezoom[] = { 0.02, 0.035, 0.05, 0.065, 0.085, 0.1, 0.11, 0.12, 0.1, 0.09, 0.05 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;

@@ -4718,11 +4718,11 @@ void game_key (unsigned char key, int x, int y)
       fplayer->targetNext ((AIObj **) fighter);
       sound->play (SOUND_CLICK1);
     }
-    else if (key == 'k')
+/*    else if (key == 'k')
     {
       if (fplayer->target != NULL)
         fplayer->target->shield = 0;
-    }
+    }*/
 /*    else if (key == 'g')
     {
       if (polygonMode==GL_FILL)

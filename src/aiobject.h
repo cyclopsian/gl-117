@@ -76,7 +76,7 @@
 #define STATIC_BASE1 10303
 #define ASTEROID 50
 
-#include "main.h"
+//extern GLLandscape *l;
 
 class DynamicObj : public CSpaceObj
 {

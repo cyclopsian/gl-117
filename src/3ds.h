@@ -30,6 +30,7 @@
 
 #include "model.h"
 #include "gl.h"
+#include "dirs.h"
 
 // Primary Chunk
 #define PRIMARY       0x4D4D

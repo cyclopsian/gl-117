@@ -24,6 +24,15 @@
 #ifndef IS_EFFECTS_H
 #define IS_EFFECTS_H
 
+#ifdef USE_GLUT
+#include <GL/glut.h>
+#else
+#include <GL/glut.h>
+/*#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glu.h>*/
+#endif
+
 #include "model.h"
 #include "mathtab.h"
 #include "object.h"
