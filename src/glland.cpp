@@ -1307,6 +1307,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
       glVertex3fv (pos [j]);
     }
     glEnd();
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable (GL_ALPHA_TEST);
     glDisable (GL_BLEND);
 //  glEnable (GL_DEPTH_TEST);

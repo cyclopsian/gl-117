@@ -77,7 +77,7 @@ void Cockpit::setColor (CColor *color, int alpha)
 void Cockpit::drawCounter ()
 {
   int i;
-  float xf = 7.0F, yf = -3.0F, zf = -10.0F;
+  float xf = 7.0F, yf = -3.0F, zf = -11.0F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   bool flarewarn = false, chaffwarn = false;
   for (i = 0; i < maxmissile; i ++)
@@ -250,6 +250,7 @@ void Cockpit::drawCross ()
 
 void Cockpit::drawHeading ()
 {
+  char str [STDSIZE];
   CColor color;
   int i = 0;
   int alpha = 175;
@@ -369,6 +370,9 @@ void Cockpit::drawHeading ()
         font1->drawText (yf - 2.0, xf - 0.5, zf, "60", &color);
     }
   }
+  
+  sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
+  font1->drawText (-12.0, -8.5, -4.0, str, &color);
 
   gl->enableAlphaBlending ();
   int t1 = (int) (fplayer->theta - 135.0);
@@ -452,8 +456,6 @@ void Cockpit::drawWeapon ()
   font1->drawText (16.0, -22.0, -4.0, missile->name, &color);
   sprintf (str, "N %d", fplayer->missiles [fplayer->missiletype]);
   font1->drawText (16.0, -24.0, -4.0, str, &color);
-  sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
-  font1->drawText (16.0, -27.0, -4.0, str, &color);
 }
 
 void Cockpit::drawRadar ()
@@ -477,7 +479,7 @@ void Cockpit::drawRadar ()
   else
   {
     gl->enableTextures (texradar1->textureID);
-    xl = 1.5; yl = 1.2;
+    xl = 1.3; yl = 1.2;
     type = 1;
   }
   glBegin (GL_QUADS);

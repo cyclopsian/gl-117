@@ -2518,7 +2518,12 @@ void fighter_display ()
   else if (aktfighter == 6) { model = &model_figg; id = FIGHTER_REDARROW; }
   else if (aktfighter == 7) { model = &model_figf; id = FIGHTER_PHOENIX; }
   else { model = &model_figh; id = FIGHTER_BLACKBIRD; }
+
+/* Some code to get screenshots of missiles
+glClearColor (1, 1, 1, 1);
 gl->clearScreen ();
+model = &model_missile7; */
+
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
   model->draw (&vec, &tl, &rot, 1.0, 1.0, 0);
@@ -4196,6 +4201,7 @@ void game_display ()
   if (camera != 50)
   {
     space->lum = sunlight;
+//    printf ("sunlight=%f\n", space->lum);
     for (i = 0; i < space->no; i ++)
     {
       if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
