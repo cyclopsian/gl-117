@@ -898,25 +898,25 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   if (id == MISSILE_AIR1)
   {
     intelligence = 100;
-    maxspeed = 0.4;
-    nimbility = 3.2; // old 2.2
-    manoeverability = 2.2;
+    maxspeed = 0.38;
+    nimbility = 3.5; // old 2.2
+    manoeverability = 2.5;
     ttl = 200;
     impact = 40;
   }
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
-    maxspeed = 0.42;
-    nimbility = 4.5; // old 3.5
-    manoeverability = 2.8;
+    maxspeed = 0.4;
+    nimbility = 4.8; // old 3.5
+    manoeverability = 3.0;
     ttl = 220;
     impact = 50;
   }
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
-    maxspeed = 0.44;
+    maxspeed = 0.42;
     nimbility = 6.0;
     manoeverability = 3.5;
     ttl = 250;
@@ -955,18 +955,18 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_FF1)
   {
     intelligence = 0;
-    maxspeed = 0.4;
+    maxspeed = 0.45;
     nimbility = 3.0;
-    manoeverability = 2.5;
+    manoeverability = 1.6;
     ttl = 250;
     impact = 50;
   }
   else if (id == MISSILE_FF2)
   {
     intelligence = 0;
-    maxspeed = 0.45;
+    maxspeed = 0.47;
     nimbility = 4.0;
-    manoeverability = 3.0;
+    manoeverability = 2.0;
     ttl = 250;
     impact = 60;
   }
@@ -1168,12 +1168,12 @@ void AIObj::fireCannon (DynamicObj **laser)
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
-//printf ("%d:m=%d\n", party, id); fflush (stdout);
+printf ("%d:m=%d\n", party, id); fflush (stdout);
   missile->dinit ();
   missile->aiinit ();
   missile->newinit (id, party, 0);
   initValues (missile, phi);
-  missile->id = MISSILE1;
+  missile->id = id;
   missile->explode = 0;
   missile->speed = speed + 0.0005;
   missile->recspeed = 0.5;
@@ -1344,11 +1344,11 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
           bool hit = false;
           if (easymodel)
           {
-            if (myrandom (theta + 30) > 50) hit = true;
+            if (myrandom (theta + 10) > 35) hit = true;
           }
           else
           {
-            if (myrandom (fabs (aileroneffect) * 90 + 30) > 50) hit = true;
+            if (myrandom (fabs (aileroneffect) * 90 + 10) > 35) hit = true;
           }
           if (hit)
             missile [i]->target = flare [i];
@@ -1382,11 +1382,11 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
           bool hit = false;
           if (easymodel)
           {
-            if (myrandom (theta + 30) > 50) hit = true;
+            if (myrandom (theta + 15) > 35) hit = true;
           }
           else
           {
-            if (myrandom (fabs (aileroneffect) * 90 + 30) > 50) hit = true;
+            if (myrandom (fabs (aileroneffect) * 90 + 15) > 35) hit = true;
           }
           if (hit)
             missile [i]->target = chaff [i];
@@ -1980,7 +1980,7 @@ m [0]->tl->y = target->tl->y;
       recspeed = maxspeed;
     }
     // fire cannon?
-    float agr = 4.0 - aggressivity / 100;
+    float agr = 4.0 - (float) aggressivity / 100;
     if (fabs (rectheta - theta) < 2 + agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
       fireCannon (c);
     else if (disttarget < 2 + agr && fabs (aw) < 20 + agr * 4)
@@ -1990,12 +1990,12 @@ m [0]->tl->y = target->tl->y;
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
-        if (fabs (rectheta - theta) < 25 + agr * 5 && fabs (aw) < 40 + agr * 4 && disttarget < 40/* && target->theta < 20*/)
+        if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 40/* && target->theta < 20*/)
           fireMissile (m, (AIObj *) target);
       }
       else // ground target
       {
-        if (fabs (rectheta - theta) < 5 + agr && fabs (aw) < 25 + agr * 4 && disttarget < 50)
+        if (fabs (rectheta - theta) < 3 + agr * 2 && fabs (aw) < 25 + agr * 4 && disttarget < 50)
           fireMissile (m);
       }
     }

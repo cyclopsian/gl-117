@@ -109,7 +109,7 @@ int clouds = 0;
 
 
 CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
-CTexture *texradar1, *texradar2;
+CTexture *texradar1, *texradar2, *texcounter;
 
 CTexture *texclouds1, *texclouds2, *texclouds3;
 
@@ -3132,6 +3132,13 @@ Mission *missionnew = NULL;
 class Cockpit
 {
   public:
+  int flarewarning, chaffwarning;
+
+  Cockpit ()
+  {
+    flarewarning = 0;
+    chaffwarning = 0;
+  }
 
 /*  float getGamma (DynamicObj *obj)
   {
@@ -3174,6 +3181,67 @@ class Cockpit
     else if (fplayer->o == &model_figc) color->setColor (200, 200, 100, alpha);
     else if (fplayer->o == &model_figg) color->setColor (255, 0, 0, alpha);
     else color->setColor (100, 100, 255, alpha);
+  }
+
+  void drawCounter ()
+  {
+    int i;
+    float xf = 6.5F, yf = -3.0F, zf = -10.0F;
+//    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    bool flarewarn = false, chaffwarn = false;
+    for (i = 0; i < maxmissile; i ++)
+      if (missile [i]->active)
+        if (missile [i]->target == fplayer)
+        {
+          if (missile [i]->id <= MISSILE_AIR1)
+            flarewarn = true;
+          else
+            chaffwarn = true;
+        }
+    if (flarewarn)
+    {
+      if (flarewarning <= 0) flarewarning = 10;
+      flarewarning --;
+      if (flarewarning <= 6)
+      {
+        glColor3ub (200, 0, 0);
+        glBegin (GL_QUADS);
+        glVertex3f (xf - 1.0F, yf - 1.0F, zf);
+        glVertex3f (xf + 1.0F, yf - 1.0F, zf);
+        glVertex3f (xf + 1.0F, yf - 0.25F, zf);
+        glVertex3f (xf - 1.0F, yf - 0.25F, zf);
+        glEnd ();
+      }
+    }
+    if (chaffwarn)
+    {
+      if (chaffwarning <= 0) chaffwarning = 10;
+      chaffwarning --;
+      if (chaffwarning <= 6)
+      {
+        glColor3ub (0, 0, 200);
+        glBegin (GL_QUADS);
+        glVertex3f (xf - 1.0F, yf + 0.25F, zf);
+        glVertex3f (xf + 1.0F, yf + 0.25F, zf);
+        glVertex3f (xf + 1.0F, yf + 1.0F, zf);
+        glVertex3f (xf - 1.0F, yf + 1.0F, zf);
+        glEnd ();
+      }
+    }
+    glColor3ub (255, 255, 255);
+    gl->enableTextures (texcounter->textureID);
+    glEnable (GL_BLEND);
+    glBegin (GL_QUADS);
+    glTexCoord2f (0, 0);
+    glVertex3f (xf - 1.0F, yf - 1.0F, zf);
+    glTexCoord2f (0.999, 0);
+    glVertex3f (xf + 1.0F, yf - 1.0F, zf);
+    glTexCoord2f (0.999, 0.999);
+    glVertex3f (xf + 1.0F, yf + 1.0F, zf);
+    glTexCoord2f (0, 0.999);
+    glVertex3f (xf - 1.0F, yf + 1.0F, zf);
+    glEnd ();
+    glDisable (GL_BLEND);
   }
 
   void drawTargeter ()
@@ -7743,6 +7811,7 @@ if (quality > 0)
     cockpit->drawRadar ();
     cockpit->drawTargetedElement ();
     cockpit->drawWeapon ();
+    cockpit->drawCounter ();
   }
 //  glPopMatrix ();
 //  glutStrokeCharacter (GLUT_STROKE_ROMAN, 'A');
@@ -8588,6 +8657,7 @@ void myInit ()
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
   texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
   texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
+  texcounter = gl->genTextureTGA (dirs->getTextures ("counter.tga"), 0, 1, 0, true);
   texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
   texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
