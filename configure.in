@@ -2,6 +2,28 @@ AC_INIT(src/main.cpp)
 AM_INIT_AUTOMAKE(gl-117,0.8.2,200302170000)
 AM_CONFIG_HEADER(config.h)
 
+AC_ARG_WITH(opengl-dir, AC_HELP_STRING([--with-opengl-dir=<path>],[Search for OpenGL files in <path>]))
+AC_ARG_WITH(sdl-dir, AC_HELP_STRING([--with-sdl-dir=<path>],[Search for SDL files in <path>]))
+
+AC_DEFUN(GL_PATH_CHECK, [
+ AC_MSG_CHECKING(for $1 directory)
+ path=""
+ for tmp in /usr/local /usr/X11R6 /usr $3
+ do
+  if test -f $tmp/include/$2 ; then
+   path=$tmp
+  fi
+ done
+ if test -z $path ; then
+  AC_MSG_RESULT(not found)
+ else
+  AC_MSG_RESULT($path)
+  CPPFLAGS="$CPPFLAGS -I$path/include"
+  CXXFLAGS="$CXXFLAGS -I$path/include"
+  LIBS="$LIBS -L$path/lib"
+ fi
+])
+
 AH_TEMPLATE([HAVE_SDL],[Use SDL library])
 AH_TEMPLATE([HAVE_SDL_MIXER],[Use SDL mixer library])
 AH_TEMPLATE([HAVE_GL],[Use GL library])
@@ -9,16 +31,17 @@ AH_TEMPLATE([HAVE_GLU],[Use GLU library])
 AH_TEMPLATE([HAVE_GLUT],[Use GLUT library])
 
 LDFLAGS="$LDFLAGS -lm"
-
 AC_PROG_CXX
 AC_PROG_CC
 AC_LANG_C
-
 AC_PROG_INSTALL
-
 AC_PROG_MAKE_SET
 
 AC_C_BIGENDIAN()
+
+GL_PATH_CHECK(OpenGL,GL/gl.h,$with_opengl_dir)
+GL_PATH_CHECK(SDL,SDL/SDL.h,$with_sdl_dir)
+
 AC_CHECK_HEADER(GL/gl.h,AC_DEFINE(HAVE_GL),AC_MSG_ERROR(gl.h not found - please install OpenGL- or Mesa-devel))
 AC_CHECK_HEADER(GL/glu.h,AC_DEFINE(HAVE_GLU),AC_MSG_ERROR(glu.h not found - please install GLU- or MesaGLU-devel))
 AC_CHECK_HEADER(GL/glut.h,AC_DEFINE(HAVE_GLUT),AC_MSG_ERROR(glut.h not found - please install GLUT- or MesaGLUT-devel))
