@@ -879,8 +879,8 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   }
   float midh = (minh + maxh) / 2 * zoomz - zoomz2;
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
-  if (size < hh2 / 2)
-    size = hh2 / 2;
+  if (size < hh2 / 2 * step)
+    size = hh2 / 2 * step;
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
     return;
   if (tex1 [x] [y] == 0xFF)
@@ -1151,7 +1151,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2*step))
     return;
 
   if (tex1 [x] [y] == 0xFF)
@@ -1290,7 +1290,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2*step))
     return;
 
 /*              int a = selectColor (x, y+step);
