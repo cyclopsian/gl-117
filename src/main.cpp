@@ -3781,11 +3781,13 @@ int load_config ()
   else
   { modes [3] = atoi (str); }*/
 
-  delete cf;
-
   if (cf->buf [0] == 0) // no file found
+  {
+    delete cf;
     return 0;
-  
+  }
+
+  delete cf;
   return 1;
 }
 
@@ -4984,6 +4986,10 @@ void game_mousemotion (int x, int y)
   if (fabs (dx) <= width / 15 && fabs (dy) <= height / 15)
   {
     fplayer->ruddereffect = (float) dx / width * 15.0; // damit ist automatisch -1<=ruddereffect<=1
+    fplayer->rolleffect = 0;
+  }
+  else if (fabs (dx) <= width / 15)
+  {
     fplayer->rolleffect = 0;
   }
   else
