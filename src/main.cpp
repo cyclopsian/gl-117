@@ -75,7 +75,7 @@ int net_thread_main (void *data);
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_MOST;
+int debuglevel = LOG_ALL;
 
 SoundSystem *sound = NULL;
 
@@ -191,7 +191,7 @@ class InitKugel
   int explosion;
   CModel *m;
   CVector3 tl;
-  InitKugel(){}
+  InitKugel () {}
 
   InitKugel (CModel *m)
   {
@@ -314,6 +314,7 @@ HighClouds *highclouds2;
 //GLLandscape *l;
 CModel *obj, *objlaser, *objmissile;
 CVector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
+CRotation *rotnull, *rotmissile;
 
 EditField pilotedit;
 
@@ -606,9 +607,32 @@ void setLightSource (int gamma)
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
+CModel *getModel (int id)
+{
+  if (id == FIGHTER_FALCON) return &model_fig;
+  else if (id == FIGHTER_SWALLOW) return &model_figa;
+  else if (id == FIGHTER_HAWK) return &model_figb;
+  else if (id == FIGHTER_HAWK2) return &model_figc;
+  else if (id == FIGHTER_BUZZARD) return &model_figd;
+  else if (id == FIGHTER_CROW) return &model_fige;
+  else if (id == FIGHTER_PHOENIX) return &model_figf;
+  else if (id == FIGHTER_REDARROW) return &model_figg;
+  else if (id == FIGHTER_BLACKBIRD) return &model_figh;
+  else if (id == FIGHTER_TRANSPORT) return &model_figt;
+  else if (id == MISSILE_AIR1) return &model_missile1;
+  else if (id == MISSILE_AIR2) return &model_missile2;
+  else if (id == MISSILE_AIR3) return &model_missile3;
+  else if (id == MISSILE_GROUND1) return &model_missile4;
+  else if (id == MISSILE_GROUND2) return &model_missile5;
+  else if (id == MISSILE_DF1) return &model_missile6;
+  else if (id == MISSILE_FF1) return &model_missile7;
+  else if (id == MISSILE_FF2) return &model_missile8;
+  return &model_fig;
+}
+
 void game_levelInit ()
 {
-  int i;
+  int i, i2;
 
   initing = true;
   flash = 0;
@@ -650,6 +674,8 @@ void game_levelInit ()
     mission->start ();
   }
 
+
+
   if (clouds == 0) highclouds->setTexture (NULL);
   else if (clouds == 1) highclouds->setTexture (texclouds1);
   else if (clouds == 2) highclouds->setTexture (texclouds2);
@@ -659,6 +685,28 @@ void game_levelInit ()
   else if (clouds == 1) highclouds2->setTexture (texclouds1);
   else if (clouds == 2) highclouds2->setTexture (texclouds2);
   else if (clouds == 3) highclouds2->setTexture (texclouds3);
+
+  for (i = 0; i < maxfighter; i ++)
+  {
+    if (fighter [i]->id >= FIGHTER1 && fighter [i]->id <= FIGHTER2)
+      for (i2 = 0; i2 < 4; i2 ++)
+      {
+        int type = fighter [i]->missilerack [i2];
+        CModel *rm = getModel (MISSILE1 + type);
+        fighter [i]->refmodel [i2 * 3] = rm;
+        fighter [i]->refmodel [i2 * 3 + 1] = rm;
+        fighter [i]->refmodel [i2 * 3 + 2] = rm;
+        fighter [i]->reftl [i2 * 3 + 1].z = fighter [i]->reftl [i2 * 3].z - 0.04;
+        fighter [i]->reftl [i2 * 3 + 2].z = fighter [i]->reftl [i2 * 3].z + 0.04;
+        fighter [i]->reftl [i2 * 3].y = fighter [i]->reftl [i2 * 3 + 1].y - 0.04;
+        int tmp = fighter [i]->missilerackn [i2];
+        fighter [i]->refscale [i2 * 3] = 0.25;
+        fighter [i]->refscale [i2 * 3 + 1] = 0.25;
+        fighter [i]->refscale [i2 * 3 + 2] = 0.25;
+        if (tmp < 3) fighter [i]->refscale [i2 * 3] = 0;
+        if (tmp < 2) fighter [i]->refscale [i2 * 3 + 1] = 0;
+      }
+  }
 
   for (i = 0; i < maxfighter; i ++)
   {
@@ -734,12 +782,13 @@ void game_levelInit ()
     if (day)
     {
       laser [i]->o = &model_cannon1;
-      laser [i]->zoom = 0.07;
+      laser [i]->zoom = 0.05;
+      laser [i]->drawlight = false;
     }
     else
     {
       laser [i]->o = &model_cannon2;
-      laser [i]->zoom = 0.1;
+      laser [i]->zoom = 0.08;
     }
   }
 
@@ -1443,11 +1492,15 @@ void game_keyspecial (int key, int x, int y)
     fplayer->rolleffect = -5;
     break;
   case KEY_PGUP:
+#ifndef USE_GLUT
   case KEY_LALT:
+#endif
     fplayer->ruddereffect = 1.0;
     break;
   case KEY_PGDOWN:
+#ifndef USE_GLUT
   case KEY_LCTRL:
+#endif
     fplayer->ruddereffect = -1.0;
     break;
   case KEY_F1:
@@ -1922,24 +1975,6 @@ void fighter_key (unsigned char key, int x, int y)
   {
     switch_menu ();
   }
-}
-
-CModel *getModel (int id)
-{
-  if (id == FIGHTER_FALCON) return &model_fig;
-  else if (id == FIGHTER_SWALLOW) return &model_figa;
-  else if (id == FIGHTER_HAWK) return &model_figb;
-  else if (id == FIGHTER_HAWK2) return &model_figc;
-  else if (id == FIGHTER_BUZZARD) return &model_figd;
-  else if (id == FIGHTER_CROW) return &model_fige;
-  else if (id == FIGHTER_PHOENIX) return &model_figf;
-  else if (id == FIGHTER_REDARROW) return &model_figg;
-  else if (id == FIGHTER_BLACKBIRD) return &model_figh;
-  else if (id == FIGHTER_TRANSPORT) return &model_figt;
-  else if (id == MISSILE_AIR1) return &model_missile1;
-  else if (id == MISSILE_GROUND1) return &model_missile4;
-  else if (id == MISSILE_DF1) return &model_missile6;
-  return &model_fig;
 }
 
 char *getModelText (int id)
@@ -2603,8 +2638,8 @@ void game_quit ()
   save_configInterface ();
   pilots->save (dirs->getSaves ("pilots"));
   display ("Pilots saved", LOG_MOST);
-  for (i = 0; i < maxfighter; i ++)
-    delete (fighter [i]);
+/*  for (i = 0; i < maxfighter; i ++)
+    delete (fighter [i]);*/
   for (i = 0; i < maxlaser; i ++)
     delete (laser [i]);
   for (i = 0; i < maxmissile; i ++)
@@ -4126,7 +4161,7 @@ void game_display ()
       else
         space->o [i]->lum = 1.0;
     }
-    if (flash > 5)
+    if (flash > 7)
     {
       if (quality <= 2)
         flash1->draw ();
@@ -4370,6 +4405,21 @@ void game_display ()
     }
   }
 
+/*    glColor4ub (0, 0, 0, 40);
+    float xf = 2.0, yf = 1.5, zf = 1.0;
+    glDisable (GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBegin (GL_QUADS);
+    glVertex3f (-xf, -yf, -zf);
+    glVertex3f (-xf, yf, -zf);
+    glVertex3f (xf, yf, -zf);
+    glVertex3f (xf, -yf, -zf);
+    glEnd ();
+    gl->disableAlphaBlending ();
+    glDisable (GL_BLEND);
+    glEnable (GL_DEPTH_TEST);*/
+
 //  glPopMatrix ();
 //  glutStrokeCharacter (GLUT_STROKE_ROMAN, 'A');
 
@@ -4500,9 +4550,9 @@ void game_timer ()
     vibration = 25;
   }
 
-  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (40))
+  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (50))
   {
-    flash = 10;
+    flash = 12;
     int fphi = (int) camphi + myrandom (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
@@ -4520,7 +4570,7 @@ void game_timer ()
 
   if (flash)
     flash --;
-  if (flash <= 5 && flash > 0)
+  if (flash <= 7 && flash > 0)
     flash --;
 
   if (lastthrust != fplayer->thrust && !(gametimer & 15))
@@ -4798,7 +4848,7 @@ int net_thread_main (void *data)
 
   if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
   {
-    flash = 10;
+    flash = 12;
     int fphi = (int) camphi + myrandom (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
@@ -4814,7 +4864,7 @@ int net_thread_main (void *data)
 
   if (flash)
     flash --;
-  if (flash <= 5 && flash > 0)
+  if (flash <= 7 && flash > 0)
     flash --;
 
   if (lastthrust != fplayer->thrust && !(gametimer & 15))
@@ -5159,9 +5209,38 @@ void join_timer ()
 #endif
 }
 
-void myInit ()
+void setMissiles (CModel *model)
 {
   int i;
+  CVector3 tlmissile (0, 0.3, 0.3);
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    if (model->object [i]->numVertices == 4)
+    {
+      CObject *o = model->object [i];
+      float sumx = 0, sumz = 0;
+      float maxy = 2;
+      int i2;
+      for (i2 = 0; i2 < o->numVertices; i2 ++)
+      {
+        sumx += o->vertex [i2].vector.x;
+        if (o->vertex [i2].vector.y < maxy)
+          maxy = o->vertex [i2].vector.y;
+        sumz += o->vertex [i2].vector.z;
+      }
+      tlmissile.x = sumx / 4.0F;
+      tlmissile.y = maxy;
+      tlmissile.z = sumz / 4.0F;
+
+      tlmissile.y = maxy;
+      model->addRefPoint (&tlmissile);
+    }
+  }
+}
+
+void myInit ()
+{
+  int i, i2;
   texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
   texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
   texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
@@ -5181,9 +5260,9 @@ void myInit ()
   textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
   textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
   texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
-  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, 4, 1, true);
-  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 4, 1, true);
-  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 5, 1, true);
+  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, -1, 1, true);
+  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, -1, 1, true);
+  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke3.tga"), 0, 5, 1, true);
   texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, -1, 1, true);
   texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
   texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 0, true);
@@ -5209,6 +5288,10 @@ void myInit ()
   tlinf = new CVector3 (1E10, 1E10, 1E10);
   tlminf = new CVector3 (-1E10, -1E10, -1E10);
   tlnull = new CVector3 (0, 0, 0);
+  rotnull = new CRotation ();
+  rotmissile = new CRotation ();
+  rotmissile->a = 90;
+  rotmissile->c = 270;
 
   for (i = 0; i < maxgroundobj; i ++)
   {
@@ -5222,8 +5305,11 @@ void myInit ()
   ((CSphere *) explsphere)->init (1, 9);
   CColor explcolor (255, 255, 1);
   explsphere->setColor (&explcolor);
+  explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
-    explsphere->object [0]->vertex [i].color.setColor (myrandom (100) + 155, myrandom (100) + 100, 0);
+  {
+    explsphere->object [0]->vertex [i].color.setColor (myrandom (100) + 155, myrandom (100) + 100, 0, myrandom (3) / 2 * 255);
+  }
 //  ((CSphere *) explsphere)->invertNormals ();
   for (i = 0; i < maxexplosion; i ++)
   {
@@ -5238,6 +5324,8 @@ void myInit ()
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i] = new AIObj (space, &model_fig, 0.4);
+    for (i2 = 0; i2 < 12; i2 ++)
+      fighter [i]->addRefModel (&model_missile1, tlnull, rotmissile, 0.2);
   }
 
   highclouds = new HighClouds (25);
@@ -5346,24 +5434,42 @@ void myFirstInit ()
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 //  texfont1 = gl->genTextureTGA ("../textures/font2.tga", 0, 1, 0);
   display ("Loading 3ds models", LOG_ALL);
-  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig7.3ds"));
+//  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig1.3ds"));
+  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
-  g_Load3ds.Import3DS (&model_figa, dirs->getModels ("fig4.3ds"));
+  model_fig.scaleTexture (0.3, 0.3);
+//  g_Load3ds.Import3DS (&model_figa, dirs->getModels ("fig4.3ds"));
+  g_Load3ds.Import3DS (&model_figa, dirs->getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
-  g_Load3ds.Import3DS (&model_figb, dirs->getModels ("fig2.3ds"));
+  model_figa.scaleTexture (0.3, 0.3);
+//  g_Load3ds.Import3DS (&model_figb, dirs->getModels ("fig2.3ds"));
+  g_Load3ds.Import3DS (&model_figb, dirs->getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
-  g_Load3ds.Import3DS (&model_figc, dirs->getModels ("fig3.3ds"));
+  model_figb.scaleTexture (0.2, 0.2);
+//  g_Load3ds.Import3DS (&model_figc, dirs->getModels ("fig3.3ds"));
+  g_Load3ds.Import3DS (&model_figc, dirs->getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
-  g_Load3ds.Import3DS (&model_figd, dirs->getModels ("fig1.3ds"));
+  model_figc.scaleTexture (0.2, 0.2);
+//  g_Load3ds.Import3DS (&model_figd, dirs->getModels ("fig1.3ds"));
+  g_Load3ds.Import3DS (&model_figd, dirs->getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
-  g_Load3ds.Import3DS (&model_fige, dirs->getModels ("fig6.3ds"));
+  model_figd.scaleTexture (0.3, 0.3);
+//  g_Load3ds.Import3DS (&model_fige, dirs->getModels ("fig6.3ds"));
+  g_Load3ds.Import3DS (&model_fige, dirs->getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
-  g_Load3ds.Import3DS (&model_figf, dirs->getModels ("fig8.3ds"));
+  model_fige.scaleTexture (0.3, 0.3);
+//  g_Load3ds.Import3DS (&model_figf, dirs->getModels ("fig8.3ds"));
+  g_Load3ds.Import3DS (&model_figf, dirs->getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
-  g_Load3ds.Import3DS (&model_figg, dirs->getModels ("fig9.3ds"));
+  model_figf.scaleTexture (0.2, 0.2);
+//  g_Load3ds.Import3DS (&model_figg, dirs->getModels ("fig9.3ds"));
+  g_Load3ds.Import3DS (&model_figg, dirs->getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
-  g_Load3ds.Import3DS (&model_figh, dirs->getModels ("fig5.3ds"));
+  model_figg.scaleTexture (0.2, 0.2);
+//  g_Load3ds.Import3DS (&model_figh, dirs->getModels ("fig5.3ds"));
+  g_Load3ds.Import3DS (&model_figh, dirs->getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
+  model_figh.scaleTexture (0.3, 0.3);
   g_Load3ds.Import3DS (&model_figt, dirs->getModels ("transp1.3ds"));
   model_figt.setName ("TRANSPORT");
   // cannon at daylight
@@ -5450,6 +5556,18 @@ void myFirstInit ()
     }
     model.pMaterials[i]->texureId = i;
   }*/
+
+  setMissiles (&model_fig);
+  setMissiles (&model_figa);
+  setMissiles (&model_figb);
+  setMissiles (&model_figc);
+  setMissiles (&model_figd);
+  setMissiles (&model_fige);
+  setMissiles (&model_figf);
+  setMissiles (&model_figg);
+  setMissiles (&model_figh);
+
+//  model_fig.displaylist = false;
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);

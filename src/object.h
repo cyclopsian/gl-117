@@ -39,9 +39,16 @@ class CSpaceObj
   CModel *o; // reference to a model
   CVector3 *tl; // translation
   CRotation *rot;
+  int numRefModels;
+  CModel **refmodel;
+  CVector3 *reftl;
+  CRotation *refrot;
+  float *refscale;
+
   CSpaceObj ();
   CSpaceObj (CModel *o, float zoom);
   ~CSpaceObj ();
+  void addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float scale);
   void translate (CVector3 *v);
   void translate (float x, float y, float z);
   void rotate (short a, short b, short c);

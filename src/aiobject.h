@@ -158,6 +158,7 @@ class DynamicObj : public CSpaceObj
 };
 
 const int missiletypes = 8;
+const int missileracks = 6;
 
 class AIObj : public DynamicObj
 {
@@ -177,6 +178,8 @@ class AIObj : public DynamicObj
   int firemissilettl; // minimum time to wait between shooting missiles
   int missiletype; // only relevant for the player, describes type: AAM, AGM, DF
   int missiles [missiletypes]; // number of missiles of each type
+  int missilerack [missileracks]; // number of missile racks
+  int missilerackn [missileracks]; // number of missile racks
   int aw; // current heading difference to target
   int score; // final score
   float dtheta, dgamma; // theta/gamma alteration (smooth piloting)
@@ -189,6 +192,7 @@ class AIObj : public DynamicObj
   CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
 
   void aiinit (); // initialize variables
+  void missileCount ();
   void newinit (int id, int party, int intelligence, int precision, int aggressivity); // init new AI object
   void newinit (int id, int party, int intelligence); // init new AI object (esp. non-fighter)
   AIObj ();

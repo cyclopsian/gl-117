@@ -447,24 +447,56 @@ CModel::CModel ()
   light_diffuse [0] = 0.8; light_diffuse [1] = 0.8; light_diffuse [2] = 0.8; light_diffuse [3] = 1;
   light_ambient2 [0] = 0.1; light_ambient2 [1] = 0.1; light_ambient2 [2] = 0.1; light_ambient2 [3] = 1;
   light_diffuse2 [0] = 0.4; light_diffuse2 [1] = 0.4; light_diffuse2 [2] = 0.4; light_diffuse [3] = 1;
+  numRefpoints = 0;
+  refpoint = NULL;
 }
+
 void CModel::setName (char *name)
 {
   strcpy (this->name, name);
 }
+
 void CModel::addMaterial (CMaterial *material)
 {
   this->material [numMaterials] = new CMaterial;
-  memcpy (this->material [numMaterials], material, sizeof (CMaterial));
+  if (this->material [numMaterials] == NULL) exit (100);
+  if (material != NULL) memcpy (this->material [numMaterials], material, sizeof (CMaterial));
   numMaterials ++;
 }
+
 void CModel::addObject (CObject *object)
 {
   this->object [numObjects] = new CObject;
-  memcpy (this->object [numObjects], object, sizeof (CObject));
+  if (this->object [numObjects] == NULL) exit (101);
+  if (object != NULL) memcpy (this->object [numObjects], object, sizeof (CObject));
   numObjects ++;
   rotcol = 0;
 }
+
+void CModel::addRefPoint (CVector3 *tl)
+{
+  int i, i2;
+  if (refpoint == NULL)
+  {
+    refpoint = new CVector3 [10];
+  }
+  for (i = 0; i < numRefpoints; i ++)
+  {
+    if (tl->z < refpoint [i].z)
+    {
+      for (i2 = numRefpoints; i2 > i; i2 --)
+      {
+        refpoint [i2].take (&refpoint [i2 - 1]);
+      }
+      refpoint [i].take (tl);
+      goto fertigref1;
+    }
+  }
+  refpoint [numRefpoints].take (tl);
+fertigref1:;
+  numRefpoints ++;
+}
+
 CModel::~CModel ()
 {
   int i;
@@ -472,7 +504,12 @@ CModel::~CModel ()
     delete material [i];
   for (i = 0; i < numObjects; i ++)
     delete object [i];
+  if (refpoint)
+  {
+    delete refpoint;
+  }
 }
+
 void CModel::setColor (CColor *col)
 {
   int i;
@@ -519,6 +556,21 @@ int CModel::rotateColor (int n)
   return rotcol;
 }
 
+void CModel::scaleTexture (float fx, float fy)
+{
+  int i;
+  for (i = 0; i < numObjects; i ++)
+  {
+    CObject *o = object [i];
+    int i2;
+    for (i2 = 0; i2 < o->numVertices; i2 ++)
+    {
+      o->vertex [i2].tex.x *= fx;
+      o->vertex [i2].tex.y *= fy;
+    }
+  }
+}
+
 void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, float lum, int explode)
 {
   if (nolight) // if model wants to be rendered without light, call draw2
@@ -528,21 +580,26 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     glEnable (GL_LIGHTING);
     return;
   }
+
+  if (tl == NULL) tl = &tlnull;
+  if (tl2 == NULL) tl2 = &tlnull;
+  if (rot == NULL) rot = &rotnull;
+
   int i, j;
   CObject *cm;
   //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   if (lum == 1.0)
   {
-      glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
-      glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 /*      float light_specular [4] = {1, 1, 1, 1};
       glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
       glLighti (GL_LIGHT0, GL_SHININESS, 125.0);*/
   }
   else // half light if enshadowed
   {
-      glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient2);
-      glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse2);
+    glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient2);
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse2);
 //      glLightf (GL_LIGHT0, GL_SHININESS, 0.0);
   }
 
@@ -581,7 +638,8 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     else
       glShadeModel (GL_SMOOTH);
 
-    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
+    if (alpha)
+    { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
 	  for (i = 0; i < numObjects; i ++)
 	  {
@@ -739,7 +797,8 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     else
       glShadeModel (GL_SMOOTH);
 
-    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
+    if (alpha)
+    { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.01); }
 
     for (i = 0; i < numObjects; i++)
     {
@@ -783,7 +842,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
           else
           {
             unsigned char *pColor = v->color.c;
-            glColor3ub (pColor[0], pColor[1], pColor[2]);
+            glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
           }
           glVertex3f(v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
         }
@@ -814,7 +873,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
           else
           {
             unsigned char *pColor = v->color.c;
-            glColor3ub (pColor[0], pColor[1], pColor[2]);
+            glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
           }
           glVertex3f(v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
         }
@@ -859,7 +918,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   glRotatef (-rot->a+90, 0, 0, 1);
   glScalef (zoom, zoom, zoom);
 
-  if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
+  if (alpha)
+  { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
   for (i = 0; i < numObjects; i++)
   {
@@ -957,7 +1017,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     else
       glShadeModel (GL_SMOOTH);
 
-    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
+    if (alpha)
+    { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
     for (i = 0; i < numObjects; i++)
     {
@@ -1075,9 +1136,13 @@ void CSphere::init (float radius, int segments)
 void CSphere::init (float radius, int segments, float dx, float dy, float dz, int randomized)
 {
   CObject *co = new CObject;
+  if (co == NULL) exit (100);
   co->vertex = new CVertex [segments * segments * 2 + 2];
+  if (co->vertex == NULL) exit (100);
   co->triangle = new CTriangle [segments * 4];
+  if (co->triangle == NULL) exit (100);
   co->quad = new CQuad [segments * segments * 2];
+  if (co->quad == NULL) exit (100);
   this->radius = radius;
   this->segments = segments;
   this->dx = dx;
@@ -1087,7 +1152,9 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
 //    printf ("\n%d\n", segments); fflush (stdout);
   float step = 180.0 / segments;
   CRotation *rot = new CRotation ();
+  if (rot == NULL) exit (100);
   CVertex *w = new CVertex ();
+  if (w == NULL) exit (100);
   for (float i = 0; i < 180; i += step)
     for (float i2 = 0; i2 < 360; i2 += step)
     {

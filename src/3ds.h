@@ -50,19 +50,20 @@ class BinaryFile
   int readFloat (float *f, int n);
   int readUInt32 (Uint32 *i);
   int readUInt16 (Uint16 *i);
+  int readString (char *ptr, int ptrmax, int n);
   int readString (char *ptr, int n);
   int readString (char *ptr);
 };
 
-// Primary Chunk
+// Primary Chunk (19789)
 #define PRIMARY       0x4D4D
 
-// Main Chunks
+// Main Chunks (15677, 2, 45056)
 #define OBJECTINFO    0x3D3D
 #define VERSION       0x0002
 #define EDITKEYFRAME  0xB000
 
-// Sub defines of OBJECTINFO
+// Sub defines of OBJECTINFO (45055, 16384)
 #define MATERIAL	  0xAFFF
 #define OBJECT		  0x4000
 

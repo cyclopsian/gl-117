@@ -289,7 +289,10 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
       tl->y >= d->tl->y - z && tl->y <= d->tl->y + z &&
       tl->z >= d->tl->z - z && tl->z <= d->tl->z + z)
   {
-    shield -= d->impact;
+    if (id < STATIC && d->id >= MISSILE1)
+      shield -= d->impact;
+    else
+      shield -= 2;
     d->shield -= impact;
 //      printf (" c(%d,%d)=>s(%d,%d)\n", id, d->id, shield, d->shield);
     if (d->source != NULL && active) // only for missiles/cannons
@@ -668,6 +671,7 @@ cannondone:;
 
 void AIObj::aiinit ()
 {
+  int i;
   acttype = 0;
   intelligence = 100;
   aggressivity = 100;
@@ -704,12 +708,34 @@ void AIObj::aiinit ()
   ttl = -1;
   ttf = 30;
   score = -1;
-  for (int i = 0; i < missiletypes; i ++)
+  for (i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
+  for (i = 0; i < missileracks; i ++)
+  {
+    missilerack [i] = -1;
+    missilerackn [i] = 0;
+  }
+}
+
+void AIObj::missileCount ()
+{
+  if (id < FIGHTER1 || id > FIGHTER2) return;
+  
+  int i;
+  for (i = 0; i < missiletypes; i ++)
+    missiles [i] = 0;
+  for (i = 0; i < missileracks; i ++)
+  {
+    if (missilerackn [i] > 0)
+    {
+      missiles [missilerack [i]] += missilerackn [i];
+    }
+  }
 }
 
 void AIObj::newinit (int id, int party, int intelligence, int precision, int aggressivity)
 {
+  int i;
   ai = true;
   this->id = id;
   this->party = party;
@@ -717,18 +743,19 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   this->precision = precision;
   this->aggressivity = aggressivity;
   activate ();
+  for (i = 0; i < missileracks; i ++)
+    missilerackn [i] = 0;
   if (id == FIGHTER_FALCON)
   {
     maxthrust = 0.31;
     nimbility = 0.8;
     manoeverability = 0.45;
     maxshield = 95;
-    zoom = 0.4;
+    zoom = 0.35;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 4;
-    missiles [3] = 2;
-    missiles [6] = 2;
+    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
+    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
     flares = 20;
     chaffs = 20;
   }
@@ -741,9 +768,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.43;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 2;
-    missiles [3] = 6;
-    missiles [6] = 1;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
   }
@@ -756,10 +782,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.43;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 2;
-    missiles [3] = 6;
-    missiles [5] = 2;
-    missiles [6] = 2;
+    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
   }
@@ -769,13 +793,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 0.65;
     manoeverability = 0.38;
     maxshield = 140;
-    zoom = 0.44;
+    zoom = 0.45;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [1] = 2;
-    missiles [3] = 0;
-    missiles [4] = 6;
-    missiles [5] = 2;
+    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
   }
@@ -798,13 +820,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 0.76;
     manoeverability = 0.43;
     maxshield = 80;
-    zoom = 0.4;
+    zoom = 0.44;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 2;
-    missiles [1] = 2;
-    missiles [3] = 2;
-    missiles [6] = 3;
+    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
+    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
     flares = 20;
     chaffs = 20;
   }
@@ -814,12 +834,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 0.62;
     manoeverability = 0.35;
     maxshield = 60;
-    zoom = 0.39;
+    zoom = 0.41;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 2;
-    missiles [3] = 1;
-    missiles [6] = 1;
+    missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
   }
@@ -832,8 +851,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.47;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [4] = 6;
-    missiles [5] = 6;
+    missilerackn [0] = 3; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 3;
+    missilerack [0] = 4; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 4;
     flares = 20;
     chaffs = 20;
   }
@@ -843,11 +862,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 1;
     manoeverability = 0.51;
     maxshield = 125;
-    zoom = 0.41;
+    zoom = 0.4;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [1] = 5;
-    missiles [7] = 3;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
     flares = 25;
     chaffs = 25;
   }
@@ -857,11 +876,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     nimbility = 1.02;
     manoeverability = 0.5;
     maxshield = 90;
-    zoom = 0.25;
+    zoom = 0.33;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [1] = 5;
-    missiles [7] = 3;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
     flares = 25;
     chaffs = 25;
   }
@@ -1110,8 +1129,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     shield = maxshield = 100000;
     zoom = 0.01 * myrandom (60) + 1.0;
     impact = 5;
-    thrust = 0.18;
-    maxthrust = 0.18;
+    thrust = 0.25;
+    maxthrust = 0.25;
+    forcez = 0.12;
     ai = false;
   }
   if (id == STATIC_BASE1)
@@ -1138,6 +1158,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     precision /= 2;
     aggressivity /= 2;
   }
+
+  missileCount ();
 }
 
 void AIObj::newinit (int id, int party, int intelligence)
@@ -1384,6 +1406,7 @@ bool AIObj::haveMissile () // due to missiletype
 void AIObj::decreaseMissile (int id)
 {
   char buf [STDSIZE];
+  int i;
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
   {
@@ -1391,6 +1414,19 @@ void AIObj::decreaseMissile (int id)
     display (buf, LOG_ERROR);
   }
   missiles [id] --;
+  int ptrrack = 0, maxrack = 0;
+  for (i = 0; i < missileracks; i ++)
+    if (missilerack [i] == id)
+      if (missilerackn [i] > maxrack)
+      {
+        ptrrack = i;
+        maxrack = missilerackn [i];
+      }
+  if (maxrack > 0)
+  {
+    missilerackn [ptrrack] --;
+    refscale [ptrrack * 3 + 2 - missilerackn [ptrrack]] = 0;
+  }
 }
 
 bool AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
@@ -1768,7 +1804,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
 
   if (ai)
   {
-    if (id >= MISSILE_GROUND1 && id <= MISSILE_GROUND2) // is AGM
+    if (id >= MISSILE1 && id <= MISSILE_GROUND2) // is AGM
     {
       float dgamma = 0;
       if (disttarget <= -0.00001 || disttarget >= 0.00001) // no division by zero

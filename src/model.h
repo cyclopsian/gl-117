@@ -194,6 +194,9 @@ class CModel
   float light_diffuse [4];
   float light_ambient2 [4];
   float light_diffuse2 [4];
+  CVector3 tlnull;
+  CRotation rotnull;
+
   public:
   char name [20]; // unique model name like "GL-117"
   int shading;
@@ -205,14 +208,19 @@ class CModel
   CObject *object [100]; // objects, at most 100 (these are only pointers)
   bool nolight; // do not use light?
   bool alpha; // use alpha blending?
+  int numRefpoints;
+  CVector3 *refpoint;
+
   CModel ();
   void setName (char *name);
   void addMaterial (CMaterial *material);
   void addObject (CObject *object);
+  void addRefPoint (CVector3 *tl);
   ~CModel ();
   void setColor (CColor *col);
   void drawVertexNormals (CObject *cm, float zoom);
   int rotateColor (int n);
+  void scaleTexture (float fx, float fy);
   // the drawing methods take the following parameters:
   // tl+tl2=translation, rot=rotation, lum=luminance (default 1.0), explode=radial translation (default 0)
   // draw everything
