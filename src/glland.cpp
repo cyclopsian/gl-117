@@ -431,14 +431,38 @@ float GLLandscape::getHeight (float x, float z)
 }
 
 // Get height over landscape/water, linear interpolation (slow)
+float GLLandscape::getExactHeight2 (float x, float z)
+{
+  float mx = x+MAXX/2;
+  float mz = (float)MAXX/2-z;
+  int mx1 = (int) mx;
+  int mz1 = (int) mz;
+  mx1 -= mx1 & 1;
+  mz1 -= mz1 & 1;
+  int mx2 = mx1 + 1;
+  int mz2 = mz1 + 1;
+  mx1 = getCoord (mx1);
+  mx2 = getCoord (mx2);
+  mz1 = getCoord (mz1);
+  mz2 = getCoord (mz2);
+  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  return (ZOOM * (h2/4*zoomz - zoomz2));
+}
+
+// Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight (float x, float z)
 {
-  float mx = getCoord (x+MAXX/2);
-  float mz = getCoord ((float)MAXX/2-z);
+  float mx = x+MAXX/2;
+  float mz = (float)MAXX/2-z;
   int mx1 = (int) mx;
-  int mx2 = mx1 + 1;
   int mz1 = (int) mz;
+  int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
+  mx1 = getCoord (mx1);
+  mx2 = getCoord (mx2);
+  mz1 = getCoord (mz1);
+  mz2 = getCoord (mz2);
   float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2*zoomz - zoomz2));
@@ -446,14 +470,42 @@ float GLLandscape::getExactHeight (float x, float z)
 
 // Get height over landscape/water without ZOOM scaling, linear interpolation (slow)
 // Only used to draw trees
+// Get height over landscape/water, linear interpolation (slow)
+float GLLandscape::getExactLSHeight2 (float x, float z)
+{
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) mx;
+  int mz1 = (int) mz;
+  mx1 -= mx1 & 1;
+  mz1 -= mz1 & 1;
+  int mx2 = mx1 + 2;
+  int mz2 = mz1 + 2;
+  mx1 = getCoord (mx1);
+  mx2 = getCoord (mx2);
+  mz1 = getCoord (mz1);
+  mz2 = getCoord (mz2);
+  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  return (h2/4*zoomz - zoomz2);
+}
+
+// Get height over landscape/water without ZOOM scaling, linear interpolation (slow)
+// Only used to draw trees
+// Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactLSHeight (float x, float z)
 {
-  float mx = getCoord (x);
-  float mz = getCoord (z);
+  if (quality < 3) return getExactLSHeight2 (x, z);
+  float mx = x;
+  float mz = z;
   int mx1 = (int) mx;
-  int mx2 = mx1 + 1;
   int mz1 = (int) mz;
+  int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
+  mx1 = getCoord (mx1);
+  mx2 = getCoord (mx2);
+  mz1 = getCoord (mz1);
+  mz2 = getCoord (mz2);
   float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
   return (h2*zoomz - zoomz2);
@@ -1490,9 +1542,9 @@ void GLLandscape::draw (int phi, int gamma)
       fx = (float) minx + (float) (dx * (0.5 + (float) i2));
       fy = (float) miny + (float) (dy * (0.5 + (float) i));
       float d = dist (camx + MAXX/2 - fx, MAXX/2 - camz - fy);
-      detail [i] [i2] = (int) (d / 10.0);
+      detail [i] [i2] = (int) ((d - dx/2) / 12.0);
+      if (detail [i] [i2] < 0) detail [i] [i2] = 0;
     }
-
 
 /*    float zoomz2 = 32768.0 * zoomz;
     int step = 1;
@@ -1538,7 +1590,11 @@ void GLLandscape::draw (int phi, int gamma)
   }
 
   int fardetail = quality;
-  if (quality < 2) fardetail = 2;
+//  if (quality == 2) fardetail ++;
+//  if (quality < 2) fardetail = 2;
+
+  int lineardetail = -1;
+  if (quality >= 2) lineardetail = 0;
 /*  unsigned char done [400] [400];
   for (x = 0; x < 400; x ++)
   memset (&done [x], 0, 400*sizeof (unsigned char));*/
@@ -1720,7 +1776,7 @@ void GLLandscape::draw (int phi, int gamma)
     if (mode == 0)
     {
 
-      if (quality == 1) step = 2;
+      if (quality == 1 || quality == 2) step = 2;
       else step = 1;
 /*int j;
 
@@ -1755,11 +1811,16 @@ void GLLandscape::draw (int phi, int gamma)
           }
           if (detail [i] [i2] > fardetail)
           {
+/*      if (gl->isPointInFrustum (hh2*ax - 1.0, (float)hw[getCoord(ax)][getCoord(ay)]*zoomz - zoomz2, hh2*((float)MAXX-ay) - 1.0) ||
+          gl->isPointInFrustum (hh2*ax - 1.0, (float)hw[getCoord(ax)][getCoord(zy)]*zoomz - zoomz2, hh2*((float)MAXX-zy) - 1.0) ||
+          gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(zy)]*zoomz - zoomz2, hh2*((float)MAXX-zy) - 1.0) ||
+          gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(ay)]*zoomz - zoomz2, hh2*((float)MAXX-ay) - 1.0))*/
+      if (gl->isSphereInFrustum (hh2*(ax+zx)/2 - 1.0, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)]*zoomz - zoomz2, hh2*((float)MAXX-(ay+zy)/2) - 1.0, hh2*(zx-ax)*1.5))
             drawQuadStrip (ax, ay, zx, zy, step);
           }
           else
           {
-            if (detail [i] [i2] <= fardetail - 3)
+            if (detail [i] [i2] <= lineardetail)
             {
               gl->enableLinearTexture (texgrass->textureID);
               gl->enableLinearTexture (texrocks->textureID);
@@ -1975,6 +2036,8 @@ void GLLandscape::draw (int phi, int gamma)
 */
   }
 
+  if (quality == 2) step = 1;
+
 // Draw trees, bushes
   if (quality >= 1)
   {
@@ -2014,14 +2077,14 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     float mydep = 1000;
-    if (quality == 3) mydep = 1600;
+    if (quality == 2) mydep = 1500;
+    else if (quality == 3) mydep = 1800;
     else if (quality == 4) mydep = 2500;
     else if (quality == 5) mydep = 3500;
     if (mydep > view * view) mydep = view * view;
 
     int lineartree = -1;
-    if (quality == 3 || quality == 4) lineartree = 0;
-    else if (quality == 5) lineartree = 1;
+    if (quality >= 2) lineartree = 0;
 
     float x21 = 0.3, y21 = -0.32;
     float x22 = -0.21, y22 = 0.22;

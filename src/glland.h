@@ -104,8 +104,10 @@ class GLLandscape : public Landscape
 
   float getHeight (float x, float z); // height at (int) landscape point
 
+  float getExactHeight2 (float x, float z); // linear interpolation, coarse grid
   float getExactHeight (float x, float z); // linear interpolation
 
+  float getExactLSHeight2 (float x, float z); // linear interpolation, coarse grid
   float getExactLSHeight (float x, float z); // linear interpolation
 
   float getRayHeight (float x, float z); // height of lowest sun ray
