@@ -59,8 +59,8 @@ AC_CHECK_LIB(glut,glutMainLoop,LIBS="$LIBS -lglut",AC_MSG_WARN(GLUT not found - 
 AC_CHECK_LIB(SDL,SDL_Init,LIBS="$LIBS -lSDL -lSDLmain",AC_MSG_WARN(SDL not found - please install SDL),-lpthread)
 AC_CHECK_LIB(SDL_mixer,Mix_LoadMUS,LIBS="$LIBS -lSDL_mixer",AC_MSG_WARN(SDL_mixer not found - please install SDL_mixer))
 
-CFLAGS="$CFLAGS -Wall -pedantic"
-CPPFLAGS="-DDATADIR='\"$datadir\"'"
+CFLAGS="$CFLAGS"
+CPPFLAGS="-DDATADIR='\"$datadir\"' -Wall -pedantic"
 CXXFLAGS="$CXXFLAGS"
 
 AC_OUTPUT([ \
