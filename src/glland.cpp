@@ -1098,6 +1098,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     return;
 
 //  glittering = 0;
+  // glittering is obsolete, does not achieve the desired effect
   float glitter [4] = { 1, 1, 1, 1 };
   if (quality >= 2)
   {

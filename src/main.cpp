@@ -530,6 +530,7 @@ class Mission
   int alliedpilot [10];
   CColor textcolor;
   int difficulty;
+  int heading;
 
   Mission ()
   {
@@ -549,6 +550,7 @@ class Mission
     wantweapon = 0;
     textcolor.setColor (255, 255, 0, 128);
     clouds = 0;
+    heading = 180;
   }
   void playerInit ()
   {
@@ -1008,6 +1010,7 @@ class MissionDogfight1 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
+    heading = 220;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
     playerInit ();
@@ -1300,6 +1303,7 @@ class MissionDogfight2 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
+    heading = 200;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
     playerInit ();
@@ -1486,6 +1490,7 @@ class MissionGround1 : public Mission
     weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 40;
+    heading = 200;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_ALPINE_NOLAKE, NULL);
     int px, py;
@@ -1599,7 +1604,8 @@ class MissionScout : public Mission
     clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
-    sungamma = 25;
+    sungamma = 22;
+    heading = 250;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
     playerInit ();
@@ -1854,7 +1860,8 @@ class MissionDefend1 : public Mission
     clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
-    sungamma = 45;
+    sungamma = 65;
+    heading = 200;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
     playerInit ();
@@ -1952,6 +1959,7 @@ class MissionDogfight3 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 20;
+    heading = 300;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
     playerInit ();
@@ -2056,6 +2064,7 @@ class MissionTank1 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
+    heading = 280;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
     playerInit ();
@@ -2233,6 +2242,7 @@ class MissionShip2 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
+    heading = 270;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
     playerInit ();
@@ -2409,6 +2419,7 @@ class MissionCanyon1 : public Mission
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
+    heading = 270;
     if (l != NULL) delete l;
     l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
     l->searchPlain (-1, -1, &px, &py);
@@ -3311,13 +3322,13 @@ class Cockpit
         glVertex3f (xf * 0.1, (yf - g) * 0.1, zf);
         glVertex3f (xf * 0.1, (yf + g) * 0.1, zf);
         glEnd ();
-        if (i == 0)
+        if (i == mission->heading)
           font1->drawText (xf - 0.5, yf - 2.0, zf, "N", &color);
-        else if (i == 90)
+        else if (i == mission->heading + 90 || i == mission->heading - 270)
           font1->drawText (xf - 0.5, yf - 2.0, zf, "W", &color);
-        else if (i == 180)
+        else if (i == mission->heading + 180 || i == mission->heading - 180)
           font1->drawText (xf - 0.5, yf - 2.0, zf, "S", &color);
-        else if (i == 270)
+        else if (i == mission->heading + 270 || i == mission->heading - 90)
           font1->drawText (xf - 0.5, yf - 2.0, zf, "E", &color);
       }
     }
@@ -7145,11 +7156,11 @@ void game_display ()
     }
   }
 
-  if (camera == 0 && l->glittering > 1.0F)
+/*  if (camera == 0 && l->glittering > 1.0F)
   {
-    sunlight += l->glittering * 2.0F - 2.0F;
-  }
-  l->glittering = false;
+    sunlight += l->glittering * 1.0F - 1.0F;
+  }*/
+  l->glittering = 0;
 
 
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
