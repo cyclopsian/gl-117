@@ -1,3 +1,23 @@
+Version 1.0.1:
+	- major bugfixes concerning coordinates (lighting, sun)
+	- improved 3DS loader and model textures
+	- changed intro
+
+Version 1.0:
+	- three more missions for the campaign
+	- more realistic physics (optional)
+	- new bomber "Storm"
+	- some visual improvements
+	- adjustments to almost everything
+
+Version 0.9:
+	- faster rendering (occlusion culling: ray casting)
+	- more interface options (multiple joysticks)
+	- difficulty changes/adjustments (easier missions)
+	- two new missions
+	- lots of visual improvements
+	- lots of bugfixes
+
 Version 0.8.8:
 	- new missions (training)
 	- AI bugfixes and improvements
@@ -73,7 +93,7 @@ Version 0.6.5:
 
 Version 0.6:
 	- two new missions (one still missing)
-	- list of pilots and fighter
+	- list of pilots and fighters
 	- adjusted (easier) missions
 	- improved mouse and joystick interface
 	- better graphics detection system
