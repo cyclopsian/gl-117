@@ -1,0 +1,111 @@
+\chapter{GL-117 Installation}
+\label{chap:installation}
+
+This chapter describes how to download and install \emph{GL-117} on your
+system.
+
+\section{Requirements}
+\label{sec:requirements}
+
+\emph{GL-117} requires Linux/Unix or MSWindows as operating system as well as
+properly installed versions of the following libraries:
+\begin{itemize}
+\item{OpenGL or MesaGL: graphics library, 3D engine}
+\item{GLU or MesaGLU: utilities for GL}
+\item{GLUT or MesaGLUT: a toolkit that provides keyboard and mouse support}
+\item{SDL (optional): the Direct Media Layer library has similar features of GLUT plus joystick
+support and basic sound processing}
+\item{SDL\_mixer (optional): a library that provides advanced multichannel sound
+support and music}
+\end{itemize}
+
+Installation of \texttt{SDL} is optional, however strongly recommended.
+
+\section{Downloading GL-117}
+\label{sec:downloading_gl117}
+
+The latest \emph{GL-117} release is currently available for download at
+\texttt{http://www.freshmeat.net/gl-117} in \texttt{.tar.gz} and \texttt{.zip} format.
+Using MSWindows you may prefer the \texttt{.zip} file that may be unpacked with
+lots of programs like \texttt{PKUnzip, Winzip, WinRAR, WinACE}.
+The \texttt{.tar.gz} version can be unpacked with GNU Tar using \\\texttt{tar xvfz
+gl-117-x.y.z.tar.gz}\\ where \texttt{x.y.z} is the \emph{GL-117} version
+number. For last minute updates and release-specific building and
+install instructions, make sure to have a look at the
+\texttt{README} and \texttt{INSTALL} files.
+
+\section{Linux/Unix installation}
+\label{sec:linux_installation}
+
+If you got a binary \texttt{gl-117} in the \texttt{linux} directory, you will only
+need the libraries \texttt{GL, GLU, GLUT} and \texttt{SDL, SDL\_mixer} as
+described above.
+
+In order to compile \emph{GL-117} you will also have to install the developement
+versions of the libraries above (except \texttt{SDL\_mixer}).
+To compile \emph{GL-117} do the following steps in the gl-117-\textit{VERSION}
+directory:
+\begin{verbatim}
+./configure
+make
+\end{verbatim}
+
+The \texttt{configure} script will check for the required libraries and will output
+a \texttt{Makefile}, which can be invoked using the \texttt{make} command.
+After compiling \emph{GL-117} successfully, you will find a binary called \texttt{gl-117}
+in the \texttt{src} directory. Move it to the \texttt{linux} directory manually and
+execute.\\
+To really install \emph{GL-117} please use:
+\begin{verbatim}
+make install
+\end{verbatim}
+This will copy the binary to your binary directory (e.g. \texttt{/usr/local/bin})
+and the rest of data files to your data directory (e.g. \texttt{/usr/local/share}).
+Any files that require output permissions will be stored in the user's home directory,
+exactly \texttt{\$HOME/.gl-117}.\\
+This step will require write permissions in the binary and data directories.
+However you may customize these directories using for example
+\begin{verbatim}
+./configure --prefix='/home/tom/gl-117'
+make
+make install
+\end{verbatim}
+
+
+\section{MSWindows installation}
+\label{sec:windows_installation}
+
+First, you might have to install \texttt{GL, GLU, GLUT} and \texttt{SDL, SDL\_mixer}.
+Look into your system directory, that is generally
+\begin{verbatim}
+\WINDOWS\SYSTEM    for Windows9x/ME
+\WINDOWS\SYSTEM32  for WindowsNT/2000/XP
+\end{verbatim}
+You will need the files \texttt{opengl32.dll, glu32.dll, glut32.dll, sdl.dll, sdl\_mixer.dll}
+there.
+If one is missing, please search the internet.
+That's it. Execute the binary \texttt{gl-117.exe} in \emph{GL-117}'s \texttt{windows}
+directory.\\
+
+If you had already an earlier version of \emph{GL-117} you might want to use your
+old pilots with the new version of the game. Therefore simply copy the old
+\texttt{saves} directory to the new version.
+
+
+\section{Running GL-117}
+\label{sec:running_gl117}
+
+At startup, \emph{GL-117} tries to read a file \texttt{conf} from the user's home
+directory (Linux/Unix) or the \texttt{saves} directory (MSWindows).
+If there is none, the game will try out some screen settings and store the file.
+\begin{verbatim}
+Linux/Unix      $HOME/.gl-117/conf
+MSWindows       GL-117-INSTALLDIR/saves/conf
+\end{verbatim}
+
+Edit the file using your favourite text editor and adjust the settings
+to your system.
+If you lack a hardware accelerated video card, please turn down the
+quality to 0 or 1. Further acceleration can be achieved negligating fullscreen mode
+and choosing a lower resolution.\\
+Just delete the \texttt{conf} file if you want to reset to the initial settings.
