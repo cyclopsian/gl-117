@@ -118,7 +118,7 @@ int MissionDeathmatch2::processtimer (Uint32 dt)
         fighter [i]->newinit (FalconDescriptor, i + 1, 200);
       }
       fighter [i]->party = i / 2 + 1;
-      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
       fighter [i]->immunity = 50 * timestep;
       fighter [i]->activate ();
 //      fighter [i]->killed = false;

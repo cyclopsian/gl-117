@@ -72,7 +72,7 @@ void MissionTutorial2::start ()
     fighter [i]->trafo.translation.x = px + 6 - i * 4;
     fighter [i]->trafo.translation.z = py + 6 - i * 4;
     fighter [i]->newinit (PantherDescriptor, 0, 400);
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
   }
 }
 

@@ -32,11 +32,13 @@
 #include <cassert>
 
 
-Missile::Missile () : AIObj ()
+Missile::Missile (const UnitDescriptor &desc)
+  : AIObj (desc)
 {
 }
 
-Missile::Missile (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
+Missile::Missile (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : AIObj (desc, space2, o2, zoom2)
 {
 }
 

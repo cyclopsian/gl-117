@@ -32,11 +32,13 @@
 #include <cassert>
 
 
-Ship::Ship () : AIObj ()
+Ship::Ship (const UnitDescriptor &desc)
+  : AIObj (desc)
 {
 }
 
-Ship::Ship (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
+Ship::Ship (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : AIObj (desc, space2, o2, zoom2)
 {
 }
 

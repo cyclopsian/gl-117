@@ -497,9 +497,9 @@ void setPlaneVolume ()
 {
   if (gamestate == &stateplay)
   {
-    int lev = (int) ((float) 128 * fplayer->thrust / fplayer->maxthrust) - 32;
+    int lev = (int) ((float) 128 * fplayer->thrust / fplayer->getPrototype ()->maxthrust) - 32;
     sound->stop (SOUND_PLANE1);
-    sound->engine = (int) (fplayer->thrust / fplayer->maxthrust * 20) - 10;
+    sound->engine = (int) (fplayer->thrust / fplayer->getPrototype ()->maxthrust * 20) - 10;
     sound->setVolume (SOUND_PLANE1, lev);
     sound->playLoop (SOUND_PLANE1);
   }
@@ -632,7 +632,7 @@ int game_levelInit ()
     if (fighter [i]->id >= FighterBeginDescriptor && fighter [i]->id <= AirEndDescriptor)
       for (i2 = 0; i2 < 4; i2 ++)
       {
-        int type = fighter [i]->missilerack [i2];
+        int type = fighter [i]->getPrototype ()->missilerack [i2];
         Model3d *rm = getModel (MissileBeginDescriptor + type);
         fighter [i]->refModel [i2 * 3] = rm;
         fighter [i]->refModel [i2 * 3 + 1] = rm;
@@ -640,7 +640,7 @@ int game_levelInit ()
         fighter [i]->refTl [i2 * 3 + 1].z = fighter [i]->refTl [i2 * 3].z - 0.04;
         fighter [i]->refTl [i2 * 3 + 2].z = fighter [i]->refTl [i2 * 3].z + 0.04;
         fighter [i]->refTl [i2 * 3].y = fighter [i]->refTl [i2 * 3 + 1].y - 0.04;
-        int tmp = fighter [i]->missilerackn [i2];
+        int tmp = fighter [i]->getPrototype ()->missilerackn [i2];
         fighter [i]->refScale [i2 * 3] = 0.25;
         fighter [i]->refScale [i2 * 3 + 1] = 0.25;
         fighter [i]->refScale [i2 * 3 + 2] = 0.25;
@@ -1200,7 +1200,8 @@ void Events::fireMissile ()
 {
   if (!fplayer->active) return;
   if (fplayer->firemissilettl > 0) return;
-  if (fplayer->fireMissile (MissileBeginDescriptor + fplayer->missiletype, missile)) // TODO: lookup in descriptor registry!
+  UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + fplayer->missiletype);
+  if (fplayer->fireMissile (desc, missile))
     sound->play (SOUND_MISSILE1, false);
 }
 
@@ -1705,7 +1706,7 @@ void myInit ()
 
   for (i = 0; i < maxgroundobj; i ++)
   {
-    groundobj [i] = new DynamicObj (space, Model3dRegistry::get (TentDescriptor.name), 3);
+    groundobj [i] = new DynamicObj (TentDescriptor, space, Model3dRegistry::get (TentDescriptor.name), 3);
   }
 
   explsphere = new Sphere ();
@@ -1730,7 +1731,7 @@ void myInit ()
   // TODO: will be removed
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i] = new AIObj (space, Model3dRegistry::get (FalconDescriptor.name), 0.4);
+    fighter [i] = new AIObj (FalconDescriptor, space, Model3dRegistry::get (FalconDescriptor.name), 0.4);
     fighter [i]->ref.clear ();
     for (i2 = 0; i2 < 12; i2 ++)
       fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
@@ -1754,22 +1755,22 @@ void myInit ()
 
   for (i = 0; i < maxlaser; i ++)
   {
-    laser [i] = new DynamicObj (space, Model3dRegistry::get ("Cannon1"), 0.07);
+    laser [i] = new DynamicObj (Cannon1Descriptor, space, Model3dRegistry::get ("Cannon1"), 0.07);
   }
 
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i] = new AIObj (space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1);
+    missile [i] = new AIObj (AamHs1Descriptor, space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1);
   }
 
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i] = new DynamicObj (space, Model3dRegistry::get (FlareDescriptor.name), 0.1);
+    flare [i] = new DynamicObj (FlareDescriptor, space, Model3dRegistry::get (FlareDescriptor.name), 0.1);
   }
 
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i] = new DynamicObj (space, Model3dRegistry::get (ChaffDescriptor.name), 0.1);
+    chaff [i] = new DynamicObj (ChaffDescriptor, space, Model3dRegistry::get (ChaffDescriptor.name), 0.1);
   }
 
   for (i = 0; i < maxstar; i ++)
@@ -1807,6 +1808,7 @@ void initModel (const UnitDescriptor &desc, const std::string &filename)
   DISPLAY_DEBUG(std::string (" * ").append (desc.name));
   Model3d *model = Model3dFactory::getModel (dirs.getModels (filename.c_str ()));
   Model3dRegistry::add (desc.name, model);
+  UnitDescriptorRegistry::add (desc);
 }
 
 // load game data (this method does not really belong to the intro itself)
@@ -3083,8 +3085,8 @@ void createMenu ()
   strcpy (submenu2names [z ++], "TRANSPORT");
   strcpy (submenu2names [z ++], "CONVOY");
   strcpy (submenu2names [z ++], "DOGFIGHT");
-  strcpy (submenu2names [z ++], "AirBeginDescriptor BATTLE");
-  strcpy (submenu2names [z ++], "SURFACE-AirBeginDescriptor DEFENSE");
+  strcpy (submenu2names [z ++], "AIR BATTLE");
+  strcpy (submenu2names [z ++], "SURFACE-AIR DEFENSE");
   strcpy (submenu2names [z ++], "VETERAN DOGFIGHT");
   strcpy (submenu2names [z ++], "BASE ATTACK");
   strcpy (submenu2names [z ++], "DEPOTS");

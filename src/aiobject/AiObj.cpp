@@ -116,19 +116,39 @@ UnitDescriptor HouseDescriptor (11100, "House", "HOUSE");
 
 
 AIObj::AIObj ()
+  : DynamicObj ()
 {
-  o = NULL;
-  trafo.scaling.set (1.0, 1.0, 1.0);
+  proto = NULL;
+  smoke = NULL;
+  
   init ();
   smoke = new Smoke (0);
 }
 
-AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
+AIObj::AIObj (const UnitDescriptor &desc)
+  : DynamicObj () // intended!
 {
+  id = desc;
+  proto = new AiUnitPrototype (id);
+
+  init ();
+
+  o = NULL;
+  trafo.scaling.set (1.0, 1.0, 1.0);
+  smoke = new Smoke (0);
+}
+
+AIObj::AIObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : DynamicObj () // intended!
+{
+  id = desc;
+  proto = new AiUnitPrototype (id);
+
+  init ();
+
   space = space2;
   o = o2;
   trafo.scaling.set (zoom2, zoom2, zoom2);
-  init ();
   smoke = new Smoke (0);
   space->addObject (this);
 }
@@ -136,15 +156,22 @@ AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
 AIObj::~AIObj ()
 {
   delete smoke;
+  smoke = NULL;
+}
+
+AiUnitPrototype *AIObj::getPrototype ()
+{
+  AiUnitPrototype *aiproto = dynamic_cast<AiUnitPrototype *>(proto);
+  assert (aiproto);
+  return aiproto;
 }
 
 void AIObj::init ()
 {
-  DynamicObj::init ();
+//  DynamicObj::init ();
   
   int i;
   acttype = 0;
-  dualshot = false;
   intelligence = 100;
   aggressivity = 100;
   precision = 100;
@@ -156,7 +183,6 @@ void AIObj::init ()
   dtheta = 0;
   dgamma = 0;
   id = MissileBeginDescriptor;
-  impact = 30;
   manoevertheta = 0;
   manoeverheight = 0;
   manoeverthrust = 0;
@@ -177,8 +203,6 @@ void AIObj::init ()
   recrot.gamma = 180;
   dgamma = 0;
   currot.theta = 0;
-  maxrot.gamma = 70;
-  maxrot.theta = 90;
   missiletype = 0;
   autofire = false;
   ttl = -1;
@@ -186,11 +210,6 @@ void AIObj::init ()
   score = -1;
   for (i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
-  for (i = 0; i < missileracks; i ++)
-  {
-    missilerack [i] = -1;
-    missilerackn [i] = 0;
-  }
   bomber = 0;
   timer = 0;
   ammo = -1;
@@ -207,9 +226,9 @@ void AIObj::missileCount ()
     missiles [i] = 0;
   for (i = 0; i < missileracks; i ++)
   {
-    if (missilerackn [i] > 0)
+    if (getPrototype ()->missilerackn [i] > 0)
     {
-      missiles [missilerack [i]] += missilerackn [i];
+      missiles [getPrototype ()->missilerack [i]] += getPrototype ()->missilerackn [i];
     }
   }
 }
@@ -224,10 +243,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   manoeverstate = 0;
   activate ();
   for (i = 0; i < missileracks; i ++)
-    missilerackn [i] = 0;
+    getPrototype ()->missilerackn [i] = 0;
   ammo = -1;
   bomber = 0;
-  dualshot = false;
+  getPrototype ()->dualshot = false;
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams
 
@@ -245,15 +264,15 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
 
   if (id == FalconDescriptor)
   {
-    maxthrust = 0.31;
-    nimbility = 0.86;
-    manoeverability = 0.48;
-    maxshield = 85;
+    getPrototype ()->maxthrust = 0.31;
+    getPrototype ()->nimbility = 0.86;
+    getPrototype ()->manoeverability = 0.48;
+    getPrototype ()->maxshield = 85;
     zoom = 0.35;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
-    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 2;
+    getPrototype ()->missilerack [0] = 0; getPrototype ()->missilerack [1] = 6; getPrototype ()->missilerack [2] = 6; getPrototype ()->missilerack [3] = 0;
     flares = 20;
     chaffs = 20;
     statfirepower = 1;
@@ -261,15 +280,15 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == SwallowDescriptor)
   {
-    maxthrust = 0.24;
-    nimbility = 0.64;
-    manoeverability = 0.35;
-    maxshield = 110;
+    getPrototype ()->maxthrust = 0.24;
+    getPrototype ()->nimbility = 0.64;
+    getPrototype ()->manoeverability = 0.35;
+    getPrototype ()->maxshield = 110;
     zoom = 0.43;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
-    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
+    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 3; getPrototype ()->missilerack [2] = 3; getPrototype ()->missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
     bomber = 1;
@@ -278,15 +297,15 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == HawkDescriptor)
   {
-    maxthrust = 0.26;
-    nimbility = 0.72;
-    manoeverability = 0.42;
-    maxshield = 120;
+    getPrototype ()->maxthrust = 0.26;
+    getPrototype ()->nimbility = 0.72;
+    getPrototype ()->manoeverability = 0.42;
+    getPrototype ()->maxshield = 120;
     zoom = 0.43;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
-    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 1;
+    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 3; getPrototype ()->missilerack [2] = 3; getPrototype ()->missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
     bomber = 1;
@@ -295,63 +314,63 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == Hawk2Descriptor)
   {
-    maxthrust = 0.28;
-    nimbility = 0.75;
-    manoeverability = 0.44;
-    maxshield = 140;
+    getPrototype ()->maxthrust = 0.28;
+    getPrototype ()->nimbility = 0.75;
+    getPrototype ()->manoeverability = 0.44;
+    getPrototype ()->maxshield = 140;
     zoom = 0.45;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
-    missilerack [0] = 6; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 6;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 1;
+    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 4; getPrototype ()->missilerack [2] = 4; getPrototype ()->missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
     bomber = 1;
     statfirepower = 3;
     ammo = 1400;
-    dualshot = true;
+    getPrototype ()->dualshot = true;
   }
   else if (id == TransportDescriptor)
   {
-    maxthrust = 0.14;
-    maxshield = 45;
+    getPrototype ()->maxthrust = 0.14;
+    getPrototype ()->maxshield = 45;
     missiles [0] = 0;
-    nimbility = 0.15;
-    manoeverability = 0.05;
-    impact = 5;
+    getPrototype ()->nimbility = 0.15;
+    getPrototype ()->manoeverability = 0.05;
+    getPrototype ()->impact = 5;
     zoom = 1.5;
-    maxrot.gamma = 25;
-    maxrot.theta = 30;
+    getPrototype ()->maxrot.gamma = 25;
+    getPrototype ()->maxrot.theta = 30;
     flares = 0;
     chaffs = 0;
     ammo = 0;
   }
   else if (id == Transport2Descriptor)
   {
-    maxthrust = 0.16;
-    maxshield = 35;
+    getPrototype ()->maxthrust = 0.16;
+    getPrototype ()->maxshield = 35;
     missiles [0] = 0;
-    nimbility = 0.12;
-    manoeverability = 0.04;
-    impact = 5;
+    getPrototype ()->nimbility = 0.12;
+    getPrototype ()->manoeverability = 0.04;
+    getPrototype ()->impact = 5;
     zoom = 1.5;
-    maxrot.gamma = 25;
-    maxrot.theta = 30;
+    getPrototype ()->maxrot.gamma = 25;
+    getPrototype ()->maxrot.theta = 30;
     flares = 0;
     chaffs = 0;
     ammo = 0;
   }
   else if (id == BuzzardDescriptor)
   {
-    maxthrust = 0.31;
-    nimbility = 0.82;
-    manoeverability = 0.46;
-    maxshield = 75;
+    getPrototype ()->maxthrust = 0.31;
+    getPrototype ()->nimbility = 0.82;
+    getPrototype ()->manoeverability = 0.46;
+    getPrototype ()->maxshield = 75;
     zoom = 0.44;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
-    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 2;
+    getPrototype ()->missilerack [0] = 0; getPrototype ()->missilerack [1] = 6; getPrototype ()->missilerack [2] = 6; getPrototype ()->missilerack [3] = 0;
     flares = 20;
     chaffs = 20;
     statfirepower = 2;
@@ -359,15 +378,15 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == CrowDescriptor)
   {
-    maxthrust = 0.25;
-    nimbility = 0.72;
-    manoeverability = 0.4;
-    maxshield = 60;
+    getPrototype ()->maxthrust = 0.25;
+    getPrototype ()->nimbility = 0.72;
+    getPrototype ()->manoeverability = 0.4;
+    getPrototype ()->maxshield = 60;
     zoom = 0.41;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
-    missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 1;
+    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 0; getPrototype ()->missilerack [2] = 0; getPrototype ()->missilerack [3] = 6;
     flares = 20;
     chaffs = 20;
     statfirepower = 1;
@@ -375,15 +394,15 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == StormDescriptor)
   {
-    maxthrust = 0.25;
-    nimbility = 0.52;
-    manoeverability = 0.34;
-    maxshield = 160;
+    getPrototype ()->maxthrust = 0.25;
+    getPrototype ()->nimbility = 0.52;
+    getPrototype ()->manoeverability = 0.34;
+    getPrototype ()->maxshield = 160;
     zoom = 0.45;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
-    missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 1;
+    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 0; getPrototype ()->missilerack [2] = 0; getPrototype ()->missilerack [3] = 6;
     flares = 25;
     chaffs = 25;
     statfirepower = 4;
@@ -391,85 +410,85 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   }
   else if (id == PhoenixDescriptor)
   {
-    maxthrust = 0.3;
-    nimbility = 0.54;
-    manoeverability = 0.34;
-    maxshield = 180;
+    getPrototype ()->maxthrust = 0.3;
+    getPrototype ()->nimbility = 0.54;
+    getPrototype ()->manoeverability = 0.34;
+    getPrototype ()->maxshield = 180;
     zoom = 0.47;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 3; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 3;
-    missilerack [0] = 4; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 4;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 3; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 3;
+    getPrototype ()->missilerack [0] = 4; getPrototype ()->missilerack [1] = 4; getPrototype ()->missilerack [2] = 4; getPrototype ()->missilerack [3] = 4;
     flares = 25;
     chaffs = 25;
     bomber = 1;
     statfirepower = 5;
     ammo = 2000;
-    dualshot = true;
+    getPrototype ()->dualshot = true;
   }
   else if (id == RedArrowDescriptor)
   {
-    maxthrust = 0.33;
-    nimbility = 0.95;
-    manoeverability = 0.52;
-    maxshield = 120;
+    getPrototype ()->maxthrust = 0.33;
+    getPrototype ()->nimbility = 0.95;
+    getPrototype ()->manoeverability = 0.52;
+    getPrototype ()->maxshield = 120;
     zoom = 0.4;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
-    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
+    getPrototype ()->missilerack [0] = 7; getPrototype ()->missilerack [1] = 1; getPrototype ()->missilerack [2] = 1; getPrototype ()->missilerack [3] = 7;
     flares = 25;
     chaffs = 25;
     statfirepower = 2;
     ammo = 1400;
-    dualshot = true;
+    getPrototype ()->dualshot = true;
   }
   else if (id == BlackBirdDescriptor)
   {
-    maxthrust = 0.3;
-    nimbility = 1.0;
-    manoeverability = 0.54;
-    maxshield = 85;
+    getPrototype ()->maxthrust = 0.3;
+    getPrototype ()->nimbility = 1.0;
+    getPrototype ()->manoeverability = 0.54;
+    getPrototype ()->maxshield = 85;
     zoom = 0.33;
-    maxrot.theta = 90.0;
-    maxrot.gamma = 70.0;
-    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
-    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
+    getPrototype ()->maxrot.theta = 90.0;
+    getPrototype ()->maxrot.gamma = 70.0;
+    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
+    getPrototype ()->missilerack [0] = 7; getPrototype ()->missilerack [1] = 1; getPrototype ()->missilerack [2] = 1; getPrototype ()->missilerack [3] = 7;
     flares = 25;
     chaffs = 25;
     statfirepower = 2;
     ammo = 1400;
-    dualshot = true;
+    getPrototype ()->dualshot = true;
   }
   if (id >= FighterBeginDescriptor && id <= AirEndDescriptor)
   {
-    recthrust = maxthrust / 2.0;
-    shield = maxshield;
-    thrust = recthrust = maxthrust / 2;
+    recthrust = getPrototype ()->maxthrust / 2.0;
+    shield = getPrototype ()->maxshield;
+    thrust = recthrust = getPrototype ()->maxthrust / 2;
     smoke->type = 1;
-    impact = 2;
+    getPrototype ()->impact = 2;
     force.z = recthrust;
     o->cube.set (zoom * cubefac, zoom * cubefac, zoom * cubefac);
   }
 
   if (id == SacDescriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 12.0;
-    shield = maxshield = 80;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 12.0;
+    shield = getPrototype ()->maxshield = 80;
     zoom = 0.35;
   }
   if (id == SamDescriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 6.0;
-    shield = maxshield = 70;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 6.0;
+    shield = getPrototype ()->maxshield = 70;
     zoom = 0.3;
     missiles [6] = 100;
   }
@@ -480,69 +499,69 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
 
   if (id == WieselDescriptor)
   {
-    maxthrust = 0.04;
+    getPrototype ()->maxthrust = 0.04;
     thrust = 0;
     currot.gamma = 180; currot.theta = 0; currot.phi = 0;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 8.0;
-    shield = maxshield = 160;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 8.0;
+    shield = getPrototype ()->maxshield = 160;
     zoom = 0.35;
     o->cube.set (zoom * 0.7, zoom * 0.45, zoom * 0.7);
   }
   else if (id == PantherDescriptor)
   {
-    maxthrust = 0.04;
+    getPrototype ()->maxthrust = 0.04;
     thrust = 0;
     currot.gamma = 180; currot.theta = 0; currot.phi = 0;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 8.0;
-    shield = maxshield = 200;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 8.0;
+    shield = getPrototype ()->maxshield = 200;
     zoom = 0.4;
     o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
   else if (id == PickupDescriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0.02;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 0;
-    shield = maxshield = 30;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 0;
+    shield = getPrototype ()->maxshield = 30;
     zoom = 0.25;
     o->cube.set (zoom * 0.7, zoom * 0.55, zoom * 0.7);
   }
   else if (id == TruckDescriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0.02;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 0;
-    shield = maxshield = 20;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 0;
+    shield = getPrototype ()->maxshield = 20;
     zoom = 0.45;
     o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
   else if (id == Truck2Descriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0.02;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 0;
-    shield = maxshield = 40;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 0;
+    shield = getPrototype ()->maxshield = 40;
     zoom = 0.4;
     o->cube.set (zoom * 0.6, zoom * 0.35, zoom * 0.6);
   }
   else if (id == MobileSamDescriptor)
   {
-    maxthrust = 0;
+    getPrototype ()->maxthrust = 0;
     thrust = 0.02;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 0;
-    shield = maxshield = 50;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 0;
+    shield = getPrototype ()->maxshield = 50;
     zoom = 0.35;
     missiles [6] = 200;
     o->cube.set (zoom * 0.7, zoom * 0.6, zoom * 0.7);
@@ -554,26 +573,26 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   if (id == CruiserDescriptor)
   {
     zoom = 5.0;
-    maxthrust = 0.05;
+    getPrototype ()->maxthrust = 0.05;
     thrust = 0.05;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 4.0;
-    impact = 20;
-    shield = maxshield = 5500;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 4.0;
+    getPrototype ()->impact = 20;
+    shield = getPrototype ()->maxshield = 5500;
     missiles [6] = 200;
     o->cube.set (zoom * 0.35, zoom * 0.1, zoom * 0.35);
   }
   else if (id == LightDestroyerDescriptor)
   {
     zoom = 2.5;
-    maxthrust = 0.05;
+    getPrototype ()->maxthrust = 0.05;
     thrust = 0.05;
-    maxrot.gamma = 0;
-    maxrot.theta = 0.03;
-    manoeverability = 6.0;
-    impact = 20;
-    shield = maxshield = 2800;
+    getPrototype ()->maxrot.gamma = 0;
+    getPrototype ()->maxrot.theta = 0.03;
+    getPrototype ()->manoeverability = 6.0;
+    getPrototype ()->impact = 20;
+    shield = getPrototype ()->maxshield = 2800;
     o->cube.set (zoom * 0.4, zoom * 0.12, zoom * 0.4);
   }
 
@@ -581,89 +600,89 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   if (id == AamHs1Descriptor)
   {
     intelligence = 100;
-    maxthrust = 0.7 * missilethrustbase;
-    nimbility = 2.5; // old 2.2
-    manoeverability = 1.5;
+    getPrototype ()->maxthrust = 0.7 * missilethrustbase;
+    getPrototype ()->nimbility = 2.5; // old 2.2
+    getPrototype ()->manoeverability = 1.5;
     ttl = 300 * timestep;
-    impact = 35;
+    getPrototype ()->impact = 35;
   }
   else if (id == AamHs2Descriptor)
   {
     intelligence = 50;
-    maxthrust = 0.75 * missilethrustbase;
-    nimbility = 3.5; // old 3.5
-    manoeverability = 2.0;
+    getPrototype ()->maxthrust = 0.75 * missilethrustbase;
+    getPrototype ()->nimbility = 3.5; // old 3.5
+    getPrototype ()->manoeverability = 2.0;
     ttl = 320 * timestep;
-    impact = 45;
+    getPrototype ()->impact = 45;
   }
   else if (id == AamHs3Descriptor)
   {
     intelligence = 0;
-    maxthrust = 0.8 * missilethrustbase;
-    nimbility = 4.5;
-    manoeverability = 2.5;
+    getPrototype ()->maxthrust = 0.8 * missilethrustbase;
+    getPrototype ()->nimbility = 4.5;
+    getPrototype ()->manoeverability = 2.5;
     ttl = 340 * timestep;
-    impact = 55;
+    getPrototype ()->impact = 55;
   }
   else if (id == Agm1Descriptor)
   {
     intelligence = 50;
-    maxthrust = 0.75 * missilethrustbase;
-    nimbility = 1.2;
-    manoeverability = 1.0;
+    getPrototype ()->maxthrust = 0.75 * missilethrustbase;
+    getPrototype ()->nimbility = 1.2;
+    getPrototype ()->manoeverability = 1.0;
     ai = true;
     ttl = 300 * timestep;
-    impact = 400;
+    getPrototype ()->impact = 400;
   }
   else if (id == Agm2Descriptor)
   {
     intelligence = 0;
-    maxthrust = 0.8 * missilethrustbase;
-    nimbility = 1.5;
-    manoeverability = 1.0;
+    getPrototype ()->maxthrust = 0.8 * missilethrustbase;
+    getPrototype ()->nimbility = 1.5;
+    getPrototype ()->manoeverability = 1.0;
     ai = true;
     ttl = 400 * timestep;
-    impact = 500;
+    getPrototype ()->impact = 500;
   }
   else if (id == DfmDescriptor)
   {
     intelligence = 0;
-    maxthrust = 0.75 * missilethrustbase;
-    nimbility = 0.0;
-    manoeverability = 0.0;
+    getPrototype ()->maxthrust = 0.75 * missilethrustbase;
+    getPrototype ()->nimbility = 0.0;
+    getPrototype ()->manoeverability = 0.0;
     ai = true;
     ttl = 350 * timestep;
-    impact = 920;
+    getPrototype ()->impact = 920;
   }
   else if (id == AamFf1Descriptor)
   {
     intelligence = 0;
-    maxthrust = 0.8 * missilethrustbase;
-    nimbility = 2.0;
-    manoeverability = 1.3;
+    getPrototype ()->maxthrust = 0.8 * missilethrustbase;
+    getPrototype ()->nimbility = 2.0;
+    getPrototype ()->manoeverability = 1.3;
     ttl = 300 * timestep;
-    impact = 40;
+    getPrototype ()->impact = 40;
   }
   else if (id == AamFf2Descriptor)
   {
     intelligence = 0;
-    maxthrust = 0.85 * missilethrustbase;
-    nimbility = 3.0;
-    manoeverability = 2.0;
+    getPrototype ()->maxthrust = 0.85 * missilethrustbase;
+    getPrototype ()->nimbility = 3.0;
+    getPrototype ()->manoeverability = 2.0;
     ttl = 320 * timestep;
-    impact = 50;
+    getPrototype ()->impact = 50;
   }
   else if (id == MineDescriptor)
   {
     intelligence = 0;
-    maxthrust = 0.1;
-    if (difficulty == 1) maxthrust = 0.14;
-    else if (difficulty == 2) maxthrust = 0.18;
-    nimbility = 1.5;
-    manoeverability = 1.0;
+    getPrototype ()->maxthrust = 0.1;
+    if (difficulty == 1) getPrototype ()->maxthrust = 0.14;
+    else if (difficulty == 2) getPrototype ()->maxthrust = 0.18;
+    getPrototype ()->nimbility = 1.5;
+    getPrototype ()->manoeverability = 1.0;
     ai = true;
     ttl = -1;
-    impact = 500;
+    getPrototype ()->impact = 500;
     zoom = 0.3;
   }
   if (id >= MissileBeginDescriptor && id <= MissileEndDescriptor)
@@ -674,97 +693,97 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   if (id >= StaticPassiveBeginDescriptor)
   {
     intelligence = 0;
-    maxthrust = 0;
-    nimbility = 0;
-    manoeverability = 0;
-    impact = 5;
-    maxrot.theta = 0;
-    maxrot.gamma = 0;
+    getPrototype ()->maxthrust = 0;
+    getPrototype ()->nimbility = 0;
+    getPrototype ()->manoeverability = 0;
+    getPrototype ()->impact = 5;
+    getPrototype ()->maxrot.theta = 0;
+    getPrototype ()->maxrot.gamma = 0;
   }
   if (id == TentDescriptor)
   {
-    shield = maxshield = 80;
+    shield = getPrototype ()->maxshield = 80;
     zoom = 0.5;
     o->cube.set (zoom * 0.9, zoom, zoom * 0.9);
   }
   if (id == BigTentDescriptor)
   {
-    shield = maxshield = 160;
+    shield = getPrototype ()->maxshield = 160;
     zoom = 1.2;
     o->cube.set (zoom * 0.7, zoom * 0.42, zoom * 0.7);
   }
   if (id == ContainerDescriptor)
   {
-    shield = maxshield = 30;
+    shield = getPrototype ()->maxshield = 30;
     zoom = 1.0;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.4, zoom * 0.35, zoom * 0.9);
   }
   if (id == HallDescriptor)
   {
-    shield = maxshield = 450;
+    shield = getPrototype ()->maxshield = 450;
     zoom = 1.8;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.45, zoom * 0.42, zoom);
   }
   if (id == Hall2Descriptor)
   {
-    shield = maxshield = 900;
+    shield = getPrototype ()->maxshield = 900;
     zoom = 2.5;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom, zoom * 0.45, zoom);
   }
   if (id == OilrigDescriptor)
   {
-    shield = maxshield = 1400;
+    shield = getPrototype ()->maxshield = 1400;
     zoom = 3.5;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.95, zoom * 0.5, zoom * 0.95);
   }
   if (id == ComplexDescriptor)
   {
-    shield = maxshield = 5000;
+    shield = getPrototype ()->maxshield = 5000;
     zoom = 2.0;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.75, zoom * 0.6, zoom * 0.75);
   }
   if (id == RadarDescriptor)
   {
-    shield = maxshield = 500;
+    shield = getPrototype ()->maxshield = 500;
     zoom = 1.3;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.5, zoom * 0.7, zoom * 0.5);
   }
   if (id == AsteroidDescriptor)
   {
-    shield = maxshield = 100000;
+    shield = getPrototype ()->maxshield = 100000;
     zoom = 0.01 * math.random (60) + 1.0;
-    impact = 5;
+    getPrototype ()->impact = 5;
     thrust = 0.25;
-    maxthrust = 0.25;
+    getPrototype ()->maxthrust = 0.25;
     force.z = 0.12;
     ai = false;
     o->cube.set (zoom * 0.7, zoom * 0.7, zoom * 0.7);
   }
   if (id == MoonBaseDescriptor)
   {
-    shield = maxshield = 5500;
+    shield = getPrototype ()->maxshield = 5500;
     zoom = 4.0;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom * 0.7, zoom * 0.5, zoom * 0.7);
   }
   if (id == DepotDescriptor)
   {
-    shield = maxshield = 3000;
+    shield = getPrototype ()->maxshield = 3000;
     zoom = 1.5;
-    impact = 20;
+    getPrototype ()->impact = 20;
     o->cube.set (zoom, zoom * 0.5, zoom);
   }
   if (id == LaserBarrierDescriptor)
   {
-    shield = maxshield = 1000;
+    shield = getPrototype ()->maxshield = 1000;
     zoom = 12.0;
-    impact = 2000;
+    getPrototype ()->impact = 2000;
     o->cube.set (0.8, 11, 11);
   }
   if (id >= StaticPassiveBeginDescriptor)
@@ -779,7 +798,7 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     if (party != 1 && shield > 10) // not player party
     {
       shield = shield * 8 / 10;
-      maxshield = shield;
+      getPrototype ()->maxshield = shield;
     }
   }
   else if (difficulty == 1) // normal
@@ -828,8 +847,8 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
   ammo --;
   laser->thrust = 0;
   laser->recthrust = laser->thrust;
-  laser->manoeverability = 0.0;
-  laser->maxthrust = 0;
+  laser->getPrototype ()->manoeverability = 0.0;
+  laser->getPrototype ()->maxthrust = 0;
   if (target != NULL && ai)
   {
     if (target->active)
@@ -859,14 +878,14 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
   firecannonttl += 45;
   if (day)
   {
-    if (dualshot)
+    if (getPrototype ()->dualshot)
       laser->o = Model3dRegistry::get ("Cannon1b");
     else
       laser->o = Model3dRegistry::get ("Cannon1");
   }
   else
   {
-    if (dualshot)
+    if (getPrototype ()->dualshot)
       laser->o = Model3dRegistry::get ("Cannon2b");
     else
       laser->o = Model3dRegistry::get ("Cannon2");
@@ -905,7 +924,7 @@ void AIObj::fireMissile2 (const UnitDescriptor &id, AIObj *missile, AIObj *targe
   missile->id = id;
   missile->explode = 0;
   missile->thrust = thrust + 0.001;
-  missile->recthrust = missile->maxthrust;
+  missile->recthrust = missile->getPrototype ()->maxthrust;
   missile->currot.gamma = currot.gamma;
   missile->target = target;
   missile->recrot.gamma = currot.gamma;
@@ -979,16 +998,16 @@ void AIObj::decreaseMissile (const UnitDescriptor &id)
   missiles [value] --;
   int ptrrack = 0, maxrack = 0;
   for (i = 0; i < missileracks; i ++)
-    if (missilerack [i] == id.id)
-      if (missilerackn [i] > maxrack)
+    if (getPrototype ()->missilerack [i] == id.id)
+      if (getPrototype ()->missilerackn [i] > maxrack)
       {
         ptrrack = i;
-        maxrack = missilerackn [i];
+        maxrack = getPrototype ()->missilerackn [i];
       }
   if (maxrack > 0)
   {
-    missilerackn [ptrrack] --;
-    ref [ptrrack * 3 + 2 - missilerackn [ptrrack]].trafo.scaling.set (0, 0, 0);
+    getPrototype ()->missilerackn [ptrrack] --;
+    ref [ptrrack * 3 + 2 - getPrototype ()->missilerackn [ptrrack]].trafo.scaling.set (0, 0, 0);
   }
 }
 
@@ -1014,16 +1033,8 @@ bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile, AIObj *targe
 bool AIObj::fireMissile (AIObj **missile, AIObj *target)
 {
   if (ttf > 0) return false;
-  UnitDescriptor desc;
-  if (missiletype == 0) desc = AamHs1Descriptor;
-  else if (missiletype == 1) desc = AamHs2Descriptor;
-  else if (missiletype == 2) desc = AamHs3Descriptor;
-  else if (missiletype == 3) desc = Agm1Descriptor;
-  else if (missiletype == 4) desc = Agm2Descriptor;
-  else if (missiletype == 5) desc = DfmDescriptor;
-  else if (missiletype == 6) desc = AamFf1Descriptor;
-  else if (missiletype == 7) desc = AamFf1Descriptor;
-  return fireMissile (desc, missile, (AIObj *) target); // TODO: lookup in descriptor registry: MissileBeginDescriptor + missiletype
+  UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + missiletype);
+  return fireMissile (desc, missile, (AIObj *) target);
 }
 
 bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile)
@@ -1035,16 +1046,8 @@ bool AIObj::fireMissile (const UnitDescriptor &id, AIObj **missile)
 bool AIObj::fireMissile (AIObj **missile)
 {
   if (ttf > 0) return false;
-  UnitDescriptor desc;
-  if (missiletype == 0) desc = AamHs1Descriptor;
-  else if (missiletype == 1) desc = AamHs2Descriptor;
-  else if (missiletype == 2) desc = AamHs3Descriptor;
-  else if (missiletype == 3) desc = Agm1Descriptor;
-  else if (missiletype == 4) desc = Agm2Descriptor;
-  else if (missiletype == 5) desc = DfmDescriptor;
-  else if (missiletype == 6) desc = AamFf1Descriptor;
-  else if (missiletype == 7) desc = AamFf1Descriptor;
-  return fireMissile (desc, missile); // TODO: lookup in descriptor registry: MissileBeginDescriptor + missiletype
+  UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + missiletype);
+  return fireMissile (desc, missile);
 }
 
 bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
@@ -1319,8 +1322,8 @@ void AIObj::easyPiloting (Uint32 dt)
   deltatheta = recrot.theta - currot.theta;
   if (fabs (dtheta) > 30)
   { dtheta = 0; }
-  float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
-  if (mynimbility > nimbility) mynimbility = nimbility;
+  float mynimbility = fabs (deltatheta) / 5.0F * getPrototype ()->nimbility;
+  if (mynimbility > getPrototype ()->nimbility) mynimbility = getPrototype ()->nimbility;
   float nimbility2 = mynimbility;
   if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
     nimbility2 = 0.00001;
@@ -1339,17 +1342,17 @@ void AIObj::easyPiloting (Uint32 dt)
     if (deltatheta < estimatedtheta) dtheta -= mynimbility * timefac;
     else if (deltatheta > estimatedtheta) dtheta += mynimbility * timefac;
   }
-  if (dtheta > (nimbility * (1.0 + realspeed)) * timefac * 5.0F)
-    dtheta = (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
+  if (dtheta > (getPrototype ()->nimbility * (1.0 + realspeed)) * timefac * 5.0F)
+    dtheta = (getPrototype ()->nimbility * (1.0 + realspeed)) * timefac * 5.0F;
   currot.theta += dtheta;
 
   assert (easymodel == 1);
   // height changes
-  float nimbility1 = nimbility / 5;
+  float nimbility1 = getPrototype ()->nimbility / 5;
   if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
     nimbility1 = 0.00001;
-  if (currot.theta > maxrot.theta) currot.theta = maxrot.theta; // restrict roll angle
-  else if (currot.theta < -maxrot.theta) currot.theta = -maxrot.theta;
+  if (currot.theta > getPrototype ()->maxrot.theta) currot.theta = getPrototype ()->maxrot.theta; // restrict roll angle
+  else if (currot.theta < -getPrototype ()->maxrot.theta) currot.theta = -getPrototype ()->maxrot.theta;
 
   float deltagamma = recrot.gamma - currot.gamma;
   if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
@@ -1370,15 +1373,15 @@ void AIObj::easyPiloting (Uint32 dt)
     if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
     else if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
   }
-  if (dgamma > manoeverability * (3.33 + 15.0 * realspeed) * timefac)
-    dgamma = manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+  if (dgamma > getPrototype ()->manoeverability * (3.33 + 15.0 * realspeed) * timefac)
+    dgamma = getPrototype ()->manoeverability * (3.33 + 15.0 * realspeed) * timefac;
   currot.gamma += dgamma;
 }
 
 void AIObj::limitRotation ()
 {
-  if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
-  else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
+  if (currot.gamma > 180 + getPrototype ()->maxrot.gamma) currot.gamma = 180 + getPrototype ()->maxrot.gamma;
+  else if (currot.gamma < 180 - getPrototype ()->maxrot.gamma) currot.gamma = 180 - getPrototype ()->maxrot.gamma;
 }
 
 void AIObj::estimateTargetPosition (float *dx2, float *dz2)
@@ -1389,7 +1392,7 @@ void AIObj::estimateTargetPosition (float *dx2, float *dz2)
   t *= (float) (400 - precision) / 400;
   int tt = (int) target->currot.theta;
   if (tt < 0) tt += 360;
-  float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
+  float newphi = t * SIN(tt) * 5.0 * target->getPrototype ()->manoeverability; // new angle of target after time t
   if (newphi > 90) newphi = 90;
   else if (newphi < -90) newphi = -90;
   newphi += (float) target->currot.phi;
@@ -1701,11 +1704,11 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     recthrust = 0; thrust = 0;
     if (aw > 5)
     {
-      recrot.theta = maxrot.theta;
+      recrot.theta = getPrototype ()->maxrot.theta;
     }
     else if (aw < -5)
     {
-      recrot.theta = -maxrot.theta;
+      recrot.theta = -getPrototype ()->maxrot.theta;
     }
     else
     {
@@ -1714,14 +1717,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   }
   else if (id >= TankBeginDescriptor && id <= TankEndDescriptor) // tanks
   {
-    recthrust = maxthrust; thrust = maxthrust; // always at maximum thrust
+    recthrust = getPrototype ()->maxthrust; thrust = getPrototype ()->maxthrust; // always at maximum thrust
     if (aw > 5)
     {
-      recrot.theta = maxrot.theta;
+      recrot.theta = getPrototype ()->maxrot.theta;
     }
     else if (aw < -5)
     {
-      recrot.theta = -maxrot.theta;
+      recrot.theta = -getPrototype ()->maxrot.theta;
     }
     else
     {

@@ -50,25 +50,25 @@ void MissionDemo1::start ()
   sungamma = 45;
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
-  objectInit (new Fighter (), FalconDescriptor, 1, 0, 0);
+  objectInit (new Fighter (FalconDescriptor), 1, 0, 0);
   fplayer = fighter [0];
   fighter [0]->trafo.translation.x = 220;
   fighter [0]->trafo.translation.z = -30;
 //  fighter [0]->o = Model3dRegistry::get ("FalconDescriptor");
-  fighter [0]->target = fighter [2];
-  objectInit (new Fighter (), FalconDescriptor, 1, 0, 1);
-  fighter [1]->target = fighter [3];
+  objectInit (new Fighter (FalconDescriptor), 1, 0, 1);
   fighter [1]->trafo.translation.x = 49;
   fighter [1]->trafo.translation.z = -30;
   fighter [1]->aggressivity = 300;
   for (i = 2; i <= 8; i ++)
   {
-    objectInit (new Fighter (), SwallowDescriptor, 0, 400 - i * 20, i);
+    objectInit (new Fighter (SwallowDescriptor), 0, 400 - i * 20, i);
     fighter [i]->target = fighter [math.random (2)];
 //    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = i * 20;
     fighter [i]->trafo.translation.z = 0;
   }
+  fighter [0]->target = fighter [2];
+  fighter [1]->target = fighter [3];
 }
 
 int MissionDemo1::processtimer (Uint32 dt)

@@ -79,13 +79,13 @@ void MissionCanyon3::start ()
   fighter [5]->newinit (ComplexDescriptor, 0, 0);
   fighter [5]->trafo.translation.x = px;
   fighter [5]->trafo.translation.z = py;
-  fighter [5]->maxthrust = 0;
+  fighter [5]->getPrototype ()->maxthrust = 0;
   fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
   {
 //    fighter [i]->o = &model_hall1;
     fighter [i]->newinit (HallDescriptor, 0, 100);
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
   fighter [6]->trafo.translation.x = px + 3;

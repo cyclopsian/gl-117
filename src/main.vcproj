@@ -375,6 +375,12 @@
 			<File
 				RelativePath=".\configuration\Dirs.h">
 			</File>
+			<File
+				RelativePath=".\configuration\OptionFile.cpp">
+			</File>
+			<File
+				RelativePath=".\configuration\OptionFileFactory.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="net"
@@ -574,6 +580,12 @@
 			</File>
 			<File
 				RelativePath=".\aiobject\Tank.cpp">
+			</File>
+			<File
+				RelativePath=".\aiobject\UnitDescriptor.cpp">
+			</File>
+			<File
+				RelativePath=".\aiobject\UnitDescriptorRegistry.cpp">
 			</File>
 		</Filter>
 		<Filter

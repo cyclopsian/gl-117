@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes all AI objects instancing models. */
-
 #ifndef IS_AIOBJECT_H
 
 #include "AiObj.h"
@@ -32,11 +30,13 @@
 #include <cassert>
 
 
-StaticAa::StaticAa () : AIObj ()
+StaticAa::StaticAa (const UnitDescriptor &desc)
+  : AIObj (desc)
 {
 }
 
-StaticAa::StaticAa (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
+StaticAa::StaticAa (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : AIObj (desc, space2, o2, zoom2)
 {
 }
 
@@ -143,11 +143,11 @@ void StaticAa::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynami
   recthrust = 0; thrust = 0;
   if (aw > 5)
   {
-    recrot.theta = maxrot.theta;
+    recrot.theta = getPrototype ()->maxrot.theta;
   }
   else if (aw < -5)
   {
-    recrot.theta = -maxrot.theta;
+    recrot.theta = -getPrototype ()->maxrot.theta;
   }
   else
   {

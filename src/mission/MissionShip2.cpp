@@ -71,7 +71,7 @@ void MissionShip2::start ()
   fighter [2]->trafo.translation.x = 20;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->newinit (OilrigDescriptor, 0, 0);
-  fighter [2]->maxthrust = 0;
+  fighter [2]->getPrototype ()->maxthrust = 0;
   fighter [2]->thrust = 0;
   fighter [2]->party = 1;
   for (i = 3; i <= 5; i ++)

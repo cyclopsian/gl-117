@@ -40,6 +40,7 @@ class Dirs
     char models [4096];
     char maps [4096];
     char shaders [4096];
+    char units [4096];
 
     Dirs ();
     virtual ~Dirs ();
@@ -55,6 +56,7 @@ class Dirs
     char *getModels (const char *name);
     char *getMaps (const char *name);
     char *getShaders (const char *name);
+    char *getUnits (const char *name);
   
   protected:
 

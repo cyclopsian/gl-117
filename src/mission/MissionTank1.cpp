@@ -69,7 +69,7 @@ void MissionTank1::start ()
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
     fighter [i]->newinit (PantherDescriptor, 0, 400 - i * 25);
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
   for (i = 8; i <= 10; i ++)

@@ -146,7 +146,7 @@ void MissionBase::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py - 6;
@@ -154,7 +154,7 @@ void MissionBase::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   n ++;
   fighter [n]->trafo.translation.x = px + 6;
   fighter [n]->trafo.translation.z = py - 6;
@@ -162,7 +162,7 @@ void MissionBase::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 270;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   n ++;
   fighter [n]->trafo.translation.x = px + 6;
   fighter [n]->trafo.translation.z = py + 6;
@@ -170,7 +170,7 @@ void MissionBase::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 180;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   n ++;
   for (i = n; i < n + 6; i ++)
   {

@@ -111,6 +111,7 @@ void Dirs::init (char *arg)
   strcpy (saves, path);
   strcpy (maps, path);
   strcpy (shaders, path);
+  strcpy (units, path);
   append (saves, "saves");
 #else
   char buf [4096];
@@ -222,6 +223,7 @@ void Dirs::init (char *arg)
     strcpy (models, env);
     strcpy (maps, env);
     strcpy (shaders, path);
+    strcpy (units, env);
   }
   else
   {
@@ -232,6 +234,7 @@ void Dirs::init (char *arg)
     strcpy (models, myfile);
     strcpy (maps, myfile);
     strcpy (shaders, myfile);
+    strcpy (units, myfile);
   }
 #endif
   append (textures, "textures");
@@ -240,6 +243,7 @@ void Dirs::init (char *arg)
   append (models, "models");
   append (maps, "maps");
   append (shaders, "shaders");
+  append (units, "units");
 }
 
 Dirs::~Dirs ()
@@ -291,6 +295,13 @@ char *Dirs::getMaps (const char *name)
 char *Dirs::getShaders (const char *name)
 {
   strcpy (dir, shaders);
+  strcat (dir, name);
+  return dir;
+}
+
+char *Dirs::getUnits (const char *name)
+{
+  strcpy (dir, units);
   strcat (dir, name);
   return dir;
 }

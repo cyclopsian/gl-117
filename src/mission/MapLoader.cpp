@@ -113,6 +113,7 @@ Mission *MapLoader::getMission ()
 
 
 MissionCustom::MissionCustom ()
+  : Mission ()
 {
   reterror = 0;
   numobjects = 0;

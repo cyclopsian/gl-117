@@ -22,6 +22,8 @@
 #ifndef IS_CONFIGURATION_H
 #define IS_CONFIGURATION_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "../config.h" // defines HAVE_SDL, HAVE_SDL_MIXER
 #include "opengl/includegl.h"
 
@@ -258,5 +260,40 @@ class Configuration
 };
 
 extern Configuration conf;
+
+
+
+#include <map>
+#include <string>
+
+#include "filetokenizer/FileTokenizer.h"
+
+typedef std::map <std::string, std::string> OptionList;
+
+class OptionFile
+{
+  public:
+  
+    FileTokenizer file;
+    OptionList optionList;
+  
+    OptionFile (const std::string &filename);
+    ~OptionFile ();
+    
+    std::string getString (const std::string &name);
+    bool getBoolean (const std::string &name);
+    int getInteger (const std::string &name);
+    float getFloat (const std::string &name);
+};
+
+typedef std::map<std::string, OptionFile *> OptionFileList;
+
+class OptionFileFactory
+{
+  public:
+
+    static OptionFileList optionFileList;
+    static OptionFile *get (const std::string &filename);
+};
 
 #endif

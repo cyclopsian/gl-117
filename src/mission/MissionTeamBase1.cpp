@@ -112,7 +112,7 @@ void MissionTeamBase1::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
@@ -121,7 +121,7 @@ void MissionTeamBase1::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   fighter [n]->party = 1;
   n ++;
   fighter [n]->trafo.translation.x = px - 15;
@@ -198,7 +198,7 @@ void MissionTeamBase1::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px - 6;
@@ -207,7 +207,7 @@ void MissionTeamBase1::start ()
 //  fighter [n]->o = &model_flak1;
   fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
-  fighter [n]->maxrot.theta = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
   fighter [n]->party = 2;
   n ++;
   fighter [n]->trafo.translation.x = px - 15;
@@ -285,7 +285,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
         fighter [i]->newinit (tempid, 0, 200);
       }
       fighter [i]->party = i / 2 + 1;
-      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
       fighter [i]->immunity = 50 * timestep;
       fighter [i]->activate ();
 //      fighter [i]->killed = false;

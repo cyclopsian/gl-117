@@ -66,7 +66,7 @@ void MissionCanyon1::start ()
   fighter [1]->newinit (ComplexDescriptor, 0, 0);
   fighter [1]->trafo.translation.x = px + 1;
   fighter [1]->trafo.translation.z = py + 1;
-  fighter [1]->maxthrust = 0;
+  fighter [1]->getPrototype ()->maxthrust = 0;
   fighter [1]->thrust = 0;
   for (i = 2; i < 4; i ++)
   {
@@ -74,7 +74,7 @@ void MissionCanyon1::start ()
     fighter [i]->newinit (RadarDescriptor, 0, 0);
     fighter [i]->trafo.translation.x = px - 2 - (i - 2) * 2;
     fighter [i]->trafo.translation.z = py - 2 - (i - 2) * 2;
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
   for (i = 4; i <= 10; i ++)
@@ -95,7 +95,7 @@ void MissionCanyon1::start ()
     fighter [i]->newinit (SamDescriptor, 0, 200);
     fighter [i]->trafo.translation.x = px + 4;
     fighter [i]->trafo.translation.z = py + i * 3 - 30;
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
     fighter [i]->currot.phi = 220;
   }

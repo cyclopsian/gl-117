@@ -311,7 +311,7 @@ void StatePlay::key (int key, int x, int y)
   }
   else if (key >= '1' && key <= '9')
   {
-    fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
+    fplayer->recthrust = fplayer->getPrototype ()->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
     sound->play (SOUND_CLICK1, false);
   }
   else if (hikey == key_targetnearest || lokey == key_targetnearest)
@@ -564,7 +564,7 @@ void StatePlay::joystickAxis (int x, int y, int rudder, int throttle)
   fplayer->ruddereffect = (float) rudder / 30000;
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
-  fplayer->recthrust = fplayer->maxthrust * 0.75 - fplayer->maxthrust / 4 * throttle / 32638;
+  fplayer->recthrust = fplayer->getPrototype ()->maxthrust * 0.75 - fplayer->getPrototype ()->maxthrust / 4 * throttle / 32638;
 }
 
 void StatePlay::joystickButton (int button)
@@ -1052,7 +1052,7 @@ void StateFighter::display ()
   allmenus.setVisible (false);
   fightermenu.setVisible (true);
   fightermenu.draw ();
-  AIObj ffighter;
+  AIObj ffighter (FalconDescriptor);
 
   char buf [256];
   int i;
@@ -1106,19 +1106,19 @@ void StateFighter::display ()
   font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   yf -= 1;
   strcpy (buf, "SPEED: ");
-  int stars = (int) ((ffighter.maxthrust - 0.2) * 40);
+  int stars = (int) ((ffighter.getPrototype ()->maxthrust - 0.2) * 40);
   font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
-  strcpy (buf, "NIMBILITY: ");
-  stars = (int) ((ffighter.manoeverability - 0.3) * 20 + 1);
+  strcpy (buf, "getPrototype ()->nimbility: ");
+  stars = (int) ((ffighter.getPrototype ()->manoeverability - 0.3) * 20 + 1);
   font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "SHIELD: ");
-  stars = (int) ((ffighter.maxshield - 30) / 30);
+  stars = (int) ((ffighter.getPrototype ()->maxshield - 30) / 30);
   font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, *col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
@@ -1279,7 +1279,7 @@ void StateStats::display ()
   font1->drawText (xf2, yf, zf, buf, *color);
   sprintf (buf, "+%d", timebonus);
   font1->drawText (xf3, yf, zf, buf, *color);
-  int shieldbonus = (int) (fplayer->shield * 100 / fplayer->maxshield);
+  int shieldbonus = (int) (fplayer->shield * 100 / fplayer->getPrototype ()->maxshield);
   yf -= linedist;
   font1->drawText (xf1, yf, zf, "SHIELD BONUS:", *color);
   sprintf (buf, "%d%%", shieldbonus);
@@ -2159,7 +2159,7 @@ void StatePlay::timer (Uint32 dt)
     flash -= dt;
 
   if (!fplayer->ai)
-    if (sound->engine != (int) ((fplayer->thrust / fplayer->maxthrust * 20) - 10))
+    if (sound->engine != (int) ((fplayer->thrust / fplayer->getPrototype ()->maxthrust * 20) - 10))
     {
       setPlaneVolume ();
       lastthrust = fplayer->thrust;

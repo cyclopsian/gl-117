@@ -70,7 +70,7 @@ void MissionShip3::start ()
   fighter [2]->trafo.translation.x = -20;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->newinit (CruiserDescriptor, 0, 200);
-  fighter [2]->maxthrust = 0;
+  fighter [2]->getPrototype ()->maxthrust = 0;
   fighter [2]->thrust = 0;
   for (i = 4; i <= 7; i ++)
   {

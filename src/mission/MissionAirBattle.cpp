@@ -70,11 +70,10 @@ void MissionAirBattle::start ()
     else
       fighter [i]->trafo.translation.x = -((i + 1) / 2) * 5;
     fighter [i]->trafo.translation.z = 100 + i * 5;
-    fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
   {
-    objectInit (new Fighter (), CrowDescriptor, 0, 440 - i * 10, i);
+    objectInit (new Fighter (CrowDescriptor), 0, 440 - i * 10, i);
     fighter [i]->target = fighter [math.random (7)];
     if (i <= 13)
     {
@@ -92,6 +91,9 @@ void MissionAirBattle::start ()
       fighter [i]->trafo.translation.z = -i * 8 - 350;
     }
   }
+  for (i = 1; i <= 6; i ++)
+    fighter [i]->target = fighter [7 + i];
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

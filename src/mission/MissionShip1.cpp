@@ -71,7 +71,7 @@ void MissionShip1::start ()
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
     fighter [i]->newinit (LightDestroyerDescriptor, 0, 50);
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
   for (i = 4; i <= 8; i ++)

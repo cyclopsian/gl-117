@@ -34,11 +34,23 @@
 
 DynamicObj::DynamicObj ()
 {
+  proto = NULL;
   init ();
 }
 
-DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
+DynamicObj::DynamicObj (const UnitDescriptor &desc)
 {
+  id = desc;
+  proto = new DynamicUnitPrototype (id);
+  
+  init ();
+}
+
+DynamicObj::DynamicObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+{
+  id = desc;
+  proto = new DynamicUnitPrototype (id);
+
   init ();
   
   space = space2;
@@ -49,6 +61,8 @@ DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
 
 DynamicObj::~DynamicObj ()
 {
+  delete proto;
+  proto = NULL;
 }
 
 void DynamicObj::activate ()
@@ -63,54 +77,52 @@ void DynamicObj::deactivate ()
   draw = false;
 }
 
+DynamicUnitPrototype *DynamicObj::getPrototype ()
+{
+  return proto;
+}
+
 void DynamicObj::init ()
 {
-  trafo.rotation.gamma = 90;
-  currot.phi = 0; currot.theta = 0; currot.gamma = 180;
-  recrot.theta = 0;
-  trafo.translation.z = 0; trafo.translation.x = 0;
-  force.x = 0; force.z = 0; force.y = 0;
-  maxthrust = 0.3; braking = 0/*0.99*/; manoeverability = 0.5;
-  thrust = maxthrust; recthrust = thrust; recheight = 5.0;
+  if (proto)
+  {
+    thrust = proto->maxthrust;
+    shield = proto->maxshield;
+  }
+  trafo.rotation.set (90.0, 0.0, 0.0);
+  currot.set (180.0, 0.0, 0.0);
+  recrot.set (0.0, 0.0, 0.0);
+  trafo.translation.set (0.0, 0.0, 0.0);
+  force.set (0.0, 0.0, 0.0);
+  recrot.set (180.0, 0.0, 0.0);
+  acc.set (0.0, 0.0, 0.0);
+  recthrust = thrust;
+  recheight = 5.0;
   ttl = -1;
-  shield = 0.01F; maxshield = 0.01F;
   immunity = 0;
-  recrot.gamma = 180;
   id = Cannon1Descriptor.id;
-  impact = 7;
   source = NULL;
-  stat.points = 0;
   party = 0;
   easymodel = 1; // easy model
   elevatoreffect = 0;
   ruddereffect = 0;
   rolleffect = 0;
-  maxrot.gamma = 70;
-  maxrot.theta = 90;
-  currot.gamma = 180;
-  currot.theta = 0;
   explode = 0;
   sink = 0;
-  nimbility = 1.0;
-  stat.fighterkills = 0;
-  stat.shipkills = 0;
-  stat.tankkills = 0;
-  stat.otherkills = 0;
-  stat.killed = false;
   realism = false;
-  acc.x = acc.y = acc.z = 0;
+  stat = ObjectStatistics ();
 }
 
 void DynamicObj::thrustUp ()
 {
-  recthrust += maxthrust / 12;
-  if (recthrust > maxthrust) recthrust = maxthrust;
+  recthrust += getPrototype ()->maxthrust / 12;
+  if (recthrust > getPrototype ()->maxthrust) recthrust = getPrototype ()->maxthrust;
 }
 
 void DynamicObj::thrustDown ()
 {
-  recthrust -= maxthrust / 12;
-  if (recthrust < maxthrust / 2) recthrust = maxthrust / 2;
+  recthrust -= getPrototype ()->maxthrust / 12;
+  if (recthrust < getPrototype ()->maxthrust / 2) recthrust = getPrototype ()->maxthrust / 2;
 }
 
 float DynamicObj::distance (DynamicObj *target)
@@ -295,20 +307,20 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 	    d->shield = -1.0F;
 	  }
     if (id < StaticPassiveBeginDescriptor || (id >= StaticPassiveBeginDescriptor && d->id >= MissileBeginDescriptor && d->id <= MissileEndDescriptor))
-      shield -= (float) d->impact;
+      shield -= (float) d->getPrototype ()->impact;
     else
       shield -= 2.0F;
-    d->shield -= (float) impact;
+    d->shield -= (float) getPrototype ()->impact;
     if (d->source != NULL && active) // only for missiles/cannons
     {
       if (d->source->party != party) // calculate points
       {
-        if (maxshield < 2000)
-          d->source->stat.points += (int) impact; // extra points for shooting an enemy object
+        if (getPrototype ()->maxshield < 2000)
+          d->source->stat.points += (int) getPrototype ()->impact; // extra points for shooting an enemy object
       }
       else
       {
-        d->source->stat.points -= (int) impact; // subtract points for shooting an own object
+        d->source->stat.points -= (int) getPrototype ()->impact; // subtract points for shooting an own object
       }
 
       if (shield <= 0)
@@ -453,8 +465,8 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   // check maximum gamma
   if (easymodel == 1)
   {
-    if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
-    else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
+    if (currot.gamma > 180 + getPrototype ()->maxrot.gamma) currot.gamma = 180 + getPrototype ()->maxrot.gamma;
+    else if (currot.gamma < 180 - getPrototype ()->maxrot.gamma) currot.gamma = 180 - getPrototype ()->maxrot.gamma;
   }
   else if (easymodel == 2) // otherwise check for value overflow due to loops
   {
@@ -469,13 +481,13 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   {
     if (id >= MovingGroundBeginDescriptor)
     {
-      currot.phi += SIN(currot.theta) * manoeverability * 667 * timefac; //10.0 * maxthrust / div;
+      currot.phi += SIN(currot.theta) * getPrototype ()->manoeverability * 667 * timefac; //10.0 * getPrototype ()->maxthrust / div;
     }
     else
     {
-      currot.phi += SIN(currot.theta) * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.phi += SIN(currot.theta) * getPrototype ()->manoeverability * (3.33 + 15.0 * realspeed) * timefac;
       currot.gamma -= fabs (SIN(currot.theta) * COS(currot.gamma) / realspeed / 20) * timefac; // realistic modification
-      if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
+      if (currot.gamma < 180 - getPrototype ()->maxrot.gamma) currot.gamma = 180 - getPrototype ()->maxrot.gamma;
     }
   }
   else if (easymodel == 2) // now this is much more general, however simplified:
@@ -484,19 +496,19 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     if (currot.gamma < 90 || currot.gamma > 270)
       vz = -1;
     // change heading and elevation due to ailerons and rudder
-    if (maxthrust + thrust <= -0.00001 || maxthrust + thrust >= 0.00001)
+    if (getPrototype ()->maxthrust + thrust <= -0.00001 || getPrototype ()->maxthrust + thrust >= 0.00001)
     {
-      currot.phi += vz * SIN(currot.theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      currot.gamma += COS(currot.theta) * elevatoreffect * manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      currot.phi += -vz * COS(currot.theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
-      currot.gamma += SIN(currot.theta) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed) * timefac;
+      currot.phi += vz * SIN(currot.theta) * elevatoreffect * getPrototype ()->manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.gamma += COS(currot.theta) * elevatoreffect * getPrototype ()->manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+      currot.phi += -vz * COS(currot.theta) * ruddereffect * getPrototype ()->manoeverability * (0.66 + 3.0 * realspeed) * timefac;
+      currot.gamma += SIN(currot.theta) * ruddereffect * getPrototype ()->manoeverability * (0.66 + 3.0 * realspeed) * timefac;
       if (!realism)
         currot.gamma -= fabs (SIN(currot.theta) * COS(currot.gamma) / realspeed / 20) * timefac; // realistic modification
     }
     // change roll due to roll ;-)
     if (rolleffect)
     {
-      currot.theta += rolleffect * (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
+      currot.theta += rolleffect * (getPrototype ()->nimbility * (1.0 + realspeed)) * timefac * 5.0F;
       recrot.theta = currot.theta;
     }
   }
@@ -505,10 +517,10 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   if (easymodel == 1) // easy model restrictions
   {
-    if (recrot.theta > maxrot.theta) recrot.theta = maxrot.theta;
-    else if (recrot.theta < -maxrot.theta) recrot.theta = -maxrot.theta;
-    if (recrot.gamma > 180 + maxrot.gamma) recrot.gamma = 180 + maxrot.gamma;
-    else if (recrot.gamma < 180 - maxrot.gamma) recrot.gamma = 180 - maxrot.gamma;
+    if (recrot.theta > getPrototype ()->maxrot.theta) recrot.theta = getPrototype ()->maxrot.theta;
+    else if (recrot.theta < -getPrototype ()->maxrot.theta) recrot.theta = -getPrototype ()->maxrot.theta;
+    if (recrot.gamma > 180 + getPrototype ()->maxrot.gamma) recrot.gamma = 180 + getPrototype ()->maxrot.gamma;
+    else if (recrot.gamma < 180 - getPrototype ()->maxrot.gamma) recrot.gamma = 180 - getPrototype ()->maxrot.gamma;
   }
   else if (easymodel == 2)
   {
@@ -518,10 +530,10 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
     { recrot.theta -= 360; currot.theta -= 360; }
   }
 
-  if (recthrust > maxthrust) // check maximum throttle
-    recthrust = maxthrust;
+  if (recthrust > getPrototype ()->maxthrust) // check maximum throttle
+    recthrust = getPrototype ()->maxthrust;
   
-  float throttlechange = maxthrust / 200 * timefac;
+  float throttlechange = getPrototype ()->maxthrust / 200 * timefac;
   if (recthrust > thrust + throttlechange) // alter throttle effect slowly
   {
     thrust += throttlechange;

@@ -34,13 +34,17 @@
 #include <cassert>
 
 
-Fighter::Fighter () : AIObj ()
+Fighter::Fighter (const UnitDescriptor &desc)
+  : AIObj ()
 {
+  id = desc;
+  proto = new FighterPrototype (id);
 }
 
-Fighter::Fighter (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
+/*Fighter::Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : AIObj (desc, space2, o2, zoom2)
 {
-}
+}*/
 
 Fighter::~Fighter ()
 {
@@ -57,14 +61,14 @@ void Fighter::placeMissiles ()
     addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, scale)));
   for (i2 = 0; i2 < 4; i2 ++)
   {
-    int type = missilerack [i2];
+    int type = getPrototype ()->missilerack [i2];
 /*    ref [i2 * 3].o = o;
     ref [i2 * 3 + 1].o = o;
     ref [i2 * 3 + 2].o = o; */
     ref [i2 * 3 + 1].trafo.translation.z = ref [i2 * 3].trafo.translation.z - 0.04;
     ref [i2 * 3 + 2].trafo.translation.z = ref [i2 * 3].trafo.translation.z + 0.04;
     ref [i2 * 3].trafo.translation.y = ref [i2 * 3 + 1].trafo.translation.y - 0.04;
-    int tmp = missilerackn [i2];
+    int tmp = getPrototype ()->missilerackn [i2];
     ref [i2 * 3].trafo.scaling.set (0.25, 0.25, 0.25);
     ref [i2 * 3 + 1].trafo.scaling.set (0.25, 0.25, 0.25);
     ref [i2 * 3 + 2].trafo.scaling.set (0.25, 0.25, 0.25);
@@ -80,8 +84,8 @@ void Fighter::fireFlare2 (DynamicObj *flare)
   flare->thrust = 0;
   flare->realspeed = 0;
   flare->recthrust = 0;
-  flare->manoeverability = 0.0;
-  flare->maxthrust = 1.0;
+  flare->getPrototype ()->manoeverability = 0.0;
+  flare->getPrototype ()->maxthrust = 1.0;
   flare->currot.gamma = 0;
   flare->party = party;
   flare->ttl = 80 * timestep;
@@ -102,8 +106,8 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
   chaff->thrust = 0;
   chaff->realspeed = 0;
   chaff->recthrust = 0;
-  chaff->manoeverability = 0.0;
-  chaff->maxthrust = 1.0;
+  chaff->getPrototype ()->manoeverability = 0.0;
+  chaff->getPrototype ()->maxthrust = 1.0;
   chaff->currot.gamma = 0;
   chaff->party = party;
   chaff->ttl = 80 * timestep;
@@ -494,7 +498,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   if (phi < 0) phi += 360;
   if (gamma >= 360) gamma -= 360;
   if (gamma < 0) gamma += 360;
-  thrust = maxthrust * 0.7;
+  thrust = getPrototype ()->maxthrust * 0.7;
 
   float pulljoystick = 0.005;
   float nocorrection = 0.1;
@@ -511,11 +515,11 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
 
   if (disttarget < 5 && dphi < 90 && dgamma < 90)
   {
-    thrust = maxthrust / 2;
+    thrust = getPrototype ()->maxthrust / 2;
   }
   else
   {
-    thrust = maxthrust;
+    thrust = getPrototype ()->maxthrust;
   }
 
   return;
@@ -711,7 +715,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
               DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
-              recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
+              recthrust = getPrototype ()->maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
@@ -775,7 +779,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
               DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
-              recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
+              recthrust = getPrototype ()->maxthrust / (1.05F + (float) intelligence * 0.0015);
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
@@ -812,7 +816,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   if (disttarget > 5 + aggressivity / 12) // 2.5 seems to be best, but fighters become far too strong
   {
     if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0)
-      recthrust = maxthrust / (1.0F + (float) intelligence * 0.0025);
+      recthrust = getPrototype ()->maxthrust / (1.0F + (float) intelligence * 0.0025);
     else thrustUp (); // otherwise fly faster
   }
   else if (manoeverthrust <= 0)
@@ -832,8 +836,8 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
     if (disttarget < 25 && fabs (aw) > 160 && target->id >= TankBeginDescriptor) // avoid collisions
     {
       manoeverthrust = 25 * timestep;
-      recthrust = maxthrust;
-      if (difficulty == 0) recthrust = maxthrust * 0.8F;
+      recthrust = getPrototype ()->maxthrust;
+      if (difficulty == 0) recthrust = getPrototype ()->maxthrust * 0.8F;
       manoevertheta = 25 * timestep;
       recrot.theta = 0;
       manoeverheight = 25 * timestep;

@@ -609,15 +609,7 @@ void Cockpit::drawWeapon ()
   gl.disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
   Model3d *missile = NULL;
-  UnitDescriptor desc;
-  if (fplayer->missiletype == 0) desc = AamHs1Descriptor; // TODO: lookup in descriptor registry!
-  else if (fplayer->missiletype == 1) desc = AamHs2Descriptor;
-  else if (fplayer->missiletype == 2) desc = AamHs3Descriptor;
-  else if (fplayer->missiletype == 3) desc = Agm1Descriptor;
-  else if (fplayer->missiletype == 4) desc = Agm2Descriptor;
-  else if (fplayer->missiletype == 5) desc = DfmDescriptor;
-  else if (fplayer->missiletype == 6) desc = AamFf1Descriptor;
-  else if (fplayer->missiletype == 7) desc = AamFf1Descriptor;
+  UnitDescriptor desc = UnitDescriptorRegistry::get (MissileBeginDescriptor + fplayer->missiletype);
   missile = Model3dRegistry::get (desc.name);
   glEnable (GL_LIGHTING);
   Model3dRealizer mr;
@@ -772,7 +764,7 @@ void Cockpit::drawThrustBar()
   float xf = -1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
   
   // turn 0.5 -> 1.0 range to -0.7 -> 0.7 for drawing
-  float yfv = fplayer->thrust / fplayer->maxthrust * 2.8F - 2.1F;
+  float yfv = fplayer->thrust / fplayer->getPrototype ()->maxthrust * 2.8F - 2.1F;
   // cap max-min values
   if(yfv >  0.7F) yfv =  0.7F;
   if(yfv < -0.7F) yfv = -0.7F;

@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes all AI objects instancing models. */
-
 #ifndef IS_AIOBJECT_H
 
 #include "AiObj.h"
@@ -32,11 +30,13 @@
 #include <cassert>
 
 
-Tank::Tank () : AIObj ()
+Tank::Tank (const UnitDescriptor &desc)
+  : AIObj (desc)
 {
 }
 
-Tank::Tank (Space *space2, Model3d *o2, float zoom2) : AIObj (space2, o2, zoom2)
+Tank::Tank (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
+  : AIObj (desc, space2, o2, zoom2)
 {
 }
 
@@ -139,14 +139,15 @@ void Tank::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj
   // heading calculations
   int firerate = getFireRate ();
 
-  recthrust = maxthrust; thrust = maxthrust; // always at maximum thrust
+  recthrust = getPrototype ()->maxthrust;
+  thrust = getPrototype ()->maxthrust; // always at maximum thrust
   if (aw > 5)
   {
-    recrot.theta = maxrot.theta;
+    recrot.theta = getPrototype ()->maxrot.theta;
   }
   else if (aw < -5)
   {
-    recrot.theta = -maxrot.theta;
+    recrot.theta = -getPrototype ()->maxrot.theta;
   }
   else
   {

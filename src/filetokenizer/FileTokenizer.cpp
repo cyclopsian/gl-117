@@ -70,7 +70,7 @@ void FileTokenizer::initComments ()
   commentNum = 0;
 }
 
-XLONG FileTokenizer::getPosition ()
+XLONG FileTokenizer::getPosition () const
 {
   if (!reverse)
     return (XLONG) ftell (file) - MAXLEN + ptr;
@@ -78,24 +78,24 @@ XLONG FileTokenizer::getPosition ()
     return (XLONG) ftell (file) - ptr;
 }
 
-int FileTokenizer::getLine ()
+int FileTokenizer::getLine () const
 {
   return line;
 }
 
-void FileTokenizer::setWhitespace (char *string)
+void FileTokenizer::setWhitespace (const char *string)
 {
   strncpy (whitespace, string, 256);
   whitespace [255] = 0;
 }
 
-void FileTokenizer::setSeparator (char *string)
+void FileTokenizer::setSeparator (const char *string)
 {
   strncpy (separator, string, 256);
   separator [255] = 0;
 }
 
-void FileTokenizer::addComment (char *startstring, char *endstring)
+void FileTokenizer::addComment (const char *startstring, const char *endstring)
 {
   if (commentNum >= MAXCOMMENTS) return;
   strncpy (commentStart [commentNum], startstring, 256);
@@ -105,7 +105,7 @@ void FileTokenizer::addComment (char *startstring, char *endstring)
   commentNum ++;
 }
 
-void FileTokenizer::setQuotes (char *string)
+void FileTokenizer::setQuotes (const char *string)
 {
   strncpy (quotes, string, 256);
   quotes [255] = 0;
@@ -236,10 +236,11 @@ void FileTokenizer::rewind ()
   line = 1;
 }
 
-int FileTokenizer::open (char *filename)
+int FileTokenizer::open (const char *filename)
 {
   file = fopen (filename, "rb");
   if (!file) return 0;
+  strncpy (this->filename, filename, 4096);
   rewind ();
   return 1;
 }
@@ -252,7 +253,7 @@ int FileTokenizer::close ()
     return 1;
 }
 
-int FileTokenizer::isChar (char *string)
+int FileTokenizer::isChar (const char *string) const
 {
   int i = 0;
   while (string [i] != 0 && i < 256)
@@ -297,7 +298,7 @@ int FileTokenizer::isCommentEnd ()
   return 0;
 }
 
-int FileTokenizer::find (char *string)
+int FileTokenizer::find (const char *string)
 {
   char *result = NULL;
   int stringlen = strlen (string);
@@ -445,6 +446,11 @@ int FileTokenizer::nextToken (char *token, int tokenlen)
     }
   }
   return 1;
+}
+
+const char *FileTokenizer::getFilename () const
+{
+  return filename;
 }
 
 #endif

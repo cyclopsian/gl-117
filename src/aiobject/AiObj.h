@@ -29,6 +29,14 @@
 #include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok
 #include "effects/Effects.h" // ok
+#include "filetokenizer/FileTokenizer.h"
+#include "util/Util.h"
+#include "logging/Logging.h"
+#include "configuration/Dirs.h"
+
+#include <map>
+#include <cassert>
+
 
 class UnitDescriptor
 {
@@ -37,76 +45,32 @@ class UnitDescriptor
     std::string name;
     std::string displayedName;
     
-    UnitDescriptor ()
-    {
-      this->id = -1;
-      this->name = "";
-      this->displayedName = "";
-    }
+    UnitDescriptor ();
+    UnitDescriptor (int id);
+    UnitDescriptor (int id, const std::string &name, const std::string &displayedName);
+    bool operator == (const UnitDescriptor &desc) const;
+    bool operator < (const UnitDescriptor &desc) const;
+    bool operator <= (const UnitDescriptor &desc) const;
+    bool operator > (const UnitDescriptor &desc) const;
+    bool operator >= (const UnitDescriptor &desc) const;
+    bool operator != (const UnitDescriptor &desc) const;
+    int operator + (const UnitDescriptor &desc) const;
+    int operator + (int value) const;
+    int operator - (const UnitDescriptor &desc) const;
+    int operator - (int value) const;
+};
 
-    UnitDescriptor (int id)
-    {
-      this->id = id;
-      this->name = "";
-      this->displayedName = "";
-    }
+typedef std::map<int, UnitDescriptor> UnitDescriptorList;
 
-    UnitDescriptor (int id, const std::string &name, const std::string &displayedName)
-    {
-      this->id = id;
-      this->name = name;
-      this->displayedName = displayedName;
-    }
-    
-    bool operator == (const UnitDescriptor &desc) const
-    {
-      return id == desc.id;
-    }
+class UnitDescriptorRegistry
+{
+  public:
+    static UnitDescriptorList unitDescriptorList;
 
-    bool operator < (const UnitDescriptor &desc) const
-    {
-      return id < desc.id;
-    }
-
-    bool operator <= (const UnitDescriptor &desc) const
-    {
-      return id <= desc.id;
-    }
-
-    bool operator > (const UnitDescriptor &desc) const
-    {
-      return id > desc.id;
-    }
-
-    bool operator >= (const UnitDescriptor &desc) const
-    {
-      return id >= desc.id;
-    }
-
-    bool operator != (const UnitDescriptor &desc) const
-    {
-      return id != desc.id;
-    }
-
-    int operator + (const UnitDescriptor &desc) const
-    {
-      return id + desc.id;
-    }
-
-    int operator + (int value) const
-    {
-      return id + value;
-    }
-
-    int operator - (const UnitDescriptor &desc) const
-    {
-      return id - desc.id;
-    }
-
-    int operator - (int value) const
-    {
-      return id - value;
-    }
+    UnitDescriptorRegistry ();
+    virtual ~UnitDescriptorRegistry ();
+    static void add (const UnitDescriptor &desc);
+    static const UnitDescriptor &get (int id);
 };
 
 // id values of objects
@@ -200,6 +164,101 @@ class ObjectStatistics
     int tankkills;    ///< number of tank shots
     int otherkills;   ///< number of other objects (buildings) shot
     bool killed;      ///< this object is already deactivated
+    
+    ObjectStatistics ()
+    {
+      points = 0;
+      fighterkills = 0;
+      shipkills = 0;
+      tankkills = 0;
+      otherkills = 0;
+      killed = false;
+    }
+};
+
+
+
+const int missiletypes = 8;
+const int missileracks = 4;
+
+class UnitPrototype
+{
+  public:
+    UnitPrototype (const UnitDescriptor &desc)
+    {
+    }
+    
+    virtual ~UnitPrototype ()
+    {
+    }
+};
+
+class DynamicUnitPrototype : public UnitPrototype
+{
+  public:
+  
+    float impact;    ///< this value will be subtracted from the other objects shield when colliding
+    float manoeverability; ///< how fast a fighter can alter its direction
+    float nimbility; ///< how fast a fighter responds to alterations of recXXX (recommended XXX)
+    float maxthrust; ///< maximum throttle value
+    float maxshield; ///< maximum shield
+    Rotation maxrot; ///< only used for easymodel calculations, no use of getPrototype ()->maxrot.phi
+    float maxzoom;
+
+    DynamicUnitPrototype (const UnitDescriptor &desc)
+      : UnitPrototype (desc)
+    {
+      OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+      impact = file->getFloat ("impact");
+      manoeverability = file->getFloat ("manoeverability");
+      nimbility = file->getFloat ("nimbility");
+      maxthrust = file->getFloat ("thrust");
+      maxshield = file->getFloat ("shield");
+      maxrot.gamma = file->getFloat ("rot.gamma");
+      maxrot.theta = file->getFloat ("rot.theta");
+      maxrot.phi = 0; // no restriction for the heading
+      maxzoom = file->getFloat ("zoom");
+    }
+    
+    virtual ~DynamicUnitPrototype ()
+    {
+    }
+};
+
+class AiUnitPrototype : public DynamicUnitPrototype
+{
+  public:
+  
+    int missilerack [missileracks]; ///< number of missile racks
+    int missilerackn [missileracks]; ///< number of missile racks
+    bool dualshot;      ///< one or two cannons?
+    
+    AiUnitPrototype (const UnitDescriptor &desc)
+      : DynamicUnitPrototype (desc)
+    {
+      OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+      dualshot = file->getBoolean ("dualshot");
+      for (int i = 0; i < missileracks; i ++)
+      {
+        missilerack [i] = file->getInteger (FormatString ("missilerack.%d", i));
+        missilerackn [i] = file->getInteger (FormatString ("missilerackn.%d", i));
+      }
+    }
+
+    virtual ~AiUnitPrototype ()
+    {
+    }
+};
+
+class FighterPrototype : public AiUnitPrototype
+{
+  public:
+  
+    FighterPrototype (const UnitDescriptor &desc)
+      : AiUnitPrototype (desc)
+    {
+      OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+    }
 };
 
 /**
@@ -218,21 +277,13 @@ class DynamicObj : public SpaceObj
     int easymodel;
     int ttl;         ///< time to live: cannon and missiles will only live a short time, missiles will sink when ttl<=0
     int immunity;    ///< immunity means the object cannot collide with others, needed for shooting missiles/cannon
-    float impact;    ///< this value will be subtracted from the other objects shield when colliding
+    float braking;   ///< far away from reality: this factorizes the last speed vector with the current conditions (see move method)
     /// Imagine a carthesian coordinate system in the landscape, the y-axis pointing up
     Rotation currot; ///< current rotation, sets rot of SpaceObj, TODO: merge with rot
     Rotation recrot; ///< recommended rotation, recrot.phi is not used
-    Rotation maxrot; ///< only used for easymodel calculations, no use of maxrot.phi
-//    float phi;       ///< angle in x-z plane (polar coordinates)
-//    float gamma;     ///< orthogonal angle (polar coordinates)
-//    float theta;     ///< roll angle of the fighter!
     float thrust;    ///< current thrust, not the speed itself!
     float realspeed; ///< the current speed, we only want to calculate this once per time step
     Vector3 force;   ///< the force vector
-    float braking;   ///< far away from reality: this factorizes the last speed vector with the current conditions (see move method)
-    float manoeverability; ///< how fast a fighter can alter its direction
-    float nimbility; ///< how fast a fighter responds to alterations of recXXX (recommended XXX)
-    float maxthrust; ///< maximum throttle value
 //    float rectheta;  ///< roll angle the fighter/object wants to reach
     float recthrust; ///< throttle the fighter/object wants to reach
     float recheight; ///< height above ground the fighter wants to reach
@@ -250,18 +301,20 @@ class DynamicObj : public SpaceObj
     ObjectStatistics stat; ///< objects statistics like number of kills, etc.
     Space *space;    ///< in which space is this object, there is only one ;-)
     DynamicObj *source; ///< missiles must keep track of the object they have been fired from -> statistics
-    int bomber;      ///< act as bomber and prefer groud targets
-  //  char net [100];
+    int bomber;      ///< act as bomber and prefer ground targets
     int realism;
     Vector3 acc;     ///< acceleration
-    float shield, maxshield; ///< current and initial/maximum shield
+    float shield;    ///< current shield
+    DynamicUnitPrototype *proto;
 
     DynamicObj ();
-    DynamicObj (Space *space2, Model3d *o2, float zoom2);
+    DynamicObj (const UnitDescriptor &desc);
+    DynamicObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~DynamicObj ();
 
     void activate ();
     void deactivate ();
+    DynamicUnitPrototype *getPrototype ();
     virtual void init ();
     void thrustUp ();
     void thrustDown ();
@@ -286,9 +339,6 @@ class DynamicObj : public SpaceObj
     bool checkLooping ();
     void move (Uint32 dt, float camphi, float camgamma);
 };
-
-const int missiletypes = 8;
-const int missileracks = 6;
 
 /**
 * This class represents an object with artificial intelligence.
@@ -317,8 +367,6 @@ class AIObj : public DynamicObj
     int smokettl;       ///< minimum time to wait between setting smoke elements
     int missiletype;    ///< only relevant for the player, describes type: AAM, AGM, DF
     int missiles [missiletypes]; ///< number of missiles of each type
-    int missilerack [missileracks]; ///< number of missile racks
-    int missilerackn [missileracks]; ///< number of missile racks
     float aw;           ///< current heading difference to target
     int score;          ///< final score
     float dtheta, dgamma; ///< theta/gamma alteration (smooth piloting)
@@ -332,13 +380,14 @@ class AIObj : public DynamicObj
     Smoke *smoke;       ///< bright smoke behind the object (fighter&missiles)
     Uint32 timer;
     int statfirepower;  ///< firepower (missiles) statistics, number of stars
-    bool dualshot;      ///< one or two cannons?
     int manoeverstate;  ///< changes to realistic manoevers and turns off easymodel
 
     AIObj ();
-    AIObj (Space *space2, Model3d *o2, float zoom2);
+    AIObj (const UnitDescriptor &desc);
+    AIObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~AIObj ();
 
+    AiUnitPrototype *getPrototype ();
     virtual void init ();     ///< initialize variables
     void missileCount ();
     void newinit (const UnitDescriptor &id, int party, int intelligence, int precision, int aggressivity); ///< init new AI object
@@ -387,8 +436,8 @@ class AIObj : public DynamicObj
 class Missile : public AIObj
 {
   public:
-    Missile ();
-    Missile (Space *space2, Model3d *o2, float zoom2);
+    Missile (const UnitDescriptor &desc);
+    Missile (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Missile ();
 
     virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
@@ -397,8 +446,8 @@ class Missile : public AIObj
 class Tank : public AIObj
 {
   public:
-    Tank ();
-    Tank (Space *space2, Model3d *o2, float zoom2);
+    Tank (const UnitDescriptor &desc);
+    Tank (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Tank ();
 
     virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
@@ -407,8 +456,8 @@ class Tank : public AIObj
 class StaticAa : public AIObj
 {
   public:
-    StaticAa ();
-    StaticAa (Space *space2, Model3d *o2, float zoom2);
+    StaticAa (const UnitDescriptor &desc);
+    StaticAa (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~StaticAa ();
 
     virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
@@ -417,8 +466,8 @@ class StaticAa : public AIObj
 class StaticPassive : public AIObj
 {
   public:
-    StaticPassive ();
-    StaticPassive (Space *space2, Model3d *o2, float zoom2);
+    StaticPassive (const UnitDescriptor &desc);
+    StaticPassive (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~StaticPassive ();
 
     virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
@@ -427,8 +476,8 @@ class StaticPassive : public AIObj
 class Ship : public AIObj
 {
   public:
-    Ship ();
-    Ship (Space *space2, Model3d *o2, float zoom2);
+    Ship (const UnitDescriptor &desc);
+    Ship (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Ship ();
 
     virtual void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma);
@@ -437,8 +486,8 @@ class Ship : public AIObj
 class Fighter : public AIObj
 {
   public:
-    Fighter ();
-    Fighter (Space *space2, Model3d *o2, float zoom2);
+    Fighter (const UnitDescriptor &desc);
+    Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Fighter ();
 
     void fireFlare2 (DynamicObj *flare);

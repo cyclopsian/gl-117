@@ -72,7 +72,7 @@ void MissionConvoy::start ()
     fighter [i]->trafo.translation.z = py + COS(phi) * 3.0;
     fighter [i]->currot.phi = 359 - phi;
     fighter [i]->thrust = 0;
-    fighter [i]->maxthrust = 0;
+    fighter [i]->getPrototype ()->maxthrust = 0;
   }
   for (i = 4; i <= 9; i ++)
   {

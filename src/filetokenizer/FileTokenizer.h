@@ -72,38 +72,41 @@ class FileTokenizer
     /// Revert the file read order (forward/backward)
     void revert ();
     /// Get current position of the file pointer
-    XLONG getPosition ();
+    XLONG getPosition () const;
     /// Get current line of the file
-    int getLine ();
+    int getLine () const;
     /// Set the whitespace chars for this file
     /// Example: setWhitespace (" \n\t");
-    void setWhitespace (char *string);
+    void setWhitespace (const char *string);
     /// Set the separator chars for this file
     /// Example: setSeparator (",;");
-    void setSeparator (char *string);
+    void setSeparator (const char *string);
     /// Add comment strings for this file
     /// Example language C++: addComment ("//", "\n");
-    void addComment (char *startstring, char *endstring);
+    void addComment (const char *startstring, const char *endstring);
     /// Set the quote chars for string in this file
     /// Example: setQuotes ("\'\"");
-    void setQuotes (char *string);
+    void setQuotes (const char *string);
     /// Rewind file to an initial state to restart parsing
     void rewind ();
     /// Open file for parsing
-    int open (char *filename);
+    int open (const char *filename);
     /// Close file
     int close ();
     /// Find the first occurance of string from the cursor and set cursor
     /// to the new position, this is quite fast!
-    int find (char *string);
+    int find (const char *string);
     /// Find the next token from the current cursor position and fill the
     /// token string. Use tokenlen to define a maximum length for token.
     int nextToken (char *token, int tokenlen);
     /// Return the next character.
     int nextChar ();
+    /// Return the file name
+    const char *getFilename () const;
 
   protected:
 
+    char filename [4096];
     int reverse;
     int quoteRemove;             ///< 1: remove quotes from tokens
     int ptr;                     ///< buffer pointer to current char = "file cursor"
@@ -127,7 +130,7 @@ class FileTokenizer
     void revertBuffer (int start, int end);
     int fillBuffer ();
     int setPosition (XLONG pointer, int whence);
-    int isChar (char *string);
+    int isChar (const char *string) const;
     int isCommentStart ();
     int isCommentEnd ();
     int fillToken (char *token, int tokenlen);
