@@ -27,12 +27,13 @@
 
 CFile::CFile (char *filename)
 {
+  char buf [STDSIZE];
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "\nCannot open file %s!", filename);
-    fflush (stderr);
-    return;
+    sprintf (buf, "Cannot open file %s", filename);
+    display (buf, LOG_FATAL);
+    exit (1);
   }
   fseek (in, 0, SEEK_END);
   size = ftell (in);

@@ -1660,6 +1660,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
     
 void GLLandscape::draw (int phi, int gamma)
 {
+  char buf [STDSIZE];
   int i, i2, x, y;
   int xs, ys;
 
@@ -1679,10 +1680,16 @@ void GLLandscape::draw (int phi, int gamma)
   else if (gamma >= 360) gamma -= 360;
 
   if (phi < 0 || phi >= 360)
-  { fprintf (stderr, "\nError in file %s, line %s, val %d\n", __FILE__, __LINE__, phi); fflush (stderr); }
+  {
+    sprintf (buf, "Phi exceeds in file %s, line %s, val %d", __FILE__, __LINE__, phi);
+    display (buf, LOG_ERROR);
+  }
 
   if (gamma < 0 || gamma >= 360)
-  { fprintf (stderr, "\nError in file %s, line %s, val %d\n", __FILE__, __LINE__, gamma); fflush (stderr); }
+  {
+    sprintf (buf, "Gamma exceeds in file %s, line %s, val %d", __FILE__, __LINE__, gamma);
+    display (buf, LOG_ERROR);
+  }
 
   glPushMatrix ();
 /*  GLfloat mat_ambient[]  = { 0.7,0.7,0.7,1 };

@@ -27,12 +27,13 @@
 
 BinaryFile::BinaryFile (char *filename)
 {
+  char buf [STDSIZE];
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "\nCannot open file %s!", filename);
-    fflush (stderr);
-    return;
+    sprintf (buf, "Cannot open file %s", filename);
+    display (buf, LOG_FATAL);
+    exit (1);
   }
   fseek (in, 0, SEEK_END);
   size = ftell (in);
@@ -156,10 +157,9 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   // Make sure this is a 3DS file
   if (currentChunk->ID != PRIMARY)
   {
-    sprintf (message, "\nUnable to load PRIMARY chuck from file: %s!", filename);
-    fprintf (stderr, "%s", message);
-    fflush (stdout);
-    return false;
+    sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
+    display (message, LOG_FATAL);
+    exit (1);
   }
   // Load objects recursively
   ProcessNextChunk (model, currentChunk);
@@ -191,6 +191,7 @@ void CLoad3DS::CleanUp ()
 void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 {
   char version [10];
+  char buf [STDSIZE];
   CObject newObject;
   CMaterial newTexture;
   char buffer [50000] = {0};
@@ -207,8 +208,8 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         currentChunk->bytesRead += file->readString (version, currentChunk->length - currentChunk->bytesRead);
         if (version [0] > 0x03)
         {
-          fprintf (stderr, "\nWarning: This 3DS file is over version 3 so it may load incorrectly");
-          fflush (stdout);
+          sprintf (buf, "This 3DS file is over version 3 so it may load incorrectly");
+          display (buf, LOG_WARN);
         }
         break;
 

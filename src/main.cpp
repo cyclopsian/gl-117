@@ -73,6 +73,8 @@ int net_thread_main (void *data);
 
 int game = GAME_INIT;
 
+int debuglevel = LOG_MOST;
+
 SoundSystem *sound = NULL;
 
 GL *gl;
@@ -1522,13 +1524,17 @@ int lastmousex = 0;
 // This function is experimental. It is called about 30 times per second.
 void game_easymouse ()
 {
+  char buf [STDSIZE];
   float mx = width / 2, my = height / 2;
   float dx = mousex - mx, dy = my - mousey; // deltax and deltay
 
   int t = (int) fplayer->theta; // roll angle
   if (t < 0) t += 360;
   if (t < 0 || t >= 360)
-  { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
+  {
+    sprintf (buf, "Theta exceeds in file %s, line %s", __FILE__, __LINE__);
+    display (buf, LOG_ERROR);
+  }
   float rx = dx * cosi [t] - dy * sine [t]; // rolled mouse x coordinate
   float ry = -dx * sine [t] + dy * cosi [t]; // rolled mouse y coordinate
 
@@ -1858,7 +1864,7 @@ void stats_key (unsigned char key, int x, int y)
   if (key == 27)
   {
     pleaseWait ();
-    fprintf (stdout, "\nIniting new mission"); fflush (stdout);
+    display ("Initing new mission", LOG_MOST);
     missionactive = false;
     createMission (MISSION_DEMO);
     game_levelInit ();
@@ -2594,7 +2600,7 @@ void game_quit ()
   save_config ();
   save_configInterface ();
   pilots->save (dirs->getSaves ("pilots"));
-  fprintf (stdout, "\nPilots saved"); fflush (stdout);
+  display ("Pilots saved", LOG_MOST);
   for (i = 0; i < maxfighter; i ++)
     delete (fighter [i]);
   for (i = 0; i < maxlaser; i ++)
@@ -2635,7 +2641,7 @@ void game_quit ()
 //  SDL_Quit (); // done atexit()
   delete sound;
 #endif
-  fprintf (stdout, "\n"); fflush (stdout);
+//  fprintf (stdout, "\n"); fflush (stdout);
   exit (0);
 }
 
@@ -4903,7 +4909,7 @@ int net_thread_main (void *data)
     if (missionending >= 35)
     {
       missionending = 0;
-      fprintf (stdout, "\nIniting new mission"); fflush (stdout);
+      display ("Initing new mission", LOG_MOST);
       missionactive = false;
       createMission (MISSION_DEMO);
       game_levelInit ();
@@ -4917,7 +4923,7 @@ int net_thread_main (void *data)
     if (missionending >= 35)
     {
       missionending = 0;
-      fprintf (stdout, "\nIniting new mission"); fflush (stdout);
+      display ("Initing new mission", LOG_MOST);
       missionactive = false;
       createMission (MISSION_DEMO);
       game_levelInit ();
@@ -6073,20 +6079,22 @@ bool configinit = false;
 
 void config_test (int argc, char **argv)
 {
-  fprintf (stdout, "\nNo configuration file found. Testing..."); fflush (stdout);
+  display ("No configuration file found. Testing...", LOG_MOST);
+  char buf [STDSIZE];
   int bppi [4];
 //  memset (modes, 0, 4 * sizeof (int));
 
 #ifdef USE_GLUT
-  fprintf (stdout, "\nUsing GLUT only"); fflush (stdout);
+  display ("Using GLUT only", LOG_MOST);
   glutInit (&argc, argv);
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
 #else
-  fprintf (stdout, "\nUsing SDL and GLUT"); fflush (stdout);
+  display ("Using SDL and GLUT", LOG_MOST);
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
-    fprintf (stderr, "\nCouldn't initialize SDL: %s\n", SDL_GetError ());
+    sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   configinit = true;
@@ -6113,8 +6121,7 @@ void config_test (int argc, char **argv)
 
   if (valids == -1)
   {
-    fprintf (stderr, "\nFatal: No working display modes found! Try editing the file conf yourself. You may not be able to play this game.");
-    fflush (stderr);
+    display ("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.", LOG_FATAL);
     exit (2);
   }
 
@@ -6134,10 +6141,12 @@ void config_test (int argc, char **argv)
 
 int main (int argc, char **argv)
 {
-  fprintf (stdout, "\nStartup %s, %s ... ", argv [0], VERSIONSTRING); fflush (stdout);
+  char buf [STDSIZE];
+  sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
+  display (buf, LOG_MOST);
 
 #ifdef _MSC_VER
-  fprintf (stdout, "\nWindows detected ");
+  display ("Windows detected ", LOG_MOST);
 #endif
 
   dirs = new Dirs (argv [0]);
@@ -6175,15 +6184,15 @@ int main (int argc, char **argv)
   pilots = new PilotList (dirs->getSaves ("pilots"));
 
 #ifdef USE_GLUT
-  fprintf (stdout, "\nUsing GLUT only"); fflush (stdout);
+  display ("Using GLUT only", LOG_MOST);
   if (!configinit)
   {
     glutInit (&argc, argv);
     glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
     if (!setScreen (width, height, bpp, fullscreen))
     {
-      fprintf (stderr, "\nFatal: No working display mode %dx%d found", width, height);
-      fflush (stderr);
+      sprintf (buf, "No working display mode %dx%d found", width, height);
+      display (buf, LOG_FATAL);
       exit (10);
     }
   }
@@ -6222,11 +6231,12 @@ int main (int argc, char **argv)
     controls = CONTROLS_MOUSE;
   glutMainLoop();
 #else
-  fprintf (stdout, "\nUsing SDL and GLUT"); fflush (stdout);
+  display ("Using SDL and GLUT", LOG_MOST);
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
-      fprintf (stderr, "\nCouldn't initialize SDL: %s\n", SDL_GetError ());
+      sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
+      display (buf, LOG_FATAL);
       exit (1);
     }
   atexit (SDL_Quit);
@@ -6234,18 +6244,19 @@ int main (int argc, char **argv)
   // initialize SDL_net
   if (SDLNet_Init () == -1)
   {
-    fprintf (stderr, "\nSDLNet_Init: %s\n", SDLNet_GetError ()); fflush (stderr);
+    sprintf (buf, "SDLNet_Init: %s", SDLNet_GetError ());
+    display (buf, LOG_FATAL);
     exit (2);
   }
-  fprintf (stdout, "\nUsing SDL_net"); fflush (stdout);
+  display ("Using SDL_net", LOG_MOST);
 #endif
 
   if (!configinit)
   {
     if (!setScreen (width, height, bpp, fullscreen))
     {
-      fprintf (stderr, "\nFatal: No working display mode %dx%d found", width, height);
-      fflush (stderr);
+      sprintf (buf, "No working display mode %dx%d found", width, height);
+      display (buf, LOG_FATAL);
       exit (10);
     }
   }
@@ -6270,11 +6281,11 @@ int main (int argc, char **argv)
   {
     SDL_JoystickEventState (SDL_ENABLE);
     sdljoystick = SDL_JoystickOpen (0);
-    fprintf (stdout, "\nJoystick detected."); fflush (stdout);
+    display ("Joystick detected", LOG_MOST);
   }
   else
   {
-    fprintf (stdout, "\nNo joystick found."); fflush (stdout);
+    display ("No joystick found", LOG_MOST);
     sdljoystick = NULL;
     if (controls == 2)
       controls = CONTROLS_MOUSE;

@@ -1176,7 +1176,12 @@ void AIObj::fireCannon (DynamicObj **laser)
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
-  if (debug == 1) { printf ("%d:m=%d\n", party, id); fflush (stdout); }
+  char buf [STDSIZE];
+  if (debuglevel == LOG_ALL)
+  {
+    sprintf (buf, "Missile: party=%d, id=%d", party, id);
+    display (buf, LOG_ALL);
+  }
   ttf = 50;
   missile->dinit ();
   missile->aiinit ();
@@ -1207,7 +1212,12 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 
 void AIObj::fireFlare2 (DynamicObj *flare)
 {
-  if (debug == 1) { printf ("%d:flare\n", party); fflush (stdout); }
+  char buf [STDSIZE];
+  if (debuglevel == LOG_ALL)
+  {
+    sprintf (buf, "Flare: party=%d", party);
+    display (buf, debuglevel);
+  }
   flare->dinit ();
   flare->speed = 0;
   flare->realspeed = 0;
@@ -1229,7 +1239,12 @@ void AIObj::fireFlare2 (DynamicObj *flare)
 
 void AIObj::fireChaff2 (DynamicObj *chaff)
 {
-  if (debug == 1) { printf ("%d:chaff\n", party); fflush (stdout); }
+  char buf [STDSIZE];
+  if (debug == LOG_ALL)
+  {
+    sprintf (buf, "Chaff: party=%d", party);
+    display (buf, LOG_ALL);
+  }
   chaff->dinit ();
   chaff->speed = 0;
   chaff->realspeed = 0;
@@ -1278,9 +1293,13 @@ int AIObj::nextMissile (int from)
 
 bool AIObj::haveMissile (int id)
 {
+  char buf [STDSIZE];
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
-  { fprintf (stderr, "\nError in %s, line %s!", __FILE__, __LINE__); return false; }
+  {
+    sprintf (buf, "Wrong missile ID in %s, line %s", __FILE__, __LINE__);
+    display (buf, LOG_ERROR);
+  }
   if (missiles [id] > 0)
     return true;
   return false;
@@ -1295,9 +1314,13 @@ bool AIObj::haveMissile () // due to missiletype
 
 void AIObj::decreaseMissile (int id)
 {
+  char buf [STDSIZE];
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
-  { fprintf (stderr, "\nError in %s, line %s!", __FILE__, __LINE__); return; }
+  {
+    sprintf (buf, "Wrong missile ID in %s, line %s", __FILE__, __LINE__);
+    display (buf, LOG_ERROR);
+  }
   missiles [id] --;
 }
 
@@ -1370,7 +1393,10 @@ bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             if (hit)
             {
-              if (debug == 1) { printf ("\n missile to flare"); fflush (stdout); }
+              if (debuglevel == LOG_ALL)
+              {
+                display ("Missile to flare", LOG_ALL);
+              }
               missile [i2]->target = flare [i];
             }
           }
@@ -1413,7 +1439,10 @@ bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             if (hit)
             {
-              if (debug == 1) { printf ("\n missile to chaff"); fflush (stdout); }
+              if (debuglevel == LOG_ALL)
+              {
+                display ("Missile to chaff", LOG_ALL);
+              }
               missile [i2]->target = chaff [i];
             }
           }

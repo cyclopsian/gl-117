@@ -129,7 +129,7 @@ void Pilot::load ()
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "\nWarning: Could not load pilot!");
+    display ("Could not load pilot", LOG_WARN);
     return;
   }
   char saveversion [20];
@@ -157,7 +157,7 @@ void Pilot::save ()
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {
-    fprintf (stderr, "\nWarning: Could not write pilot!");
+    display ("Could not write pilot", LOG_WARN);
     return;
   }
   fwrite (SAVEVERSION, sizeof (char), strlen (SAVEVERSION), out);
@@ -224,7 +224,7 @@ void PilotList::load (char *fname)
   FILE *in = fopen (fname, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "\nWarning: Could not load saves/pilots!");
+    display ("Could not load saves/pilots", LOG_WARN);
     aktpilots = 0;
     add ("PLAYER");
     return;
@@ -253,7 +253,7 @@ void PilotList::save (char *fname)
   FILE *out = fopen (fname, "wb");
   if (out == NULL)
   {
-    fprintf (stderr, "\nWarning: Could not write saves/pilots!");
+    display ("Could not write saves/pilots", LOG_WARN);
     return;
   }
   sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);

@@ -154,4 +154,19 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
   #define KEY_PGDOWN SDLK_PAGEDOWN
 #endif
 
+// debug level
+#define LOG_NONE 0
+#define LOG_FATAL 1
+#define LOG_ERROR 2
+#define LOG_WARN 3
+#define LOG_MOST 4
+#define LOG_ALL 5
+
+void display (char *str, int level);
+
+extern int debuglevel;
+
+#define STDSIZE 256
+#define PATHSIZE 4096
+
 #endif

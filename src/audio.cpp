@@ -106,11 +106,13 @@ WaveFile::~WaveFile () {}
 
 void WaveFile::load (char *filename)
 {
+  char buf [STDSIZE];
 #ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
   if (SDL_LoadWAV (filename, &spec, &sound, &soundlen) == NULL)
   {
-    fprintf (stderr, "\nCouldn't load %s: %s", filename, SDL_GetError ());
+    sprintf (buf, "Couldn't load %s: %s", filename, SDL_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   spec.callback = fillrepeat;
@@ -119,7 +121,8 @@ void WaveFile::load (char *filename)
   chunk = Mix_LoadWAV (filename);
   if (chunk == NULL)
   {
-    fprintf (stderr, "\nError: %s", Mix_GetError ());
+    sprintf (buf, "SDL_Mixer: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
 #endif
@@ -205,6 +208,7 @@ void WaveFile::setVolume (int level)
 
 SoundSystem::SoundSystem ()
 {
+  char buf [STDSIZE];
   audio = false;
   sound = true;
   music = true;
@@ -216,7 +220,8 @@ SoundSystem::SoundSystem ()
   waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
   {
-    fprintf (stderr, "\nCouldn't open audio: %s, no sound available!", SDL_GetError ());
+    sprintf (buf, "Couldn't open audio: %s, no sound available", SDL_GetError ());
+    display (buf, LOG_ERROR);
     audio = false;
     delete waveclick1;
     return;
@@ -227,10 +232,10 @@ SoundSystem::SoundSystem ()
   }
   delete waveclick1;
 #else
-  fprintf (stdout, "\nUsing SDL_mixer"); fflush (stdout);
+  display ("Using SDL_mixer", LOG_MOST);
   if (Mix_OpenAudio (22050, AUDIO_S16, 2, 4096))
   {
-    fprintf (stderr, "\nUnable to open audio device!");
+    display ("Unable to open audio device", LOG_ERROR);
     audio = false;
     return;
   }
@@ -241,49 +246,56 @@ SoundSystem::SoundSystem ()
   music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open winner.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open winner.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open loser.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open loser.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open dark.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open dark.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open electro.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open stars.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open stars.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open softtec.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
   if (music1 == NULL)
   {
-    fprintf (stderr, "\nCannot open standby.s3m: %s", Mix_GetError ()); fflush (stderr);
+    sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
+    display (buf, LOG_FATAL);
     exit (1);
   }
   playtime = 0;

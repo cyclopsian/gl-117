@@ -52,6 +52,7 @@ ConfigFile::ConfigFile () {}
 
 ConfigFile::ConfigFile (char *fname)
 {
+  char buf2 [STDSIZE];
   bool commentmode = false;
   FILE *in;
   length = 0;
@@ -63,8 +64,8 @@ ConfigFile::ConfigFile (char *fname)
   }
   else
   {
-    fprintf (stderr, "\nCould not load %s.", fname);
-    fflush (stderr);
+    sprintf (buf2, "Could not load %s", fname);
+    display (buf2, LOG_WARN);
     buf [0] = 0;
   }
   for (int i = 0; i < length; i ++)
@@ -159,13 +160,15 @@ void ConfigFile::close ()
 
 void save_config ()
 {
+  char buf [STDSIZE];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("conf");
-  fprintf (stdout, "\nSaving %s ", confname); fflush (stdout);
+  sprintf (buf, "Saving %s ", confname);
+  display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    fprintf (stderr, "\nCould not save configuration.");
+    display ("Could not save configuration", LOG_ERROR);
     fflush (stderr);
     return;
   }
@@ -204,10 +207,12 @@ void save_config ()
 
 int load_config ()
 {
+  char buf [STDSIZE];
   char ret [256];
   char *str;
   char *confname = dirs->getSaves ("conf");
-  fprintf (stdout, "\nLoading %s ", confname); fflush (stdout);
+  sprintf (buf, "Loading %s ", confname);
+  display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "width");
@@ -314,14 +319,15 @@ int load_config ()
 
 void save_configInterface ()
 {
+  char buf [STDSIZE];
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs->getSaves ("conf.interface");
-  fprintf (stdout, "\nSaving %s ", confname); fflush (stdout);
+  sprintf (buf, "Saving %s ", confname);
+  display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    fprintf (stderr, "\nCould not save interface configuration.");
-    fflush (stderr);
+    display ("Could not save interface configuration", LOG_ERROR);
     return;
   }
   cf->writeText ("# Interface configuration\n");
@@ -384,10 +390,12 @@ void save_configInterface ()
 
 int load_configInterface ()
 {
+  char buf [STDSIZE];
   char ret [256];
   char *str;
   char *confname = dirs->getSaves ("conf.interface");
-  fprintf (stdout, "\nLoading %s ", confname); fflush (stdout);
+  sprintf (buf, "Loading %s ", confname);
+  display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "key_firecannon");

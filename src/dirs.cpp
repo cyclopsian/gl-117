@@ -57,6 +57,7 @@ void Dirs::append (char *target, char *str)
 
 Dirs::Dirs (char *arg)
 {
+  char buf [STDSIZE];
 #ifdef _MSC_VER
   char path [4096];
   int bscount = 0;
@@ -81,9 +82,8 @@ Dirs::Dirs (char *arg)
   else
   {
 //    strcpy (path, "d:\\temp\\gl-117\\gl-117\\");
-    fprintf (stderr, "\nError: binary file has no context to the data files.\n");
-    fprintf (stderr, "\nDo not execute from console, just doubleclick.\n");
-    fflush (stdout);
+    display ("Binary file has no context to the data files", LOG_FATAL);
+    display ("Do not execute from console, just doubleclick", LOG_MOST);
     exit (100);
   }
   strcpy (textures, path);
@@ -151,8 +151,7 @@ Dirs::Dirs (char *arg)
       p = mystrtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
     }
   }
-  fprintf (stderr, "\nError: binary file has no context to the data files.\n");
-  fflush (stdout);
+  display ("Binary file has no context to the data files.", LOG_FATAL);
   exit (100);
 
 found:;
@@ -177,8 +176,7 @@ found:;
   }
   else
   {
-    fprintf (stderr, "\nError: binary file has no context to the data files.\n");
-    fflush (stdout);
+    display ("Binary file has no context to the data files.", LOG_FATAL);
     exit (100);
   }
 
@@ -216,7 +214,8 @@ found:;
   else
   {
 //      strcpy (myfile, "/home/tom/gl-117_0_4_9/");
-    fprintf (stdout, "\nFound gl-117 data directory %s ", myfile); fflush (stdout);
+    sprintf (buf, "Found gl-117 data directory %s ", myfile);
+    display (buf, LOG_MOST);
     strcpy (textures, myfile);
     strcpy (music, myfile);
     strcpy (sound, myfile);

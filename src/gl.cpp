@@ -163,6 +163,7 @@ CTexture *GL::getTextureTGA (char *fname)
 
 CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap2, bool alpha)
 {
+  char buf [STDSIZE];
   CTexture *mytex;
   if ((mytex = getTextureTGA (fname)) != NULL)
   {
@@ -173,8 +174,8 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
   tex [texnum] = new CTexture ();
   if (!tex [texnum]->loadFromTGA (fname, quality, alphatype, mipmap2))
   {
-    fprintf (stderr, "\nError: Texture %s not found", fname);
-    fflush (stderr);
+    sprintf (buf, "Texture %s not found", fname);
+    display (buf, LOG_FATAL);
     exit (1);
   }
   tex [texnum]->alpha = alpha;

@@ -34,6 +34,8 @@
 #include <sys/stat.h>
 #endif
 
+#include "common.h"
+
 class Dirs
 {
   public:
