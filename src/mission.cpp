@@ -65,7 +65,7 @@ void Mission::playerInit ()
   int i;
   fplayer = fighter [0];
   if (controls != 100)
-    fplayer->easymodel = false;
+    fplayer->easymodel = 2;
   fplayer->target = NULL;
   fplayer->newinit (selfighter [wantfighter], 1, 0);
   if (selfighter [wantfighter] == FIGHTER_FALCON) fplayer->o = &model_fig;
@@ -121,7 +121,7 @@ void Mission::playerInit ()
 void Mission::alliedInit (int fighterid, int pilotid, AIObj *aiobj)
 {
   Pilot *p = pilots->pilot [pilots->aktpilot];
-  aiobj->easymodel = true;
+  aiobj->easymodel = 1;
   aiobj->target = NULL;
   int intelligence = p->tp [pilotid]->intelligence;
   int precision = p->tp [pilotid]->precision;
@@ -790,8 +790,8 @@ void MissionConvoy::start ()
     fighter [i]->tl->x = px + sine [phi] * 3.0;
     fighter [i]->tl->z = py + cosi [phi] * 3.0;
     fighter [i]->phi = 359 - phi;
-    fighter [i]->speed = 0;
-    fighter [i]->maxspeed = 0;
+    fighter [i]->thrust = 0;
+    fighter [i]->maxthrust = 0;
   }
   for (i = 4; i <= 9; i ++)
   {
@@ -1630,8 +1630,8 @@ void MissionTank1::start ()
     fighter [i]->tl->x = -i * 4;
     fighter [i]->tl->z = -i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400 - i * 25);
-    fighter [i]->maxspeed = 0;
-    fighter [i]->speed = 0;
+    fighter [i]->maxthrust = 0;
+    fighter [i]->thrust = 0;
   }
   for (i = 8; i <= 10; i ++)
   {
@@ -1721,8 +1721,8 @@ void MissionShip1::start ()
     fighter [i]->tl->x = -i * 4;
     fighter [i]->tl->z = -i * 4;
     fighter [i]->newinit (SHIP_DESTROYER1, 0, 50);
-    fighter [i]->maxspeed = 0;
-    fighter [i]->speed = 0;
+    fighter [i]->maxthrust = 0;
+    fighter [i]->thrust = 0;
   }
   for (i = 4; i <= 8; i ++)
   {
@@ -1801,8 +1801,8 @@ void MissionShip2::start ()
   fighter [2]->tl->x = 20;
   fighter [2]->tl->z = 0;
   fighter [2]->newinit (STATIC_OILRIG1, 0, 0);
-  fighter [2]->maxspeed = 0;
-  fighter [2]->speed = 0;
+  fighter [2]->maxthrust = 0;
+  fighter [2]->thrust = 0;
   fighter [2]->party = 1;
   for (i = 3; i <= 5; i ++)
   {
@@ -1893,8 +1893,8 @@ void MissionShip3::start ()
   fighter [2]->tl->x = -20;
   fighter [2]->tl->z = 0;
   fighter [2]->newinit (SHIP_CRUISER, 0, 200);
-  fighter [2]->maxspeed = 0;
-  fighter [2]->speed = 0;
+  fighter [2]->maxthrust = 0;
+  fighter [2]->thrust = 0;
   for (i = 4; i <= 7; i ++)
   {
     fighter [i]->party = 0;
@@ -1971,16 +1971,16 @@ void MissionCanyon1::start ()
   fighter [1]->newinit (STATIC_COMPLEX1, 0, 0);
   fighter [1]->tl->x = px + 1;
   fighter [1]->tl->z = py + 1;
-  fighter [1]->maxspeed = 0;
-  fighter [1]->speed = 0;
+  fighter [1]->maxthrust = 0;
+  fighter [1]->thrust = 0;
   for (i = 2; i <= 4; i ++)
   {
     fighter [i]->o = &model_radar;
     fighter [i]->newinit (STATIC_RADAR1, 0, 0);
     fighter [i]->tl->x = px - 2 - (i - 2) * 2;
     fighter [i]->tl->z = py - 2 - (i - 2) * 2;
-    fighter [i]->maxspeed = 0;
-    fighter [i]->speed = 0;
+    fighter [i]->maxthrust = 0;
+    fighter [i]->thrust = 0;
   }
   for (i = 4; i <= 10; i ++)
   {
@@ -2000,8 +2000,8 @@ void MissionCanyon1::start ()
     fighter [i]->newinit (FLARAK_AIR1, 0, 200);
     fighter [i]->tl->x = px + 4;
     fighter [i]->tl->z = py + i * 3 - 30;
-    fighter [i]->maxspeed = 0;
-    fighter [i]->speed = 0;
+    fighter [i]->maxthrust = 0;
+    fighter [i]->thrust = 0;
     fighter [i]->phi = 220;
   }
 }
@@ -2191,14 +2191,14 @@ void MissionCanyon3::start ()
   fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
   fighter [5]->tl->x = px;
   fighter [5]->tl->z = py;
-  fighter [5]->maxspeed = 0;
-  fighter [5]->speed = 0;
+  fighter [5]->maxthrust = 0;
+  fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
   {
     fighter [i]->o = &model_hall1;
     fighter [i]->newinit (STATIC_HALL1, 0, 100);
-    fighter [i]->maxspeed = 0;
-    fighter [i]->speed = 0;
+    fighter [i]->maxthrust = 0;
+    fighter [i]->thrust = 0;
   }
   fighter [6]->tl->x = px + 3;
   fighter [6]->tl->z = py + 3;
@@ -2604,7 +2604,7 @@ void MissionMultiDogfight1::start ()
   else
     fplayer = fighter [1];
   if (controls != 100)
-    fplayer->easymodel = false;
+    fplayer->easymodel = 2;
 }
 
 int MissionMultiDogfight1::processtimer ()

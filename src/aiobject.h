@@ -91,10 +91,10 @@ class DynamicObj : public CSpaceObj
   int id; // object type: FLARAK_AIR1, STATIC_TENT1, FIGHTER_SWALLOW, ...
 //  bool controls;
   bool active; // deactivated means no AI, no collision control and so on
-  // easymodel is the ancient core of the game ;-)
-  // true means that thetha will directly alter phi! Computer AI uses this model!
-  // false means the realistic model with ailerons, elevator, rudder
-  bool easymodel;
+  // easymodel==1 is the ancient core of the game ;-)
+  // 1 means that theta will directly alter phi! Computer AI uses this model!
+  // 2 means the realistic model with ailerons, elevator, rudder
+  int easymodel;
   int ttl; // time to live: cannon and missiles will only live a short time, missiles will sink when ttl<=0
   int immunity; // immunity means the object cannot collide with others, needed for shooting missiles/cannon
   int impact; // this value will be subtracted from the other objects shield when colliding
@@ -102,19 +102,19 @@ class DynamicObj : public CSpaceObj
   float phi; // angle in x-z plane (polar coordinates)
   float gamma; // orthogonal angle (polar coordinates)
   float theta; // roll angle of the fighter!
-  float speed; // current thrust, not the speed itself!
+  float thrust; // current thrust, not the speed itself!
   float realspeed; // the current speed, we only want to calculate this once per time step
   float forcex, forcez, forcey; // the force vectors (orthogonal, should be clear)
   float braking; // far away from reality: this factorizes the last speed vector with the current conditions (see move method)
   float manoeverability; // how fast a fighter can alter its direction
-  float nimbility; // how fast a fighter responds to alterations of recXXX
-  float maxspeed; // maximum throttle value
+  float nimbility; // how fast a fighter responds to alterations of recXXX (recommended XXX)
+  float maxthrust; // maximum throttle value
   float rectheta; // roll angle the fighter/object wants to reach
-  float recspeed; // throttle the fighter/object wants to reach
+  float recthrust; // throttle the fighter/object wants to reach
   float recheight; // height above ground the fighter wants to reach
   float recgamma; // elevation the fighter wants to reach
-  float maxtheta; // a maximum roll angle the object may achieve, easymodel only!
-  float maxgamma; // a maximum elevation the object may achieve, easymodel only!
+  float maxtheta; // a maximum roll angle the object may achieve, easymodel==1 only!
+  float maxgamma; // a maximum elevation the object may achieve, easymodel==1 only!
   float elevatoreffect; // number between 1.0 and -0.5, as diving should be less
   float ruddereffect;
   float rolleffect;
@@ -136,8 +136,8 @@ class DynamicObj : public CSpaceObj
   void dinit ();
   DynamicObj ();
   DynamicObj (Space *space2, CModel *o2, float zoom2);
-  void speedUp ();
-  void speedDown ();
+  void thrustUp ();
+  void thrustDown ();
   float distance (DynamicObj *target);
   // check whether the object is exploding or sinking and deactivate if necessary
   void checkExplosion ();
@@ -172,7 +172,7 @@ class AIObj : public DynamicObj
   int aggressivity; // valid for fighters: fly low, stay near and behind enemy
   int precision; // valid for fighters: heading calculation
   // manoevers disable any other AI consideration
-  int manoevertheta, manoeverheight, manoeverspeed;
+  int manoevertheta, manoeverheight, manoeverthrust;
   int idle; // counter how long AI object does the same thing (to change direction)
   int firemissilettl; // minimum time to wait between shooting missiles
   int missiletype; // only relevant for the player, describes type: AAM, AGM, DF

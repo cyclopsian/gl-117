@@ -591,7 +591,7 @@ void setPlaneVolume ()
 {
   if (game == GAME_PLAY)
   {
-    int lev = (int) ((float) 128 * fplayer->speed / fplayer->maxspeed) - 32;
+    int lev = (int) ((float) 128 * fplayer->thrust / fplayer->maxthrust) - 32;
     sound->setVolume (SOUND_PLANE1, lev);
   }
   else
@@ -625,7 +625,7 @@ void game_levelInit ()
     fighter [i]->zoom = 0.35;
     fighter [i]->deactivate ();
     fighter [i]->recheight = 15;
-    fighter [i]->recspeed = 0.2;
+    fighter [i]->recthrust = 0.2;
     fighter [i]->rectheta = 0;
     fighter [i]->o = &model_fig;
   }
@@ -1298,7 +1298,7 @@ void game_key (unsigned char key, int x, int y)
     }*/
     else if (key >= '1' && key <= '9')
     {
-      fplayer->recspeed = fplayer->maxspeed * (1.0 / 18.0 * (key - '0') + 0.5);
+      fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
       sound->play (SOUND_CLICK1);
     }
 /*    else if (key == 'a')
@@ -1315,13 +1315,13 @@ void game_key (unsigned char key, int x, int y)
     }*/
 /*    else if (key == 'w')
     {
-      fplayer->speedUp ();
+      fplayer->thrustUp ();
       sound->play (SOUND_CLICK1);
       setPlaneVolume ();
     }
     else if (key == 's')
     {
-      fplayer->speedDown ();
+      fplayer->thrustDown ();
       sound->play (SOUND_CLICK1);
       setPlaneVolume ();
     }*/
@@ -1392,12 +1392,12 @@ void game_keyspecialup (int key, int x, int y)
     fplayer->autofire = false;
     break;
   case KEY_UP:
-//    fplayer->speedUp ();
+//    fplayer->thrustUp ();
 //    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 0.0;
     break;
   case KEY_DOWN:
-//    fplayer->speedDown ();
+//    fplayer->thrustDown ();
 //    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 0.0;
     break;
@@ -1429,12 +1429,12 @@ void game_keyspecial (int key, int x, int y)
   }
   switch (key) {
   case KEY_UP:
-//    fplayer->speedUp ();
+//    fplayer->thrustUp ();
 //    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = -0.5;
     break;
   case KEY_DOWN:
-//    fplayer->speedDown ();
+//    fplayer->thrustDown ();
 //    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 1.0;
     break;
@@ -1698,7 +1698,7 @@ void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
 //  fplayer->elevatoreffect = 0;
-  fplayer->recspeed = fplayer->maxspeed * 0.75 - fplayer->maxspeed / 4 * throttle / 32638;
+  fplayer->recthrust = fplayer->maxthrust * 0.75 - fplayer->maxthrust / 4 * throttle / 32638;
 }
 
 void game_joystickbutton (int button)
@@ -2482,10 +2482,10 @@ void fighter_display ()
   font1->drawText (-10, yf, -2.5, buf);
   yf -= 1.5;
   strcpy (buf, "SPEED: ");
-  if (fplayer->maxspeed < 0.20) strcat (buf, "VERY SLOW");
-  else if (fplayer->maxspeed < 0.25) strcat (buf, "SLOW");
-  else if (fplayer->maxspeed < 0.3) strcat (buf, "INTERMEDITATE");
-  else if (fplayer->maxspeed < 0.33) strcat (buf, "FAST");
+  if (fplayer->maxthrust < 0.20) strcat (buf, "VERY SLOW");
+  else if (fplayer->maxthrust < 0.25) strcat (buf, "SLOW");
+  else if (fplayer->maxthrust < 0.3) strcat (buf, "INTERMEDITATE");
+  else if (fplayer->maxthrust < 0.33) strcat (buf, "FAST");
   else strcat (buf, "EXTREMELY FAST");
   font1->drawText (-10, yf, -2.5, buf);
   yf -= 1.5;
@@ -4475,7 +4475,7 @@ void game_display ()
     drawMouseCursor ();
 }
 
-float lastspeed;
+float lastthrust;
 int gametimer;
 
 void game_timer ()
@@ -4522,9 +4522,9 @@ void game_timer ()
   if (flash <= 5 && flash > 0)
     flash --;
 
-  if (lastspeed != fplayer->speed && !(gametimer & 15))
+  if (lastthrust != fplayer->thrust && !(gametimer & 15))
     setPlaneVolume ();
-  lastspeed = fplayer->speed;
+  lastthrust = fplayer->thrust;
 
   for (i = 0; i < maxfighter; i ++)
   {
@@ -4595,12 +4595,12 @@ void game_timer ()
   float testout;
   if (redout < 1)
   {
-    testout = (fplayer->speed * fplayer->elevatoreffect - 0.15F) * 40.0F;
+    testout = (fplayer->thrust * fplayer->elevatoreffect - 0.15F) * 40.0F;
     if (testout > 0) blackout += testout;
   }
   if (blackout < 1)
   {
-    testout = (fplayer->speed * fplayer->elevatoreffect + 0.075F) * 80.0F;
+    testout = (fplayer->thrust * fplayer->elevatoreffect + 0.075F) * 80.0F;
     if (testout < 0) redout -= testout;
   }
 
@@ -4816,9 +4816,9 @@ int net_thread_main (void *data)
   if (flash <= 5 && flash > 0)
     flash --;
 
-  if (lastspeed != fplayer->speed && !(gametimer & 15))
+  if (lastthrust != fplayer->thrust && !(gametimer & 15))
     setPlaneVolume ();
-  lastspeed = fplayer->speed;
+  lastthrust = fplayer->thrust;
 
   for (i = 0; i < maxfighter; i ++)
   {
