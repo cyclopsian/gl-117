@@ -1,8 +1,12 @@
- GGGG L              1    1 77777
-G     L             11   11    7
-G GGG L     -----  1 1  1 1   7
-G   G L              1    1  7
- GGGG LLLLL          1    1 7     (C) Thomas A. Drexl aka heptargon 2002
+  ________    __                        __        __    __________
+ /   ___  \  /\ \                      /  \      /  \  /\________ \
+/\  /___/\_\ \ \ \                    /    \    /    \ \/_______/\ \
+\ \ \   \/_/_ \ \ \         _______  /\__/\ \  /\__/\ \         \/ /
+ \ \ \  /\__ \ \ \ \       /\______\ \/_/\ \ \ \/_/\ \ \        / /
+  \ \ \ \/_/\ \ \ \ \      \/______/      \ \ \     \ \ \      / /
+   \ \ \___\/  \ \ \ \_______              \ \ \     \ \ \    /\ \
+    \ \________/  \ \________\              \ \_\     \ \ \   \ \_\
+     \/_______/    \/________/               \/_/      \/_/    \/_/
 
 
 GL-117 is an action flight simulator written in C++ and OpenGL.
@@ -21,16 +25,17 @@ MSWINDOWS INSTALLATION:
 You might have to install GL, GLU, GLUT, and SDL, SDL_mixer
 Look into your system directory, that is
  \WINDOWS\SYSTEM for Win9x/ME
- \WINDOWS\SYSTEM32 for WinNT/2000/XP
+ \WINDOWS\SYSTEM32 for WinNT/2000/XP.
 You need the files opengl32.dll, glu32.dll, glut32.dll, and sdl.dll,
-sdl_mixer.dll there!
+sdl_mixer.dll stored there!
 If one is missing, search the internet.
 That's it. Execute the binary gl-117.exe in the windows directory!
 
 
-LINUX INSTALLATION:
+UNIX/LINUX INSTALLATION:
 
-If you got a binary gl-117 in the linux directory, you will only need
+If you got a binary gl-117 for your OS in the linux directory,
+you will only need
 	GL, GLU, GLUT, and SDL, SDL_mixer
 installed on your system.
 If you have to compile the sources, you will need
@@ -38,10 +43,15 @@ If you have to compile the sources, you will need
 OR:	mesa-devel, mesaglu-devel, mesaglut-devel, SDL-devel, SDL_mixer
 as well.
 
-To compile gl-117, just execute "./configure" and "make". The new binary
-is in the src directory and may be executed.
-As root enter "make install" to properly install all game files.
-Then you may start the game just using "gl-117".
+To compile gl-117, just execute
+	./configure
+	make
+The new binary is in the src directory and may be executed.
+As root enter
+	make install
+to properly install all game files.
+Then you may start the game just executing
+	gl-117
 Never execute the game as root!
 
 
@@ -62,19 +72,19 @@ negligating fullscreen mode and making the window smaller.
 
 FAQ:
 
+Cannot open GLX?
+Try another bpp setting. (32, 16, 8)
+
 Libraries are installed, but gcc (linker) does not find them?
 Try the command
  g++ -g -O2 -lm -o gl-117 main.o gl.o model.o 3ds.o audio.o land.o \
   glland.o aiobject.o effects.o roam.o net.o mathtab.o dirs.o \
-  objload.o pilots.o \
+  objload.o pilots.o common.o \
   -lGL -lGLU -lglut -lSDL -lSDLmain -lSDL_mixer \
   -lXmu -lXext -lXi -lXxf86vm
 
 Graphics do not initialize?
 This game needs properly installed versions of OpenGL, GLU, and GLUT!
-
-Cannot open GLX?
-Try another bpp setting. (32, 16, 8)
 
 Graphics too lame?
 Sorry, OpenGL is not supported by every graphics card.

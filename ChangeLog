@@ -1,3 +1,14 @@
+Version 0.8.2:
+	- major code cleanup
+	- added debug levels
+	- added command line parameters
+	- added exit values according to fatal errors
+	- more realistic physics model
+	- added blackouts
+	- new intro (fire)
+	- big endian bugfixes
+	- added plasma background
+
 Version 0.8:
 	- important buffer overflow bugfix
 	- chaff/flare countermeasures

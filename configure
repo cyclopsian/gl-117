@@ -1451,7 +1451,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=gl-117
- VERSION=0.5
+ VERSION=0.8.2
 
 
 # Some tools Automake needs.

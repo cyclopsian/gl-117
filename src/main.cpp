@@ -5625,7 +5625,7 @@ void proceedFire ()
   for (i = maxfy - 2; i >= 0; i --)
     for (i2 = 1; i2 < maxfx - 1; i2 ++)
     {
-      col2 [i] [i2] = (col [i + 1] [i2 - 1] + 6 * col [i + 1] [i2] + col [i + 1] [i2 + 1]) / 8 - 500.0F / maxfy;
+      col2 [i] [i2] = (col [i + 1] [i2 - 1] + 6 * col [i + 1] [i2] + col [i + 1] [i2 + 1]) / 8 - (int) (500.0F / maxfy);
       if (col2 [i] [i2] < 0) col2 [i] [i2] = 0;
     }
   memcpy (col, col2, maxfx * maxfy * sizeof (int));
