@@ -56,7 +56,7 @@ Load3ds::Load3ds ()
     ErrorOutOfMemory ();
 }
 
-void Load3ds::setTextureDir (std::string &texDir)
+void Load3ds::setTextureDir (std::string texDir)
 {
   textureDir = texDir;
 }

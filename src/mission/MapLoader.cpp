@@ -23,7 +23,7 @@
 
 #ifndef IS_MAPLOADER_H
 
-#include "Maploader.h"
+#include "MapLoader.h"
 #include "game/globals.h"
 #include "loadbitmap/LoadTga.h"
 #include "filetokenizer/FileTokenizer.h"
@@ -76,7 +76,7 @@ MapLoader::MapLoader ()
   // initialize map file loader
   file.setWhitespace (" \t\r\n");
   file.addComment ("#", "\n");
-  file.setQuotes ("\"'´`");
+  file.setQuotes ("\"'`");
   readMapFile ();
   mapptr = 0;
 }

@@ -175,7 +175,7 @@ extern int menuitem;
 extern int menutimer;
 extern int menuitemselected;
 
-extern missionmenutimer;
+extern int missionmenutimer;
 
 extern void drawCircles (Color *colorstd);
 extern void drawQuads (Color *colorstd);

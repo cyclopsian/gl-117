@@ -54,6 +54,7 @@ TODO:
 #include "game/GameState.h"
 #include "game/Events.h"
 #include "game/Callbacks.h"
+#include "loadmodel/Load3ds.h"
 
 #include <ctype.h>
 

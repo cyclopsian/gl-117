@@ -111,7 +111,7 @@ class Load3ds
 
     Load3ds ();
 
-    void setTextureDir (std::string &texDir);
+    void setTextureDir (std::string texDir);
     bool import3ds (Model3d *model, const char *filename);
   
   // developer specific loading routines
