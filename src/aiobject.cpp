@@ -83,7 +83,7 @@ void DynamicObj::dinit ()
   rectheta = 0;
   tl->z = 0; tl->x = 0;
   forcex = 0; forcez = 0; forcey = 0;
-  maxthrust = 0.3; braking = 0.99; manoeverability = 0.5;
+  maxthrust = 0.3; braking = 0/*0.99*/; manoeverability = 0.5;
   thrust = maxthrust; recthrust = thrust; recheight = 5.0;// height = 5.0;
   ttl = -1;
   shield = 1; maxshield = 1;
@@ -461,16 +461,24 @@ void DynamicObj::move ()
     // change heading and elevation due to ailerons and rudder
     if (maxthrust + thrust <= -0.00001 || maxthrust + thrust >= 0.00001)
     {
+/*
       phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 6.67; // 10.0 * maxthrust / (maxthrust + thrust);
       gamma += COS(theta0) * elevatoreffect * manoeverability * 6.67; // 10.0 * maxthrust / (maxthrust + thrust);
       phi += -vz * COS(theta0) * ruddereffect * manoeverability * 1.33; // 2.0 * maxthrust / (maxthrust + thrust);
       gamma += SIN(theta0) * ruddereffect * manoeverability * 1.33; // 2.0 * maxthrust / (maxthrust + thrust);
       gamma -= sqrt (SIN(theta0) * SIN(theta0) * COS(gamma) * COS(gamma)); // realistic modification
+*/
+      phi += vz * SIN(theta0) * elevatoreffect * manoeverability *(3.33+ 15.0 * realspeed);
+      gamma += COS(theta0) * elevatoreffect * manoeverability * (3.33+ 15.0 * realspeed);
+      phi += -vz * COS(theta0) * ruddereffect * manoeverability * (0.66 +3.0 *realspeed);
+      gamma += SIN(theta0) * ruddereffect * manoeverability * (0.66 + 3.0 * realspeed);
+      gamma -= fabs (SIN(theta0) * COS(gamma) / realspeed / 20); // realistic modification
     }
     // change roll due to roll ;-)
     if (rolleffect)
     {
-      rectheta += rolleffect;
+//      rectheta += rolleffect;
+      rectheta += rolleffect *(0.5+1.5*realspeed);
     }
   }
   if (phi < 0) phi += 360.0; // validate heading
@@ -540,7 +548,7 @@ void DynamicObj::move ()
 
 
 
-  gravityforce = sqrt(realspeed) * vaxis.y *0.001; //0.006 by try and error
+  gravityforce = sqrt(realspeed) * vaxis.y *0.0012; //0.006 by try and error
  //   printf ("id: %d %f \n ",id, gravityforce); fflush (stdout);
   forcez += gravityforce * vaxis.z;
   forcex += gravityforce * vaxis.x;
@@ -585,8 +593,10 @@ void DynamicObj::move ()
   // drag force simulated by just halving the vector, this is not realistic, yet easy to play
   // braking = 0.97
 
-forcex *= braking; forcez *= braking; forcey *= braking;
-
+//  forcex *= braking; forcez *= braking; forcey *= braking;
+  braking = (fabs(ruddereffect)+fabs(elevatoreffect))*realspeed/50;
+  if (easymodel == 2) printf ("\n%f ", 0.9915 - braking);
+  forcex *= 0.9915 - braking; forcez *= 0.9915 - braking; forcey *= 0.9915 - braking;
 
   stop = false;
   if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
