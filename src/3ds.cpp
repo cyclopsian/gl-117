@@ -551,7 +551,8 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
     {
       object->material = model->material [i];
       if (strlen (model->material [i]->filename) > 0)
-        if (model->material [i]->filename [0] >= '0' && model->material [i]->filename [0] <= 'z')
+        if ((model->material [i]->filename [0] >= 'A' && model->material [i]->filename [0] <= 'Z') ||
+            (model->material [i]->filename [0] >= 'a' && model->material [i]->filename [0] <= 'z'))
         {
           object->hasTexture = true;
         }  
@@ -746,11 +747,11 @@ void CLoad3DS::Normalize (CModel *model)
   float tlx = (maxx + minx) / 2.0;
   float tly = (maxy + miny) / 2.0;
   float tlz = (maxz + minz) / 2.0;
-  float scx = (maxx - minx) * 0.5;
-  float scy = (maxy - miny) * 0.5;
-  float scz = (maxz - minz) * 0.5;
-  float sc = scx > scy ? scx : scy;
-  sc = scz > sc ? scz : sc;
+  model->scalex = (maxx - minx) * 0.5;
+  model->scaley = (maxy - miny) * 0.5;
+  model->scalez = (maxz - minz) * 0.5;
+  float sc = model->scalex > model->scaley ? model->scalex : model->scaley;
+  sc = model->scalez > sc ? model->scalez : sc;
 
   for (i = 0; i < model->numObjects; i ++)
   {

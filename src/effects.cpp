@@ -124,7 +124,7 @@ void CSmoke::draw ()
   int smoketype;
   if (type == 0) smoketype = texsmoke->textureID;
   else if (type == 1) smoketype = texsmoke2->textureID;
-  if (quality >= 3)
+  if (antialiasing)
     gl->enableLinearTexture (smoketype);
   else
     gl->disableLinearTexture (smoketype);
@@ -242,7 +242,7 @@ CExplosion::CExplosion (Space *space, CModel *sphere)
   drawlight = false;
 }
 
-void CExplosion::setExplosion (float x, float y, float z, float maxzoom, int len)
+void CExplosion::setExplosion (float x, float y, float z, float vx, float vy, float vz, float maxzoom, int len)
 {
   tl->x = x;
   tl->y = y;
@@ -251,6 +251,7 @@ void CExplosion::setExplosion (float x, float y, float z, float maxzoom, int len
   ttl = len;
   maxlen = len;
   draw = true;
+  v.set (vx, vy, vz);
 //  alpha = 1;
 }
 
@@ -258,15 +259,21 @@ void CExplosion::move (Uint32 dt)
 {
   if (ttl > 0)
   {
+    float timefac = (float) dt / (float) timestep;
     zoom = sine [ttl * 180 / maxlen] * maxzoom;
 //    if (ttl / maxlen < 0.5) alpha = ttl / maxlen + 0.5;
     ttl -= dt;
-    tl->y += 0.01 * dt / timestep;
+    tl->y += 0.01 * timefac;
     if (ttl <= 0)
     {
       ttl = 0;
       draw = false;
     }
+    float brakepower = pow (0.98, timefac);
+    v.mul (brakepower);
+    tl->x += v.x * timefac;
+    tl->y += v.y * timefac;
+    tl->z += v.z * timefac;
   }
 }
 
@@ -313,11 +320,11 @@ void CBlackSmoke::move (Uint32 dt)
 
 void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
-  if (ttl <= 0 || quality == 0) return;
+  if (ttl <= 0 || !specialeffects) return;
   if (draw == 2 || gl->isSphereInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
   {
     glDepthMask (GL_FALSE);
-    if (quality >= 3)
+    if (antialiasing)
       gl->enableLinearTexture (texsmoke3->textureID);
     else
       gl->disableLinearTexture (texsmoke3->textureID);

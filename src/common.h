@@ -49,7 +49,7 @@
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "V1.0.1"
+#define VERSIONSTRING "V1.1"
 
 // data types
 #ifdef USE_GLUT
@@ -83,8 +83,10 @@
 #define CONTROLS_KEYBOARD 0
 #define CONTROLS_MOUSE 1
 #define CONTROLS_JOYSTICK 2
-#define CONTROLS_MOUSE_REVERSE 3
-#define CONTROLS_MOUSE_EXP 4
+
+// view range borders
+#define VIEW_MIN 30
+#define VIEW_MAX 120
 
 // preferences
 extern int quality;
@@ -93,6 +95,9 @@ extern int width, height, bpp;
 extern int volumesound;
 extern int volumemusic;
 extern int dithering;
+extern int antialiasing;
+extern int specialeffects;
+extern int dynamiclighting;
 
 // current mouse coordinates
 extern int mousex, mousey;
@@ -143,9 +148,9 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 
 // define common GLUT/SDL keys
 #ifdef USE_GLUT
-  #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON
-  #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON
-  #define MOUSE_BUTTON_RIGHT GLUT_RIGHT_BUTTON
+  #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON+1 // LEFT MB=0, but we use 0 for "no button"
+  #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON+1
+  #define MOUSE_BUTTON_RIGHT GLUT_RIGHT_BUTTON+1
   #define MOUSE_UP GLUT_UP
   #define MOUSE_DOWN GLUT_DOWN
   #define KEY_F1 GLUT_KEY_F1
@@ -157,14 +162,24 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
   #define KEY_F7 GLUT_KEY_F7
   #define KEY_F8 GLUT_KEY_F8
   #define KEY_F9 GLUT_KEY_F9
+  #define KEY_F10 GLUT_KEY_F10
   #define KEY_UP GLUT_KEY_UP
   #define KEY_DOWN GLUT_KEY_DOWN
   #define KEY_LEFT GLUT_KEY_LEFT
   #define KEY_RIGHT GLUT_KEY_RIGHT
   #define KEY_PGUP GLUT_KEY_PAGE_UP
   #define KEY_PGDOWN GLUT_KEY_PAGE_DOWN
-  #define KEY_LALT GLUT_KEY_PAGE_UP
-  #define KEY_LCTRL GLUT_KEY_PAGE_DOWN
+  #define KEY_LALT -1 // where in glut.h???
+  #define KEY_LCTRL -2
+  #define KEY_LSHIFT -3
+  #define KEY_RSHIFT -4
+  #define KEY_RALT -5
+  #define KEY_RCTRL -6
+  #define KEY_CAPSLOCK -7
+  #define KEY_DELETE -8
+  #define KEY_INSERT GLUT_KEY_INSERT
+  #define KEY_HOME GLUT_KEY_HOME
+  #define KEY_END GLUT_KEY_END
 #else
   #define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
   #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
@@ -180,6 +195,7 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
   #define KEY_F7 SDLK_F7
   #define KEY_F8 SDLK_F8
   #define KEY_F9 SDLK_F9
+  #define KEY_F10 SDLK_F10
   #define KEY_UP SDLK_UP
   #define KEY_DOWN SDLK_DOWN
   #define KEY_LEFT SDLK_LEFT
@@ -187,8 +203,22 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
   #define KEY_PGUP SDLK_PAGEUP
   #define KEY_PGDOWN SDLK_PAGEDOWN
   #define KEY_LALT SDLK_LALT
+  #define KEY_RALT SDLK_RALT
   #define KEY_LCTRL SDLK_LCTRL
+  #define KEY_RCTRL SDLK_RCTRL
+  #define KEY_LSHIFT SDLK_LSHIFT
+  #define KEY_RSHIFT SDLK_RSHIFT
+  #define KEY_CAPSLOCK SDLK_CAPSLOCK
+  #define KEY_DELETE SDLK_DELETE
+  #define KEY_INSERT SDLK_INSERT
+  #define KEY_HOME SDLK_HOME
+  #define KEY_END SDLK_END
 #endif
+
+#define KEY_BACKSPACE 8
+#define KEY_TAB 9
+#define KEY_ENTER 13
+#define KEY_SPACE 32
 
 // log/debug level, look at common.cpp
 #define LOG_NONE 0 // do not log anything
@@ -199,13 +229,19 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 #define LOG_ALL 5 // log everything (stdout)
 
 // display log/debug message
-void display (char *str, int level);
+extern void display (char *str, int level);
 
 // display "out of memory" error and exit
-void error_outofmemory ();
+extern void error_outofmemory ();
+
+extern void key2string (int key, char *buf);
+extern void joystick2string (int key, char *buf);
 
 // current log/debug level (set to constants above)
 extern int debuglevel;
+
+// show collition detection
+extern int showcollision;
 
 #define STDSIZE 256 // typical temporary buffer size
 #define PATHSIZE 4096 // maximum path/directory string size

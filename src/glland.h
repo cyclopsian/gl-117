@@ -57,8 +57,8 @@
 
 // textures are loaded in main.cpp
 extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
-extern CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *texcactusu1;
-extern CTexture *textree4, *texearth, *texsand, *texredsand, *texgravel1;
+extern CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
+extern CTexture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
 extern CTexture *texglitter1;
 
 class GLLandscape : public Landscape
@@ -128,6 +128,7 @@ class GLLandscape : public Landscape
   float getExactRayHeight (float x, float z); // linear interpolation
 
   void drawTree (float x, float y, float htree, float wtree, int phi); // two in one
+  void drawTreeQuad (int x, int y, int phi, bool hq);
 //  void drawTreeGrid (float x, float y, float htree, float wtree, int phi); // 9 trees in 6 quads
 
   int detail [PARTS] [PARTS]; // LOD

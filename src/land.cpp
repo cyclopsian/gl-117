@@ -1283,6 +1283,93 @@ void Landscape::genLake (int depthpc)
               f [i] [i2] = XDEEPWATER;
             hw [i] [i2] = level; // + myrandom (w);
           }
+
+      int barrage = ROCKS;
+      for (i = 0; i <= MAXX; i ++)
+      {
+        if (hw [i] [0] != hw [i] [MAXX]) // error: water and landscape at different heights => make a barrage
+        {
+          if (hw [i] [0] == 0)
+          {
+            h [i] [MAXX - 2] = hw [i] [MAXX] + 100;
+            h [i] [MAXX - 1] = hw [i] [MAXX] + 100;
+            h [i] [MAXX] = h [i] [MAXX - 1];
+            h [i] [0] = h [i] [MAXX];
+            for (i2 = 1; i2 < 5; i2 ++)
+              if (h [i] [i2] < h [i] [0] - i2 * 1000)
+              {
+                h [i] [i2] = h [i] [0] - i2 * 1000;
+                f [i] [i2] = barrage;
+                f [i] [i2 + 1] = barrage;
+              }
+            f [i] [MAXX - 2] = barrage;
+            f [i] [MAXX - 1] = barrage;
+            f [i] [MAXX] = barrage;
+            f [i] [0] = barrage;
+            f [i] [1] = barrage;
+          }
+          else if (hw [i] [MAXX] == 0)
+          {
+            h [i] [2] = hw [i] [0] + 100;
+            h [i] [1] = hw [i] [0] + 100;
+            h [i] [0] = h [i] [1];
+            h [i] [MAXX] = h [i] [0];
+            for (i2 = 1; i2 < 5; i2 ++)
+              if (h [i] [MAXX - i2] < h [i] [MAXX] - i2 * 1000)
+              {
+                h [i] [MAXX - i2] = h [i] [MAXX] - i2 * 1000;
+                f [i] [MAXX - i2] = barrage;
+                f [i] [MAXX - i2 - 1] = barrage;
+              }
+            f [i] [2] = barrage;
+            f [i] [1] = barrage;
+            f [i] [0] = barrage;
+            f [i] [MAXX] = barrage;
+            f [i] [MAXX - 1] = barrage;
+          }
+        }
+        if (hw [0] [i] != hw [MAXX] [i]) // error: water and landscape at different heights => make a barrage
+        {
+          if (hw [0] [i] == 0)
+          {
+            h [MAXX - 2] [i] = hw [MAXX] [i] + 100;
+            h [MAXX - 1] [i] = hw [MAXX] [i] + 100;
+            h [MAXX] [i] = h [MAXX - 1] [i];
+            h [0] [i] = h [MAXX] [i];
+            for (i2 = 1; i2 < 5; i2 ++)
+              if (h [i2] [i] < h [0] [i] - i2 * 1000)
+              {
+                h [i2] [i] = h [0] [i] - i2 * 1000;
+                f [i2] [i] = barrage;
+                f [i2 + 1] [i] = barrage;
+              }
+            f [MAXX - 2] [i] = barrage;
+            f [MAXX - 1] [i] = barrage;
+            f [MAXX] [i] = barrage;
+            f [0] [i] = barrage;
+            f [1] [i] = barrage;
+          }
+          else if (hw [MAXX] [i] == 0)
+          {
+            h [2] [i] = hw [0] [i] + 100;
+            h [1] [i] = hw [0] [i] + 100;
+            h [0] [i] = h [1] [i];
+            h [MAXX] [i] = h [0] [i];
+            for (i2 = 1; i2 < 5; i2 ++)
+              if (h [MAXX - i2] [i] < h [MAXX] [i] - i2 * 1000)
+              {
+                h [MAXX - i2] [i] = h [MAXX] [i] - i2 * 1000;
+                f [MAXX - i2] [i] = barrage;
+                f [MAXX - i2 - 1] [i] = barrage;
+              }
+            f [2] [i] = barrage;
+            f [1] [i] = barrage;
+            f [0] [i] = barrage;
+            f [MAXX] [i] = barrage;
+            f [MAXX - 1] [i] = barrage;
+          }
+        }
+      }
       return;
     }
   }

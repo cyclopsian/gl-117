@@ -56,15 +56,17 @@
 #include "conf.h"
 #include "mission.h"
 #include "cockpit.h"
+#include "menu.h"
 
-extern CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+extern Font *font1, *font2;
+
+extern CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
 extern CTexture *texradar1, *texradar2, *texarrow;
 
 extern PilotList *pilots; // other pilots of the Eagle Squad
 
 extern CExplosion *explosion [maxexplosion];
 extern CBlackSmoke *blacksmoke [maxblacksmoke];
-extern Font *font1, *font2;
 
 extern CLoad3DS g_Load3ds;
 extern CModel model_fig; // fighter models

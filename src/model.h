@@ -218,7 +218,8 @@ class CModel
   bool alpha; // use alpha blending?
   int numRefpoints;
   CVector3 *refpoint;
-  float scale;
+  float scale, scalex, scaley, scalez;
+  float cubex, cubey, cubez; // surrounding cube (or radius of sphere) for simplified collision detection
 
   CModel ();
   void setName (char *name);

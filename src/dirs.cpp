@@ -57,7 +57,6 @@ void Dirs::append (char *target, char *str)
 
 Dirs::Dirs (char *arg)
 {
-  char buf [STDSIZE];
 #ifdef _MSC_VER
   char path [4096];
   int bscount = 0;
@@ -92,6 +91,7 @@ Dirs::Dirs (char *arg)
   strcpy (saves, path);
   append (saves, "saves");
 #else
+  char buf [STDSIZE];
   char *home = getenv ("HOME");
   char *env = getenv ("GL117");
   char *path = getenv ("PATH");

@@ -56,8 +56,8 @@ int mode = 0;
 
 // pre-defined screen resolutions (x, y, bpp, fullscreen)
 int resolution [4] [4] =
-        { { 800, 600, 32, 1 },
-          { 1024, 768, 32, 1 },
+        { { 1024, 768, 32, 1 },
+          { 800, 600, 32, 1 },
           { 640, 480, 32, 1 },
           { 640, 480, 32, 0 } };
 
@@ -76,6 +76,7 @@ SDL_Thread *threadnet = NULL;
 int game = GAME_INIT;
 
 int debuglevel = LOG_MOST;
+int showcollision = 0;
 int brightness = 0;
 
 SoundSystem *sound = NULL;
@@ -102,7 +103,7 @@ CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
 
 
-CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon = NULL, *texcross, *texcross2, *texranks, *texmedals;
 CTexture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
@@ -117,7 +118,7 @@ CTexture *textitle;
 Uint32 lasttime = 0;
 
 
-class EditField
+/*class EditField
 {
   public:
   char text [256];
@@ -184,7 +185,7 @@ class EditField
     }
     font1->drawText (x, y, z, buf);
   }
-};
+};*/
 
 // intro balls, obsolete
 /*class InitKugel
@@ -225,9 +226,10 @@ class EditField
   }
 };*/
 
-char *getKeyString (int key, char *str)
+/*char *getKeyString (int key, char *str)
 {
-  if (key == 8) sprintf (str, "%s", "BKSPC");
+  if (key == 8) sprintf (str, "%s", "BSPACE");
+  else if (key == 9) sprintf (str, "%s", "");
   else if (key == 13) sprintf (str, "%s", "ENTER");
   else if (key == 32) sprintf (str, "%s", "SPACE");
   else
@@ -236,7 +238,7 @@ char *getKeyString (int key, char *str)
     sprintf (str, "%c", upkey);
   }
   return str;
-}
+}*/
 
 
 
@@ -325,7 +327,7 @@ CModel *obj, *objlaser, *objmissile;
 CVector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
 CRotation *rotnull, *rotmissile;
 
-EditField pilotedit;
+//EditField pilotedit;
 
 GLenum polygonMode = GL_FILL;
 
@@ -340,16 +342,30 @@ int joysticks;
 Mission *mission = NULL;
 Mission *missionnew = NULL;
 
+int keyb_elev = 0, keyb_roll = 0, keyb_rudder = 0;
+int keyb_lshift = 0;
 
+Container allmenus;
+Container famemenu;
+Container fightermenu;
+Container missionmenu;
+Container quitmenu;
+Container statsmenu;
+Component *currentsubmenu = NULL;
+Component *currentoptmenu = NULL;
+
+Container *mainmenu, *submenu [10], *optmenu [5], *controlsmenu [5];
+Button *mainbutton [10];
+Button *optbutton [10];
 
 
 
 bool firststart = false;
 
-
+bool missionactive = false;
 
 CColor colorwhite (255, 255, 255, 255);
-CColor colorblue (100, 150, 255, 255);
+CColor colorblue (50, 50, 255, 255);
 CColor colorgreen (100, 255, 100, 255);
 CColor colororange (255, 150, 100, 255);
 CColor colorred (255, 0, 0, 255);
@@ -360,18 +376,22 @@ CColor colorlightgrey (210, 210, 210, 255);
 
 void drawRank (float xp, float yp, float zp, int rank, float zoom)
 {
+  rank --;
+  if (rank < 0) return;
   float x = xp / 10.0, y = yp / 10.0, z = zp;
   float tx1 = 0.5 * (rank % 2);
   float tx2 = tx1 + 0.5;
-  float ty1 = 0.75 - 0.25 * (rank / 2);
-  float ty2 = ty1 + 0.25;
+  float ty1 = 0.755 - 0.25 * (rank / 2);
+  float ty2 = ty1 + 0.24;
   zoom /= 10;
   gl->enableTextures (texranks->textureID);
+  if (antialiasing) gl->enableLinearTexture (texranks->textureID);
+  else gl->disableLinearTexture (texranks->textureID);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.1);
+  glAlphaFunc (GL_GEQUAL, 0.35);
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, 255);
+  glColor4ub (255, 255, 255, 200);
   glTexCoord2f (tx1, ty1);
   glVertex3f (x, y, z);
   glTexCoord2f (tx2, ty1);
@@ -397,11 +417,13 @@ void drawMedal (float xp, float yp, float zp, int medal, float zoom, int mission
   float ty2 = ty1 + 0.5;
   zoom /= 10;
   gl->enableTextures (texmedals->textureID);
+  if (antialiasing) gl->enableLinearTexture (texmedals->textureID);
+  else gl->disableLinearTexture (texmedals->textureID);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, 255);
+  glColor4ub (255, 255, 255, 200);
   glTexCoord2f (tx1, ty1);
   glVertex3f (x, y, z);
   glTexCoord2f (tx2, ty1);
@@ -522,7 +544,9 @@ void adjustBrightness ()
 
 #ifndef USE_GLUT
 SDL_Joystick *sdljoystick [maxjoysticks];
+int sdljoystickaxes [maxjoysticks];
 #endif
+
 int sdldisplay = true;
 int sdlreshape = true;
 Cockpit *cockpit;
@@ -532,10 +556,86 @@ int glutwindow;
 
 
 
-
 bool initing = true;
 int flash = 0;
 int lastshield = 0;
+
+int getTrainingIdFromValue (int n)
+{
+  int z = 0;
+  if (n == z ++) return MISSION_TUTORIAL;
+  else if (n == z ++) return MISSION_TUTORIAL2;
+  else if (n == z ++) return MISSION_DOGFIGHT;
+  else if (n == z ++) return MISSION_TUTORIAL3;
+  else if (n == z ++) return MISSION_FREEFLIGHT1;
+  else if (n == z ++) return MISSION_DEATHMATCH1;
+  else if (n == z ++) return MISSION_DEATHMATCH2;
+  else if (n == z ++) return MISSION_TEAMBASE1;
+  else if (n == z ++) return MISSION_WAVES1;
+  return 0;
+}
+
+int getCampaignIdFromValue (int n)
+{
+  int z = 0;
+  if (n == z ++) return MISSION_TEST1;
+  else if (n == z ++) return MISSION_TEST2;
+  else if (n == z ++) return MISSION_TRANSPORT;
+  else if (n == z ++) return MISSION_CONVOY;
+  else if (n == z ++) return MISSION_DOGFIGHT2;
+  else if (n == z ++) return MISSION_AIRBATTLE;
+  else if (n == z ++) return MISSION_SADEFENSE;
+  else if (n == z ++) return MISSION_SCOUT;
+  else if (n == z ++) return MISSION_BASE;
+  else if (n == z ++) return MISSION_DEPOT;
+  else if (n == z ++) return MISSION_DEFEND1;
+  else if (n == z ++) return MISSION_DOGFIGHT3;
+  else if (n == z ++) return MISSION_TANK1;
+  else if (n == z ++) return MISSION_CONVOY2;
+  else if (n == z ++) return MISSION_SHIP1;
+  else if (n == z ++) return MISSION_SHIP2;
+  else if (n == z ++) return MISSION_SHIP3;
+  else if (n == z ++) return MISSION_CANYON1;
+  else if (n == z ++) return MISSION_CANYON2;
+  else if (n == z ++) return MISSION_TUNNEL1;
+  else if (n == z ++) return MISSION_CANYON3;
+  else if (n == z ++) return MISSION_MOON1;
+  else if (n == z ++) return MISSION_MOONBATTLE;
+  else if (n == z ++) return MISSION_MOON2;
+  else if (n == z ++) return MISSION_MOON3;
+  return 0;
+}
+
+int getCampaignValueFromId (int n)
+{
+  int z = 0;
+  if (MISSION_TEST1) z = 0;
+  else if (MISSION_TEST2) z = 1;
+  else if (MISSION_TRANSPORT) z = 2;
+  else if (MISSION_CONVOY) z = 3;
+  else if (MISSION_DOGFIGHT2) z = 4;
+  else if (MISSION_AIRBATTLE) z = 5;
+  else if (MISSION_SADEFENSE) z = 6;
+  else if (MISSION_SCOUT) z = 7;
+  else if (MISSION_BASE) z = 8;
+  else if (MISSION_DEPOT) z = 9;
+  else if (MISSION_DEFEND1) z = 10;
+  else if (MISSION_DOGFIGHT3) z = 11;
+  else if (MISSION_TANK1) z = 12;
+  else if (MISSION_CONVOY2) z = 13;
+  else if (MISSION_SHIP1) z = 14;
+  else if (MISSION_SHIP2) z = 15;
+  else if (MISSION_SHIP3) z = 16;
+  else if (MISSION_CANYON1) z = 17;
+  else if (MISSION_CANYON2) z = 18;
+  else if (MISSION_TUNNEL1) z = 19;
+  else if (MISSION_CANYON3) z = 20;
+  else if (MISSION_MOON1) z = 21;
+  else if (MISSION_MOONBATTLE) z = 22;
+  else if (MISSION_MOON2) z = 23;
+  else if (MISSION_MOON3) z = 24;
+  return z;
+}
 
 void setPlaneVolume ()
 {
@@ -676,7 +776,7 @@ void game_levelInit ()
     }
     else if (fighter [i]->id >= TANK1 && fighter [i]->id <= TANK2)
     {
-      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom / 2;
+      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + fighter [i]->zoom * 0.55;
     }
     else if (fighter [i]->id == STATIC_TENT1)
     {
@@ -1012,6 +1112,16 @@ void switch_menu ()
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
     playRandomMusic ();
+  allmenus.visible = true;
+  allmenus.components [0]->setVisible (true);
+  if (currentsubmenu)
+  {
+    currentsubmenu->setVisible (true);
+  }
+  if (missionactive)
+    mainbutton [6]->setVisible (true);
+  else
+    mainbutton [6]->setVisible (false);
 #ifdef HAVE_SDL
   SDL_WM_GrabInput (SDL_GRAB_OFF);
 #endif
@@ -1083,7 +1193,9 @@ void createMission (int missionid)
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
   else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
+  else if (missionid == MISSION_TUTORIAL2) missionnew = new MissionTutorial2 ();
   else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
+  else if (missionid == MISSION_TUTORIAL3) missionnew = new MissionTutorial3 ();
   else if (missionid == MISSION_FREEFLIGHT1) missionnew = new MissionFreeFlight1 ();
   else if (missionid == MISSION_DEATHMATCH1) missionnew = new MissionDeathmatch1 ();
   else if (missionid == MISSION_DEATHMATCH2) missionnew = new MissionDeathmatch2 ();
@@ -1207,15 +1319,41 @@ void switch_game ()
     sound->haltMusic ();
   sound->playLoop (SOUND_PLANE1);
   setPlaneVolume ();
-  if (fplayer)
+/*  if (fplayer)
     if (!fplayer->ai)
-      fplayer->realism = physics;
+      fplayer->realism = physics;*/
 #ifdef HAVE_SDL
   SDL_WM_GrabInput (SDL_GRAB_ON);
 #endif
 }
 
 bool startcannon = false;
+
+void event_setAntialiasing ()
+{
+  if (antialiasing)
+  {
+    gl->enableLinearTexture (font1->texture->textureID);
+    gl->enableLinearTexture (font2->texture->textureID);
+    if (texmoon != NULL)
+    {
+      gl->enableLinearTexture (texmoon->textureID);
+      gl->enableLinearTexture (texsun->textureID);
+      gl->enableLinearTexture (texearth->textureID);
+    }
+  }
+  else
+  {
+    gl->disableLinearTexture (font1->texture->textureID);
+    gl->disableLinearTexture (font2->texture->textureID);
+    if (texmoon != NULL)
+    {
+      gl->disableLinearTexture (texmoon->textureID);
+      gl->disableLinearTexture (texsun->textureID);
+      gl->disableLinearTexture (texearth->textureID);
+    }
+  }
+}
 
 void event_fireCannon ()
 {
@@ -1306,40 +1444,17 @@ void event_thrustDown ()
   fplayer->thrustDown ();
 }
 
-void game_key (unsigned char key, int x, int y)
+void game_key (int key, int x, int y)
 {
-  int hikey = toupper (key);
-  int lokey = tolower (key);
+  unsigned int hikey = key;
+  unsigned int lokey = key;
+
   if (camera == 50 && game == GAME_PAUSE)
   {
     camera = 0;
     game = GAME_PLAY;
     return;
   }
-/*    if (hikey == 'R')
-    {
-      view_x += 20;
-    }
-    else if (hikey == 'F')
-    {
-      view_y += 20;
-    }*/
-/*  if (key == 'v')
-  {
-    view += 10.0;
-    if (view > 100) view = 20;
-    game_reshape ();
-    sound->play (SOUND_CLICK1);
-  }
-  else if (key == 'q')
-  {
-    quality ++;
-    if (quality > 5) quality = 0;
-    if (quality <= 1) space->drawlight = false;
-    else space->drawlight = true;
-    sound->play (SOUND_CLICK1);
-//      printf ("\nQuality = %d", quality); fflush (stdout);
-  }*/
   else if (key == 27)
   {
     switch_menu ();
@@ -1372,131 +1487,136 @@ void game_key (unsigned char key, int x, int y)
   {
     event_thrustDown ();
   }
-/*    else if (key == 'l')
-    {
-      if (lighting == 0) lighting = 1;
-      else lighting = 0;
-    }
-    else if (key == 'm')
-    {
-      if (mode == 0) mode = 1;
-      else mode = 0;
-    }*/
-    else if (key >= '1' && key <= '9')
-    {
-      fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
-      sound->play (SOUND_CLICK1);
-    }
-/*    else if (hikey == 'X')
-    {
-      sphere->rot->a += 90;
-      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
-    }
-    else if (hikey == 'C')
-    {
-      sphere->rot->b += 90;
-      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
-    }
-    else if (hikey == 'V')
-    {
-      sphere->rot->c += 90;
-      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
-    }*/
-/*    else if (key == 'a')
-    {
-      fplayer->ai = !fplayer->ai;
-      if (!fplayer->ai) fplayer->easymodel = 2;
-      else fplayer->easymodel = 1;
-      if (controls == 100)
-        fplayer->easymodel = true;
-    }*/
-/*    else if (key == 'p')
-    {
-      if (game == GAME_PLAY) game = GAME_PAUSE;
-      else game = GAME_PLAY;
-    }*/
-/*    else if (key == 'w')
-    {
-      fplayer->thrustUp ();
-      sound->play (SOUND_CLICK1);
-      setPlaneVolume ();
-    }
-    else if (key == 's')
-    {
-      fplayer->thrustDown ();
-      sound->play (SOUND_CLICK1);
-      setPlaneVolume ();
-    }*/
-/*    else if (key == 'n')
-    {
-      game_levelInit (0);
-    }*/
-/*    else if (key == '-')
-    {
-      width -= 50; height -= 50;
-      if (width < 50) width = 50;
-      if (height < 50) height = 50;
+  else if (key >= '1' && key <= '9')
+  {
+    fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
+    sound->play (SOUND_CLICK1);
+  }
+  else if (hikey == key_targetnearest || lokey == key_targetnearest)
+  {
+    event_targetNearest ();
+  }
+  else if (hikey == key_targetnext || lokey == key_targetnext)
+  {
+    event_targetNext ();
+  }
+  else if (hikey == key_targetprevious || lokey == key_targetprevious)
+  {
+    event_targetPrevious ();
+  }
+  else if (hikey == key_targetlocking || lokey == key_targetlocking)
+  {
+    event_targetLocking ();
+  }
+/*  else if (key == 'k')
+  {
+    if (fplayer->target != NULL)
+      fplayer->target->shield = -1;
+  }*/
+  else if (key == ' ')
+  {
+    fplayer->autofire = false;
+  }
+
+  switch (key - 256) // standard special keys
+  {
+    case KEY_LSHIFT:
+      keyb_lshift = 1;
+      break;
+    case KEY_UP:
+      keyb_elev = -1;
+      break;
+    case KEY_DOWN:
+      keyb_elev = 1;
+      break;
+    case KEY_LEFT:
+      if (keyb_lshift) keyb_rudder = -1;
+      else keyb_roll = 1;
+      break;
+    case KEY_RIGHT:
+      if (keyb_lshift) keyb_rudder = 1;
+      else keyb_roll = -1;
+      break;
+    case KEY_F1:
+      camera = 0;
+      game_reshape ();
+      break;
+    case KEY_F2:
+      camera = 1;
+      game_reshape ();
+      break;
+    case KEY_F3:
+      camera = 2;
+      game_reshape ();
+      break;
+    case KEY_F4:
+      camera = 6;
+      game_reshape ();
+      break;
+    case KEY_F5:
+      camera = 7;
+      game_reshape ();
+      break;
+    case KEY_F6:
+      camera = 9;
+      game_reshape ();
+      break;
+    case KEY_F7:
+      camera = 8;
+      game_reshape ();
+      break;
+    case KEY_F8:
+      camera = 5;
+      game_reshape ();
+      break;
+    default:
+      return;
+  }
+
 #ifdef USE_GLUT
-      glutReshapeWindow (width, height);
+  glutPostRedisplay();
 #else
-      sdlreshape = true;
-#endif
-    }
-    else if (key == '+')
-    {
-      width += 50; height += 50;
-      if (width > 1000) width = 1000;
-      if (height > 1000) height = 1000;
-#ifdef USE_GLUT
-      glutReshapeWindow (width, height);
-#else
-      sdlreshape = true;
-#endif
-    }*/
-    else if (hikey == key_targetnearest || lokey == key_targetnearest)
-    {
-      event_targetNearest ();
-    }
-    else if (hikey == key_targetnext || lokey == key_targetnext)
-    {
-      event_targetNext ();
-    }
-    else if (hikey == key_targetprevious || lokey == key_targetprevious)
-    {
-      event_targetPrevious ();
-    }
-    else if (hikey == key_targetlocking || lokey == key_targetlocking)
-    {
-      event_targetLocking ();
-    }
-/*    else if (key == 'k')
-    {
-      if (fplayer->target != NULL)
-        fplayer->target->shield = 0;
-    }*/
-/*    else if (key == 'g')
-    {
-      if (polygonMode==GL_FILL)
-        polygonMode=GL_LINE;
-      else
-        polygonMode=GL_FILL;
-      glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
-    }*/
-#ifdef USE_GLUT
-    glutPostRedisplay();
-#else
-    sdldisplay = true;
+  sdldisplay = true;
 #endif
 }
 
-void game_keyup (unsigned char key, int x, int y)
+void game_keyup (int key, int x, int y)
 {
-  int hikey = toupper (key);
-  int lokey = tolower (key);
+  unsigned int hikey = (unsigned int) key;
+  unsigned int lokey = (unsigned int) key;
+
   if (hikey == key_firecannon || lokey == key_firecannon)
   {
     event_stopCannon ();
   }
+
+  switch (key - 256) // standard special keys
+  {
+    case KEY_LSHIFT:
+      keyb_lshift = 0;
+      break;
+    case KEY_UP:
+      keyb_elev = 0;
+      break;
+    case KEY_DOWN:
+      keyb_elev = 0;
+      break;
+    case KEY_LEFT:
+      keyb_roll = 0;
+      keyb_rudder = 0;
+      break;
+    case KEY_RIGHT:
+      keyb_roll = 0;
+      keyb_rudder = 0;
+      break;
+    case KEY_LALT:
+      keyb_rudder = 0;
+      break;
+    case KEY_LCTRL:
+      keyb_rudder = 0;
+      break;
+  }
+
 #ifdef USE_GLUT
     glutPostRedisplay();
 #else
@@ -1505,116 +1625,6 @@ void game_keyup (unsigned char key, int x, int y)
 }
 
 int aktcam = 0;
-
-void game_keyspecialup (int key, int x, int y)
-{
-  switch (key) {
-  case ' ':
-    fplayer->autofire = false;
-    break;
-  case KEY_UP:
-    fplayer->elevatoreffect = 0.0;
-    break;
-  case KEY_DOWN:
-    fplayer->elevatoreffect = 0.0;
-    break;
-  case KEY_LEFT:
-    fplayer->rolleffect = 0;
-    break;
-  case KEY_RIGHT:
-    fplayer->rolleffect = 0;
-    break;
-#ifdef HAVE_SDL
-  case KEY_PGUP:
-  case KEY_LALT:
-    fplayer->ruddereffect = 0;
-    break;
-  case KEY_PGDOWN:
-  case KEY_LCTRL:
-    fplayer->ruddereffect = 0;
-    break;
-#endif
-  }
-}
-
-void game_keyspecial (int key, int x, int y)
-{
-  if (camera == 50 && game == GAME_PAUSE)
-  {
-    camera = 0;
-    game = GAME_PLAY;
-  }
-  switch (key) {
-  case KEY_UP:
-    fplayer->elevatoreffect = -1.0;
-    break;
-  case KEY_DOWN:
-    fplayer->elevatoreffect = 1.0;
-    break;
-  case KEY_LEFT:
-    fplayer->rolleffect = 1.0;
-    break;
-  case KEY_RIGHT:
-    fplayer->rolleffect = -1.0;
-    break;
-  case KEY_PGUP:
-#ifndef USE_GLUT
-  case KEY_LALT:
-#endif
-    fplayer->ruddereffect = 1.0;
-    break;
-  case KEY_PGDOWN:
-#ifndef USE_GLUT
-  case KEY_LCTRL:
-#endif
-    fplayer->ruddereffect = -1.0;
-    break;
-  case KEY_F1:
-    camera = 0;
-    game_reshape ();
-    break;
-  case KEY_F2:
-    camera = 1;
-    game_reshape ();
-    break;
-  case KEY_F3:
-    camera = 2;
-    game_reshape ();
-    break;
-  case KEY_F4:
-    camera = 6;
-    game_reshape ();
-    break;
-  case KEY_F5:
-    camera = 7;
-    game_reshape ();
-    break;
-  case KEY_F6:
-    camera = 9;
-    game_reshape ();
-    break;
-  case KEY_F7:
-    camera = 8;
-    game_reshape ();
-    break;
-  case KEY_F8:
-    camera = 5;
-    game_reshape ();
-    break;
-/*  case KEY_F9:
-    aktcam ++;
-    if (aktcam > 7) aktcam = 0;
-    camera = 3;
-    break;*/
-  default:
-    return;
-  }
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
-  sdldisplay = true;
-#endif
-}
 
 void game_mouse (int button, int state, int x, int y)
 {
@@ -1628,6 +1638,10 @@ void game_mouse (int button, int state, int x, int y)
     {
       event_fireMissile ();
     }
+    else if (button == mouse_selectmissile)
+    {
+      event_selectMissile ();
+    }
   }
 }
 
@@ -1639,7 +1653,7 @@ int lastmx = 0, lastmy = 0;
 
 void game_mouserelmotion (int xrel, int yrel)
 {
-  if (controls != CONTROLS_MOUSE_EXP) return;
+  if (controls != CONTROLS_MOUSE || !mouse_relative) return;
   float xr = (float) xrel / width, yr = (float) yrel / height;
   
   float roll = (float) -xr * 20;
@@ -1656,13 +1670,14 @@ void game_mouserelmotion (int xrel, int yrel)
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
 
   fplayer->elevatoreffect = (float) yr * fabs (yr) * 20000;
+  if (!mouse_reverse) fplayer->elevatoreffect *= -1;
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
   else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
 }
 
 void game_mousemotion (int x, int y)
 {
-  if (controls != CONTROLS_MOUSE && controls != CONTROLS_MOUSE_REVERSE) return;
+  if (controls != CONTROLS_MOUSE || mouse_relative) return;
 
 //  game_mouserelmotion (x, y);
 //  return;
@@ -1672,7 +1687,7 @@ void game_mousemotion (int x, int y)
   float dx = x - mx, dy = my - y;
   dx *= mouse_sensitivity / 70.0F;
   dy *= mouse_sensitivity / 70.0F;
-  if (controls == CONTROLS_MOUSE_REVERSE)
+  if (mouse_reverse)
     dy *= -1;
 /*  int t = (int) fplayer->theta;
   if (t < 0) t += 360;
@@ -1686,16 +1701,22 @@ void game_mousemotion (int x, int y)
 // mouse interface code added by Lourens Veen
   float nx = dx / width; // normalised x-coordinate, -1 at lefthand 
                          // side of the screen, 1 at righthand side 
+  if (mouse_autorudder)
+  {
+    if (fabs(nx) < (1.0f/3.0f)) 
+    if (nx < 0.0f) 
+      fplayer->ruddereffect = 729.0f*nx*(nx+1.0f/3.0f)*(nx+1.0f/3.0f)/4.0f; 
+    else 
+      fplayer->ruddereffect = 729.0f*nx*(nx-1.0f/3.0f)*(nx-1.0f/3.0f)/4.0f; 
+    else 
+      fplayer->ruddereffect = 0.0f; 
+  }
+  else
+  {
+    fplayer->ruddereffect = 0;
+  }
 
-  if (fabs(nx) < (1.0f/3.0f)) 
-  if (nx < 0.0f) 
-    fplayer->ruddereffect = 729.0f*nx*(nx+1.0f/3.0f)*(nx+1.0f/3.0f)/4.0f; 
-  else 
-    fplayer->ruddereffect = 729.0f*nx*(nx-1.0f/3.0f)*(nx-1.0f/3.0f)/4.0f; 
-  else 
-    fplayer->ruddereffect = 0.0f; 
-
-  const float roll_deadarea = (1.0f/30.0f); 
+  const float roll_deadarea = (float) mouse_autorudder / 1000.0F; //(1.0f/30.0f);
 
   if (fabs(nx) > roll_deadarea) 
   { 
@@ -1713,8 +1734,6 @@ void game_mousemotion (int x, int y)
   } 
   else 
     fplayer->rolleffect = 0.0f; 
-/*  if (fplayer->rolleffect > 70) fplayer->rolleffect = 70; 
-  if (fplayer->rolleffect < -70) fplayer->rolleffect = -70; */
 
   fplayer->elevatoreffect = dy / height * 2.5; 
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
@@ -1753,7 +1772,7 @@ void game_joystickaxis (int x, int y, int rudder, int throttle)
   fplayer->recthrust = fplayer->maxthrust * 0.75 - fplayer->maxthrust / 4 * throttle / 32638;
 }
 
-void game_joystickbutton (unsigned int button)
+void game_joystickbutton (int button)
 {
   if (!fplayer->active) return;
   if (button == joystick_firecannon)
@@ -1812,15 +1831,9 @@ void game_joystickbutton (unsigned int button)
   }
 }
 
-void game_joystickhat (int hat)
+void game_joystickhat (int normhat)
 {
-  int normhat = hat;
 #ifndef USE_GLUT
-  if (hat % 1000 == SDL_HAT_RIGHT) normhat = 100;
-  if (hat % 1000 == SDL_HAT_UP) normhat = 101;
-  if (hat % 1000 == SDL_HAT_LEFT) normhat = 102;
-  if (hat % 1000 == SDL_HAT_DOWN) normhat = 103;
-  normhat += (hat / 1000) * 1000;
   game_joystickbutton (normhat);
 #endif
 }
@@ -1858,7 +1871,6 @@ void game_view ()
 int missionending = 0;
 int missionstate = 0;
 
-bool missionactive = false;
 int menuitem = 0, menutimer = 0, menuitemselected = -1, missionmenutimer;
 int missionmenuitemselected = 0, missionmenufighterselected = -1, missionmenuweaponselected = -1;
 
@@ -1965,13 +1977,13 @@ void drawPlasma (CColor *colorstd)
 
 void menu_key (unsigned char key, int x, int y)
 {
-  if (pilotedit.active)
+/*  if (pilotedit.active)
   {
     pilotedit.event (key);
     if (key == 13)
       pilots->add (pilotedit.text);
     key = 0;
-  }
+  }*/
   if (key == 27)
   {
     if (missionactive)
@@ -2074,11 +2086,11 @@ void create_key (unsigned char key, int x, int y)
 //    server->sendMessage (0, "s", 1);
     if (server->checkStart()) 
     {
-    printf ("Starting..");
-    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
-    game_levelInit ();
-    switch_game ();
-    missionactive = true;
+      printf ("Starting..");
+      createMission (MISSION_MULTIPLAYER_DOGFIGHT);
+      game_levelInit ();
+      switch_game ();
+      missionactive = true;
     }
   }
   if (key == 27)
@@ -2157,48 +2169,24 @@ void mission_mouse (int button, int state, int x, int y)
   float rx = (float) x / width;
   float ry = (float) y / height;
   int lastitemselected = missionmenuitemselected;
-//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
-  if (ry >= 0.88 && ry <= 0.93)
-  {
-    if (rx >= 0.55 && rx <= 0.85)
-    {
-      missionmenuitemselected = 0;
-      if (state == MOUSE_DOWN)
-      {
-        pleaseWait ();
-        game_levelInit ();
-        switch_game ();
-        missionactive = true;
-      }
-    }
-    if (rx >= 0.12 && rx <= 0.35)
-    {
-      missionmenuitemselected = 1;
-      if (state == MOUSE_DOWN)
-      {
-        switch_menu ();
-      }
-    }
-  }
-
   missionmenufighterselected = -1;
-  if (ry >= 0.55 && ry <= 0.75)
+  if (ry >= 0.53 && ry <= 0.65)
   {
-    if (rx >= 0.1 && rx < 0.23)
+    if (rx >= 0.18 && rx < 0.28)
     {
       missionmenufighterselected = 0;
       if (state == MOUSE_DOWN)
         missionnew->wantfighter = 0;
     }
-    if (rx >= 0.23 && rx < 0.36 && missionnew->selfighters >= 2)
+    if (rx >= 0.28 && rx < 0.38 && missionnew->selfighters >= 2)
     {
       missionmenufighterselected = 1;
       if (state == MOUSE_DOWN)
         missionnew->wantfighter = 1;
     }
-    if (rx >= 0.36 && rx < 0.5 && missionnew->selfighters >= 3)
+    if (rx >= 0.38 && rx < 0.48 && missionnew->selfighters >= 3)
     {
       missionmenufighterselected = 2;
       if (state == MOUSE_DOWN)
@@ -2207,31 +2195,26 @@ void mission_mouse (int button, int state, int x, int y)
   }
 
   missionmenuweaponselected = -1;
-  if (ry >= 0.55 && ry <= 0.75)
+  if (ry >= 0.53 && ry <= 0.65)
   {
-    if (rx >= 0.6 && rx < 0.7)
+    if (rx >= 0.54 && rx < 0.64)
     {
       missionmenuweaponselected = 0;
       if (state == MOUSE_DOWN)
         missionnew->wantweapon = 0;
     }
-    if (rx >= 0.7 && rx < 0.8 && missionnew->selweapons >= 2)
+    if (rx >= 0.64 && rx < 0.74 && missionnew->selweapons >= 2)
     {
       missionmenuweaponselected = 1;
       if (state == MOUSE_DOWN)
         missionnew->wantweapon = 1;
     }
-    if (rx >= 0.8 && rx < 0.9 && missionnew->selweapons >= 3)
+    if (rx >= 0.74 && rx < 0.84 && missionnew->selweapons >= 3)
     {
       missionmenuweaponselected = 2;
       if (state == MOUSE_DOWN)
         missionnew->wantweapon = 2;
     }
-  }
-
-  if (lastitemselected != missionmenuitemselected)
-  {
-//    missionmenutimer = 0; // do not alter, it will affect the background
   }
 }
 
@@ -2273,68 +2256,20 @@ void drawArrow (float x, float y, float w, float h)
 
 void mission_display ()
 {
+  allmenus.setVisible (false);
+  missionmenu.setVisible (true);
+  missionmenu.draw ();
+
   char buf [256];
   int i;
   float zf = -3;
-  float xstats = 1, ystats = 6;
-  float xstatstab = 10;
-  float piloty = 6;
+  float piloty = 5;
   Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorred;
   if (p->mission_state [missionnew->id] == 1)
     colorstd = &colorblue;
-
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity ();
-  glPushMatrix ();
-
-  gl117_rotateColors (missionmenutimer);
-
-  drawPlasma (colorstd);
-
-  drawArrow (-2.1, 1.6, 1, 0.05);
-  drawArrow (-2.3, 1.6, 0.05, 0.6);
-
-  drawArrow (-2.1, 0.8, 1, 0.05);
-  drawArrow (-2.3, 0.8, 0.05, 0.9);
-
-  drawArrow (0.2, 0.8, 1, 0.05);
-  drawArrow (0, 0.8, 0.05, 0.9);
-
-  drawArrow (-2.1, -0.3, 1, 0.05);
-  drawArrow (-2.3, -0.3, 0.05, 0.9);
-
-  drawArrow (0.2, -0.3, 1, 0.05);
-  drawArrow (0, -0.3, 0.05, 0.9);
-
-/*  glLineWidth (2.0);
-  glColor4ub (180, 180, 180, 255);
-  glBegin (GL_LINE_STRIP);
-  glVertex3f (-2.3, 0.8, zf);
-  glVertex3f (2.3, 0.8, zf);
-  glVertex3f (2.3, 1.6, zf);
-  glVertex3f (-2.3, 1.6, zf);
-  glVertex3f (-2.3, 0.8, zf);
-  glEnd ();
-  glBegin (GL_LINE_STRIP);
-  glVertex3f (-2.3, -0.3, zf);
-  glVertex3f (2.3, -0.3, zf);
-  glVertex3f (2.3, 0.8, zf);
-  glVertex3f (-2.3, 0.8, zf);
-  glVertex3f (-2.3, -0.3, zf);
-  glEnd ();
-  glBegin (GL_LINE_STRIP);
-  glVertex3f (-2.3, -1.5, zf);
-  glVertex3f (2.3, -1.5, zf);
-  glVertex3f (2.3, -0.3, zf);
-  glVertex3f (-2.3, -0.3, zf);
-  glVertex3f (-2.3, -1.5, zf);
-  glEnd ();
-  glBegin (GL_LINE_STRIP);
-  glVertex3f (0, 0.8, zf);
-  glVertex3f (0, -1.5, zf);
-  glEnd ();*/
+  CColor *col = &menu_colwhite;
+  Font *font2 = font1;
 
   CVector3 vec;
   CVector3 tl (-4.5, 5.5, -8.0);
@@ -2350,95 +2285,101 @@ void mission_display ()
   
   glEnable (GL_LIGHTING);
   glEnable (GL_DEPTH_TEST);
-  model_gl117.draw2 (&vec, &tl, &rot, 1.0, 0);
-  tl.x = 4.5;
-  model_gl117.draw2 (&vec, &tl, &rot, 1.0, 0);
   
-  tl.x = -20; tl.y = -2.4; tl.z = -9.2;
+  tl.x = -0.24; tl.y = -0.075; tl.z = -0.5;
   rot.a = 300;
   rot.b = 0;
   for (i = 0; i < missionnew->selfighters; i ++)
   {
-    tl.x = -5.6 + (float) i * 2.1;
+    tl.x = -0.24 + (float) i * 0.085;
     if (missionnew->wantfighter == i)
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
-    getModel (missionnew->selfighter [i])->draw2 (&vec, &tl, &rot, 0.9, 0);
+    getModel (missionnew->selfighter [i])->draw (&vec, &tl, &rot, 0.04, 0.1, 0);
   }
 
-  tl.x = 0; tl.y = -2.4; tl.z = -8.5;
+  tl.x = 0; tl.y = -0.075; tl.z = -0.5;
   rot.a = 300;
   rot.b = 0;
   for (i = 0; i < missionnew->selweapons; i ++)
   {
-    tl.x = 2.0 + (float) i * 1.5;
+    tl.x = 0.08 + (float) i * 0.07;
     if (missionnew->wantweapon == i)
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
-    getModel (missionnew->selweapon [i])->draw2 (&vec, &tl, &rot, 0.9, 0);
+    getModel (missionnew->selweapon [i])->draw (&vec, &tl, &rot, 0.04, 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_LIGHTING);
 
-  font1->drawTextCentered (0, 9.8, -1.5, missionnew->name);
-  font1->drawText (-22, 14, -3, "BRIEFING:");
-  font2->drawText (-22, 12, -3, missionnew->briefing);
 
-  font1->drawText (xstats, ystats, -3, "STATUS:");
+  float textx = -12, texty = 9.8;
+  font1->zoom = 0.105;
+  font2->zoom = 0.105;
+  float fontscale = 1.05;
+  font1->drawTextCentered (0, texty / fontscale, -2, missionnew->name, col);
+  texty -= 1.1;
+  font1->zoom = 0.05;
+  font2->zoom = 0.05;
+  fontscale = 0.5;
+  font1->drawText (textx / fontscale, texty / fontscale, -2, "BRIEFING:", col);
+  texty -= 1;
+  font1->drawText (textx / fontscale, texty / fontscale, -2, missionnew->briefing, col);
+
+/* font1->zoom = 0.06;
+  font2->zoom = 0.06;
+  fontscale = 0.6;*/
+  float xstats = 0.8, ystats = 5;
+  float xstatstab = 5;
+  font1->drawText (xstats / fontscale, ystats / fontscale, -2, "STATUS:", col);
   if (p->mission_state [missionnew->id] == 1)
-    font1->drawText (xstatstab, ystats, -3, "SUCCESS", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "SUCCESS", colorstd);
   else if (p->mission_state [missionnew->id] == 2)
-    font1->drawText (xstatstab, ystats, -3, "FAILED", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "FAILED", colorstd);
   else
-    font1->drawText (xstatstab, ystats, -3, "EMPTY", colorstd);
+    font1->drawText (xstatstab / fontscale, ystats / fontscale, -2, "EMPTY", colorstd);
   if (missionnew->id >= MISSION_CAMPAIGN1 && missionnew->id <= MISSION_CAMPAIGN2)
   {
-    font1->drawText (xstats, ystats - 1.5, -3, "SCORE:");
+    texty = ystats - 0.7;
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", col);
     int score = p->mission_score [missionnew->id];
     if (score < -10000 || score > 100000) score = 0;
     sprintf (buf, "%d", score);
-    font1->drawText (xstatstab, ystats - 1.5, -3, buf, colorstd);
-    font1->drawText (xstats, ystats - 3, -3, "KILLS:");
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, colorstd);
+    texty -= 0.7;
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "KILLS:", col);
     sprintf (buf, "%d AIRCRAFTS", p->mission_fighterkills [missionnew->id]);
-    font1->drawText (xstatstab, ystats - 3, -3, buf, colorstd);
-    drawMedal (xstatstab + 2, ystats - 5.5, -3, getMedal (p->mission_score [missionnew->id]), 3.5, mission->id);
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, buf, colorstd);
+//    drawMedal (xstatstab + 2, ystats - 3, -2, getMedal (p->mission_score [missionnew->id]), 2, mission->id);
   }
   else
   {
-    font1->drawText (xstats, ystats - 1.5, -3, "SCORE:");
-    font1->drawText (xstatstab, ystats - 1.5, -3, "TRAINING");
+    texty = ystats - 0.7;
+    font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", col);
+    font1->drawText (xstatstab / fontscale, texty / fontscale, -2, "TRAINING", col);
   }
   
-  font1->drawText (-22, piloty, -3, "PILOTS:");
-  strcpy (buf, pilots->pilot [pilots->aktpilot]->getRank ());
+  font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", col);
+  strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank ());
   strcat (buf, " ");
   strcat (buf, pilots->pilot [pilots->aktpilot]->name);
-  font2->drawText (-20, piloty - 2 + 0.2, -3, buf);
-  drawRank (-22, piloty - 2 + 0.3, -3, pilots->pilot [pilots->aktpilot]->ranking, 0.8);
+  font2->drawText ((textx + 1.5) / fontscale, (piloty - 0.8) / fontscale, -2, buf, col);
+  drawRank (textx, piloty - 0.8, -2, pilots->pilot [pilots->aktpilot]->ranking, 0.5);
   for (i = 1; i < missionnew->alliedfighters; i ++)
     if (missionnew->alliedpilot [i - 1] >= 0 && missionnew->alliedpilot [i - 1] < 100)
     {
-      drawRank (-22, piloty - 2 - i + 0.1, -3, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->ranking, 0.8);
-      font2->drawText (-20, piloty - 2 - i, -3, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->getName ());
+      drawRank (textx, piloty - 1 - 0.6 * i, -2, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->ranking, 0.5);
+      font2->drawText ((textx + 1.5) / fontscale, (piloty - 1 - 0.6 * i) / fontscale, -2, pilots->pilot [pilots->aktpilot]->tp [missionnew->alliedpilot [i - 1]]->getShortName (), col);
     }
 
-  font1->drawText (-22, -5, -3, "CHOOSE FIGHTER:");
-  font1->drawText (xstats, -5, -3, "CHOOSE WEAPON PACK:");
-  if (missionmenuitemselected == 0)
-    font1->drawTextScaled (2, -14, -2, "START MISSION", colorstd, -missionmenutimer * 5);
-  else
-    font1->drawText (2, -14, -2, "START MISSION");
-  if (missionmenuitemselected == 1)
-    font1->drawTextScaled (-12, -14, -2, "CANCEL", colorstd, -missionmenutimer * 5);
-  else
-    font1->drawText (-12, -14, -2, "CANCEL");
-  font2->drawText (-20, -14, -3, getModelName (missionnew->selfighter [missionnew->wantfighter]));
-  font2->drawText (xstats + 2, -14, -3, getModelName (missionnew->selweapon [missionnew->wantweapon]));
-  glPopMatrix ();
-
-  adjustBrightness ();
+  font1->drawText (textx / fontscale, -1 / fontscale, -2, "CHOOSE FIGHTER:", col);
+  font1->drawText (xstats / fontscale, -1 / fontscale, -2, "CHOOSE WEAPON PACK:", col);
+  font2->drawText (textx / fontscale, -6 / fontscale, -2, getModelName (missionnew->selfighter [missionnew->wantfighter]), col);
+  font2->drawText (xstats / fontscale, -6 / fontscale, -2, getModelName (missionnew->selweapon [missionnew->wantweapon]), col);
+  font1->zoom = 0.1;
+  font2->zoom = 0.1;
 
   drawMouseCursor ();
 }
@@ -2449,7 +2390,7 @@ void fame_mouse (int button, int state, int x, int y)
   float ry = (float) y / height;
   missionmenuitemselected = -1;
 
-  if (ry >= 0.75 && ry <= 0.82)
+/*  if (ry >= 0.75 && ry <= 0.82)
   {
     if (rx >= 0.4 && rx <= 0.6)
     {
@@ -2459,7 +2400,7 @@ void fame_mouse (int button, int state, int x, int y)
         fame_key (27, 0, 0);
       }
     }
-  }
+  }*/
 }
 
 void create_mouse (int button, int state, int x, int y)
@@ -2494,6 +2435,7 @@ void create_display ()
 
   float my = 0;
 #ifdef HAVE_SDL_NET
+  int i;
   for (i = 0; i < server->num_clients; i ++)
   {
     font1->drawTextCentered (0, my, -2.5, server->clients [i].name);
@@ -2563,106 +2505,23 @@ int aktfighter = 0;
 
 void fighter_mouse (int button, int state, int x, int y)
 {
-  float rx = (float) x / width;
-  float ry = (float) y / height;
-  missionmenuitemselected = -1;
-
-  int maxfighter = 6;
-  Pilot *p = pilots->pilot [pilots->aktpilot];
-  if (p->mission_state [MISSION_DEPOT] == 1) maxfighter ++;
-  if (p->mission_state [MISSION_SHIP1] == 1) maxfighter ++;
-  if (p->mission_state [MISSION_CANYON3] == 1) maxfighter ++;
-  if (p->mission_state [MISSION_MOON1] == 1) maxfighter ++;
-
-  if (ry >= 0.45 && ry <= 0.55)
-  {
-    if (rx >= 0.08 && rx <= 0.18)
-    {
-      missionmenuitemselected = 10;
-      if (state == MOUSE_DOWN)
-      {
-        aktfighter --;
-        if (aktfighter < 0) aktfighter = maxfighter - 1;
-      }
-    }
-    if (rx >= 0.82 && rx <= 0.92)
-    {
-      missionmenuitemselected = 11;
-      if (state == MOUSE_DOWN)
-      {
-        aktfighter ++;
-        if (aktfighter >= maxfighter) aktfighter = 0;
-      }
-    }
-  }
-
-  if (ry >= 0.8 && ry <= 0.9)
-  {
-    if (rx >= 0.4 && rx <= 0.6)
-    {
-      missionmenuitemselected = 0;
-      if (state == MOUSE_DOWN)
-      {
-        fighter_key (27, 0, 0);
-      }
-    }
-  }
 }
 
 void fighter_display ()
 {
+  allmenus.setVisible (false);
+  fightermenu.setVisible (true);
+  fightermenu.draw ();
+  AIObj ffighter;
+
   char buf [256];
   int i;
-//  Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorblue;
-
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity ();
-  glPushMatrix ();
-
-  drawQuads (colorstd);
-
-  font1->drawTextCentered (0, 9, -1.5, "FIGHTER");
-
-  glBegin (GL_TRIANGLES);
-  if (missionmenuitemselected == 10)
-    glColor3ub (220, 220, 0);
-  else
-    glColor3ub (150, 150, 150);
-  glVertex3f (-1.3, 0, -2);
-  glVertex3f (-1.1, -0.1, -2);
-  glVertex3f (-1.1, 0.1, -2);
-  glEnd ();  
-  glBegin (GL_LINE_STRIP);
-  glColor3ub (200, 200, 200);
-  glVertex3f (-1.3, 0, -2);
-  glVertex3f (-1.1, -0.1, -2);
-  glVertex3f (-1.1, 0.1, -2);
-  glVertex3f (-1.3, 0, -2);
-  glEnd ();
-  glBegin (GL_TRIANGLES);
-  if (missionmenuitemselected == 11)
-    glColor3ub (220, 220, 0);
-  else
-    glColor3ub (150, 150, 150);
-  glVertex3f (1.3, 0, -2);
-  glVertex3f (1.1, -0.1, -2);
-  glVertex3f (1.1, 0.1, -2);
-  glEnd ();  
-  glBegin (GL_LINE_STRIP);
-  glColor3ub (200, 200, 200);
-  glVertex3f (1.3, 0, -2);
-  glVertex3f (1.1, -0.1, -2);
-  glVertex3f (1.1, 0.1, -2);
-  glVertex3f (1.3, 0, -2);
-  glEnd ();
-
 
   CVector3 vec;
   CVector3 tl;
-  tl.y = -0.45;
-  tl.z = -3;
+  tl.y = -0.04;
+  tl.z = -0.4;
   CRotation rot;
   rot.a = 300;
   rot.b = 0;
@@ -2680,81 +2539,68 @@ void fighter_display ()
   else if (aktfighter == 8) { model = &model_figf; id = FIGHTER_PHOENIX; }
   else if (aktfighter == 9) { model = &model_figh; id = FIGHTER_BLACKBIRD; }
 
-/* Some code to get screenshots of missiles
-glClearColor (1, 1, 1, 1);
-gl->clearScreen ();
-model = &model_missile7; */
-
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
-  model->draw (&vec, &tl, &rot, 1.0, 2.0, 0);
+  model->draw (&vec, &tl, &rot, 0.11, 0.5, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
 
-  fplayer->newinit (id, 1, 0);
+  ffighter.o = model;
+  ffighter.newinit (id, 1, 0);
 
-  font1->drawText (-10, 9, -2, getModelName (id));
-  float yf = 9.5;
+  float fontzoom = 0.7;
+  float textx = -9.5;
+  font1->zoom = 0.07;
+  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), &menu_colwhite);
+  float yf = 9.6 - 1.35;
   strcpy (buf, "TYPE: ");
-  if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_CROW || fplayer->id == FIGHTER_BUZZARD || fplayer->id == FIGHTER_REDARROW || fplayer->id == FIGHTER_BLACKBIRD)
+  if (ffighter.id == FIGHTER_FALCON || ffighter.id == FIGHTER_CROW || ffighter.id == FIGHTER_BUZZARD || ffighter.id == FIGHTER_REDARROW || ffighter.id == FIGHTER_BLACKBIRD)
     strcat (buf, "FIGHTER");
-  else if (fplayer->id == FIGHTER_HAWK || fplayer->id == FIGHTER_HAWK2)
+  else if (ffighter.id == FIGHTER_HAWK || ffighter.id == FIGHTER_HAWK2)
     strcat (buf, "FIGHTER-BOMBER");
   else
     strcat (buf, "BOMBER");
-  font1->drawText (-10, yf, -2.5, buf);
-  yf -= 1.5;
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  yf -= 1;
   strcpy (buf, "SPEED: ");
-  int stars = (int) ((fplayer->maxthrust - 0.2) * 40);
-  font1->drawText (-10, yf, -2.5, buf);
+  int stars = (int) ((ffighter.maxthrust - 0.2) * 40);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
   for (i = 0; i < stars; i ++)
-    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
-  yf -= 1.5;
+    drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
+  yf -= 1;
   strcpy (buf, "NIMBILITY: ");
-  stars = (int) ((fplayer->manoeverability - 0.3) * 20 + 1);
-  font1->drawText (-10, yf, -2.5, buf);
+  stars = (int) ((ffighter.manoeverability - 0.3) * 20 + 1);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
   for (i = 0; i < stars; i ++)
-    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
-  yf -= 1.5;
+    drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
+  yf -= 1;
   strcpy (buf, "SHIELD: ");
-  stars = (int) ((fplayer->maxshield - 30) / 30);
-  font1->drawText (-10, yf, -2.5, buf);
+  stars = (int) ((ffighter.maxshield - 30) / 30);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
   for (i = 0; i < stars; i ++)
-    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
-  yf -= 1.5;
+    drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
+  yf -= 1;
   strcpy (buf, "FIREPOWER: ");
-  stars = fplayer->statfirepower;
-  font1->drawText (-10, yf, -2.5, buf);
+  stars = ffighter.statfirepower;
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
   for (i = 0; i < stars; i ++)
-    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
-
-  if (missionmenuitemselected == 0)
-    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
-  else
-    font1->drawText (-2, -12, -2, "BACK");
-
-  glPopMatrix ();
-
-  adjustBrightness ();
+    drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
+  font1->zoom = 0.1;
 
   drawMouseCursor ();
 }
 
 void fame_display ()
 {
+  allmenus.setVisible (false);
+  famemenu.setVisible (true);
+  famemenu.draw ();
+
   char buf [256];
   int i, i2;
   Pilot *p = pilots->pilot [pilots->aktpilot];
-  CColor *colorstd = &colorblue;
 
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity ();
-  glPushMatrix ();
-
-  drawCircles (colorstd);
-
-  font1->drawTextCentered (0, 8, -1.5, "TOP PILOTS");
+  float textx = -10;
   int sum = 0;
   for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
     sum += p->mission_fighterkills [i];
@@ -2777,21 +2623,14 @@ void fame_display ()
 
   for (i = 0; i < 11; i ++)
   {
-    drawRank (-12.5, 1.5 * i - 7, -2.5, p->tp [index [i]]->ranking, 1);
+    font1->zoom = 0.07;
+    drawRank (textx + 0.2, i - 3.7, -2, p->tp [index [i]]->ranking, 0.7);
     sprintf (buf, "%s %s", p->tp [index [i]]->getRank (), p->tp [index [i]]->name);
-    font1->drawText (-10, 1.5 * i - 7, -2.5, buf);
+    font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, &menu_colwhite);
     sprintf (buf, "%d", p->tp [index [i]]->fighterkills);
-    font1->drawText (11, 1.5 * i - 7, -2.5, buf);
+    font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, &menu_colwhite);
+    font1->zoom = 0.1;
   }
-
-  if (missionmenuitemselected == 0)
-    font1->drawTextScaled (-2, -10, -2, "BACK", colorstd, -missionmenutimer * 5);
-  else
-    font1->drawText (-2, -10, -2, "BACK");
-
-  glPopMatrix ();
-
-  adjustBrightness ();
 
   drawMouseCursor ();
 }
@@ -2887,681 +2726,10 @@ void quit_mouse (int button, int state, int x, int y)
 
 void menu_mouse (int button, int state, int x, int y)
 {
-  int i;
-  float rx = (float) x / width;
-  float ry = (float) y / height;
-  int lastitemselected = menuitemselected;
-  int lastitem = menuitem;
-  menuitemselected = -1;
-
-  if (rx >= 0.08 && rx <= 0.4)
-  {
-    if (ry >= 0.15 && ry <= 0.2)
-    {
-      menuitemselected = 0;
-      if (state == MOUSE_DOWN)
-        menuitem = 0;
-    }
-    else if (ry >= 0.22 && ry <= 0.27)
-    {
-      menuitemselected = 1;
-      if (state == MOUSE_DOWN)
-        menuitem = 1;
-    }
-    else if (ry >= 0.28 && ry <= 0.33)
-    {
-      menuitemselected = 2;
-      if (state == MOUSE_DOWN)
-        menuitem = 2;
-    }
-    else if (ry >= 0.34 && ry <= 0.39)
-    {
-      menuitemselected = 3;
-      if (state == MOUSE_DOWN)
-        menuitem = 3;
-    }
-    else if (ry >= 0.40 && ry <= 0.45)
-    {
-      menuitemselected = 4;
-      if (state == MOUSE_DOWN)
-        menuitem = 4;
-    }
-    else if (ry >= 0.46 && ry <= 0.51)
-    {
-      menuitemselected = 5;
-      if (state == MOUSE_DOWN)
-      {
-        menuitem = 5;
-        switch_credits ();
-      }
-    }
-    else if (ry >= 0.52 && ry <= 0.57)
-    {
-      menuitemselected = 6;
-      if (state == MOUSE_DOWN)
-      {
-        menuitem = 6;
-        switch_quit ();
-      }
-    }
-#ifdef HAVE_SDL_NET
-    else if (ry >= 0.58 && ry <= 0.63)
-    {
-      menuitemselected = 7;
-      if (state == MOUSE_DOWN)
-        menuitem = 7;
-    }
-#endif
-    else if (ry >= 0.64 && ry <= 0.69)
-    {
-      menuitemselected = 9;
-      if (state == MOUSE_DOWN)
-      {
-        // no new menuitem!
-        switch_game ();
-      }
-    }
-  }
-
-  if (menuitem == 0)
-  {
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      for (i = 0; i < pilots->aktpilots; i ++)
-      {
-        if (ry >= 0.22 + 0.06 * (float) i && ry <= 0.27 + 0.06 * (float) i)
-        {
-          menuitemselected = 20 + i;
-          if (state == MOUSE_DOWN)
-          {
-            pilots->aktpilot = i;
-          }
-        }
-      }
-      if (ry >= 0.58 && ry <= 0.63)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-          if (button == MOUSE_BUTTON_RIGHT)
-          {
-            pilots->rm ();
-          }
-      }
-      if (ry >= 0.64 && ry <= 0.69)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          pilotedit.init ();
-        }
-      }
-    }
-  }
-
-  if (menuitem == 1)
-  {
-//    Pilot *p = pilots->pilot [pilots->aktpilot];
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      if (ry >= 0.12 && ry <= 0.14)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TUTORIAL);
-        }
-      }
-      if (ry >= 0.15 && ry <= 0.17)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DOGFIGHT);
-        }
-      }
-      if (ry >= 0.21 && ry <= 0.23)
-      {
-        menuitemselected = 13;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_FREEFLIGHT1);
-        }
-      }
-      if (ry >= 0.24 && ry <= 0.26)
-      {
-        menuitemselected = 14;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DEATHMATCH1);
-        }
-      }
-      if (ry >= 0.27 && ry <= 0.29)
-      {
-        menuitemselected = 15;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DEATHMATCH2);
-        }
-      }
-      if (ry >= 0.30 && ry <= 0.32)
-      {
-        menuitemselected = 16;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TEAMBASE1);
-        }
-      }
-      if (ry >= 0.33 && ry <= 0.35)
-      {
-        menuitemselected = 17;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_WAVES1);
-        }
-      }
-    }
-  }
-
-  if (menuitem == 2)
-  {
-    Pilot *p = pilots->pilot [pilots->aktpilot];
-    float ydiff1 = 0.02F, ydiff2 = 0.026F;
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      float ryu = 0.12F;
-      if (ry >= ryu && ry <= ryu + ydiff1)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TEST1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TEST1] == 1)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TEST2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TEST2] == 1)
-      {
-        menuitemselected = 12;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TRANSPORT);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TRANSPORT] == 1)
-      {
-        menuitemselected = 13;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_CONVOY);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CONVOY] == 1)
-      {
-        menuitemselected = 14;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DOGFIGHT2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DOGFIGHT2] == 1)
-      {
-        menuitemselected = 15;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_AIRBATTLE);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_AIRBATTLE] == 1)
-      {
-        menuitemselected = 16;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_SADEFENSE);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SADEFENSE] == 1)
-      {
-        menuitemselected = 17;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_SCOUT);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SCOUT] == 1)
-      {
-        menuitemselected = 18;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_BASE);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_BASE] == 1)
-      {
-        menuitemselected = 19;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DEPOT);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DEPOT] == 1)
-      {
-        menuitemselected = 20;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DEFEND1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DEFEND1] == 1)
-      {
-        menuitemselected = 21;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DOGFIGHT3);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DOGFIGHT3] == 1)
-      {
-        menuitemselected = 22;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TANK1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TANK1] == 1)
-      {
-        menuitemselected = 23;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_CONVOY2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CONVOY2] == 1)
-      {
-        menuitemselected = 25;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_SHIP1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP1] == 1)
-      {
-        menuitemselected = 26;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_SHIP2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP2] == 1)
-      {
-        menuitemselected = 27;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_SHIP3);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP3] == 1)
-      {
-        menuitemselected = 30;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_CANYON1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON1] == 1)
-      {
-        menuitemselected = 31;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_CANYON2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON2] == 1)
-      {
-        menuitemselected = 36;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_TUNNEL1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TUNNEL1] == 1)
-      {
-        menuitemselected = 32;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_CANYON3);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON3] == 1)
-      {
-        menuitemselected = 33;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_MOON1);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOON1] == 1)
-      {
-        menuitemselected = 37;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_MOONBATTLE);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOONBATTLE] == 1)
-      {
-        menuitemselected = 34;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_MOON2);
-        }
-      }
-      ryu += ydiff2;
-      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOON2] == 1)
-      {
-        menuitemselected = 35;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_MOON3);
-        }
-      }
-    }
-    if (ry >= 0.82 && ry <= 0.88)
-    {
-      if (rx >= 0.40 && rx <= 0.6)
-      {
-        menuitemselected = 100;
-        if (state == MOUSE_DOWN)
-        {
-          switch_fame ();
-        }
-      }
-      if (rx >= 0.65 && rx <= 0.85)
-      {
-        menuitemselected = 101;
-        if (state == MOUSE_DOWN)
-        {
-          switch_fighter ();
-        }
-      }
-    }
-  }
-
-  if (menuitem == 3)
-  {
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      if (ry >= 0.15 && ry <= 0.2)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            quality ++;
-            if (quality > 5) quality = 0;
-          }
-          else
-          {
-            quality --;
-            if (quality < 0) quality = 5;
-          }
-        }
-      }
-      else if (ry >= 0.22 && ry <= 0.27)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            view += 10;
-            if (view > 100) view = 30;
-            menu_reshape ();
-          }
-          else
-          {
-            view -= 10;
-            if (view < 30) view = 100;
-            menu_reshape ();
-          }
-        }
-      }
-      else if (ry >= 0.28 && ry <= 0.33)
-      {
-        menuitemselected = 12;
-        if (state == MOUSE_DOWN)
-        {
-          dithering = (dithering == 0 ? 1 : 0);
-        }
-      }
-      else if (ry >= 0.34 && ry <= 0.39)
-      {
-        menuitemselected = 13;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            fplayer->rolleffect = 0;
-            fplayer->ruddereffect = 0;
-            fplayer->elevatoreffect = 0;
-            if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
-            else if (controls == CONTROLS_MOUSE) controls = CONTROLS_MOUSE_REVERSE;
-            else if (controls == CONTROLS_MOUSE_REVERSE) controls = CONTROLS_MOUSE_EXP;
-            else if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_JOYSTICK;
-            else if (controls == CONTROLS_JOYSTICK) controls = CONTROLS_MOUSE;
-            if (controls > 4) controls = 0;
-            if (controls == CONTROLS_JOYSTICK && !joysticks) controls = CONTROLS_KEYBOARD;
-#ifdef USE_GLUT
-            if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
-            if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_MOUSE;
-#endif
-          }
-        }
-      }
-#ifdef HAVE_SDL_MIXER
-      else if (ry >= 0.40 && ry <= 0.45)
-      {
-        if (sound->audio)
-        {
-          menuitemselected = 14;
-          if (state == MOUSE_DOWN)
-          {
-            if (button == MOUSE_BUTTON_LEFT)
-            {
-              sound->volumesound += 10;
-              if (sound->volumesound > 100)
-                sound->volumesound = 0;
-              sound->setVolume ();
-              setPlaneVolume ();
-              sound->play (SOUND_CLICK1);
-              menu_reshape ();
-            }
-            else
-            {
-              sound->volumesound -= 10;
-              if (sound->volumesound < 0)
-                sound->volumesound = 100;
-              sound->setVolume ();
-              setPlaneVolume ();
-              sound->play (SOUND_CLICK1);
-              menu_reshape ();
-            }
-          }
-        }
-      }
-      else if (ry >= 0.46 && ry <= 0.51)
-      {
-        if (sound->audio)
-        {
-          menuitemselected = 15;
-          if (state == MOUSE_DOWN)
-          {
-            if (button == MOUSE_BUTTON_LEFT)
-            {
-              sound->volumemusic += 10;
-              if (sound->volumemusic > 100)
-              {
-                sound->volumemusic = 0;
-                sound->haltMusic ();
-              }
-              sound->setVolumeMusic ();
-              menu_reshape ();
-            }
-            else
-            {
-              sound->volumemusic -= 10;
-              if (sound->volumemusic < 0)
-                sound->volumemusic = 100;
-              sound->setVolumeMusic ();
-              menu_reshape ();
-            }
-            if (sound->volumemusic != 0 && !sound->musicplaying)
-              playRandomMusic ();
-          }
-        }
-      }
-#endif
-      else if (ry >= 0.52 && ry <= 0.57)
-      {
-        menuitemselected = 16;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            difficulty ++;
-            if (difficulty > 2) difficulty = 0;
-          }
-          else
-          {
-            difficulty --;
-            if (difficulty < 0) difficulty = 2;
-          }
-        }
-      }
-      else if (ry >= 0.58 && ry <= 0.63)
-      {
-        menuitemselected = 17;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            brightness += 10;
-            if (brightness > 50) brightness = -50;
-          }
-          else
-          {
-            brightness -= 10;
-            if (brightness < -50) brightness = 50;
-          }
-        }
-      }
-      else if (ry >= 0.64 && ry <= 0.69)
-      {
-        menuitemselected = 18;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            physics = !physics;
-          }
-        }
-      }
-    }
-  }
-
-#ifdef HAVE_SDL_NET
-  if (menuitem == 7)
-  {
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      if (ry >= 0.15 && ry <= 0.2)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-        {
-          switch_create ();
-        }
-      }
-      else if (ry >= 0.22 && ry <= 0.27)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          switch_join ();
-        }
-      }
-    }
-  }
-#endif
-
-  if (lastitemselected != menuitemselected)
-  {
-//    menutimer = 0;
-  }
-
-  if (lastitem != menuitem)
-  {
-    sound->play (SOUND_CLICK1);
-  }
-
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
-  sdldisplay = true;
-#endif
 }
 
 void stats_mouse (int button, int state, int x, int y)
 {
-  float rx = (float) x / width;
-  float ry = (float) y / height;
-  statsitemselected = 0;
-  if (ry >= 0.7 && ry <= 0.8)
-  {
-    if (rx >= 0.38 && rx <= 0.62)
-    {
-      statsitemselected = 1;
-      if (state == MOUSE_DOWN)
-      {
-        stats_key (27, 0, 0);
-      }
-    }
-  }
-
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
-  sdldisplay = true;
-#endif
 }
 
 
@@ -3572,11 +2740,10 @@ void stats_mouse (int button, int state, int x, int y)
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
-  int menutimernorm = menutimer * 5 / timestep;
+/*  int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
-  Pilot *p = pilots->pilot [pilots->aktpilot];
   if (p->mission_state [missionid] == 1)
   {
     if (menuitemselected == selected)
@@ -3587,15 +2754,20 @@ void drawMissionElement (float x, float y, float z, int thismissionid, int missi
   else
   {
     font1->drawText (x, y, z, string, &colorgrey);
-  }
+  }*/
+  Pilot *p = pilots->pilot [pilots->aktpilot];
   drawMedal (x - 0.8, y + 0.6, z, getMedal (p->mission_score [thismissionid]), 1.0, thismissionid);
 }
 
 void stats_display ()
 {
+  allmenus.setVisible (false);
+  statsmenu.setVisible (true);
+  statsmenu.draw ();
+
   float xf = 1.4, yf = 1.4, zf = -2.5;
   int c1 = 100, c2 = 10, c3 = 180;
-  glBegin (GL_QUADS);
+/*  glBegin (GL_QUADS);
   glColor4ub (c2, c2, c2, 255);
   glVertex3f (-xf, -yf, zf);
   glColor4ub (c1, c1, c1, 255);
@@ -3613,110 +2785,225 @@ void stats_display ()
   glVertex3f (xf, yf, zf);
   glVertex3f (-xf, yf, zf);
   glVertex3f (-xf, -yf, zf);
-  glEnd ();
+  glEnd ();*/
 
-  drawMedal (-5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6, mission->id);
-  drawMedal (5.5, 6.5, -1.5, getMedal (fplayer->score), 1.6, mission->id);
+  drawMedal (-5.5, 5.8, -1.5, getMedal (fplayer->score), 1.6, mission->id);
+  drawMedal (5.5, 5.8, -1.5, getMedal (fplayer->score), 1.6, mission->id);
 
   char buf [100];
-  float xf1 = -12, xf2 = 0;
-  yf = 6; zf = -2.5;
+  float xf1 = -12, xf2 = 0, xf3 = 8;
+  float linedist = 1.3, linedist2 = 1.1;
+  yf = 6.5; zf = -2.5;
   CColor *color;
   Pilot *p = pilots->pilot [pilots->aktpilot];
+
+  color = &menu_colwhite;
   if (missionstate == 1)
   {
-    font1->drawTextCentered (0, 6, -1.5, "SUCCESS", &colorblue);
-    color = &colorblue;
+    font1->drawTextCentered (0, 7, -2, "SUCCESS", &colorblue);
   }
   else
   {
-    font1->drawTextCentered (0, 6, -1.5, "FAILED", &colorred);
-    color = &colorred;
+    font1->drawTextCentered (0, 7, -2, "FAILED", &colorred);
   }
+
   font1->drawText (xf1, yf, zf, "SCORE:", color);
   sprintf (buf, "%d", fplayer->score);
-  font1->drawText (xf2, yf, zf, buf, color);
-  if (mission->difficulty != 1)
-  {
-    yf -= 1.5;
-    font1->drawText (xf1, yf, zf, "DIFFICULTY:", color);
-    if (mission->difficulty == 0) font1->drawText (xf2, yf, zf, "-50", color);
-    else if (mission->difficulty == 2) font1->drawText (xf2, yf, zf, "+50", color);
-  }
+  font1->drawText (xf3, yf, zf, buf, color);
+  yf -= linedist * 1.2;
+
+  font1->drawText (xf1, yf, zf, "DIFFICULTY:", color);
+  if (mission->difficulty == 0) font1->drawText (xf2, yf, zf, "EASY", color);
+  else if (mission->difficulty == 1) font1->drawText (xf2, yf, zf, "NORMAL", color);
+  else if (mission->difficulty == 2) font1->drawText (xf2, yf, zf, "HARD", color);
+  if (mission->difficulty == 0) font1->drawText (xf3, yf, zf, "-25", color);
+  else if (mission->difficulty == 1) font1->drawText (xf3, yf, zf, "+25", color);
+  else if (mission->difficulty == 2) font1->drawText (xf3, yf, zf, "+75", color);
+  yf -= linedist;
+
+  font1->drawText (xf1, yf, zf, "FLIGHT MODEL:", color);
+  if (!fplayer->realism) font1->drawText (xf2, yf, zf, "ACTION", color);
+  else font1->drawText (xf2, yf, zf, "SIM", color);
+  if (!fplayer->realism) font1->drawText (xf3, yf, zf, "-25", color);
+  else font1->drawText (xf3, yf, zf, "+25", color);
+
   int timebonus = 0;
   if (mission->timer < mission->maxtime)
     timebonus = (mission->maxtime - mission->timer) * 100 / mission->maxtime;
-  yf -= 1.5;
+  yf -= linedist;
   font1->drawText (xf1, yf, zf, "TIME BONUS:", color);
   sprintf (buf, "%d%%", timebonus);
   font1->drawText (xf2, yf, zf, buf, color);
+  sprintf (buf, "+%d", timebonus);
+  font1->drawText (xf3, yf, zf, buf, color);
   int shieldbonus = (int) (fplayer->shield * 100 / fplayer->maxshield);
-  yf -= 1.5;
+  yf -= linedist;
   font1->drawText (xf1, yf, zf, "SHIELD BONUS:", color);
   sprintf (buf, "%d%%", shieldbonus);
   font1->drawText (xf2, yf, zf, buf, color);
-  yf -= 1.5;
+  sprintf (buf, "+%d", shieldbonus);
+  font1->drawText (xf3, yf, zf, buf, color);
+  yf -= linedist;
   font1->drawText (xf1, yf, zf, "KILLS:", color);
   if (fplayer->fighterkills > 0)
   {
-    sprintf (buf, "%d AIRCRAFTS", fplayer->fighterkills);
+    sprintf (buf, "%d AIR", fplayer->fighterkills);
     font1->drawText (xf2, yf, zf, buf, color);
-    yf -= 1.2;
+    sprintf (buf, "+%d", fplayer->fighterkills * 20);
+    font1->drawText (xf3, yf, zf, buf, color);
+    yf -= linedist2;
   }
   if (fplayer->tankkills > 0)
   {
     sprintf (buf, "%d TANKS", fplayer->tankkills);
     font1->drawText (xf2, yf, zf, buf, color);
-    yf -= 1.2;
+    sprintf (buf, "+%d", fplayer->tankkills * 10);
+    font1->drawText (xf3, yf, zf, buf, color);
+    yf -= linedist2;
   }
   if (fplayer->shipkills > 0)
   {
     sprintf (buf, "%d SHIPS", fplayer->shipkills);
     font1->drawText (xf2, yf, zf, buf, color);
-    yf -= 1.2;
+    sprintf (buf, "+%d", fplayer->shipkills * 12);
+    font1->drawText (xf3, yf, zf, buf, color);
+    yf -= linedist2;
   }
   if (fplayer->otherkills > 0)
   {
     sprintf (buf, "%d OTHERS", fplayer->otherkills);
     font1->drawText (xf2, yf, zf, buf, color);
-    yf -= 1.2;
+    sprintf (buf, "+%d", fplayer->otherkills * 5);
+    font1->drawText (xf3, yf, zf, buf, color);
+    yf -= linedist2;
   }
+  yf -= (linedist - linedist2);
+/*  font1->drawText (xf1, yf, zf, "DAMAGE POINTS:", color);
+  sprintf (buf, "+%d", fplayer->points / 20);
+  font1->drawText (xf3, yf, zf, buf, color);
+  yf -= linedist;*/
   if (ispromoted)
   {
     yf = -6;
     font1->drawTextCentered (0, yf, zf, "PROMOTED TO", color);
-    yf -= 2;
+    yf -= 1.5;
     sprintf (buf, "%s", p->getRank ());
     font1->drawTextCentered (0, yf, zf, buf, color);
-    drawRank (-11, yf + 0.5, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
-    drawRank (7, yf + 0.5, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
+    drawRank (-11, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
+    drawRank (7, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
   }
   yf = -9;
-  if (!statsitemselected)
+/*  if (!statsitemselected)
     font1->drawText (-3.5, yf, -2.0, "CONTINUE", &colorwhite);
   else
-    font1->drawTextScaled (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);
+    font1->drawTextScaled (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);*/
   drawMouseCursor ();
+}
+
+void test ()
+{
+  view ++;
+  if (view > VIEW_MAX) view = VIEW_MIN;
 }
 
 void menu_display ()
 {
-  char buf [100];
   int i;
 
-  glMatrixMode(GL_MODELVIEW);
+  glInitNames ();
+  glPushName (0);
+
+  glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-  glPushMatrix ();
+//  glPushMatrix ();
 
   int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
 
-  int textx = -14, textx2 = 0;
+  float textx = 0;
   int normtimef = -menutimer * 5;
 
-  if (menuitemselected == 0)
+  Pilot *p = pilots->pilot [pilots->aktpilot];
+
+  if (allmenus.components [3]->isVisible ())
+  {
+    ((Container *) allmenus.components [3])->components [0]->setVisible (true);
+    for (i = 1; i < 25; i ++)
+    {
+      if (p->mission_state [getCampaignIdFromValue (i - 1)] == 1)
+        ((Container *) allmenus.components [3])->components [i]->setVisible (true);
+      else
+        ((Container *) allmenus.components [3])->components [i]->setVisible (false);
+    }
+  }
+
+  allmenus.draw ();
+
+  if (allmenus.components [1]->isVisible ())
+  {
+    float textx2 = -0.7, yf = 10.15, zf = -2, ydiff = 1;
+    drawRank (textx2, yf, zf, pilots->pilot [pilots->aktpilot]->ranking, 0.8);
+    yf -= 2;
+    for (i = 0; i < pilots->aktpilots; i ++)
+    {
+      drawRank (textx2, yf, zf, pilots->pilot [i]->ranking, 0.8);
+      yf -= ydiff;
+    }
+  }
+
+  if (allmenus.components [3]->isVisible ())
+  {
+    float textx2 = 11, textx3 = 11, yf = 9.05, zf = -2, ydiff = 0.8;
+    for (i = 0; i < 24; i ++)
+    {
+      drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [getCampaignIdFromValue (i)]), 0.8, getCampaignIdFromValue (i));
+      yf -= ydiff;
+    }
+/*    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
+    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
+    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SADEFENSE, MISSION_AIRBATTLE, 16, "SURFACE-AIR DEFENSE");
+    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_SCOUT, MISSION_SADEFENSE, 17, "VETERAN DOGFIGHT");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_BASE, MISSION_SCOUT, 18, "BASE ATTACK");
+    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_DEPOT, MISSION_BASE, 19, "DEPOTS");
+    if (p->mission_state [MISSION_DEPOT] == 1)
+    {
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEFEND1, MISSION_DEPOT, 20, "DEFEND SAM");
+      drawMissionElement (textx3, yf -= ydiff, zf, MISSION_DOGFIGHT3, MISSION_DEFEND1, 21, "DESERT DOGFIGHT");
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TANK1, MISSION_DOGFIGHT3, 22, "TANK ASSAUT");
+      drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CONVOY2, MISSION_TANK1, 23, "SAM CONVOY");
+      if (p->mission_state [MISSION_CONVOY2] == 1)
+      {
+        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP1, MISSION_CONVOY2, 25, "DESTROYERS");
+        drawMissionElement (textx3, yf -= ydiff, zf, MISSION_SHIP2, MISSION_SHIP1, 26, "OILRIG");
+        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
+        if (p->mission_state [MISSION_SHIP3] == 1)
+        {
+          drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
+          drawMissionElement (textx3, yf -= ydiff, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
+          if (p->mission_state [MISSION_CANYON3] == 1)
+          {
+            drawMissionElement (textx3, yf -= ydiff, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOONBATTLE, MISSION_MOON1, 37, "MOON BATTLE");
+            drawMissionElement (textx3, yf -= ydiff, zf, MISSION_MOON2, MISSION_MOONBATTLE, 34, "ELITE DOGFIGHT");
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
+          }
+        }
+      }
+    }*/
+  }
+
+/*  mainmenu.draw ();
+  submenu [0].draw ();
+  submenu [1].draw ();*/
+
+/*  if (menuitemselected == 0)
     font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, normtimef);
   else
     font1->drawText (textx, 10, -2, "PILOTS");
@@ -3757,16 +3044,17 @@ void menu_display ()
   else
     font1->drawText (textx, -4, -2, "MULTIPLAYER");
 #endif
+*/
 
-  if (missionactive)
+/*  if (missionactive)
   {
     if (menuitemselected == 9)
       font1->drawTextScaled (textx, -6, -2, "RETURN", &color2, normtimef);
     else
       font1->drawText (textx, -6, -2, "RETURN");
-  }
+  }*/
 
-  if (menuitem == 0)
+/*  if (menuitem == 0)
   {
     font1->drawText (textx2 - 2, 10, -2, "ACTIVE:", &coloryellow);
     if (pilots->aktpilot < pilots->aktpilots)
@@ -4008,7 +3296,7 @@ void menu_display ()
     font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU", col);
     font1->drawText (xs, (-- ys) --, -3, "MOUSE:", col2);
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
-    font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:", col);
+    font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:", col2);
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
     font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN", col);
     strcpy (buf, dirs->getSaves (""));
@@ -4029,8 +3317,84 @@ void menu_display ()
       font1->drawText (textx2, 8, -2, "JOIN GAME");
 #endif
   }
-
+*/
   drawMouseCursor ();
+}
+
+int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
+{
+//  glutSwapBuffers ();
+	GLuint selectBuff [20 * 4];
+	GLint hits, viewport [4];
+
+	// Select buffer parameters
+	glSelectBuffer (20 * 4, selectBuff);
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	
+	// Enter to selection mode
+	glEnable (GL_DEPTH_TEST);
+	glDisable (GL_LIGHTING);
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix ();
+	glLoadIdentity ();
+
+	// Set-up pick matrix
+  gluPickMatrix (x, viewport [3] - y, 5, 5, viewport);
+
+	// Set our perpective transformation matrix
+  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, view * GLOBALSCALE);
+//  gluPerspective (60.0, 1.0, 0.2, 200.0);
+	
+	glMatrixMode (GL_MODELVIEW);
+
+	// Render all scene and fill selection buffer
+	glRenderMode (GL_SELECT);
+  menu_display ();
+
+	// Get hits and go back to normal rendering
+	hits = glRenderMode (GL_RENDER);
+
+	// Get first model in selection buffer stack
+  GLuint *ptr = selectBuff;
+  int mypicks = 0;
+  int pickz2 = -1;
+  int pick [100];
+	if (hits > 0)
+  {
+    int i;
+    GLuint z = 0xFFFFFFFF;
+    for (i = 0; i < hits; i ++)
+    {
+      int names = *ptr;
+      ptr ++;
+      GLuint z1 = *ptr;
+      ptr ++;
+      ptr ++;
+      if (motionx < 0 && motiony < 0)
+      {
+        if (z1 < z)
+        {
+          z = z1; pickz2 = *ptr; mypicks = 1;
+        }
+      }
+      else
+      {
+        pick [mypicks] = *ptr; mypicks ++;
+      }
+      ptr += names;
+      if (mypicks >= 20) break;
+    }
+  }
+
+	glMatrixMode (GL_PROJECTION);
+
+	glPopMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+
+  char buf [STDSIZE];
+  sprintf (buf, "selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift);
+  display (buf, LOG_ALL);
+  return pickz2;
 }
 
 void pause_display ()
@@ -4051,25 +3415,48 @@ void credits_mouse (int button, int state, int x, int y)
 
 void credits_display ()
 {
-  float yt = 12, zf = -2.4;
+  float yt = 12, zf = -2.4, ydist = 0.7;
+  glPushMatrix ();
   glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
   CColor *col = &colorwhite;
   CColor *col2 = &coloryellow;
-  font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", col);
-  font2->drawTextCentered (0, yt -= 2, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "THOMAS A. DREXL", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "SPECIAL THANKS TO...", col);
-  font2->drawTextCentered (0, yt -= 4, zf, "LENS FLARES & FURTHER DEBUGGING", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "PIOTR PAWLOW", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "LOURENS VEEN", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "PUBLISHING & FURTHER GAME IDEAS", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL (ACTION) & COCKPIT IMPROVEMENTS", col);
-  font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "...AND TAHNKS ALL THOSE GIVING FEEDBACK AND ADVICE", col);
+  float fontzoom = 1;
+  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GAME PROGRAMMING,", col);
+  font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "THOMAS A. DREXL", col2);
+  font1->zoom = 0.08;
+  font2->zoom = 0.08;
+  fontzoom = 0.8;
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "SPECIAL THANKS TO...", col);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "LENS FLARES & FURTHER DEBUGGING", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "PIOTR PAWLOW", col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "LOURENS VEEN", col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PUBLISHING & FURTHER GAME IDEAS", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "BERNHARD KAINDL", col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "MOON TERRAIN", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "NORBERT DREXL", col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "PHYSICAL MODEL (ACTION) & COCKPIT IMPROVEMENTS", col);
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "ARNE REINERS", col2);
+  font2->drawTextCentered (0, (yt -= 4 * ydist) / fontzoom, zf, "...AND THANKS TO ALL PEOPLE GIVING FEEDBACK AND ADVICE", col);
+  float xf = -10;
+  font1->zoom = 0.1;
+  font2->zoom = 0.1;
+  fontzoom = 1;
+  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "***********************", col);
+  font1->drawTextCentered (0, (yt -= 10 * ydist) / fontzoom, zf, "DO YOU WANT TO CONTRIBUTE?", col);
+  font1->zoom = 0.08;
+  font2->zoom = 0.08;
+  fontzoom = 0.8;
+  font2->drawText (xf / fontzoom, (yt -= 4 * ydist) / fontzoom, zf, "LOTS OF THINGS ARE STILL NEEDED:", col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DRAW TEXTURES OF TREES, BUILDINGS, ETC", col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- DESIGN 3D MODELS", col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- CREATE SOUNDTRACKS", col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- MAKE MISSION SUGGESTIONS", col);
+  font2->drawText (xf / fontzoom, (yt -= 2 * ydist) / fontzoom, zf, "- GIVE FEEDBACK AND ADVICE", col);
+  font1->zoom = 0.1;
+  font2->zoom = 0.1;
+  glPopMatrix ();
 }
 
 void finish_display ()
@@ -4097,7 +3484,12 @@ void quit_display ()
 {
   float xf = 1.0, yf = 0.5, zf = -2.5;
   int c1 = 100, c2 = 10, c4 = 180;
-  glBegin (GL_QUADS);
+
+  allmenus.setVisible (false);
+  quitmenu.setVisible (true);
+  quitmenu.draw ();
+
+/*  glBegin (GL_QUADS);
   glColor4ub (c2, c2, c2, 255);
   glVertex3f (-xf, -yf, zf);
   glColor4ub (c1, c1, c1, 255);
@@ -4114,17 +3506,17 @@ void quit_display ()
   glVertex3f (xf, yf, zf);
   glVertex3f (-xf, yf, zf);
   glVertex3f (-xf, -yf, zf);
-  glEnd ();
+  glEnd ();*/
 
-  font1->drawTextCentered (0, 0.8, -1.5, "REALLY QUIT?", &colorblue);
-  if (missionmenuitemselected == 0)
+  font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", &menu_colwhite);
+/*  if (missionmenuitemselected == 0)
     font1->drawTextScaled (-4, -1.5, -1.8, "YES", &colorblue, -missionmenutimer * 5, 0);
   else
     font1->drawText (-4, -1.5, -1.8, "YES", &colorblue, 0);
   if (missionmenuitemselected == 1)
     font1->drawTextScaled (2, -1.5, -1.8, "NO", &colorblue, -missionmenutimer * 5, 0);
   else
-    font1->drawText (2, -1.5, -1.8, "NO", &colorblue, 0);
+    font1->drawText (2, -1.5, -1.8, "NO", &colorblue, 0);*/
 
   drawMouseCursor ();
 }
@@ -4189,7 +3581,7 @@ void game_display ()
   }
 
   // show a short flash when an object explodes
-  if (quality > 0)
+  if (dynamiclighting)
   {
     for (i = 0; i < maxfighter; i ++)
     {
@@ -4424,7 +3816,7 @@ void game_display ()
 //    printf ("%2.1f*%2.1f ", fplayer->lum, sunlight);
     if (flash > 7 * timestep)
     {
-      if (quality <= 2)
+      if (antialiasing)
         flash1->draw ();
       else
         flash1->drawHQ ();
@@ -4465,10 +3857,10 @@ void game_display ()
   if (camera == 0)
   {
     glDisable (GL_DEPTH_TEST);
-    if (quality > 0)
+    if (antialiasing)
       glEnable (GL_LINE_SMOOTH);
     cockpit->drawTargeter ();
-    if (quality > 0)
+    if (antialiasing)
       glDisable (GL_LINE_SMOOTH);
     glEnable (GL_DEPTH_TEST);
   }
@@ -4476,7 +3868,7 @@ void game_display ()
   glPopMatrix ();
 
 // draw flares
-  if (quality > 0)
+  if (specialeffects)
     if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
     {
       CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
@@ -4553,7 +3945,7 @@ void game_display ()
   // draw cockpit
   if (camera == 0)
   {
-    if (quality > 0)
+    if (antialiasing)
       glEnable (GL_LINE_SMOOTH);
     glPushMatrix ();
     glRotatef (view_y, 1, 0, 0);
@@ -4561,7 +3953,7 @@ void game_display ()
     cockpit->drawCross ();
     cockpit->drawHeading ();
     glPopMatrix ();
-    if (quality > 0)
+    if (antialiasing)
       glDisable (GL_LINE_SMOOTH);
     cockpit->drawRadar ();
     cockpit->drawTargetedElement ();
@@ -4644,7 +4036,7 @@ void game_display ()
     font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
   }
 
-  if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE)
+  if (controls == CONTROLS_MOUSE && !mouse_relative)
     drawMouseCursor ();
 }
 
@@ -4746,7 +4138,7 @@ void game_timer (int dt)
     for (i2 = 0; i2 < maxmissile; i2 ++)
       if (missile [i2]->active)
         fighter [i]->collide (missile [i2], dt);
-    for (i2 = 0; i2 < maxfighter; i2 ++)
+    for (i2 = 0; i2 < i; i2 ++)
       if (fighter [i2]->active)
         if (i != i2)
           fighter [i]->collide (fighter [i2], dt);
@@ -4838,7 +4230,7 @@ void game_timer (int dt)
   }
   if (camera == 1) // chase
   {
-    cf = fplayer->zoom * 2;
+    cf = fplayer->zoom * 3;
     camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + fplayer->zoom;
     camz = fplayer->tl->z + cf * COS(fplayer->phi);
@@ -4848,7 +4240,7 @@ void game_timer (int dt)
   }
   else if (camera == 2) // backwards
   {
-    cf = -fplayer->zoom * 2;
+    cf = -fplayer->zoom * 3;
     camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + fplayer->zoom;
     camz = fplayer->tl->z + cf * COS(fplayer->phi);
@@ -4858,7 +4250,7 @@ void game_timer (int dt)
   }
   else if (camera == 3) // other players
   {
-    cf = fighter [aktcam]->zoom * 2;
+    cf = fighter [aktcam]->zoom * 3;
     camx = fighter [aktcam]->tl->x + cf * SIN(fighter [aktcam]->phi);
     camy = fighter [aktcam]->tl->y + fighter [aktcam]->zoom;
     camz = fighter [aktcam]->tl->z + cf * COS(fighter [aktcam]->phi);
@@ -4993,6 +4385,23 @@ void game_timer (int dt)
       }
     }
   }
+
+  if (controls == CONTROLS_KEYBOARD)
+  {
+    float fac = 0.005;
+    if (keyb_elev == 0) fplayer->elevatoreffect = 0;
+    else fplayer->elevatoreffect += (float) dt * keyb_elev * fac;
+    if (keyb_roll == 0) fplayer->rolleffect = 0;
+    else fplayer->rolleffect += (float) dt * keyb_roll * fac;
+    if (keyb_rudder == 0) fplayer->ruddereffect = 0;
+    else fplayer->ruddereffect += (float) dt * keyb_rudder * fac;
+    if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
+    if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
+    if (fplayer->rolleffect > 1.0) fplayer->rolleffect = 1.0;
+    if (fplayer->rolleffect < -1.0) fplayer->rolleffect = -1.0;
+    if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
+    if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
+  }
 }
 
 float lastfps = -1;
@@ -5033,13 +4442,27 @@ void menu_timer (Uint32 dt)
         lastfps = fps;
         if (fps > 40)
         {
-          if (view < quality * 10 + 60 && view < 100) view += 10;
-          else if (quality < 5) { quality ++; view = quality * 10 + 30; }
+          if (view < quality * 10 + 60 && view < 100)
+            view += 10;
+          else if (quality < 5)
+          {
+            quality ++;
+            view = quality * 10 + 30;
+            if (quality >= 1)
+            { antialiasing = 1; specialeffects = 1; dithering = 1; dynamiclighting = 0; }
+          }
         }
         else if (fps < 30)
         {
-          if (view > quality * 10 + 30 && view > 20) view -= 10;
-          else if (quality > 0) { quality --; view = quality * 10 + 60; }
+          if (view > quality * 10 + 30 && view > 20)
+            view -= 10;
+          else if (quality > 0)
+          {
+            quality --;
+            view = quality * 10 + 60;
+            if (quality < 1)
+            { antialiasing = 0; specialeffects = 0; dithering = 0; dynamiclighting = 0; }
+          }
         }
         menu_reshape ();
       }
@@ -5074,7 +4497,7 @@ void mission_timer (Uint32 dt)
 void credits_timer (Uint32 dt)
 {
   creditstimer += dt;
-  if (creditstimer > 650 * timestep)
+  if (creditstimer > 700 * timestep)
     creditstimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5193,6 +4616,8 @@ void myInit ()
   textreeu3 = gl->genTextureTGA (dirs->getTextures ("treeu3.tga"), 0, 3, 1, true);
   textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
   textreeu4 = gl->genTextureTGA (dirs->getTextures ("treeu4.tga"), 0, 3, 1, true);
+  textree5 = gl->genTextureTGA (dirs->getTextures ("tree5.tga"), 0, -1, 1, true);
+  textreeu5 = gl->genTextureTGA (dirs->getTextures ("treeu5.tga"), 0, -1, 1, true);
   texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
   texcactusu1 = gl->genTextureTGA (dirs->getTextures ("cactusu1.tga"), 0, 3, 1, true);
   texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, -1, 1, true);
@@ -5385,10 +4810,13 @@ void myFirstInit ()
   model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
+  float cannoncube = 0.025;
   display (" * cannon1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+  model_cannon1.cubex = cannoncube; model_cannon1.cubey = cannoncube; model_cannon1.cubez = cannoncube;
   display (" * cannon1b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
+  model_cannon1b.cubex = cannoncube; model_cannon1b.cubey = cannoncube; model_cannon1b.cubez = cannoncube;
 
   // cannon at night
   display (" * cannon2.3ds", LOG_ALL);
@@ -5404,6 +4832,7 @@ void myFirstInit ()
   }
   model_cannon2.object [0]->vertex [1].color.c [3] = 50;
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
+  model_cannon2.cubex = cannoncube; model_cannon2.cubey = cannoncube; model_cannon2.cubez = cannoncube;
 
   display (" * cannon2b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
@@ -5421,6 +4850,7 @@ void myFirstInit ()
     model_cannon2b.object [i2]->vertex [1].color.c [3] = 50;
     model_cannon2b.object [i2]->vertex [2].color.c [3] = 50;
   }
+  model_cannon2b.cubex = cannoncube; model_cannon2b.cubey = cannoncube; model_cannon2b.cubez = cannoncube;
 
   display (" * flare1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
@@ -5593,6 +5023,8 @@ void myFirstInit ()
   sungamma = 60;
   setLightSource (60);
 
+  event_setAntialiasing ();
+
   glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
   glEnable (GL_LIGHT0);
   glEnable (GL_LIGHTING);
@@ -5655,15 +5087,16 @@ void init_display ()
   CVector3 vec;
   CColor color (200, 200, 200, 255);
 
-  if (inittimer_gl117 > 2000)
+/*  if (inittimer_gl117 > 2000)
   {
     float xf = 1.0F, yf = 1.0F, zf = 2.0F;
     float col = (inittimer_gl117 - 2000) / 2;
-    col = 255 - col;
+//    col = 255 - col;
     if (col < 0) col = 0;
+    if (col > 255) col = 0;
     col /= 256;
     glClearColor (col, col, col, 1);
-  }
+  }*/
   
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
@@ -5685,14 +5118,18 @@ void init_display ()
 
   if (inittimer_gl117 > 2000)
   {
-    float xf = 1.0F, yf = 1.0F, zf = 2.0F;
-/*    int col = (inittimer_gl117 - 2000) / 2;
+    float xf = 1.3F, yf = 0.65F, zf = 2.0F;
+    int col = (inittimer_gl117 - 2000) / 2;
     if (col < 0 || col > 255) col = 255;
-    glColor3ub (col, col, col);*/
+    glColor3ub (col, col, col);
     glPushMatrix ();
-    glTranslatef (0, 0.2F, 0);
+    glTranslatef (0, 0.5F, 0);
     gl->enableTextures (textitle->textureID);
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    if (antialiasing)
+      gl->enableLinearTexture (textitle->textureID);
+    else
+      gl->disableLinearTexture (textitle->textureID);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin (GL_QUADS);
     glTexCoord2d (0, 1);
     glVertex3f (-xf, yf, -zf);
@@ -5895,14 +5332,19 @@ void init_timer (Uint32 dt)
   ABSTRACT EVENT BRANCHES
 ****************************************************************************/
 
-static void myKeyboardFunc (unsigned char key, int x, int y)
+static void myKeyboardFunc (unsigned char uckey, int x, int y)
 {
+  int key = (int) uckey;
+  if (key >= 'a' && key <= 'z') key = toupper (key);
   if (game == GAME_PLAY || game == GAME_PAUSE)
     game_key (key, x, y);
   else if (game == GAME_INIT)
     init_key (key, x, y);
   else if (game == GAME_MENU)
+  {
+    allmenus.eventKey (key);
     menu_key (key, x, y);
+  }
   else if (game == GAME_CREDITS)
     credits_key (key, x, y);
   else if (game == GAME_CREATE)
@@ -5926,19 +5368,23 @@ static void myKeyboardFunc (unsigned char key, int x, int y)
 static void myKeyboardFuncUp (unsigned char key, int x, int y)
 {
   if (game == GAME_PLAY || game == GAME_PAUSE)
-    game_keyup (key, x, y);
+    game_keyup ((int) key, x, y);
 }
 
 static void mySpecialFunc (int key, int x, int y)
 {
   if (game == GAME_PLAY || game == GAME_PAUSE)
-    game_keyspecial (key, x, y);
+    game_key (key + 256, x, y);
+  else if (game == GAME_MENU)
+  {
+    allmenus.eventSpecial (key);
+  }
 }
 
 static void mySpecialFuncUp (int key, int x, int y)
 {
   if (game == GAME_PLAY || game == GAME_PAUSE)
-    game_keyspecialup (key, x, y);
+    game_keyup (key + 256, x, y);
 }
 
 static void myPassiveRelMotionFunc (int xrel, int yrel)
@@ -5953,25 +5399,46 @@ static void myPassiveMotionFunc (int x, int y)
   if (game == GAME_PLAY)
     game_mousemotion (x, y);
   else if (game == GAME_MENU)
+  {
+    allmenus.eventMouse (x, y, 0);
     menu_mouse (-1, -1, x, y);
+  }
   else if (game == GAME_STATS)
+  {
+    statsmenu.eventMouse (x, y, 0);
     stats_mouse (-1, -1, x, y);
+  }
   else if (game == GAME_MISSION)
+  {
+    missionmenu.eventMouse (x, y, 0);
     mission_mouse (-1, -1, x, y);
+  }
   else if (game == GAME_FAME)
+  {
+    famemenu.eventMouse (x, y, 0);
     fame_mouse (-1, -1, x, y);
+  }
   else if (game == GAME_FIGHTER)
+  {
+    fightermenu.eventMouse (x, y, 0);
     fighter_mouse (-1, -1, x, y);
+  }
   else if (game == GAME_CREATE)
     create_mouse (-1, -1, x, y);
   else if (game == GAME_JOIN)
     join_mouse (-1, -1, x, y);
   else if (game == GAME_QUIT)
+  {
+    quitmenu.eventMouse (x, y, 0);
     quit_mouse (-1, -1, x, y);
+  }
 }
 
 static void myMouseFunc (int button, int state, int x, int y)
 {
+#ifdef USE_GLUT
+  button ++;
+#endif
   if (game == GAME_PLAY)
   {
     game_mouse (button, state, x, y);
@@ -5982,22 +5449,42 @@ static void myMouseFunc (int button, int state, int x, int y)
   }
   else if (game == GAME_MENU)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    allmenus.eventMouse (x, y, button);
     menu_mouse (button, state, x, y);
   }
   else if (game == GAME_MISSION)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    missionmenu.eventMouse (x, y, button);
     mission_mouse (button, state, x, y);
   }
   else if (game == GAME_STATS)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    statsmenu.eventMouse (x, y, button);
     stats_mouse (button, state, x, y);
   }
   else if (game == GAME_FAME)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    famemenu.eventMouse (x, y, button);
     fame_mouse (button, state, x, y);
   }
   else if (game == GAME_FIGHTER)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    fightermenu.eventMouse (x, y, button);
     fighter_mouse (button, state, x, y);
   }
   else if (game == GAME_CREATE)
@@ -6010,10 +5497,17 @@ static void myMouseFunc (int button, int state, int x, int y)
   }
   else if (game == GAME_QUIT)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
+    quitmenu.eventMouse (x, y, button);
     quit_mouse (button, state, x, y);
   }
   else if (game == GAME_CREDITS)
   {
+#ifdef USE_GLUT
+    if (state == 0)
+#endif
     credits_mouse (button, state, x, y);
   }
 }
@@ -6068,6 +5562,8 @@ static void myDisplayFunc ()
   }
   else if (game == GAME_MISSION)
   {
+    if (camera == 50) camera = 0;
+    game_display ();
     mission_display ();
     game_view ();
   }
@@ -6080,11 +5576,13 @@ static void myDisplayFunc ()
   }
   else if (game == GAME_FAME)
   {
+    game_display ();
     fame_display ();
     game_view ();
   }
   else if (game == GAME_FIGHTER)
   {
+    game_display ();
     fighter_display ();
     game_view ();
   }
@@ -6134,13 +5632,29 @@ static void myJoystickButtonFunc (int button)
   {
     game_joystickbutton (button);
   }
+  else if (game == GAME_MENU)
+  {
+    allmenus.eventJoystick (button);
+  }
 }
 
 static void myJoystickHatFunc (int hat)
 {
+  int normhat = hat;
+#ifndef USE_GLUT
+  if (hat % 1000 == SDL_HAT_RIGHT) normhat = 100;
+  if (hat % 1000 == SDL_HAT_UP) normhat = 101;
+  if (hat % 1000 == SDL_HAT_LEFT) normhat = 102;
+  if (hat % 1000 == SDL_HAT_DOWN) normhat = 103;
+  normhat += (hat / 1000) * 1000;
+#endif
   if (game == GAME_PLAY)
   {
-    game_joystickhat (hat);
+    game_joystickhat (normhat);
+  }
+  else if (game == GAME_MENU)
+  {
+    allmenus.eventJoystick (normhat);
   }
 }
 
@@ -6178,6 +5692,8 @@ static void myTimerFunc (int value)
   }
   else if (game == GAME_CREDITS)
   {
+    if (!missionactive)
+      game_timer (dt);
     credits_timer (dt);
   }
   else if (game == GAME_CREATE)
@@ -6185,17 +5701,33 @@ static void myTimerFunc (int value)
   else if (game == GAME_JOIN)
     join_timer (dt);
   else if (game == GAME_MISSION)
+  {
+    if (!missionactive)
+      game_timer (dt);
     mission_timer (dt);
+  }
   else if (game == GAME_STATS)
     stats_timer (dt);
   else if (game == GAME_FAME)
+  {
+    if (!missionactive)
+      game_timer (dt);
     mission_timer (dt);
+  }
   else if (game == GAME_FIGHTER)
+  {
+    if (!missionactive)
+      game_timer (dt);
     mission_timer (dt);
+  }
   else if (game == GAME_FINISH)
     finish_timer (dt);
   else if (game == GAME_QUIT)
+  {
+    if (!missionactive)
+      game_timer (dt);
     mission_timer (dt);
+  }
 
 #ifdef USE_GLUT
   glutTimerFunc (1, myTimerFunc, 0); // do as many timer calls as possible
@@ -6286,6 +5818,7 @@ bool joystickfirebutton = false;
 // This loop emulates the glutMainLoop() of GLUT using SDL!!!
 void sdlMainLoop ()
 {
+  int sym = 0;
   SDL_Event event;
   
   while (true)
@@ -6296,7 +5829,7 @@ void sdlMainLoop ()
       {
         case SDL_MOUSEMOTION:
           myPassiveMotionFunc (event.motion.x, event.motion.y);
-          if (game == GAME_PLAY && controls == CONTROLS_MOUSE_EXP)
+          if (game == GAME_PLAY && controls == CONTROLS_MOUSE && mouse_relative)
           {
             fplayer->rolleffect = 0;
             fplayer->elevatoreffect = 0;
@@ -6304,24 +5837,27 @@ void sdlMainLoop ()
           }
           myPassiveRelMotionFunc (event.motion.xrel, event.motion.yrel);
           break;
+
         case SDL_MOUSEBUTTONDOWN:
           myMouseFunc (event.button.button, event.button.state, event.button.x, event.button.y);
           break;
+
         case SDL_KEYDOWN:
           if (!event.key.keysym.unicode)
             mySpecialFunc (event.key.keysym.sym, 0, 0);
           else
             myKeyboardFunc (event.key.keysym.sym, 0, 0);
           break;
+
         case SDL_KEYUP:
-          if (!event.key.keysym.unicode)
-            mySpecialFuncUp (event.key.keysym.sym, 0, 0);
-          else
+          sym = event.key.keysym.sym;
+          if (sym == 8 || sym == 9 || sym == 13 || (sym >= 32 && sym <= 'z'))
             myKeyboardFuncUp (event.key.keysym.sym, 0, 0);
+          else
+            mySpecialFuncUp (event.key.keysym.sym, 0, 0);
           break;
+
         case SDL_JOYAXISMOTION:
-//          if (abs (event.jaxis.value) > 500)
-//          jaxis [event.jaxis.axis + event.jaxis.which * 10] = event.jaxis.value;
           if (abs (event.jaxis.value) < 2000)
           {
             jaxis [event.jaxis.axis + event.jaxis.which * 10] = 0;
@@ -6334,43 +5870,27 @@ void sdlMainLoop ()
               event.jaxis.value -= 2500;
             jaxis [event.jaxis.axis + event.jaxis.which * 10] = (int) event.jaxis.value * 32768 / 30268;
           }
-/*          {
-            if (event.jaxis.axis == 0)
-            {
-              joystickx = event.jaxis.value;
-            }
-            else if (event.jaxis.axis == 1)
-            {
-              joysticky = event.jaxis.value;
-            }
-            else if (event.jaxis.axis == 2)
-            {
-              joystickt = event.jaxis.value;
-            }
-            else if (event.jaxis.axis == 3)
-            {
-              joystickr = event.jaxis.value;
-            }
-            if (joystickx > -3000 && joystickx < 3000) joystickx = 0;
-            if (joysticky > -3000 && joysticky < 3000) joysticky = 0;
-          }*/
           break;
+
         case SDL_JOYBUTTONDOWN:
           joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
-          if (joystickbutton == joystick_firecannon)
+          if (joystickbutton == (int) joystick_firecannon)
             joystickfirebutton = true;
           myJoystickButtonFunc (joystickbutton);
           joystickbutton = -1;
           break;
+
         case SDL_JOYBUTTONUP:
           joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
-          if (joystickbutton == joystick_firecannon)
+          if (joystickbutton == (int) joystick_firecannon)
             joystickfirebutton = false;
           joystickbutton = -1;
           break;
+
         case SDL_JOYHATMOTION:
           myJoystickHatFunc (event.jhat.value + event.jhat.which * 1000);
           break;
+
         case SDL_ACTIVEEVENT:
           sdlreshape = true;
           sdldisplay = true;
@@ -6689,6 +6209,1670 @@ void checkargs (int argc, char **argv)
   }
 }
 
+void textMouseButton (char *buf, int button)
+{
+  if (button == 0) strcpy (buf, "NONE");
+  else sprintf (buf, "BUTTON%d", button);
+}
+
+int campaignstartid;
+int trainingstartid;
+
+void callbackReturn (Component *comp, int key)
+{
+  switch_game ();
+}
+
+void callbackStats (Component *comp, int key)
+{
+  stats_key (27, 0, 0);
+}
+
+void callbackQuitNow (Component *comp, int key)
+{
+  game_quit ();
+}
+
+void callbackSwitchMainMenu (Component *comp, int key)
+{
+  switch_menu ();
+}
+
+void callbackQuit (Component *comp, int key)
+{
+  switch_quit ();
+}
+
+void callbackCredits (Component *comp, int key)
+{
+  switch_credits ();
+}
+
+void callbackPilots (Component *comp, int key)
+{
+  switch_fame ();
+}
+
+int currentaxis = 0;
+
+#ifndef USE_GLUT
+void callbackJoystickAxis (Component *comp, int key)
+{
+  int i;
+  int buttonnum = -1;
+
+  // get clicked button's number
+  for (i = 0; i < 12; i ++)
+  {
+    if (comp == controlsmenu [2]->components [i])
+    {
+      buttonnum = i;
+    }
+  }
+  if (buttonnum == -1) return;
+
+  // read text from label of button
+  Label *la = (Label *) controlsmenu [2]->components [buttonnum + 1];
+  
+  int joynum = 0;
+  int joyaxis = 0;
+  if (la->text [1] == '/') joynum = -1;
+  else
+  {
+    joynum = la->text [0] - 'A';
+    joyaxis = la->text [2] - '0';
+  }
+
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    if (joynum == -1)
+    {
+      joynum = 0;
+      joyaxis = 0;
+    }
+    else if (joynum >= joysticks) joynum = -1;
+    else
+    {
+      joyaxis ++;
+      if (joyaxis >= sdljoystickaxes [joynum])
+      {
+        joyaxis = 0;
+        joynum ++;
+        if (joynum >= joysticks) joynum = -1;
+      }
+    }
+  }
+  else
+  {
+    if (joynum == -1)
+    {
+      joynum = joysticks - 1;
+      joyaxis = sdljoystickaxes [joynum] - 1;
+    }
+    else if (joynum >= joysticks) joynum = -1;
+    else
+    {
+      joyaxis --;
+      if (joyaxis < 0)
+      {
+        joynum --;
+        if (joynum < 0)
+        {
+          joynum = -1;
+          joyaxis = 0;
+        }
+        else
+          joyaxis = sdljoystickaxes [joynum] - 1;
+      }
+    }
+  }
+
+  int *joysetting;
+  if (buttonnum == 0) joysetting = &joystick_aileron;
+  else if (buttonnum == 2) joysetting = &joystick_elevator;
+  else if (buttonnum == 4) joysetting = &joystick_throttle;
+  else if (buttonnum == 6) joysetting = &joystick_rudder;
+  else if (buttonnum == 8) joysetting = &joystick_view_x;
+  else if (buttonnum == 10) joysetting = &joystick_view_y;
+
+  *joysetting = joynum * 1000 + joyaxis;
+  char latext [4];
+  if (joynum >= 0)
+  {
+    latext [0] = 'A' + joynum;
+    latext [1] = 32;
+    latext [2] = '0' + joyaxis;
+    latext [3] = 0;
+    la->setText (latext);
+  }
+  else
+  {
+    la->setText ("N/A");
+  }
+}
+#endif
+
+void callbackSwitchStartMission (Component *comp, int key)
+{
+  pleaseWait ();
+  game_levelInit ();
+  switch_game ();
+  missionactive = true;
+}
+
+void callbackFighterPrev (Component *comp, int key)
+{
+  int maxfighter = 6;
+  Pilot *p = pilots->pilot [pilots->aktpilot];
+  if (p->mission_state [MISSION_DEPOT] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_SHIP1] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_CANYON3] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_MOON1] == 1) maxfighter ++;
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    aktfighter --;
+    if (aktfighter < 0) aktfighter = maxfighter - 1;
+  }
+}
+
+void callbackFighterNext (Component *comp, int key)
+{
+  int maxfighter = 6;
+  Pilot *p = pilots->pilot [pilots->aktpilot];
+  if (p->mission_state [MISSION_DEPOT] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_SHIP1] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_CANYON3] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_MOON1] == 1) maxfighter ++;
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    aktfighter ++;
+    if (aktfighter >= maxfighter) aktfighter = 0;
+  }
+}
+
+void callbackFighter (Component *comp, int key)
+{
+  switch_fighter ();
+}
+
+void setpilotstext ()
+{
+  char buf [64];
+  int i;
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (), pilots->pilot [pilots->aktpilot]->name);
+  ((Label *) submenu [0]->components [1])->setText (buf);
+  for (i = 0; i < pilots->aktpilots; i ++)
+  {
+    sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (), pilots->pilot [i]->name);
+    ((Label *) submenu [0]->components [i + 2])->setText (buf);
+  }
+  for (; i < 5; i ++)
+  {
+    ((Label *) submenu [0]->components [i + 2])->setText ("N/A");
+  }
+}
+
+void callbackPilotsAdd (Component *comp, int key)
+{
+  char buf [64];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    strcpy (buf, ((EditField *) submenu [0]->components [9])->text);
+    if (strlen (buf) > 0 && pilots->aktpilots < 5)
+    {
+      pilots->add (buf);
+      ((EditField *) submenu [0]->components [9])->setText ("");
+      setpilotstext ();
+    }
+  }
+}
+
+void callbackPilotsDelete (Component *comp, int key)
+{
+  if (key == MOUSE_BUTTON_RIGHT)
+  {
+    pilots->rm ();
+    setpilotstext ();
+  }
+}
+
+void callbackPilotsList (Component *comp, int key)
+{
+  int i;
+  for (i = 0; i < 5; i ++)
+  {
+    if (comp == submenu [0]->components [i + 2])
+    {
+      if (i < pilots->aktpilots)
+      {
+        pilots->aktpilot = i;
+        setpilotstext ();
+      }
+    }
+  }
+}
+
+void callbackJoystick (Component *comp, int key)
+{
+  int i;
+  for (i = 12; i < 23; i ++)
+    if (comp == controlsmenu [0]->components [i])
+    {
+      int z = 12;
+      if (i == z ++) joystick_firecannon = key;
+      else if (i == z ++) joystick_firemissile = key;
+      else if (i == z ++) joystick_dropflare = key;
+      else if (i == z ++) joystick_dropchaff = key;
+      else if (i == z ++) joystick_selectmissile = key;
+      else if (i == z ++) joystick_targetnearest = key;
+      else if (i == z ++) joystick_targetlocking = key;
+      else if (i == z ++) joystick_targetnext = key;
+      else if (i == z ++) joystick_targetprevious = key;
+      else if (i == z ++) joystick_thrustup = key;
+      else if (i == z ++) joystick_thrustdown = key;
+    }
+}
+
+void callbackMouseDefaults (Component *comp, int key)
+{
+  char buf [256];
+  mouse_sensitivity = 100;
+  mouse_reverse = false;
+  mouse_relative = false;
+  mouse_autorudder = 30;
+
+  sprintf (buf, "%d%%", mouse_autorudder);
+  ((Label *) controlsmenu [1]->components [7])->setText (buf);
+  if (mouse_relative) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  ((Label *) controlsmenu [1]->components [5])->setText (buf);
+  if (mouse_reverse) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  ((Label *) controlsmenu [1]->components [3])->setText (buf);
+  sprintf (buf, "%d%%", mouse_sensitivity);
+  ((Label *) controlsmenu [1]->components [1])->setText (buf);
+}
+
+void callbackMouseAutorudder (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    mouse_autorudder += 10;
+    if (mouse_autorudder > 100) mouse_autorudder = 0;
+  }
+  else
+  {
+    mouse_autorudder -= 10;
+    if (mouse_autorudder < 0) mouse_autorudder = 100;
+  }
+  sprintf (buf, "%d%%", mouse_autorudder);
+  ((Label *) controlsmenu [1]->components [7])->setText (buf);
+}
+
+void callbackMouseRelative (Component *comp, int key)
+{
+  char buf [256];
+  mouse_relative = !mouse_relative;
+  if (mouse_relative) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  ((Label *) controlsmenu [1]->components [5])->setText (buf);
+}
+
+void callbackMouseReverse (Component *comp, int key)
+{
+  char buf [256];
+  mouse_reverse = !mouse_reverse;
+  if (mouse_reverse) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  ((Label *) controlsmenu [1]->components [3])->setText (buf);
+}
+
+void callbackMouseSensitivity (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    mouse_sensitivity += 10;
+    if (mouse_sensitivity > 200) mouse_sensitivity = 70;
+  }
+  else
+  {
+    mouse_sensitivity -= 10;
+    if (mouse_sensitivity < 70) mouse_sensitivity = 200;
+  }
+  sprintf (buf, "%d%%", mouse_sensitivity);
+  ((Label *) controlsmenu [1]->components [1])->setText (buf);
+}
+
+void callbackDefaultsJoystick (Component *comp, int key)
+{
+  joystick_aileron = 0;
+  joystick_elevator = 1;
+  joystick_throttle = 2;
+  joystick_rudder = 3;
+  joystick_view_x = 4;
+  joystick_view_y = 5;
+
+  int z = 1;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 0");
+  z += 2;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 1");
+  z += 2;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 2");
+  z += 2;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 3");
+  z += 2;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 4");
+  z += 2;
+  ((Label *) controlsmenu [2]->components [z])->setText ("A 5");
+
+  joystick_firecannon = 0;
+  joystick_firemissile = 2;
+  joystick_dropflare = 3;
+  joystick_dropchaff = 3;
+  joystick_selectmissile = 1;
+  joystick_targetnearest = 101;
+  joystick_targetlocking = 103;
+  joystick_targetnext = 100;
+  joystick_targetprevious = 102;
+  joystick_thrustup = 4;
+  joystick_thrustdown = 5;
+
+  z = 12;
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_firecannon);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_firemissile);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_dropflare);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_dropchaff);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_selectmissile);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_targetnearest);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_targetlocking);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_targetnext);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_targetprevious);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_thrustup);
+  ((EditJoystick *) controlsmenu [2]->components [z ++])->setButton (joystick_thrustdown);
+}
+
+void callbackDefaults (Component *comp, int key)
+{
+  key_firecannon = 32;
+  key_firemissile = 13;
+  key_dropflare = 'F';
+  key_dropchaff = 'C';
+  key_selectmissile = 'M';
+  key_targetnearest = 'E';
+  key_targetlocking = 'L';
+  key_targetnext = 'N';
+  key_targetprevious = 'P';
+  key_thrustup = 'S';
+  key_thrustdown = 'X';
+
+  int z = 5;
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_firecannon);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_firemissile);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_dropflare);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_dropchaff);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_selectmissile);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_targetnearest);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_targetlocking);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_targetnext);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_targetprevious);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_thrustup);
+  ((EditKey *) controlsmenu [0]->components [z ++])->setKey (key_thrustdown);
+}
+
+void callbackKeyboard (Component *comp, int key)
+{
+  int i;
+  for (i = 5; i < 16; i ++)
+    if (comp == controlsmenu [0]->components [i])
+    {
+      int z = 5;
+      if (i == z ++) key_firecannon = key;
+      else if (i == z ++) key_firemissile = key;
+      else if (i == z ++) key_dropflare = key;
+      else if (i == z ++) key_dropchaff = key;
+      else if (i == z ++) key_selectmissile = key;
+      else if (i == z ++) key_targetnearest = key;
+      else if (i == z ++) key_targetlocking = key;
+      else if (i == z ++) key_targetnext = key;
+      else if (i == z ++) key_targetprevious = key;
+      else if (i == z ++) key_thrustup = key;
+      else if (i == z ++) key_thrustdown = key;
+    }
+}
+
+void textControls (char *buf)
+{
+  if (controls == CONTROLS_KEYBOARD) sprintf (buf, "%s", "KEYBOARD");
+  else if (controls == CONTROLS_MOUSE) sprintf (buf, "%s", "MOUSE");
+  else if (controls == CONTROLS_JOYSTICK) sprintf (buf, "%s", "JOYSTICK");
+}
+
+void callbackControls (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    fplayer->rolleffect = 0;
+    fplayer->ruddereffect = 0;
+    fplayer->elevatoreffect = 0;
+    keyb_elev = 0;
+    keyb_roll = 0;
+    keyb_rudder = 0;
+    controls ++;
+    if (controls > 2) controls = 0;
+    if (controls == CONTROLS_JOYSTICK && !joysticks) controls = CONTROLS_KEYBOARD;
+#ifdef USE_GLUT
+    if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
+#endif
+  }
+  textControls (buf);
+  ((Label *) optmenu [2]->components [5])->setText (buf);
+  allmenus.components [11]->setVisible (false);
+  allmenus.components [12]->setVisible (false);
+  allmenus.components [13]->setVisible (false);
+  if (controls == CONTROLS_KEYBOARD) allmenus.components [11]->setVisible (true);
+  else if (controls == CONTROLS_JOYSTICK) allmenus.components [13]->setVisible (true);
+  else allmenus.components [12]->setVisible (true);
+}
+
+void callbackPhysics (Component *comp, int key)
+{
+  char buf [256];
+  physics = !physics;
+  if (!physics) sprintf (buf, "%s", "ACTION");
+  else sprintf (buf, "%s", "SIMULATION");
+  ((Label *) optmenu [2]->components [3])->setText (buf);
+}
+
+void callbackDifficulty (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    difficulty ++;
+    if (difficulty > 2) difficulty = 0;
+  }
+  else
+  {
+    difficulty --;
+    if (difficulty < 0) difficulty = 2;
+  }
+  if (difficulty == 0) sprintf (buf, "%s", "EASY");
+  else if (difficulty == 1) sprintf (buf, "%s", "NORMAL");
+  else if (difficulty == 2) sprintf (buf, "%s", "HARD");
+  ((Label *) optmenu [2]->components [1])->setText (buf);
+}
+
+void callbackSound (Component *comp, int key)
+{
+  char buf [256];
+  if (sound->audio)
+  {
+    if (key == MOUSE_BUTTON_LEFT)
+    {
+      sound->volumesound += 10;
+      if (sound->volumesound > 100)
+        sound->volumesound = 0;
+      volumesound = sound->volumesound;
+      sound->setVolume ();
+      setPlaneVolume ();
+      sound->play (SOUND_CLICK1);
+      menu_reshape ();
+    }
+    else
+    {
+      sound->volumesound -= 10;
+      if (sound->volumesound < 0)
+        sound->volumesound = 100;
+      volumesound = sound->volumesound;
+      sound->setVolume ();
+      setPlaneVolume ();
+      sound->play (SOUND_CLICK1);
+      menu_reshape ();
+    }
+    sprintf (buf, "%d%%", volumesound);
+    ((Label *) optmenu [1]->components [1])->setText (buf);
+  }
+}
+
+void callbackMusic (Component *comp, int key)
+{
+  char buf [256];
+  if (sound->audio)
+  {
+    if (key == MOUSE_BUTTON_LEFT)
+    {
+      sound->volumemusic += 10;
+      if (sound->volumemusic > 100)
+      {
+        sound->volumemusic = 0;
+        sound->haltMusic ();
+      }
+      volumemusic = sound->volumemusic;
+      sound->setVolumeMusic ();
+      menu_reshape ();
+    }
+    else
+    {
+      sound->volumemusic -= 10;
+      if (sound->volumemusic < 0)
+        sound->volumemusic = 100;
+      volumemusic = sound->volumemusic;
+      sound->setVolumeMusic ();
+      menu_reshape ();
+    }
+    if (sound->volumemusic != 0 && !sound->musicplaying)
+      playRandomMusic ();
+    sprintf (buf, "%d%%", volumemusic);
+    ((Label *) optmenu [1]->components [3])->setText (buf);
+  }
+}
+
+void callbackBrightness (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    brightness += 10;
+    if (brightness > 50) brightness = -50;
+  }
+  else
+  {
+    brightness -= 10;
+    if (brightness < -50) brightness = 50;
+  }
+  sprintf (buf, "%d%%", brightness);
+  ((Label *) optmenu [0]->components [13])->setText (buf);
+}
+
+void callbackDynamicLighting (Component *comp, int key)
+{
+  char buf [256];
+  dynamiclighting = (dynamiclighting == 0 ? 1 : 0);
+  if (dynamiclighting) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  ((Label *) optmenu [0]->components [11])->setText (buf);
+}
+
+void callbackSpecialEffects (Component *comp, int key)
+{
+  char buf [256];
+  specialeffects = (specialeffects == 0 ? 1 : 0);
+  if (specialeffects) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  ((Label *) optmenu [0]->components [9])->setText (buf);
+}
+
+void callbackAntialiasing (Component *comp, int key)
+{
+  char buf [256];
+  antialiasing = (antialiasing == 0 ? 1 : 0);
+  if (antialiasing) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  ((Label *) optmenu [0]->components [7])->setText (buf);
+  event_setAntialiasing ();
+}
+
+void callbackDithering (Component *comp, int key)
+{
+  char buf [256];
+  dithering = (dithering == 0 ? 1 : 0);
+  if (dithering) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  ((Label *) optmenu [0]->components [5])->setText (buf);
+}
+
+void callbackView (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    view += 10;
+    if (view > VIEW_MAX) view = VIEW_MIN;
+    menu_reshape ();
+  }
+  else
+  {
+    view -= 10;
+    if (view < VIEW_MIN) view = VIEW_MAX;
+    menu_reshape ();
+  }
+  sprintf (buf, "%d", (int) view);
+  ((Label *) optmenu [0]->components [3])->setText (buf);
+}
+
+void callbackQuality (Component *comp, int key)
+{
+  char buf [256];
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    quality ++;
+    if (quality > 5) quality = 0;
+  }
+  else
+  {
+    quality --;
+    if (quality < 0) quality = 5;
+  }
+  sprintf (buf, "%d", quality);
+  ((Label *) optmenu [0]->components [1])->setText (buf);
+}
+
+void callbackTraining (Component *comp, int key)
+{
+  allmenus.setVisible (false);
+  Button *button = (Button *) comp;
+  switch_mission (getTrainingIdFromValue (comp->id - trainingstartid));
+}
+
+void callbackCampaign (Component *comp, int key)
+{
+  allmenus.setVisible (false);
+  Button *button = (Button *) comp;
+  switch_mission (getCampaignIdFromValue (comp->id - campaignstartid));
+}
+
+void callbackMainMenu (Component *comp, int key)
+{
+  for (i = 0; i < 6; i ++)
+    if (comp == mainbutton [i])
+    {
+      allmenus.setVisible (false);
+      allmenus.visible = true;
+      allmenus.components [0]->setVisible (true);
+      allmenus.components [i + 1]->setVisible (true);
+      currentsubmenu = allmenus.components [i + 1];
+      if (missionactive)
+        mainbutton [6]->setVisible (true);
+      else
+        mainbutton [6]->setVisible (false);
+      if (i == 3)
+      {
+        if (currentoptmenu) currentoptmenu->setVisible (true);
+        if (currentoptmenu == allmenus.components [10])
+        {
+          if (controls == CONTROLS_KEYBOARD) allmenus.components [11]->setVisible (true);
+          else if (controls == CONTROLS_JOYSTICK) allmenus.components [13]->setVisible (true);
+          else allmenus.components [12]->setVisible (true);
+        }
+      }
+      return;
+    }
+  for (i = 0; i < 3; i ++)
+    if (comp == optbutton [i])
+    {
+      allmenus.components [8]->setVisible (false);
+      allmenus.components [9]->setVisible (false);
+      allmenus.components [10]->setVisible (false);
+      allmenus.components [i + 1 + 7]->setVisible (true);
+      if (i + 1 + 7 == 10)
+      {
+        if (controls == CONTROLS_KEYBOARD) allmenus.components [11]->setVisible (true);
+        else if (controls == CONTROLS_JOYSTICK) allmenus.components [13]->setVisible (true);
+        else allmenus.components [12]->setVisible (true);
+      }
+      else
+      {
+        allmenus.components [11]->setVisible (false);
+        allmenus.components [12]->setVisible (false);
+        allmenus.components [13]->setVisible (false);
+      }
+      currentoptmenu = allmenus.components [i + 1 + 7];
+      return;
+    }
+}
+
+void setJoystickAxisString (int joysetting, char *joystr)
+{
+  joystr [3] = 0;
+  if (joysetting < 0)
+  {
+    strcpy (joystr, "N/A");
+  }
+  else
+  {
+    joystr [0] = 'A' + (joysetting / 1000);
+    joystr [1] = 32;
+    joystr [2] = '0' + (joysetting % 1000);
+  }
+}
+
+char mainmenunames [10] [25];
+char submenu1names [20] [25];
+char submenu2names [30] [25];
+char optmenunames [5] [25];
+char controlsmenu0names [15] [25];
+
+void createMenu ()
+{
+  char buf [256];
+  char buf2 [256];
+  int i;
+  int z = 0;
+  float xf = -2;
+  float xfstep = 4;
+  float yf = 12;
+  float yfstep = 1.0;
+  float xsubmenu = -1;
+  float ysubmenu = 12;
+  Button *button;
+  Label *label;
+  TextField *textfield;
+  EditKey *editkey;
+  EditField *editfield;
+  EditJoystick *editjoystick;
+  
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register main menu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  strcpy (mainmenunames [0], "PILOTS");
+  strcpy (mainmenunames [1], "TRAINING");
+  strcpy (mainmenunames [2], "CAMPAIGN");
+  strcpy (mainmenunames [3], "OPTIONS");
+  strcpy (mainmenunames [4], "CREDITS");
+  strcpy (mainmenunames [5], "QUIT");
+  strcpy (mainmenunames [6], "RETURN");
+
+  mainmenu = new Container ();
+//  mainmenu->setBounds (-14.3, 12.2, 10.6, 7.4);
+  allmenus.add (mainmenu);
+
+  for (i = 0; i < 7; i ++)
+  {
+    submenu [i] = new Container ();
+    allmenus.add (submenu [i]);
+  }
+
+/*  submenu [0]->setBounds (-1.3, 12.2, 14.1, 12.4);
+  submenu [1]->setBounds (-1.3, 12.2, 12.6, 7.4);
+  submenu [2]->setBounds (-1.3, 12.2, 12.6, 1.4);
+  submenu [3]->setBounds (-1.3, 12.2, 14.1, 1.4);*/
+
+  for (i = 0; i < 7; i ++)
+  {
+    mainbutton [i] = new Button (mainmenunames [i]);
+    mainbutton [i]->setBounds (-14, yf, 10, yfstep - 0.1);
+    yf -= yfstep;
+    mainbutton [i]->setFunction (callbackMainMenu);
+    mainmenu->add (mainbutton [i]);
+  }
+
+  currentsubmenu = submenu [0];
+  mainbutton [4]->setFunction (callbackCredits);
+  mainbutton [5]->setFunction (callbackQuit);
+  mainbutton [6]->setVisible (false);
+  mainbutton [6]->setFunction (callbackReturn);
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register pilots submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = xsubmenu; yf = ysubmenu; xfstep = 13.5; yfstep = 1;
+  sprintf (buf, "ACTIVE:");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  submenu [0]->add (label);
+  yf -= yfstep;
+
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (), pilots->pilot [pilots->aktpilot]->name);
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  submenu [0]->add (label);
+
+  yf -= 2;
+  for (i = 0; i < 5; i ++)
+  {
+    if (i < pilots->aktpilots)
+      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (), pilots->pilot [i]->name);
+    else
+      sprintf (buf, "N/A");
+    button = new Button (buf);
+    button->setFunction (callbackPilotsList);
+    button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    submenu [0]->add (button);
+    yf -= yfstep;
+  }
+
+  yf -= 0.5;
+  button = new Button ("DELETE (RIGHT MB)");
+  button->setFunction (callbackPilotsDelete);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  submenu [0]->add (button);
+  yf -= yfstep;
+
+  yf -= 0.5;
+  button = new Button ("ADD");
+  button->setFunction (callbackPilotsAdd);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  submenu [0]->add (button);
+  yf -= yfstep;
+
+  editfield = new EditField (15);
+  editfield->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  submenu [0]->add (editfield);
+  yf -= yfstep;
+
+/*    font1->drawText (textx2 - 2, 10, -2, "ACTIVE:", &coloryellow);
+    if (pilots->aktpilot < pilots->aktpilots)
+    {
+      font1->drawText (textx2 + 4, 10, -2, pilots->pilot [pilots->aktpilot]->name, &coloryellow);
+    }
+    for (i = 0; i < pilots->aktpilots; i ++)
+    {
+      drawRank (textx2 - 1, 12.2 - (float) i * 3, -3, pilots->pilot [i]->ranking, 1.3);
+      if (menuitemselected == 20 + i)
+      {
+        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, normtimef);
+        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, normtimef);
+      }
+      else
+      {
+        font1->drawText (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank ());
+        font1->drawText (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name);
+      }
+    }
+    if (menuitemselected == 10)
+      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, normtimef);
+    else
+      font1->drawText (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)");
+    if (menuitemselected == 11)
+      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, normtimef);
+    else
+      font1->drawText (textx2 - 2, -7, -2.5, "CREATE");
+    pilotedit.draw (textx2, -9, -2.5, menutimer / 8);*/
+
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register training submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  z = 0;
+  strcpy (submenu1names [z ++], "TUTORIAL: PILOTING");
+  strcpy (submenu1names [z ++], "TUTORIAL: BOMBER");
+  strcpy (submenu1names [z ++], "TUTORIAL: FIGHTER");
+  strcpy (submenu1names [z ++], "TUTORIAL: AERODYNAMICS");
+  strcpy (submenu1names [z ++], "FREE FLIGHT");
+  strcpy (submenu1names [z ++], "DEATHMATCH");
+  strcpy (submenu1names [z ++], "TEAM DEATHMATCH");
+  strcpy (submenu1names [z ++], "TEAM BASE");
+  strcpy (submenu1names [z ++], "WAVES");
+
+  xf = xsubmenu; yf = ysubmenu - 2; xfstep = 12; yfstep = 0.8;
+  for (i = 0; i < 9; i ++)
+  {
+    button = new Button (submenu1names [i]);
+    button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    button->setFunction (callbackTraining);
+    yf -= yfstep;
+    if (i == 3) yf -= yfstep;
+    submenu [1]->add (button);
+  }
+
+  trainingstartid = submenu [1]->components [0]->id;
+
+  xf = xsubmenu; yf = ysubmenu; yfstep = 1;
+  button = new Button ("FIGHTER INFO");
+  button->setFunction (callbackFighter);
+  button->setBounds (xf, yf, xfstep - 0.2, yfstep - 0.1);
+  submenu [1]->add (button);
+  xf += xfstep;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register campaign submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+ 
+  z = 0;
+  strcpy (submenu2names [z ++], "FIRST TEST");
+  strcpy (submenu2names [z ++], "SECOND TEST");
+  strcpy (submenu2names [z ++], "TRANSPORT");
+  strcpy (submenu2names [z ++], "CONVOY");
+  strcpy (submenu2names [z ++], "DOGFIGHT");
+  strcpy (submenu2names [z ++], "AIR BATTLE");
+  strcpy (submenu2names [z ++], "SURFACE-AIR DEFENSE");
+  strcpy (submenu2names [z ++], "VETERAN DOGFIGHT");
+  strcpy (submenu2names [z ++], "BASE ATTACK");
+  strcpy (submenu2names [z ++], "DEPOTS");
+  strcpy (submenu2names [z ++], "DEFEND SAM");
+  strcpy (submenu2names [z ++], "DESERT DOGFIGHT");
+  strcpy (submenu2names [z ++], "TANK ASSAUT");
+  strcpy (submenu2names [z ++], "SAM CONVOY");
+  strcpy (submenu2names [z ++], "DESTROYERS");
+  strcpy (submenu2names [z ++], "OILRIG");
+  strcpy (submenu2names [z ++], "CRUISER");
+  strcpy (submenu2names [z ++], "RADAR BASE");
+  strcpy (submenu2names [z ++], "CANYON BATTLE");
+  strcpy (submenu2names [z ++], "TUNNEL");
+  strcpy (submenu2names [z ++], "MAIN BASE");
+  strcpy (submenu2names [z ++], "TURRETS");
+  strcpy (submenu2names [z ++], "MOON BATTLE");
+  strcpy (submenu2names [z ++], "ELITE DOGFIGHT");
+  strcpy (submenu2names [z ++], "SNEAKING");
+
+  xf = xsubmenu; yf = ysubmenu - 2; xfstep = 12; yfstep = 0.8;
+  for (i = 0; i < z; i ++)
+  {
+    button = new Button (submenu2names [i]);
+    button->setFunction (callbackCampaign);
+    button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    yf -= yfstep;
+    submenu [2]->add (button);
+  }
+
+  campaignstartid = submenu [2]->components [0]->id;
+
+  xf = xsubmenu; yf = ysubmenu; yfstep = 1;
+  button = new Button ("PILOTS RANKING");
+  button->setFunction (callbackPilots);
+  button->setBounds (xf, yf, xfstep - 0.2, yfstep - 0.1);
+  submenu [2]->add (button);
+  xf += xfstep;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register options submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = xsubmenu; yf = 12; xfstep = 4.6;
+  strcpy (optmenunames [0], "VIDEO");
+  strcpy (optmenunames [1], "AUDIO");
+  strcpy (optmenunames [2], "GAME");
+
+  for (i = 0; i < 3; i ++)
+  {
+    optmenu [i] = new Container ();
+    allmenus.add (optmenu [i]);
+  }
+
+  for (i = 0; i < 3; i ++)
+  {
+    optbutton [i] = new Button (optmenunames [i]);
+    optbutton [i]->setBounds (xf, yf, xfstep - 0.2, 1);
+    xf += xfstep;
+    optbutton [i]->setFunction (callbackMainMenu);
+    submenu [3]->add (optbutton [i]);
+  }
+
+  currentoptmenu = optmenu [0];
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register video options submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  float xftab = 3;
+  xf = xsubmenu; yf = 10; xfstep = 13.6; yfstep = 1;
+  button = new Button ("QUALITY");
+  button->setFunction (callbackQuality);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  sprintf (buf, "%d", quality);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("VIEW");
+  button->setFunction (callbackView);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  sprintf (buf, "%d", (int) view);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("DITHERING");
+  button->setFunction (callbackDithering);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  if (dithering) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("ANTIALIASING");
+  button->setFunction (callbackAntialiasing);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  if (antialiasing) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("SPECIAL EFFECTS");
+  button->setFunction (callbackSpecialEffects);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  if (specialeffects) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("DYN LIGHTING");
+  button->setFunction (callbackDynamicLighting);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  if (dynamiclighting) strcpy (buf, "ON");
+  else strcpy (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("BRIGHTNESS");
+  button->setFunction (callbackBrightness);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  sprintf (buf, "%d%%", brightness);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register sound options submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  yf = 10; xfstep = 13.6; yfstep = 1;
+#ifdef USE_GLUT
+  textfield = new TextField ("PLEASE INSTALL SDL AND\nSDLMIXER AND RECOMIPLE\nGL-117 TO ENABLE SOUND\nAND MUSIC", 0.6);
+  textfield->setBounds (xf, yf, xfstep, 0.6 * 4);
+  optmenu [1]->add (textfield);
+  yf -= 0.6 * 4;
+#else
+  button = new Button ("SOUND VOLUME");
+  button->setFunction (callbackSound);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [1]->add (button);
+
+  if (sound->audio) sprintf (buf, "%d%%", volumesound);
+  else sprintf (buf, "N/A");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [1]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("MUSIC VOLUME");
+  button->setFunction (callbackMusic);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [1]->add (button);
+
+  if (sound->audio) sprintf (buf, "%d%%", volumemusic);
+  else sprintf (buf, "N/A");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [1]->add (label);
+  yf -= yfstep;
+
+  if (!sound->audio)
+  {
+    optmenu [1]->components [0]->setActive (false);
+    optmenu [1]->components [1]->setActive (false);
+    optmenu [1]->components [2]->setActive (false);
+    optmenu [1]->components [3]->setActive (false);
+  }
+#endif
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register controls options submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xftab = 6.8;
+  xf = xsubmenu; yf = 10; xfstep = 13.5; yfstep = 1;
+  button = new Button ("DIFFICULTY");
+  button->setFunction (callbackDifficulty);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [2]->add (button);
+
+  if (difficulty == 0) sprintf (buf, "%s", "EASY");
+  else if (difficulty == 1) sprintf (buf, "%s", "NORMAL");
+  else if (difficulty == 2) sprintf (buf, "%s", "HARD");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("PHYSICS");
+  button->setFunction (callbackPhysics);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [2]->add (button);
+
+  if (!physics) sprintf (buf, "%s", "ACTION");
+  else sprintf (buf, "%s", "SIMULATION");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("CONTROLS");
+  button->setFunction (callbackControls);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [2]->add (button);
+
+  textControls (buf);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [2]->add (label);
+  yf -= yfstep;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register keyboard control submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = xsubmenu + 1; yf = ysubmenu - 6; xfstep = 12.5; yfstep = 0.8;
+  for (i = 0; i < 3; i ++)
+  {
+    controlsmenu [i] = new Container ();
+    allmenus.add (controlsmenu [i]);
+  }
+
+  label = new Label ("ROLL:       \t   LEFT, RIGHT");
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (label);
+  yf -= yfstep;
+
+  label = new Label ("ELEVATOR: \t   UP, DOWN");
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (label);
+  yf -= yfstep;
+
+  label = new Label ("RUDDER:  \t   LSHIFT+ROLL");
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (label);
+  yf -= yfstep;
+
+  label = new Label ("THROTTLE: \t   1...9");
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (label);
+  yf -= yfstep;
+
+  label = new Label ("CAMERA:  \t   F1...F8");
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (label);
+  yf -= yfstep;
+
+  z = 0;
+  strcpy (controlsmenu0names [z ++], "FIRE CANNON");
+  strcpy (controlsmenu0names [z ++], "FIRE MISSILE");
+  strcpy (controlsmenu0names [z ++], "DROP FLARE");
+  strcpy (controlsmenu0names [z ++], "DROP CHAFF");
+  strcpy (controlsmenu0names [z ++], "SELECT MISSILE");
+  strcpy (controlsmenu0names [z ++], "TARGET NEAREST");
+  strcpy (controlsmenu0names [z ++], "TARGET LOCKING");
+  strcpy (controlsmenu0names [z ++], "TARGET NEXT");
+  strcpy (controlsmenu0names [z ++], "TARGET PREVIOUS");
+  strcpy (controlsmenu0names [z ++], "INC THRUST");
+  strcpy (controlsmenu0names [z ++], "DEC THRUST");
+
+  int keys [11];
+  keys [0] = key_firecannon;
+  keys [1] = key_firemissile;
+  keys [2] = key_dropflare;
+  keys [3] = key_dropchaff;
+  keys [4] = key_selectmissile;
+  keys [5] = key_targetnearest;
+  keys [6] = key_targetlocking;
+  keys [7] = key_targetnext;
+  keys [8] = key_targetprevious;
+  keys [9] = key_thrustup;
+  keys [10] = key_thrustdown;
+
+  yf -= 0.5;
+  for (i = 0; i < 11; i ++)
+  {
+    editkey = new EditKey (controlsmenu0names [i]);
+    editkey->setKey (keys [i]);
+    editkey->setFunction (callbackKeyboard);
+    editkey->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    controlsmenu [0]->add (editkey);
+    yf -= yfstep;
+  }
+
+  yf -= 1; yfstep = 1.0;
+  button = new Button ("LOAD DEFAULTS");
+  button->setFunction (callbackDefaults);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [0]->add (button);
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register mouse control submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xftab = 3.5;
+  xf = xsubmenu + 1; yf = ysubmenu - 6; xfstep = 12.5; yfstep = 0.8;
+  button = new Button ("SENSITIVITY");
+  button->setFunction (callbackMouseSensitivity);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (button);
+
+  sprintf (buf, "%d%%", (int) mouse_sensitivity);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("REVERSE");
+  button->setFunction (callbackMouseReverse);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (button);
+
+  if (mouse_reverse) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("RELATIVE");
+  button->setFunction (callbackMouseRelative);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (button);
+
+  if (mouse_relative) sprintf (buf, "ON");
+  else sprintf (buf, "OFF");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("AUTORUDDER");
+  button->setFunction (callbackMouseAutorudder);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (button);
+
+  sprintf (buf, "%d%%", mouse_autorudder);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  yf -= 0.5;
+  textMouseButton (buf2, mouse_firecannon);
+  sprintf (buf, "FIRE CANNON:            \t %s", buf2);
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  textMouseButton (buf2, mouse_firemissile);
+  sprintf (buf, "FIRE MISSILE:            \t %s", buf2);
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  textMouseButton (buf2, mouse_selectmissile);
+  sprintf (buf, "SELECT MISSILE:      \t %s", buf2);
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (label);
+  yf -= yfstep;
+
+  yf -= 1; yfstep = 1.0;
+  button = new Button ("LOAD DEFAULTS");
+  button->setFunction (callbackMouseDefaults);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [1]->add (button);
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register joystick control submenu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+#ifndef USE_GLUT
+  char joystr [4];
+
+  xf = xsubmenu + 1; yf = ysubmenu - 6; xfstep = 12.5; yfstep = 0.8;
+  button = new Button ("AILERON");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_aileron, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("ELEVATOR");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_elevator, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("THROTTLE");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_throttle, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("RUDDER");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_rudder, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("VIEW X");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_view_x, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("VIEW Y");
+  button->setFunction (callbackJoystickAxis);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+  setJoystickAxisString (joystick_view_y, joystr);
+  label = new Label (joystr);
+  label->setBounds (xf + xfstep - xftab, yf, xftab, yfstep - 0.1);
+  label->setTransparent (true);
+  controlsmenu [2]->add (label);
+  yf -= yfstep;
+
+  int buttons [11];
+  buttons [0] = joystick_firecannon;
+  buttons [1] = joystick_firemissile;
+  buttons [2] = joystick_dropflare;
+  buttons [3] = joystick_dropchaff;
+  buttons [4] = joystick_selectmissile;
+  buttons [5] = joystick_targetnearest;
+  buttons [6] = joystick_targetlocking;
+  buttons [7] = joystick_targetnext;
+  buttons [8] = joystick_targetprevious;
+  buttons [9] = joystick_thrustup;
+  buttons [10] = joystick_thrustdown;
+
+  yf -= 0.5;
+  for (i = 0; i < 11; i ++)
+  {
+    editjoystick = new EditJoystick (controlsmenu0names [i]);
+    editjoystick->setButton (buttons [i]);
+    editjoystick->setFunction (callbackJoystick);
+    editjoystick->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    controlsmenu [2]->add (editjoystick);
+    yf -= yfstep;
+  }
+
+  yf -= 1; yfstep = 1.0;
+  button = new Button ("LOAD DEFAULTS");
+  button->setFunction (callbackDefaultsJoystick);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  controlsmenu [2]->add (button);
+#endif
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register top pilots menu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = -10; yf = 9; xfstep = 20; yfstep = 1.2;
+  sprintf (buf, "         PILOTS RANKING");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  famemenu.add (label);
+  yf -= yfstep + 0.25;
+
+  yfstep = 1.0;
+  textfield = new TextField ("", yfstep - 0.1);
+  textfield->setBounds (xf, yf, xfstep, (yfstep - 0.1) * 13);
+  famemenu.add (textfield);
+  yf -= yfstep * 13;
+
+/*  for (i = 0; i < 10; i ++)
+  {
+    yfstep = 1.0;
+    sprintf (buf, "1.");
+    label = new Label (buf);
+    label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    famemenu.add (label);
+    yf -= yfstep;
+  }
+  yf -= 0.25;*/
+
+  yfstep = 1.1;
+  sprintf (buf, "         BACK TO MAIN MENU");
+  button = new Button (buf);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  button->setFunction (callbackSwitchMainMenu);
+  famemenu.add (button);
+  yf -= yfstep + 0.25;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register fighter menu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = -10; yf = 12; xfstep = 20; yfstep = 1.2;
+  sprintf (buf, "          FIGHTER INFO");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  fightermenu.add (label);
+  yf -= yfstep + 0.25;
+
+  yfstep = 1.0;
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  fightermenu.add (label);
+  yf -= yfstep + 0.25;
+
+  yfstep = 1.1;
+  textfield = new TextField ("", yfstep - 0.1);
+  textfield->setBounds (xf, yf, xfstep, (yfstep - 0.1) * 5 + 0.15);
+  fightermenu.add (textfield);
+  yf -= yfstep * 5 + 0.05;
+
+/*  for (i = 0; i < 4; i ++)
+  {
+    yfstep = 1.0;
+    sprintf (buf, "1.");
+    label = new Label (buf);
+    label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+    fightermenu.add (label);
+    yf -= yfstep;
+  }
+  yf -= 6.25;*/
+
+  button = new Button ("<");
+  button->setBounds (xf, yf, 1.5, 1.5);
+  button->setFunction (callbackFighterPrev);
+  fightermenu.add (button);
+  button = new Button (">");
+  button->setBounds (-xf -1.5, yf, 1.5, 1.5);
+  button->setFunction (callbackFighterNext);
+  fightermenu.add (button);
+  textfield = new TextField ("", yfstep - 0.1);
+  textfield->setBounds (xf + 1.5, yf, 17, 12.5);
+  fightermenu.add (textfield);
+  yf -= 13;
+  
+  sprintf (buf, "         BACK TO MAIN MENU");
+  button = new Button (buf);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  button->setFunction (callbackSwitchMainMenu);
+  fightermenu.add (button);
+  yf -= yfstep + 0.25;
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register mission menu
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = -12.5; yf = 11; xfstep = 25; yfstep = 1.3;
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  missionmenu.add (label);
+  yf -= yfstep + 0.15;
+
+  yfstep = 1.0;
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, 3.5);
+  missionmenu.add (label);
+  yf -= 3.75;
+
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep / 2 - 0.1, 5.7);
+  missionmenu.add (label);
+
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, 5.7);
+  missionmenu.add (label);
+  yf -= 5.95;
+
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep / 2 - 0.1, 6.8);
+  missionmenu.add (label);
+
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, 6.8);
+  missionmenu.add (label);
+  yf -= 7.15;
+
+  yfstep = 1.0;
+  button = new Button (" BACK TO MAIN MENU");
+  button->setBounds (xf, yf, xfstep / 2 - 0.1, yfstep - 0.1);
+  button->setFunction (callbackSwitchMainMenu);
+  missionmenu.add (button);
+
+  button = new Button ("    START MISSION");
+  button->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, yfstep - 0.1);
+  button->setFunction (callbackSwitchStartMission);
+  missionmenu.add (button);
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register quit dialog
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = -6; yf = 2; xfstep = 12; yfstep = 1.2;
+  sprintf (buf, "");
+  label = new Label (buf);
+  label->setBounds (xf, yf, xfstep, 3);
+  quitmenu.add (label);
+  yf -= 3.25;
+
+  yfstep = 1.0; xfstep = 12;
+  button = new Button ("    YES");
+  button->setBounds (xf, yf, xfstep / 2 - 0.1, yfstep - 0.1);
+  button->setFunction (callbackQuitNow);
+  quitmenu.add (button);
+
+  button = new Button ("     NO");
+  button->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, yfstep - 0.1);
+  button->setFunction (callbackSwitchMainMenu);
+  quitmenu.add (button);
+
+/*
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Register stats dialog
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+
+  xf = -10; yf = 9; xfstep = 20; yfstep = 1.2;
+  sprintf (buf, "");
+  textfield = new TextField (buf, 1);
+  textfield->setBounds (xf, yf, xfstep, 15.8);
+  statsmenu.add (textfield);
+  yf -= 16;
+
+  yfstep = 1.0; xfstep = 20;
+  button = new Button ("                  CONTINUE");
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  button->setFunction (callbackStats);
+  statsmenu.add (button);
+
+
+
+  famemenu.setVisible (false);
+  fightermenu.setVisible (false);
+  missionmenu.setVisible (false);
+  quitmenu.setVisible (false);
+  statsmenu.setVisible (false);
+  allmenus.setVisible (false);
+  allmenus.visible = true;
+  allmenus.components [0]->setVisible (true);
+}
 
 
 /****************************************************************************
@@ -6754,6 +7938,8 @@ int main (int argc, char **argv)
 
   display ("Creating dummy sound system, install SDL to enable sound", LOG_ALL);
   sound = new SoundSystem ();
+
+  createMenu ();
 
   display ("Registering GLUT callbacks", LOG_ALL);
   glutReshapeFunc (myReshapeFunc);
@@ -6840,6 +8026,7 @@ int main (int argc, char **argv)
     {
       SDL_JoystickEventState (SDL_ENABLE);
       sdljoystick [i] = SDL_JoystickOpen (i);
+      sdljoystickaxes [i] = SDL_JoystickNumAxes (sdljoystick [i]);
       sprintf (buf, "Joystick \"%s\" detected", SDL_JoystickName (i));
       display (buf, LOG_MOST);
     }
@@ -6853,13 +8040,19 @@ int main (int argc, char **argv)
   }
 
 // disable joystick manually
-//  joystick = 0;
+//  joysticks = 0;
+
+/*  joysticks = 2;
+  sdljoystickaxes [0] = 4;
+  sdljoystickaxes [1] = 2;*/
 
   SDL_EnableUNICODE (1);
   SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 // Restrict mouse to SDL window
 //  SDL_WM_GrabInput (SDL_GRAB_ON);
+
+  createMenu ();
 
   display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
   sdlMainLoop (); // simulate GLUT's main loop (above)

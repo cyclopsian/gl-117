@@ -57,7 +57,9 @@ class TeamPilot
   TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills);
   void flyMission (int averagekills);
   char *getRank ();
+  char *getShortRank ();
   char *getName ();
+  char *getShortName ();
   void load (FILE *in);
   void save (FILE *out);
 };
@@ -81,6 +83,7 @@ class Pilot
   void load ();
   void save ();
   char *getRank ();
+  char *getShortRank ();
   Pilot (char *name);
   ~Pilot ();
 };

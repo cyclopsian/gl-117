@@ -29,55 +29,37 @@ int port = 4567;
 char *message;
 
 #ifdef HAVE_SDL_NET
-int getMsg(TCPsocket sock, char *buf)
+int getMsg (TCPsocket sock, char *buf)
 {
-  Uint32 len,result;
-//  static char *_buf;
-
-  // allow for a NULL buf, use a static internal one...
-//  if(!buf)
-//    buf=&_buf;
-  
-  // free the old buffer
-//  if(*buf)
-//    free(*buf);
-//  *buf=NULL;
+  Uint32 len, result;
 
   // receive the length of the string message
-  result=SDLNet_TCP_Recv(sock,&len,sizeof(len));
-  if(result<sizeof(len))
+  result = SDLNet_TCP_Recv (sock, &len, sizeof (len));
+  if (result < sizeof (len))
   {
-    if(SDLNet_GetError() && strlen(SDLNet_GetError())) // sometimes blank!
-      printf("SDLNet_TCP_Recv: %s\n", SDLNet_GetError());
+    if (SDLNet_GetError () && strlen (SDLNet_GetError ())) // sometimes blank!
+      printf ("SDLNet_TCP_Recv: %s\n", SDLNet_GetError ());
     else 
-      printf ("Fehler unbekannt"); fflush (stdout);
+      printf ("unknown error"); fflush (stdout);
     return 0;
   }
   
   // swap byte order to our local order
-  len=SDL_SwapBE32(len);
+  len = SDL_SwapBE32 (len);
   
   // check if anything is strange, like a zero length buffer
-  if(!len)
+  if (!len)
     return 0;
-
-  // allocate the buffer memory
-//  *buf=(char*)malloc(len);
-//  if(!(*buf))
-//    return;
 
   // get the string buffer over the socket
-  result=SDLNet_TCP_Recv(sock,buf,len);
-  if(result<len)
+  result = SDLNet_TCP_Recv (sock, buf, len);
+  if (result<len)
   {
-    if(SDLNet_GetError() && strlen(SDLNet_GetError())) // sometimes blank!
-      printf("SDLNet_TCP_Recv: %s\n", SDLNet_GetError());
+    if (SDLNet_GetError () && strlen (SDLNet_GetError ())) // sometimes blank!
+      printf ("SDLNet_TCP_Recv: %s\n", SDLNet_GetError ());
     return 0;
-//    free(*buf);
-//    buf=NULL;
   }
 
-  // return the new buffer
   return 1;
 }
 #endif
@@ -85,40 +67,35 @@ int getMsg(TCPsocket sock, char *buf)
 // send a string buffer over a TCP socket with error checking
 // returns 0 on any errors, length sent on success
 #ifdef HAVE_SDL_NET
-int putMsg(TCPsocket sock, char *buf, int len)
+int putMsg (TCPsocket sock, char *buf, int len)
 {
   Uint32 result;
 
-/*  if(!buf || !strlen(buf))
-    return(1);*/
-
-  // determine the length of the string
-//  len=strlen(buf)+1; // add one for the terminating NULL
-  
   // change endianness to network order
-  len=SDL_SwapBE32(len);
+  len = SDL_SwapBE32 (len);
 
   // send the length of the string
-  result=SDLNet_TCP_Send(sock,&len,sizeof(len));
-  if(result<sizeof(len)) {
-    if(SDLNet_GetError() && strlen(SDLNet_GetError())) // sometimes blank!
-      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  result = SDLNet_TCP_Send (sock, &len, sizeof(len));
+  if (result < sizeof (len)) {
+    if (SDLNet_GetError () && strlen (SDLNet_GetError ())) // sometimes blank!
+      printf ("SDLNet_TCP_Send: %s\n", SDLNet_GetError ());
     return(0);
   }
   
   // revert to our local byte order
-  len=SDL_SwapBE32(len);
+  len = SDL_SwapBE32 (len);
   
   // send the buffer, with the NULL as well
-  result=SDLNet_TCP_Send(sock,buf,len);
-  if(result<len) {
-    if(SDLNet_GetError() && strlen(SDLNet_GetError())) // sometimes blank!
-      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-    return(0);
+  result = SDLNet_TCP_Send (sock, buf, len);
+  if (result < len)
+  {
+    if (SDLNet_GetError () && strlen (SDLNet_GetError ())) // sometimes blank!
+      printf ("SDLNet_TCP_Send: %s\n", SDLNet_GetError ());
+    return 0;
   }
   
   // return the length sent
-  return(result);
+  return result;
 }
 #endif
 

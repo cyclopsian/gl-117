@@ -219,6 +219,7 @@ class AIObj : public DynamicObj
   Uint32 timer;
   int statfirepower; // firepower (missiles) statistics, number of stars
   bool dualshot; // one or two cannons?
+  int manoeverstate; // changes to realistic manoevers and turns off easymodel
 
   void aiinit (); // initialize variables
   void missileCount ();

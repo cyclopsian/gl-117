@@ -87,8 +87,9 @@ class CExplosion : public CSpaceObj
   Space *space;
   int ttl, maxlen;
   float maxzoom;
+  CVector3 v;
   CExplosion (Space *space, CModel *sphere);
-  void setExplosion (float x, float y, float z, float maxzoom, int len);
+  void setExplosion (float x, float y, float z, float vx, float vy, float vz, float maxzoom, int len);
   void move (Uint32 dt);
 };
 

@@ -55,7 +55,7 @@ Mission::Mission ()
   selweapon [1] = MISSILE_GROUND1;
   selweapon [2] = MISSILE_DF1;
   wantweapon = 0;
-  textcolor.setColor (255, 255, 0, 128);
+  textcolor.setColor (255, 255, 0, 180);
   clouds = 0;
   heading = 180;
   state = 0;
@@ -241,14 +241,15 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
 int Mission::getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points)
 {
   if (points > 2000) points = 2000;
-  int score = timebonus + shieldbonus + fighterkills * 20 + shipkills * 12 + tankkills * 10 + otherkills * 5 + points / 20;
+  int score = timebonus + shieldbonus + fighterkills * 20 + shipkills * 12 + tankkills * 10 + otherkills * 5/* + points / 20*/;
   if (difficulty == 0) score -= 25;
   else if (difficulty == 1) score += 25;
   else if (difficulty == 2) score += 75;
+  if (!fplayer->realism) score -= 25;
+  else score += 25;
   if (missionstate == 2) // if failed
   {
-    score /= 4;
-    score -= 100;
+    score = 0;
   }
   return score;
 }
@@ -329,7 +330,7 @@ void MissionDemo1::draw ()
 MissionTutorial1::MissionTutorial1 ()
 {
   id = MISSION_TUTORIAL;
-  strcpy (name, "TUTORIAL");
+  strcpy (name, "TUTORIAL: PILOTING");
   alliedfighters = 1;
   strcpy (briefing, "WELCOME TO THE FIRST TUTORIAL! BEFORE FLYING ANY MISSION YOU SHOULD PLAY THIS TUTORIAL. LEARN TO HANDLE YOUR FIGHTER AND THE BASIC CONTROLS LIKE TARGETING OR FIRING A MISSILE.");
   autoLFBriefing ();
@@ -350,7 +351,6 @@ void MissionTutorial1::start ()
   playerInit ();
   fplayer->tl->x = 220;
   fplayer->tl->z = -30;
-  loop = false;
 }
 
 int MissionTutorial1::processtimer (Uint32 dt)
@@ -375,11 +375,11 @@ void MissionTutorial1::draw ()
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "LEAVE THE JOYSTICK CENTERED", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THE FIGHTER SHOULD FLY STRAIGHT ON", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "LEAVE THE JOYSTICK CENTERED.", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "THE FIGHTER SHOULD FLY STRAIGHT ON.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "IF NOT, RECALIBRATE YOUR JOYSTICK", &textcolor);
     }
-    else if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE || controls == CONTROLS_MOUSE_EXP)
+    else if (controls == CONTROLS_MOUSE)
     {
       font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU", &textcolor);
       font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", &textcolor);
@@ -400,31 +400,34 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "MOVING THE JOYSTICK LEFT OR RIGHT", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE AILERON", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE AILERON.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THUS YOU WILL ONLY ROLL", &textcolor);
     }
     else if (controls == CONTROLS_MOUSE)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE MOUSE INTERFACE IS VERY EASY", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "ALWAYS POINT TO WHERE YOU WANT TO FLY", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "YOU'LL HAVE TO MOVE THE MOUSE PERMANENTLY", &textcolor);
+      if (!mouse_reverse && !mouse_relative)
+      {
+        font1->drawTextCentered (0, 7, -2.5, "THE MOUSE INTERFACE IS VERY EASY.", &textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "ALWAYS POINT TO WHERE YOU WANT TO FLY.", &textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "YOU'LL HAVE TO MOVE THE MOUSE PERMANENTLY", &textcolor);
+      }
+      else if (mouse_reverse && !mouse_relative)
+      {
+        font1->drawTextCentered (0, 7, -2.5, "THE REVERTED MOUSE IS FOR REAL GAMERS ONLY.", &textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "THE STANDARD MOUSE INTERFACE MAY BE", &textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "EASIER TO LEARN", &textcolor);
+      }
+      else
+      {
+        font1->drawTextCentered (0, 7, -2.5, "MOUSE RELATIVE IS A LOT OF WORK.", &textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "ONLY THE RELATIVE MOUSE COORDINATES (MOVING)", &textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "WILL HAVE AN EFFECT", &textcolor);
+      }
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "THE KEYBOARD INTERFACE IS NOT SO EASY", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "THE KEYBOARD INTERFACE IS NOT THAT EASY.", &textcolor);
       font1->drawTextCentered (0, 6, -2.5, "USING THE MOUSE IS STRONLY RECOMMENDED", &textcolor);
-    }
-    else if (controls == CONTROLS_MOUSE_REVERSE)
-    {
-      font1->drawTextCentered (0, 7, -2.5, "THE REVERTED MOUSE IS FOR REAL GAMERS ONLY", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THE STANDARD MOUSE INTERFACE MAY BE", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "EASIER TO LEARN", &textcolor);
-    }
-    else if (controls == CONTROLS_MOUSE_EXP)
-    {
-      font1->drawTextCentered (0, 7, -2.5, "MOUSE RELATIVE IS A LOT OF WORK", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "ONLY THE RELATIVE MOUSE COORDINATES (MOVING)", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "WILL HAVE AN EFFECT", &textcolor);
     }
   }
   else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
@@ -432,13 +435,13 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "MOVING UP OR DOWN WILL AFFECT", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THE ELEVATOR", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "THE ELEVATOR.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "YOU'LL START TO FLY A LOOP", &textcolor);
     }
-    else if (controls == CONTROLS_MOUSE || controls == CONTROLS_KEYBOARD || controls == CONTROLS_MOUSE_REVERSE || controls == CONTROLS_MOUSE_EXP)
+    else if (controls == CONTROLS_MOUSE || controls == CONTROLS_KEYBOARD)
     {
-      font1->drawTextCentered (0, 7, -2.5, "MOVING RIGHT OR LEFT WILL AFFECT THE AILERON", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "MOVING UP OR DOWN WILL AFFECT THE ELEVATOR", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "MOVING RIGHT OR LEFT WILL AFFECT THE AILERON,", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "MOVING UP OR DOWN WILL AFFECT THE ELEVATOR.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THUS YOU CAN FLY ROLLS AND LOOPS", &textcolor);
     }
   }
@@ -447,10 +450,10 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "IF YOUR JOYSTICK HAS A SO-CALLED \"RUDDER\",", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "YOU MAY ALTER THE FIGHTER'S RUDDER", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "YOU MAY ALTER THE FIGHTER'S RUDDER.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "YOU'LL SLIGHTLY FLY TO THE LEFT OR RIGHT", &textcolor);
     }
-    else if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE || controls == CONTROLS_MOUSE_EXP)
+    else if (controls == CONTROLS_MOUSE)
     {
       font1->drawTextCentered (0, 7, -2.5, "MOVING THE MOUSE SLIGHTLY LEFT OR RIGHT", &textcolor);
       font1->drawTextCentered (0, 6, -2.5, "WILL AFFECT THE RUDDER.", &textcolor);
@@ -466,13 +469,13 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "YOUR JOYSTICK HAS ALSO A THROTTLE", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "TO SPEEDUP OR DECELERATE", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "TO SPEEDUP OR DECELERATE.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", &textcolor);
     }
     else
     {
       font1->drawTextCentered (0, 7, -2.5, "USE THE KEYS '1' THROUGH '9' TO ALTER", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "YOUR THROTTLE (SPEED)", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "YOUR THROTTLE (SPEED).", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", &textcolor);
     }
   }
@@ -484,11 +487,11 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 6, -2.5, "FIRE CANNON, DROP CHAFF/FLARE,", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "FIRE MISSILE, CHOOSE MISSILE", &textcolor);
     }
-    else if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE || controls == CONTROLS_MOUSE_EXP)
+    else if (controls == CONTROLS_MOUSE)
     {
       font1->drawTextCentered (0, 7, -2.5, "LEFT MOUSE BUTTON: FIRE CANNON", &textcolor);
       font1->drawTextCentered (0, 6, -2.5, "RIGHT MOUSE BUTTON: FIRE MISSILE", &textcolor);
-      font1->drawTextCentered (0, 5, -2.5, "BUT YOU WILL ALSO HAVE TO USE THE KEYBOARD", &textcolor);
+      font1->drawTextCentered (0, 5, -2.5, "BUT YOU SHOULD REALLY PREFER THE KEYBOARD", &textcolor);
     }
     else if (controls == CONTROLS_KEYBOARD)
     {
@@ -499,26 +502,26 @@ void MissionTutorial1::draw ()
   {
     if (controls == CONTROLS_JOYSTICK)
     {
-      font1->drawTextCentered (0, 7, -2.5, "A SUMMARY OF COMMANDS CAN BE FOUND IN THE MENU", &textcolor);
+      font1->drawTextCentered (0, 7, -2.5, "A SUMMARY OF COMMANDS CAN BE FOUND IN THE MENU.", &textcolor);
       font1->drawTextCentered (0, 6, -2.5, "\"ESC\" WILL SHOW THE MENU", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "AND RETURN BACK TO THE ACTION", &textcolor);
     }
     else
     {
-      getKeyString (key_firecannon, buf2);
+      key2string (key_firecannon, buf2);
       sprintf (buf, "%s: FIRE CANNON", buf2);
       font1->drawTextCentered (0, 7, -2.5, buf, &textcolor);
-      getKeyString (key_selectmissile, buf2);
+      key2string (key_selectmissile, buf2);
       sprintf (buf, "%s: CHOOSE MISSILE", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
-      getKeyString (key_firemissile, buf2);
+      key2string (key_firemissile, buf2);
       sprintf (buf, "%s: FIRE MISSILE", buf2);
       font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
     }
   }
   else if (timer > timeroff + 7 * timerdelay && timer <= timeroff + 8 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "LOOK AT THE RADAR ON THE BOTTOM OF YOUR SCREEN", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "LOOK AT THE RADAR ON THE BOTTOM OF YOUR SCREEN.", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "THERE ARE ENEMIES REPRESENTED BY A YELLOW POINT (TARGETED)", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "AND A RED POINT (NOT TARGETED)", &textcolor);
   }
@@ -527,16 +530,16 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY USING THE COOLIE HAT,", &textcolor);
-      getKeyString (key_targetnearest, buf2);
-      sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD", buf2);
+      key2string (key_targetnearest, buf2);
+      sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
     }
     else
     {
       font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY PRESSING", &textcolor);
-      getKeyString (key_targetnearest, buf2);
-      sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD", buf2);
+      key2string (key_targetnearest, buf2);
+      sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
     }
@@ -566,11 +569,247 @@ void MissionTutorial1::draw ()
 
 
 
+MissionTutorial2::MissionTutorial2 ()
+{
+  id = MISSION_TUTORIAL2;
+  strcpy (name, "TUTORIAL: BOMBER");
+  strcpy (briefing, "THE SECOND TUTORIAL SHOWS YOU HOW TO USE THE WEAPONS OF A BOMBER TO BLOW UP HEAVILY ARMORED TARGETS.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  maxtime = 5000 * timestep;
+  selfighter [0] = FIGHTER_STORM;
+  selfighters = 1;
+  wantfighter = 0;
+  selweapons = 1;
+  selweapon [0] = MISSILE_DF1;
+  wantweapon = 0;
+//  alliedpilot [0] = PILOT_PRIMETIME;
+}
+
+void MissionTutorial2::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  int px, py;
+  l->searchPlain (-1, -1, &px, &py);
+  playerInit ();
+  fplayer->tl->x = px;
+  fplayer->tl->z = py + 150;
+  for (i = 1; i <= 2; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_tank1;
+    fighter [i]->tl->x = px + 6 - i * 4;
+    fighter [i]->tl->z = py + 6 - i * 4;
+    fighter [i]->newinit (TANK_GROUND1, 0, 400);
+    fighter [i]->maxthrust = 0;
+  }
+}
+
+int MissionTutorial2::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 2; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionTutorial2::draw ()
+{
+  char buf [250], buf2 [10];
+  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
+  if (timer >= 0 && timer <= timeroff - 20)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+  else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "FIRSTLY, HAVE A LOOK AT YOUR MISSILES:", &textcolor);
+    key2string (key_selectmissile, buf2);
+    sprintf (buf, "PRESS '%s' TO SWITCH BETWEEN", buf2);
+    font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AGM (AIR-GROUND-MISSILE) AND DF (DUMB FIRE)", &textcolor);
+  }
+  else if (timer > timerdelay + timeroff && timer <= timeroff + 2 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "LET'S USE THE AGM: AS SOON AS THE TARGET", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IS LOCKED (YELLOW), SHOOT THE AGM AT ANY", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "DIRECTION AND WATCH WHERE IT GOES.", &textcolor);
+  }
+  else if (timer > 2 * timerdelay + timeroff && timer <= timeroff + 3 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "THEN TRY A DF MISSILE BUT CAREFUL:", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IT IS QUITE 'DUMB' AND WILL FLY STRAIGHT AHEAD.", &textcolor);
+  }
+  else if (timer > 3 * timerdelay + timeroff && timer <= timeroff + 4 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 6, -2.5, "HOWEVER, DF MISSILES WILL CAUSE MUCH MORE DAMAGE", &textcolor);
+  }
+  else if (timer > 4 * timerdelay + timeroff && timer <= timeroff + 5 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 6, -2.5, "NOW, BLOW UP THE TWO TANKS", &textcolor);
+  }
+}
+
+
+
+
+MissionTutorial3::MissionTutorial3 ()
+{
+  id = MISSION_TUTORIAL3;
+  strcpy (name, "TUTORIAL: AERODYNAMICS");
+  alliedfighters = 1;
+  strcpy (briefing, "THIS TUTORIAL WILL TEACH YOU THE BASICS OF AERODYNAMICS USING THE SIMULATION MODEL FOR PROVIDING MORE REALISTIC PHYSICS THAN THE SIMPLE ACTION MODEL.");
+  autoLFBriefing ();
+  maxtime = 2500 * timestep;
+  heading = 210;
+}
+
+void MissionTutorial3::start ()
+{
+  day = 1;
+  clouds = 2;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
+//  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+//    l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
+  playerInit ();
+  fplayer->tl->x = 220;
+  fplayer->tl->z = -30;
+}
+
+int MissionTutorial3::processtimer (Uint32 dt)
+{
+  timer += dt;
+  fplayer->realism = true;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+    return 2;
+  if (!fighter [1]->active && !fighter [2]->active && state == 1)
+    return 1;
+  return 0;
+}
+
+void MissionTutorial3::draw ()
+{
+  char buf [250], buf2 [10];
+  int timeroff = 100 * timestep, timerdelay = 350 * timestep, timerlag = 120 * timestep;
+  if (timer >= 0 && timer <= timeroff - 20)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+  else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "THE MENU OPTIONS/CONTROLS LETS YOU DEFINE DIFFICULTY", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "AND REALISM. CHANGING THESE SETTINGS WILL ONLY HAVE", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "EFFECT ON THE NEXT MISSION YOU START", &textcolor);
+  }
+  else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "APART FROM YOUR CURRENT PHYSICS SETTINGS", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "LET'S USE THE SIMULATION MODEL AND DISCUSS", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "THE FOUR FORCES THRUST, DRAG, LIFT, AND WEIGHT", &textcolor);
+  }
+  else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "THRUST IS FORWARD FORCE CREATED BY THE ENGINES.", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "CHANGE THE THRUST TO GAIN OR LOSE SPEED", &textcolor);
+  }
+  else if (timer > timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "DRAG IS THE RETARDING FORCE THAT LIMITS THE AIRCRAFT'S", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "SPEED. IT IS MAINLY CAUSED BY THE AIRCRAFT'S STRUCTURE", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "THAT PROTUDES INTO THE WIND", &textcolor);
+  }
+  else if (timer > timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "LIFT IS THE UPWARD FORCE CREATED BY THE AIRFLOW THAT PASSES", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "OVER THE WINGS. IN STRAIGHT UNACCELERATED FLIGHT, IT", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "COMPENSATES THE WEIGHT AND YOUR FIGHTER WON'T CLIMB OR DIVE", &textcolor);
+  }
+  else if (timer > timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "THE LIFT FORCE DEPENDS ON THE SPEED:", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "LOW SPEED WILL CAUSE THE AIRPLANE TO DIVE,", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AT HIGH SPEED IT WILL EVEN CLIMB", &textcolor);
+  }
+  else if (timer > timeroff + 6 * timerdelay && timer <= timeroff + 8 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "NOW TRY THIS EFFECT BY FLYING STRAIGHT AHEAD AT 0 DEGREE", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "ELEVATION WHILE USING THE LOWEST/HIGHEST THRUST SETTINGS", &textcolor);
+  }
+  else if (timer > timeroff + 8 * timerdelay && timer <= timeroff + 10 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "IF YOU FLY A ROLL, THE LIFT WILL NOT OPPOSE THE THRUST", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "AND YOU WILL LOSE HEIGHT. TRY!", &textcolor);
+  }
+  else if (timer > timeroff + 10 * timerdelay && timer <= timeroff + 12 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "IF YOU ROLL TO THE SIDE, THE LIFT WILL TEAR THE AIRCRAFT", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "FROM STRAIGHT FLIGHT TO A DIAGONAL DIRECTION WHILE", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "LOSING HEIGHT. TRY!", &textcolor);
+  }
+  else if (timer > timeroff + 12 * timerdelay && timer <= timeroff + 13 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "THE OVERALL FORCE IS GAINED BY ADDING THE FOUR FORCES.", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "IT IS MEASURED IN 'G' WITH 1G MEANING THE EARTH'S GRAVITY", &textcolor);
+  }
+  else if (timer > timeroff + 13 * timerdelay && timer <= timeroff + 14 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "YOU ARE MOSTLY OPPOSED TO MORE THAN ONLY 1G. BE CAREFUL:", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "9G OR MORE MAY LEAD TO A BLACKOUT,", &textcolor);
+    font1->drawTextCentered (0, 5, -2.5, "AT LESS THAN -3G THE BLOOD WILL SHOOT INTO YOUR HEAD", &textcolor);
+  }
+  else if (timer > timeroff + 14 * timerdelay && timer <= timeroff + 15 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "NOW ROLL ON THE BACK AND GET RID OF", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "THE TWO TRANSPORTERS AHEAD", &textcolor);
+  }
+  if (timer >= timeroff + 14 * timerdelay - timerlag / 2 && state == 0)
+  {
+    state ++;
+    fighter [1]->activate ();
+    fighter [1]->target = fighter [0];
+    fighter [1]->o = &model_figt;
+    fighter [1]->newinit (FIGHTER_TRANSPORT, 0, 200);
+    fighter [1]->tl->x = fplayer->tl->x - 30;
+    fighter [1]->tl->z = fplayer->tl->z - 30;
+    fighter [2]->activate ();
+    fighter [2]->target = fighter [0];
+    fighter [2]->o = &model_figt;
+    fighter [2]->newinit (FIGHTER_TRANSPORT, 0, 200);
+    fighter [2]->tl->x = fplayer->tl->x + 30;
+    fighter [2]->tl->z = fplayer->tl->z + 30;
+  }
+}
+
+
+
 MissionDogfight1::MissionDogfight1 ()
 {
   id = MISSION_DOGFIGHT;
-  strcpy (name, "DOGFIGHT");
-  strcpy (briefing, "HERE IS THE SECOND TUTORIAL: PRACTICE YOUR DOGFIGHT SKILLS.");
+  strcpy (name, "TUTORIAL: FIGHTER");
+  strcpy (briefing, "HERE IS THE THIRD TUTORIAL: PRACTICE YOUR DOGFIGHT SKILLS.");
   autoLFBriefing ();
   alliedfighters = 1;
   maxtime = 5000 * timestep;
@@ -682,7 +921,7 @@ void MissionDogfight1::draw ()
   else if (timer >= timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "THERE IS AN ENEMY ATTACKING", &textcolor);
-    getKeyString (key_selectmissile, buf2);
+    key2string (key_selectmissile, buf2);
     sprintf (buf, "PRESS '%s' ON THE KEYBOARD TO", buf2);
     font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "SELECT A MISSILE", &textcolor);
@@ -690,7 +929,7 @@ void MissionDogfight1::draw ()
   else if (timer >= timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "CHOOSE A FRIEND-FOE (FF) MISSILE", &textcolor);
-    font1->drawTextCentered (0, 6, -2.5, "WHICH DETECTS ENEMIES BY RADAR", &textcolor);
+    font1->drawTextCentered (0, 6, -2.5, "WHICH DETECTS ENEMIES BY RADAR.", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "SHOOT AS EARLY AS POSSIBLE", &textcolor);
   }
   else if (timer >= timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
@@ -701,23 +940,33 @@ void MissionDogfight1::draw ()
   }
   else if (timer >= timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "CHECK THE CHAFF/FLARE DISPLAYS", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "CHECK THE CHAFF/FLARE DISPLAYS.", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "IF THEY START BLINKING, AN ENEMY HAS", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "FIRED A MISSILE TO GET YOU DOWN", &textcolor);
   }
   else if (timer >= timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES,", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "FLARES PROTECT FROM INFRARED MISSILES", &textcolor);
-    getKeyString (key_dropchaff, buf2);
-    getKeyString (key_dropflare, buf3);
+    key2string (key_dropchaff, buf2);
+    key2string (key_dropflare, buf3);
     sprintf (buf, "KEYS: DROP CHAFF = '%s', DROP FLARE = '%s'", buf2, buf3);
     font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
   }
   else if (timer >= timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
-    font1->drawTextCentered (0, 7, -2.5, "THE COUNTER MEASURE ONLY HAD AN EFFECT", &textcolor);
+    font1->drawTextCentered (0, 7, -2.5, "THE COUNTER MEASURE ONLY HAD AN EFFECT,", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "IF THE DISPLAYS STOP BLINKING", &textcolor);
+  }
+  else if (timer >= timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - timerlag)
+  {
+    font1->drawTextCentered (0, 7, -2.5, "A LITTLE TARGETING HINT:", &textcolor);
+    key2string (key_targetnearest, buf2);
+    sprintf (buf, "'%s' WILL TARGET THE NEAREST ENEMY IN FRONT,", buf2);
+    font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
+    key2string (key_targetlocking, buf2);
+    sprintf (buf, "'%s' WILL TARGET AN ENEMY WHO HAS LOCKED YOU", buf2);
+    font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
   }
 }
 

@@ -59,6 +59,8 @@
 #define MISSION_CAMPAIGN2 40
 #define MISSION_TUTORIAL 80
 #define MISSION_DOGFIGHT 81
+#define MISSION_TUTORIAL2 82
+#define MISSION_TUTORIAL3 83
 #define MISSION_FREEFLIGHT1 84
 #define MISSION_DEATHMATCH1 85
 #define MISSION_DEATHMATCH2 86
@@ -88,6 +90,7 @@ class Mission
   int difficulty; // difficulty level for THIS mission
   int heading; // define northern direction (the sun is at 0 degree)
   int state; // different mission states (individual meaning)
+  int physics; // action=0 or simulation=1
 
   Mission ();
   void playerInit ();
@@ -113,11 +116,26 @@ class MissionDemo1 : public Mission
 
 class MissionTutorial1 : public Mission
 {
-  private:
-  bool loop;
-
   public:
   MissionTutorial1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionTutorial2 : public Mission
+{
+  public:
+  MissionTutorial2 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionTutorial3 : public Mission
+{
+  public:
+  MissionTutorial3 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

@@ -489,10 +489,9 @@ void Cockpit::drawTargetedElement ()
   glEnable (GL_DEPTH_TEST);
   if (fplayer->target != NULL)
     if (fplayer->target->active)
-
     {
       glEnable (GL_LIGHTING);
-      fplayer->target->o->draw (&n, &tl, fplayer->target->rot, 0.05, 1.0, 0);
+      fplayer->target->o->draw (&n, &tl, fplayer->target->rot, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.setColor (0, 0, 255);
@@ -620,7 +619,7 @@ void Cockpit::drawRadar ()
     }
   for (i = 0; i < maxmissile; i ++)
   {
-    if (missile [i]->target == fplayer)
+    if (missile [i]->target == fplayer && missile [i]->active)
     {
       int aw = fplayer->getAngle (missile [i]);
       if (aw < 0) aw += 360;

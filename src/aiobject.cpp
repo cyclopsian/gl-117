@@ -113,6 +113,10 @@ void DynamicObj::dinit ()
   killed = false;
   realism = false;
   accx = accy = accz = 0;
+/*  if (o != NULL)
+  {
+    o->cubex = 0.05; o->cubey = 0.05; o->cubez = 0.05;
+  }*/
 //  rot->setAngles ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
 }
 
@@ -307,7 +311,7 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 {
   if (immunity > 0 || d->immunity > 0) return;
   if (explode > 0 || sink > 0) return;
-  float z = d->zoom > zoom ? d->zoom : zoom;
+/*  float z = d->zoom > zoom ? d->zoom : zoom;
   if ((id >= MISSILE1 && id <= MISSILE2) || (d->id >= MISSILE1 && d->id <= MISSILE2))
   {
     if (d->party != party)
@@ -316,7 +320,7 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
   if (id >= STATIC_PASSIVE)
   {
     if (id == STATIC_HALL1 || id == STATIC_HALL2 || id == STATIC_DEPOT1)
-      z *= 0.3;
+      z *= 0.15;
     else if (id == STATIC_OILRIG1)
       z *= 0.6;
     else
@@ -326,9 +330,10 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
     z *= 0.3;
   if (id == ASTEROID)
     z *= 1.1;
+*/
   
   bool collide = false;
-  if (id == STATIC_BARRIER1 || d->id == STATIC_BARRIER1)
+/*  if (id == STATIC_BARRIER1 || d->id == STATIC_BARRIER1)
   {
     if (tl->x >= d->tl->x - 1.0F && tl->x <= d->tl->x + 1.0F &&
         tl->y >= d->tl->y - 10 && tl->y <= d->tl->y + 10 &&
@@ -337,23 +342,46 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
       collide = true;
     }
   }
-  else
+  if (id >= STATIC_PASSIVE)
   {
-    if (tl->x >= d->tl->x - z && tl->x <= d->tl->x + z &&
-        tl->y >= d->tl->y - z && tl->y <= d->tl->y + z &&
-        tl->z >= d->tl->z - z && tl->z <= d->tl->z + z)
+    float z = d->o->cube;
+    if (tl->x >= d->tl->x - d->o->scalex / d->o->scale * d->zoom && tl->x <= d->tl->x + d->o->scalex / d->o->scale * o->zoom &&
+        tl->y >= d->tl->y - d->o->scaley / d->o->scale * d->zoom && tl->y <= d->tl->y + d->o->scaley / d->o->scale * o->zoom &&
+        tl->z >= d->tl->z - d->o->scalez / d->o->scale * d->zoom && tl->z <= d->tl->z + d->o->scalez / d->o->scale * o->zoom)
     {
       collide = true;
     }
+    z = o->cube;
+    if (d->tl->x >= tl->x - o->scalex / o->scale * zoom && d->tl->x <= tl->x + o->scalex / o->scale * zoom &&
+        d->tl->y >= tl->y - o->scaley / o->scale * zoom && d->tl->y <= tl->y + o->scaley / o->scale * zoom &&
+        d->tl->z >= tl->z - o->scalez / o->scale * zoom && d->tl->z <= tl->z + o->scalez / o->scale * zoom)
+    {
+      collide = true;
+    }
+  }
+  else*/
+  {
+    if (tl->x + o->cubex >= d->tl->x - d->o->cubex && tl->x - o->cubex <= d->tl->x + d->o->cubex &&
+        tl->y + o->cubey >= d->tl->y - d->o->cubey && tl->y - o->cubey <= d->tl->y + d->o->cubey &&
+        tl->z + o->cubez >= d->tl->z - d->o->cubez && tl->z - o->cubez <= d->tl->z + d->o->cubez)
+    {
+      collide = true;
+    }
+/*    if (d->tl->x >= tl->x - o->cubex && d->tl->x <= tl->x + o->cubex &&
+        d->tl->y >= tl->y - o->cubey && d->tl->y <= tl->y + o->cubey &&
+        d->tl->z >= tl->z - o->cubez && d->tl->z <= tl->z + o->cubez)
+    {
+      collide = true;
+    }*/
   }
 
   if (collide)
   {
     if (this == (DynamicObj *) fplayer && game == GAME_PLAY && realism && d->id >= AIR && d->id < MOVING_GROUND)
-	{
+	  {
       shield = -1.0F; // player collision vs another plane in SIM mode, boom
-	  d->shield = -1.0F;
-	}
+	    d->shield = -1.0F;
+	  }
     if (id < STATIC_PASSIVE || (id >= STATIC_PASSIVE && d->id >= MISSILE1 && d->id <= MISSILE2))
       shield -= (float) d->impact /** dt / timestep*/;
     else
@@ -398,7 +426,7 @@ void DynamicObj::setExplosion (float maxzoom, int len)
     if (explosion [i]->ttl <= 0)
       break;
   if (i >= maxexplosion) i = 0;
-  explosion [i]->setExplosion (tl->x, tl->y, tl->z, maxzoom, len);
+  explosion [i]->setExplosion (tl->x, tl->y, tl->z, forcex, forcey, forcez, maxzoom, len);
 }
 
 void DynamicObj::setBlackSmoke (float maxzoom, int len)
@@ -481,7 +509,7 @@ void DynamicObj::move (Uint32 dt)
     gamma = recgamma = 180.0 + 0.5 * (float) sink / timestep; // change angle when sinking
     return; // and exit move()
   }
-  if (!active) return; // exit if not active
+  if (!active && !draw) return; // exit if not active
 
   if (id >= STATIC_PASSIVE) // only buildings, static objects
   {
@@ -824,6 +852,7 @@ void AIObj::aiinit ()
   bomber = 0;
   timer = 0;
   ammo = -1;
+  manoeverstate = 0;
 }
 
 void AIObj::missileCount ()
@@ -848,12 +877,17 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   ai = true;
   this->id = id;
   this->party = party;
+  manoeverstate = 0;
   activate ();
   for (i = 0; i < missileracks; i ++)
     missilerackn [i] = 0;
   ammo = -1;
   bomber = 0;
   dualshot = false;
+  float cubefac = 0.6F; // fighter
+  float cubefac1 = 0.7F; // tanks and sams
+  o->cubex = zoom; o->cubey = zoom; o->cubez = zoom;
+  
   if (id == FIGHTER_FALCON)
   {
     maxthrust = 0.31;
@@ -1060,6 +1094,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     smoke->type = 1;
     impact = 2;
     forcez = recthrust;
+    o->cubex = zoom * cubefac; o->cubey = zoom * cubefac; o->cubez = zoom * cubefac;
   }
 
   if (id == FLAK_AIR1)
@@ -1083,6 +1118,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.3;
     missiles [6] = 100;
   }
+  if (id >= FLAK1 && id <= FLAK2)
+  {
+    o->cubex = zoom * cubefac1; o->cubey = zoom * cubefac1; o->cubez = zoom * cubefac1;
+  }
 
   if (id == TANK_AIR1)
   {
@@ -1094,6 +1133,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 8.0;
     shield = maxshield = 160;
     zoom = 0.35;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.45; o->cubez = zoom * 0.7;
   }
   else if (id == TANK_GROUND1)
   {
@@ -1105,6 +1145,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 8.0;
     shield = maxshield = 200;
     zoom = 0.4;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.5; o->cubez = zoom * 0.7;
   }
   else if (id == TANK_PICKUP1)
   {
@@ -1115,6 +1156,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 30;
     zoom = 0.25;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.55; o->cubez = zoom * 0.7;
   }
   else if (id == TANK_TRUCK1)
   {
@@ -1125,6 +1167,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 20;
     zoom = 0.45;
+    o->cubex = zoom * 0.6; o->cubey = zoom * 0.35; o->cubez = zoom * 0.6;
   }
   else if (id == TANK_TRUCK2)
   {
@@ -1135,6 +1178,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 0;
     shield = maxshield = 40;
     zoom = 0.4;
+    o->cubex = zoom * 0.6; o->cubey = zoom * 0.35; o->cubez = zoom * 0.6;
   }
   else if (id == TANK_TRSAM1)
   {
@@ -1146,6 +1190,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     shield = maxshield = 50;
     zoom = 0.35;
     missiles [6] = 200;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.6; o->cubez = zoom * 0.7;
+  }
+  if (id >= TANK1 && id <= TANK2)
+  {
   }
 
   if (id == SHIP_CRUISER)
@@ -1159,6 +1207,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 20;
     shield = maxshield = 5500;
     missiles [6] = 200;
+    o->cubex = zoom * 0.35; o->cubey = zoom * 0.1; o->cubez = zoom * 0.35;
   }
   else if (id == SHIP_DESTROYER1)
   {
@@ -1170,39 +1219,41 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 6.0;
     impact = 20;
     shield = maxshield = 2800;
+    o->cubex = zoom * 0.4; o->cubey = zoom * 0.12; o->cubez = zoom * 0.4;
   }
 
+  float missilethrustbase = 1.2F;
   if (id == MISSILE_AIR1)
   {
     intelligence = 100;
-    maxthrust = 0.5;
-    nimbility = 4.5; // old 2.2
-    manoeverability = 2.5;
+    maxthrust = 0.65 * missilethrustbase;
+    nimbility = 2.5; // old 2.2
+    manoeverability = 1.5;
     ttl = 200 * timestep;
     impact = 35;
   }
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
-    maxthrust = 0.51;
-    nimbility = 5.5; // old 3.5
-    manoeverability = 3.0;
+    maxthrust = 0.7 * missilethrustbase;
+    nimbility = 3.5; // old 3.5
+    manoeverability = 2.0;
     ttl = 220 * timestep;
     impact = 45;
   }
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
-    maxthrust = 0.52;
-    nimbility = 6.5;
-    manoeverability = 3.5;
+    maxthrust = 0.73 * missilethrustbase;
+    nimbility = 4.5;
+    manoeverability = 2.5;
     ttl = 250 * timestep;
     impact = 55;
   }
   else if (id == MISSILE_GROUND1)
   {
     intelligence = 50;
-    maxthrust = 0.68;
+    maxthrust = 0.68 * missilethrustbase;
     nimbility = 1.2;
     manoeverability = 1.0;
     ai = true;
@@ -1212,7 +1263,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_GROUND2)
   {
     intelligence = 0;
-    maxthrust = 0.73;
+    maxthrust = 0.73 * missilethrustbase;
     nimbility = 1.5;
     manoeverability = 1.0;
     ai = true;
@@ -1222,7 +1273,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_DF1)
   {
     intelligence = 0;
-    maxthrust = 0.7;
+    maxthrust = 0.7 * missilethrustbase;
     nimbility = 0.0;
     manoeverability = 0.0;
     ai = true;
@@ -1232,18 +1283,18 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_FF1)
   {
     intelligence = 0;
-    maxthrust = 0.55;
-    nimbility = 4.0;
-    manoeverability = 2.2;
+    maxthrust = 0.75 * missilethrustbase;
+    nimbility = 2.0;
+    manoeverability = 1.3;
     ttl = 250 * timestep;
     impact = 40;
   }
   else if (id == MISSILE_FF2)
   {
     intelligence = 0;
-    maxthrust = 0.56;
-    nimbility = 4.5;
-    manoeverability = 2.5;
+    maxthrust = 0.8 * missilethrustbase;
+    nimbility = 3.0;
+    manoeverability = 2.0;
     ttl = 250 * timestep;
     impact = 50;
   }
@@ -1260,6 +1311,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 500;
     zoom = 0.3;
   }
+  if (id >= MISSILE1 && id <= MISSILE2)
+  {
+    o->cubex = zoom; o->cubey = zoom; o->cubez = zoom;
+  }
 
   if (id >= STATIC_PASSIVE)
   {
@@ -1275,47 +1330,55 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     shield = maxshield = 80;
     zoom = 0.5;
+    o->cubex = zoom * 0.9; o->cubey = zoom; o->cubez = zoom * 0.9;
   }
   if (id == STATIC_TENT4)
   {
     shield = maxshield = 160;
     zoom = 1.2;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.42; o->cubez = zoom * 0.7;
   }
   if (id == STATIC_CONTAINER1)
   {
     shield = maxshield = 30;
     zoom = 1.0;
     impact = 20;
+    o->cubex = zoom * 0.4; o->cubey = zoom * 0.35; o->cubez = zoom * 0.9;
   }
   if (id == STATIC_HALL1)
   {
     shield = maxshield = 450;
     zoom = 1.8;
     impact = 20;
+    o->cubex = zoom * 0.45; o->cubey = zoom * 0.42; o->cubez = zoom;
   }
   if (id == STATIC_HALL2)
   {
     shield = maxshield = 900;
     zoom = 2.5;
     impact = 20;
+    o->cubex = zoom; o->cubey = zoom * 0.45; o->cubez = zoom;
   }
   if (id == STATIC_OILRIG1)
   {
     shield = maxshield = 1400;
     zoom = 3.5;
     impact = 20;
+    o->cubex = zoom * 0.95; o->cubey = zoom * 0.5; o->cubez = zoom * 0.95;
   }
   if (id == STATIC_COMPLEX1)
   {
     shield = maxshield = 5000;
     zoom = 2.0;
     impact = 20;
+    o->cubex = zoom * 0.75; o->cubey = zoom * 0.6; o->cubez = zoom * 0.75;
   }
   if (id == STATIC_RADAR1)
   {
     shield = maxshield = 500;
     zoom = 1.3;
     impact = 20;
+    o->cubex = zoom * 0.5; o->cubey = zoom * 0.7; o->cubez = zoom * 0.5;
   }
   if (id == ASTEROID)
   {
@@ -1326,24 +1389,31 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.25;
     forcez = 0.12;
     ai = false;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.7; o->cubez = zoom * 0.7;
   }
   if (id == STATIC_BASE1)
   {
     shield = maxshield = 5500;
     zoom = 4.0;
     impact = 20;
+    o->cubex = zoom * 0.7; o->cubey = zoom * 0.5; o->cubez = zoom * 0.7;
   }
   if (id == STATIC_DEPOT1)
   {
     shield = maxshield = 3000;
     zoom = 1.5;
     impact = 20;
+    o->cubex = zoom; o->cubey = zoom * 0.5; o->cubez = zoom;
   }
   if (id == STATIC_BARRIER1)
   {
     shield = maxshield = 1000;
     zoom = 12.0;
     impact = 2000;
+    o->cubex = 0.8; o->cubey = 11; o->cubez = 11;
+  }
+  if (id >= STATIC_PASSIVE)
+  {
   }
 
   if (difficulty == 0) // easy
@@ -1447,8 +1517,10 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
     if (target->active)
     {
       // exact calculation to hit enemy (non-static turret!)
-      // laser->gamma = 180.0 + atan ((target->tl->y - tl->y) / distance (target)) * 180.0 / pitab;
-      laser->gamma = gamma;
+      if (id >= FIGHTER1 && id <= FIGHTER2)
+        laser->gamma = gamma;
+      else
+        laser->gamma = 180.0 + atan ((target->tl->y - tl->y) / distance (target)) * 180.0 / pitab;
     }
   }
   else
@@ -2036,6 +2108,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   }
   if (explode > 0 || sink > 0) // exploding or sinking, then exit
   {
+    thrust = 0;
     return;
   }
   
@@ -2238,11 +2311,13 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   return;
 */
 
-
-
+/*  if (id == 200)
+    printf ("theta=%3.0f, gamma=%3.0f, state=%d\n", theta, gamma, manoeverstate);
+  if (!manoeverstate) manoeverstate = 1;*/
+  
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  int lsdist = 5;
+  int lsdist = 15;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
   int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);
   {
@@ -2255,15 +2330,15 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     {
        // missiles and non intelligent objects will not change their height due to the surface
       if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
-          (tl->y - myheight > 6 && target != NULL && tl->y - myheight < 50/* && !manoeverheight*/))
+          (tl->y - myheight > 8 && target != NULL && tl->y - myheight < 50/* && !manoeverheight*/))
       {
         recheight2 = target->tl->y - 8 * target->thrust * SIN(target->gamma);
       }
       else
       {
         // precalculated height
-        float flyx2 = tl->x + forcex * lsdist * 4, flyz2 = tl->z + forcez * lsdist * 4;
-        float flyx3 = tl->x + forcex * lsdist * 20, flyz3 = tl->z + forcez * lsdist * 20;
+        float flyx2 = tl->x + forcex * lsdist * 3, flyz2 = tl->z + forcez * lsdist * 3;
+        float flyx3 = tl->x + forcex * lsdist * 8, flyz3 = tl->z + forcez * lsdist * 8;
         float h1 = l->getMaxHeight (flyx, flyz);
         float h2 = l->getMaxHeight (flyx2, flyz2);
         float h3 = l->getMaxHeight (flyx3, flyz3);
@@ -2272,6 +2347,146 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         recheight2 = recheight + h1;
       }
     }
+  }
+
+  // fire flares and chaff
+  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  {
+    if (manoevertheta <= 0)
+      for (i = 0; i < maxmissile; i ++)
+        if (m [i]->ttl > 0)
+          if (m [i]->target == this)
+          {
+            if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
+            {
+              if ((easymodel == 1 && fabs (theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
+              {
+                fireFlare (flare, m);
+                fireflarettl += intelligence / 20 * timestep;
+              }
+              manoevertheta = 35 * timestep;
+            }
+            else
+            {
+              if ((easymodel == 1 && fabs (theta) >= 30) || (easymodel == 2 && fplayer->elevatoreffect >= 0.5))
+              {
+                fireChaff (chaff, m);
+                firechaffttl += intelligence / 20 * timestep;
+              }
+              manoevertheta = 35 * timestep;
+            }
+          }
+  }
+
+  // manoevers (may use the height information)
+  if (manoeverstate && active && draw)
+  {
+    easymodel = 2;
+
+    if (manoeverstate == 1) // Immelmann
+    {
+      recelevatoreffect = 0.05;
+      if (fabs (theta) > 10) recrolleffect = -1;
+      else
+      {
+        recrolleffect = 0;
+        manoeverstate = 2;
+      }
+    }
+    else if (manoeverstate == 2)
+    {
+      if (fabs (theta) <= 150)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 1;
+      }
+      else
+      {
+        manoeverstate = 3;
+      }
+    }
+    else if (manoeverstate == 3)
+    {
+      if (gamma < 170 || gamma > 190)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 1;
+      }
+      else
+      {
+        manoeverstate = 4;
+      }
+    }
+    else if (manoeverstate == 4)
+    {
+      if (fabs (theta) > 20)
+      {
+        recrolleffect = 1;
+        recelevatoreffect = 0.05;
+      }
+      else
+      {
+        manoeverstate = 0;
+      }
+    }
+
+    if (manoeverstate == 10) // climb vertical
+    {
+      recrolleffect = 0;
+      recelevatoreffect = 1;
+      if (gamma > 260 || gamma < 90)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 0;
+        manoeverstate = 11;
+      }
+    }
+    else if (manoeverstate == 11)
+    {
+      if (fabs (tl->y - myheight) > 3)
+      {
+        manoeverstate = 12;
+      }
+    }
+    else if (manoeverstate == 12)
+    {
+      recelevatoreffect = -0.5;
+      if (gamma > 170 && gamma < 190)
+      {
+        recelevatoreffect = 0;
+        manoeverstate = 0;
+      }
+    }
+
+    if (manoeverstate == 20) // Roll
+    {
+      recelevatoreffect = 0.55;
+      recrolleffect = 1;
+      if (theta > 80 && theta < 90)
+      {
+        manoeverstate = 21;
+      }
+    }
+    else if (manoeverstate == 21)
+    {
+      if (theta > -10 && theta < 10)
+      {
+        manoeverstate = 0;
+      }
+    }
+
+    float pulljoystick = 0.005;
+    float nocorrection = 0.1;
+    if (recrolleffect > rolleffect + nocorrection) rolleffect += pulljoystick * timestep;
+    else if (recrolleffect < rolleffect - nocorrection) rolleffect -= pulljoystick * timestep;
+    if (recelevatoreffect > elevatoreffect + nocorrection) elevatoreffect += pulljoystick * timestep;
+    else if (recelevatoreffect < elevatoreffect - nocorrection) elevatoreffect -= pulljoystick * timestep;
+    return;
+  }
+  else
+  {
+    if (ai)
+      easymodel = 1;
   }
 
   // calculate the recommended height, recheight2 depends on it
@@ -2302,12 +2517,20 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       if (fabs (tl->y - myheight) < minh)
       {
         recheight = 9 + 0.015 * aggressivity;
-        manoeverheight = 15 * timestep; // fly manoever to gain height
+        if (fabs (tl->y - myheight) < minh * 0.3)
+        {
+          manoeverstate = 10;
+          display ("Manoever: Vertical climb", LOG_ALL);
+        }
+        else
+        {
+          manoeverheight = 5 * timestep; // fly manoever to gain height
+        }
       }
-      if (disttarget < 50 && fabs (tl->y - myheight) > 20)
+      if (disttarget < 50 && fabs (tl->y - myheight) > 25)
       {
         recheight = 8 + 0.025 * aggressivity;
-        manoeverheight = 15 * timestep;
+        manoeverheight = 12 * timestep;
       }
     }
   }
@@ -2328,6 +2551,10 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       recgamma = (int) ((recheight2 - tl->y) * 10 - gamma + 360);
     }
   }
+
+
+
+
 
   // do a smooth roll
   float deltatheta;
@@ -2436,35 +2663,6 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     return;
   }
 
-  // fire flares
-  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
-  {
-    if (manoevertheta <= 0)
-      for (i = 0; i < maxmissile; i ++)
-        if (m [i]->ttl > 0)
-          if (m [i]->target == this)
-          {
-            if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
-            {
-              if (fabs (theta) >= 30)
-              {
-                fireFlare (flare, m);
-                fireflarettl += intelligence / 20 * timestep;
-              }
-              manoevertheta = 35 * timestep;
-            }
-            else
-            {
-              if (fabs (theta) >= 30)
-              {
-                fireChaff (chaff, m);
-                firechaffttl += intelligence / 20 * timestep;
-              }
-              manoevertheta = 35 * timestep;
-            }
-          }
-  }
-
   int firerate;
   if (difficulty == 0) firerate = 12;
   else if (difficulty == 1) firerate = 6;
@@ -2520,20 +2718,39 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if (manoeverthrust > 0) manoeverthrust -= dt;
 
   // heading calculations  
-  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  if (id >= FIGHTER1 && id < FIGHTER_TRANSPORT) // for fighters do the following
   {
     if (!acttype && disttarget <= 1000 && manoevertheta <= 0) // no special action, near distance, no roll manoever
     {
       if (aw > 0) // positive angle
       {
-        if (aw > 140 && disttarget < 25) // target is at the back
+        if (aw > 140 && disttarget > 50)
         {
-          rectheta = -90;
-          manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8)); // turn hard left or right
-          if (manoeverthrust <= 0)
-            recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
-          if (manoeverheight <= 0)
-          { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); } // stay low
+          manoeverstate = 1;
+          display ("Manoever: Immelmann", LOG_ALL);
+        }
+        else if (aw > 160.0F + 0.03 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
+        {
+          manoeverstate = 1;
+          display ("Manoever: Immelmann", LOG_ALL);
+        }
+        else if (aw > 160 && disttarget < 25) // target is at the back
+        {
+          if (fabs (tl->y - myheight) > 7 && gamma >= 175) // high enough over ground
+          {
+            manoeverstate = 20; // roll
+            display ("Manoever: Roll", LOG_ALL);
+          }
+          else
+          {
+            rectheta = -90;
+            manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8)); // turn hard left or right
+            if (manoeverthrust <= 0)
+              recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
+            if (manoeverheight <= 0)
+            { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); } // stay low
+            display ("Manoever: Turn", LOG_ALL);
+          }
         }
         else if (aw < 40 && disttarget > 60)
         {
@@ -2546,22 +2763,46 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         else // otherwise fly to target direction
         {
           int maw = aw > 90 ? 90 : (int) aw;
-          if (maw < 30) maw /= 5;
-          if (maw < 5) maw = 0;
-          maw = 90 - maw;
-          rectheta = 90 - maw * intelligence / 400;
+          int maw2 = 90 - maw;
+          rectheta = 90 - maw2 * intelligence / 400;
+          if (maw < 30) rectheta /= 2;
+          if (maw < 5)
+          {
+            rectheta = 0;
+            if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
+              ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
+          }
         }
       }
       else // same for negative angle
       {
-        if (aw < -140 && disttarget < 25)
+        if (aw < -140 && disttarget > 50)
         {
-          rectheta = 90;
-          manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8));
-          if (manoeverthrust <= 0)
-            recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
-          if (manoeverheight <= 0)
-          { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); }
+          manoeverstate = 1;
+          display ("Manoever: Immelmann", LOG_ALL);
+        }
+        else if (aw < -160.0F - 0.03 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
+        {
+          manoeverstate = 1;
+          display ("Manoever: Immelmann", LOG_ALL);
+        }
+        else if (aw < -160 && disttarget < 25)
+        {
+          if (fabs (tl->y - myheight) > 7 && gamma >= 175) // high enough over ground
+          {
+            manoeverstate = 20; // roll
+            display ("Manoever: Roll", LOG_ALL);
+          }
+          else
+          {
+            rectheta = 90;
+            manoevertheta = timestep * (30 + myrandom ((400 - intelligence) / 8));
+            if (manoeverthrust <= 0)
+              recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
+            if (manoeverheight <= 0)
+            { recheight = 5; manoeverheight = timestep * (20 - intelligence / 50); }
+            display ("Manoever: Turn", LOG_ALL);
+          }
         }
         else if (aw > -40 && disttarget > 60)
         {
@@ -2574,10 +2815,15 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         else
         {
           int maw = aw < -90 ? -90 : (int) aw;
-          if (maw > -30) maw /= 5;
-          if (maw > -5) maw = 0;
-          maw = -90 - maw;
-          rectheta = -90 - maw * intelligence / 400;
+          int maw2 = -90 - maw;
+          rectheta = -90 - maw2 * intelligence / 400;
+          if (maw > -30) rectheta /= 2;
+          if (maw > -5)
+          {
+            rectheta = 0;
+            if (target->id >= FIGHTER1 && target->id <= FIGHTER2 && disttarget < 20)
+              ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
+          }
         }
       }
     }

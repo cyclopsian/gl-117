@@ -48,19 +48,41 @@ void TeamPilot::flyMission (int averagekills)
 
 char *TeamPilot::getRank ()
 {
-  if (ranking == 0) return "2ND AIRMAN";
-  else if (ranking == 1) return "1ST AIRMAN";
-  else if (ranking == 2) return "2ND LIEUTNANT";
-  else if (ranking == 3) return "1ST LIEUTNANT";
-  else if (ranking == 4) return "CAPTAIN";
-  else if (ranking == 5) return "MAJOR";
-  else if (ranking == 6) return "LT COLONEL";
-  else return "COLONEL";
+  if (ranking == 0) return "AIRMAN BASIC";
+  else if (ranking == 1) return "AIRMAN";
+  else if (ranking == 2) return "AIRMAN 1ST CLASS";
+  else if (ranking == 3) return "2ND LIEUTNANT";
+  else if (ranking == 4) return "1ST LIEUTNANT";
+  else if (ranking == 5) return "CAPTAIN";
+  else if (ranking == 6) return "MAJOR";
+  else if (ranking == 7) return "COLONEL";
+  else return "GENERAL";
+}
+
+char *TeamPilot::getShortRank ()
+{
+  if (ranking == 0) return "AB";
+  else if (ranking == 1) return "ARM";
+  else if (ranking == 2) return "A1C";
+  else if (ranking == 3) return "2ND LT";
+  else if (ranking == 4) return "1ST LT";
+  else if (ranking == 5) return "CAPT";
+  else if (ranking == 6) return "MAJ";
+  else if (ranking == 7) return "COL";
+  else return "GEN";
 }
 
 char *TeamPilot::getName ()
 {
   strcpy (fullname, getRank ());
+  strcat (fullname, " ");
+  strcat (fullname, name);
+  return fullname;
+}
+
+char *TeamPilot::getShortName ()
+{
+  strcpy (fullname, getShortRank ());
   strcat (fullname, " ");
   strcat (fullname, name);
   return fullname;
@@ -112,15 +134,15 @@ void Pilot::load ()
   {
     tp = new TeamPilot *[11];
     tp [0] = new TeamPilot (5, "PRIMETIME", 200, 100, 150, 20);
-    tp [1] = new TeamPilot (1, "HEPTARGON", 80, 220, 300, 3);
-    tp [2] = new TeamPilot (2, "LARA", 180, 160, 50, 8);
-    tp [3] = new TeamPilot (7, "SHARK", 70, 90, 120, 25);
+    tp [1] = new TeamPilot (1, "HEPTARGON", 80, 220, 300, 1);
+    tp [2] = new TeamPilot (2, "KARA", 180, 160, 50, 4);
+    tp [3] = new TeamPilot (6, "SHARK", 70, 90, 120, 22);
     tp [4] = new TeamPilot (3, "BOSS", 250, 180, 80, 10);
-    tp [5] = new TeamPilot (1, "DR DOOM", 320, 210, 20, 2);
+    tp [5] = new TeamPilot (2, "DR DOOM", 320, 210, 20, 2);
     tp [6] = new TeamPilot (4, "SHADOW", 130, 200, 320, 15);
-    tp [7] = new TeamPilot (6, "MATRIX", 40, 80, 180, 22);
-    tp [8] = new TeamPilot (3, "FIREBIRD", 250, 140, 100, 8);
-    tp [9] = new TeamPilot (5, "THUNDER", 150, 170, 60, 20);
+    tp [7] = new TeamPilot (7, "MATRIX", 40, 80, 180, 25);
+    tp [8] = new TeamPilot (1, "FIREBIRD", 250, 140, 100, 1);
+    tp [9] = new TeamPilot (4, "THUNDER", 150, 170, 60, 18);
     tp [10] = new TeamPilot (0, "PLAYER", 0, 0, 0, 0);
   }
 
@@ -183,21 +205,65 @@ char *Pilot::getRank ()
       sum += mission_score [i];
   }
   if (sum < 500)
-  { ranking = 0; return "2ND AIRMAN"; }
+  { ranking = 0; return "AIRMAN BASIC"; }
   else if (sum < 1000)
-  { ranking = 1; return "1ST AIRMAN"; }
+  { ranking = 1; return "AIRMAN"; }
   else if (sum < 1500)
-  { ranking = 2; return "2ND LIEUTNANT"; }
+  { ranking = 2; return "AIRMAN 1ST CLASS"; }
   else if (sum < 2500)
-  { ranking = 3; return "1ST LIEUTNANT"; }
+  { ranking = 3; return "2ND LIEUTNANT"; }
   else if (sum < 3500)
-  { ranking = 4; return "CAPTAIN"; }
-  else if (sum < 4500)
-  { ranking = 5; return "MAJOR"; }
-  else if (sum < 5500)
-  { ranking = 6; return "LT COLONEL"; }
-  else
+  { ranking = 4; return "1ST LIEUTNANT"; }
+  else if (sum < 5000)
+  { ranking = 5; return "CAPTAIN"; }
+  else if (sum < 7000)
+  { ranking = 6; return "MAJOR"; }
+  else if (sum < 9000)
   { ranking = 7; return "COLONEL"; }
+  else
+  { ranking = 8; return "GENERAL"; }
+}
+
+/*
+US RANKS:
+Second Lieutenant, 2nd Lt
+First Lieutenant, 1st Lt
+Captain, Capt
+Major, Maj
+Lieutenant Colonel, Lt Col
+Colonel, Col
+Brigadier General, Brig Gen
+Major General, Maj Gen
+Lieutenant General, Lt Gen
+General, Gen
+*/
+
+char *Pilot::getShortRank ()
+{
+  int i, sum = 0;
+  for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
+  {
+    if (mission_score [i] > 0 && mission_score [i] < 2000)
+      sum += mission_score [i];
+  }
+  if (sum < 500)
+  { ranking = 0; return "AB"; }
+  else if (sum < 1000)
+  { ranking = 1; return "AMN"; }
+  else if (sum < 1500)
+  { ranking = 2; return "A1C"; }
+  else if (sum < 2500)
+  { ranking = 3; return "2ND LT"; }
+  else if (sum < 3500)
+  { ranking = 4; return "1ST LT"; }
+  else if (sum < 5000)
+  { ranking = 5; return "CAPT"; }
+  else if (sum < 7000)
+  { ranking = 6; return "MAJ"; }
+  else if (sum < 9000)
+  { ranking = 7; return "COL"; }
+  else
+  { ranking = 8; return "GEN"; }
 }
 
 Pilot::Pilot (char *name)

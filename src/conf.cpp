@@ -37,20 +37,27 @@ int fullscreen = 1;
 int controls = CONTROLS_MOUSE;
 int difficulty = 1;
 int physics = 0;
+int antialiasing = 0;
+int specialeffects = 0;
+int dynamiclighting = 0;
 
-unsigned char key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
-unsigned char key_selectmissile = 'M', key_thrustup = 'I', key_thrustdown = 'D';
-unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P', key_targetlocking = 'L';
+// use 0...255 for one byte keys, 256... for special (two byte) beys
+unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
+unsigned int key_selectmissile = 'M', key_thrustup = 'S', key_thrustdown = 'X';
+unsigned int key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P', key_targetlocking = 'L';
 
-unsigned int joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
-unsigned int joystick_selectmissile = 1, joystick_thrustup = 4, joystick_thrustdown = 5;
-unsigned int joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102, joystick_targetlocking = 103;
-unsigned int joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
-unsigned int joystick_view_x = 4, joystick_view_y = 5;
+int joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
+int joystick_selectmissile = 1, joystick_thrustup = 4, joystick_thrustdown = 5;
+int joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102, joystick_targetlocking = 103;
+int joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
+int joystick_view_x = 4, joystick_view_y = 5;
 
 unsigned char mouse_firecannon = MOUSE_BUTTON_LEFT, mouse_firemissile = MOUSE_BUTTON_RIGHT;
 unsigned char mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
 unsigned int mouse_sensitivity = 100;
+bool mouse_reverse = false;
+bool mouse_relative = false;
+int mouse_autorudder = 30;
 
 ConfigFile::ConfigFile () {}
 
@@ -211,15 +218,21 @@ void save_config ()
   cf->write (" quality", quality);
   cf->writeText ("# Far clipping plane: 20..100 (default=50)");
   cf->write (" view", (int) view);
-  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
+  cf->writeText ("# Dithering: 0=off, 1=on (default=1)");
   cf->write (" dithering", dithering);
+  cf->writeText ("# Antialiasing: 0=off, 1=on (default=1)");
+  cf->write (" antialiasing", antialiasing);
+  cf->writeText ("# Special effects: 0=off, 1=on (default=1)");
+  cf->write (" specialeffects", specialeffects);
+  cf->writeText ("# Dynamic lighting: 0=off, 1=on (default=1)");
+  cf->write (" dynamiclighting", dynamiclighting);
 #ifdef HAVE_SDL_MIXER
   cf->writeText ("# Sound volume: 0..100 (default=100) per cent");
   cf->write (" sound", (int) volumesound);
   cf->writeText ("# Music volume: 0..100 (default=100) per cent");
   cf->write (" music", (int) volumemusic);
 #endif
-  cf->writeText ("# Piloting controls: 0=keyboard, 1=mouse easy, 2=joystick, 3=mouse reverse");
+  cf->writeText ("# Piloting controls: 0=keyboard, 1=mouse easy, 2=joystick");
   cf->write (" controls", controls);
   cf->writeText ("# Difficulty level: 0=easy, 1=medium, 2=hard");
   cf->write (" difficulty", difficulty);
@@ -288,18 +301,30 @@ int load_config ()
   { view = 50; }
   else
   { view = atoi (str); }
-  if (view < 30)
+  if (view < VIEW_MIN)
   {
-    view = 30;
+    view = VIEW_MIN;
   }
-  else if (view > 100)
+  else if (view > VIEW_MAX)
   {
-    view = 100;
+    view = VIEW_MAX;
   }
 
   str = cf->getString (ret, "dithering");
   dithering = (str == NULL) ? 1 : atoi (str);
   if (dithering) dithering = 1;
+
+  str = cf->getString (ret, "antialiasing");
+  antialiasing = (str == NULL) ? 1 : atoi (str);
+  if (antialiasing) antialiasing = 1;
+
+  str = cf->getString (ret, "specialeffects");
+  specialeffects = (str == NULL) ? 1 : atoi (str);
+  if (specialeffects) specialeffects = 1;
+
+  str = cf->getString (ret, "dynamiclighting");
+  dynamiclighting = (str == NULL) ? 1 : atoi (str);
+  if (dynamiclighting) dynamiclighting = 1;
 
 #ifdef HAVE_SDL_MIXER
   str = cf->getString (ret, "sound");
@@ -325,7 +350,7 @@ int load_config ()
   else
   { controls = atoi (str); }
   if (controls < 0) controls = 0;
-  else if (controls > 4) controls = 0;
+  else if (controls > 2) controls = 0;
 
   str = cf->getString (ret, "difficulty");
   if (str == NULL)
@@ -387,25 +412,31 @@ void save_configInterface ()
   cf->writeText ("# ---------------------------------------------------------------------\n");
   cf->writeText ("# Use ASCII-Code values or letters to remap");
   cf->writeText ("#  8=BACKSPACE, 13=ENTER, 32=SPACE, 65=A...90=Z (NOT case sensitive)");
-  cf->write (" key_firecannon", (char) key_firecannon);
-  cf->write (" key_firemissile", (char) key_firemissile);
-  cf->write (" key_dropflare", (char) key_dropflare);
-  cf->write (" key_dropchaff", (char) key_dropchaff);
-  cf->write (" key_selectmissile", (char) key_selectmissile);
+  cf->write (" key_firecannon", (int) key_firecannon);
+  cf->write (" key_firemissile", (int) key_firemissile);
+  cf->write (" key_dropflare", (int) key_dropflare);
+  cf->write (" key_dropchaff", (int) key_dropchaff);
+  cf->write (" key_selectmissile", (int) key_selectmissile);
   cf->writeText ("#  Target nearest enemy with priority for enemies in front of you");
-  cf->write (" key_targetnearest", (char) key_targetnearest);
+  cf->write (" key_targetnearest", (int) key_targetnearest);
   cf->writeText ("#  Target next enemy who has locked you");
-  cf->write (" key_targetlocking", (char) key_targetlocking);
-  cf->write (" key_targetnext", (char) key_targetnext);
-  cf->write (" key_targetprevious", (char) key_targetprevious);
-  cf->write (" key_incthrust", (char) key_thrustup);
-  cf->write (" key_decthrust", (char) key_thrustdown);
+  cf->write (" key_targetlocking", (int) key_targetlocking);
+  cf->write (" key_targetnext", (int) key_targetnext);
+  cf->write (" key_targetprevious", (int) key_targetprevious);
+  cf->write (" key_incthrust", (int) key_thrustup);
+  cf->write (" key_decthrust", (int) key_thrustdown);
   cf->writeText ("# All other piloting keys (CURSORS, PGUP/DN) are fixed.");
   cf->writeText ("\n# ---------------------------------------------------------------------");
   cf->writeText ("# Mouse section");
   cf->writeText ("# ---------------------------------------------------------------------\n");
   cf->writeText ("# Sensitivity: 70...200%, 70%=full screen area, 200%=max sensitivity");
   cf->write (" mouse_sensitivity", (int) mouse_sensitivity);
+  cf->writeText ("# Reverse y-axis: 0 (no) or 1 (yes)");
+  cf->write (" mouse_reverse", (int) mouse_reverse);
+  cf->writeText ("# Relative coordinates: 0 (no) or 1 (yes)");
+  cf->write (" mouse_relative", (int) mouse_relative);
+  cf->writeText ("# Auto rudder on x-axis, dead area for rolls: 0...100");
+  cf->write (" mouse_autorudder", (int) mouse_autorudder);
   cf->writeText ("\n# Buttons: 1=Left, 2=Middle, 3=Right");
   int mousebutton = 1;
   if (mouse_firecannon == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
@@ -473,7 +504,7 @@ int getJoystick (char *str, int n)
   int tmp, jn = 0;
   if (str == NULL) return n;
   int str0 = toupper (str [0]) - (int) 'A';
-  if (str0 >= 0 && str0 < 10)
+  if (str0 >= -1 && str0 < 10)
     jn = str0;
   else
     return n;
@@ -519,10 +550,10 @@ int load_configInterface ()
   key_targetprevious = getKey (str, 'P');
 
   str = cf->getString (ret, "key_incthrust");
-  key_thrustup = getKey (str, 'I');
+  key_thrustup = getKey (str, 'S');
 
   str = cf->getString (ret, "key_decthrust");
-  key_thrustdown = getKey (str, 'D');
+  key_thrustdown = getKey (str, 'X');
 
   str = cf->getString (ret, "mouse_sensitivity");
   if (str == NULL)
@@ -531,6 +562,26 @@ int load_configInterface ()
   { mouse_sensitivity = atoi (str); }
   if (mouse_sensitivity < 70) mouse_sensitivity = 70;
   else if (mouse_sensitivity > 200) mouse_sensitivity = 200;
+
+  str = cf->getString (ret, "mouse_reverse");
+  if (str == NULL)
+  { mouse_reverse = false; }
+  else
+  { mouse_reverse = (bool) atoi (str); }
+
+  str = cf->getString (ret, "mouse_relative");
+  if (str == NULL)
+  { mouse_relative = false; }
+  else
+  { mouse_relative = (bool) atoi (str); }
+
+  str = cf->getString (ret, "mouse_autorudder");
+  if (str == NULL)
+  { mouse_autorudder = 30; }
+  else
+  { mouse_autorudder = atoi (str); }
+  if (mouse_autorudder < 0) mouse_autorudder = 0;
+  else if (mouse_autorudder > 100) mouse_autorudder = 100;
 
   int mousebutton = 1;
   str = cf->getString (ret, "mouse_firecannon");

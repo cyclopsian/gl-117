@@ -146,7 +146,7 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
   }
   tex [texnum]->alpha = alpha;
   tex [texnum]->textureID = texnum;
-  if (quality == 0) disableLinearTexture (texnum);
+  if (!antialiasing) disableLinearTexture (texnum);
   else enableLinearTexture (texnum);
   if (!mipmap2)
     glTexImage2D (GL_TEXTURE_2D, 0, 4, tex [texnum]->width, tex [texnum]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex [texnum]->data);

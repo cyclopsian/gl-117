@@ -30,8 +30,8 @@ const float hh = (float) 1 / (float) MAXX;
 const float zoomz2 = 32768.0 * zoomz;
 const float hh2 = 2.0*hh;
 CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
-CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *texcactusu1;
-CTexture *textree4, *texearth, *texsand, *texredsand, *texgravel1;
+CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
+CTexture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
 CTexture *texglitter1;
 
 void GLLandscape::norm (float *c)
@@ -694,6 +694,294 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
     glVertex3f (hh2*(ex4+x), ht, hh2*((ey4+y+zy)));
     glEnd ();
   }
+}
+
+float xtree [256];
+float ytree [256];
+
+// Draw tree using two static quads (high quality, slow)
+void GLLandscape::drawTreeQuad (int x, int y, int phi, bool hq)
+{
+  int i;
+/*  float xtree [5] [5] = { {0, 0, 0, 0, 0},
+                          {0.3, -0.21, 0, 0, 0},
+                          {0.32, -0.31, -0.11, 0, 0},
+                          {0.22, -0.28, 0.31, -0.21, 0},
+                          {0, 0, 0, 0, 0} };
+  float ytree [5] [5] = { {0, 0, 0, 0, 0},
+                          {-0.32, 0.22, 0, 0, 0},
+                          {0.08, -0.33, 0.28, 0, 0},
+                          {-0.3, -0.18, 0.17, 0.32, 0},
+                          {0, 0, 0, 0, 0} };*/
+  int rotval = (x + 2 * y) & 127;
+  int xs = getCoord (x);
+  int ys = getCoord (y);
+  if (f [xs] [ys] >= CONIFEROUSWOODS0 && f [xs] [ys] <= CONIFEROUSWOODS3)
+  {
+    texturetree1 = textree2->textureID;
+    if (hq) texturetree2 = textreeu2->textureID;
+    else texturetree2 = -1;
+    int trees = CONIFEROUSWOODS3 - f [xs] [ys] + 1;
+    if (hq && quality >= 2) trees += (trees - 1);
+    for (i = 0; i < trees; i ++)
+    {
+      float htree = 0.0035 + 0.0002 * ((3 * y + 2 * x) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 70, phi);
+    }
+  }
+  else if (f [xs] [ys] >= DECIDUOUSWOODS0 && f [xs] [ys] <= DECIDUOUSWOODS3)
+  {
+    texturetree1 = textree->textureID;
+    if (hq) texturetree2 = textreeu->textureID;
+    else texturetree2 = -1;
+    int trees = DECIDUOUSWOODS3 - f [xs] [ys] + 1;
+    if (hq && quality >= 2) trees += (trees - 1);
+    for (i = 0; i < trees; i ++)
+    {
+      float htree = 0.0035 + 0.0003 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 60, phi);
+    }
+  }
+  else if (f [xs] [ys] >= MIXEDWOODS0 && f [xs] [ys] <= MIXEDWOODS3)
+  {
+    texturetree1 = textree2->textureID;
+    if (hq) texturetree2 = textreeu2->textureID;
+    else texturetree2 = -1;
+    int trees = MIXEDWOODS3 - f [xs] [ys] + 1;
+    if (hq && quality >= 2) trees += (trees - 1);
+    for (i = 0; i < 2; i ++)
+    {
+      float htree = 0.0035 + 0.0002 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 70, phi);
+    }
+    texturetree1 = textree5->textureID;
+    if (hq) texturetree2 = textreeu5->textureID;
+    else texturetree2 = -1;
+    for (i = 2; i < 3; i ++)
+    {
+      float htree = 0.0025 + 0.00015 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 60, phi);
+    }
+    texturetree1 = textree->textureID;
+    if (hq) texturetree2 = textreeu->textureID;
+    else texturetree2 = -1;
+    for (i = 3; i < trees; i ++)
+    {
+      float htree = 0.0035 + 0.0003 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 60, phi);
+    }
+  }
+  else if (f [xs] [ys] >= DWARFPINES0 && f [xs] [ys] <= DWARFPINES3)
+  {
+    texturetree1 = textree3->textureID;
+    if (hq) texturetree2 = textreeu3->textureID;
+    else texturetree2 = -1;
+    int trees = DWARFPINES3 - f [xs] [ys] + 1;
+    if (hq && quality >= 2) trees += (trees - 1);
+    for (i = 0; i < trees; i ++)
+    {
+      float htree = 0.0015 + 0.00015 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 150, phi);
+    }
+  }
+  else if (f [xs] [ys] >= BUSHES0 && f [xs] [ys] <= BUSHES3)
+  {
+    texturetree1 = textree5->textureID;
+    if (hq) texturetree2 = textreeu5->textureID;
+    else texturetree2 = -1;
+    int trees = BUSHES3 - f [xs] [ys] + 1;
+    if (hq && quality >= 2) trees += (trees - 1);
+    for (i = 0; i < trees; i ++)
+    {
+      float htree = 0.0025 + 0.00015 * ((3 * y + 2 * x + 4 * i) & 7);
+      drawTree (xtree [i + rotval] + x, ytree [i + rotval] + y, htree, htree * 80, phi);
+    }
+  }
+  else if (f [xs] [ys] == REDTREE0)
+  {
+    texturetree1 = textree4->textureID;
+    if (hq) texturetree2 = textreeu4->textureID;
+    else texturetree2 = -1;
+    drawTree (x, y, 0.004, 0.35, phi);
+  }
+  else if (f [xs] [ys] == CACTUS0)
+  {
+    texturetree1 = texcactus1->textureID;
+    if (hq) texturetree2 = texcactusu1->textureID;
+    else texturetree2 = -1;
+    drawTree (x, y, 0.004, 0.3, phi);
+  }
+
+/*  float x21 = 0.3, y21 = -0.32;
+  float x22 = -0.21, y22 = 0.22;
+  float x31 = 0.32, y31 = -0.08;
+  float x32 = -0.31, y32 = -0.33;
+  float x33 = -0.11, y33 = 0.28;
+  float x41 = 0.22, y41 = -0.3;
+  float x42 = -0.28, y42 = -0.18;
+  float x43 = 0.31, y43 = 0.17;
+  float x44 = -0.21, y44 = 0.32;
+  int xs = x, ys = y;
+                  if (f [x] [y] == CONIFEROUSWOODS0 || f [x] [y] == BUSHES0)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x41, ys + y41, 0.0036, 0.23, phi);
+                    drawTree (xs + x42, ys + y42, 0.0040, 0.25, phi);
+                    drawTree (xs + x43, ys + y43, 0.0041, 0.26, phi);
+                    drawTree (xs + x44, ys + y44, 0.0034, 0.22, phi);
+                  }
+                  else if (f [x] [y] == CONIFEROUSWOODS1 || f [x] [y] == BUSHES1)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x31, ys + y31, 0.0036, 0.23, phi);
+                    drawTree (xs + x32, ys + y32, 0.0041, 0.25, phi);
+                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
+                  }
+                  else if (f [x] [y] == CONIFEROUSWOODS2 || f [x] [y] == BUSHES2)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x21, ys + y21, 0.0032, 0.22, phi);
+                    drawTree (xs + x22, ys + y22, 0.0045, 0.27, phi);
+                  }
+                  else if (f [x] [y] == CONIFEROUSWOODS3 || f [x] [y] == BUSHES3)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.0047, 0.3, phi);
+                  }
+                  else if (f [x] [y] == DECIDUOUSWOODS0)
+                  {
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x41, ys + y41, 0.004, 0.23, phi);
+                    drawTree (xs + x42, ys + y42, 0.0044, 0.27, phi);
+                    drawTree (xs + x43, ys + y43, 0.0045, 0.25, phi);
+                    drawTree (xs + x44, ys + y44, 0.0038, 0.22, phi);
+                  }
+                  else if (f [x] [y] == DECIDUOUSWOODS1)
+                  {
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x31, ys + y31, 0.004, 0.23, phi);
+                    drawTree (xs + x32, ys + y32, 0.0045, 0.25, phi);
+                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
+                  }
+                  else if (f [x] [y] == DECIDUOUSWOODS2)
+                  {
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x21, ys + y21, 0.0035, 0.22, phi);
+                    drawTree (xs + x22, ys + y22, 0.0048, 0.27, phi);
+                  }
+                  else if (f [x] [y] == DECIDUOUSWOODS3)
+                  {
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.005, 0.3, phi);
+                  }
+                  else if (f [x] [y] == DWARFPINES0)
+                  {
+                    texturetree1 = textree3->textureID;
+                    texturetree2 = textreeu3->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x41, ys + y41, 0.002, 0.28, phi);
+
+                    drawTree (xs + x42, ys + y42, 0.0023, 0.34, phi);
+                    drawTree (xs + x43, ys + y43, 0.0025, 0.37, phi);
+                    drawTree (xs + x44, ys + y44, 0.0018, 0.26, phi);
+                  }
+                  else if (f [x] [y] == DWARFPINES1)
+                  {
+                    texturetree1 = textree3->textureID;
+                    texturetree2 = textreeu3->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x31, ys + y31, 0.002, 0.28, phi);
+                    drawTree (xs + x32, ys + y32, 0.0025, 0.35, phi);
+                    drawTree (xs + x33, ys + y33, 0.0015, 0.2, phi);
+                  }
+                  else if (f [x] [y] == DWARFPINES2)
+                  {
+                    texturetree1 = textree3->textureID;
+                    texturetree2 = textreeu3->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x21, ys + y21, 0.0018, 0.26, phi);
+                    drawTree (xs + x22, ys + y22, 0.0024, 0.37, phi);
+                  }
+                  else if (f [x] [y] == DWARFPINES3)
+                  {
+                    texturetree1 = textree3->textureID;
+                    texturetree2 = textreeu3->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.0027, 0.38, phi);
+                  }
+                  else if (f [x] [y] == MIXEDWOODS0)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x41, ys + y41, 0.004, 0.26, phi);
+                    drawTree (xs + x42, ys + y42, 0.0041, 0.29, phi);
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x43, ys + y43, 0.0045, 0.26, phi);
+                    drawTree (xs + x44, ys + y44, 0.0038, 0.24, phi);
+                  }
+                  else if (f [x] [y] == MIXEDWOODS1)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x31, ys + y31, 0.004, 0.27, phi);
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x32, ys + y32, 0.0045, 0.25, phi);
+                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
+                  }
+                  else if (f [x] [y] == MIXEDWOODS2)
+                  {
+                    texturetree1 = textree2->textureID;
+                    texturetree2 = textreeu2->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x21, ys + y21, 0.0035, 0.25, phi);
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs + x22, ys + y22, 0.0048, 0.27, phi);
+                  }
+                  else if (f [x] [y] == MIXEDWOODS3)
+                  {
+                    texturetree1 = textree->textureID;
+                    texturetree2 = textreeu->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.005, 0.3, phi);
+                  }
+                  else if (f [x] [y] == REDTREE0)
+                  {
+                    texturetree1 = textree4->textureID;
+                    texturetree2 = textreeu4->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.004, 0.35, phi);
+                  }
+                  else if (f [x] [y] == CACTUS0)
+                  {
+                    texturetree1 = texcactus1->textureID;
+                    texturetree2 = texcactusu1->textureID;
+                    if (hq) texturetree2 = -1;
+                    drawTree (xs, ys, 0.004, 0.3, phi);
+                  }*/
 }
 
 int visibility = 0;
@@ -1375,7 +1663,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   // glittering is obsolete, does not achieve the desired effect
   float quadglittering = 0;
   float glitter [4] = { 1, 1, 1, 1 };
-  if (quality >= 2)
+  if (specialeffects)
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
     float dz1 = fabs ((float) camx - xs);
@@ -1498,7 +1786,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   }
   glEnd();
 
-  if (quality >= 2 && quadglittering > 1.2)
+  if (specialeffects && quadglittering > 1.2)
   {
     glEnable (GL_BLEND);
     glDepthFunc (GL_LEQUAL);
@@ -1529,7 +1817,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glDisable (GL_BLEND);
   }
 
-  if (quality >= 2 && quadglittering > 1.02)
+  if (specialeffects && quadglittering > 1.02)
   {
     glEnable (GL_BLEND);
     glDepthFunc (GL_LEQUAL);
@@ -2398,6 +2686,8 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (textree4->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    gl->enableTextures (textree5->textureID);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -2407,20 +2697,11 @@ void GLLandscape::draw (int phi, int gamma)
     else if (quality == 4) mydep = 3200;
     else if (quality == 5) mydep = 3800;
     if (mydep > view * view) mydep = view * view;
-    int cutdep = 1000;
+    int cutdep = 800;
 
     int lineartree = -1;
-    if (quality >= 3) lineartree = 0;
+    if (antialiasing) lineartree = 0;
 
-    float x21 = 0.3, y21 = -0.32;
-    float x22 = -0.21, y22 = 0.22;
-    float x31 = 0.32, y31 = -0.08;
-    float x32 = -0.31, y32 = -0.33;
-    float x33 = -0.11, y33 = 0.28;
-    float x41 = 0.22, y41 = -0.3;
-    float x42 = -0.28, y42 = -0.18;
-    float x43 = 0.31, y43 = 0.17;
-    float x44 = -0.21, y44 = 0.32;
     for (i = 0; i < parts; i ++)
       for (i2 = 0; i2 < parts; i2 ++)
       {
@@ -2434,11 +2715,13 @@ void GLLandscape::draw (int phi, int gamma)
           gl->enableLinearTexture (textree2->textureID);
           gl->enableLinearTexture (textree3->textureID);
           gl->enableLinearTexture (textree4->textureID);
+          gl->enableLinearTexture (textree5->textureID);
           gl->enableLinearTexture (texcactus1->textureID);
           gl->enableLinearTexture (textreeu->textureID);
           gl->enableLinearTexture (textreeu2->textureID);
           gl->enableLinearTexture (textreeu3->textureID);
           gl->enableLinearTexture (textreeu4->textureID);
+          gl->enableLinearTexture (textreeu5->textureID);
           gl->enableLinearTexture (texcactusu1->textureID);
         }
         else
@@ -2447,11 +2730,13 @@ void GLLandscape::draw (int phi, int gamma)
           gl->disableLinearTexture (textree2->textureID);
           gl->disableLinearTexture (textree3->textureID);
           gl->disableLinearTexture (textree4->textureID);
+          gl->disableLinearTexture (textree5->textureID);
           gl->disableLinearTexture (texcactus1->textureID);
           gl->disableLinearTexture (textreeu->textureID);
           gl->disableLinearTexture (textreeu2->textureID);
           gl->disableLinearTexture (textreeu3->textureID);
           gl->disableLinearTexture (textreeu4->textureID);
+          gl->disableLinearTexture (textreeu5->textureID);
           gl->disableLinearTexture (texcactusu1->textureID);
         }
         int ax = minx + (int) (dx * (float) i2);
@@ -2478,170 +2763,11 @@ void GLLandscape::draw (int phi, int gamma)
                 if (gl->isSphereInFrustum (hh2*(xs), (float)h[x][y]*zoomz - zoomz2, hh2*((ys)), hh2*2))
                 {
                   float cg = g [x] [y];
-                  fac = 0.0007 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;
+                  fac = 0.0008 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;
                   cg = (float) cg * fac;
                   if (cg >= 256.0) cg = 255.0;
                   treecolor.c [0] = treecolor.c [1] = treecolor.c [2] = (int) cg;
-                  if (f [x] [y] == CONIFEROUSWOODS0 || f [x] [y] == BUSHES0)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x41, ys + y41, 0.0036, 0.23, phi);
-                    drawTree (xs + x42, ys + y42, 0.0040, 0.25, phi);
-                    drawTree (xs + x43, ys + y43, 0.0041, 0.26, phi);
-                    drawTree (xs + x44, ys + y44, 0.0034, 0.22, phi);
-                  }
-                  else if (f [x] [y] == CONIFEROUSWOODS1 || f [x] [y] == BUSHES1)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x31, ys + y31, 0.0036, 0.23, phi);
-                    drawTree (xs + x32, ys + y32, 0.0041, 0.25, phi);
-                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
-                  }
-                  else if (f [x] [y] == CONIFEROUSWOODS2 || f [x] [y] == BUSHES2)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x21, ys + y21, 0.0032, 0.22, phi);
-                    drawTree (xs + x22, ys + y22, 0.0045, 0.27, phi);
-                  }
-                  else if (f [x] [y] == CONIFEROUSWOODS3 || f [x] [y] == BUSHES3)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.0047, 0.3, phi);
-                  }
-                  else if (f [x] [y] == DECIDUOUSWOODS0)
-                  {
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x41, ys + y41, 0.004, 0.23, phi);
-                    drawTree (xs + x42, ys + y42, 0.0044, 0.27, phi);
-                    drawTree (xs + x43, ys + y43, 0.0045, 0.25, phi);
-                    drawTree (xs + x44, ys + y44, 0.0038, 0.22, phi);
-                  }
-                  else if (f [x] [y] == DECIDUOUSWOODS1)
-                  {
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x31, ys + y31, 0.004, 0.23, phi);
-                    drawTree (xs + x32, ys + y32, 0.0045, 0.25, phi);
-                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
-                  }
-                  else if (f [x] [y] == DECIDUOUSWOODS2)
-                  {
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x21, ys + y21, 0.0035, 0.22, phi);
-                    drawTree (xs + x22, ys + y22, 0.0048, 0.27, phi);
-                  }
-                  else if (f [x] [y] == DECIDUOUSWOODS3)
-                  {
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.005, 0.3, phi);
-                  }
-                  else if (f [x] [y] == DWARFPINES0)
-                  {
-                    texturetree1 = textree3->textureID;
-                    texturetree2 = textreeu3->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x41, ys + y41, 0.002, 0.28, phi);
-
-                    drawTree (xs + x42, ys + y42, 0.0023, 0.34, phi);
-                    drawTree (xs + x43, ys + y43, 0.0025, 0.37, phi);
-                    drawTree (xs + x44, ys + y44, 0.0018, 0.26, phi);
-                  }
-                  else if (f [x] [y] == DWARFPINES1)
-                  {
-                    texturetree1 = textree3->textureID;
-                    texturetree2 = textreeu3->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x31, ys + y31, 0.002, 0.28, phi);
-                    drawTree (xs + x32, ys + y32, 0.0025, 0.35, phi);
-                    drawTree (xs + x33, ys + y33, 0.0015, 0.2, phi);
-                  }
-                  else if (f [x] [y] == DWARFPINES2)
-                  {
-                    texturetree1 = textree3->textureID;
-                    texturetree2 = textreeu3->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x21, ys + y21, 0.0018, 0.26, phi);
-                    drawTree (xs + x22, ys + y22, 0.0024, 0.37, phi);
-                  }
-                  else if (f [x] [y] == DWARFPINES3)
-                  {
-                    texturetree1 = textree3->textureID;
-                    texturetree2 = textreeu3->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.0027, 0.38, phi);
-                  }
-                  else if (f [x] [y] == MIXEDWOODS0)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x41, ys + y41, 0.004, 0.26, phi);
-                    drawTree (xs + x42, ys + y42, 0.0041, 0.29, phi);
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x43, ys + y43, 0.0045, 0.26, phi);
-                    drawTree (xs + x44, ys + y44, 0.0038, 0.24, phi);
-                  }
-                  else if (f [x] [y] == MIXEDWOODS1)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x31, ys + y31, 0.004, 0.27, phi);
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x32, ys + y32, 0.0045, 0.25, phi);
-                    drawTree (xs + x33, ys + y33, 0.003, 0.18, phi);
-                  }
-                  else if (f [x] [y] == MIXEDWOODS2)
-                  {
-                    texturetree1 = textree2->textureID;
-                    texturetree2 = textreeu2->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x21, ys + y21, 0.0035, 0.25, phi);
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs + x22, ys + y22, 0.0048, 0.27, phi);
-                  }
-                  else if (f [x] [y] == MIXEDWOODS3)
-                  {
-                    texturetree1 = textree->textureID;
-                    texturetree2 = textreeu->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.005, 0.3, phi);
-                  }
-                  else if (f [x] [y] == REDTREE0)
-                  {
-                    texturetree1 = textree4->textureID;
-                    texturetree2 = textreeu4->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.004, 0.35, phi);
-                  }
-                  else if (f [x] [y] == CACTUS0)
-                  {
-                    texturetree1 = texcactus1->textureID;
-                    texturetree2 = texcactusu1->textureID;
-                    if (dep > cutdep) texturetree2 = -1;
-                    drawTree (xs, ys, 0.004, 0.3, phi);
-                  }
+                  drawTreeQuad (xs, ys, phi, dep < cutdep);
                 }
             ys += treestep;
           } // ys for
@@ -2666,6 +2792,7 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
 {
   int i, x, y;
   memset (dl, 0, (MAXX + 1) * (MAXX + 1));
+  if (!dynamiclighting) return;
   for (i = 0; i < maxexplosion; i ++)
   {
     if (explo [i]->ttl > 0)
@@ -2952,6 +3079,23 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
       {
         hw [i] [i2] = h [i] [i2];
       }
+
+  i = 0;
+  while (i < 256)
+  {
+    bool again = false;
+    xtree [i] = -0.47 + 0.001 * myrandom (940);
+    ytree [i] = -0.47 + 0.001 * myrandom (940);
+    for (i2 = i - 1; i2 >= 0 && i2 >= i - 6; i2 --)
+    {
+      if (fabs (xtree [i] - xtree [i2]) + fabs (ytree [i] - ytree [i2]) < 0.08)
+      {
+        again = true;
+        break;
+      }
+    }
+    if (!again) i ++;
+  }
 
   precalculate ();
 }

@@ -720,7 +720,7 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     cm = object [i];
     if (cm->hasTexture)
     {
-      if (quality >= 2)
+      if (antialiasing)
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);
@@ -731,10 +731,49 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
+
+  if (showcollision)
+  {
+    glPushMatrix ();
+    glScalef (cubex, cubey, cubez);
+    glColor3ub (255, 0, 0);
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (1, 1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (-1, 1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (-1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINES);
+    glVertex3f (1, 1, 1);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (-1, 1, -1);
+    glEnd ();
+    glPopMatrix ();
+  }
+
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
+
+/*  if (cube >= 0.5)
+  {
+    GLUquadricObj* cube1 = gluNewQuadric ();
+    gluSphere (cube1, cube / zoom, 8, 5);
+  }*/
 
   bool listgen = false;
 /*  if (list1 == -1 && explode <= 0 && displaylist)
@@ -946,7 +985,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     cm = object [i];
     if (cm->hasTexture)
     {
-      if (quality >= 2)
+      if (antialiasing)
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);
@@ -961,6 +1000,39 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
+
+  if (showcollision)
+  {
+    glPushMatrix ();
+    glScalef (cubex, cubey, cubez);
+    glColor3ub (255, 0, 0);
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (1, 1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (-1, 1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (-1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINES);
+    glVertex3f (1, 1, 1);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (-1, 1, -1);
+    glEnd ();
+    glPopMatrix ();
+  }
+
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
@@ -1098,6 +1170,39 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
+
+  if (showcollision)
+  {
+    glPushMatrix ();
+    glScalef (cubex, cubey, cubez);
+    glColor3ub (255, 0, 0);
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (1, 1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (-1, 1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (-1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINES);
+    glVertex3f (1, 1, 1);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (-1, 1, -1);
+    glEnd ();
+    glPopMatrix ();
+  }
+
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
@@ -1185,6 +1290,39 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
+
+  if (showcollision)
+  {
+    glPushMatrix ();
+    glScalef (cubex, cubey, cubez);
+    glColor3ub (255, 0, 0);
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (1, 1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINE_STRIP);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (-1, 1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (-1, 1, 1);
+    glEnd ();
+    glBegin (GL_LINES);
+    glVertex3f (1, 1, 1);
+    glVertex3f (-1, 1, 1);
+    glVertex3f (1, -1, -1);
+    glVertex3f (-1, -1, -1);
+    glVertex3f (1, -1, 1);
+    glVertex3f (-1, -1, 1);
+    glVertex3f (1, 1, -1);
+    glVertex3f (-1, 1, -1);
+    glEnd ();
+    glPopMatrix ();
+  }
+
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
