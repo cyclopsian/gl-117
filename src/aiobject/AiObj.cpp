@@ -110,6 +110,7 @@ void AIObj::aiinit ()
   timer = 0;
   ammo = -1;
   manoeverstate = 0;
+  target = 0;
 }
 
 void AIObj::missileCount ()

@@ -53,7 +53,7 @@ void HighClouds::init (int theta)
     co->vertex [i2].tex.y = co->vertex [i2].vector.y * 5;
   }
   co->hasTexture = true;
-  sphere->displaylist = false;
+//  sphere->displaylist = false;
   o = sphere;
   trafo.rotation.theta = 90;
   draw = 2;

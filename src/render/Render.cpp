@@ -98,6 +98,8 @@ Renderer::get(void)
 
 Renderer::Renderer(void)
 {
+  if(g_render_register == 0)
+    g_render_register = new std::vector<Renderer*>;
   g_render_register->push_back(this);
 }
 

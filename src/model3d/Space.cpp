@@ -85,7 +85,7 @@ void Space::translate (Vector3 &v)
   tl.set (v);
 }
 
-void Space::drawGL ()
+/*void Space::drawGL ()
 {
   int i;
   frustum.extractFrustum ();
@@ -97,48 +97,40 @@ void Space::drawGL ()
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && !o [i]->o->alpha)
-            o [i]->drawGL (tl, 1.0/*dummy*/, lum, true, true);
+            o [i]->drawGL (tl, 1.0, lum, true, true);
     }
     for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && o [i]->o->alpha)
-            o [i]->drawGL (tl, 1.0/*dummy*/, lum, true, true);
+            o [i]->drawGL (tl, 1.0, lum, true, true);
     }
-    // TODO: why the following code block???
-/*    for (i = 0; i < no; i ++)
-    {
-      if (o [i] != NULL)
-        if (o [i]->o == NULL)
-          if (o [i]->draw)
-            o [i]->drawGL (tl, alpha, lum, true, true);
-    }*/
   }
-  else /* not yet implemented */
+  else
   {
     for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && !o [i]->o->alpha)
-            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
+            o [i]->drawGL (tl, 1.0, lum, false, false);
     }
     for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o != NULL)
           if (o [i]->draw && o [i]->o->alpha)
-            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
+            o [i]->drawGL (tl, 1.0, lum, false, false);
     }
     for (i = 0; i < o.size (); i ++)
     {
       if (o [i] != NULL)
         if (o [i]->o == NULL)
           if (o [i]->draw)
-            o [i]->drawGL (tl, 1.0/*dummy*/, lum, false, false);
+            o [i]->drawGL (tl, 1.0, lum, false, false);
     }
   }
-}
+}*/
 
 #endif

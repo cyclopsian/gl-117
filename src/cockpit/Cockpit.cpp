@@ -31,6 +31,8 @@
 #include "opengl/GlPrimitives.h"
 #include "gllandscape/GlLandscape.h"
 
+#include "render/Render.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -578,7 +580,10 @@ void Cockpit::drawTargetedElement ()
     if (fplayer->target->active)
     {
       glEnable (GL_LIGHTING);
-      fplayer->target->o->draw (n, tl, fplayer->target->trafo.rotation, 0.05, 0.3, 0);
+      Model3dRealizer mr;
+      mr.draw (*fplayer->target->o, Transformation(tl, fplayer->target->trafo.rotation,
+               Vector3(0.05)), 0.3, 0);
+//      fplayer->target->o->draw (n, tl, fplayer->target->trafo.rotation, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
       if (((AIObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
@@ -612,7 +617,9 @@ void Cockpit::drawWeapon ()
   else if (fplayer->missiletype == 6) missile = &model_missile7;
   else if (fplayer->missiletype == 7) missile = &model_missile8;
   glEnable (GL_LIGHTING);
-  missile->draw (n, tl, fplayer->trafo.rotation, 0.05, 1.0, 0);
+  Model3dRealizer mr;
+  mr.draw (*missile, Transformation(tl, fplayer->trafo.rotation, Vector3(0.05)), 1.0, 0);
+//  missile->draw (n, tl, fplayer->trafo.rotation, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   font1->drawText (16.0, -22.0, -4.0, const_cast<char *>(missile->name.c_str ()), color);

@@ -28,6 +28,8 @@
 #include "gllandscape/GlLandscape.h"
 #include "mission/Mission.h"
 
+#include "render/Render.h"
+
 /*#include "menu/Component.h"
 #include "mission/MapLoader.h"
 #include "configuration/Dirs.h"
@@ -830,7 +832,9 @@ void StateMission::display ()
   
   // Draw dummy missile
   glEnable (GL_LIGHTING);
-  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
+  Model3dRealizer mr;
+  mr.draw (model_missile1, Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
+//  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   
   glEnable (GL_LIGHTING);
@@ -846,7 +850,9 @@ void StateMission::display ()
       rot.phi = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.phi = 5;
-    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
+    Model3dRealizer mr;
+    mr.draw (*getModel (missionnew->selfighter [i]), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+//    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
 
   tl.x = 0; tl.y = -0.075; tl.z = -0.5;
@@ -859,7 +865,9 @@ void StateMission::display ()
       rot.phi = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.phi = 5;
-    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
+    Model3dRealizer mr;
+    mr.draw (*getModel (missionnew->selweapon [i]), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+//    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_LIGHTING);
@@ -1071,7 +1079,9 @@ void StateFighter::display ()
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
-  model->draw (vec, tl, rot, 0.11, 0.5, 0);
+  Model3dRealizer mr;
+  mr.draw (*model, Transformation (tl, rot, Vector3(0.11)), 0.5, 0);
+//  model->draw (vec, tl, rot, 0.11, 0.5, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
 
@@ -1652,7 +1662,9 @@ void StatePlay::display ()
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
   gl.setFogLuminance (mylight);
-  sphere->drawGL (tlnull, 1.0/*dummy*/, mylight, true, false);
+  Model3dRealizer mr;
+  mr.drawNoTexture (*sphere->o, sphere->trafo, mylight, 0);
+//  sphere->drawGL (tlnull, 1.0, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
@@ -1847,7 +1859,9 @@ void StatePlay::display ()
       glEnable( GL_LIGHTING);
       glEnable( GL_LIGHT0 );
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      space->drawGL (); // draw all objects
+      OpenGlRenderer renderer;
+      renderer.draw(*space, *l);
+//      space->drawGL (); // draw all objects
       glDisable (GL_LIGHTING);
       glDepthMask (GL_FALSE);
       for (i = 0; i < space->o.size (); i ++)
@@ -1868,7 +1882,7 @@ void StatePlay::display ()
     }
     else
     {
-      space->drawGL ();
+//      space->drawGL ();
     }
   }
   glDisable (GL_TEXTURE_2D);
@@ -2648,7 +2662,9 @@ void StateInit::display ()
   // draw fighter
   glPushMatrix ();
   glTranslatef (0, 0, -5);
-  model_fig.draw (vec, tl, rot, 1.0, 2.0, initexplode1);
+  Model3dRealizer mr;
+  mr.draw (model_fig, Transformation(tl, rot, Vector3(1.0)), 2.0, initexplode1);
+//  model_fig.draw (vec, tl, rot, 1.0, 2.0, initexplode1);
   glPopMatrix ();
 
   glDisable (GL_DEPTH_TEST);

@@ -92,7 +92,7 @@ void SpaceObj::rotateOn (short a, short b, short c)
   trafo.rotation.add (a, b, c);
 }
 
-void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool isTextured2)
+/*void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool isTextured2)
 {
   int i;
   Vector3 tl1;
@@ -137,6 +137,6 @@ void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, b
       }
     }
   }
-}
+}*/
 
 #endif

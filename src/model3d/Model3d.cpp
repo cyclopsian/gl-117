@@ -38,10 +38,10 @@ Model3d::Model3d ()
   numObjects = 0;
   numMaterials = 0;
   shading = 0;
-  displaylist = true;
+/*  displaylist = true;
   list1 = -1;
   list2 = -1;
-  list3 = -1;
+  list3 = -1;*/
   scale = 1.0F;
   name = "";
   nolight = false;
@@ -52,7 +52,7 @@ Model3d::Model3d ()
   light_diffuse2 [0] = 0.1; light_diffuse2 [1] = 0.1; light_diffuse2 [2] = 0.1; light_diffuse [3] = 1;*/
   numRefpoints = 0;
   refpoint = NULL;
-  va = new VertexArray (VERTEXARRAY_V3N3C4T2);
+//  va = new VertexArray (VERTEXARRAY_V3N3C4T2);
 }
 
 void Model3d::setName (const std::string name)
@@ -163,7 +163,7 @@ void Model3d::scaleTexture (float fx, float fy)
   }
 }
 
-void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
+/*void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
                     float zoom, float lum, int explode)
 {
   if (nolight) // if model wants to be rendered without light, call draw2
@@ -314,7 +314,7 @@ void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
         {
           if (numMaterials && cm->material) 
           {
-            unsigned char *color = cm->material->color.c; /*material[cm->material->textureID]->color.c;*/
+            unsigned char *color = cm->material->color.c;
             if (color [0] > 190 && color [1] > 190 && color [2] < 20)
             {
               rotateColor (30);
@@ -665,7 +665,7 @@ void Model3d::drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotati
   { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
   glPopMatrix ();
-}
+}*/
 
 /*void Model3d::draw3 (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 					float zoom, int explode)

@@ -118,6 +118,7 @@ class Vector3
   
     Vector3 ();
     Vector3 (float x, float y, float z);
+    Vector3 (float xyz);
     Vector3 (const Vector3 &v);
   
     void set (const Vector3 &v);
@@ -331,7 +332,7 @@ class Model3d
     int shading;         ///< shading can be set to FLAT (0) or SMOOTH/GOURAUD (1)
     Uint16 numObjects;   ///< number of objects (which have a unique material)
     Uint16 numMaterials; ///< number of materials (should be the same as the number of objects)
-    bool displaylist;    ///< enable using a display list
+//    bool displaylist;    ///< enable using a display list
     std::vector<Material *> material;  ///< pointers to materials
     std::vector<Object3d *> object;    ///< pointers to objects
     bool nolight;        ///< do not use light?
@@ -342,7 +343,7 @@ class Model3d
     Vector3 vscale;      ///< scaling of the original 3DS coords in x,y,z
     // Note: the model is stored to (-1,-1,-1)-(1,1,1) in RAM, the SpaceObj tells about the scaling of a model
     Vector3 cube;        ///< surrounding cube (or radius of sphere) for simplified collision detection
-    int list1, list2, list3;   ///< display lists already generated for each type of draw() method
+//    int list1, list2, list3;   ///< display lists already generated for each type of draw() method
 
     Model3d ();
     ~Model3d ();
@@ -356,20 +357,20 @@ class Model3d
     int rotateColor (int n);
     void scaleTexture (float fx, float fy);
     /// draw everything
-    void draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
+/*    void draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 		       float zoom = 1.0F, float lum = 1.0F, int explode = 0);
     /// draw without GL lighting, no luminance => VERY FAST (uses display list)
     void drawNoLight (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 		              float zoom = 1.0F, int explode = 0);
     /// draw without textures, different luminance
     void drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
-		                float zoom = 1.0F, float lum = 1.0F, int explode = 0);
+		                float zoom = 1.0F, float lum = 1.0F, int explode = 0);*/
 
   private:
 
     // all private members are only used "temporarily" at runtime!
     int rotcol; ///< very special for flickering light sources, e.g. the engine's bright yellow color is rotated
-    VertexArray *va; ///< using a vertex array means more memory, but better performance
+//    VertexArray *va; ///< using a vertex array means more memory, but better performance
 };
 
 /**
@@ -449,7 +450,7 @@ class SpaceObj
     void rotate (short a, short b, short c);
     void rotateOn (short a, short b, short c);
     ///< z1,z2=easy preculling space/cube, tl=translation
-    virtual void drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool isTextured2);
+//    virtual void drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, bool isTextured2);
 };
 
 /**
@@ -474,7 +475,7 @@ class Space
     bool removeObject (SpaceObj *o2);
     void removeAllObjects ();
     void translate (Vector3 &v);
-    virtual void drawGL ();
+//    virtual void drawGL ();
 };
 
 #endif

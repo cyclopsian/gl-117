@@ -895,12 +895,12 @@ int game_levelInit ()
     objsphere->setColor (skycolor);
     gl.setFogColor (20, 20, 20);
   }
-  glDeleteLists (objsphere->list1, 1);
+/*  glDeleteLists (objsphere->list1, 1);
   glDeleteLists (objsphere->list2, 1);
   glDeleteLists (objsphere->list3, 1);
   objsphere->list1 = -1;
   objsphere->list2 = -1;
-  objsphere->list3 = -1;
+  objsphere->list3 = -1; */
 
 //  glLightfv( GL_LIGHT0, GL_AMBIENT, light_ambient );
 /*  float light_specular [3] = {0.5, 0.5, 0.5};
@@ -2047,7 +2047,7 @@ void myFirstInit ()
   model_tent1.setName ("TENT");
   logging.display (" * gl-117.3ds", LOG_ALL);
   load3ds.import3ds (&model_gl117, dirs.getModels ("gl-117.3ds"));
-  model_gl117.displaylist = false;
+//  model_gl117.displaylist = false;
   logging.display (" * tank1.3ds", LOG_ALL);
   load3ds.import3ds (&model_tank1, dirs.getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");

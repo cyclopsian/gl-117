@@ -35,6 +35,11 @@ Vector3::Vector3 ()
   set (0, 0, 0);
 }
 
+Vector3::Vector3 (float xyz)
+{
+  set (xyz, xyz, xyz);
+}
+
 Vector3::Vector3 (float x, float y, float z)
 {
   set (x, y, z);
