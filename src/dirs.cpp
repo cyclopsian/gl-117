@@ -80,6 +80,7 @@ Dirs::Dirs (char *arg)
   }
   else
   {
+//    strcpy (path, "d:\\temp\\gl-117\\gl-117\\");
     fprintf (stderr, "\nError: binary file has no context to the data files.\n");
     fprintf (stderr, "\nDo not execute from console, just doubleclick.\n");
     fflush (stdout);

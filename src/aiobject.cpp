@@ -1199,6 +1199,7 @@ printf ("%d:m=%d\n", party, id); fflush (stdout);
 
 void AIObj::fireFlare2 (DynamicObj *flare)
 {
+printf ("%d:flare\n", party); fflush (stdout);
   flare->dinit ();
   flare->speed = 0;
   flare->realspeed = 0;
@@ -1220,6 +1221,7 @@ void AIObj::fireFlare2 (DynamicObj *flare)
 
 void AIObj::fireChaff2 (DynamicObj *chaff)
 {
+printf ("%d:chaff\n", party); fflush (stdout);
   chaff->dinit ();
   chaff->speed = 0;
   chaff->realspeed = 0;
@@ -1339,7 +1341,7 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
   {
     fireFlare2 (flare [i]);
     flares --;
-    fireflarettl = 15;
+    fireflarettl = 8;
     for (i2 = 0; i2 < maxmissile; i2 ++)
     {
       if (missile [i2]->ttl > 0)
@@ -1357,7 +1359,10 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
               if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
             }
             if (hit)
+            {
+              printf ("\n missile to flare");
               missile [i2]->target = flare [i];
+            }
           }
       }
     }
@@ -1377,7 +1382,7 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
   {
     fireChaff2 (chaff [i]);
     chaffs --;
-    firechaffttl = 15;
+    firechaffttl = 8;
     for (i2 = 0; i2 < maxmissile; i2 ++)
     {
       if (missile [i2]->ttl > 0)
@@ -1395,7 +1400,10 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
               if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
             }
             if (hit)
+            {
+              printf ("\n missile to chaff");
               missile [i2]->target = chaff [i];
+            }
           }
       }
     }
@@ -1716,6 +1724,14 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
   /*    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
     else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;*/
 
+  if (id >= MISSILE1 && id <= MISSILE2)
+  {
+    if (target == NULL)
+      return;
+    else if (target->active == false)
+      return;
+  }
+
   // get a new target if necessary
   if (target == NULL)
     targetNearestEnemy (f);
@@ -1729,14 +1745,26 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
   if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
   {
     if (ai)
+    {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+      {
         if (!selectMissileAirFF (m))
           selectMissileAir (m);
+      }
+      else
+      {
+        selectMissileGround (m);
+      }
+    }
     if (haveMissile ())
     {
       float dgamma = atan ((target->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
       float dphi = getAngle (target);
-      if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
+      if (missiletype == MISSILE_DF1 - MISSILE1)
+      {
+        ttf = 0;
+      }
+      else if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
       {
         if (disttarget < 40)
         {
@@ -1744,28 +1772,36 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
           {
             if (missiletype >= 0 && missiletype <= 2)
             {
-              float dphi = fabs (phi - target->phi);
-              if (dphi > 270) dphi = 360 - dphi;
-              if (dphi < 45)
-                ttf -= 2;
-              else
-                ttf = 50;
+              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+              {
+                float dphi = fabs (phi - target->phi);
+                if (dphi > 270) dphi = 360 - dphi;
+                if (dphi < 45)
+                  ttf -= 2;
+                else
+                  ttf = 50;
+              }
             }
             else if (missiletype == 6 || missiletype == 7)
             {
-              ttf -= 3;
+              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+              {
+                ttf -= 3;
+              }
             }
             else
             {
-              ttf -= 3;
+              if (target->id > FIGHTER2)
+              {
+                ttf -= 3;
+              }
             }
           }
         }
       }
       else
       {
-        if (missiletype == MISSILE_DF1 - MISSILE1) ttf = 0;
-        else ttf = 50;
+        ttf = 50;
       }
     }
   }
@@ -1787,17 +1823,19 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
           {
             if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
             {
-              if (theta >= 15 + myrandom (30))
-                fireFlare (flare, m);
+              if (fabs (theta) >= 35)
+                if (myrandom (intelligence) < 100)
+                  fireFlare (flare, m);
               if (myrandom (intelligence) < 200)
-                manoevertheta = 20;
+                manoevertheta = 35;
             }
             else
             {
-              if (theta >= 15 + myrandom (30))
-                fireChaff (chaff, m);
+              if (fabs (theta) >= 35)
+                if (myrandom (intelligence) < 100)
+                  fireChaff (chaff, m);
               if (myrandom (intelligence) < 200)
-                manoevertheta = 20;
+                manoevertheta = 35;
             }
           }
   }
@@ -2003,13 +2041,13 @@ m [0]->tl->y = target->tl->y;
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
         if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 40/* && target->theta < 20*/)
-          if (myrandom (intelligence) < 5)
+          if (myrandom (intelligence) < difficulty * 10 + 4)
             fireMissile (m, (AIObj *) target);
       }
       else // ground target
       {
         if (fabs (rectheta - theta) < 3 + agr * 2 && fabs (aw) < 25 + agr * 4 && disttarget < 50)
-          if (myrandom (intelligence) < 5)
+          if (myrandom (intelligence) < difficulty * 10 + 4)
             fireMissile (m);
       }
     }
@@ -2068,14 +2106,18 @@ m [0]->tl->y = target->tl->y;
           if (fabs (aw) < 25 && disttarget < 40) // + aggressive
             if (f [i]->tl->y > tl->y + 2)
               if (myrandom (intelligence) < 80)
-                fireMissileAir (m, f [i]);
+              {
+                ttf = 0;
+                fireMissileAirFF (m, f [i]);
+              }
       if (id == SHIP_CRUISER)
       {
         if (!(l->lsticker & 15))
           if (fabs (aw) >= -30 && fabs (aw) < 30 && disttarget < 40) // + aggressive
             if (myrandom (intelligence) < 100)
             {
-              fireMissileAir (m, f [i]);
+              ttf = 0;
+              fireMissileAirFF (m, f [i]);
   //            missiles ++;
             }
 //          if (myrandom (intelligence) < 120)

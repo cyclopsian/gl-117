@@ -2080,7 +2080,7 @@ class MissionTank1 : public Mission
     alliedInit (FIGHTER_HAWK2, alliedpilot [0], fighter [1]);
     fighter [1]->tl->x = 5;
     fighter [1]->tl->z = 105;
-    for (i = 2; i <= 6; i ++)
+    for (i = 2; i <= 7; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [myrandom (2)];
@@ -2091,16 +2091,16 @@ class MissionTank1 : public Mission
       fighter [i]->maxspeed = 0;
       fighter [i]->speed = 0;
     }
-    for (i = 7; i <= 9; i ++)
+    for (i = 8; i <= 10; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [myrandom (2)];
       fighter [i]->o = &model_tank1;
       fighter [i]->tl->x = i * 3;
       fighter [i]->tl->z = i * 3;
-      fighter [i]->newinit (TANK_AIR1, 0, 50);
+      fighter [i]->newinit (TANK_AIR1, 0, 80);
     }
-    for (i = 10; i <= 12; i ++)
+    for (i = 11; i <= 13; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [0];
@@ -3293,7 +3293,7 @@ class Cockpit
       bool full = false;
       if (((AIObj *) fplayer->target)->party != fplayer->party)
       {
-        if (fplayer->ttf <= 0)
+        if (fplayer->ttf <= 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
         {
           glColor4ub (255, 255, 0, 255); full = true;
         }
@@ -3425,7 +3425,7 @@ class Cockpit
       if (p > 180) p -= 360;
       if (p >= -40 && p <= 40)
       {
-        if (i == 0 || i == 90 || i == 180 || i == 270)
+        if ((i - mission->heading) % 90 == 0)
           g = 0.6;
         else if (!(i % 10))
           g = 0.3;
@@ -5203,7 +5203,7 @@ void game_mouse (int button, int state, int x, int y)
     else if (button == MOUSE_BUTTON_RIGHT)
     {
       if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
+      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
       if (fplayer->missiles [fplayer->missiletype] > 0)
       {
         fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
@@ -5229,7 +5229,7 @@ void game_easymouse ()
   int t = (int) fplayer->theta; // roll angle
   if (t < 0) t += 360;
   if (t < 0 || t >= 360)
-  { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
+  { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
   float rx = dx * cosi [t] - dy * sine [t]; // rolled mouse x coordinate
   float ry = -dx * sine [t] + dy * cosi [t]; // rolled mouse y coordinate
 
@@ -5377,7 +5377,7 @@ void game_joystickbutton (int button)
   else if (button == 2)
   {
     if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
+    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
     if (fplayer->missiles [fplayer->missiletype] > 0)
     {
       fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
@@ -7931,7 +7931,7 @@ if (quality > 0)
     drawMouseCursor ();
 
   if (debug)
-    printf ("\nleaving myDisplayFunc()"); fflush (stdout);
+  { printf ("\nleaving myDisplayFunc()"); fflush (stdout); }
 }
 
 float lastspeed;
@@ -7953,13 +7953,14 @@ void game_timer ()
 
   if (lastshield > fplayer->shield && !fplayer->ai)
   {
+//    fprintf (stdout, "\nshield=%d", fplayer->shield);
     sound->play (SOUND_HIT1);
     lastshield = fplayer->shield;
     vibration = 25;
   }
 
   if (debug)
-    printf ("\nentering myTimerFunc()"); fflush (stdout);
+  { printf ("\nentering myTimerFunc()"); fflush (stdout); }
 
     if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (40))
     {
@@ -8230,7 +8231,7 @@ void game_timer ()
   }
 
   if (debug)
-    printf ("\nleaving myTimerFunc()"); fflush (stdout);
+  { printf ("\nleaving myTimerFunc()"); fflush (stdout); }
 }
 
 int net_thread_main (void *data)
@@ -8243,7 +8244,7 @@ int net_thread_main (void *data)
   gametimer ++;
 
   if (debug)
-    printf ("\nentering myTimerFunc()"); fflush (stdout);
+  { printf ("\nentering myTimerFunc()"); fflush (stdout); }
 
     if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
     {
@@ -8442,7 +8443,7 @@ int net_thread_main (void *data)
   }
 
   if (debug)
-    printf ("\nleaving myTimerFunc()"); fflush (stdout);
+  { printf ("\nleaving myTimerFunc()"); fflush (stdout); }
 
 
   if (multiplayer)
@@ -8633,10 +8634,10 @@ void myInit ()
 {
   int i;
   if (debug)
-    printf ("\nentering myInit()"); fflush (stdout);
+  { printf ("\nentering myInit()"); fflush (stdout); }
 
   if (debug)
-    printf ("\n initing landscape"); fflush (stdout);
+  { printf ("\n initing landscape"); fflush (stdout); }
 
   texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
   texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
@@ -8687,7 +8688,7 @@ void myInit ()
   tlnull = new CVector3 (0, 0, 0);
 
   if (debug)
-    printf ("\n initing fighters"); fflush (stdout);
+  { printf ("\n initing fighters"); fflush (stdout); }
 
   for (i = 0; i < maxgroundobj; i ++)
   {
@@ -8720,7 +8721,7 @@ void myInit ()
   }
 
   if (debug)
-    printf ("\n initing sphere"); fflush (stdout);
+  { printf ("\n initing sphere"); fflush (stdout); }
 
   highclouds = new HighClouds (25);
   highclouds->setTexture (texclouds3);
@@ -8755,7 +8756,7 @@ void myInit ()
   flash1 = new Flash ();
 
   if (debug)
-    printf ("\n initing lasers"); fflush (stdout);
+  { printf ("\n initing lasers"); fflush (stdout); }
 
 //  objlaser = new CModel ();
 //  objlaser->loadFromFile ("./data/c1.v3d");
@@ -8765,7 +8766,7 @@ void myInit ()
   }
 
   if (debug)
-    printf ("\n initing missiles"); fflush (stdout);
+  { printf ("\n initing missiles"); fflush (stdout); }
 
 //  objmissile = new CModel ();
 //  objmissile->loadFromFile ("./data/r1.v3d");
@@ -8798,7 +8799,7 @@ void myInit ()
   menu_reshape ();
 
   if (debug)
-    printf ("\nleaving myInit()"); fflush (stdout);
+  { printf ("\nleaving myInit()"); fflush (stdout); }
 }
 
 
