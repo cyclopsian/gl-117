@@ -4,6 +4,7 @@
 Having understood the physical aspects of piloting,
 you may now get an introduction to the game itself.
 
+
 \section{Cockpit controls}
 \label{sec:cockpit}
 
@@ -15,19 +16,18 @@ you may now get an introduction to the game itself.
 \end{center}
 \end{figure}
 
-Figure \ref{fig:hud} shows a typical \texttt{HUD} (heads up display):
+Figure \ref{fig:hud} shows a typical \textit{HUD} (head-up display):
 \begin{itemize}
 \item{A: your current heading, showing the letters \texttt{'N', 'E', 'S', W'}
 to represent north, east, south, west.}
 \item{B: your current elevation in degree; the rotating lines reveal the
 horizon and thus your roll angle.}
-\item{C: the autotargeter shows you the best way to the current target.}
-\item{D: your current target}
-\item{E: the radar reveals the position of other targets. Enemies are marked red,
-allies blue, and the current target is respresented as yellow point.
-The screen is only 2D, so it will only reveal the necessary heading to get
+\item{C: your current target}
+\item{D: the radar reveals the position of other targets. Enemies are marked red,
+allies blue. The screen is only 2D, so it will only reveal the necessary \textit{heading} to
 other targets.}
 \item{F: your currently selected weapon}
+\item{G: the chaff/flare countermeasure systems alarms you about enemy missiles.}
 \end{itemize}
 
 
@@ -70,6 +70,11 @@ F6, F7, F8 & Top cameras\\
 \end{tabular}
 \end{center}
 
+Note that the tabular only shows the predefined settings. You may customize the
+keyboard editing the file \texttt{conf.interface} located in the \texttt{saves}
+directory on MSWindows, in the directory \texttt{\$HOME/.gl-117} for UNIX respectively.
+
+
 \subsection{The mouse}
 \label{subsec:mouse}
 
@@ -89,15 +94,17 @@ Along with the "mouse easy" interface comes the possibility to revert the
 elevator controls, called "mouse reverse". Only experienced players should
 use this option.
 
+
 \subsection{The joystick}
 \label{subsec:joystick}
 
 The easiest interface to play \emph{GL-117} is likely the joystick.\\
-\emph{GL-117} supports up to four joystick axis:
+\emph{GL-117} supports up to four joystick axes:
 moving the joystick up or down will change the elevator, moving left or right
 will affect the aileron, turning the joystick along the rudder will alter
 the fighter's rudder settings, and moving the throttle will change
-the fighter's throttle.\\\\
+the fighter's throttle. If two axes functions are swapped, please edit the file
+\texttt{conf.interface} to correct the settings.\\\\
 Depending on your joystick, \emph{GL-117} supports four buttons:
 fire cannon, target nearest enemy, change weapon/missile, fire weapon/missile.\\\\
 Any properly installed joystick will be available automatically.
@@ -112,31 +119,21 @@ description of the different menu items:
 \item{The \texttt{PILOTS} menu lets you create and delete pilots. You can
 play only one pilot at a time.}
 \item{The \texttt{MISSIONS} menu shows all available missions. You have to
-succeed in a mission to enable the next one.}
+succeed in a mission to enable the next one.
+Every mission you succeed will earn you a certain score, being calculated
+depending on the time it took, the shield you lost, how many targets you
+eliminated, and a difficulty bonus.
+High scores are necessary to get a promotion to a higher military rank.
+The difficulty bonus is added to the overall score automatically.}
 \item{Several \texttt{OPTIONS} may be adjusted: quality, view, sound, music,
 difficulty.}
 \end{itemize}
 
-
-\section{Graphics optimization}
-\label{sec:graphics_optimization}
-
 To get the best graphics possible on your system, always look at the
 \texttt{FPS} rate which describes the number of frames per second.
 This rate is directly influenced by the quality and view settings and
-should not drop below 20. If your rate is \texttt{perfect}, you should
+should not drop below 25. If your rate is above 50 FPS, you should
 use higher/better quality and view settings.
 You should also try out higher screen resolutions modifying the file
-\texttt{conf}. On \texttt{MSWindows} you will find it in the \texttt{saves}
-directory, on \texttt{UNIX/Linux} it is stored in the directory
-\texttt{\$HOME/.gl-117}.
-
-
-\section{Score}
-\label{sec:score}
-
-Every mission you succeed will earn you a certain score, being calculated
-depending on the time it took, the shield you lost, how many targets you
-eliminated, and a difficulty bonus.\\
-High scores are necessary to get a promotion to a higher military rank.
-The difficulty bonus is added to the overall score automatically.
+\texttt{conf} located in the \texttt{saves}
+directory on MSWindows, in the directory \texttt{\$HOME/.gl-117} for UNIX respectively.

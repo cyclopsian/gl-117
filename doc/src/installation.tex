@@ -46,8 +46,8 @@ versions of the libraries above (except \texttt{SDL\_mixer}).
 To compile \emph{GL-117} do the following steps in the gl-117-\textit{VERSION}
 directory:
 \begin{verbatim}
-./configure
-make
+ ./configure
+ make
 \end{verbatim}
 
 The \texttt{configure} script will check for the required libraries and will output
@@ -57,7 +57,7 @@ in the \texttt{src} directory. Move it to the \texttt{linux} directory manually 
 execute.\\
 To really install \emph{GL-117} please use:
 \begin{verbatim}
-make install
+ make install
 \end{verbatim}
 This will copy the binary to your binary directory (e.g. \texttt{/usr/local/bin})
 and the rest of data files to your data directory (e.g. \texttt{/usr/local/share}).
@@ -66,9 +66,9 @@ exactly \texttt{\$HOME/.gl-117}.\\
 This step will require write permissions in the binary and data directories.
 However you may customize these directories using for example
 \begin{verbatim}
-./configure --prefix='/home/tom/gl-117'
-make
-make install
+ ./configure --prefix='/home/tom/gl-117'
+ make
+ make install
 \end{verbatim}
 
 
@@ -78,8 +78,8 @@ make install
 First, you might have to install \texttt{GL, GLU, GLUT} and \texttt{SDL, SDL\_mixer}.
 Look into your system directory, that is generally
 \begin{verbatim}
-\WINDOWS\SYSTEM    for Windows9x/ME
-\WINDOWS\SYSTEM32  for WindowsNT/2000/XP
+ \WINDOWS\SYSTEM    for Windows9x/ME
+ \WINDOWS\SYSTEM32  for WindowsNT/2000/XP
 \end{verbatim}
 You will need the files \texttt{opengl32.dll, glu32.dll, glut32.dll, sdl.dll, sdl\_mixer.dll}
 there.
@@ -99,8 +99,8 @@ At startup, \emph{GL-117} tries to read a file \texttt{conf} from the user's hom
 directory (Linux/Unix) or the \texttt{saves} directory (MSWindows).
 If there is none, the game will try out some screen settings and store the file.
 \begin{verbatim}
-Linux/Unix      $HOME/.gl-117/conf
-MSWindows       GL-117-INSTALLDIR/saves/conf
+ Linux/Unix      $HOME/.gl-117/conf
+ MSWindows       GL-117-INSTALLDIR/saves/conf
 \end{verbatim}
 
 Edit the file using your favourite text editor and adjust the settings
