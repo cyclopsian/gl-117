@@ -32,8 +32,6 @@
 
 
 bool Model3d::showCollision = false;
-bool Model3d::antialiasing = true;
-int Model3d::timeStep = 34;
 
 Model3d::Model3d ()
 {
@@ -216,8 +214,8 @@ void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timeStep / timeStep, tl.z + tl2.z);
-  float explodefac = (float) explode / 10 / timeStep;
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
+  float explodefac = (float) explode / 10 / timestep;
 
   if (showCollision)
   {
@@ -397,8 +395,8 @@ void Model3d::drawNoLight (const Vector3 &tl, const Vector3 &tl2, const Rotation
 
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timeStep / timeStep, tl.z + tl2.z);
-  float explodefac = (float) explode / 10 / timeStep;
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
+  float explodefac = (float) explode / 10 / timestep;
 
   if (showCollision)
   {
@@ -555,8 +553,8 @@ void Model3d::drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotati
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   zoom *= scale;
   glPushMatrix ();
-  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timeStep / timeStep, tl.z + tl2.z);
-  float explodefac = (float) explode / 10 / timeStep;
+  glTranslatef (tl.x + tl2.x, tl.y + tl2.y - 0.002 * explode * explode / timestep / timestep, tl.z + tl2.z);
+  float explodefac = (float) explode / 10 / timestep;
 
   if (showCollision)
   {

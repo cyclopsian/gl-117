@@ -48,7 +48,6 @@
 #define Uint16 unsigned short
 #endif
 
-#define ZOOM 256
 #define GLOBALSCALE 1
 #define VERSIONSTRING "V1.3"
 
@@ -68,11 +67,6 @@
 #define GAME_FIGHTER 10
 #define GAME_FINISH 11
 #define GAME_QUIT 12
-
-// weather
-#define WEATHER_SUNNY 0
-#define WEATHER_THUNDERSTORM 1
-#define WEATHER_CLOUDY 2
 
 // controls
 #define CONTROLS_KEYBOARD 0
@@ -106,12 +100,11 @@ extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
 extern float sungamma; // angle of sunrays dropping on horizon
 
 extern int camera; // camera type (0=cockpit, 1=chase, 2=backward, ...)
-extern float camx, camy, camz; // camera position
+//extern float camx, camy, camz; // camera position
 extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: elevation
-extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
+//extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
 
 extern int lighting; // 1=on, 0=off (obsolete)
-extern int mode; // always off=0, 1 would mean to calculate ROAM (obsolete)!
 
 extern float getView (); // return view dependant on weather
 

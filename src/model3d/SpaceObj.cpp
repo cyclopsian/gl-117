@@ -100,7 +100,7 @@ void SpaceObj::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2, b
       if (!refModel.empty ())
       {
         glPushMatrix ();
-        glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode / 35 / 35, tl1.z); // divide by timestep
+        glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode / timestep / timestep, tl1.z);
         glRotatef (rot.c+90, 0, -1, 0);
         glRotatef (-rot.a+90, 0, 0, 1);
         glRotatef (rot.b+180, 1, 0, 0);

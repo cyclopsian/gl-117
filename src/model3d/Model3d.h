@@ -28,6 +28,9 @@
 
 #include <iostream>
 
+extern int antialiasing;
+extern const int timestep;
+
 /* Currently models are normalized to the (-1,-1,-1)-(1,1,1) cube and static!
    The model represents the "class" description of a static model's geometry and colors.
    It is "instanciated" using a DynamicObj which has a reference to the model,
@@ -300,8 +303,6 @@ class Model3d
 {
   public:
 
-    static int timeStep;       ///< number of milliseconds per discrete movement of all models
-    static bool antialiasing;  ///< shade const or linear?
     static bool showCollision; ///< show collision cube of the model
 
     std::string name;    ///< unique model name like "GL-117"

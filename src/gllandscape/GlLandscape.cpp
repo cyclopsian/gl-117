@@ -25,10 +25,14 @@
 //#include "main.h"
 #include "math/Math.h"
 #include "opengl/GlPrimitives.h"
-#include "common.h"
+//#include "common.h"
 
 #include <stdlib.h>
 #include <math.h>
+
+
+
+#define ZOOM 256
 
 const float zoomz = 1.0/(100.0*MAXX);
 const float hh = (float) 1 / (float) MAXX;
@@ -97,6 +101,13 @@ void GlLandscape::normalcrossproduct( float* a, float* b, float*c )
   c[1] = a[2]*b[0] - a[0]*b[2];
   c[2] = a[0]*b[1] - a[1]*b[0];
   norm (c);
+}
+
+float GlLandscape::getView ()
+{
+  if (weather == WEATHER_THUNDERSTORM && view > 40.0)
+    return 40.0;
+  return view;
 }
 
 int GlLandscape::selectColor (int x, int y)
@@ -1509,7 +1520,7 @@ void GlLandscape::drawTexturedQuad (int xs, int ys)
 }
 
 // Draw a single textured water quad
-void GlLandscape::drawWaterTexturedQuad (int xs, int ys)
+void GlLandscape::drawWaterTexturedQuad (Vector3 &cam, int xs, int ys)
 {
   int i, j;
   int step = gridstep;
@@ -1549,17 +1560,17 @@ void GlLandscape::drawWaterTexturedQuad (int xs, int ys)
   if (specialeffects)
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
-    float dz1 = fabs ((float) camx - xs);
-    float dz2 = fabs ((float) camx - xs - step);
-    float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
+    float dz1 = fabs ((float) cam.x - xs);
+    float dz2 = fabs ((float) cam.x - xs - step);
+    float dy = fabs (cam.y - (h1*zoomz - zoomz2) * ZOOM);
     float dtheta1 = fabs (atan (dy / dz1) * 180.0 / PI - 90);
     float dtheta2 = fabs (atan (dy / dz2) * 180.0 / PI - 90);
     dtheta1 /= 4; dtheta2 /= 4;
 //    if (lz1 <= 5 || lz2 <= 5)
     {
       float divdy = 1.0F / dy * 200;
-      float dx1 = ((float) -camz + ys);
-      float dx2 = ((float) -camz + ys + step);
+      float dx1 = ((float) -cam.z + ys);
+      float dx2 = ((float) -cam.z + ys + step);
 //      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
       float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
       float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
@@ -1955,9 +1966,9 @@ void GlLandscape::drawTexturedTriangle2 (int xs, int ys)
 //  glEnd();
 }
 
-void GlLandscape::draw (int phi, int gamma)
+void GlLandscape::draw (Vector3 &cam, int phi, int gamma)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   int i, i2, i3, x, y;
   int xs, ys;
 
@@ -2024,8 +2035,8 @@ void GlLandscape::draw (int phi, int gamma)
   float pseudoview = getView ();
   float radius = pseudoview / COS(45);
 
-  int minx = (int) (camx - radius);
-  int miny = (int) (camz - radius);
+  int minx = (int) (cam.x - radius);
+  int miny = (int) (cam.z - radius);
   int maxx = (int) (minx + radius * 2);
   int maxy = (int) (miny + radius * 2);
 
@@ -2036,11 +2047,11 @@ void GlLandscape::draw (int phi, int gamma)
   space->z2.y = MAXX / 2;
   space->z2.z = miny - MAXX / 2;*/
 
-  if (camera == 50)
+/*  if (camera == 50)
   {
     minx = 0; maxx = MAXX;
     miny = 0; maxy = MAXX;
-  }
+  }*/
 
   int parts = (int) (view / 13);
   parts *= 2;
@@ -2092,7 +2103,7 @@ void GlLandscape::draw (int phi, int gamma)
   bool set = true;
   memset (vis, 0, PARTS * PARTS * sizeof (bool));
   int cx = parts / 2, cy = parts / 2;
-  float ch = (unsigned int) ((camy / ZOOM + zoomz2) / zoomz); // - (h1*zoomz - zoomz2) * ZOOM;
+  float ch = (unsigned int) ((cam.y / ZOOM + zoomz2) / zoomz); // - (h1*zoomz - zoomz2) * ZOOM;
   vh [cy] [cx] = ch;
   vis [cy] [cx] = set;
   for (i = cy + 1; i < parts; i ++)
@@ -2352,7 +2363,7 @@ void GlLandscape::draw (int phi, int gamma)
 
   int zz1 = 0, zz = 0;
 
-  if (quality <= 0 || camera == 50)
+  if (quality <= 0 /*|| camera == 50*/)
   {
 
     drawQuadStrip (minx, miny, maxx, maxy);
@@ -2361,226 +2372,221 @@ void GlLandscape::draw (int phi, int gamma)
   else
   {
 
-    if (mode == 0)
-    {
+    for (i = 0; i < parts; i ++)
+      for (i2 = 0; i2 < parts; i2 ++)
+      if (vis [i] [i2])
+      {
+        int ax = (minx + (int) (dx * (float) i2));
+        int ay = (miny + (int) (dy * (float) i));
+        int zx = (minx + (int) (dx * (float) (i2 + 1)));
+        int zy = (miny + (int) (dy * (float) (i + 1))/* + gridstep*/);
 
-      for (i = 0; i < parts; i ++)
-        for (i2 = 0; i2 < parts; i2 ++)
-        if (vis [i] [i2])
+        if (fargridstep == 2)
         {
-          int ax = (minx + (int) (dx * (float) i2));
-          int ay = (miny + (int) (dy * (float) i));
-          int zx = (minx + (int) (dx * (float) (i2 + 1)));
-          int zy = (miny + (int) (dy * (float) (i + 1))/* + gridstep*/);
+          ax -= ax & 1; ay -= ay & 1;
+          zx -= zx & 1; zy -= zy & 1;
+        }
+        else if (fargridstep == 3)
+        {
+          ax -= ax % 3; ay -= ay % 3;
+          zx -= zx % 3; zy -= zy % 3;
+        }
+        else if (fargridstep == 4)
+        {
+          ax -= ax & 3; ay -= ay & 3;
+          zx -= zx & 3; zy -= zy & 3;
+        }
 
-          if (fargridstep == 2)
-          {
-            ax -= ax & 1; ay -= ay & 1;
-            zx -= zx & 1; zy -= zy & 1;
-          }
-          else if (fargridstep == 3)
-          {
-            ax -= ax % 3; ay -= ay % 3;
-            zx -= zx % 3; zy -= zy % 3;
-          }
-          else if (fargridstep == 4)
-          {
-            ax -= ax & 3; ay -= ay & 3;
-            zx -= zx & 3; zy -= zy & 3;
-          }
-
-          if (detail [i] [i2] > fardetail)
-          {
-            zy += fargridstep;
+        if (detail [i] [i2] > fardetail)
+        {
+          zy += fargridstep;
 //            if (frustum.isSphereInFrustum ((ax+zx)/2, (float)hw[GETCOORD((ax+zx)/2)][GETCOORD((ay+zy)/2)], ((float)(ay+zy)/2), (zx-ax)*2.0))
-            if (frustum.isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(ay)], (float)(ay), 0.00001) ||
-                frustum.isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(zy)], (float)(zy), 0.00001) ||
-                frustum.isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(ay)], (float)(ay), 0.00001) ||
-                frustum.isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(zy)], (float)(zy), 0.00001))
-            {
-              drawQuadStrip (ax, ay, zx, zy);
-            }
-            else
-            {
-              float sl = sunlight;
-              sunlight = 10.0;
-//              drawQuadStrip (ax, ay, zx, zy);
-              sunlight = sl;
-            }
+          if (frustum.isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(ay)], (float)(ay), 0.00001) ||
+              frustum.isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(zy)], (float)(zy), 0.00001) ||
+              frustum.isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(ay)], (float)(ay), 0.00001) ||
+              frustum.isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(zy)], (float)(zy), 0.00001))
+          {
+            drawQuadStrip (ax, ay, zx, zy);
           }
           else
           {
-            if (detail [i] [i2] <= lineardetail)
+            float sl = sunlight;
+            sunlight = 10.0;
+//              drawQuadStrip (ax, ay, zx, zy);
+            sunlight = sl;
+          }
+        }
+        else
+        {
+          if (detail [i] [i2] <= lineardetail)
+          {
+            texgrass->shadeLinear ();
+            texgravel1->shadeLinear ();
+            texredsand->shadeLinear ();
+            texrocks->shadeLinear ();
+            texwater->shadeLinear ();
+            texredstone->shadeLinear ();
+          }
+          else
+          {
+            texgrass->shadeConst ();
+            texgravel1->shadeConst ();
+            texredsand->shadeConst ();
+            texrocks->shadeConst ();
+            texwater->shadeConst ();
+            texredstone->shadeConst ();
+          }
+          if (detail [i] [i2] <= middetail)
+          {
+          if (i > 0) // south
+          {
+            if (detail [i - 1] [i2] > middetail)
             {
-              texgrass->shadeLinear ();
-              texgravel1->shadeLinear ();
-              texredsand->shadeLinear ();
-              texrocks->shadeLinear ();
-              texwater->shadeLinear ();
-              texredstone->shadeLinear ();
-            }
-            else
-            {
-              texgrass->shadeConst ();
-              texgravel1->shadeConst ();
-              texredsand->shadeConst ();
-              texrocks->shadeConst ();
-              texwater->shadeConst ();
-              texredstone->shadeConst ();
-            }
-            if (detail [i] [i2] <= middetail)
-            {
-            if (i > 0) // south
-            {
-              if (detail [i - 1] [i2] > middetail)
+              if (fargridstep == 3 * neargridstep)
               {
-                if (fargridstep == 3 * neargridstep)
+                ys = ay;
+                for (xs = ax; xs < zx;)
                 {
-                  ys = ay;
-                  for (xs = ax; xs < zx;)
-                  {
-                    drawTexturedQuad (xs, ys, xs + 3 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
-                    xs += fargridstep;
-                  }
-                }
-                else if (fargridstep == 2 * neargridstep)
-                {
-                  ys = ay;
-                  for (xs = ax; xs < zx;)
-                  {
-                    drawTexturedTriangle (xs, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
-                    xs += fargridstep;
-                  }
+                  drawTexturedQuad (xs, ys, xs + 3 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
+                  xs += fargridstep;
                 }
               }
-            }
-            if (i < parts - 1) // north
-            {
-              if (detail [i + 1] [i2] > middetail)
+              else if (fargridstep == 2 * neargridstep)
               {
-                if (fargridstep == 3 * neargridstep)
+                ys = ay;
+                for (xs = ax; xs < zx;)
                 {
-                  ys = zy;
-                  for (xs = ax; xs < zx;)
-                  {
-                    drawTexturedQuad (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 3 * neargridstep, ys);
-                    xs += fargridstep;
-                  }
-                }
-                else if (fargridstep == 2 * neargridstep)
-                {
-                  ys = zy;
-                  for (xs = ax; xs < zx;)
-                  {
-                    drawTexturedTriangle (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys);
-                    xs += fargridstep;
-                  }
+                  drawTexturedTriangle (xs, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
+                  xs += fargridstep;
                 }
               }
-            }
-            if (i2 > 0) // east
-            {
-              if (detail [i] [i2 - 1] > middetail)
-              {
-                if (fargridstep == 3 * neargridstep)
-                {
-                  xs = ax;
-                  for (ys = ay; ys < zy;)
-                  {
-                    drawTexturedQuad (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 3 * neargridstep);
-                    ys += fargridstep;
-                  }
-                }
-                else if (fargridstep == 2 * neargridstep)
-                {
-                  xs = ax;
-                  for (ys = ay; ys < zy;)
-                  {
-                    drawTexturedTriangle (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep);
-                    ys += fargridstep;
-                  }
-                }
-              }
-            }
-            if (i2 < parts - 1) // west
-            {
-              if (detail [i] [i2 + 1] > middetail)
-              {
-                if (fargridstep == 3 * neargridstep)
-                {
-                  xs = zx;
-                  for (ys = ay; ys < zy;)
-                  {
-                    drawTexturedQuad (xs, ys, xs, ys + 3 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
-                    ys += fargridstep;
-                  }
-                }
-                else if (fargridstep == 2 * neargridstep)
-                {
-                  xs = zx;
-                  for (ys = ay; ys < zy;)
-                  {
-                    drawTexturedTriangle (xs, ys, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
-                    ys += fargridstep;
-                  }
-                }
-              }
-            }
-              gridstep = neargridstep;
-            }
-            else
-            {
-              gridstep = fargridstep;
-            }
-            for (xs = ax; xs < zx;)
-            {
-              x = GETCOORD(xs);
-              for (ys = ay; ys < zy;)
-              {
-                y = GETCOORD(ys);
-                zz1 ++;
-				        int x2 = GETCOORD(xs+gridstep);
-				        int y2 = GETCOORD(ys+gridstep);
-				        if (h [x] [y] < hw [x] [y] && h [x2] [y] < hw [x2] [y] && h [x] [y2] < hw [x] [y2] && h [x2] [y2] < hw [x2] [y2])
-			              ; // water
-                else
-                {
-                  if (drawrule [x] [y] == 0)
-                    drawTexturedQuad (xs, ys);
-                  else if (drawrule [x] [y] == 2)
-                    drawTexturedTriangle1 (xs, ys);
-                  else
-                    drawTexturedTriangle2 (xs, ys);
-                }
-
-                ys += gridstep;
-                zz ++;
-              }
-              xs += gridstep;
-            }
-            for (xs = ax; xs < zx;)
-            {
-              x = GETCOORD(xs);
-              for (ys = ay; ys < zy;)
-              {
-                y = GETCOORD(ys);
-                zz1 ++;
-                int xstep = GETCOORD(xs + gridstep);
-                int ystep = GETCOORD(ys + gridstep);
-                if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]))
-                {
-                  drawWaterTexturedQuad (xs, ys);
-                }
-                ys += gridstep;
-                zz ++;
-              }
-              xs += gridstep;
             }
           }
+          if (i < parts - 1) // north
+          {
+            if (detail [i + 1] [i2] > middetail)
+            {
+              if (fargridstep == 3 * neargridstep)
+              {
+                ys = zy;
+                for (xs = ax; xs < zx;)
+                {
+                  drawTexturedQuad (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 3 * neargridstep, ys);
+                  xs += fargridstep;
+                }
+              }
+              else if (fargridstep == 2 * neargridstep)
+              {
+                ys = zy;
+                for (xs = ax; xs < zx;)
+                {
+                  drawTexturedTriangle (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys);
+                  xs += fargridstep;
+                }
+              }
+            }
+          }
+          if (i2 > 0) // east
+          {
+            if (detail [i] [i2 - 1] > middetail)
+            {
+              if (fargridstep == 3 * neargridstep)
+              {
+                xs = ax;
+                for (ys = ay; ys < zy;)
+                {
+                  drawTexturedQuad (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 3 * neargridstep);
+                  ys += fargridstep;
+                }
+              }
+              else if (fargridstep == 2 * neargridstep)
+              {
+                xs = ax;
+                for (ys = ay; ys < zy;)
+                {
+                  drawTexturedTriangle (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep);
+                  ys += fargridstep;
+                }
+              }
+            }
+          }
+          if (i2 < parts - 1) // west
+          {
+            if (detail [i] [i2 + 1] > middetail)
+            {
+              if (fargridstep == 3 * neargridstep)
+              {
+                xs = zx;
+                for (ys = ay; ys < zy;)
+                {
+                  drawTexturedQuad (xs, ys, xs, ys + 3 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
+                  ys += fargridstep;
+                }
+              }
+              else if (fargridstep == 2 * neargridstep)
+              {
+                xs = zx;
+                for (ys = ay; ys < zy;)
+                {
+                  drawTexturedTriangle (xs, ys, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
+                  ys += fargridstep;
+                }
+              }
+            }
+          }
+            gridstep = neargridstep;
+          }
+          else
+          {
+            gridstep = fargridstep;
+          }
+          for (xs = ax; xs < zx;)
+          {
+            x = GETCOORD(xs);
+            for (ys = ay; ys < zy;)
+            {
+              y = GETCOORD(ys);
+              zz1 ++;
+				      int x2 = GETCOORD(xs+gridstep);
+				      int y2 = GETCOORD(ys+gridstep);
+				      if (h [x] [y] < hw [x] [y] && h [x2] [y] < hw [x2] [y] && h [x] [y2] < hw [x] [y2] && h [x2] [y2] < hw [x2] [y2])
+			            ; // water
+              else
+              {
+                if (drawrule [x] [y] == 0)
+                  drawTexturedQuad (xs, ys);
+                else if (drawrule [x] [y] == 2)
+                  drawTexturedTriangle1 (xs, ys);
+                else
+                  drawTexturedTriangle2 (xs, ys);
+              }
 
-        } // for i2
+              ys += gridstep;
+              zz ++;
+            }
+            xs += gridstep;
+          }
+          for (xs = ax; xs < zx;)
+          {
+            x = GETCOORD(xs);
+            for (ys = ay; ys < zy;)
+            {
+              y = GETCOORD(ys);
+              zz1 ++;
+              int xstep = GETCOORD(xs + gridstep);
+              int ystep = GETCOORD(ys + gridstep);
+              if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]))
+              {
+                drawWaterTexturedQuad (cam, xs, ys);
+              }
+              ys += gridstep;
+              zz ++;
+            }
+            xs += gridstep;
+          }
+        }
 
-    } // if mode
+      } // for i2
 
   }
 
@@ -2731,8 +2737,8 @@ void GlLandscape::draw (int phi, int gamma)
           for (ys = ay; ys <= ey;)
           {
             y = GETCOORD(ys);
-            float tdx = camx - xs;
-            float tdy = camz - ys;
+            float tdx = cam.x - xs;
+            float tdy = cam.z - ys;
             dep = tdx * tdx + tdy * tdy;
             if (dep < mydep)
               if (isWoods (f [x] [y]) || isType (f [x] [y], REDTREE0) || isType (f [x] [y], CACTUS0))
@@ -2797,8 +2803,8 @@ void GlLandscape::draw (int phi, int gamma)
             y = GETCOORD(ys);
             if (f [x] [y] == TOWN)
             {
-              float tdx = camx - xs;
-              float tdy = camz - ys;
+              float tdx = cam.x - xs;
+              float tdy = cam.z - ys;
               dep = tdx * tdx + tdy * tdy;
               if (dep < mydep)
                 if (frustum.isSphereInFrustum (hh2*(xs), (float)h[x][y]*zoomz - zoomz2, hh2*((ys)), hh2*2))

@@ -63,14 +63,14 @@ int weather = WEATHER_SUNNY;
 float sungamma = 45.0;
 
 int camera = 0;
-float camx = 0, camy = 0, camz = 0, camphi = 0, camgamma = 0, camtheta = 0;
+//float cam.x = 0, cam.y = 0, cam.z = 0, camphi = 0, camgamma = 0, camtheta = 0;
+Vector3 cam;
 float view_x = 0, view_y = 0;
 float sunlight = 1.0, sunlight_dest = 1.0;
 
 float blackout = 0, redout = 0;
 
 int lighting = 1;
-int mode = 0;
 
 // pre-defined screen resolutions (x, y, bpp, fullscreen)
 int resolution [4] [4] =
@@ -98,13 +98,6 @@ int brightness = 0;
 int contrast = 10;
 
 SoundSystem *sound = NULL;
-
-float getView ()
-{
-  if (weather == WEATHER_THUNDERSTORM && view > 40.0)
-    return 40.0;
-  return view;
-}
 
 int clouds = 0;
 
@@ -1301,7 +1294,6 @@ void event_setAntialiasing ()
       texsun->shadeLinear ();
       texearth->shadeLinear ();
     }
-    Model3d::antialiasing = true;
   }
   else
   {
@@ -1313,7 +1305,6 @@ void event_setAntialiasing ()
       texsun->shadeConst ();
       texearth->shadeConst ();
     }
-    Model3d::antialiasing = false;
   }
 }
 
@@ -3166,6 +3157,7 @@ void game_display ()
 
   // turn down global sunlight when menu is showing
   if (game != GAME_PLAY && sunlight > 0.9F) sunlight = 0.9F;
+  l->sunlight = sunlight;
 
   // start rendering
 
@@ -3316,7 +3308,7 @@ void game_display ()
   glRotatef (-mycamphi, 0.0, 1.0, 0.0);
   glScalef (1, 1, 1);
 
-  glTranslatef (-camx, -camy, -camz);
+  glTranslatef (-cam.x, -cam.y, -cam.z);
 
   if (camera != 50)
   {
@@ -3350,7 +3342,7 @@ void game_display ()
   }
   glEnable (GL_CULL_FACE);
   glCullFace (GL_FRONT);
-  l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
+  l->draw (cam, (int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
 
   // draw objects
@@ -3624,6 +3616,7 @@ void game_timer (int dt)
   int i, i2;
 
   sunlight += (sunlight_dest - sunlight) / 10 * dt / timestep;
+  l->sunlight = sunlight;
 
   gametimer += dt;
   cockpit->dt = dt;
@@ -3796,9 +3789,9 @@ void game_timer (int dt)
     float cgamma = fplayer->gamma + 25.0F * COS(fplayer->theta);
     float cphi = fplayer->phi + 25.0F * SIN(fplayer->theta);
     float fac = fplayer->zoom / 2;
-    camx = fplayer->tl.x + COS(cgamma) * SIN(cphi) * fac;
-    camy = fplayer->tl.y - SIN(cgamma) * fac;
-    camz = fplayer->tl.z + COS(cgamma) * COS(cphi) * fac;
+    cam.x = fplayer->tl.x + COS(cgamma) * SIN(cphi) * fac;
+    cam.y = fplayer->tl.y - SIN(cgamma) * fac;
+    cam.z = fplayer->tl.z + COS(cgamma) * COS(cphi) * fac;
     camphi = fplayer->phi;
     camgamma = -fplayer->gamma + 180;
     fplayer->draw = 0;
@@ -3806,9 +3799,9 @@ void game_timer (int dt)
   if (camera == 1) // chase
   {
     cf = fplayer->zoom * 3;
-    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl.y + fplayer->zoom;
-    camz = fplayer->tl.z + cf * COS(fplayer->phi);
+    cam.x = fplayer->tl.x + cf * SIN(fplayer->phi);
+    cam.y = fplayer->tl.y + fplayer->zoom;
+    cam.z = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 20;
@@ -3816,9 +3809,9 @@ void game_timer (int dt)
   else if (camera == 2) // backwards
   {
     cf = -fplayer->zoom * 3;
-    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl.y + fplayer->zoom;
-    camz = fplayer->tl.z + cf * COS(fplayer->phi);
+    cam.x = fplayer->tl.x + cf * SIN(fplayer->phi);
+    cam.y = fplayer->tl.y + fplayer->zoom;
+    cam.z = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi + 180.0;
     fplayer->draw = 1;
     camgamma = 20;
@@ -3826,9 +3819,9 @@ void game_timer (int dt)
   else if (camera == 3) // other players
   {
     cf = fighter [aktcam]->zoom * 3;
-    camx = fighter [aktcam]->tl.x + cf * SIN(fighter [aktcam]->phi);
-    camy = fighter [aktcam]->tl.y + fighter [aktcam]->zoom;
-    camz = fighter [aktcam]->tl.z + cf * COS(fighter [aktcam]->phi);
+    cam.x = fighter [aktcam]->tl.x + cf * SIN(fighter [aktcam]->phi);
+    cam.y = fighter [aktcam]->tl.y + fighter [aktcam]->zoom;
+    cam.z = fighter [aktcam]->tl.z + cf * COS(fighter [aktcam]->phi);
     camphi = fighter [aktcam]->phi;
     camgamma = 20;
     camtheta = fighter [aktcam]->theta;
@@ -3837,18 +3830,18 @@ void game_timer (int dt)
   else if (camera == 4) // missile
   {
     cf = missile [0]->zoom * 10;
-    camx = missile [0]->tl.x + cf * SIN(missile [0]->phi);
-    camy = missile [0]->tl.y + fplayer->zoom * 2;
-    camz = missile [0]->tl.z + cf * COS(missile [0]->phi);
+    cam.x = missile [0]->tl.x + cf * SIN(missile [0]->phi);
+    cam.y = missile [0]->tl.y + fplayer->zoom * 2;
+    cam.z = missile [0]->tl.z + cf * COS(missile [0]->phi);
     camphi = missile [0]->phi;
     fplayer->draw = 1;
   }
   else if (camera == 5) // top
   {
     cf = fplayer->zoom * 15;
-    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl.y + 5.5;
-    camz = fplayer->tl.z + cf * COS(fplayer->phi);
+    cam.x = fplayer->tl.x + cf * SIN(fplayer->phi);
+    cam.y = fplayer->tl.y + 5.5;
+    cam.z = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -3859,9 +3852,9 @@ void game_timer (int dt)
     camphi = fplayer->phi + 90.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl.x + cf * SIN(camphi);
-    camy = fplayer->tl.y + fplayer->zoom;
-    camz = fplayer->tl.z + cf * COS(camphi);
+    cam.x = fplayer->tl.x + cf * SIN(camphi);
+    cam.y = fplayer->tl.y + fplayer->zoom;
+    cam.z = fplayer->tl.z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
@@ -3871,18 +3864,18 @@ void game_timer (int dt)
     camphi = fplayer->phi + 270.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl.x + cf * SIN(camphi);
-    camy = fplayer->tl.y + fplayer->zoom;
-    camz = fplayer->tl.z + cf * COS(camphi);
+    cam.x = fplayer->tl.x + cf * SIN(camphi);
+    cam.y = fplayer->tl.y + fplayer->zoom;
+    cam.z = fplayer->tl.z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
   else if (camera == 8) // top near
   {
     cf = fplayer->zoom * 5;
-    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl.y + 2.5;
-    camz = fplayer->tl.z + cf * COS(fplayer->phi);
+    cam.x = fplayer->tl.x + cf * SIN(fplayer->phi);
+    cam.y = fplayer->tl.y + 2.5;
+    cam.z = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -3890,18 +3883,18 @@ void game_timer (int dt)
   else if (camera == 9) // top very near
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl.x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl.y + 1.0;
-    camz = fplayer->tl.z + cf * COS(fplayer->phi);
+    cam.x = fplayer->tl.x + cf * SIN(fplayer->phi);
+    cam.y = fplayer->tl.y + 1.0;
+    cam.z = fplayer->tl.z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
   }
   else if (camera == 50)
   {
-    camx = 20;
-    camz = 80;
-    camy = 250;
+    cam.x = 20;
+    cam.z = 80;
+    cam.y = 250;
     camphi = 20;
     camgamma = 75;
     game = GAME_PAUSE;

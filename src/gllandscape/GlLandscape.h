@@ -27,7 +27,14 @@
 #include "model3d/Model3d.h" // ok
 #include "landscape/Landscape.h" // ok
 
+
+
 #define PARTS 24 ///< maximum LOD (occlusion culling) parts
+
+// weather
+#define WEATHER_SUNNY 0
+#define WEATHER_THUNDERSTORM 1
+#define WEATHER_CLOUDY 2
 
 /// the exact landscape type
 #define LANDSCAPE_ALPINE 0
@@ -52,6 +59,15 @@ extern Texture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, 
 extern Texture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
 extern Texture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
 extern Texture *texglitter1;
+
+extern int antialiasing;
+extern int weather;
+extern float view;
+extern int contrast;
+extern float sungamma; ///< angle of sunrays dropping on horizon
+extern int day;
+extern int quality;
+extern int specialeffects;
 
 /**
 * This class calculates all landscape data that is related to OpenGL visualisation.
@@ -86,6 +102,7 @@ class GlLandscape : public Landscape
     unsigned short hcmax [MAXX/4 + 1] [MAXX/4 + 1]; ///< height mask on a coarser grid: max{h[x+-2][y+-2]}
     bool hastowns;
     int detail [PARTS] [PARTS]; ///< LOD
+    float sunlight;
 //    Space *space;
 
   public:
@@ -93,6 +110,7 @@ class GlLandscape : public Landscape
     GlLandscape (int type, int *heightmask);
 
     void precalculate (); ///< precalculate everything (colors, light mask)
+    float getView (); ///< get current view depth depending on the weather
 
     float getMinHeight (float x, float z);      ///< min height of 4x4 grid at landscape point
     float getMaxHeight (float x, float z);      ///< min height of 4x4 grid at landscape point
@@ -118,11 +136,11 @@ class GlLandscape : public Landscape
     void drawTexturedQuad (int x, int y);
     void drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, int y3);
     void drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
-    void drawWaterTexturedQuad (int x, int y);
+    void drawWaterTexturedQuad (Vector3 &cam, int x, int y);
     void drawTexturedTriangle1 (int x, int y);
     void drawTexturedTriangle2 (int x, int y);
   
-    void draw (int phi, int gamma); ///< draw ALL
+    void draw (Vector3 &cam, int phi, int gamma); ///< draw ALL
     /// explosions and other light sources light up the surface, calculate dynamically by CPU
 //    void calcDynamicLight (Explosion **explo, SpaceObj **cannon, SpaceObj **missile, SpaceObj **flare);
     void calcDynamicLight (SpaceObj *object, float threshold, float maxintens, float intensfac);
