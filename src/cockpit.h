@@ -29,6 +29,9 @@
 
 class Cockpit
 {
+  private:
+  void cockpitvertex (float phi, float gamma);
+
   public:
   int flarewarning, chaffwarning;
   Uint32 dt;

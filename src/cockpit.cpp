@@ -56,6 +56,22 @@ float getPhi (DynamicObj *obj)
   return aw;
 }*/
 
+/*void Cockpit::cockpitvertex (float phi, float gamma) //cylindrical headup projetion
+{
+  float x = cos ((-fplayer->theta+180)/180*PI) * phi + sin ((-fplayer->theta+180)/180*PI)* gamma;
+  float y = sin ((-fplayer->theta+180)/180*PI) * phi - cos ((-fplayer->theta+180)/180*PI)* gamma;
+  glVertex3f (10*sin((x+180)/180*PI),10*sin((y+180)/180*PI),-10*cos((x+180)/180*PI)*cos((y+180)/180*PI));
+}*/
+
+void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup projection
+{
+  float fpt = -fplayer->theta + 180;
+  float sinfpt = SIN(fpt), cosfpt = COS(fpt);
+  float x = cosfpt * phi + sinfpt * gamma + 180;
+  float y = sinfpt * phi - cosfpt * gamma + 180;
+  glVertex3f (10*SIN(x),10*SIN(y),-10*COS(x)*COS(y));
+}
+
 void Cockpit::setColor (int alpha)
 {
   if (fplayer->o == &model_fig) glColor4ub (255, 255, 0, alpha);
@@ -378,7 +394,7 @@ void Cockpit::drawHeading ()
       }
     }
 
-  zf = -4.0F;
+/*  zf = -4.0F;
   for (i = 0; i < 360; i += 5)
   {
     float p = (float) i - fplayer->gamma;
@@ -416,7 +432,7 @@ void Cockpit::drawHeading ()
       else if (i == 270)
         font1->drawText (yf - 2.0, xf - 0.5, zf, "90", &color);
     }
-  }
+  }*/
   
   sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
   font1->drawTextCentered (-8.0, -8.5, -4.0, str, &color);
@@ -425,7 +441,7 @@ void Cockpit::drawHeading ()
   font1->drawTextCentered (8.0, -8.5, -4.0, str, &color);
 
   gl->enableAlphaBlending ();
-  int t1 = (int) (fplayer->theta - 135.0);
+/*  int t1 = (int) (fplayer->theta - 135.0);
   int t2 = t1 + 90, t3 = t1 + 180, t4 = t1 + 270;
   if (t1 != 0) t1 %= 360;
   if (t2 != 0) t2 %= 360;
@@ -442,8 +458,88 @@ void Cockpit::drawHeading ()
   glVertex3f (xf * cosi [t2], yf * sine [t2], zf);
   glVertex3f (xf * cosi [t3], yf * sine [t3], zf);
   glVertex3f (xf * cosi [t4], yf * sine [t4], zf);
+  glEnd ();*/
+
+  float dgamma = fplayer->gamma - (int) fplayer->gamma;
+  float innerx = 5, outerx = 10, widthx = 1;
+  int step = 15;
+
+  glLineWidth (1.2F);
+
+  glBegin (GL_LINES);
+  //float tmp = int(fplayer->gamma+360)%360-180;
+  float tmp = fplayer->gamma - 180;
+  cockpitvertex (-innerx,tmp);
+  cockpitvertex (-15,tmp);
+  cockpitvertex (innerx,tmp);
+  cockpitvertex (15,tmp);
+
+  for (i = -180 + step; i < 0; i += step)
+  {
+    float tmp=int(-i+fplayer->gamma+540)%360-180;
+    tmp += dgamma;
+//    float tmp = (fplayer->gamma - i + 540) % 360 - 180;
+    cockpitvertex (-innerx,tmp+1);
+    cockpitvertex (-innerx,tmp);
+    cockpitvertex (innerx,tmp+1);
+    cockpitvertex (innerx,tmp);
+    cockpitvertex (-outerx,tmp);
+    cockpitvertex (-innerx,tmp);
+    cockpitvertex (innerx,tmp);
+    cockpitvertex (outerx,tmp);
+  }
+
+/*  for (i = -90; i < -1; i += 10)
+  {
+    int tmp=int(-i+fplayer->gamma+540)%360-180;
+//    float tmp = fplayer->gamma - i;
+    cockpitvertex (-5,tmp-1);
+    cockpitvertex (-5,tmp);
+    cockpitvertex (5,tmp-1);
+    cockpitvertex (5,tmp);
+    cockpitvertex (-10,tmp);
+    cockpitvertex (-5,tmp);
+    cockpitvertex (5,tmp);
+    cockpitvertex (10,tmp);
+  }*/
+
+  for (i = step; i < 180; i += step)
+  {
+    float tmp=int(-i+fplayer->gamma+540)%360-180;
+    tmp += dgamma;
+    cockpitvertex (-innerx,tmp+1);
+    cockpitvertex (-innerx,tmp);
+    cockpitvertex (innerx,tmp+1);
+    cockpitvertex (innerx,tmp);
+    cockpitvertex (-outerx,tmp);
+    cockpitvertex (-outerx+widthx,tmp);
+    cockpitvertex (innerx,tmp);
+    cockpitvertex (innerx+widthx,tmp);
+    cockpitvertex (-innerx-widthx,tmp);
+    cockpitvertex (-innerx,tmp);
+    cockpitvertex (outerx-widthx,tmp);
+    cockpitvertex (outerx,tmp);
+  }
+/*  for (i = 90; i < 180; i += 10)
+  {
+    int tmp=int(-i+fplayer->gamma+540)%360-180;
+    cockpitvertex (-5,tmp-1);
+    cockpitvertex (-5,tmp);
+    cockpitvertex (5,tmp-1);
+    cockpitvertex (5,tmp);
+    cockpitvertex (-10,tmp);
+    cockpitvertex (-9,tmp);
+    cockpitvertex (5,tmp);
+    cockpitvertex (6,tmp);
+    cockpitvertex (-6,tmp);
+    cockpitvertex (-5,tmp);
+    cockpitvertex (9,tmp);
+    cockpitvertex (10,tmp);
+  }*/
   glEnd ();
   gl->disableAlphaBlending ();
+
+  glLineWidth (2.0F);
 }
 
 void Cockpit::drawTargetedElement ()
