@@ -29,13 +29,6 @@
 #include <stdlib.h>
 #include "../config.h"
 
-#ifdef HAVE_SDL
-#include "SDL/SDL.h"
-#ifdef HAVE_SDL_NET
-#include "SDL/SDL_net.h"
-#endif
-#endif
-
 #ifdef HAVE_SDL_NET
 extern int getMsg(TCPsocket sock, char *buf);
 extern int putMsg(TCPsocket sock, char *buf);

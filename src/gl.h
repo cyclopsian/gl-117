@@ -26,12 +26,6 @@
 
 #include "common.h"
 
-#ifdef USE_GLUT
-#include <GL/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

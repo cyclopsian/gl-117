@@ -2,6 +2,7 @@
 #define IS_COMMON_H
 
 #include "../config.h"
+
 #define USE_GLUT
 #ifdef HAVE_SDL
 #undef USE_GLUT
@@ -9,8 +10,28 @@
 #undef HAVE_SDL_MIXER
 #endif
 
+#ifdef USE_GLUT
+#include <GL/glut.h>
+#else
+#include <GL/glut.h>
+#include "SDL/SDL.h"
+#include "SDL/SDL_thread.h"
+#ifdef HAVE_SDL_MIXER
+#include "SDL/SDL_mixer.h"
+#endif
+#ifdef HAVE_SDL_NET
+#include "SDL/SDL_net.h"
+#endif
+#endif
+
 #define ZOOM 256
 #define VERSIONSTRING "GL-117 V. 0.8.1 (BETA) BY THOMAS A. DREXL"
+
+// data types
+#ifdef USE_GLUT
+#define Uint32 unsigned int
+#define Uint16 unsigned short
+#endif
 
 // game states
 #define GAME_INIT 0

@@ -190,13 +190,13 @@ char *Pilot::getRank ()
   else if (sum < 1500)
   { ranking = 2; return "2ND LIEUTNANT"; }
   else if (sum < 2500)
-  { ranking = 3;  return "1ST LIEUTNANT"; }
+  { ranking = 3; return "1ST LIEUTNANT"; }
   else if (sum < 3500)
-  { ranking = 4;  return "CAPTAIN"; }
+  { ranking = 4; return "CAPTAIN"; }
   else if (sum < 4500)
-  { ranking = 5;  return "MAJOR"; }
+  { ranking = 5; return "MAJOR"; }
   else if (sum < 5500)
-  { ranking = 6;  return "LIEUTNANT COLONEL"; }
+  { ranking = 6; return "LIEUTNANT COLONEL"; }
   else
   { ranking = 7; return "COLONEL"; }
 }

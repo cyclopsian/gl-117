@@ -38,7 +38,7 @@ BinaryFile::BinaryFile (char *filename)
   size = ftell (in);
   fseek (in, 0, SEEK_SET);
   data = new unsigned char [size];
-  uint32 z = 0;
+  Uint32 z = 0;
   while (!feof (in))
   {
     fread (&data [z], 1, 4096, in);
@@ -79,7 +79,7 @@ int BinaryFile::readFloat (float *f, int n)
   return n * 4;
 }
 
-int BinaryFile::readUInt32 (uint32 *i)
+int BinaryFile::readUInt32 (Uint32 *i)
 {
 #ifdef WORDS_BIGENDIAN
   ret [0] = data [filepointer + 3];
@@ -87,23 +87,23 @@ int BinaryFile::readUInt32 (uint32 *i)
   ret [2] = data [filepointer + 1];
   ret [3] = data [filepointer];
   ret [4] = 0;
-  *i = *((uint32 *) ret);
+  *i = *((Uint32 *) ret);
 #else
-  *i = *((uint32 *) &data [filepointer]);
+  *i = *((Uint32 *) &data [filepointer]);
 #endif
   filepointer += 4;
   return 4;
 }
 
-int BinaryFile::readUInt16 (uint16 *i)
+int BinaryFile::readUInt16 (Uint16 *i)
 {
 #ifdef WORDS_BIGENDIAN
   ret [0] = data [filepointer + 1];
   ret [1] = data [filepointer + 0];
   ret [2] = 0;
-  *i = *((uint16 *) ret);
+  *i = *((Uint16 *) ret);
 #else
-  *i = *((uint16 *) &data [filepointer]);
+  *i = *((Uint16 *) &data [filepointer]);
 #endif
   filepointer += 2;
   return 2;
@@ -193,7 +193,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   char version [10];
   CObject newObject;
   CMaterial newTexture;
-  int buffer [50000] = {0};
+  char buffer [50000] = {0};
 
   currentChunk = new Chunk;
 
@@ -248,7 +248,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
 void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *previousChunk)
 {
-  int buffer[50000] = {0};
+  char buffer[50000] = {0};
 
   currentChunk = new Chunk;
 
@@ -292,7 +292,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
 
 void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 {
-  int buffer[50000] = {0};
+  char buffer[50000] = {0};
 
   currentChunk = new Chunk;
 
@@ -319,10 +319,9 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         {
           char* str=model->material [model->numMaterials - 1]->filename;
           while (*str)
- {
+          {
             if (*str >= 'A' && *str <= 'Z')
- *str = tolower (*str);
-
+              *str = tolower (*str);
             str++;
           }
         }
@@ -361,8 +360,8 @@ void CLoad3DS::ReadColorChunk (CMaterial *material, Chunk *pChunk)
 
 void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
 {
-  unsigned short index = 0;
-  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numTriangles);
+  Uint16 index = 0;
+  previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTriangles);
 
   object->triangle = new CTriangle [object->numTriangles];
   memset (object->triangle, 0, sizeof (CTriangle) * object->numTriangles);
@@ -383,7 +382,7 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
 
 void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
 {
-  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numTexVertex);
+  previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTexVertex);
 
   CVector2 *p = new CVector2 [object->numTexVertex];
 
@@ -397,7 +396,7 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
 void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
 {
   int i;
-  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numVertices);
+  previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numVertices);
 
   object->vertex = new CVertex [object->numVertices];
   memset (object->vertex, 0, sizeof (CVertex) * object->numVertices);
@@ -424,7 +423,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
 void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)
 {
   char materialName [255] = {0};
-  int buffer [50000] = {0};
+  char buffer [50000] = {0};
   previousChunk->bytesRead += GetString (materialName);
 
   for (int i = 0; i < model->numMaterials; i ++)
@@ -452,22 +451,22 @@ void CLoad3DS::Compile (CModel *model)
 {
   for (int i = 0; i < model->numObjects; i ++)
   {
-  CObject *co = model->object [i];
+    CObject *co = model->object [i];
     for (int i2 = 1; i2 < co->numVertices; i2 ++)
-  {
-    for (int i3 = 0; i3 < i2; i3 ++)
     {
-      if (co->vertex [i2].vector.isEqual (&co->vertex [i3].vector))
-    {
-      for (int i4 = 0; i4 < co->numTriangles; i4 ++)
+      for (int i3 = 0; i3 < i2; i3 ++)
       {
-        if (co->triangle [i4].v [0] == &co->vertex [i2]) co->triangle [i4].v [0] = &co->vertex [i3];
-        if (co->triangle [i4].v [1] == &co->vertex [i2]) co->triangle [i4].v [1] = &co->vertex [i3];
-        if (co->triangle [i4].v [2] == &co->vertex [i2]) co->triangle [i4].v [2] = &co->vertex [i3];
+        if (co->vertex [i2].vector.isEqual (&co->vertex [i3].vector))
+        {
+          for (int i4 = 0; i4 < co->numTriangles; i4 ++)
+          {
+            if (co->triangle [i4].v [0] == &co->vertex [i2]) co->triangle [i4].v [0] = &co->vertex [i3];
+            if (co->triangle [i4].v [1] == &co->vertex [i2]) co->triangle [i4].v [1] = &co->vertex [i3];
+            if (co->triangle [i4].v [2] == &co->vertex [i2]) co->triangle [i4].v [2] = &co->vertex [i3];
+          }
+        }
       }
     }
-    }
-  }
   }
 }
 

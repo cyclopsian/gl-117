@@ -244,6 +244,21 @@ class InitKugel
 
 
 
+char *getKeyString (int key, char *str)
+{
+  if (key == 8) sprintf (str, "%s", "BKSPC");
+  else if (key == 13) sprintf (str, "%s", "ENTER");
+  else if (key == 32) sprintf (str, "%s", "SPACE");
+  else
+  {
+    int upkey = toupper (key);
+    sprintf (str, "%c", upkey);
+  }
+  return str;
+}
+
+
+
 
 
 
@@ -665,6 +680,7 @@ class MissionTutorial1 : public Mission
 
   virtual void draw ()
   {
+    char buf [250], buf2 [10];
     int timeroff = 100, timerdelay = 300;
     if (timer >= 0 && timer <= timeroff - 20)
     {
@@ -773,9 +789,9 @@ class MissionTutorial1 : public Mission
     {
       if (controls == 2)
       {
-        font1->drawTextCentered (0, 7, -2.5, "THE FIRST FOUR JOYSTICK BUTTONS:", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "1: FIRE CANNON, 2: TARGET NEAREST ENEMY", &textcolor);
-        font1->drawTextCentered (0, 5, -2.5, "3: FIRE MISSILE, 4: CHOOSE MISSILE", &textcolor);
+        font1->drawTextCentered (0, 7, -2.5, "THE PREDEFINED JOYSTICK BUTTONS:", &textcolor);
+        font1->drawTextCentered (0, 6, -2.5, "FIRE CANNON, DROP CHAFF/FLARE,", &textcolor);
+        font1->drawTextCentered (0, 5, -2.5, "FIRE MISSILE, CHOOSE MISSILE", &textcolor);
       }
       else if (controls == 1 || controls == 3)
       {
@@ -798,9 +814,15 @@ class MissionTutorial1 : public Mission
       }
       else
       {
-        font1->drawTextCentered (0, 7, -2.5, "SPACE: FIRE CANNON (UNLIMITED AMMO)", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "M: CHOOSE MISSILE", &textcolor);
-        font1->drawTextCentered (0, 5, -2.5, "ENTER: FIRE MISSILE", &textcolor);
+        getKeyString (key_firecannon, buf2);
+        sprintf (buf, "%s: FIRE CANNON (UNLIMITED AMMO)", buf2);
+        font1->drawTextCentered (0, 7, -2.5, buf, &textcolor);
+        getKeyString (key_selectmissile, buf2);
+        sprintf (buf, "%s: CHOOSE MISSILE", buf2);
+        font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
+        getKeyString (key_firemissile, buf2);
+        sprintf (buf, "%s: FIRE MISSILE", buf2);
+        font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
       }
     }
     else if (timer > timeroff + 7 * timerdelay && timer <= timeroff + 8 * timerdelay - 20)
@@ -814,13 +836,17 @@ class MissionTutorial1 : public Mission
       if (controls == 2)
       {
         font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY USING THE COOLIE HAT,", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "BUTTON2, OR PRESSING 'T' ON THE KEYBOARD", &textcolor);
+        getKeyString (key_targetnearest, buf2);
+        sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD", buf2);
+        font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
       }
       else
       {
         font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY PRESSING", &textcolor);
-        font1->drawTextCentered (0, 6, -2.5, "'T' ON THE KEYBOARD", &textcolor);
+        getKeyString (key_targetnearest, buf2);
+        sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD", buf2);
+        font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
         font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
       }
     }
@@ -6632,6 +6658,8 @@ void menu_mouse (int button, int state, int x, int y)
           if (button == MOUSE_BUTTON_LEFT)
           {
             fplayer->rolleffect = 0;
+            fplayer->ruddereffect = 0;
+            fplayer->aileroneffect = 0;
             if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
             else if (controls == CONTROLS_MOUSE) controls = CONTROLS_MOUSE_REVERSE;
             else if (controls == CONTROLS_MOUSE_REVERSE) controls = CONTROLS_JOYSTICK;
@@ -6947,19 +6975,6 @@ void stats_display ()
   else
     font1->drawTextScaled (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);
   drawMouseCursor ();
-}
-
-char *getKeyString (int key, char *str)
-{
-  if (key == 8) sprintf (str, "%s", "BKSPC");
-  else if (key == 13) sprintf (str, "%s", "ENTER");
-  else if (key == 32) sprintf (str, "%s", "SPACE");
-  else
-  {
-    int upkey = toupper (key);
-    sprintf (str, "%c", upkey);
-  }
-  return str;
 }
 
 void menu_display ()

@@ -34,15 +34,12 @@
 #include "gl.h"
 #include "dirs.h"
 
-#define uint32 unsigned int
-#define uint16 unsigned short
-
 class BinaryFile
 {
   public:
   FILE *in;
-  uint32 size;
-  uint32 filepointer;
+  Uint32 size;
+  Uint32 filepointer;
   unsigned char *data;
   unsigned char ret [11];
 
@@ -50,8 +47,8 @@ class BinaryFile
   ~BinaryFile ();
   int readFloat (float *f);
   int readFloat (float *f, int n);
-  int readUInt32 (uint32 *i);
-  int readUInt16 (uint16 *i);
+  int readUInt32 (Uint32 *i);
+  int readUInt16 (Uint16 *i);
   int readString (char *ptr, int n);
   int readString (char *ptr);
 };
@@ -85,15 +82,15 @@ class BinaryFile
 
 // Structure for the 3DS indicies
 struct Indices {
-  unsigned short a, b, c, bVisible;
+  Uint16 a, b, c, bVisible;
 };
 
 // Chunk info
 struct Chunk
 {
-  unsigned short int ID;
-  unsigned int length;
-  unsigned int bytesRead;
+  Uint16 ID;
+  Uint32 length;
+  Uint32 bytesRead;
 };
 
 // CLoad3DS handles all of the loading code (see NEHE's OpenGL tutorials)

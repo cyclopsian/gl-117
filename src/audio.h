@@ -28,17 +28,6 @@
 
 #include <stdlib.h>
 
-#ifdef USE_GLUT
-#include <GL/glut.h>
-#else
-#include <GL/glut.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_thread.h"
-#ifdef HAVE_SDL_MIXER
-#include "SDL/SDL_mixer.h"
-#endif
-#endif
-
 #include "dirs.h"
 
 class WaveFile
