@@ -66,7 +66,7 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
-float nearclippingplane = 0.2; // do NOT lower this!
+float nearclippingplane = 0.25; // do NOT lower this!
 
 bool sunblinding=false;
 
@@ -4892,15 +4892,16 @@ void game_keyspecial (int key, int x, int y)
     game_reshape ();
     break;
   case KEY_F6:
-    camera = 4;
+//    camera = 4;
+    camera = 9;
     game_reshape ();
     break;
   case KEY_F7:
-    camera = 5;
+    camera = 8;
     game_reshape ();
     break;
   case KEY_F8:
-    camera = 50;
+    camera = 5;
     game_reshape ();
     break;
 /*  case KEY_F9:
@@ -6866,8 +6867,7 @@ void menu_display ()
     font1->drawText (xs, ys --, -3, "E\tTARGET NEAREST ENEMY");
     font1->drawText (xs, ys --, -3, "M\tSWITCH WEAPON");
     font1->drawText (xs, ys --, -3, "1..9\tCHANGE SPEED");
-    font1->drawText (xs, ys --, -3, "F1..7\tCAMERAS");
-    font1->drawText (xs, ys --, -3, "F8\tSHOW MAP");
+    font1->drawText (xs, ys --, -3, "F1..8\tCAMERAS");
     font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU");
     font1->drawText (xs, ys --, -3, "SPACE\tFIRE CANNON");
     font1->drawText (xs, ys --, -3, "ENTER\tFIRE MISSILE");
@@ -7731,6 +7731,26 @@ void game_timer ()
     camz = fplayer->tl->z + cf * cosi [(int) camphi];// * MAXX / zoom / 2;
     fplayer->draw = 1;
     camgamma = 20;
+  }
+  else if (camera == 8) // top near
+  {
+    cf = fplayer->zoom * 5;
+    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camy = fplayer->tl->y + 2.5;
+    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camphi = fplayer->phi;
+    fplayer->draw = 1;
+    camgamma = 50;
+  }
+  else if (camera == 9) // top very near
+  {
+    cf = fplayer->zoom * 2;
+    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camy = fplayer->tl->y + 1.0;
+    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camphi = fplayer->phi;
+    fplayer->draw = 1;
+    camgamma = 50;
   }
   else if (camera == 50)
   {
