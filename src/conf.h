@@ -24,13 +24,6 @@
 #ifndef IS_CONF_H
 #define IS_CONF_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#include "common.h"
-
 // interface definitions
 extern unsigned int key_firecannon, key_firemissile, key_dropchaff, key_dropflare;
 extern unsigned int key_selectmissile, key_thrustup, key_thrustdown;

@@ -22,6 +22,7 @@ rm ./src/main.opt
 rm ./src/main.plg
 
 echo Deleting obsolete CVS and automake/autoconf files...
+rm config.h 2> /dev/null
 rm configure 2> /dev/null
 rm Makefile 2> /dev/null
 rm Makefile.in 2> /dev/null

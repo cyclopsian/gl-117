@@ -24,12 +24,11 @@
 #ifndef IS_NET_H
 #define IS_NET_H
 
-#include "common.h"
-#include "main.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "common.h" // ok
 
 #ifdef HAVE_SDL_NET
 extern int getMsg(TCPsocket sock, char *buf);

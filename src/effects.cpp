@@ -23,11 +23,14 @@
 
 #ifndef IS_EFFECTS_H
 
+#include <math.h>
 #include "effects.h"
-
+#include "mathtab.h"
 #include "glland.h"
+#include "gl.h"
+#include "common.h"
 
-const float smokezoom[] = { 0.015, 0.025, 0.03, 0.035, 0.04, 0.045, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
+const float smokezoom[] = { 0.174, 0.171, 0.168, 0.165, 0.162, 0.159, 0.156, 0.153, 0.15, 0.149, 0.146, 0.143, 0.14, 0.136, 0.132, 0.128, 0.124, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
@@ -76,9 +79,7 @@ void CSmoke::drawElem (int n)
   glScalef (myzoom, myzoom, myzoom);
 
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, time [n] * 5 + 100);
-  float cg = 1;
-  float cg2 = 0;
+  glColor4ub (255, 255, 255, time [n] * 5 + 25);
   glTexCoord2f (0, 0);
   glVertex3f (1, 1, 0);
   glTexCoord2f (1, 0);
@@ -121,7 +122,7 @@ void CSmoke::drawElemHQ (int n)
 void CSmoke::draw ()
 {
   int i;
-  int smoketype;
+  int smoketype = 0;
   if (type == 0) smoketype = texsmoke->textureID;
   else if (type == 1) smoketype = texsmoke2->textureID;
   if (antialiasing)
@@ -252,7 +253,6 @@ void CExplosion::setExplosion (float x, float y, float z, float vx, float vy, fl
   maxlen = len;
   draw = true;
   v.set (vx, vy, vz);
-//  alpha = 1;
 }
 
 void CExplosion::move (Uint32 dt)
@@ -261,7 +261,6 @@ void CExplosion::move (Uint32 dt)
   {
     float timefac = (float) dt / (float) timestep;
     zoom = sine [ttl * 180 / maxlen] * maxzoom;
-//    if (ttl / maxlen < 0.5) alpha = ttl / maxlen + 0.5;
     ttl -= dt;
     tl->y += 0.01 * timefac;
     if (ttl <= 0)
@@ -399,7 +398,7 @@ void Font::extractLetters (int height, char start, int num)
   this->start = start;
   this->height = height;
   int x = 0, y = 0;
-  int xs, xe;
+  int xs = 0, xe = 0;
   n = 0;
 
   for (;;)
@@ -820,7 +819,7 @@ void HighClouds::setTexture (CTexture *texture)
 
 void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
 {
-  int i = 0, j;
+  int j;
   CObject *cm = o->object [0];
   for (int i2 = 0; i2 < cm->numVertices; i2 ++)
   {
@@ -831,7 +830,7 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.05);
+  glAlphaFunc (GL_GEQUAL, 0.015);
   glDisable (GL_DEPTH_TEST);
 
   glPushMatrix ();
@@ -863,9 +862,12 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
   }
   glEnd();
 
-  glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  if (quality <= 2 || !antialiasing)
+  {
+    glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  }
   glBegin(GL_QUADS);
   for (j = 0; j < cm->numQuads; j++)
   {

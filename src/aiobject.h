@@ -24,10 +24,9 @@
 #ifndef IS_AIOBJECT_H
 #define IS_AIOBJECT_H
 
-#include "common.h"
-
-#include "model.h"
-#include "effects.h"
+#include "common.h" // ok
+#include "model.h" // ok
+#include "effects.h" // ok
 
 // id values of objects
 // non-AI air objects

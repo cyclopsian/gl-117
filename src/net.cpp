@@ -24,6 +24,7 @@
 #ifndef IS_NET_H
 
 #include "net.h"
+#include "main.h"
 
 int port = 4567;
 char *message;

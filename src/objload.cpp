@@ -23,6 +23,9 @@
 
 #ifndef IS_OBJLOAD_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "objload.h"
 
 CFile::CFile (char *filename)
@@ -80,8 +83,8 @@ int CFile::readInteger (int32 offset)
   while ((data [i] >= '0' && data [i] <= '9') || data [i] == '-') i ++;
   data [i] = 0;
   filepointer = i + 1;
-  char *p1;
-  char **p2 = &p1;
+//  char *p1;
+//  char **p2 = &p1;
   return (int) atoi (&data [offset]);
 }
 int CFile::readInteger ()
@@ -268,7 +271,7 @@ bool CLoadOBJ::ImportOBJ (CModel *model, char *filename)
       int z = 0;
       do
       {
-        int a = file->readInteger ();
+        (void) file->readInteger ();
         file->nextWhite ();
         file->skipWhite ();
         p = file->getChar ();
@@ -292,7 +295,7 @@ bool CLoadOBJ::ImportOBJ (CModel *model, char *filename)
   object->triangle = new CTriangle [object->numTriangles];
   object->quad = new CQuad [object->numQuads];
 
-  int vn = 0, tn = 0, qn = 0;
+  int vn = 0, tn = 0;
   i = 0;
   while (i < file->size - 1)
   {

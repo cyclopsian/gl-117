@@ -24,14 +24,8 @@
 #ifndef IS_GL_H
 #define IS_GL_H
 
-#include "common.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
-
-#include "model.h"
+#include "common.h" // ok
+#include "model.h" // ok
 
 class GL
 {
@@ -74,10 +68,10 @@ class GL
   void shadeFlat ();
   void shadeSmooth ();
   void enableFog (float view);
-  void extractFrustum();
-  bool isPointInFrustum( float x, float y, float z );
-  bool isSphereInFrustum( float x, float y, float z, float radius );
-  bool isCubeInFrustum( float x, float y, float z, float size );
+  void extractFrustum ();
+  bool isPointInFrustum (float x, float y, float z);
+  bool isSphereInFrustum (float x, float y, float z, float radius);
+  bool isCubeInFrustum (float x, float y, float z, float size);
 };
 
 extern GL *gl;

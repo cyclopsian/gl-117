@@ -23,7 +23,13 @@
 
 #ifndef IS_LAND_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
 #include "land.h"
+#include "mathtab.h"
 
 
 
@@ -50,7 +56,7 @@ void Landscape::convolveGauss (int radius, int hmin, int hmax) // only convolve 
 {
   // create u and v vectors and restrict them to the interval [mincore...maxcore]
   float core_u [MAXCORE], core_v [MAXCORE];
-  int mincorex, mincorey, maxcorex, maxcorey;
+  int mincorex = 0, mincorey = 0, maxcorex = 0, maxcorey = 0;
   if (radius == 1)
   {
     core_u [4] = 0.25; core_u [5] = 0.5; core_u [6] = 0.25;
@@ -131,34 +137,6 @@ void Landscape::smoothGlacier ()
       }
     }
 }
-
-// Gaussian convolution, primitive (obsolete -> faster isotropic kernel calculation)
-/*void Landscape::gauss ()
-{
-  int i, i2, i3, i4;
-  int g5[5][5]={{1,1,2,1,1},
-                {1,3,4,3,1},
-                {2,4,5,4,2},
-                {1,3,4,3,1},
-                {1,1,2,1,1}};
-  for (i = 0; i <= MAXX; i ++)
-    for (i2 = 0; i2 <= MAXX; i2 ++)
-    {
-      int sum = 0;
-      for (i3 = 0; i3 < 5; i3 ++)
-        for (i4 = 0; i4 < 5; i4 ++)
-        {
-          sum += g5[i3][i4] * h[getCoord(i+i3-2)][getCoord(i2+i4-2)];
-        }
-      sum /= 53;
-      hg[i][i2]=sum;
-    }
-  for (i = 0; i <= MAXX; i ++)
-    for (i2 = 0; i2 <= MAXX; i2 ++)
-    {
-      h [i] [i2] = hg [i] [i2];
-    }
-}*/
 
 // Gaussian convolution for a single raster point (5x5)
 void Landscape::gauss (int x, int y)
@@ -538,7 +516,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
   for (i = 0; i < maxx; i ++)
     for (i2 = 0; i2 < maxx; i2 ++)
       if (h [i] [i2] < erosion)
-        h [i] [i2] = erosion - 100 + myrandom (200, i, i2);
+        h [i] [i2] = erosion - 30 + myrandom (60, i, i2);
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
 }
@@ -1195,7 +1173,7 @@ void Landscape::genLake (int depthpc)
   {
     int a1, i, i2;
     unsigned short level, zmin;
-    int xs, ys;
+    int xs = 0, ys = 0;
     unsigned short depth = (highestpoint - lowestpoint) * depthpc / 100;
     zmin = 65535;
     int radius = MAXX * 2 * depthpc / 100;
@@ -1636,36 +1614,6 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
       }
   }
 }
-
-/*void Landscape::searchGreatPlain (int *x, int *y)
-{
-  int i, i2;
-    int val [MAXX_8 / 2] [MAXX_8 / 2];
-    for (i = 16; i <= MAXX - 16; i += 16)
-      for (i2 = 16; i2 <= MAXX - 16; i2 += 16)
-        if (f [i] [i2] == GRASS && f [i-8] [i2] == GRASS && f [i+8] [i2] == GRASS && f [i] [i2-8] == GRASS && f [i] [i2+8] == GRASS)
-        {
-          val [i >> 4] [i2 >> 4] = abs (h [i] [i2] - h [i-8] [i2]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i+8] [i2]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i] [i2-8]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i] [i2+8]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i-4] [i2]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i+4] [i2]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i] [i2-4]);
-          val [i >> 4] [i2 >> 4] += abs (h [i] [i2] - h [i] [i2+4]);
-        }
-    int min = 100000;
-    for (i = 1; i < MAXX_8; i ++)
-      for (i2 = 1; i2 < MAXX_8; i2 ++)
-      {
-        if (val [i] [i2] < min)
-        {
-          min = val [i] [i2];
-          *x = i;
-          *y = i2;
-        }
-      }
-}*/
 
 
 

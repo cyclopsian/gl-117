@@ -24,8 +24,8 @@
 #ifndef IS_COCKPIT_H
 #define IS_COCKPIT_H
 
-#include "main.h"
-#include "pilots.h"
+#include "common.h" // ok
+#include "model.h" // ok
 
 class Cockpit
 {
@@ -37,6 +37,8 @@ class Cockpit
   Uint32 dt;
 
   Cockpit ();
+
+  void drawBlip (int shape, float x, float y, float z, unsigned char r, unsigned char g, unsigned char b);
 
   void setColor (int alpha);
   void setColor (CColor *color, int alpha);

@@ -24,7 +24,7 @@
 #ifndef IS_OBJECT_H
 #define IS_OBJECT_H
 
-#include "model.h"
+#include "model.h" // ok
 
 // CSpaceObj represents an abstract object (like a cannon shot or a complete fighter)
 class CSpaceObj

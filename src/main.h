@@ -38,26 +38,12 @@
     HAVE_SDL_MIXER: SDL_mixer installed
     HAVE_SDL_NET: SDL_net installed */
 
-#include "common.h"
-
-#include "dirs.h"
-#include "model.h"
-#include "3ds.h"
-#include "gl.h"
-#include "land.h"
-#include "audio.h"
-#include "net.h"
-#include "effects.h"
-#include "mathtab.h"
-#include "aiobject.h"
-#include "roam.h"
-#include "glland.h"
-#include "pilots.h"
-#include "conf.h"
-#include "mission.h"
-#include "cockpit.h"
-#include "menu.h"
-#include "maploader.h"
+#include "aiobject.h" // ok
+#include "model.h" // ok
+#include "3ds.h" // ok
+#include "effects.h" // ok
+#include "audio.h" // ok
+#include "pilots.h" // ok
 
 extern Font *font1, *font2;
 

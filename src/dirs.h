@@ -24,18 +24,6 @@
 #ifndef IS_DIRS_H
 #define IS_DIRS_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#ifndef _MSC_VER // no microsoft?
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif
-
-#include "common.h"
-
 class Dirs
 {
   public:

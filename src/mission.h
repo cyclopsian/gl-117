@@ -24,11 +24,8 @@
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
 
-#include <stdio.h>
-#include <string.h>
-#include "common.h"
-#include "model.h"
-#include "aiobject.h"
+#include "model.h" // ok
+#include "aiobject.h" // ok
 
 #define MISSION_DEMO 0
 #define MISSION_CAMPAIGN1 1

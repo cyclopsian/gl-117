@@ -23,12 +23,54 @@
 
 #ifndef IS_COCKPIT_H
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "cockpit.h"
+#include "main.h"
+#include "pilots.h"
+#include "mathtab.h"
+#include "mission.h"
+#include "gl.h"
+#include "glland.h"
+
+#define TRIANGLE_BLIP 1
+#define SQUARE_BLIP   2
 
 Cockpit::Cockpit ()
 {
   flarewarning = 0;
   chaffwarning = 0;
+}
+
+// Mitchell Perilstein:
+void Cockpit::drawBlip(int shape, float x, float y, float z, unsigned char r, unsigned char g, unsigned char b)
+{
+  float blipsize = 0.02;
+  int alpha = 200;
+  CColor color;
+
+//  setColor (&color, alpha); // no need here
+  glColor4ub (r, g, b, alpha);
+  glBegin (GL_QUADS);
+ 
+  switch (shape) {
+  case SQUARE_BLIP:
+    glVertex3f (x + blipsize, y + blipsize, z);	  
+    glVertex3f (x + blipsize, y - blipsize, z);	  
+    glVertex3f (x - blipsize, y - blipsize, z);
+    glVertex3f (x - blipsize, y + blipsize, z);	  
+    glVertex3f (x + blipsize, y + blipsize, z);	  
+    break;
+  case TRIANGLE_BLIP:
+    glVertex3f (x, y + blipsize, z);
+    glVertex3f (x + blipsize, y - blipsize, z);
+    glVertex3f (x - blipsize, y - blipsize, z);
+    glVertex3f (x, y + blipsize, z);
+    break;
+  default:
+    abort();
+  }
+  glEnd ();
 }
 
 void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup projection
@@ -156,22 +198,129 @@ void Cockpit::drawCounter ()
       font1->drawText (-30.0F, 15.0F - i, -3.0F, buf, &red);
     }
   }
-/*  glColor3ub (255, 255, 255);
-  gl->enableTextures (texcounter->textureID);
-  glEnable (GL_BLEND);
-  glBegin (GL_QUADS);
-  glTexCoord2f (0, 0);
-  glVertex3f (xf - 1.0F, yf - 1.0F, zf);
-  glTexCoord2f (0.999, 0);
-  glVertex3f (xf + 1.0F, yf - 1.0F, zf);
-  glTexCoord2f (0.999, 0.999);
-  glVertex3f (xf + 1.0F, yf + 1.0F, zf);
-  glTexCoord2f (0, 0.999);
-  glVertex3f (xf - 1.0F, yf + 1.0F, zf);
-  glEnd ();
-  glDisable (GL_BLEND);
-  glDisable (GL_TEXTURE_2D);*/
 }
+
+/*void Cockpit::drawTargeter ()
+{
+  if (! fplayer->target)
+    return;
+
+  glMatrixMode (GL_MODELVIEW);
+  glPushMatrix();
+  if (fplayer->target->active)
+  {
+    DynamicObj* target = fplayer->target;
+
+    float hud_width  = 800.0f; // so x will be from -400.0f to 400.0f
+    float hud_height = 600.0f; //        and y from -300.0f to 300.0f
+    float view_angle = 80.0f / 180.0f * PI; // in radians!
+
+    float view_matrix [16];
+    glGetFloatv (GL_MODELVIEW_MATRIX, view_matrix);
+
+    glLoadIdentity ();
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluOrtho2D (-hud_width * 0.5f,  hud_width * 0.5f,
+                -hud_height * 0.5f, hud_height * 0.5f);
+
+    CVector3 pos = *target->tl;
+    CVector3 delta = *fplayer->tl;
+    delta.sub (&pos);
+
+    // multiply Vector by Matrix
+    float* m = view_matrix;
+    float x = m[0] * pos.x + m[4] * pos.y + m[8] * pos.z + m[12];
+    float y = m[1] * pos.x + m[5] * pos.y + m[9] * pos.z + m[13];
+    float z = m[2] * pos.x + m[6] * pos.y + m[10] * pos.z + m[14];
+    pos.x = x; pos.y = y; pos.z = z;
+    
+    float dist = delta.length ();
+
+    // sorry, but some variables names as good as my english :(
+    float a = sqrt (pos.x * pos.x + pos.y * pos.y);
+    float b = sqrt (dist * dist - a * a);
+    float descale = hud_height * 0.5f / tan (view_angle * 0.5f) / b;
+
+    gl->enableAlphaBlending ();
+    glTranslatef (pos.x * descale, pos.y * descale, 0.0f);
+    glPushMatrix ();
+
+      // FIXME: don't sure that this is right:
+      float object_radius = target->zoom;
+
+      float second_descale = hud_height * 0.5f / tan (view_angle * 0.5f) / (b - object_radius);
+      float radius = object_radius * second_descale + 4.0f;
+
+      bool full = false;
+      if (static_cast <AIObj*> (fplayer->target)->party != fplayer->party)
+      {
+        if (fplayer->ttf < 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
+        {
+          glColor4ub (255, 255, 0, 255); full = true;
+        }
+        else
+        {
+          glColor4ub (255, (50 * timestep - fplayer->ttf) * 255 / 60 / timestep, 0, 255);
+        }
+      }
+      else
+      {
+        glColor4ub (0, 0, 255, 255);
+      }
+      if (! full)
+      {
+        const float corner_size = 0.5f; // in half's of rect side
+        glBegin (GL_LINE_STRIP);
+        glVertex2f (- radius, radius * (1.0f - corner_size));
+        glVertex2f (- radius, radius);
+        glVertex2f (- radius * (1.0f - corner_size), radius);
+        glEnd ();
+
+        glBegin (GL_LINE_STRIP);
+        glVertex2f (radius * (1.0f - corner_size), radius);
+        glVertex2f (radius, radius);
+        glVertex2f (radius, radius * (1.0f - corner_size));
+        glEnd ();
+
+        glBegin (GL_LINE_STRIP);
+        glVertex2f (radius * (1.0f - corner_size), - radius);
+        glVertex2f (radius, - radius);
+        glVertex2f (radius, - radius * (1.0f - corner_size));
+        glEnd ();
+
+        glBegin (GL_LINE_STRIP);
+        glVertex2f (- radius, - radius * (1.0f - corner_size));
+        glVertex2f (- radius, - radius);
+        glVertex2f (- radius * (1.0f - corner_size), - radius);
+        glEnd ();
+      }
+      else
+      {
+        glBegin (GL_LINE_STRIP);
+        glVertex2f (- radius, - radius);
+        glVertex2f (radius, - radius);
+        glVertex2f (radius, radius);
+        glVertex2f (- radius, radius);
+        glVertex2f (- radius, - radius);
+        glEnd ();
+      }
+    glPopMatrix ();
+    gl->disableAlphaBlending ();
+  }
+  glMatrixMode (GL_MODELVIEW);
+  glPopMatrix();
+
+  glViewport(0, 0, (GLint) width, (GLint) height);
+
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+
+  float v = getView ();
+  if (camera == 50) v = 100000.0;
+  gluPerspective (80.0, (float) width / height, 0.25 * GLOBALSCALE, v * GLOBALSCALE);
+  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+}*/
 
 void Cockpit::drawTargeter ()
 {
@@ -190,7 +339,6 @@ void Cockpit::drawTargeter ()
     {
       if (fplayer->ttf <= 0 && fplayer->missiletype != MISSILE_DF1 - MISSILE1)
       {
-//  printf ("t%d ", fplayer->ttf);
         glColor4ub (255, 255, 0, 255); full = true;
       }
       else
@@ -240,7 +388,6 @@ void Cockpit::drawTargeter ()
     }
     gl->disableAlphaBlending ();
   }
-
 }
 
 void Cockpit::drawCross ()
@@ -292,8 +439,6 @@ void Cockpit::drawHeading ()
   float yf = 17.5;
   float zf = -2.5;
   float g = 0.5;
-//    float p1 = fplayer->phi - 40.0;
-//    float p2 = fplayer->phi + 40.0;
   for (i = 0; i < 360; i += 5)
   {
     float p = (float) i - fplayer->phi;
@@ -336,10 +481,7 @@ void Cockpit::drawHeading ()
         else if (dphi > 90) dphi = 90;
         float delta = atan (dgamma / dphi) * 180 / PI;
         if (dphi > 0) delta -= 180;
-//        printf ("delta=%f, dgamma=%f, dphi=%f\n",delta, dgamma, dphi);
         delta += fplayer->theta;
-//        while (delta < 0) delta += 360;
-//        while (delta >= 360) delta -= 360;
         float xs = COS(delta) * 3;
         float ys = -SIN(delta) * 3;
         float delta1 = delta + 5;
@@ -348,10 +490,6 @@ void Cockpit::drawHeading ()
         float delta2 = delta - 5;
         float xs2 = COS(delta2) * 2.8;
         float ys2 = -SIN(delta2) * 2.8;
-/*        if (xs > 3) xs = 3;
-        else if (xs < -3) xs = -3;
-        if (ys > 3) ys = 3;
-        else if (ys < -3) ys = -3;*/
         zf = -4;
         glBegin (GL_LINE_STRIP);
         glColor4ub (255, 0, 0, alpha);
@@ -359,62 +497,8 @@ void Cockpit::drawHeading ()
         glVertex3f (xs, ys, zf);
         glVertex3f (xs1, ys1, zf);
         glEnd ();
-/*        glBegin (GL_LINE_STRIP);
-        glColor4ub (255, 0, 0, alpha);
-        glVertex3f (xs - 0.12, ys - 0.12, zf);
-        glVertex3f (xs + 0.12, ys - 0.12, zf);
-        glVertex3f (xs + 0.12, ys + 0.12, zf);
-        glVertex3f (xs - 0.12, ys + 0.12, zf);
-        glVertex3f (xs - 0.12, ys - 0.12, zf);
-        glEnd ();
-        glBegin (GL_LINES);
-        glVertex3f (xs - 0.15, ys - 0.15, zf);
-        glVertex3f (xs + 0.15, ys + 0.15, zf);
-        glVertex3f (xs + 0.15, ys - 0.15, zf);
-        glVertex3f (xs - 0.15, ys + 0.15, zf);
-        glEnd ();*/
       }
     }
-
-/*  zf = -4.0F;
-  for (i = 0; i < 360; i += 5)
-  {
-    float p = (float) i - fplayer->gamma;
-    if (p < -180) p += 360;
-    if (p > 180) p -= 360;
-    if (p >= -30 && p <= 30)
-    {
-      if (i == 0 || i == 90 || i == 180 || i == 270)
-        g = 0.6;
-      else if (!(i % 10))
-        g = 0.3;
-      else
-        g = 0.1;
-      xf = p / 6.0;
-      gl->enableAlphaBlending ();
-      yf = -8;
-      setColor (alpha);
-      glBegin (GL_LINES);
-      glVertex3f ((yf - g) * 0.1, xf * 0.1, zf);
-      glVertex3f (yf * 0.1, xf * 0.1, zf);
-      glEnd ();
-      yf = -9.5;
-      if (i == 90)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "-90", &color);
-      else if (i == 120)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "-60", &color);
-      else if (i == 150)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "-30", &color);
-      else if (i == 180)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "0", &color);
-      else if (i == 210)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "30", &color);
-      else if (i == 240)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "60", &color);
-      else if (i == 270)
-        font1->drawText (yf - 2.0, xf - 0.5, zf, "90", &color);
-    }
-  }*/
   
   sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 80000.0F));
   font1->drawTextCentered (-8.0, -8.5, -4.0, str, &color);
@@ -431,7 +515,6 @@ void Cockpit::drawHeading ()
   glLineWidth (LINEWIDTH(1.2F));
 
   glBegin (GL_LINES);
-  //float tmp = int(fplayer->gamma+360)%360-180;
   float tmp = fplayer->gamma - 180;
   cockpitvertex (-innerx,tmp);
   cockpitvertex (-15,tmp);
@@ -442,7 +525,6 @@ void Cockpit::drawHeading ()
   {
     float tmp=int(-i+fplayer->gamma+540)%360-180;
     tmp += dgamma;
-//    float tmp = (fplayer->gamma - i + 540) % 360 - 180;
     cockpitvertex (-innerx,tmp+1);
     cockpitvertex (-innerx,tmp);
     cockpitvertex (innerx,tmp+1);
@@ -515,7 +597,7 @@ void Cockpit::drawWeapon ()
   tl.x = 0.35; tl.y = -0.3; tl.z = -0.5;
   gl->disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
-  CModel *missile;
+  CModel *missile = NULL;
   if (fplayer->missiletype == 0) missile = &model_missile1;
   else if (fplayer->missiletype == 1) missile = &model_missile2;
   else if (fplayer->missiletype == 2) missile = &model_missile3;
@@ -576,22 +658,8 @@ void Cockpit::drawRadar ()
   glVertex3f (-xl * 0.9, yf, zf);
   glVertex3f (xl * 0.9, yf, zf);
   glEnd ();
-//  gl->disableAlphaBlending ();
-/*    gl->enableAlphaBlending ();
-  glDisable (GL_DEPTH_TEST);
-  glBegin (GL_QUADS);
-  glColor4ub (255, 255, 0, 100);
-  glVertex3f (-1.2, yf - 1.0, zf);
-  glVertex3f (1.2, yf - 1.0, zf);
-  glVertex3f (1.2, yf + 1.0, zf);
-  glVertex3f (-1.2, yf + 1.0, zf);
-  glEnd ();*/
   int radarzoom = 1;
   if (fplayer->disttarget < 40) radarzoom = 2;
-  glPointSize (LINEWIDTH(2.5F));
-  glBegin (GL_POINTS);
-  glColor4ub (255, 255, 255, 255);
-  glVertex3f (0.0, yf, zf);
   for (i = 0; i < maxfighter; i ++)
     if (fighter [i] != fplayer && fighter [i]->active)
     {
@@ -604,17 +672,16 @@ void Cockpit::drawRadar ()
       {
         if (fighter [i] == fplayer->target)
         {
-          glColor4ub (255, 200, 0, 255);
+          drawBlip(SQUARE_BLIP, px, py, zf, 255, 200, 0);
         }
         else if (fighter [i]->party != fplayer->party)
         {
-          glColor4ub (255, 0, 0, 255);
+      	  drawBlip(SQUARE_BLIP, px, py, zf, 255, 0, 0);
         }
         else
         {
-          glColor4ub (0, 0, 255, 255);
+      	  drawBlip(SQUARE_BLIP, px, py, zf, 0, 0, 255);
         }
-        glVertex3f (px, py, zf);
       }
     }
   for (i = 0; i < maxmissile; i ++)
@@ -628,12 +695,10 @@ void Cockpit::drawRadar ()
       float py = yf + d * cosi [aw];
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
       {
-        glColor4ub (255, 255, 255, 255);
-        glVertex3f (px, py, zf);
+        drawBlip(TRIANGLE_BLIP, px, py, zf, 255, 255, 255);
       }
     }
   }
-  glEnd ();
   gl->disableAlphaBlending ();
 }
 
@@ -652,7 +717,7 @@ void Cockpit::drawRelativeHeightBar()
   float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
   float px = fplayer->tl->x, py = fplayer->tl->y, pz = fplayer->tl->z;
   float lh = l->getExactHeight(px, pz);
-  setColor(80); //low alpha for better visibility
+  setColor(80); // low alpha for better visibility
   // add 100.0 to each player_y and land_h to avoid values <= 0.0
   float rel_height = ((100.0F+py)/(100.0F+lh) * 100.0F) - 100.0F;	
 

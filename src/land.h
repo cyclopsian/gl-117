@@ -24,13 +24,6 @@
 #ifndef IS_LAND_H
 #define IS_LAND_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-
-#include "mathtab.h"
-
 // surface extents
 #define MAXX 512
 #define MAXX2 256
@@ -92,6 +85,7 @@
 #define DEEPWATER 42
 #define XSHALLOWWATER 43
 #define XDEEPWATER 44
+// Water until 49
 #define MOONSAND 50
 #define DESERTSAND 60
 #define TOWN 90

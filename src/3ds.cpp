@@ -23,7 +23,17 @@
 
 #ifndef IS_3DS_H
 
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <math.h>
+
 #include "3ds.h"
+#include "common.h"
+#include "gl.h"
+#include "dirs.h"
+#include "mathtab.h"
 
 FILE *debugstream3ds = stdout;
 
@@ -225,7 +235,6 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   char buf [STDSIZE];
   CObject newObject;
   CMaterial newTexture;
-//  char buffer [50000] = {0};
 
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -275,12 +284,10 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case EDITKEYFRAME:
-//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
 
       default: 
-//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
@@ -293,8 +300,6 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
 void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *previousChunk)
 {
-//  char buffer[50000] = {0};
-
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
 
@@ -330,7 +335,6 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
         break;
 
       default:
-//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
@@ -344,8 +348,6 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
 
 void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 {
-//  char buffer[50000] = {0};
-
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
 
@@ -402,7 +404,6 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         break;
 
       default:  
-//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
@@ -416,13 +417,8 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 
 void CLoad3DS::ReadChunk (Chunk *pChunk)
 {
-//  unsigned char buf [10];
   pChunk->bytesRead = file->readUInt16 (&pChunk->ID);
   pChunk->bytesRead += file->readUInt32 (&pChunk->length);
-/*  if (pChunk->length > 128000)
-  {
-    display ("Chunk length exceeds 128K", LOG_WARN);
-  }*/
 }
 
 int CLoad3DS::GetString (char *buffer)
@@ -542,7 +538,6 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
 void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)
 {
   char materialName [255] = {0};
-//  char buffer [50000] = {0};
   previousChunk->bytesRead += GetString (materialName);
 
   for (int i = 0; i < model->numMaterials; i ++)
@@ -564,7 +559,6 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
     }
   }
 
-//  previousChunk->bytesRead += file->readString ((char *) buffer, 50000, previousChunk->length - previousChunk->bytesRead);
   currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }      
 
@@ -595,7 +589,6 @@ void CLoad3DS::Compile (CModel *model)
   }
 
   // Scale texture coordinated by uscale, vscale
-//  model->scaleTexture (uscale, vscale);
   for (i = 0; i < model->numObjects; i ++)
   {
     CObject *co = model->object [i];
@@ -657,7 +650,6 @@ void CLoad3DS::LoadTextures (CModel *model)
     if (model->object [i]->hasTexture)
     {
       strcpy (str, dirs->getTextures (model->object [i]->material->filename));
-//			strcat (str, model->object [i]->material->filename);
 			for (i2 = (int) strlen (str) - 1; i2 >= 0; i2 --)
 			{
         if (i2 > 2 && str [i2] == '.')

@@ -24,19 +24,14 @@
 #ifndef IS_GLLAND_H
 #define IS_GLLAND_H
 
-#include "common.h"
-
-#define PARTS 20 // maximum LOD parts
-
 #include <string.h>
 
-#include "gl.h"
-#include "model.h"
-#include "aiobject.h"
-#include "effects.h"
-#include "land.h"
-#include "roam.h"
-#include "net.h"
+#include "model.h" // ok
+#include "aiobject.h" // ok
+#include "effects.h" // ok
+#include "land.h" // ok
+
+#define PARTS 24 // maximum LOD parts
 
 // exact landscape type
 #define LANDSCAPE_ALPINE 0
@@ -53,7 +48,7 @@
 #define LANDSCAPE_ARCTIC 50
 
 // number of materials
-#define MAXMATERIAL 17
+#define MAXMATERIAL 101
 
 // textures are loaded in main.cpp
 extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
@@ -69,7 +64,6 @@ class GLLandscape : public Landscape
   public:
   short nl [MAXX + 2] [MAXX + 2]; // lighting mask, MAXX+1 x MAXX+1 is sufficient, but VC bug?
   float lv [3];
-//  RTerrain *rt;
   unsigned char r [MAXX + 1] [MAXX + 1]; // red
   unsigned char g [MAXX + 1] [MAXX + 1]; // green
   unsigned char b [MAXX + 1] [MAXX + 1]; // blue
@@ -87,11 +81,9 @@ class GLLandscape : public Landscape
   bool hastowns;
 
   private:
-//  float hh, hh2, zoomz2;
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
   float mat [MAXMATERIAL] [4]; // materials=colors of landscape IDs
   CTexture *texmap [MAXMATERIAL]; // texture for material
-//  float mata [MAXMATERIAL] [4];
   Space *space; // space of all objects
   CColor treecolor;
   int vmin [PARTS] [PARTS]; // LOD
@@ -99,10 +91,11 @@ class GLLandscape : public Landscape
   float vh [PARTS] [PARTS]; // LOD
   bool vis [PARTS] [PARTS]; // LOD
 
+  float lightfac; // light factor to multiply
+
   void norm (float *c);
   void normalcrossproduct (float *a, float *b, float *c);
 
-//  float *selectMaterial (int x, int y);
   int selectColor (int x, int y);
   
   unsigned short lg [MAXX + 1] [MAXX + 1]; // gaussian filter result
@@ -131,11 +124,9 @@ class GLLandscape : public Landscape
 
   void drawTree (float x, float y, float htree, float wtree, int phi); // two in one
   void drawTreeQuad (int x, int y, int phi, bool hq);
-//  void drawTreeGrid (float x, float y, float htree, float wtree, int phi); // 9 trees in 6 quads
   void drawTown (int x, int y);
 
   int detail [PARTS] [PARTS]; // LOD
-//  int done [100] [100];
 
   void drawQuadStrip (int x1, int y1, int x2, int y2); // fast quad strip without textures
   void drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
@@ -151,6 +142,8 @@ class GLLandscape : public Landscape
   void draw (int phi, int gamma); // draw ALL
 
   void calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile, DynamicObj **flare); // explosions light up the surface
+
+  void setMaterial (int n, float r, float g, float b, CTexture *tex);
 
   GLLandscape (Space *space2, int type, int *heightmask);
 };

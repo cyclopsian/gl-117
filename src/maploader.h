@@ -24,12 +24,8 @@
 #ifndef IS_MAPLOADER_H
 #define IS_MAPLOADER_H
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fileloader.h"
-#include "dirs.h"
-#include "mission.h"
+#include "aiobject.h" // ok
+#include "mission.h" // ok
 
 #define MAXMAPS 100
 #define TOKENLEN 1024
@@ -62,6 +58,7 @@ class MissionCustom : public Mission
   int reterror;
   char token [TOKENLEN];
   int map_type;
+  int save_map_type;
   int weather, clouds;
   AIObj obj [maxfighter];
   int numobjects;

@@ -24,11 +24,9 @@
 #ifndef IS_OBJLOAD_H
 #define IS_OBJLOAD_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #define int32 int
+
+#include "model.h" // ok
 
 class CFile
 {
@@ -50,8 +48,6 @@ class CFile
   void nextWhite ();
   void skipWhite ();
 };
-
-#include "model.h"
 
 // CLoad3DS handles all of the loading code (see NEHE's OpenGL tutorials)
 class CLoadOBJ

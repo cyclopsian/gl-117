@@ -49,7 +49,7 @@
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "V1.2"
+#define VERSIONSTRING "V1.3"
 
 // data types
 #ifdef USE_GLUT
@@ -86,7 +86,7 @@
 
 // view range borders
 #define VIEW_MIN 30
-#define VIEW_MAX 120
+#define VIEW_MAX 150
 
 // preferences
 extern int quality;
@@ -115,13 +115,14 @@ extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: el
 extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
 
 extern int lighting; // 1=on, 0=off (obsolete)
-extern int mode; // always off=0, 1 would mean to calculate ROAM!
+extern int mode; // always off=0, 1 would mean to calculate ROAM (obsolete)!
 
 extern float getView (); // return view dependant on weather
 
 extern int difficulty; // 0=easy, 1=normal, 2=hard
 extern int physics; // 0=action, 1=realistic
 extern int brightness; // brightness correction
+extern int contrast; // contrast/gamma correction (not yet configurable)
 
 extern bool sunblinding; // viewer gazing into the sun?
 
@@ -230,6 +231,8 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 
 // display log/debug message
 extern void display (char *str, int level);
+
+extern void display_exit ();
 
 // display "out of memory" error and exit
 extern void error_outofmemory ();

@@ -24,7 +24,7 @@
 #ifndef IS_MENU_H
 #define IS_MENU_H
 
-#include "main.h"
+#include "model.h" // ok
 
 extern int menu_id;
 
@@ -108,18 +108,6 @@ class Button : public Component
   void draw ();
   void triggerMouse (int id, int button);
 };
-
-/*class ImageButton : public Button
-{
-  public:
-  char *text;
-  CTexture *texture;
-  int aligntexture;
-
-  ImageButton ();
-  ImageButton (char *text, CTexture *texture);
-  void draw ();
-};*/
 
 class TextField : public Component
 {

@@ -23,7 +23,10 @@
 
 #ifndef IS_AUDIO_H
 
+#include <stdlib.h>
+
 #include "audio.h"
+#include "dirs.h"
 
 WaveFile *wave = NULL;
 
@@ -90,10 +93,6 @@ void freqEffect (int channel, void *stream, int len, void *udata)
   {
     ptr [i] = 0;
   }
-/*  for (i = 0; i < len; i += sizeof (Uint32), ptr ++)
-  {
-    *ptr = (((*ptr) & 0xFFFF0000) >> 16) | (((*ptr) & 0x0000FFFF) << 16);
-  }*/
 }
 
 WaveFile::WaveFile ()
@@ -114,7 +113,6 @@ WaveFile::WaveFile (char *filename)
   soundpos = 0;
 #else
   channel = -1;
-//  Mix_RegisterEffect (MIX_CHANNEL_POST, freqEffect, NULL, NULL);
 #endif
   volume = 100;
   load (filename);
@@ -125,8 +123,8 @@ WaveFile::~WaveFile () {}
 
 void WaveFile::load (char *filename)
 {
-  char buf [STDSIZE];
 #ifndef USE_GLUT
+  char buf [STDSIZE];
 #ifndef HAVE_SDL_MIXER
   if (SDL_LoadWAV (filename, &spec, &sound, &soundlen) == NULL)
   {
@@ -144,13 +142,6 @@ void WaveFile::load (char *filename)
     display (buf, LOG_FATAL);
     exit (EXIT_LOADFILE);
   }
-/*  Uint32 *ptr = (Uint32 *) chunk->abuf;
-  int i;
-  for (i = 0; i < chunk->alen/8; i ++)
-    ptr [i] = ptr [i*2];
-  for (i = chunk->alen/4 * 9/10; i < chunk->alen/4; i ++)
-    buf2 [i] = 0;
-  chunk->alen = chunk->alen * 9/10; */
 #endif
 #endif
 }
@@ -211,7 +202,6 @@ void WaveFile::setVolume (int level)
 
 SoundSystem::SoundSystem ()
 {
-  char buf [STDSIZE];
   audio = false;
   sound = true;
   music = true;
@@ -219,6 +209,7 @@ SoundSystem::SoundSystem ()
   volumesound = 100;
   volumemusic = 100;
 #ifndef USE_GLUT
+  char buf [STDSIZE];
 #ifndef HAVE_SDL_MIXER
   waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
@@ -411,34 +402,8 @@ void SoundSystem::playMusic ()
   if (!music) return;
   if (volumemusic == 0) return;
 #ifdef HAVE_SDL_MIXER
-/*  int akttime = SDL_GetTicks ();
-  if (playtime == 0)
-  {
-    playtime = akttime;
-  }
-  else
-  {
-    if (abs (akttime - playtime) < 1500) return;
-    playtime = akttime;
-  }*/
   musicplaying = true;
-//  haltMusic ();
   Mix_PlayMusic (music1, -1);
-/*  switch (sample)
-  {
-    case MUSIC_DARK1:
-      Mix_PlayMusic (musicdark1, -1);
-      break;
-    case MUSIC_WINNER1:
-      Mix_PlayMusic (musicwinner1, -1);
-      break;
-    case MUSIC_STANDBY1:
-      Mix_PlayMusic (musicstandby1, -1);
-      break;
-    case MUSIC_ELECTRO1:
-      Mix_PlayMusic (musicelectro1, -1);
-      break;
-  }*/
   setVolumeMusic ();
 #endif
 }
@@ -504,7 +469,6 @@ void SoundSystem::loadMusic (int sample)
 void SoundSystem::setVolume (int sample, int level)
 {
   if (!audio) return;
-  int ret = -1;
   level *= volumesound;
   level /= 100;
   switch (sample)

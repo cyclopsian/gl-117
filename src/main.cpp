@@ -35,6 +35,18 @@ TODO:
 #ifndef IS_MAIN_H
 
 #include "main.h"
+#include "menu.h"
+#include "maploader.h"
+#include "dirs.h"
+#include "gl.h"
+#include "land.h"
+#include "net.h"
+#include "mathtab.h"
+#include "cockpit.h"
+#include "conf.h"
+#include "mission.h"
+#include "glland.h"
+#include "common.h"
 
 int mousex, mousey;
 
@@ -78,13 +90,11 @@ int game = GAME_INIT;
 int debuglevel = LOG_MOST;
 int showcollision = 0;
 int brightness = 0;
+int contrast = 10;
 
 SoundSystem *sound = NULL;
 
 GL *gl;
-
-//const int maxchars = 8;
-//CTexture *texchar [maxchars];
 
 float getView ()
 {
@@ -98,6 +108,8 @@ int clouds = 0;
 CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
 MapLoader *maploader;
+
+float visibleangle = 80.0F;
 
 
 
@@ -118,134 +130,6 @@ Font *font1, *font2;
 CTexture *textitle;
 
 Uint32 lasttime = 0;
-
-
-/*class EditField
-{
-  public:
-  char text [256];
-  bool active;
-  int maxlen, cursorpos;
-
-  EditField ()
-  {
-    maxlen = 16;
-    memset (text, 0, 256);
-  }
-
-  EditField (int maxlen)
-  {
-    if (maxlen > 254) maxlen = 254;
-    this->maxlen = maxlen;
-    memset (text, 0, 256);
-  }
-  void init ()
-  {
-    memset (text, 0, 256);
-    cursorpos = 0;
-    active = true;
-  }
-  void event (unsigned char key)
-  {
-    if (key == 8)
-    {
-      if (cursorpos > 0)
-      {
-        cursorpos --;
-        text [cursorpos] = '\0';
-      }
-    }
-    if (cursorpos >= maxlen)
-      return;
-    if (key == 27)
-    {
-      active = false;
-    }
-    else if (key == 13)
-    {
-      active = false;
-      text [cursorpos ++] = '\0';
-    }
-    else if (key >= ' ')
-    {
-      if (key >= 'a' && key <= 'z')
-        key = key - 'a' + 'A';
-      if (key >= font1->n + font1->start) return;
-      text [cursorpos ++] = key;
-    }
-  }
-  void draw (float x, float y, float z, int timer)
-  {
-    if (!active)
-      return;
-    char buf [256];
-    memcpy (buf, text, 256);
-    if ((timer / timestep) & 1)
-    {
-      buf [cursorpos] = 'I';
-      buf [cursorpos + 1] = '\0';
-    }
-    font1->drawText (x, y, z, buf);
-  }
-};*/
-
-// intro balls, obsolete
-/*class InitKugel
-{
-  public:
-  int explosion;
-  CModel *m;
-  CVector3 tl;
-  InitKugel () {}
-
-  InitKugel (CModel *m)
-  {
-    tl.x = (int) (0.1 * myrandom(800) - 40);
-    tl.y = (int) (0.1 * myrandom(800) - 40);
-    tl.z = (int) (0.1 * myrandom(800) - 40);
-    this->m = m;
-    explosion = 0;
-  }
-
-  InitKugel (float x, float y, float z, CModel *m)
-  {
-    tl.x = x;
-    tl.y = y;
-    tl.z = z;
-    this->m = m;
-    explosion = 0;
-  }
-  
-  void draw()
-  {
-    if (explosion > 200) return;
-    if (explosion) explosion ++;
-    CVector3 tlnull;
-    CRotation rot;
-    glPushMatrix();
-    m->draw3 (&tlnull, &tl, &rot, 0.8, explosion);
-    glPopMatrix();
-  }
-};*/
-
-/*char *getKeyString (int key, char *str)
-{
-  if (key == 8) sprintf (str, "%s", "BSPACE");
-  else if (key == 9) sprintf (str, "%s", "");
-  else if (key == 13) sprintf (str, "%s", "ENTER");
-  else if (key == 32) sprintf (str, "%s", "SPACE");
-  else
-  {
-    int upkey = toupper (key);
-    sprintf (str, "%c", upkey);
-  }
-  return str;
-}*/
-
-
-
-
-
 
 
 
@@ -320,17 +204,12 @@ Space *space;
 AIObj *fplayer;
 CSpaceObj *sphere;
 CSphere *objsphere;
-//CSpaceObj *csphere;
-//CSpherePart *cloudsphere;
 HighClouds *highclouds;
 HighClouds *highclouds2;
 
-//GLLandscape *l;
 CModel *obj, *objlaser, *objmissile;
 CVector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
 CRotation *rotnull, *rotmissile;
-
-//EditField pilotedit;
 
 GLenum polygonMode = GL_FILL;
 
@@ -393,6 +272,32 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.35);
+
+  // Example how to pass the glBegin()...glEnd() code using vertex lists
+/*  float vertex [sizeof (float) * 9];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glVertexPointer (3,	GL_FLOAT,	sizeof (float) * 9, &vertex [0]);
+	glColorPointer (4, GL_FLOAT, sizeof (float) * 9, &vertex [3]);
+	glTexCoordPointer (2, GL_FLOAT, sizeof (float) * 9, &vertex [7]);
+
+  int mz = 0;
+  vertex [mz ++] = x; vertex [mz ++] = y; vertex [mz ++] = z;
+  vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 200.0F/255.0F;
+  vertex [mz ++] = tx1; vertex [mz ++] = ty1;
+  vertex [mz ++] = x + zoom * 2; vertex [mz ++] = y; vertex [mz ++] = z;
+  vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 200.0F/255.0F;
+  vertex [mz ++] = tx2; vertex [mz ++] = ty1;
+  vertex [mz ++] = x + zoom * 2; vertex [mz ++] = y + zoom; vertex [mz ++] = z;
+  vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 200.0F/255.0F;
+  vertex [mz ++] = tx2; vertex [mz ++] = ty2;
+  vertex [mz ++] = x; vertex [mz ++] = y + zoom; vertex [mz ++] = z;
+  vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 1; vertex [mz ++] = 200.0F/255.0F;
+  vertex [mz ++] = tx1; vertex [mz ++] = ty2;
+
+  glDrawArrays (GL_QUADS, 0, 4);*/
+
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, 200);
   glTexCoord2f (tx1, ty1);
@@ -404,6 +309,7 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   glTexCoord2f (tx1, ty2);
   glVertex3f (x, y + zoom, z);
   glEnd ();
+
   glDisable (GL_ALPHA_TEST);
   gl->disableAlphaBlending ();
   glDisable (GL_TEXTURE_2D);
@@ -616,31 +522,31 @@ int getCampaignIdFromValue (int n)
 int getCampaignValueFromId (int n)
 {
   int z = 0;
-  if (MISSION_TEST1) z = 0;
-  else if (MISSION_TEST2) z = 1;
-  else if (MISSION_TRANSPORT) z = 2;
-  else if (MISSION_CONVOY) z = 3;
-  else if (MISSION_DOGFIGHT2) z = 4;
-  else if (MISSION_AIRBATTLE) z = 5;
-  else if (MISSION_SADEFENSE) z = 6;
-  else if (MISSION_SCOUT) z = 7;
-  else if (MISSION_BASE) z = 8;
-  else if (MISSION_DEPOT) z = 9;
-  else if (MISSION_DEFEND1) z = 10;
-  else if (MISSION_DOGFIGHT3) z = 11;
-  else if (MISSION_TANK1) z = 12;
-  else if (MISSION_CONVOY2) z = 13;
-  else if (MISSION_SHIP1) z = 14;
-  else if (MISSION_SHIP2) z = 15;
-  else if (MISSION_SHIP3) z = 16;
-  else if (MISSION_CANYON1) z = 17;
-  else if (MISSION_CANYON2) z = 18;
-  else if (MISSION_TUNNEL1) z = 19;
-  else if (MISSION_CANYON3) z = 20;
-  else if (MISSION_MOON1) z = 21;
-  else if (MISSION_MOONBATTLE) z = 22;
-  else if (MISSION_MOON2) z = 23;
-  else if (MISSION_MOON3) z = 24;
+  if (n == MISSION_TEST1) z = 0;
+  else if (n == MISSION_TEST2) z = 1;
+  else if (n == MISSION_TRANSPORT) z = 2;
+  else if (n == MISSION_CONVOY) z = 3;
+  else if (n == MISSION_DOGFIGHT2) z = 4;
+  else if (n == MISSION_AIRBATTLE) z = 5;
+  else if (n == MISSION_SADEFENSE) z = 6;
+  else if (n == MISSION_SCOUT) z = 7;
+  else if (n == MISSION_BASE) z = 8;
+  else if (n == MISSION_DEPOT) z = 9;
+  else if (n == MISSION_DEFEND1) z = 10;
+  else if (n == MISSION_DOGFIGHT3) z = 11;
+  else if (n == MISSION_TANK1) z = 12;
+  else if (n == MISSION_CONVOY2) z = 13;
+  else if (n == MISSION_SHIP1) z = 14;
+  else if (n == MISSION_SHIP2) z = 15;
+  else if (n == MISSION_SHIP3) z = 16;
+  else if (n == MISSION_CANYON1) z = 17;
+  else if (n == MISSION_CANYON2) z = 18;
+  else if (n == MISSION_TUNNEL1) z = 19;
+  else if (n == MISSION_CANYON3) z = 20;
+  else if (n == MISSION_MOON1) z = 21;
+  else if (n == MISSION_MOONBATTLE) z = 22;
+  else if (n == MISSION_MOON2) z = 23;
+  else if (n == MISSION_MOON3) z = 24;
   return z;
 }
 
@@ -768,58 +674,6 @@ int game_levelInit ()
 
   initing = true;
   flash = 0;
-
-/*FILE *in;
-unsigned short hdata [120] [720];
-in = fopen ("mydata.bin", "rb");
-fread ((unsigned short *) hdata, 2, 120 * 720, in);
-fclose (in);
-memset (l->h, 0x77, 2 * 513 * 513);
-memset (l->hw, 0x77, 2 * 513 * 513);
-memset (l->f, 0, 1 * 513 * 513);
-int start = 300, start2 = 0;
-int div = 4;
-int height = 3;
-for (i = 0; i < 480; i ++)
-  for (i2 = 0; i2 < 480; i2 ++)
-  {
-    l->h [i] [512 - i2] = hdata [i/div + start2] [i2/div + start] * height + 0x7777;
-    l->hw [i] [512 - i2] = l->h [i] [512 - i2];
-    if (l->h [i] [512 - i2] > 0x7777 + 1700 * height) l->f [i] [512 - i2] = ROCKS;
-    if (l->h [i] [512 - i2] > 0x7777 + 2500 * height) l->f [i] [512 - i2] = GLACIER;
-    if (hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2] [i2/div + start + 1] &&
-      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2] [i2/div + start - 1] &&
-      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2+1] [i2/div + start] &&
-      hdata [i/div + start2] [i2/div + start] == hdata [i/div + start2-1] [i2/div + start])
-    {
-      l->f [i] [512 - i2] = WATER;
-      l->h [i] [512 - i2] -= 100;
-      l->f [i-1] [512 - i2] = WATER;
-      l->h [i-1] [512 - i2] -= 100;
-      l->f [i+1] [512 - i2] = WATER;
-      l->h [i+1] [512 - i2] -= 100;
-      l->f [i] [512 - i2+1] = WATER;
-      l->h [i] [512 - i2+1] -= 100;
-      l->f [i] [512 - i2-1] = WATER;
-      l->h [i] [512 - i2-1] -= 100;
-    }
-  }
-fplayer->tl->x = 125;
-fplayer->tl->z = -75;
-l->convolveGauss (3, 0, 65000);
-for (i = 0; i < 513; i ++)
-  for (i2 = 0; i2 < 513; i2 ++)
-  {
-    if (l->f [i] [i2] == ROCKS)
-    {
-      l->h [i] [i2] += myrandom (200) * height - 80;
-    }
-    if (l->f [i] [i2] != WATER)
-    {
-      l->hw [i] [i2] = l->h [i] [i2];
-    }
-  }
-l->precalculate ();*/
 
   if (clouds == 0) highclouds->setTexture (NULL);
   else if (clouds == 1) highclouds->setTexture (texclouds1);
@@ -1071,6 +925,7 @@ l->precalculate ();*/
   glLightfv( GL_LIGHT0, GL_SPECULAR, light_specular );*/
   setLightSource ((int) sungamma);
   glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+//  glLightModeli (GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
   glEnable (GL_LIGHT0);                // Turn on a light with defaults set
   float light_ambient [4] = {0.2, 0.2, 0.2, 1.0};
   float light_diffuse [4] = {1.0, 1.0, 1.0, 1.0};
@@ -1084,13 +939,14 @@ l->precalculate ();*/
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 //  glDisable (GL_DITHER);
 
-//  mission = new MissionDemo1 (space);
-
   fplayer->missiletype = fplayer->firstMissile ();
   initing = false;
   lastshield = (int) fplayer->shield;
 
   fps = 30;
+
+  redout = 0;
+  blackout = 0;
   
   if (!fplayer->ai)
     fplayer->realism = physics;
@@ -1116,7 +972,7 @@ void game_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
+  gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1136,7 +992,7 @@ void menu_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
+  gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1153,7 +1009,7 @@ void credits_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
+  gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1170,7 +1026,7 @@ void stats_reshape ()
 
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
+  gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1394,9 +1250,6 @@ void switch_credits ()
   game = GAME_CREDITS;
   creditstimer = 50 * timestep;
   credits_reshape ();
-/*  if (sound->musicplaying)
-    sound->haltMusic ();
-  sound->playMusic (MUSIC_WINNER1);*/
   sound->stop (SOUND_PLANE1);
   sound->stop (SOUND_CANNON1);
 }
@@ -1431,9 +1284,6 @@ void switch_game ()
     sound->haltMusic ();
   sound->playLoop (SOUND_PLANE1);
   setPlaneVolume ();
-/*  if (fplayer)
-    if (!fplayer->ai)
-      fplayer->realism = physics;*/
 #ifdef HAVE_SDL
   SDL_WM_GrabInput (SDL_GRAB_ON);
 #endif
@@ -1624,6 +1474,11 @@ void game_key (int key, int x, int y)
   {
     if (fplayer->target != NULL)
       fplayer->target->shield = -1;
+  }
+  else if (key == 'V')
+  {
+    visibleangle += 10.0;
+    if (visibleangle > 120.0) visibleangle = 50.0;
   }*/
   else if (hikey == key_firecannon || lokey == key_firecannon)
   {
@@ -1772,7 +1627,6 @@ void game_mouserelmotion (int xrel, int yrel)
 
   if (roll > 1.0F) roll = 1.0F;
   else if (roll < -1.0F) roll = -1.0F;
-//  fplayer->rectheta += roll;
   fplayer->rolleffect = roll;
   if (roll < 1E-3)
     fplayer->ruddereffect = (float) xr * 200;
@@ -1791,24 +1645,12 @@ void game_mousemotion (int x, int y)
 {
   if (controls != CONTROLS_MOUSE || mouse_relative) return;
 
-//  game_mouserelmotion (x, y);
-//  return;
-
-//  float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
   float dx = x - mx, dy = my - y;
   dx *= mouse_sensitivity / 70.0F;
   dy *= mouse_sensitivity / 70.0F;
   if (mouse_reverse)
     dy *= -1;
-/*  int t = (int) fplayer->theta;
-  if (t < 0) t += 360;
-  float rx = dx * cosi [t] - dy * sine [t];
-  float ry = dx * sine [t] + dy * cosi [t];
-  rx += mx;
-  ry = my - ry;*/
-//  fplayer->rectheta = (float) (width / 2 - rx) / f;
-//  fplayer->recgamma = 135.0 + (float) (height - ry) / height * 90.0;
 
 // mouse interface code added by Lourens Veen
   float nx = dx / width; // normalised x-coordinate, -1 at lefthand 
@@ -1842,7 +1684,6 @@ void game_mousemotion (int x, int y)
 
     if (fplayer->rolleffect < -1.0F) fplayer->rolleffect = -1.0F;
     if (fplayer->rolleffect > 1.0F) fplayer->rolleffect = 1.0F;
-//    printf ("%2.2f ", fplayer->rolleffect);
   } 
   else 
     fplayer->rolleffect = 0.0f; 
@@ -1890,7 +1731,6 @@ void game_joystickbutton (int button)
   if (button == joystick_firecannon)
   {
     fplayer->fireCannon (laser);
-//    sound->play (SOUND_CANNON1);
 #ifdef HAVE_SDL_MIXER
     if (!startcannon)
     {
@@ -1966,7 +1806,6 @@ void frame ()
       fps = (float) frames * 1000.0 / (time2 - time1);
     time1 = time2;
     frames = 0;
-//    printf ("\nFrames=%f ", fps); fflush (stdout);
   }
 }
 
@@ -2039,7 +1878,7 @@ void drawQuads (CColor *colorstd)
 void drawPlasma (CColor *colorstd)
 {
   int i;
-  float zf = -3, yf;
+  float yf;
   float zf1 = -2.98;
   float yind = 200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
   float xind = 200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
@@ -2089,13 +1928,6 @@ void drawPlasma (CColor *colorstd)
 
 void menu_key (unsigned char key, int x, int y)
 {
-/*  if (pilotedit.active)
-  {
-    pilotedit.event (key);
-    if (key == 13)
-      pilots->add (pilotedit.text);
-    key = 0;
-  }*/
   if (key == 27)
   {
     if (missionactive)
@@ -2123,6 +1955,7 @@ void pleaseWait ()
   glColor4ub (c1, c1, c1, 255);
   glVertex3f (-xf, yf, zf);
   glEnd ();
+  glLineWidth (LINEWIDTH(1));
   glBegin (GL_LINE_STRIP);
   glColor4ub (c3, c3, c3, 255);
   glVertex3f (-xf, -yf, zf);
@@ -2284,7 +2117,6 @@ void mission_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-  int lastitemselected = missionmenuitemselected;
   missionmenuitemselected = -1;
 
   missionmenufighterselected = -1;
@@ -2378,7 +2210,6 @@ void mission_display ()
 
   char buf [256];
   int i;
-  float zf = -3;
   float piloty = 5;
   Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorred;
@@ -2444,9 +2275,6 @@ void mission_display ()
   texty -= 1;
   font1->drawText (textx / fontscale, texty / fontscale, -2, missionnew->briefing, col);
 
-/* font1->zoom = 0.06;
-  font2->zoom = 0.06;
-  fontscale = 0.6;*/
   float xstats = 0.8, ystats = 5;
   float xstatstab = 5;
   font1->drawText (xstats / fontscale, ystats / fontscale, -2, "STATUS:", col);
@@ -2502,21 +2330,7 @@ void mission_display ()
 
 void fame_mouse (int button, int state, int x, int y)
 {
-  float rx = (float) x / width;
-  float ry = (float) y / height;
   missionmenuitemselected = -1;
-
-/*  if (ry >= 0.75 && ry <= 0.82)
-  {
-    if (rx >= 0.4 && rx <= 0.6)
-    {
-      missionmenuitemselected = 0;
-      if (state == MOUSE_DOWN)
-      {
-        fame_key (27, 0, 0);
-      }
-    }
-  }*/
 }
 
 void create_mouse (int button, int state, int x, int y)
@@ -2549,8 +2363,8 @@ void create_display ()
 
   drawQuads (colorstd);
 
-  float my = 0;
 #ifdef HAVE_SDL_NET
+  float my = 0;
   int i;
   for (i = 0; i < server->num_clients; i ++)
   {
@@ -2632,7 +2446,6 @@ void fighter_display ()
 
   char buf [256];
   int i;
-  CColor *colorstd = &colorblue;
 
   CVector3 vec;
   CVector3 tl;
@@ -2642,8 +2455,8 @@ void fighter_display ()
   rot.a = 300;
   rot.b = 0;
   rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
-  CModel *model;
-  int id;
+  CModel *model = NULL;
+  int id = 0;
   if (aktfighter == 0) { model = &model_fig; id = FIGHTER_FALCON; }
   else if (aktfighter == 1) { model = &model_fige; id = FIGHTER_CROW; }
   else if (aktfighter == 2) { model = &model_figb; id = FIGHTER_HAWK; }
@@ -2763,8 +2576,6 @@ void game_quit ()
   save_configInterface ();
   pilots->save (dirs->getSaves ("pilots"));
   display ("Pilots saved", LOG_MOST);
-/*  for (i = 0; i < maxfighter; i ++)
-    delete (fighter [i]);*/
   for (i = 0; i < maxlaser; i ++)
     delete (laser [i]);
   for (i = 0; i < maxmissile; i ++)
@@ -2801,7 +2612,6 @@ void game_quit ()
 //  SDL_Quit (); // done atexit()
   delete sound;
 #endif
-//  fprintf (stdout, "\n"); fflush (stdout);
   exit (EXIT_NORMAL);
 }
 
@@ -2856,21 +2666,6 @@ void stats_mouse (int button, int state, int x, int y)
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
-/*  int menutimernorm = menutimer * 5 / timestep;
-  if (menutimernorm != 0) menutimernorm %= 360;
-  if (menutimernorm < 0) menutimernorm *= -1;
-  CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
-  if (p->mission_state [missionid] == 1)
-  {
-    if (menuitemselected == selected)
-      font1->drawTextScaled (x, y, z, string, &color2, -menutimer * 5);
-    else
-      font1->drawText (x, y, z, string);
-  }
-  else
-  {
-    font1->drawText (x, y, z, string, &colorgrey);
-  }*/
   Pilot *p = pilots->pilot [pilots->aktpilot];
   drawMedal (x - 0.8, y + 0.6, z, getMedal (p->mission_score [thismissionid]), 1.0, thismissionid);
 }
@@ -2881,27 +2676,7 @@ void stats_display ()
   statsmenu.setVisible (true);
   statsmenu.draw ();
 
-  float xf = 1.4, yf = 1.4, zf = -2.5;
-  int c1 = 100, c2 = 10, c3 = 180;
-/*  glBegin (GL_QUADS);
-  glColor4ub (c2, c2, c2, 255);
-  glVertex3f (-xf, -yf, zf);
-  glColor4ub (c1, c1, c1, 255);
-  glVertex3f (xf, -yf, zf);
-  glColor4ub (c2, c2, c2, 255);
-
-  glVertex3f (xf, yf, zf);
-  glColor4ub (c1, c1, c1, 255);
-  glVertex3f (-xf, yf, zf);
-  glEnd ();
-  glBegin (GL_LINE_STRIP);
-  glColor4ub (c3, c3, c3, 255);
-  glVertex3f (-xf, -yf, zf);
-  glVertex3f (xf, -yf, zf);
-  glVertex3f (xf, yf, zf);
-  glVertex3f (-xf, yf, zf);
-  glVertex3f (-xf, -yf, zf);
-  glEnd ();*/
+  float yf = 1.4, zf = -2.5;
 
   drawMedal (-5.5, 5.8, -1.5, getMedal (fplayer->score), 1.6, mission->id);
   drawMedal (5.5, 5.8, -1.5, getMedal (fplayer->score), 1.6, mission->id);
@@ -2994,10 +2769,7 @@ void stats_display ()
     yf -= linedist2;
   }
   yf -= (linedist - linedist2);
-/*  font1->drawText (xf1, yf, zf, "DAMAGE POINTS:", color);
-  sprintf (buf, "+%d", fplayer->points / 20);
-  font1->drawText (xf3, yf, zf, buf, color);
-  yf -= linedist;*/
+
   if (ispromoted)
   {
     yf = -6;
@@ -3009,10 +2781,7 @@ void stats_display ()
     drawRank (7, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
   }
   yf = -9;
-/*  if (!statsitemselected)
-    font1->drawText (-3.5, yf, -2.0, "CONTINUE", &colorwhite);
-  else
-    font1->drawTextScaled (-3.5, yf, -2.0, "CONTINUE", &coloryellow, -menutimer * 5);*/
+
   drawMouseCursor ();
 }
 
@@ -3031,15 +2800,11 @@ void menu_display ()
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-//  glPushMatrix ();
 
   int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
-
-  float textx = 0;
-  int normtimef = -menutimer * 5;
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
@@ -3071,369 +2836,14 @@ void menu_display ()
 
   if (allmenus.components [3]->isVisible ())
   {
-    float textx2 = 11, textx3 = 11, yf = 9.05, zf = -2, ydiff = 0.8;
+    float textx2 = 11, yf = 9.05, zf = -2, ydiff = 0.8;
     for (i = 0; i < 24; i ++)
     {
       drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [getCampaignIdFromValue (i)]), 0.8, getCampaignIdFromValue (i));
       yf -= ydiff;
     }
-/*    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
-    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
-    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SADEFENSE, MISSION_AIRBATTLE, 16, "SURFACE-AIR DEFENSE");
-    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_SCOUT, MISSION_SADEFENSE, 17, "VETERAN DOGFIGHT");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_BASE, MISSION_SCOUT, 18, "BASE ATTACK");
-    drawMissionElement (textx3, yf -= ydiff, zf, MISSION_DEPOT, MISSION_BASE, 19, "DEPOTS");
-    if (p->mission_state [MISSION_DEPOT] == 1)
-    {
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEFEND1, MISSION_DEPOT, 20, "DEFEND SAM");
-      drawMissionElement (textx3, yf -= ydiff, zf, MISSION_DOGFIGHT3, MISSION_DEFEND1, 21, "DESERT DOGFIGHT");
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TANK1, MISSION_DOGFIGHT3, 22, "TANK ASSAUT");
-      drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CONVOY2, MISSION_TANK1, 23, "SAM CONVOY");
-      if (p->mission_state [MISSION_CONVOY2] == 1)
-      {
-        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP1, MISSION_CONVOY2, 25, "DESTROYERS");
-        drawMissionElement (textx3, yf -= ydiff, zf, MISSION_SHIP2, MISSION_SHIP1, 26, "OILRIG");
-        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
-        if (p->mission_state [MISSION_SHIP3] == 1)
-        {
-          drawMissionElement (textx3, yf -= ydiff, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
-          drawMissionElement (textx3, yf -= ydiff, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
-          if (p->mission_state [MISSION_CANYON3] == 1)
-          {
-            drawMissionElement (textx3, yf -= ydiff, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOONBATTLE, MISSION_MOON1, 37, "MOON BATTLE");
-            drawMissionElement (textx3, yf -= ydiff, zf, MISSION_MOON2, MISSION_MOONBATTLE, 34, "ELITE DOGFIGHT");
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
-          }
-        }
-      }
-    }*/
   }
 
-/*  mainmenu.draw ();
-  submenu [0].draw ();
-  submenu [1].draw ();*/
-
-/*  if (menuitemselected == 0)
-    font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, normtimef);
-  else
-    font1->drawText (textx, 10, -2, "PILOTS");
-
-  if (menuitemselected == 1)
-    font1->drawTextScaled (textx, 8, -2, "TRAINING", &color2, normtimef);
-  else
-    font1->drawText (textx, 8, -2, "TRAINING");
-
-  if (menuitemselected == 2)
-    font1->drawTextScaled (textx, 6, -2, "CAMPAIGN", &color2, normtimef);
-  else
-    font1->drawText (textx, 6, -2, "CAMPAIGN");
-
-  if (menuitemselected == 3)
-    font1->drawTextScaled (textx, 4, -2, "OPTIONS", &color2, normtimef);
-  else
-    font1->drawText (textx, 4, -2, "OPTIONS");
-
-  if (menuitemselected == 4)
-    font1->drawTextScaled (textx, 2, -2, "HELP", &color2, normtimef);
-  else
-    font1->drawText (textx, 2, -2, "HELP");
-
-  if (menuitemselected == 5)
-    font1->drawTextScaled (textx, 0, -2, "CREDITS", &color2, normtimef);
-  else
-    font1->drawText (textx, 0, -2, "CREDITS");
-
-  if (menuitemselected == 6)
-    font1->drawTextScaled (textx, -2, -2, "QUIT", &color2, normtimef);
-  else
-    font1->drawText (textx, -2, -2, "QUIT");
-
-#ifdef HAVE_SDL_NET
-  if (menuitemselected == 7)
-    font1->drawTextScaled (textx, -4, -2, "MULTIPLAYER", &color2, normtimef);
-  else
-    font1->drawText (textx, -4, -2, "MULTIPLAYER");
-#endif
-*/
-
-/*  if (missionactive)
-  {
-    if (menuitemselected == 9)
-      font1->drawTextScaled (textx, -6, -2, "RETURN", &color2, normtimef);
-    else
-      font1->drawText (textx, -6, -2, "RETURN");
-  }*/
-
-/*  if (menuitem == 0)
-  {
-    font1->drawText (textx2 - 2, 10, -2, "ACTIVE:", &coloryellow);
-    if (pilots->aktpilot < pilots->aktpilots)
-    {
-      font1->drawText (textx2 + 4, 10, -2, pilots->pilot [pilots->aktpilot]->name, &coloryellow);
-    }
-    for (i = 0; i < pilots->aktpilots; i ++)
-    {
-      drawRank (textx2 - 1, 12.2 - (float) i * 3, -3, pilots->pilot [i]->ranking, 1.3);
-      if (menuitemselected == 20 + i)
-      {
-        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, normtimef);
-        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, normtimef);
-      }
-      else
-      {
-        font1->drawText (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank ());
-        font1->drawText (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name);
-      }
-    }
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, normtimef);
-    else
-      font1->drawText (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)");
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, normtimef);
-    else
-      font1->drawText (textx2 - 2, -7, -2.5, "CREATE");
-    pilotedit.draw (textx2, -9, -2.5, menutimer / 8);
-  }
-  else
-    pilotedit.active = false;
-
-  if (menuitem == 1)
-  {
-    Pilot *p = pilots->pilot [pilots->aktpilot];
-    float zf = -3.0, yf = 18;
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: PILOTING", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "TUTORIAL: PILOTING");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TUTORIAL]), 1.0, MISSION_TUTORIAL);
-    yf -= 1.5;
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2, yf, zf, "TUTORIAL: DOGFIGHT", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "TUTORIAL: DOGFIGHT");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DOGFIGHT]), 1.0, MISSION_DOGFIGHT);
-    yf -= 2.0 * 1.5;
-    if (menuitemselected == 13)
-      font1->drawTextScaled (textx2, yf, zf, "FREE FLIGHT", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "FREE FLIGHT");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_FREEFLIGHT1]), 1.0, MISSION_FREEFLIGHT1);
-    yf -= 1.5;
-    if (menuitemselected == 14)
-      font1->drawTextScaled (textx2, yf, zf, "DEATHMATCH", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "DEATHMATCH");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH1]), 1.0, MISSION_DEATHMATCH1);
-    yf -= 1.5;
-    if (menuitemselected == 15)
-      font1->drawTextScaled (textx2, yf, zf, "TEAM DEATHMATCH", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "TEAM DEATHMATCH");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_DEATHMATCH2]), 1.0, MISSION_DEATHMATCH2);
-    yf -= 1.5;
-    if (menuitemselected == 16)
-      font1->drawTextScaled (textx2, yf, zf, "TEAM BASE", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "TEAM BASE");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEAMBASE1]), 1.0, MISSION_TEAMBASE1);
-    yf -= 1.5;
-    if (menuitemselected == 17)
-      font1->drawTextScaled (textx2, yf, zf, "WAVES", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "WAVES");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_WAVES1]), 1.0, MISSION_WAVES1);
-    yf -= 1.5;
-  }
-  else if (menuitem == 2)
-  {
-    Pilot *p = pilots->pilot [pilots->aktpilot];
-    float zf = -3.0, yf = 18, ydiff = 1.3;
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2, yf, zf, "EAGLE TEST1", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yf, zf, "EAGLE TEST1");
-    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEST1]), 1.0, MISSION_TEST1);
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SADEFENSE, MISSION_AIRBATTLE, 16, "SURFACE-AIR DEFENSE");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SCOUT, MISSION_SADEFENSE, 17, "VETERAN DOGFIGHT");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_BASE, MISSION_SCOUT, 18, "BASE ATTACK");
-    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEPOT, MISSION_BASE, 19, "DEPOTS");
-    if (p->mission_state [MISSION_DEPOT] == 1)
-    {
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEFEND1, MISSION_DEPOT, 20, "DEFEND SAM");
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT3, MISSION_DEFEND1, 21, "DESERT DOGFIGHT");
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TANK1, MISSION_DOGFIGHT3, 22, "TANK ASSAUT");
-      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CONVOY2, MISSION_TANK1, 23, "SAM CONVOY");
-      if (p->mission_state [MISSION_CONVOY2] == 1)
-      {
-        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP1, MISSION_CONVOY2, 25, "DESTROYERS");
-        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP2, MISSION_SHIP1, 26, "OILRIG");
-        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
-        if (p->mission_state [MISSION_SHIP3] == 1)
-        {
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
-          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
-          if (p->mission_state [MISSION_CANYON3] == 1)
-          {
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOONBATTLE, MISSION_MOON1, 37, "MOON BATTLE");
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON2, MISSION_MOONBATTLE, 34, "ELITE DOGFIGHT");
-            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
-          }
-        }
-      }
-    }
-    zf = -2;
-    if (menuitemselected == 100)
-      font1->drawTextScaled (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
-    else
-      font1->drawText (-2, -12, zf, "PILOTS");
-    zf = -2;
-    if (menuitemselected == 101)
-      font1->drawTextScaled (6, -12, zf, "FIGHTER", &color2, -menutimer * 5);
-    else
-      font1->drawText (6, -12, zf, "FIGHTER");
-  }
-  else if (menuitem == 3)
-  {
-    float yt = 12;
-    sprintf (buf, "QUALITY: %d", quality);
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    sprintf (buf, "VIEW: %d", (int) view);
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    strcpy (buf, "DITHERING: ");
-    if (dithering) strcat (buf, "ON");
-    else strcat (buf, "OFF");
-    if (menuitemselected == 12)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    strcpy (buf, "USE: ");
-    if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
-    else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE EASY");
-    else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
-    else if (controls == CONTROLS_MOUSE_REVERSE) strcat (buf, "MOUSE REVERSE");
-    else if (controls == CONTROLS_MOUSE_EXP) strcat (buf, "MOUSE RELATIVE");
-    if (menuitemselected == 13)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-#ifdef HAVE_SDL_MIXER
-    if (sound->audio)
-      sprintf (buf, "SOUND: %d%%", (int) sound->volumesound);
-    else
-      sprintf (buf, "SOUND: N/A");
-    if (menuitemselected == 14)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    if (sound->audio)
-      sprintf (buf, "MUSIC: %d%%", (int) sound->volumemusic);
-    else
-      sprintf (buf, "MUSIC: N/A");
-    if (menuitemselected == 15)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-#else
-    yt -= 4;
-#endif
-    strcpy (buf, "DIFFICULTY: ");
-    if (difficulty == 0) strcat (buf, "EASY");
-    else if (difficulty == 1) strcat (buf, "MEDIUM");
-    else if (difficulty == 2) strcat (buf, "HARD");
-    if (menuitemselected == 16)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    sprintf (buf, "BRIGHTNESS: %d %%", brightness);
-    if (menuitemselected == 17)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-    if (!physics) sprintf (buf, "PHYSICS: ACTION");
-    else sprintf (buf, "PHYSICS: SIM");
-    if (menuitemselected == 18)
-      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, yt -= 2, -2, buf);
-  }
-  else if (menuitem == 4)
-  {
-    int xs = -4, ys = 15;
-    char buf [100];
-    char text [100];
-  	CColor *col = &colorlightgrey;
-  	CColor *col2 = &colorwhite;
-    font1->drawText (xs, ys --, -3, "KEYS:", col2);
-    sprintf (text, "%s\tFIRE CANNON", getKeyString (key_firecannon, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tFIRE MISSILE", getKeyString (key_firemissile, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tDROP CHAFF", getKeyString (key_dropchaff, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tDROP FLARE", getKeyString (key_dropflare, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    font1->drawText (xs, ys --, -3, "1..9\tCHANGE THROTTLE", col);
-    sprintf (text, "%s\tINCREASE THROTTLE", getKeyString (key_thrustup, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tDECREASE THROTTLE", getKeyString (key_thrustdown, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tSELECT MISSILE", getKeyString (key_selectmissile, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tTARGET NEAREST ENEMY", getKeyString (key_targetnearest, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tTARGET LOCKING ENEMY", getKeyString (key_targetlocking, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tTARGET NEXT", getKeyString (key_targetnext, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    sprintf (text, "%s\tTARGET PREVIOUS", getKeyString (key_targetprevious, buf));
-    font1->drawText (xs, ys --, -3, text, col);
-    font1->drawText (xs, ys --, -3, "F1..8\tCAMERAS", col);
-    font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU", col);
-    font1->drawText (xs, (-- ys) --, -3, "MOUSE:", col2);
-    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
-    font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:", col2);
-    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
-    font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN", col);
-    strcpy (buf, dirs->getSaves (""));
-    for (i = 0; i < (int) strlen (buf); i ++)
-      buf [i] = toupper (buf [i]);
-    font1->drawTextCentered (0, -18.5, -3, buf, col);
-  }
-  else if (menuitem == 7)
-  {
-#ifdef HAVE_SDL_NET
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2, 10, -2, "CREATE GAME", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, 10, -2, "CREATE GAME");
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2, 8, -2, "JOIN GAME", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, 8, -2, "JOIN GAME");
-#endif
-  }
-*/
   drawMouseCursor ();
 }
 
@@ -3458,7 +2868,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
   gluPickMatrix (x, viewport [3] - y, 5, 5, viewport);
 
 	// Set our perpective transformation matrix
-  gluPerspective (80.0, 1.0, nearclippingplane * GLOBALSCALE, view * GLOBALSCALE);
+  gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, view * GLOBALSCALE);
 //  gluPerspective (60.0, 1.0, 0.2, 200.0);
 	
 	glMatrixMode (GL_MODELVIEW);
@@ -3598,41 +3008,11 @@ void finish_display ()
 
 void quit_display ()
 {
-  float xf = 1.0, yf = 0.5, zf = -2.5;
-  int c1 = 100, c2 = 10, c4 = 180;
-
   allmenus.setVisible (false);
   quitmenu.setVisible (true);
   quitmenu.draw ();
 
-/*  glBegin (GL_QUADS);
-  glColor4ub (c2, c2, c2, 255);
-  glVertex3f (-xf, -yf, zf);
-  glColor4ub (c1, c1, c1, 255);
-  glVertex3f (xf, -yf, zf);
-  glColor4ub (c2, c2, c2, 255);
-  glVertex3f (xf, yf, zf);
-  glColor4ub (c1, c1, c1, 255);
-  glVertex3f (-xf, yf, zf);
-  glEnd ();
-  glBegin (GL_LINE_STRIP);
-  glColor4ub (c4, c4, c4, 255);
-  glVertex3f (-xf, -yf, zf);
-  glVertex3f (xf, -yf, zf);
-  glVertex3f (xf, yf, zf);
-  glVertex3f (-xf, yf, zf);
-  glVertex3f (-xf, -yf, zf);
-  glEnd ();*/
-
   font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", &menu_colwhite);
-/*  if (missionmenuitemselected == 0)
-    font1->drawTextScaled (-4, -1.5, -1.8, "YES", &colorblue, -missionmenutimer * 5, 0);
-  else
-    font1->drawText (-4, -1.5, -1.8, "YES", &colorblue, 0);
-  if (missionmenuitemselected == 1)
-    font1->drawTextScaled (2, -1.5, -1.8, "NO", &colorblue, -missionmenutimer * 5, 0);
-  else
-    font1->drawText (2, -1.5, -1.8, "NO", &colorblue, 0);*/
 
   drawMouseCursor ();
 }
@@ -3649,7 +3029,7 @@ int starttime;
 void game_display ()
 {
   int i;
-  double sunx, suny, sunz;
+  double sunx = 0, suny = 0, sunz;
 
   if (dithering) glEnable (GL_DITHER);
   else glDisable (GL_DITHER);
@@ -3793,18 +3173,12 @@ void game_display ()
 
   if (quality >= 1 && clouds > 0)
   {
-    gl->enableFog (pseudoview);
+    int cloudfog = pseudoview;
+    if (cloudfog > 110) cloudfog = 110;
+    gl->enableFog (cloudfog);
 
-    if (quality >= 3 && clouds == 1)
-    {
-      highclouds2->zoom = 350;
-      float ch2 = -332 - fplayer->tl->y / 10.5;
-      CVector3 tlsphere3 (0, ch2, 0);
-      highclouds2->drawGL (&tlsphere3, fplayer->tl);
-    }
-
-    highclouds->zoom = 300;
-    float ch2 = -288 - fplayer->tl->y / 10.0;
+    highclouds->zoom = 400;
+    float ch2 = -382 - fplayer->tl->y / 10.0;
     CVector3 tlsphere2 (0, ch2, 0);
     highclouds->drawGL (&tlsphere2, fplayer->tl);
 
@@ -4572,12 +3946,12 @@ void menu_timer (Uint32 dt)
         lastfps = fps;
         if (fps > 40)
         {
-          if (view < quality * 10 + 60 && view < 100)
-            view += 10;
+          if (view < quality * 20 + 60 && view < 100)
+            view += 20;
           else if (quality < 5)
           {
             quality ++;
-            view = quality * 10 + 30;
+            view = quality * 20 + 30;
             if (quality >= 1)
             { antialiasing = 1; specialeffects = 1; dithering = 1; dynamiclighting = 0; }
           }
@@ -4588,12 +3962,12 @@ void menu_timer (Uint32 dt)
         }
         else if (fps < 30)
         {
-          if (view > quality * 10 + 30 && view > 20)
-            view -= 10;
+          if (view > quality * 20 + 30 && view > 20)
+            view -= 20;
           else if (quality > 0)
           {
             quality --;
-            view = quality * 10 + 60;
+            view = quality * 20 + 60;
             if (quality < 1)
             { antialiasing = 0; specialeffects = 0; dithering = 0; dynamiclighting = 0; }
           }
@@ -4731,49 +4105,6 @@ void myInit ()
 {
   int i, i2;
 
-  // create textures (OpenGL)
-  display ("Loading textures", LOG_ALL);
-  texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
-  texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
-  texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
-  texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, -1, 0, true);
-  texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), 1, -1, 0, true);
-  texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), 1, -1, 0, true);
-  texflare4 = gl->genTextureTGA (dirs->getTextures ("flare4.tga"), 1, -1, 0, true);
-  texgrass = gl->genTextureTGA (dirs->getTextures ("grass1.tga"), 0, 0, 1, false);
-  texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 0, 1, false);
-  texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 0, 1, false);
-  texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 0, 1, false);
-  texredsand = gl->genTextureTGA (dirs->getTextures ("redsand1.tga"), 0, 0, 1, false);
-  texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1, false);
-  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, -1, 1, true);
-  textreeu = gl->genTextureTGA (dirs->getTextures ("treeu1.tga"), 0, -1, 1, true);
-  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, -1, 1, true);
-  textreeu2 = gl->genTextureTGA (dirs->getTextures ("treeu2.tga"), 0, -1, 1, true);
-  textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
-  textreeu3 = gl->genTextureTGA (dirs->getTextures ("treeu3.tga"), 0, 3, 1, true);
-  textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
-  textreeu4 = gl->genTextureTGA (dirs->getTextures ("treeu4.tga"), 0, 3, 1, true);
-  textree5 = gl->genTextureTGA (dirs->getTextures ("tree5.tga"), 0, -1, 1, true);
-  textreeu5 = gl->genTextureTGA (dirs->getTextures ("treeu5.tga"), 0, -1, 1, true);
-  texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
-  texcactusu1 = gl->genTextureTGA (dirs->getTextures ("cactusu1.tga"), 0, 3, 1, true);
-  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, -1, 1, true);
-  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, -1, 1, true);
-  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke3.tga"), 0, 5, 1, true);
-  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, -1, 1, true);
-  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
-  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 0, true);
-  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 0, true);
-  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, -1, 1, true);
-  texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
-  texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
-  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
-  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
-  texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
-  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
-  texarrow = gl->genTextureTGA (dirs->getTextures ("arrow.tga"), 0, -1, 0, true);
-
   // useful global variables/constants
   tlinf = new CVector3 (1E10, 1E10, 1E10);
   tlminf = new CVector3 (-1E10, -1E10, -1E10);
@@ -4891,7 +4222,7 @@ void init_reshape ()
   glLoadIdentity ();
   
   // angle, aspectratio, nearclip, farclip
-  gluPerspective (80.0, 1.0, nearclippingplane, 80);
+  gluPerspective (visibleangle, 1.0, nearclippingplane, 80);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 }
 
@@ -4904,8 +4235,52 @@ void myFirstInit ()
   display ("Creating advanced OpenGL methods", LOG_ALL);
   gl = new GL ();
 
+  // create textures (OpenGL)
+  display ("Loading textures", LOG_ALL);
+  texgrass = gl->genTextureTGA (dirs->getTextures ("grass1.tga"), 0, 0, 1, false);
+  texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 0, 1, false);
+  texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 0, 1, false);
+  texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 0, 1, false);
+  texredsand = gl->genTextureTGA (dirs->getTextures ("redsand1.tga"), 0, 0, 1, false);
+  texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1, false);
+  texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
+  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
+  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, -1, 1, true);
+  textreeu = gl->genTextureTGA (dirs->getTextures ("treeu1.tga"), 0, -1, 1, true);
+  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, -1, 1, true);
+  textreeu2 = gl->genTextureTGA (dirs->getTextures ("treeu2.tga"), 0, -1, 1, true);
+  textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
+  textreeu3 = gl->genTextureTGA (dirs->getTextures ("treeu3.tga"), 0, 3, 1, true);
+  textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
+  textreeu4 = gl->genTextureTGA (dirs->getTextures ("treeu4.tga"), 0, 3, 1, true);
+  textree5 = gl->genTextureTGA (dirs->getTextures ("tree5.tga"), 0, -1, 1, true);
+  textreeu5 = gl->genTextureTGA (dirs->getTextures ("treeu5.tga"), 0, -1, 1, true);
+  texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
+  texcactusu1 = gl->genTextureTGA (dirs->getTextures ("cactusu1.tga"), 0, 3, 1, true);
+  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, -1, 1, true);
+  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, -1, 1, true);
+  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke3.tga"), 0, 5, 1, true);
+  texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
+  texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
+  texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
+  texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, -1, 0, true);
+  texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), 1, -1, 0, true);
+  texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), 1, -1, 0, true);
+  texflare4 = gl->genTextureTGA (dirs->getTextures ("flare4.tga"), 1, -1, 0, true);
+  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, -1, 1, true);
+  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
+  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 0, true);
+  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 0, true);
+  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, -1, 1, true);
+  texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
+  texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
+  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
+  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
+  texarrow = gl->genTextureTGA (dirs->getTextures ("arrow.tga"), 0, -1, 0, true);
+
   display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
+//  font1 = new Font (dirs->getTextures ("font3.tga"), 37, '!', 100);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 
   display ("Loading 3ds models:", LOG_ALL);
@@ -5166,6 +4541,7 @@ void myFirstInit ()
   event_setAntialiasing ();
 
   glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+//  glLightModeli (GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
   glEnable (GL_LIGHT0);
   glEnable (GL_LIGHTING);
   glEnable (GL_COLOR_MATERIAL);
@@ -5200,44 +4576,9 @@ int heat2 [maxfy] [maxfx];
 
 void init_display ()
 {
-/*  glClearColor (0, 0, 0, 0);
-  gl->clearScreen (); // exit intro
-  glDisable (GL_LIGHTING);
-  float xf = 0.1, zf = 10.0;
-
-  glPushMatrix ();
-
-  for (float xb = -5; xb <= 5; xb += 1)
-  {
-  glPushMatrix ();
-  glTranslatef (xb, 0, -5);
-  glRotatef (inittimer_gl117 / 3 - xb * 10, 0, 0, 1);
-  glColor4ub (255, 255, 0, 255);
-  glBegin (GL_QUADS);
-  glVertex3f (-xf, -zf, 0);
-  glVertex3f (-xf, zf, 0);
-  glVertex3f (xf, zf, 0);
-  glVertex3f (xf, -zf, 0);
-  glEnd ();
-  glPopMatrix ();
-  }
-
-  glPopMatrix ();
-*/
   CVector3 vec;
   CColor color (200, 200, 200, 255);
 
-/*  if (inittimer_gl117 > 2000)
-  {
-    float xf = 1.0F, yf = 1.0F, zf = 2.0F;
-    float col = (inittimer_gl117 - 2000) / 2;
-//    col = 255 - col;
-    if (col < 0) col = 0;
-    if (col > 255) col = 0;
-    col /= 256;
-    glClearColor (col, col, col, 1);
-  }*/
-  
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -5284,20 +4625,8 @@ void init_display ()
     glDisable (GL_BLEND);
   }
   
-  // draw gl-117 logo
-/*  if (initexplode1 < 0)
-  {
-    gl117_rotateColors (inittimer_gl117);
-    glPushMatrix ();
-    glTranslatef (0, 0, -5);
-    model_gl117.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
-    glPopMatrix ();
-  }*/
-
   glDisable (GL_LIGHTING);
   glPopMatrix ();
-
-//  glPopMatrix ();
 
   // draw fire (heat array)
   glDisable (GL_DEPTH_TEST);
@@ -5364,31 +4693,31 @@ void proceedFire ()
       // rotate through fire colors (white-yellow-red-black-blue-black)
       // col in [0...512]
       int yind = i;
-	  int h = heat [yind] [i2];
-	  int b = h * 5;
-	  if (h > 30) b = (60 - h) * 5;
-	  if (h >= 60) b = 0;
-	  h -= 50;
-    int r = h * 2; // blend out late for red->black
-    if (r > 255) r = 255;
-	  else if (r < 0) r = 0;
-	  h -= 127;
-    int g = h * 2; // blend out for yellow->red
-    if (g > 255) g = 255;
-    else if (g < 0) g = 0;
-	  h -= 127;
-    if (h > 0)
-    {
-      b = h - 256; // blend out early to get white->yellow
-      if (b > 255) b = 255;
-    }
-    else if (b < 0) b = 0;
-    int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
-    glColor4ub (r, g, b, a);
-	  firetex [(i * maxfx + i2) * 4] = r;
-	  firetex [(i * maxfx + i2) * 4 + 1] = g;
-	  firetex [(i * maxfx + i2) * 4 + 2] = b;
-	  firetex [(i * maxfx + i2) * 4 + 3] = a;
+	    int h = heat [yind] [i2];
+	    int b = h * 5;
+	    if (h > 30) b = (60 - h) * 5;
+	    if (h >= 60) b = 0;
+	    h -= 50;
+      int r = h * 2; // blend out late for red->black
+      if (r > 255) r = 255;
+	    else if (r < 0) r = 0;
+	    h -= 127;
+      int g = h * 2; // blend out for yellow->red
+      if (g > 255) g = 255;
+      else if (g < 0) g = 0;
+	    h -= 127;
+      if (h > 0)
+      {
+        b = h - 256; // blend out early to get white->yellow
+        if (b > 255) b = 255;
+      }
+      else if (b < 0) b = 0;
+      int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
+      glColor4ub (r, g, b, a);
+	    firetex [(i * maxfx + i2) * 4] = r;
+	    firetex [(i * maxfx + i2) * 4 + 1] = g;
+	    firetex [(i * maxfx + i2) * 4 + 2] = b;
+	    firetex [(i * maxfx + i2) * 4 + 3] = a;
     }
     glEnd ();
   }
@@ -5879,84 +5208,10 @@ static void myTimerFunc (int value)
 #endif
 }
 
-// sdlTimerFunc has been replaced by myTimerFunc
-//#define TIMER_INTERVAL 33
-//#define GLUT_TIMER_INTERVAL 28
-/*static void sdlTimerFunc ()
-{
-  Uint32 akttime, dt;
-#ifndef USE_GLUT
-    akttime = SDL_GetTicks ();
-#else
-    akttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
-  if (lasttime == 0) dt = 1;
-  else dt = akttime - lasttime;
-  lasttime = akttime;
-
-  if (game == GAME_PLAY)
-    game_timer (dt);
-  else if (game == GAME_INIT)
-    init_timer (dt);
-  else if (game == GAME_MENU)
-  {
-    if (!missionactive)
-      game_timer (dt);
-    menu_timer (dt);
-  }
-  else if (game == GAME_CREDITS)
-  {
-    credits_timer (dt);
-  }
-  else if (game == GAME_CREATE)
-    create_timer (dt);
-  else if (game == GAME_JOIN)
-    join_timer (dt);
-  else if (game == GAME_MISSION)
-    mission_timer (dt);
-  else if (game == GAME_STATS)
-    stats_timer (dt);
-  else if (game == GAME_FAME)
-    mission_timer (dt);
-  else if (game == GAME_FIGHTER)
-    mission_timer (dt);
-  else if (game == GAME_FINISH)
-    finish_timer (dt);
-  else if (game == GAME_QUIT)
-    mission_timer (dt);
-}*/
-
 #ifndef USE_GLUT
 
 Uint32 nexttime = 0;
 
-// get time left until nexttime, obsolete
-/*Uint32 sdlTimeLeft ()
-{
-  Uint32 now;
-  now = SDL_GetTicks ();
-  if (nexttime <= now)
-  {
-    nexttime = now + TIMER_INTERVAL;
-    return 0;
-  }
-  return nexttime - now;
-}*/
-
-// delay loop, not elegant => obsolete
-/*void sdlWaitTimer ()
-{
-  Uint32 now;
-  now = SDL_GetTicks ();
-  if (abs (nexttime - now) > 2000) nexttime = now;
-  while (now < nexttime)
-  {
-    now = SDL_GetTicks ();
-  }
-  nexttime = now + TIMER_INTERVAL;
-}*/
-
-//int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
 int joystickbutton = -1;
 bool joystickfirebutton = false;
 
@@ -6199,7 +5454,7 @@ int speedTest ()
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluPerspective (80.0, 1.0, nearclippingplane, 20.0); // should be sqrt(2) or 1.5
+  gluPerspective (visibleangle, 1.0, nearclippingplane, 20.0); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -6249,7 +5504,6 @@ bool configinit = false; // has GLUT/SDL already been inited?
 void config_test (int argc, char **argv)
 {
   display ("No configuration file found. Testing...", LOG_MOST);
-  char buf [STDSIZE];
   int bppi [4];
 
 #ifdef USE_GLUT // GLUT ONLY
@@ -6258,6 +5512,7 @@ void config_test (int argc, char **argv)
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
 #else // SDL
+  char buf [STDSIZE];
   display ("Using SDL and GLUT", LOG_MOST);
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
@@ -6472,7 +5727,7 @@ void callbackJoystickAxis (Component *comp, int key)
     }
   }
 
-  int *joysetting;
+  int *joysetting = NULL;
   if (buttonnum == 0) joysetting = &joystick_aileron;
   else if (buttonnum == 2) joysetting = &joystick_elevator;
   else if (buttonnum == 4) joysetting = &joystick_throttle;
@@ -7111,7 +6366,9 @@ void createMenu ()
   TextField *textfield;
   EditKey *editkey;
   EditField *editfield;
+#ifndef USE_GLUT
   EditJoystick *editjoystick;
+#endif
   
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -7207,36 +6464,6 @@ void createMenu ()
   editfield->setBounds (xf, yf, xfstep, yfstep - 0.1);
   submenu [0]->add (editfield);
   yf -= yfstep;
-
-/*    font1->drawText (textx2 - 2, 10, -2, "ACTIVE:", &coloryellow);
-    if (pilots->aktpilot < pilots->aktpilots)
-    {
-      font1->drawText (textx2 + 4, 10, -2, pilots->pilot [pilots->aktpilot]->name, &coloryellow);
-    }
-    for (i = 0; i < pilots->aktpilots; i ++)
-    {
-      drawRank (textx2 - 1, 12.2 - (float) i * 3, -3, pilots->pilot [i]->ranking, 1.3);
-      if (menuitemselected == 20 + i)
-      {
-        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, normtimef);
-        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, normtimef);
-      }
-      else
-      {
-        font1->drawText (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank ());
-        font1->drawText (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name);
-      }
-    }
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, normtimef);
-    else
-      font1->drawText (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)");
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, normtimef);
-    else
-      font1->drawText (textx2 - 2, -7, -2.5, "CREATE");
-    pilotedit.draw (textx2, -9, -2.5, menutimer / 8);*/
-
 
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -7852,17 +7079,6 @@ void createMenu ()
   famemenu.add (textfield);
   yf -= yfstep * 13;
 
-/*  for (i = 0; i < 10; i ++)
-  {
-    yfstep = 1.0;
-    sprintf (buf, "1.");
-    label = new Label (buf);
-    label->setBounds (xf, yf, xfstep, yfstep - 0.1);
-    famemenu.add (label);
-    yf -= yfstep;
-  }
-  yf -= 0.25;*/
-
   yfstep = 1.1;
   sprintf (buf, "         BACK TO MAIN MENU");
   button = new Button (buf);
@@ -7896,17 +7112,6 @@ void createMenu ()
   textfield->setBounds (xf, yf, xfstep, (yfstep - 0.1) * 5 + 0.15);
   fightermenu.add (textfield);
   yf -= yfstep * 5 + 0.05;
-
-/*  for (i = 0; i < 4; i ++)
-  {
-    yfstep = 1.0;
-    sprintf (buf, "1.");
-    label = new Label (buf);
-    label->setBounds (xf, yf, xfstep, yfstep - 0.1);
-    fightermenu.add (label);
-    yf -= yfstep;
-  }
-  yf -= 6.25;*/
 
   button = new Button ("<");
   button->setBounds (xf, yf, 1.5, 1.5);
@@ -8047,6 +7252,9 @@ int main (int argc, char **argv)
 
   checkargs (argc, argv); // process command line parameters
 
+  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
+  atexit (display_exit);
+
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   display (buf, LOG_MOST);
 
@@ -8055,7 +7263,6 @@ int main (int argc, char **argv)
 #endif
 
   display ("Getting directory locations", LOG_ALL);
-  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
   
   if (!load_config ()) // try to load conf file (conf.cpp) and validate settings
   {
@@ -8116,7 +7323,7 @@ int main (int argc, char **argv)
   glutTimerFunc (20, myTimerFunc, 0);
 
   // parameters: visible angle, aspectracio, z-nearclip, z-farclip
-  gluPerspective (80.0, (float) width / height, nearclippingplane * GLOBALSCALE, 50.0 * GLOBALSCALE);
+  gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, 50.0 * GLOBALSCALE);
   
   // no keyboard available with GLUT, as there are no KEY_DOWN/UP events
   if (controls <= 0)

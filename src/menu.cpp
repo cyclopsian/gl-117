@@ -24,6 +24,7 @@
 #ifndef IS_MENU_H
 
 #include "menu.h"
+#include "main.h"
 
 int menu_id = 0;
 int menu_z = -2;
@@ -143,20 +144,6 @@ void Container::add (Component *component)
 void Container::draw ()
 {
   int i;
-  if (visible)
-  {
-/*    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin (GL_LINE_STRIP);
-    glColor4ub (colback [0], colback [1], colback [2], 255);
-    glVertex3f (0.1 * x, 0.1 * y, menu_z);
-    glVertex3f (0.1 * (x + w), 0.1 * y, menu_z);
-    glVertex3f (0.1 * (x + w), 0.1 * (y - h), menu_z);
-    glVertex3f (0.1 * x, 0.1 * (y - h), menu_z);
-    glVertex3f (0.1 * x, 0.1 * y, menu_z);
-    glEnd ();
-    glDisable (GL_BLEND);*/
-  }
   if (active && visible)
   {
     for (i = 0; i < numcomponents; i ++)
@@ -212,17 +199,14 @@ void Container::eventMouse (int x, int y, int button)
 	// Get first model in selection buffer stack
   GLuint *ptr = selectBuff;
   int mypicks = 0;
-  int pickz2 = -1;
   int pick [100];
 	if (hits > 0)
   {
     int i;
-    GLuint z = 0xFFFFFFFF;
     for (i = 0; i < hits; i ++)
     {
       int names = *ptr;
       ptr ++;
-      GLuint z1 = *ptr;
       ptr ++;
       ptr ++;
       pick [mypicks] = *ptr;
@@ -237,11 +221,6 @@ void Container::eventMouse (int x, int y, int button)
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 
-//  char buf [STDSIZE];
-//  sprintf (buf, "selectMouse: picks=%d, pickz=%d", mypicks, pickz2);
-//  display (buf, LOG_ALL);
-//  return pickz2;
-
   for (i = 0; i < numcomponents; i ++)
   {
     components [i]->setHighlight (false);
@@ -254,15 +233,6 @@ void Container::eventMouse (int x, int y, int button)
     }
   }
 }
-
-/*void Container::triggerMouse (int x, int y, int button)
-{
-  int i;
-  for (i = 0; i < numcomponents; i ++)
-  {
-    components [i]->triggerMouse (x, y, button);
-  }
-}*/
 
 void Container::triggerMouse (int id, int button)
 {
@@ -445,48 +415,6 @@ void Button::triggerMouse (int id, int button)
   if (button)
     execFunction (button);
 }
-
-
-
-/*ImageButton::ImageButton ()
-{
-}
-
-ImageButton::ImageButton (char *text, CTexture *texture)
-{
-  this->text = text;
-  this->texture = texture;
-  aligntexture = 0;
-}
-
-void ImageButton::draw ()
-{
-  if (!visible) return;
-  CColor *col_active = &menu_colwhite;
-  CColor *col_deactive = &menu_colgrey;
-  CColor *col_highlight = &menu_colyellow;
-  glLoadName (id);
-  glEnable (GL_BLEND);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBegin (GL_QUADS);
-  if (!highlight)
-    glColor4ub (colback [0], colback [1], colback [2], colback [3]);
-  else
-    glColor4ub (255, 255, 0, 50);
-  glVertex3f (0.1 * x, 0.1 * y, menu_z);
-  glVertex3f (0.1 * (x + w), 0.1 * y, menu_z);
-  glVertex3f (0.1 * (x + w), 0.1 * (y - h), menu_z);
-  glVertex3f (0.1 * x, 0.1 * (y - h), menu_z);
-  glEnd ();
-  glDisable (GL_BLEND);
-  font1->zoom = 0.1 * (h - 0.1);
-  float yf = (y - h - 0.01) / (h - 0.1);
-  float xf = (x + 0.25) / (h - 0.1);
-  if (active && !highlight) font1->drawText (xf, yf, menu_z, text, col_active);
-  else if (!active) font1->drawText (xf, yf, menu_z, text, col_deactive);
-  else font1->drawText (xf, yf, menu_z, text, col_highlight);
-  font1->zoom = 0.1;
-}*/
 
 
 

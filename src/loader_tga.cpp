@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "loader_tga.h"
-#include "../config.h"
+#include "common.h"
 
 //#define DATA8   unsigned char
 //#define DATA32  unsigned int

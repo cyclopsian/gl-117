@@ -23,7 +23,11 @@
 
 #ifndef IS_MATHTAB_H
 
+#include <math.h>
+#include <stdlib.h>
+
 #include "mathtab.h"
+#include "common.h"
 
 float PI;
 float sine [360];

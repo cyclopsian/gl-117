@@ -23,7 +23,18 @@
 
 #ifndef IS_DIRS_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#ifndef _MSC_VER // no microsoft?
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #include "dirs.h"
+#include "common.h"
 
 char *mystrtok (char *str, int len, char *tok)
 {

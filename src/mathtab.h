@@ -24,11 +24,6 @@
 #ifndef IS_MATHTAB_H
 #define IS_MATHTAB_H
 
-#include <math.h>
-#include <stdlib.h>
-
-#include "common.h"
-
 extern float sine[], cosi[]; // sine and cosine tables (only use for approximations)
 extern float PI;
 

@@ -24,10 +24,7 @@
 #ifndef IS_AUDIO_H
 #define IS_AUDIO_H
 
-#include <stdlib.h>
-
-#include "common.h"
-#include "dirs.h"
+#include "common.h" // ok
 
 class WaveFile
 {

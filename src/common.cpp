@@ -8,6 +8,26 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "dirs.h"
+
+void display_stream (FILE *stream, char *str, int level)
+{
+  if (level == LOG_NONE) fprintf (stream, "%s\n", str);
+  else if (level == LOG_FATAL) fprintf (stream, "Fatal: %s\n", str);
+  else if (level == LOG_ERROR) fprintf (stream, "Error: %s\n", str);
+  else if (level == LOG_WARN) fprintf (stream, "Warning: %s\n", str);
+  else if (level == LOG_MOST) fprintf (stream, "Info: %s\n", str);
+  else fprintf (stream, "Debug: %s\n", str);
+  fflush (stream);
+}
+
+FILE *display_out = NULL;
+
+void display_exit ()
+{
+  if (display_out) fclose (display_out);
+  display_out = NULL;
+}
 
 // display log/debug message
 void display (char *str, int level)
@@ -19,13 +39,19 @@ void display (char *str, int level)
     FILE *stream = stdout;
     if (level == LOG_FATAL || level == LOG_ERROR || level == LOG_WARN)
       stream = stderr;
-    if (level == LOG_NONE) fprintf (stream, "%s\n", str);
-    else if (level == LOG_FATAL) fprintf (stream, "Fatal: %s\n", str);
-    else if (level == LOG_ERROR) fprintf (stream, "Error: %s\n", str);
-    else if (level == LOG_WARN) fprintf (stream, "Warning: %s\n", str);
-    else if (level == LOG_MOST) fprintf (stream, "Info: %s\n", str);
-    else fprintf (stream, "Debug: %s\n", str);
-    fflush (stream);
+    display_stream (stream, str, level);
+
+    if (!display_out)
+    {
+      if ((display_out = fopen (dirs->getSaves ("logfile.txt"), "wt")) != NULL)
+      {
+        display_stream (display_out, str, level);
+      }
+    }
+    else
+    {
+      display_stream (display_out, str, level);
+    }
   }
 }
 

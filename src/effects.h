@@ -24,24 +24,8 @@
 #ifndef IS_EFFECTS_H
 #define IS_EFFECTS_H
 
-#include "common.h"
-
-// APPLE path differs (thanks Minami)
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#endif
-
-#ifndef __APPLE__
-#ifdef USE_GLUT
-#include <GL/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#endif // __APPLE__
-
-#include "model.h"
-#include "mathtab.h"
-#include "object.h"
+#include "model.h" // ok
+#include "object.h" // ok
 
 const int maxsmokeelem = 30;
 

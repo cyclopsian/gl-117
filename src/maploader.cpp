@@ -23,8 +23,16 @@
 
 #ifndef IS_MAPLOADER_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
 #include "maploader.h"
 #include "main.h"
+#include "loader_tga.h"
+#include "fileloader.h"
+#include "dirs.h"
+#include "glland.h"
 
 int mapPilotname2Num (char *str)
 {
@@ -172,7 +180,7 @@ int MissionCustom::isDouble (char *str)
   if (str [0] == 0)
     return 0;
   char *ptr;
-  double d = strtod (str, &ptr);
+  (void) strtod (str, &ptr);
   if ((int) (ptr - str) != (int) strlen (str)) return 0;
   return 1;
 }
@@ -191,6 +199,7 @@ int MissionCustom::parseMapData ()
   char buf [TOKENLEN];
   int ret;
   map_type = LANDSCAPE_ALPINE;
+  save_map_type = map_type;
   heading = 0;
   weather = WEATHER_SUNNY;
   clouds = 0;
@@ -216,6 +225,7 @@ int MissionCustom::parseMapData ()
         sprintf (buf, "Invalid attribute %s", attr);
         error (buf);
       }
+      save_map_type = map_type;
     }
     else if (!strcmp (attr, "HEADING"))
     {
@@ -805,18 +815,9 @@ void MissionCustom::init ()
       // error in map file, must be closed, mission freed
     }
   }
-/*  while (file_nextToken (token, TOKENLEN))
-  {
-    toUpper (token);
-    if (!strcmp (token, "INFO"))
-      parseInfoData ();
-  }*/
 
   file_close ();
 
-/*  if (name [0] == 0) error ("No mission name found");
-  if (briefing [0] == 0) error ("No briefing found");
-  else*/
   autoLFBriefing ();
   alliedfighters = 1;
   for (i = 1; i < numobjects; i ++)
@@ -907,7 +908,7 @@ void MissionCustom::start ()
         int g = map [addr + 1];
         int b = map [addr + 2];
 
-        if (map_type < LANDSCAPE_MOON) // alpine
+        if (save_map_type < LANDSCAPE_MOON) // alpine
         {
           l->f [x] [y] = GRASS;
           if (r <= 50 && g <= 50 && b >= 200)
@@ -923,11 +924,11 @@ void MissionCustom::start ()
           else if (r > 210 && g < 50 && b < 50)
             l->f [x] [y] = TOWN;
         }
-        else if (map_type < LANDSCAPE_CANYON) // moon
+        else if (save_map_type < LANDSCAPE_CANYON) // moon
         {
           l->f [x] [y] = MOONSAND;
         }
-        else if (map_type < LANDSCAPE_DESERT) // canyon
+        else if (save_map_type < LANDSCAPE_DESERT) // canyon
         {
           l->f [x] [y] = REDSTONE;
           if (r <= 50 && g <= 50 && b >= 200)
@@ -937,7 +938,7 @@ void MissionCustom::start ()
           else if (r > 150 && g > 150 && b < 50)
             l->f [x] [y] = REDTREE0;
         }
-        else if (map_type < LANDSCAPE_ARCTIC) // desert
+        else if (save_map_type < LANDSCAPE_ARCTIC) // desert
         {
           l->f [x] [y] = DESERTSAND;
           if (r <= 50 && g <= 50 && b >= 200)
@@ -946,20 +947,6 @@ void MissionCustom::start ()
             l->f [x] [y] = CACTUS0;
         }
       }
-
-/*    for (i = 1; i < mapcy - 1; i ++)
-      for (i2 = 1; i2 < mapcx - 1; i2 ++)
-      {
-        int x = i2, y = MAXX-i;
-        if (l->f [x] [y] == WATER && l->f [x+1] [y] == WATER && l->f [x] [y+1] == WATER && l->f [x-1] [y] == WATER && l->f [x] [y-1] == WATER)
-        {
-          l->h [x] [y] -= 40;
-        }
-        if (l->f [x] [y] == WATER)
-        {
-          l->h [x] [y] -= 10;
-        }
-      }*/
 
     for (i = 1; i < mapcy - 1; i ++)
       for (i2 = 1; i2 < mapcx - 1; i2 ++)
@@ -1065,13 +1052,13 @@ void MissionCustom::start ()
     }
     if (obj [i].idle == 1)
     {
-      relx = fighter [i - 1]->tl->x;
-      rely = fighter [i - 1]->tl->y;
+      relx = (int) fighter [i - 1]->tl->x;
+      rely = (int) fighter [i - 1]->tl->y;
     }
     else if (obj [i].idle == 2)
     {
-      relx = fighter [0]->tl->x;
-      rely = fighter [0]->tl->y;
+      relx = (int) fighter [0]->tl->x;
+      rely = (int) fighter [0]->tl->y;
     }
     else if (obj [i].idle == 100)
     {

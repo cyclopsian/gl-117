@@ -23,7 +23,13 @@
 
 #ifndef IS_CONF_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
 #include "conf.h"
+#include "common.h"
 #include "dirs.h"
 
 // initialization
@@ -567,13 +573,13 @@ int load_configInterface ()
   if (str == NULL)
   { mouse_reverse = false; }
   else
-  { mouse_reverse = (bool) atoi (str); }
+  { mouse_reverse = (atoi (str) != 0); }
 
   str = cf->getString (ret, "mouse_relative");
   if (str == NULL)
   { mouse_relative = false; }
   else
-  { mouse_relative = (bool) atoi (str); }
+  { mouse_relative = (atoi (str) != 0); }
 
   str = cf->getString (ret, "mouse_autorudder");
   if (str == NULL)

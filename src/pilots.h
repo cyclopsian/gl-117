@@ -24,11 +24,6 @@
 #ifndef IS_PILOTS_H
 #define IS_PILOTS_H
 
-#include <stdio.h>
-#include <string.h>
-
-#include "dirs.h"
-
 #define SAVEVERSION "GL117_S1"
 
 const int maxpilotdata = 100;

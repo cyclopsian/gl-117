@@ -9,8 +9,18 @@
      \/_______/    \/________/               \/_/      \/_/    \/_/
 
 
+Version 1.3:
+	- optimizations: graphics are much faster now!!!
+	- changed quality modes: higher detail for each mode
+	  (old quality=5 is now quality=4)
+	- enabled higher view rates
+	- source code cleanup (#includes) and documentation
+	- adjustments to missiles
+	- radar improvements
+	- logging to file
+
 Version 1.2:
-	- Map editor and examples
+	- map editor and examples
 	- bugfix: "Texture XXX not found" problem
 	- bugfix: mouse/joystick events do not occur in different controls settings
 	- bugfix: some missions produced a seg fault when selecting a bomber

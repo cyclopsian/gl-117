@@ -23,8 +23,14 @@
 
 #ifndef IS_MISSION_H
 
+#include <stdio.h>
+#include <string.h>
 #include "mission.h"
+#include "common.h"
 #include "main.h"
+#include "mathtab.h"
+#include "conf.h"
+#include "glland.h"
 
 void Mission::autoLFBriefing ()
 {
@@ -349,7 +355,6 @@ void MissionTutorial1::start ()
   sungamma = 50;
   if (l != NULL) delete l;
   l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
-//    l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
   playerInit ();
   fplayer->tl->x = 220;
   fplayer->tl->z = -30;
@@ -393,9 +398,6 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 6, -2.5, "DETERMINE THE INPUT DEVICE.", &textcolor);
       font1->drawTextCentered (0, 5, -2.5, "CURRENTLY, THIS IS THE KEYBOARD", &textcolor);
     }
-/*      if (!loop) fplayer->gamma += 2;
-    else fplayer->gamma -= 2;
-    if (fplayer->checkLooping ()) loop = !loop;*/
   }
   else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
@@ -694,8 +696,6 @@ void MissionTutorial3::start ()
   sungamma = 50;
   if (l != NULL) delete l;
   l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
-//  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
-//    l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
   playerInit ();
   fplayer->tl->x = 220;
   fplayer->tl->z = -30;
@@ -1065,7 +1065,7 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
 
 void MissionFreeFlight1::draw ()
 {
-  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
+  int timeroff = 100 * timestep, /*timerdelay = 300 * timestep,*/ timerlag = 20 * timestep;
 
   if (laststate != state)
   {
@@ -1245,7 +1245,7 @@ void MissionDeathmatch2::start ()
 
 int MissionDeathmatch2::processtimer (Uint32 dt)
 {
-  bool b = false;
+//  bool b = false;
   int i;
   if (texttimer >= 200 * timestep) texttimer = 0;
   if (texttimer > 0) texttimer += dt;
@@ -1503,7 +1503,7 @@ void MissionTeamBase1::start ()
 
 int MissionTeamBase1::processtimer (Uint32 dt)
 {
-  bool b = false;
+//  bool b = false;
   int i;
   if (texttimer >= 200 * timestep) texttimer = 0;
   if (texttimer > 0) texttimer += dt;
@@ -1684,7 +1684,7 @@ int MissionWaves1::processtimer (Uint32 dt)
 
 void MissionWaves1::draw ()
 {
-  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
+  int timeroff = 100 * timestep, /*timerdelay = 300 * timestep,*/ timerlag = 20 * timestep;
 
   if (laststate != state)
   {
@@ -2072,9 +2072,6 @@ void MissionDogfight2::start ()
   alliedInit (FIGHTER_FALCON, alliedpilot [0], fighter [1]);
   fighter [1]->tl->x = 5;
   fighter [1]->tl->z = 105;
-/*  alliedInit (FIGHTER_FALCON, alliedpilot [1], fighter [2]);
-  fighter [2]->tl->x = 10;
-  fighter [2]->tl->z = 110;*/
   for (i = 2; i <= 6; i ++)
   {
     fighter [i]->party = 0;
@@ -2653,18 +2650,6 @@ void MissionDepot::start ()
   fighter [n]->o = &model_hall1;
   fighter [n]->newinit (STATIC_HALL1, 0, 400);
   n ++;
-/*  fighter [n]->tl->x = px + 4;
-  fighter [n]->tl->z = py - 1;
-  fighter [n]->target = fighter [0];
-  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (STATIC_HALL1, 0, 400);
-  n ++;
-  fighter [n]->tl->x = px - 1.5;
-  fighter [n]->tl->z = py - 4.5;
-  fighter [n]->target = fighter [0];
-  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
-  n ++;*/
   fighter [n]->tl->x = px + 1.5;
   fighter [n]->tl->z = py - 4.5;
   fighter [n]->target = fighter [0];
@@ -2676,19 +2661,6 @@ void MissionDepot::start ()
   fighter [n]->target = fighter [0];
   fighter [n]->o = &model_tent4;
   fighter [n]->newinit (STATIC_TENT4, 0, 400);
-/*  n ++;
-  fighter [n]->tl->x = px - 5.5;
-  fighter [n]->tl->z = py + 4;
-  fighter [n]->target = fighter [0];
-  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
-  n ++;
-  fighter [n]->tl->x = px - 4;
-  fighter [n]->tl->z = py + 6;
-  fighter [n]->target = fighter [0];
-  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (STATIC_TENT4, 0, 400);
-  n ++;*/
   fighter [n]->tl->x = px - 6;
   fighter [n]->tl->z = py + 6;
   fighter [n]->target = fighter [0];
@@ -2753,15 +2725,6 @@ void MissionDepot::start ()
   fighter [n]->phi = 180;
   fighter [n]->maxtheta = 0;
   n ++;
-/*  for (i = n; i < n + 6; i ++)
-  {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (4)];
-    fighter [i]->o = &model_fige;
-    fighter [i]->tl->x = px + i * 5 - 60;
-    fighter [i]->tl->z = py + i * 5 - 60;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 180 + myrandom (200));
-  }*/
 }
 
 int MissionDepot::processtimer (Uint32 dt)
@@ -4139,7 +4102,7 @@ void MissionTunnel1::start ()
 
 int MissionTunnel1::processtimer (Uint32 dt)
 {
-  bool b = false;
+//  bool b = false;
   int i;
   if (timer <= 0) fplayer->tl->y = l->getHeight (fplayer->tl->x, fplayer->tl->z) + 5;
   timer += dt;
@@ -4259,64 +4222,6 @@ void MissionMoonBase1::draw ()
   }
 }
 
-
-
-/*MissionMoon1::MissionMoon1 ()
-{
-  id = MISSION_MOON;
-  strcpy (name, "MOON");
-  strcpy (briefing, "THIS IS JUST A SIMPLE DEMO MISSION");
-  autoLFBriefing ();
-  alliedfighters = 1;
-  maxtime = 2000 * timestep;
-}
-
-void MissionMoon1::start ()
-{
-  day = 0;
-  clouds = 0;
-  weather = WEATHER_CLOUDY;
-  camera = 0;
-  sungamma = 50;
-  if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
-  playerInit ();
-  fplayer->tl->x = 50;
-  fplayer->tl->z = 50;
-  fighter [1]->target = fighter [0];
-  fighter [1]->o = &model_figa;
-  fighter [1]->newinit (FIGHTER_SWALLOW, 0, 200);
-  fighter [2]->target = fighter [0];
-  fighter [2]->o = &model_figa;
-  fighter [2]->newinit (FIGHTER_SWALLOW, 0, 150);
-}
-
-int MissionMoon1::processtimer (Uint32 dt)
-{
-  bool b = false;
-  int i;
-  timer += dt;
-  if (!fplayer->active && fplayer->explode >= 35 * timestep)
-  {
-    return 2;
-  }
-  for (i = 0; i <= 4; i ++)
-  {
-    if (fighter [i]->active)
-      if (fighter [i]->party == 0)
-        b = true;
-  }
-  if (b) return 0;
-  return 1;
-}
-
-void MissionMoon1::draw ()
-{
-  if (timer >= 0 && timer <= 50 * timestep)
-  {
-    font1->drawTextCentered (0, 4, -2, name, &textcolor);
-  }
-}*/
 
 
 

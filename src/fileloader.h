@@ -54,16 +54,12 @@
     }
 **************************************************************************/
 
-#define _LARGEFILE_SOURCE
+//#define _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE64
 #define _FILE_OFFSET_BITS 64
 
 // we should use __long here!!!
 #define XLONG long
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
 #define FILE_MAXCOMMENTS 10     /* maximum number of comment strings */
 #define FILE_MAXLEN 4096       /* maximum length of the file buffer */
