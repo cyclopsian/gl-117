@@ -224,7 +224,14 @@ void AiObj::missileCount ()
   {
     if (missilerackn [i] > 0)
     {
-      missiles [missilerack [i]] += missilerackn [i];
+      if (missilerack [i] < 0 || missilerack [i] > 100)
+      {
+        DISPLAY_ERROR("Problem: missilerack[i] is not valid!");
+      }
+      else
+      {
+        missiles [missilerack [i]] += missilerackn [i];
+      }
     }
   }
 }

@@ -34,30 +34,43 @@ OptionFile::OptionFile (const std::string &filename)
   optionList.clear ();
 
   int ret = file.open (filename.c_str ());
+      printf ("File %s opened.", filename.c_str());
+  DISPLAY_DEBUG(FormatString ("File %s opened.", filename.c_str ()));
   assert (ret);
-  if (!ret) return;
+  if (!ret)
+    return;
   file.setWhitespace (" \t\r\n");
   file.addComment ("#", "\n");
-  file.setQuotes ("\"'`");
+  file.setQuotes ("\"'");
   
   while (file.nextToken (token, 4096))
   {
     std::string name = token;
     if (name == "") break; // the last token may be empty due to comments!
+        printf ("%s\n", token);
+        fflush(stdout);
     if (!file.nextToken (token, 4096) || strcmp (token, "="))
     {
+        printf ("=: %s\n", token);
+        fflush(stdout);
+//      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected \"=\", but got \"%s\"",
+//                    filename.c_str (), file.getLine (), token));
       assert (false);
-      DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected \"=\", but got \"%s\"",
-                    filename.c_str (), file.getLine (), token));
       return;
     }
+        printf ("=: %s\n", token);
+        fflush(stdout);
     if (!file.nextToken (token, 4096))
     {
-      assert (false);
+        printf ("V: %s\n", token);
+        fflush(stdout);
       DISPLAY_ERROR(FormatString ("Syntax error in file %s line %d. Expected a value, but got \"%s\"",
                     filename.c_str (), file.getLine (), token));
+      assert (false);
       return;
     }
+        printf ("V: %s\n", token);
+        fflush(stdout);
     std::string value = token;
     
     optionList.insert (std::pair <std::string, std::string> (name, value));

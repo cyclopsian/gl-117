@@ -207,8 +207,9 @@ void Directory::init (char *arg)
     }
     else
     {
-      DISPLAY_FATAL("Binary file has no context to the data files.");
-      exit (EXIT_CONTEXT);
+      strcpy (myfile, "/usr/local/share/");
+      DISPLAY_INFO("Binary file has no context to the data files. Presuming data files are in /usr/local/share");
+//      exit (EXIT_CONTEXT);
     }
 
   } // if (!founddir)
