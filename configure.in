@@ -28,14 +28,13 @@ AC_CHECK_HEADER(SDL/SDL_mixer.h,AC_DEFINE(HAVE_SDL_MIXER),AC_MSG_WARN(SDL_mixer.
 AC_CHECK_LIB(GL,glEnable,LIBS="$LIBS -lGL",AC_MSG_ERROR(GL not found - please install GL or MesaGL))
 AC_CHECK_LIB(GLU,gluPerspective,LIBS="$LIBS -lGLU",AC_MSG_ERROR(GLU not found - please install GLU or MesaGLU))
 AC_CHECK_LIB(glut,glutMainLoop,LIBS="$LIBS -lglut",AC_MSG_ERROR(GLUT not found - please install GLUT or MesaGLUT))
-AC_CHECK_LIB(SDL,SDL_Init,LIBS="$LIBS -lSDL -lSDLmain",AC_MSG_WARN(SDL not found - please install SDL))
+AC_CHECK_LIB(SDL,SDL_Init,LIBS="$LIBS -lSDL -lSDLmain",AC_MSG_WARN(SDL not found - please install SDL),-lpthread)
 AC_CHECK_LIB(SDL_mixer,Mix_LoadMUS,LIBS="$LIBS -lSDL_mixer",AC_MSG_WARN(SDL_mixer not found - please install SDL_mixer))
 
 CFLAGS="$CFLAGS -Wall -pedantic"
 CPPFLAGS="-DDATADIR='\"$datadir\"'"
 
-AC_OUTPUT([
-Makefile
-src/Makefile
+AC_OUTPUT([ \
+Makefile \
+src/Makefile \
 ])
-
