@@ -1,7 +1,16 @@
 #ifndef IS_COMMON_H
 #define IS_COMMON_H
 
-#include "../config.h"
+#include "../config.h" // defines HAVE_SDL, HAVE_SDL_MIXER
+
+// USE_GLUT means ONLY use GLUT
+// HAVE_SDL means that SDL is available, so USE_GLUT will not be defined
+// HAVE_SDL_MIXER means SDL and SDL_mixer are available
+// HAVE_SDL_NET means SDL_net is available
+
+#define HAVE_SDL_NET // dummy
+//#undef HAVE_SDL_MIXER // dummy
+//#undef HAVE_SDL // dummy
 
 #define USE_GLUT
 #ifdef HAVE_SDL
@@ -41,7 +50,7 @@
 // 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
-#define VERSIONSTRING "GL-117 V. 0.8.5 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.9 (BETA) BY THOMAS A. DREXL"
 
 // data types
 #ifdef USE_GLUT
@@ -95,22 +104,19 @@ extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
 extern float sungamma; // angle of sunrays dropping on horizon
 
 extern int camera; // camera type (0=cockpit, 1=chase, 2=backward, ...)
-extern float camx, camy, camz; // camera translation
-extern float camphi, camgamma, camtheta; // phi: x-z, theta: roll, gamma: y-z
-extern float sunlight;
+extern float camx, camy, camz; // camera position
+extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: elevation
+extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
 
-extern int lighting; // 1=on, 0=off
+extern int lighting; // 1=on, 0=off (obsolete)
 extern int mode; // always off=0, 1 would mean to calculate ROAM!
 
 extern float getView (); // return view dependant on weather
 
-// maximum allocation values
-//extern const int maxexplosion, maxfighter, maxlaser, maxmissile, maxstar, maxgroundobj;
-
 extern int difficulty; // 0=easy, 1=normal, 2=hard
 extern int brightness; // brightness correction
 
-extern bool sunblinding;
+extern bool sunblinding; // viewer gazing into the sun?
 
 extern int clouds;
 
@@ -120,8 +126,10 @@ extern int game; // see GAME-constants
 
 extern float blackout, redout; // high force
 
+// maximum constants for objects
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
+// sine and cosine table (obsolete)
 //#define SIN(x) sine[(int)x]
 //#define COS(x) cosi[(int)x]
 
@@ -129,6 +137,7 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
 #define SIN(x) sin(x*PI/180.0)
 #define COS(x) cos(x*PI/180.0)
 
+// define common GLUT/SDL keys
 #ifdef USE_GLUT
   #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON
   #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON
@@ -177,21 +186,24 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
   #define KEY_LCTRL SDLK_LCTRL
 #endif
 
-// debug level
-#define LOG_NONE 0
-#define LOG_FATAL 1
-#define LOG_ERROR 2
-#define LOG_WARN 3
-#define LOG_MOST 4
-#define LOG_ALL 5
+// log/debug level, look at common.cpp
+#define LOG_NONE 0 // do not log anything
+#define LOG_FATAL 1 // only show fatal (GL-117 will exit) errors (stderr)
+#define LOG_ERROR 2 // show errors too (stderr)
+#define LOG_WARN 3 // show warnings too (stdout)
+#define LOG_MOST 4 // show important messages too (stdout)
+#define LOG_ALL 5 // log everything (stdout)
 
+// display log/debug message
 void display (char *str, int level);
 
+// current log/debug level (set to constants above)
 extern int debuglevel;
 
-#define STDSIZE 256
-#define PATHSIZE 4096
+#define STDSIZE 256 // typical temporary buffer size
+#define PATHSIZE 4096 // maximum path/directory string size
 
+// exit codes
 #define EXIT_NORMAL 0
 #define EXIT_LOADFILE 1
 #define EXIT_INIT 2
@@ -199,6 +211,7 @@ extern int debuglevel;
 #define EXIT_ALLOC 4
 #define EXIT_CONTEXT 5
 
+// global normed timestep (higher values mean slower gameplay)
 const int timestep = 33;
 
 #endif

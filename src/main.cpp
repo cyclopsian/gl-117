@@ -21,9 +21,12 @@
 
 /* This file includes the main program. */
 
+/* To fully understand the GL-117 code, please read the methods from bottom to top! */
+
 /*
 TODO:
 - southern seashore landscape (additional missions)
+- antarctic
 - torpedo, water
 - faster gaussian convolution (isotropic)
 - little bigger gauss filter for light mask, 2x2 grid does not look good
@@ -49,7 +52,8 @@ float blackout = 0, redout = 0;
 
 int lighting = 1;
 int mode = 0;
-//int modes [4];
+
+// pre-defined screen resolutions (x, y, bpp, fullscreen)
 int resolution [4] [4] =
         { { 800, 600, 32, 1 },
           { 1024, 768, 32, 1 },
@@ -62,14 +66,12 @@ bool sunblinding = false;
 
 Dirs *dirs;
 
-Server *server;
-Client *client;
+Server *server = NULL;
+Client *client = NULL;
 
-#ifdef HAVE_SDL
+/*#ifdef HAVE_SDL
 SDL_Thread *threadnet = NULL;
-#endif
-
-int net_thread_main (void *data);
+#endif*/
 
 int game = GAME_INIT;
 
@@ -99,6 +101,7 @@ CTexture *texradar1, *texradar2;//, *texcounter;
 
 
 
+
 CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
 
 CTexture *texclouds1, *texclouds2, *texclouds3;
@@ -112,8 +115,6 @@ Font *font1, *font2;
 
 
 Uint32 lasttime = 0;
-
-
 
 
 class EditField
@@ -185,9 +186,8 @@ class EditField
   }
 };
 
-
-
-class InitKugel
+// intro balls, obsolete
+/*class InitKugel
 {
   public:
   int explosion;
@@ -223,9 +223,7 @@ class InitKugel
     m->draw3 (&tlnull, &tl, &rot, 0.8, explosion);
     glPopMatrix();
   }
-};
-
-
+};*/
 
 char *getKeyString (int key, char *str)
 {
@@ -420,14 +418,6 @@ void drawMouseCursor ()
   glTranslatef (mousex, mousey, 0);
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, 255);
-/*  glTexCoord2d (0, 0);
-  glVertex2d (mousex - crossradius, mousey - crossradius);
-  glTexCoord2d (0, 1);
-  glVertex2d (mousex - crossradius, mousey + crossradius);
-  glTexCoord2d (1, 1);
-  glVertex2d (mousex + crossradius, mousey + crossradius);
-  glTexCoord2d (1, 0);
-  glVertex2d (mousex + crossradius, mousey - crossradius);*/
   glTexCoord2i (0, 0);
   glVertex2d (-crossradius, -crossradius);
   glTexCoord2i (0, 1);
@@ -471,117 +461,6 @@ float fps = 30;
 
 int glutwindow;
 
-int setGlutScreen (int w, int h, int b, int f)
-{
-  char gamestr [256];
-  sprintf (gamestr, "%dx%d:%d", w, h, b);
-  glutGameModeString (gamestr);
-  if (f)
-  {
-    if (glutGameModeGet (GLUT_GAME_MODE_POSSIBLE))
-    {
-      glutEnterGameMode ();
-    }
-    else
-    {
-      return 0;
-    }
-  }
-  else
-  {
-    glutInitWindowPosition (0, 0);
-    glutInitWindowSize (w, h);
-    glutwindow = glutCreateWindow ("GL-117");
-    if (glutwindow == GL_FALSE)
-      return 0;
-  }
-  return 1;
-}
-
-int setScreen (int w, int h, int b, int f)
-{
-#ifdef USE_GLUT
-  if (!setGlutScreen (w, h, b, f))
-  {
-    b = 16;
-    if (!setGlutScreen (w, h, b, f))
-    {
-      b = 8;
-      if (!setGlutScreen (w, h, b, f))
-      {
-        b = 2;
-        if (!setGlutScreen (w, h, b, f))
-        {
-          return 0;
-        }
-      }
-    }
-  }
-#else
-  Uint32 video_flags;
-  if (f)
-  {
-    video_flags = SDL_OPENGL | SDL_FULLSCREEN;
-  }
-  else
-  {
-    video_flags = SDL_OPENGL;
-  }
-  int rgb_size[3];
-  switch (b) {
-    case 8:
-    rgb_size[0] = 2;
-    rgb_size[1] = 3;
-    rgb_size[2] = 3;
-    break;
-    case 15:
-    case 16:
-    rgb_size[0] = 5;
-    rgb_size[1] = 5;
-    rgb_size[2] = 5;
-    break;
-    default:
-    rgb_size[0] = 8;
-    rgb_size[1] = 8;
-    rgb_size[2] = 8;
-    break;
-  }
-  SDL_GL_SetAttribute (SDL_GL_RED_SIZE, rgb_size [0]);
-  SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, rgb_size [1]);
-  SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, rgb_size [2]);
-  SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16);
-  SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-  if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
-  {
-    if ((b = SDL_VideoModeOK (w, h, b, video_flags)) != 0)
-    {
-      b = 16;
-      SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 5);
-      SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 5);
-      SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 5);
-      if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
-      {
-        b = 8;
-        SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 2);
-        SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 3);
-        SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 3);
-        if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
-        {
-          return 0;
-        }
-      }
-    }
-  }
-#endif
-  glViewport(0, 0, (GLint) w, (GLint) h);
-  width = w;
-  height = h;
-  bpp = b;
-  fullscreen = f;
-//  fprintf (stderr, "\nUsing %dx%d:%d video mode. Edit the conf file to change.", width, height, bpp);
-  fflush (stderr);
-  return 1;
-}
 
 
 
@@ -638,6 +517,8 @@ void game_levelInit ()
   initing = true;
   flash = 0;
 
+  // init all objects
+
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i]->dinit ();
@@ -663,7 +544,6 @@ void game_levelInit ()
     groundobj [i]->deactivate ();
   }
 
-
 //  if (l != NULL) delete l;
   if (!multiplayer || isserver || !isserver) // clients do not need the mission
   {
@@ -675,8 +555,6 @@ void game_levelInit ()
     mission->start ();
   }
 
-
-
   if (clouds == 0) highclouds->setTexture (NULL);
   else if (clouds == 1) highclouds->setTexture (texclouds1);
   else if (clouds == 2) highclouds->setTexture (texclouds2);
@@ -687,6 +565,7 @@ void game_levelInit ()
   else if (clouds == 2) highclouds2->setTexture (texclouds2);
   else if (clouds == 3) highclouds2->setTexture (texclouds3);
 
+  // place missiles to racks
   for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FIGHTER1 && fighter [i]->id <= FIGHTER2)
@@ -709,6 +588,7 @@ void game_levelInit ()
       }
   }
 
+  // initialize object's height over the surface
   for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
@@ -936,28 +816,27 @@ void game_levelInit ()
 
   fps = 30;
 
-#ifdef HAVE_SDL_NET
+/*#ifdef HAVE_SDL_NET
   if (multiplayer)
   {
     if (threadnet != NULL)
       SDL_KillThread (threadnet);
     threadnet = SDL_CreateThread (net_thread_main, NULL);
   }
-#endif
+#endif*/
 
 }
 
 void game_reshape ()
 {
-  /* Darstellung auf gesamten Clientbereich des Fensters zulassen */
   glViewport(0, 0, (GLint) width, (GLint) height);
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  /* angle, aspect, near Clip, far Clip */
+
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, (float) width / height, nearclippingplane, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, (float) width / height, nearclippingplane, v);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -970,15 +849,14 @@ void game_reshape ()
 
 void menu_reshape ()
 {
-  /* Darstellung auf gesamten Clientbereich des Fensters zulassen */
   glViewport(0, 0, (GLint) width, (GLint) height);
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  /* angle, aspect, near Clip, far Clip */
+
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -988,15 +866,14 @@ void menu_reshape ()
 
 void credits_reshape ()
 {
-  /* Darstellung auf gesamten Clientbereich des Fensters zulassen */
   glViewport(0, 0, (GLint) width, (GLint) height);
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  /* angle, aspect, near Clip, far Clip */
+
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1006,15 +883,14 @@ void credits_reshape ()
 
 void stats_reshape ()
 {
-  /* Darstellung auf gesamten Clientbereich des Fensters zulassen */
   glViewport(0, 0, (GLint) width, (GLint) height);
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  /* angle, aspect, near Clip, far Clip */
+
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -1084,7 +960,9 @@ void switch_stats ()
 void createMission (int missionid)
 {
   if (missionid >= MISSION_MULTIPLAYER)
+  {
     multiplayer = true;
+  }
   else
   {
     multiplayer = false;
@@ -1118,6 +996,7 @@ void createMission (int missionid)
   else if (missionid == MISSION_DEATHMATCH1) missionnew = new MissionDeathmatch1 ();
   else if (missionid == MISSION_DEATHMATCH2) missionnew = new MissionDeathmatch2 ();
   else if (missionid == MISSION_TEAMBASE1) missionnew = new MissionTeamBase1 ();
+  else if (missionid == MISSION_WAVES1) missionnew = new MissionWaves1 ();
   else if (missionid == MISSION_MULTIPLAYER_DOGFIGHT) missionnew = new MissionMultiDogfight1 ();
   if (mission != NULL)
   {
@@ -1463,22 +1342,16 @@ void game_keyspecialup (int key, int x, int y)
     fplayer->autofire = false;
     break;
   case KEY_UP:
-//    fplayer->thrustUp ();
-//    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 0.0;
     break;
   case KEY_DOWN:
-//    fplayer->thrustDown ();
-//    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 0.0;
     break;
   case KEY_LEFT:
     fplayer->rolleffect = 0;
-//    fplayer->rectheta = fplayer->theta;
     break;
   case KEY_RIGHT:
     fplayer->rolleffect = 0;
-//    fplayer->rectheta = fplayer->theta;
     break;
 #ifdef HAVE_SDL
   case KEY_PGUP:
@@ -1539,8 +1412,6 @@ void game_keyspecial (int key, int x, int y)
     break;
   case KEY_F4:
     camera = 6;
-//    aktcam ++;
-//    if (aktcam > 7) aktcam = 0;
     game_reshape ();
     break;
   case KEY_F5:
@@ -1548,7 +1419,6 @@ void game_keyspecial (int key, int x, int y)
     game_reshape ();
     break;
   case KEY_F6:
-//    camera = 4;
     camera = 9;
     game_reshape ();
     break;
@@ -1581,14 +1451,10 @@ void game_mouse (int button, int state, int x, int y)
   {
     if (button == mouse_firecannon)
     {
-//      fplayer->fireCannon (laser);
-//      sound->play (SOUND_CANNON1);
       fplayer->autofire = !fplayer->autofire;
     }
     else if (button == mouse_firemissile)
     {
-/*      if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }*/
       event_fireMissile ();
     }
   }
@@ -1597,45 +1463,6 @@ void game_mouse (int button, int state, int x, int y)
 float dtheta = 0, dgamma = 0;
 
 int lastmousex = 0;
-
-// This function is experimental. It is called about 30 times per second.
-void game_easymouse ()
-{
-  char buf [STDSIZE];
-  float mx = width / 2, my = height / 2;
-  float dx = mousex - mx, dy = my - mousey; // deltax and deltay
-
-  int t = (int) fplayer->theta; // roll angle
-  if (t < 0) t += 360;
-  if (t < 0 || t >= 360)
-  {
-    sprintf (buf, "Theta exceeds in file %s, line %s", __FILE__, __LINE__);
-    display (buf, LOG_ERROR);
-  }
-  float rx = dx * cosi [t] - dy * sine [t]; // rolled mouse x coordinate
-  float ry = -dx * sine [t] + dy * cosi [t]; // rolled mouse y coordinate
-
-  if (mousex != lastmousex) // only change roll angle on mouse event
-  {
-    fplayer->rectheta = -rx * 240 / width; // some scaling
-  }
-  if (fplayer->rectheta > 90) fplayer->rectheta = 90; // limits
-  else if (fplayer->rectheta < -90) fplayer->rectheta = -90;
-  lastmousex = mousex; // save last mouse x coordinate to detect an event
-
-  // calculate the aileron effect every time
-  fplayer->elevatoreffect = 0.005F * ry;
-  if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
-  else if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
-}
-
-/*void sdl_mousemotion (int xrel, int yrel)
-{
-  fplayer->rectheta -= xrel / 2;
-  fplayer->elevatoreffect += 0.005F * yrel;
-  if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
-  if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
-}*/
 
 int lastmx = 0, lastmy = 0;
 
@@ -1663,24 +1490,6 @@ void game_mouserelmotion (int xrel, int yrel)
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
   else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
 }
-
-void game_mousemotion2 (int x, int y)
-{
-//  float dx = mousex - lastmx;
-//  float dy = mousey - lastmy;
-
-  fplayer->rolleffect = (float) -(mousex - width / 2) * 0.02;
-
-  fplayer->elevatoreffect = (float) (mousey - height / 2) * 0.01;
-  if (fplayer->elevatoreffect > 1.0f) 
-    fplayer->elevatoreffect = 1.0f; 
-  else if (fplayer->elevatoreffect < -0.5f) 
-    fplayer->elevatoreffect = -0.5f; 
-
-  lastmx = x;
-  lastmy = y;
-}
-
 
 void game_mousemotion (int x, int y)
 {
@@ -1786,8 +1595,6 @@ void game_joystickbutton (int button)
   }
   if (button == joystick_firemissile)
   {
-/*    if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }*/
     event_fireMissile ();
   }
   if (button == joystick_dropflare)
@@ -1841,12 +1648,6 @@ void game_joystickhat (int hat)
     event_targetNearest ();
   }
 #endif
-}
-
-static void myDisplayFunc2 ()
-{
-//  RenderScene ();
-//  glutSwapBuffers();
 }
 
 int frames = 0, time2 = 0, time1 = 0;
@@ -1985,6 +1786,36 @@ void mission_key (unsigned char key, int x, int y)
 
 void fame_key (unsigned char key, int x, int y)
 {
+  if (key == 27)
+  {
+    switch_menu ();
+  }
+}
+
+void create_key (unsigned char key, int x, int y)
+{
+  if (key == 's')
+  {
+    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
+    game_levelInit ();
+    switch_game ();
+    missionactive = true;
+  }
+  if (key == 27)
+  {
+    switch_menu ();
+  }
+}
+
+void join_key (unsigned char key, int x, int y)
+{
+  if (key == 's')
+  {
+    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
+    game_levelInit ();
+    switch_game ();
+    missionactive = true;
+  }
   if (key == 27)
   {
     switch_menu ();
@@ -2143,24 +1974,6 @@ void mission_display ()
   glLoadIdentity ();
   glPushMatrix ();
   float zf = -3, yf;
-/*  for (i = 0; i < 14; i ++)
-  {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer & 63) / 64.0;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 14; i2 ++)
-    {
-      float cola = sine [(i * 100+missionmenutimer*4) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
-    }
-    glEnd ();
-  }*/
-
   float zf1 = -2.98;
   float yind = 200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
   float xind = 200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
@@ -2193,10 +2006,6 @@ void mission_display ()
                  xr2 * (1.0 - yr2) * l->h [yi2] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1] [xi2];
       float h4 = xr2 * yr2 * l->h [yi2 + 1 + 5] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2 + 5] [xi2] +
                  xr2 * (1.0 - yr2) * l->h [yi2 + 5] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1 + 5] [xi2];
-/*      float h3 = xr * yr * l->h [yi + 1 + 100] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 100] [xi] +
-                 xr * (1.0 - yr) * l->h [yi + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 100] [xi];
-      float h4 = xr * yr * l->h [yi + 1 + 5 + 100] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5 + 100] [xi] +
-                 xr * (1.0 - yr) * l->h [yi + 5 + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5 + 100] [xi];*/
       float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
       float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
       if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
@@ -2263,7 +2072,7 @@ void mission_display ()
   for (i = 0; i < missionnew->selfighters; i ++)
   {
     tl.x = -5 + (float) i * 2.3;
-    if (missionnew->wantfighter == i/*missionmenufighterselected == i*/)
+    if (missionnew->wantfighter == i)
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
@@ -2276,7 +2085,7 @@ void mission_display ()
   for (i = 0; i < missionnew->selweapons; i ++)
   {
     tl.x = 2.0 + (float) i * 1.5;
-    if (missionnew->wantweapon == i/*missionmenufighterselected == i*/)
+    if (missionnew->wantweapon == i)
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
@@ -2284,26 +2093,6 @@ void mission_display ()
   }
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_LIGHTING);
-
-/*  for (i = 0; i < 8; i ++)
-  {
-    xf = -2.5 + 0.5 * (i & 3);
-    yf = -0.5 - 0.92 * (i / 4);
-    zf = -3.5;
-    gl->enableTextures (texchar [i]->textureID);
-    glBegin (GL_QUADS);
-    glColor3ub (255, 255, 255);
-    glTexCoord2d (0, 0);
-    glVertex3f (xf, yf, zf);
-    glTexCoord2d (1, 0);
-    glVertex3f (xf + 0.45, yf, zf);
-    glTexCoord2d (1, 1);
-    glVertex3f (xf + 0.45, yf + 0.85, zf);
-    glTexCoord2d (0, 1);
-    glVertex3f (xf, yf + 0.85, zf);
-    glEnd ();
-    glDisable (GL_TEXTURE_2D);
-  }*/
 
   font1->drawTextCentered (0, 9.8, -1.5, missionnew->name);
   font1->drawText (-22, 14, -3, "BRIEFING:");
@@ -2351,13 +2140,6 @@ void mission_display ()
     font1->drawText (-12, -14, -2, "CANCEL");
   font2->drawText (-20, -14, -3, getModelName (missionnew->selfighter [missionnew->wantfighter]));
   font2->drawText (xstats + 2, -14, -3, getModelName (missionnew->selweapon [missionnew->wantweapon]));
-/*  if (missionmenufighterselected > -1)
-  {
-    float textx = xstats;
-    if (missionnew->alliedfighters < 3)
-      textx -= 8;
-    font2->drawText (textx, -7, -3, getModelText (missionnew->selfighter [missionmenufighterselected]));
-  }*/
   glPopMatrix ();
 
   drawMouseCursor ();
@@ -2367,8 +2149,6 @@ void fame_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-//  int lastitemselected = missionmenuitemselected;
-//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   if (ry >= 0.75 && ry <= 0.82)
@@ -2384,14 +2164,139 @@ void fame_mouse (int button, int state, int x, int y)
   }
 }
 
+void create_mouse (int button, int state, int x, int y)
+{
+  float rx = (float) x / width;
+  float ry = (float) y / height;
+  missionmenuitemselected = -1;
+
+  if (ry >= 0.8 && ry <= 0.9)
+  {
+    if (rx >= 0.4 && rx <= 0.6)
+    {
+      missionmenuitemselected = 0;
+      if (state == MOUSE_DOWN)
+      {
+        create_key (27, 0, 0);
+      }
+    }
+  }
+}
+
+void create_display ()
+{
+  int i;
+  CColor colorblue (100, 150, 255, 255);
+  CColor *colorstd = &colorblue;
+
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+  glPushMatrix ();
+  float zf = -3, yf;
+  for (i = 0; i < 14; i ++)
+  {
+    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 14; i2 ++)
+    {
+      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
+      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
+    }
+    glEnd ();
+  }
+
+  float my = 0;
+  for (i = 0; i < server->num_clients; i ++)
+  {
+    font1->drawTextCentered (0, my, -2.5, server->clients [i].name);
+    my -= 2;
+  }
+
+  font1->drawTextCentered (0, 9, -1.5, "CREATE GAME");
+
+  if (missionmenuitemselected == 0)
+    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
+  else
+    font1->drawText (-2, -12, -2, "BACK");
+
+  glPopMatrix ();
+
+  drawMouseCursor ();
+}
+
+void join_mouse (int button, int state, int x, int y)
+{
+  float rx = (float) x / width;
+  float ry = (float) y / height;
+  missionmenuitemselected = -1;
+
+  if (ry >= 0.8 && ry <= 0.9)
+  {
+    if (rx >= 0.4 && rx <= 0.6)
+    {
+      missionmenuitemselected = 0;
+      if (state == MOUSE_DOWN)
+      {
+        create_key (27, 0, 0);
+      }
+    }
+  }
+}
+
+void join_display ()
+{
+  int i;
+  CColor colorblue (100, 150, 255, 255);
+  CColor *colorstd = &colorblue;
+
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+  glPushMatrix ();
+  float zf = -3, yf;
+  for (i = 0; i < 14; i ++)
+  {
+    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 14; i2 ++)
+    {
+      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
+      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
+    }
+    glEnd ();
+  }
+
+  font1->drawTextCentered (0, 9, -1.5, "JOIN GAME");
+
+  if (missionmenuitemselected == 0)
+    font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
+  else
+    font1->drawText (-2, -12, -2, "BACK");
+
+  glPopMatrix ();
+
+  drawMouseCursor ();
+}
+
 int aktfighter = 0;
 
 void fighter_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-//  int lastitemselected = missionmenuitemselected;
-//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   int maxfighter = 5;
@@ -2656,7 +2561,6 @@ void fame_display ()
 
 CModel *explsphere;
 CSphere *mysphere;
-InitKugel *mykugel [100];
 
 void game_quit ()
 {
@@ -2685,8 +2589,6 @@ void game_quit ()
     delete (groundobj [i]);
   for (i = 0; i < maxblacksmoke; i ++)
     delete (blacksmoke [i]);
-  for (i = 0; i < 100; i++)
-    delete (mykugel [i]);
   delete pilots;
   delete tlinf;
   delete tlminf;
@@ -2723,8 +2625,6 @@ void quit_mouse (int button, int state, int x, int y)
 {
   float rx = (float) x / width;
   float ry = (float) y / height;
-//  int lastitemselected = missionmenuitemselected;
-//  int lastitem = menuitem;
   missionmenuitemselected = -1;
 
   if (ry >= 0.5 && ry <= 0.55)
@@ -2777,8 +2677,6 @@ void menu_mouse (int button, int state, int x, int y)
       if (state == MOUSE_DOWN)
         menuitem = 2;
     }
-#ifdef HAVE_SDL_NET
-#endif
     else if (ry >= 0.34 && ry <= 0.39)
     {
       menuitemselected = 3;
@@ -2809,6 +2707,14 @@ void menu_mouse (int button, int state, int x, int y)
         switch_quit ();
       }
     }
+#ifdef HAVE_SDL_NET
+    else if (ry >= 0.58 && ry <= 0.63)
+    {
+      menuitemselected = 7;
+      if (state == MOUSE_DOWN)
+        menuitem = 7;
+    }
+#endif
     else if (ry >= 0.64 && ry <= 0.69)
     {
       menuitemselected = 9;
@@ -2900,22 +2806,14 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TEAMBASE1);
         }
       }
-/*      if (ry >= 0.18 && ry <= 0.20)
+      if (ry >= 0.33 && ry <= 0.35)
       {
-        menuitemselected = 10;
+        menuitemselected = 17;
         if (state == MOUSE_DOWN)
         {
-          switch_mission (MISSION_TUTORIAL);
+          switch_mission (MISSION_WAVES1);
         }
       }
-      if (ry >= 0.21 && ry <= 0.23)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_DOGFIGHT);
-        }
-      }*/
     }
   }
 
@@ -3114,31 +3012,6 @@ void menu_mouse (int button, int state, int x, int y)
     }
   }
 
-#ifdef HAVE_SDL_NET
-  if (menuitem == 2)
-  {
-    if (rx >= 0.48 && rx <= 0.85)
-    {
-      if (ry >= 0.15 && ry <= 0.2)
-      {
-        menuitemselected = 10;
-        if (state == MOUSE_DOWN)
-        {
-          switch_create ();
-        }
-      }
-      else if (ry >= 0.22 && ry <= 0.27)
-      {
-        menuitemselected = 11;
-        if (state == MOUSE_DOWN)
-        {
-          switch_join ();
-        }
-      }
-    }
-  }
-#endif
-
   if (menuitem == 3)
   {
     if (rx >= 0.48 && rx <= 0.85)
@@ -3308,54 +3181,33 @@ void menu_mouse (int button, int state, int x, int y)
           }
         }
       }
-/*      else if (ry >= 0.52 && ry <= 0.57)
-      {
-        menuitemselected = 16;
-        if (state == MOUSE_DOWN)
-        {
-          if (button == MOUSE_BUTTON_LEFT)
-          {
-            int i;
-            for (i = 0; i < 4; i ++)
-              if (resolution [i] [0] == width)
-                break;
-            if (i == 4) i = 0;
-            do
-            {
-              i ++;
-            } while (modes [i] == -1 && i < 4);
-            if (i == 4) i = 0;
-            int lastw = width;
-            int lasth = height;
-            int lastb = bpp;
-            int lastf = fullscreen;
-            width = resolution [i] [0];
-            height = resolution [i] [1];
-            bpp = resolution [i] [2];
-            fullscreen = resolution [i] [3];
-            if (!setScreen (width, height, bpp, fullscreen))
-            {
-              width = lastw;
-              height = lasth;
-              bpp = lastb;
-              fullscreen = lastf;
-              if (!setScreen (width, height, bpp, fullscreen))
-              {
-                fprintf (stderr, "\nFatal: Could neither switch to desired mode, nor back!");
-                fflush (stderr);
-                exit (2);
-              }
-            }
-#ifdef USE_GLUT
-            glutReshape ();
-#else
-            sdlreshape = true;
-#endif
-          }
-        }
-      }*/
     }
   }
+
+#ifdef HAVE_SDL_NET
+  if (menuitem == 7)
+  {
+    if (rx >= 0.48 && rx <= 0.85)
+    {
+      if (ry >= 0.15 && ry <= 0.2)
+      {
+        menuitemselected = 10;
+        if (state == MOUSE_DOWN)
+        {
+          switch_create ();
+        }
+      }
+      else if (ry >= 0.22 && ry <= 0.27)
+      {
+        menuitemselected = 11;
+        if (state == MOUSE_DOWN)
+        {
+          switch_join ();
+        }
+      }
+    }
+  }
+#endif
 
   if (lastitemselected != menuitemselected)
   {
@@ -3397,6 +3249,12 @@ void stats_mouse (int button, int state, int x, int y)
   sdldisplay = true;
 #endif
 }
+
+
+
+/****************************************************************************
+  DISPLAY EVENTS
+****************************************************************************/
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
@@ -3542,9 +3400,6 @@ void menu_display ()
   glLoadIdentity ();
   glPushMatrix ();
 
-/*  if (quality >= 2)
-    gl->enableAntiAliasing ();*/
-
   int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
@@ -3558,36 +3413,44 @@ void menu_display ()
     font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, normtimef);
   else
     font1->drawText (textx, 10, -2, "PILOTS");
+
   if (menuitemselected == 1)
-    font1->drawTextScaled (textx, 8, -2, "MISSIONS", &color2, normtimef);
+    font1->drawTextScaled (textx, 8, -2, "TRAINING", &color2, normtimef);
   else
-    font1->drawText (textx, 8, -2, "MISSIONS");
+    font1->drawText (textx, 8, -2, "TRAINING");
+
   if (menuitemselected == 2)
     font1->drawTextScaled (textx, 6, -2, "CAMPAIGN", &color2, normtimef);
   else
     font1->drawText (textx, 6, -2, "CAMPAIGN");
-#ifdef HAVE_SDL_NET
-  if (menuitemselected == 2)
-    font1->drawTextScaled (textx, 6, -2, "MULTIPLAYER", &color2, normtimef);
-  else
-    font1->drawText (textx, 6, -2, "MULTIPLAYER");
-#endif
+
   if (menuitemselected == 3)
     font1->drawTextScaled (textx, 4, -2, "OPTIONS", &color2, normtimef);
   else
     font1->drawText (textx, 4, -2, "OPTIONS");
+
   if (menuitemselected == 4)
     font1->drawTextScaled (textx, 2, -2, "HELP", &color2, normtimef);
   else
     font1->drawText (textx, 2, -2, "HELP");
+
   if (menuitemselected == 5)
     font1->drawTextScaled (textx, 0, -2, "CREDITS", &color2, normtimef);
   else
     font1->drawText (textx, 0, -2, "CREDITS");
+
   if (menuitemselected == 6)
     font1->drawTextScaled (textx, -2, -2, "QUIT", &color2, normtimef);
   else
     font1->drawText (textx, -2, -2, "QUIT");
+
+#ifdef HAVE_SDL_NET
+  if (menuitemselected == 7)
+    font1->drawTextScaled (textx, -4, -2, "MULTIPLAYER", &color2, normtimef);
+  else
+    font1->drawText (textx, -4, -2, "MULTIPLAYER");
+#endif
+
   if (missionactive)
   {
     if (menuitemselected == 9)
@@ -3664,6 +3527,12 @@ void menu_display ()
       font1->drawText (textx2, yf, zf, "TEAM BASE");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEAMBASE1]), 1.0);
     yf -= 1.5;
+    if (menuitemselected == 17)
+      font1->drawTextScaled (textx2, yf, zf, "WAVES", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yf, zf, "WAVES");
+    drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_WAVES1]), 1.0);
+    yf -= 1.5;
   }
   else if (menuitem == 2)
   {
@@ -3704,46 +3573,6 @@ void menu_display ()
       font1->drawTextScaled (6, -12, zf, "FIGHTER", &color2, -menutimer * 5);
     else
       font1->drawText (6, -12, zf, "FIGHTER");
-/*    if (p->mission_state [MISSION_CONVOY] == 1)
-    {
-      if (menuitemselected == 14)
-        font1->drawTextScaled (textx2, yf, zf, "DOGFIGHT", &color2, -menutimer * 5);
-      else
-        font1->drawText (textx2, yf, zf, "DOGFIGHT");
-    }
-    yf -= 1.5;
-    if (p->mission_state [MISSION_DOGFIGHT2] == 1)
-    {
-      if (menuitemselected == 15)
-        font1->drawTextScaled (textx2, yf, zf, "AIR BATTLE", &color2, -menutimer * 5);
-      else
-        font1->drawText (textx2, yf, zf, "AIR BATTLE");
-    }
-    yf -= 1.5;
-    if (p->mission_state [MISSION_AIRBATTLE] == 1)
-    {
-      if (menuitemselected == 16)
-        font1->drawTextScaled (textx2, yf, zf, "SURFACE-AIR DEFENSE", &color2, -menutimer * 5);
-      else
-        font1->drawText (textx2, yf, zf, "SURFACE-AIR DEFENSE");
-    }
-    yf -= 1.5;
-    if (p->mission_state [MISSION_SADEFENSE] == 1)
-    {
-      if (menuitemselected == 17)
-        font1->drawTextScaled (textx2, yf, zf, "DOGFIGHT VETERAN", &color2, -menutimer * 5);
-      else
-        font1->drawText (textx2, yf, zf, "DOGFIGHT VETERAN");
-    }
-    yf -= 1.5;
-    if (p->mission_state [MISSION_SCOUT] == 1)
-    {
-      if (menuitemselected == 18)
-        font1->drawTextScaled (textx2, yf, zf, "BASE ATTACK", &color2, -menutimer * 5);
-      else
-        font1->drawText (textx2, yf, zf, "BASE ATTACK");
-    }*/
-//    font1->drawText (-20, -15, -3, "MORE MISSIONS WITH THE NEXT RELEASE");
   }
   else if (menuitem == 3)
   {
@@ -3765,7 +3594,6 @@ void menu_display ()
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
-//    yt -= 2;
     strcpy (buf, "USE: ");
     if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
     else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE EASY");
@@ -3809,24 +3637,6 @@ void menu_display ()
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
-/*    sprintf (buf, "MODE: %d\x%d", width, height);
-    if (menuitemselected == 16)
-      font1->drawTextScaled (textx2, -2, -2, buf, &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, -2, -2, buf);*/
-  }
-  else if (menuitem == 2)
-  {
-#ifdef HAVE_SDL_NET
-    if (menuitemselected == 10)
-      font1->drawTextScaled (textx2, 10, -2, "CREATE GAME", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, 10, -2, "CREATE GAME");
-    if (menuitemselected == 11)
-      font1->drawTextScaled (textx2, 8, -2, "JOIN GAME", &color2, -menutimer * 5);
-    else
-      font1->drawText (textx2, 8, -2, "JOIN GAME");
-#endif
   }
   else if (menuitem == 4)
   {
@@ -3858,23 +3668,33 @@ void menu_display ()
     font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:");
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
   }
+  else if (menuitem == 7)
+  {
+#ifdef HAVE_SDL_NET
+    if (menuitemselected == 10)
+      font1->drawTextScaled (textx2, 10, -2, "CREATE GAME", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, 10, -2, "CREATE GAME");
+    if (menuitemselected == 11)
+      font1->drawTextScaled (textx2, 8, -2, "JOIN GAME", &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, 8, -2, "JOIN GAME");
+#endif
+  }
 
   drawMouseCursor ();
 }
 
 void pause_display ()
 {
-//  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
+  glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-//  glShadeModel(GL_SMOOTH);
   glPushMatrix ();
 
   CColor color (255, 255, 255, 255);
   font1->drawText (-3, -1, -1, "PAUSED", &color);
 
   glPopMatrix ();
-//  glutSwapBuffers();
 }
 
 void credits_display ()
@@ -3958,6 +3778,10 @@ void quit_display ()
 
 
 
+/****************************************************************************
+  IN-GAME DISPLAY EVENT
+****************************************************************************/
+
 int vibration = 0;
 int starttime;
 
@@ -3984,20 +3808,18 @@ void game_display ()
     }
   }
 
-//  if (fplayer->tl->y > l->getRayHeight (fplayer->tl->x, fplayer->tl->z))
-//    sunblinding = true;
 
-// calculate light factor
+  // calculate light factor
   if (camera == 0 && sunblinding && day && weather == WEATHER_SUNNY)
   {
     float np = fplayer->phi;
     if (np >= 180) np -= 360;
     float sunfactor = fabs (np) + fabs (fplayer->gamma - 180 - sungamma);
-//  printf ("\nphi=%f, gamma=%f", fplayer->phi, fplayer->gamma);
     if (sunfactor < 50)
-    { sunfactor = (50 - sunfactor) / 10;
+    {
+      sunfactor = (50 - sunfactor) / 10;
       if (sunfactor < 1.0) sunfactor = 1.0;
-    /*printf ("\nlight=%f", sunlight); fflush (stdout);*/ }
+    }
     else sunfactor = 1.0;
     sunlight = sunfactor;
     if (game == GAME_PLAY)
@@ -4045,36 +3867,33 @@ void game_display ()
     }
   }
 
-  if (game != GAME_PLAY && sunlight > 0.9F) sunlight = 0.9F;
-
-/*  if (camera == 0 && l->glittering > 1.0F)
+  // sunlight for glittering does not look good
+/* if (camera == 0 && l->glittering > 1.0F)
   {
     sunlight += l->glittering * 1.0F - 1.0F;
   }*/
   l->glittering = 0;
 
+  // turn down global sunlight when menu is showing
+  if (game != GAME_PLAY && sunlight > 0.9F) sunlight = 0.9F;
 
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-//  glClear(GL_DEPTH_BUFFER_BIT);
-  glMatrixMode(GL_MODELVIEW);
+  // start rendering
+
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 
-  glShadeModel(GL_SMOOTH);
-
+  glShadeModel (GL_SMOOTH);
 
   glPushMatrix ();
   
   if (camera != 1 && camera != 5)
     glRotatef (-mycamtheta, 0.0, 0.0, 1.0);
-/*  if (camera == 0)
-    glRotatef (-fplayer->gamma + 180, 1.0, 0.0, 0.0);
-  else*/
-    glRotatef (mycamgamma, 1.0, 0.0, 0.0);
+  glRotatef (mycamgamma, 1.0, 0.0, 0.0);
   glRotatef (-mycamphi, 0.0, 1.0, 0.0);
-//  if (camera == 0)
-//    glRotatef (-20, 1.0, 0.0, 0.0);
 
   // draw sky
+
   glDisable (GL_FOG);
   glDisable (GL_DEPTH_TEST);
 
@@ -4086,13 +3905,6 @@ void game_display ()
     mylight = mylight / 5.0 + 0.8;
   gl->foglum = mylight;
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
-
-/*  gl->enableFog (pseudoview);
-  csphere->zoom = 300;
-  float ch = -290 - fplayer->tl->y / 10.0;
-  CVector3 tlsphere (0, ch, 0);
-  csphere->drawGL (tlminf, tlinf, &tlsphere, space->alpha, mylight, true, true);
-  glDisable (GL_FOG);*/
 
   if (quality >= 1 && clouds > 0)
   {
@@ -4116,221 +3928,126 @@ void game_display ()
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
-  if (!day)
-  {
-    glPointSize (1.0);
-    int stars = maxstar;
-    if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
-    for (i = 0; i < stars; i ++)
+    if (!day)
     {
-      glPushMatrix ();
-      glRotatef (/*-camphi +*/ star [i]->phi, 0.0, 1.0, 0.0);
-/*      if (camera == 0)
+      glPointSize (1.0);
+      int stars = maxstar;
+      if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
+      for (i = 0; i < stars; i ++)
+      {
+        glPushMatrix ();
+        glRotatef (star [i]->phi, 0.0, 1.0, 0.0);
         glRotatef (star [i]->gamma, 1.0, 0.0, 0.0);
-      else*/
-        glRotatef (star [i]->gamma, 1.0, 0.0, 0.0);
-      glTranslatef (0, 0, -10);
-      star [i]->draw ();
-      glPopMatrix ();
+        glTranslatef (0, 0, -10);
+        star [i]->draw ();
+        glPopMatrix ();
+      }
     }
   }
-  }
 
-//  sphere.draw (tlnull, tlnull, , 1.0);
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_FOG);
-//  glPopMatrix ();
 
 
 // draw sun or moon (or earth)
-//  glPushMatrix ();
-//  float r = 10.0;
-//  float p = -fplayer->phi, t = -fplayer->gamma;
   float fac = view, zfac = view * 0.2;
-//  if (camera != 1 && camera != 5)
-//    glRotatef (-camtheta, 0.0, 0.0, 1.0);
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
-  if (camera == 0)
-    glRotatef (/*-fplayer->gamma + 180 +*/ sungamma, 1.0, 0.0, 0.0);
-  else
-    glRotatef (mycamgamma + sungamma, 1.0, 0.0, 0.0);
-//  glRotatef (-camphi, 0.0, 1.0, 0.0);
-  float zf = -11;
-  if (day) zf = -10;
-  if (l->type == LAND_MOON && !day) zf = -8; // diplay bigger earth
-  glTranslatef (0, 0, zf);
-/*  if (camera == 0)
-    glRotatef (-fplayer->gamma + 180 + sungamma, 1.0, 0.0, 0.0);
-  else
-    glRotatef (camgamma + sungamma, 1.0, 0.0, 0.0);
-  glRotatef (-camphi, 0.0, 1.0, 0.0);*/
-  gl->extractFrustum ();
-  if (gl->isPointInFrustum (-1, 1, 0) || gl->isPointInFrustum (-1, -1, 0) ||
-      gl->isPointInFrustum (1, -1, 0) || gl->isPointInFrustum (1, 1, 0))
-  {
-    glDisable (GL_DEPTH_TEST);
-    if (day) gl->enableTextures (texsun->textureID);
-    else if (l->type != LAND_MOON) gl->enableTextures (texmoon->textureID);
-    else gl->enableTextures (texearth->textureID);
-    if (day && l->type != 1)
-      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    gl->enableAlphaBlending ();
-    glEnable (GL_ALPHA_TEST);
-    float alphamax = 0.1;
-    if (day) alphamax = 0.1;
-    glAlphaFunc (GL_GEQUAL, alphamax);
-  //  glDisable (GL_DITHER);
-    glBegin (GL_QUADS);
-    fac = view; zfac = view * 3.5;
-    if (day && l->type != LAND_MOON)
-    {
-      float gm = (40.0 - sungamma) / 80.0;
-      if (gm < 0) gm = 0;
-      if (gm > 0.5) gm = 0.5;
-      glColor4f (1.0, 1.0 - gm, 0.8 - gm, 1.0);
-    }
+    if (camera == 0)
+      glRotatef (sungamma, 1.0, 0.0, 0.0);
     else
-      glColor4f (1.0, 1.0, 1.0, 1.0);
-    glTexCoord2d (0, 1);
-    glVertex3f (-1, 1, 0);
-    glTexCoord2d (1, 1);
-    glVertex3f (1, 1, 0);
-  //  glColor4f (0.1, 0.9, 0.9, 1.0);
-    glTexCoord2d (1, 0);
-    glVertex3f (1, -1, 0);
-    glTexCoord2d (0, 0);
-    glVertex3f (-1, -1, 0);
-    glEnd ();
-//    if (day && l->type != 1)
-//      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glRotatef (mycamgamma + sungamma, 1.0, 0.0, 0.0);
+    float zf = -11;
+    if (day)
+      zf = -10;
+    if (l->type == LAND_MOON && !day)
+      zf = -8; // diplay bigger earth
+    glTranslatef (0, 0, zf);
+    gl->extractFrustum ();
+    if (gl->isPointInFrustum (-1, 1, 0) || gl->isPointInFrustum (-1, -1, 0) ||
+        gl->isPointInFrustum (1, -1, 0) || gl->isPointInFrustum (1, 1, 0))
+    {
+      glDisable (GL_DEPTH_TEST);
+      if (day) gl->enableTextures (texsun->textureID);
+      else if (l->type != LAND_MOON) gl->enableTextures (texmoon->textureID);
+      else gl->enableTextures (texearth->textureID);
+      if (day && l->type != 1)
+        glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      gl->enableAlphaBlending ();
+      glEnable (GL_ALPHA_TEST);
+      float alphamax = 0.1;
+      if (day) alphamax = 0.1;
+      glAlphaFunc (GL_GEQUAL, alphamax);
+      glBegin (GL_QUADS);
+      fac = view; zfac = view * 3.5;
+      if (day && l->type != LAND_MOON)
+      {
+        float gm = (40.0 - sungamma) / 80.0;
+        if (gm < 0) gm = 0;
+        if (gm > 0.5) gm = 0.5;
+        glColor4f (1.0, 1.0 - gm, 0.8 - gm, 1.0);
+      }
+      else
+        glColor4f (1.0, 1.0, 1.0, 1.0);
+      glTexCoord2d (0, 1);
+      glVertex3f (-1, 1, 0);
+      glTexCoord2d (1, 1);
+      glVertex3f (1, 1, 0);
+      glTexCoord2d (1, 0);
+      glVertex3f (1, -1, 0);
+      glTexCoord2d (0, 0);
+      glVertex3f (-1, -1, 0);
+      glEnd ();
 
-  /* Where is the sun? */
-  double proj[16];
-  double modl[16];
-  int vp[4];
-  glGetDoublev( GL_PROJECTION_MATRIX, proj );
-  glGetDoublev( GL_MODELVIEW_MATRIX, modl );
-  glGetIntegerv( GL_VIEWPORT, vp );
-  gluProject (0, 0, 0, modl, proj, vp, &sunx, &suny, &sunz);
-    if ((sunx>=vp[0])&&(suny>=vp[1])&&(sunx<(vp[0]+vp[2]))&&(suny<(vp[1]+vp[3]))) sunvisible = true;
+      // Where is the sun?
+      double proj[16];
+      double modl[16];
+      int vp[4];
+      glGetDoublev( GL_PROJECTION_MATRIX, proj );
+      glGetDoublev( GL_MODELVIEW_MATRIX, modl );
+      glGetIntegerv( GL_VIEWPORT, vp );
+      gluProject (0, 0, 0, modl, proj, vp, &sunx, &suny, &sunz);
+      if ((sunx>=vp[0])&&(suny>=vp[1])&&(sunx<(vp[0]+vp[2]))&&(suny<(vp[1]+vp[3]))) sunvisible = true;
 
-    glDisable (GL_ALPHA_TEST);
-    glEnable (GL_DEPTH_TEST);
-    glDisable (GL_TEXTURE_2D);
-    gl->disableAlphaBlending ();
-  }
+      glDisable (GL_ALPHA_TEST);
+      glEnable (GL_DEPTH_TEST);
+      glDisable (GL_TEXTURE_2D);
+      gl->disableAlphaBlending ();
+    }
   }
 
   glPopMatrix ();
-  
     
   glPushMatrix ();
-
-  /* Modeltransformation ausfuehren... */
 
   if (camera != 1 && camera != 5)
     glRotatef (-mycamtheta, 0.0, 0.0, 1.0);
 
-/*  if (camera == 0)
-    glRotatef (-fplayer->gamma + 180, 1.0, 0.0, 0.0);
-  else*/
-    glRotatef (mycamgamma, 1.0, 0.0, 0.0);
+  glRotatef (mycamgamma, 1.0, 0.0, 0.0);
 
   glDisable (GL_FOG);
-/*  glPushMatrix ();
-  glDisable (GL_DEPTH_TEST);
-  glBegin (GL_QUAD_STRIP);
-  float fac = view, zfac = view * 0.2;
-  glColor4f (0.0, 1.0, 1.0, 1.0);
-  glVertex3f (-fac, 2.0*fac, -zfac);
-  glVertex3f (fac, 2.0*fac, -zfac);
-  glColor4f (0.1, 0.9, 0.9, 1.0);
-  glVertex3f (-fac, fac*0.4, -zfac);
-  glVertex3f (fac, fac*0.4, -zfac);
-  glColor4f (0.5, 0.5, 0.5, 1.0);
-  glVertex3f (-fac, -fac*0.125, -zfac);
-  glVertex3f (fac, -fac*0.125, -zfac);
-  glVertex3f (-fac, -2.0*fac, -zfac);
-  glVertex3f (fac, -2.0*fac, -zfac);
-  glEnd ();
-  glEnable (GL_DEPTH_TEST);
-  
-  glPopMatrix ();*/
-//  glEnable (GL_FOG);
 
-
-  glRotatef (-mycamphi, 0.0, 1.0, 0.0);  /* Rotation um die Y-Achse */
-
-
-    
-
-//  glPushMatrix ();
-//  if (camera == 0)
-//    glRotatef (-20, 1.0, 0.0, 0.0);
+  glRotatef (-mycamphi, 0.0, 1.0, 0.0);
   glScalef (1, 1, 1);
 
-
-
-
-
-
-
-
-  /*glPushMatrix ();
-  if (camera == 0)
-    glRotatef (-20, 1.0, 0.0, 0.0);
-  glDisable (GL_DEPTH_TEST);
-
-  drawTexture (10.0, -fplayer->phi - 20, 20 + 30, -fplayer->phi + 20, - 20 + 30);
-
-  glEnable (GL_DEPTH_TEST);
-  gl->disableAlphaBlending ();
-  glPopMatrix ();*/
-  
-  
-//  fplayer->tl->y = -(0.6*zoom - (float)l->h[(int)camx+MAXX/2][MAXX/2-(int)camz]*zoomz * zoom);
-//  if (camera != 50)
-//    camy = fplayer->tl->y + fplayer->zoom / 3.0;
-//  if (camera == 1 || camera == 2) camy += fplayer->zoom * 0.6;
-  glTranslatef (-camx /*-2*px / MAXX * zoom*/, -camy /*0.62*zoom - (float)l->h[(int)px+MAXX/2][MAXX/2-(int)pz]*zoomz * zoom*/, -camz/*-2*pz / MAXX * zoom*/);    /* Verschiebung um -3 in z-Richtung */
-
-//  glPushMatrix();
-
-
-
-
-
-
-
-
-
-/*  if (lighting)
-  {
-    glEnable( GL_LIGHTING);
-    glEnable( GL_LIGHT0 );
-  }*/
+  glTranslatef (-camx, -camy, -camz);
 
   if (camera != 50)
   {
     gl->enableFog (pseudoview);
   }
 
-//  glEnable (GL_DITHER);
-
-// draw terrain
+  // draw terrain
   l->calcDynamicLight (explosion, laser, (DynamicObj **) missile, flare);
   glEnable (GL_CULL_FACE);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
 
+  // draw objects
   gl->extractFrustum ();
-//  gl->enableTextures (texgrass);
-//  glEnable (GL_CULL_FACE);
   if (camera != 50)
   {
     space->lum = sunlight;
-//    printf ("sunlight=%f\n", space->lum);
     for (i = 0; i < space->no; i ++)
     {
       if (space->o [i]->tl->y < l->getExactRayHeight (space->o [i]->tl->x, space->o [i]->tl->z))
@@ -4350,7 +4067,7 @@ void game_display ()
       glEnable( GL_LIGHTING);
       glEnable( GL_LIGHT0 );
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      space->drawGL ();
+      space->drawGL (); // draw all objects
       glDisable (GL_LIGHTING);
       glDepthMask (GL_FALSE);
       for (i = 0; i < space->no; i ++)
@@ -4374,7 +4091,6 @@ void game_display ()
       space->drawGL ();
     }
   }
-//  glDisable (GL_CULL_FACE);
   glDisable (GL_TEXTURE_2D);
 
   glDisable (GL_LIGHTING);
@@ -4391,29 +4107,6 @@ void game_display ()
   }
 
   glPopMatrix ();
-
-//  gl->enableAntiAliasing ();
-
-  /* Where is the sun? */
-/* double ra=10.0;
-  double winx, winy, winz;
-  winx = ra*sin(fplayer->gamma)*cos(fplayer->phi)*width;
-  winy = ra*sin(fplayer->gamma)*sin(fplayer->phi)*height;
-  winz = ra*cos(fplayer->gamma);
-  double proj[16];
-  double modl[16];
-  int vp[4];
-  glGetDoublev( GL_PROJECTION_MATRIX, proj );
-  glGetDoublev( GL_MODELVIEW_MATRIX, modl );
-  vp[0]=0; vp[1]=0; vp[2]=width; vp[3]=height;
-//  gluProject (0, 0, 1.0, proj, modl, vp, &winx, &winy, &winz);
-  double objx, objy, objz;
-  gluUnProject (winx, winy, winz, modl, proj, vp, &objx, &objy, &objz);
-  printf ("\nre: x=%f, y=%f, z=%f", objx, objy, objz); fflush (stdout);
-  glBegin (GL_LINES);
-  glVertex3f (-objx, -objy, objz);
-  glVertex3f (-objx, -objy, 5);
-  glEnd ();*/
 
 // draw flares
   if (quality > 0)
@@ -4490,51 +4183,7 @@ void game_display ()
     sunblinding=false;
   }
 
-/*  int maxi = 4;
-  for (i = maxi - 1; i >= 1; i --)
-  {
-  glDisable (GL_DEPTH_TEST);
-  glPushMatrix ();
-  r = 10.0;
-  fac = view; zfac = view * 0.2;
-  int myphi = (int) mycamphi;
-  if (camera != 1 && camera != 5)
-  glRotatef (-mycamtheta, 0.0, 0.0, 1.0);
-  glRotatef (mycamgamma + sungamma * i / maxi, 1.0, 0.0, 0.0);
-  if (myphi < 180) myphi = myphi * i / maxi;
-  else myphi = 360 - (360 - myphi) * i / maxi;
-  glRotatef (-myphi, 0.0, 1.0, 0.0);
-  glTranslatef (0, 0, (float) -10.0 * i / maxi);
-  glRotatef (mycamgamma + sungamma * i / maxi, 1.0, 0.0, 0.0);
-  glRotatef (-myphi, 0.0, 1.0, 0.0);
-  glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texflare->textureID);
-  gl->enableAlphaBlending ();
-//  glDisable (GL_DITHER);
-  glBegin (GL_QUADS);
-  fac = view; zfac = view * 3.5;
-  glColor4f (1.0, 1.0, 1.0, 1.0);
-  glTexCoord2d (0, 1);
-  glVertex3f (-0.5, 0.5, 0);
-  glTexCoord2d (1, 1);
-  glVertex3f (0.5, 0.5, 0);
-//  glColor4f (0.1, 0.9, 0.9, 1.0);
-  glTexCoord2d (1, 0);
-  glVertex3f (0.5, -0.5, 0);
-  glTexCoord2d (0, 0);
-  glVertex3f (-0.5, -0.5, 0);
-  glEnd ();
-  glEnable (GL_DEPTH_TEST);
-  glDisable (GL_TEXTURE_2D);
-  gl->disableAlphaBlending ();
-  glPopMatrix ();
-  }
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  }  
-*/
-
-//  float zf, g, g2;
-//  glPushMatrix ();
+  // draw cockpit
   if (camera == 0)
   {
     if (quality > 0)
@@ -4549,6 +4198,7 @@ void game_display ()
     cockpit->drawCounter ();
   }
 
+  // draw blackout/redout (blending)
   if (camera == 0)
   {
     int black = (int) blackout;
@@ -4563,7 +4213,6 @@ void game_display ()
     else if (red > 0)
     {
       glColor4ub (255, 0, 0, red);
-//      printf ("red=%d\n", red);
     }
     if (black > 0 || red > 0)
     {
@@ -4582,6 +4231,7 @@ void game_display ()
     }
   }
 
+  // adjust brightness setting (blending)
   if (brightness < 0)
   {
     glColor4ub (0, 0, 0, -brightness);
@@ -4617,58 +4267,18 @@ void game_display ()
     glEnable (GL_DEPTH_TEST);
   }
 
-//  glPopMatrix ();
-//  glutStrokeCharacter (GLUT_STROKE_ROMAN, 'A');
-
-/*  drawText (-5, 0, -10, "DOGFIGHT");
-  drawText (-5, -3, -10, "OPTIONS");*/
-
+  // draw mission dependant informations
   mission->draw ();
 
   glPushMatrix ();
   glDisable (GL_DEPTH_TEST);
-/*  glMatrixMode (GL_PROJECTION);
-  glPushMatrix ();
-  glLoadIdentity ();
-  gluOrtho2D (0, width, 0, height);
-  glScalef (1, -1, 1);
-  glTranslatef (0, -height, 0);
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
 
-  glColor3d (255, 255, 0);
-  char *c;
-  char *string = "action fs demo";
-  glRasterPos2f (20, 25);
-  for (c = string; *c; c ++)
-  {
-    glutBitmapCharacter (GLUT_BITMAP_HELVETICA_12, *c);
-//    glutStrokeCharacter (GLUT_STROKE_ROMAN, *c);
-  }
-  char buf [25];
-  sprintf (buf, "FPS: %d", (int) fps);
-  glRasterPos2f (20, 50);
-  for (c = buf; *c; c ++)
-  {
-    glutBitmapCharacter (GLUT_BITMAP_8_BY_13, *c);
-  }
-
-  glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
-  glMatrixMode (GL_MODELVIEW);*/
-  glPopMatrix ();
-
   char buf [25];
   CColor col;
-//  if (fps < 28)
-  {
-    sprintf (buf, "FPS: %d", (int) fps);
-    font1->drawText (-25, 25, -3.5, buf, &col);
-  }
-/*  else
-  {
-    font1->drawText (-25, 25, -3.5, "FPS: PERFECT", &col);
-  }*/
+  sprintf (buf, "FPS: %d", (int) fps);
+  font1->drawText (-25, 25, -3.5, buf, &col);
+
   bool write = false;
   if (firststart)
   {
@@ -4693,43 +4303,22 @@ void game_display ()
     font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
   }
 
-
-/*  if (missionstate == 1)
-  {
-    if (fplayer->score == -1)
-    {
-      fplayer->score = mission->getScore (missionstate);
-    }
-    CColor colblue (0, 0, 255, 200);
-    font1->drawTextCentered (0, 1, -1.2, "MISSION", &colblue);
-    font1->drawTextCentered (0, -1, -1.2, "SUCCESS", &colblue);
-    sprintf (buf, "SCORE: %d", fplayer->score);
-    font1->drawTextCentered (0, -4, -2, buf, &colblue);
-  }
-  else if (missionstate == 2)
-  {
-    if (fplayer->score == -1)
-    {
-      fplayer->score = mission->getScore (missionstate);
-    }
-    CColor colred (255, 0, 0, 200);
-    font1->drawTextCentered (0, 1, -1.2, "MISSION", &colred);
-    font1->drawTextCentered (0, -1, -1.2, "FAILED", &colred);
-    sprintf (buf, "SCORE: %d", fplayer->score);
-    font1->drawTextCentered (0, -4, -2, buf, &colred);
-  }*/
-
   if (controls == CONTROLS_MOUSE || controls == CONTROLS_MOUSE_REVERSE)
     drawMouseCursor ();
 }
+
+
+
+/****************************************************************************
+  TIMER EVENTS
+****************************************************************************/
 
 float lastthrust;
 int gametimer;
 
 void game_timer (int dt)
 {
-  if (multiplayer) return;
-
+//  if (multiplayer) return;
   int i, i2;
 
   gametimer += dt;
@@ -4759,6 +4348,7 @@ void game_timer (int dt)
     vibration = 25 * timestep;
   }
 
+  // create flash during thunderstorm
   if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !myrandom (2000 / dt))
   {
     flash = 12 * timestep;
@@ -4786,6 +4376,7 @@ void game_timer (int dt)
     setPlaneVolume ();
   lastthrust = fplayer->thrust;
 
+  // collision tests
   for (i = 0; i < maxfighter; i ++)
   {
     for (i2 = 0; i2 < maxlaser; i2 ++)
@@ -4814,6 +4405,7 @@ void game_timer (int dt)
         chaff [i]->collide (missile [i2], dt);
   }
 
+  // move objects
   for (i = 0; i < maxfighter; i ++)
   {
     fighter [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff);
@@ -4846,6 +4438,7 @@ void game_timer (int dt)
   for (i = 0; i < maxblacksmoke; i ++)
     blacksmoke [i]->move (dt);
 
+  // show blackout/redout
   if (blackout > 0) blackout -= 3.0F * dt / timestep;
   if (blackout < 0) blackout = 0;
   if (redout > 0) redout -= 3.0F * dt / timestep;
@@ -4864,18 +4457,17 @@ void game_timer (int dt)
     if (testout < 0) redout -= testout * dt / timestep;
   }
 
+  // show own explosion from chase cam
   if (fplayer->shield <= 0)
     camera = 1;
-/*  if (!fplayer->active && !fplayer->draw)
-    game_levelInit ();*/
 
   float cf = -fplayer->zoom / 2;
   camtheta = fplayer->theta;
   if (camera == 0)  // cockpit
   {
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + fplayer->zoom / 3.0;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     camgamma = -fplayer->gamma + 180;
     fplayer->draw = 0;
@@ -4883,9 +4475,9 @@ void game_timer (int dt)
   if (camera == 1) // chase
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 20;
@@ -4893,9 +4485,9 @@ void game_timer (int dt)
   else if (camera == 2) // backwards
   {
     cf = -fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi + 180.0;
     fplayer->draw = 1;
     camgamma = 20;
@@ -4903,9 +4495,9 @@ void game_timer (int dt)
   else if (camera == 3) // other players
   {
     cf = fighter [aktcam]->zoom * 2;
-    camx = fighter [aktcam]->tl->x + cf * SIN(fighter [aktcam]->phi);// * MAXX / zoom / 2;
+    camx = fighter [aktcam]->tl->x + cf * SIN(fighter [aktcam]->phi);
     camy = fighter [aktcam]->tl->y + fighter [aktcam]->zoom;
-    camz = fighter [aktcam]->tl->z + cf * COS(fighter [aktcam]->phi);// * MAXX / zoom / 2;
+    camz = fighter [aktcam]->tl->z + cf * COS(fighter [aktcam]->phi);
     camphi = fighter [aktcam]->phi;
     camgamma = 20;
     camtheta = fighter [aktcam]->theta;
@@ -4914,18 +4506,18 @@ void game_timer (int dt)
   else if (camera == 4) // missile
   {
     cf = missile [0]->zoom * 10;
-    camx = missile [0]->tl->x + cf * SIN(missile [0]->phi);// * MAXX / zoom / 2;
+    camx = missile [0]->tl->x + cf * SIN(missile [0]->phi);
     camy = missile [0]->tl->y + fplayer->zoom * 2;
-    camz = missile [0]->tl->z + cf * COS(missile [0]->phi);// * MAXX / zoom / 2;
+    camz = missile [0]->tl->z + cf * COS(missile [0]->phi);
     camphi = missile [0]->phi;
     fplayer->draw = 1;
   }
   else if (camera == 5) // top
   {
     cf = fplayer->zoom * 15;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + 5.5;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4936,9 +4528,9 @@ void game_timer (int dt)
     camphi = fplayer->phi + 90.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * SIN(camphi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(camphi);
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(camphi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
@@ -4948,18 +4540,18 @@ void game_timer (int dt)
     camphi = fplayer->phi + 270.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * SIN(camphi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(camphi);
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * COS(camphi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(camphi);
     fplayer->draw = 1;
     camgamma = 20;
   }
   else if (camera == 8) // top near
   {
     cf = fplayer->zoom * 5;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + 2.5;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4967,9 +4559,9 @@ void game_timer (int dt)
   else if (camera == 9) // top very near
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
     camy = fplayer->tl->y + 1.0;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4993,7 +4585,6 @@ void game_timer (int dt)
   fplayer->rectheta -= dtheta;
   fplayer->recgamma += dgamma;
 
-//  printf ("%f, %f\n", fplayer->tl->x, fplayer->tl->z);
   missionstate = mission->processtimer (dt);
 
   if (missionstate == 2)
@@ -5002,9 +4593,6 @@ void game_timer (int dt)
     if (missionending >= 25)
     {
       missionending = 0;
-/*      if (mission->difficulty == 0) fplayer->points -= 25;
-      else if (mission->difficulty == 1) fplayer->points += 25;
-      else if (mission->difficulty == 2) fplayer->points += 75;*/
       fplayer->score = mission->getScore (missionstate);
       if (!mission->id == MISSION_DEMO)
       {
@@ -5025,9 +4613,6 @@ void game_timer (int dt)
     if (missionending >= 25)
     {
       missionending = 0;
-/*      if (mission->difficulty == 0) fplayer->points -= 25;
-      else if (mission->difficulty == 1) fplayer->points += 25;
-      else if (mission->difficulty == 2) fplayer->points += 75;*/
       fplayer->score = mission->getScore (missionstate);
       if (mission->id != MISSION_DEMO)
       {
@@ -5045,245 +4630,6 @@ void game_timer (int dt)
     }
   }
 }
-
-/*
-int net_thread_main (void *data)
-{
-  while (true)
-  {
-
-  int i, i2;
-
-  gametimer ++;
-
-  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
-  {
-    flash = 12;
-    int fphi = (int) camphi + myrandom (50) - 25;
-    if (fphi < 0) fphi += 360;
-    else if (fphi >= 360) fphi -= 360;
-    float pseudoview = getView ();
-    float fdist = myrandom ((int) pseudoview - 20) + 10;
-    float fx = fplayer->tl->x - sine [fphi] * fdist;
-    float fz = fplayer->tl->z - cosi [fphi] * fdist;
-    flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
-    int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
-    sound->setVolume (SOUND_THUNDER1, lev);
-    sound->play (SOUND_THUNDER1);
-  }
-
-  if (flash)
-    flash --;
-  if (flash <= 7 && flash > 0)
-    flash --;
-
-  if (lastthrust != fplayer->thrust && !(gametimer & 15))
-    setPlaneVolume ();
-  lastthrust = fplayer->thrust;
-
-  for (i = 0; i < maxfighter; i ++)
-  {
-    for (i2 = 0; i2 < maxlaser; i2 ++)
-      if (laser [i2]->active)
-        fighter [i]->collide (laser [i2]);
-    for (i2 = 0; i2 < maxmissile; i2 ++)
-      if (missile [i2]->active)
-        fighter [i]->collide (missile [i2]);
-    for (i2 = 0; i2 < maxfighter; i2 ++)
-      if (fighter [i2]->active)
-        if (i != i2)
-          fighter [i]->collide (fighter [i2]);
-  }
-
-  for (i = 0; i < maxfighter; i ++)
-  {
-    fighter [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
-  }
-  for (i = 0; i < maxlaser; i ++)
-    laser [i]->move ();
-  for (i = 0; i < maxmissile; i ++)
-    missile [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
-  for (i = 0; i < maxflare; i ++)
-    flare [i]->move ();
-  for (i = 0; i < maxchaff; i ++)
-    chaff [i]->move ();
-
-  for (i = 0; i < maxexplosion; i ++)
-    explosion [i]->move ();
-  for (i = 0; i < maxblacksmoke; i ++)
-    blacksmoke [i]->move ();
-
-  if (fplayer->shield <= 0)
-    camera = 1;
-
-  float cf = -fplayer->zoom / 2;
-  camtheta = fplayer->theta;
-  if (camera == 0)  // cockpit
-  {
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + fplayer->zoom / 3.0;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camphi = fplayer->phi;
-    fplayer->draw = 0;
-  }
-  if (camera == 1) // chase
-  {
-    cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camphi = fplayer->phi;
-    fplayer->draw = 1;
-    camgamma = 20;
-  }
-  else if (camera == 2) // backwards
-  {
-    cf = -fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camphi = fplayer->phi + 180.0;
-    fplayer->draw = 1;
-    camgamma = 20;
-  }
-  else if (camera == 3) // other players
-  {
-    cf = fighter [aktcam]->zoom * 2;
-    camx = fighter [aktcam]->tl->x + cf * sine [(int) fighter [aktcam]->phi];// * MAXX / zoom / 2;
-    camy = fighter [aktcam]->tl->y + fighter [aktcam]->zoom;
-    camz = fighter [aktcam]->tl->z + cf * cosi [(int) fighter [aktcam]->phi];// * MAXX / zoom / 2;
-    camphi = fighter [aktcam]->phi;
-    camgamma = 20;
-    camtheta = fighter [aktcam]->theta;
-    fplayer->draw = 1;
-  }
-  else if (camera == 4) // missile
-  {
-    cf = missile [0]->zoom * 5;
-    camx = missile [0]->tl->x + cf * sine [(int) missile [0]->phi];// * MAXX / zoom / 2;
-    camy = missile [0]->tl->y + fplayer->zoom;
-    camz = missile [0]->tl->z + cf * cosi [(int) missile [0]->phi];// * MAXX / zoom / 2;
-    camphi = missile [0]->phi;
-    fplayer->draw = 1;
-  }
-  else if (camera == 5) // top
-  {
-    cf = fplayer->zoom * 15;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + 5.5;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
-    camphi = fplayer->phi;
-    fplayer->draw = 1;
-    camgamma = 50;
-  }
-  else if (camera == 6) // left
-  {
-    cf = fplayer->zoom * 2;
-    camphi = fplayer->phi + 90.0;
-    if (camphi >= 360) camphi -= 360;
-    else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * sine [(int) camphi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) camphi];// * MAXX / zoom / 2;
-    fplayer->draw = 1;
-    camgamma = 20;
-  }
-  else if (camera == 7) // right
-  {
-    cf = fplayer->zoom * 2;
-    camphi = fplayer->phi + 270.0;
-    if (camphi >= 360) camphi -= 360;
-    else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * sine [(int) camphi];// * MAXX / zoom / 2;
-    camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) camphi];// * MAXX / zoom / 2;
-    fplayer->draw = 1;
-    camgamma = 20;
-  }
-  else if (camera == 50)
-  {
-    camx = 20;
-    camz = 80;
-    camy = 250;
-    camphi = 20;
-    camgamma = 75;
-    game = GAME_PAUSE;
-  }
-  if (camphi >= 360.0) camphi -= 360.0;
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
-  sdldisplay = true;
-#endif
-
-  fplayer->rectheta -= dtheta;
-  fplayer->recgamma += dgamma;
-
-//  printf ("%f, %f\n", fplayer->tl->x, fplayer->tl->z);
-  missionstate = mission->processtimer ();
-
-  if (missionstate == 2)
-  {
-    missionending ++;
-    if (missionending >= 35)
-    {
-      missionending = 0;
-      display ("Initing new mission", LOG_MOST);
-      missionactive = false;
-      createMission (MISSION_DEMO);
-      game_levelInit ();
-      switch_menu ();
-    }
-  }
-
-  if (missionstate == 1)
-  {
-    missionending ++;
-    if (missionending >= 35)
-    {
-      missionending = 0;
-      display ("Initing new mission", LOG_MOST);
-      missionactive = false;
-      createMission (MISSION_DEMO);
-      game_levelInit ();
-      switch_menu ();
-    }
-  }
-
-  if (multiplayer)
-  {
-
-    if (isserver)
-    {
-      server->sendMessage (1, ":", 1);
-      int len = fplayer->net_write ();
-      server->sendMessage (1, fplayer->net, len);
-      len = fighter[1]->net_write ();
-      server->sendMessage (1, fighter[1]->net, len);
-//      while (server->getMessage (1, fighter [1]->net))
-//        fighter [1]->net_read ();
-    }
-    else
-    {
-//      int len = fplayer->net_write ();
-//      client->sendMessage (fplayer->net, len);
-      char buffer[10];
-      while (! client->getMessage(buffer));
-      while (!client->getMessage (fighter [0]->net)) ;
-      fighter [0]->net_read ();
-      while (!client->getMessage (fighter [1]->net)) ;
-      fighter [1]->net_read ();
-      // if (client)
-    }
-
-  }
-
-#ifdef HAVE_SDL
-    SDL_Delay (50);
-#endif
-  }
-}
-*/
 
 float lastfps = -1;
 int newcamera = 0;
@@ -5384,29 +4730,6 @@ void finish_timer (Uint32 dt)
   sdldisplay = true;
 #endif
 }
-//#include <time.h>
-
-void create_key (unsigned char key, int x, int y)
-{
-  if (key == 's')
-  {
-    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
-    game_levelInit ();
-    switch_game ();
-    missionactive = true;
-  }
-}
-
-void join_key (unsigned char key, int x, int y)
-{
-  if (key == 's')
-  {
-    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
-    game_levelInit ();
-    switch_game ();
-    missionactive = true;
-  }
-}
 
 void create_timer (Uint32 dt)
 {
@@ -5414,17 +4737,26 @@ void create_timer (Uint32 dt)
 //  server->createSocketSet ();
   server->getClient ();
   SDL_Delay (100);
+  mission_timer (dt);
 #endif
 }
 
 void join_timer (Uint32 dt)
 {
 #ifndef USE_GLUT
-  client->getServer ("Lara", "client1");
+  client->getServer ("127.0.0.1", "client1");
   SDL_Delay (100);
+  mission_timer (dt);
 #endif
 }
 
+
+
+/****************************************************************************
+  GAME DATA INITIALIZATION
+****************************************************************************/
+
+// calculate missile rack positions for a fighter
 void setMissiles (CModel *model)
 {
   int i;
@@ -5454,13 +4786,15 @@ void setMissiles (CModel *model)
   }
 }
 
+// initialize game data
 void myInit ()
 {
   int i, i2;
+
+  // create textures (OpenGL)
   texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
   texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
   texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
-//  texflare = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, 2, 0);
   texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, -1, 0, true);
   texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), 1, -1, 0, true);
   texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), 1, -1, 0, true);
@@ -5493,19 +4827,10 @@ void myInit ()
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
   texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
   texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
-//  texcounter = gl->genTextureTGA (dirs->getTextures ("counter.tga"), 0, 1, 0, true);
   texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
   texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
-//  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
-/*  for (i = 0; i < maxchars; i ++)
-  {
-    char buf [64] = "../textures/char0.tga";
-    buf [16] = '1' + i;
-    texchar [i] = gl->genTextureTGA (buf, 0, 3, 1);
-  }*/
 
-//  l = new GLLandscape (space);
-
+  // useful global variables/constants
   tlinf = new CVector3 (1E10, 1E10, 1E10);
   tlminf = new CVector3 (-1E10, -1E10, -1E10);
   tlnull = new CVector3 (0, 0, 0);
@@ -5514,13 +4839,12 @@ void myInit ()
   rotmissile->a = 90;
   rotmissile->c = 270;
 
+  // initialize all global variables
+
   for (i = 0; i < maxgroundobj; i ++)
   {
     groundobj [i] = new DynamicObj (space, &model_tent1, 3);
   }
-
-/*  obj = new Model ();
-  obj->loadFromFile ("./data/f4.v3d");*/
 
   explsphere = new CSphere ();
   ((CSphere *) explsphere)->init (1, 9);
@@ -5531,7 +4855,6 @@ void myInit ()
   {
     explsphere->object [0]->vertex [i].color.setColor (myrandom (100) + 155, myrandom (100) + 100, 0, myrandom (3) / 2 * 255);
   }
-//  ((CSphere *) explsphere)->invertNormals ();
   for (i = 0; i < maxexplosion; i ++)
   {
     explosion [i] = new CExplosion (space, explsphere);
@@ -5555,41 +4878,19 @@ void myInit ()
   highclouds2 = new HighClouds (25);
   highclouds2->setTexture (texclouds3);
 
-/*  cloudsphere = new CSpherePart (1, 9, 25);
-  CObject *co = cloudsphere->object [0];
-  co->hasTexture = true;
-  co->material = new CMaterial ();
-  co->material->texture = texclouds1;
-  for (int i2 = 0; i2 < co->numVertices; i2 ++)
-  {
-    co->vertex [i2].tex.x = co->vertex [i2].vector.x * 5;
-    co->vertex [i2].tex.y = co->vertex [i2].vector.y * 5;
-  }
-  co->hasTexture = true;
-  cloudsphere->displaylist = false;
-  csphere = new CSpaceObj (cloudsphere, 10.0);
-  csphere->rot->b = 90;
-  csphere->draw = 2;
-  csphere->drawlight = false;*/
-
   objsphere = new CSphere (1, 9, 1, 1, 1);
   sphere = new CSpaceObj (objsphere, 10.0);
-  //sphere = new CSpaceObj ();
   sphere->rot->b = 90;
   sphere->draw = 2;
   sphere->drawlight = false;
 
   flash1 = new Flash ();
 
-//  objlaser = new CModel ();
-//  objlaser->loadFromFile ("./data/c1.v3d");
   for (i = 0; i < maxlaser; i ++)
   {
     laser [i] = new DynamicObj (space, &model_cannon1, 0.07);
   }
 
-//  objmissile = new CModel ();
-//  objmissile->loadFromFile ("./data/r1.v3d");
   for (i = 0; i < maxmissile; i ++)
   {
     missile [i] = new AIObj (space, &model_missile1, 0.1);
@@ -5620,6 +4921,11 @@ void myInit ()
 }
 
 
+
+/****************************************************************************
+  INTRO
+****************************************************************************/
+
 CRotation rot;
 CRotation rot2;
 CVector3 tl;
@@ -5631,29 +4937,30 @@ int inittimer = 0;
 
 void init_reshape ()
 {
-  /* Darstellung auf gesamten Clientbereich des Fensters zulassen */
-  glViewport(0, 0, (GLint) width, (GLint) height);
+  // use whole window
+  glViewport (0, 0, (GLint) width, (GLint) height);
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  /* angle, aspect, near Clip, far Clip */
-  float v = view;
-  if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, nearclippingplane, 80); // should be sqrt(2) or 1.5
+  
+  // angle, aspectratio, nearclip, farclip
+  gluPerspective (80.0, 1.0, nearclippingplane, 80);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 }
 
+// load game data (this method does not really belong to the intro itself)
 void myFirstInit ()
 {
   display ("Creating calculation tables", LOG_ALL);
   mathtab_init ();
 
   display ("Creating advanced OpenGL methods", LOG_ALL);
-  gl = new GL (); //(1.0, 1000.0);
+  gl = new GL ();
+
   display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
-//  texfont1 = gl->genTextureTGA ("../textures/font2.tga", 0, 1, 0);
+
   display ("Loading 3ds models", LOG_ALL);
 //  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig1.3ds"));
   g_Load3ds.Import3DS (&model_fig, dirs->getModels ("gl-16.3ds"));
@@ -5693,8 +5000,10 @@ void myFirstInit ()
   model_figh.scaleTexture (0.3, 0.3);
   g_Load3ds.Import3DS (&model_figt, dirs->getModels ("transp1.3ds"));
   model_figt.setName ("TRANSPORT");
+
   // cannon at daylight
   g_Load3ds.Import3DS (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+
   // cannon at night
   g_Load3ds.Import3DS (&model_cannon2, dirs->getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
@@ -5708,14 +5017,7 @@ void myFirstInit ()
   }
   model_cannon2.object [0]->vertex [1].color.c [3] = 50;
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
-/*  model_cannon2.object [0]->vertex [2].color.c [0] = 255;
-  model_cannon2.object [0]->vertex [2].color.c [1] = 255;
-  model_cannon2.object [0]->vertex [2].color.c [2] = 0;
-  model_cannon2.object [0]->vertex [2].color.c [3] = 100;
-  model_cannon2.object [0]->vertex [1].color.c [0] = 255;
-  model_cannon2.object [0]->vertex [1].color.c [1] = 255;
-  model_cannon2.object [0]->vertex [1].color.c [2] = 0;
-  model_cannon2.object [0]->vertex [1].color.c [3] = 100;*/
+
   g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
@@ -5785,14 +5087,6 @@ void myFirstInit ()
   model_radar.setName ("ASTEROID");
   g_Load3ds.Import3DS (&model_base1, dirs->getModels ("base1.3ds"));
   model_radar.setName ("MOON BASE");
-/*  for(i = 0; i < model.numOfMaterials; i++)
-  {
-    if(strlen(model.pMaterials[i]->strFile) > 0)
-    {
-//      CreateTexture(g_Texture, model.pMaterials[i].strFile, i);
-    }
-    model.pMaterials[i]->texureId = i;
-  }*/
 
   setMissiles (&model_fig);
   setMissiles (&model_figa);
@@ -5803,8 +5097,6 @@ void myFirstInit ()
   setMissiles (&model_figf);
   setMissiles (&model_figg);
   setMissiles (&model_figh);
-
-//  model_fig.displaylist = false;
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);
@@ -5824,17 +5116,8 @@ void myFirstInit ()
   clip2->y = ZOOM;
   clip2->z = ZOOM;
 
+  // prepare intro
   init_reshape ();
-
-/*  CColor mycolor (200, 200, 0);
-  CColor mycolor2 (100, 100, 0);
-  mysphere = new CSphere (1, 8, 1, 1, 1);
-  mysphere->setColor (&mycolor2);
-  mysphere->setNorthPoleColor (&mycolor, 1.9);
-  for (i = 0; i < 100; i++)
-  {
-    mykugel [i] = new InitKugel (mysphere);
-  }*/
 
   tl.x = 0.0;
   tl.y = 0.0;
@@ -5862,7 +5145,7 @@ void myFirstInit ()
 
 void init_key (int key, int x, int y)
 {
-  gl->clearScreen ();
+  gl->clearScreen (); // exit intro
   myInit ();
   switch_menu ();
   fplayer->ai = true;
@@ -5882,8 +5165,8 @@ void init_mouse (int button, int state, int x, int y)
 const int maxfx = 80;
 const int maxfy = 40;
 
-int col [maxfy] [maxfx];
-int col2 [maxfy] [maxfx];
+int heat [maxfy] [maxfx];
+int heat2 [maxfy] [maxfx];
 
 void init_display ()
 {
@@ -5900,11 +5183,13 @@ void init_display ()
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
 
+  // draw fighter
   glPushMatrix ();
   glTranslatef (0, 0, -5);
   model_fig.draw (&vec, &tl, &rot, 1.0, 1.0, initexplode1);
   glPopMatrix ();
 
+  // draw gl-117 logo
   if (initexplode1 < 0)
   {
     glPushMatrix ();
@@ -5918,37 +5203,45 @@ void init_display ()
 
   glPopMatrix ();
 
+  // draw fire (heat array)
   glDisable (GL_DEPTH_TEST);
   glEnable (GL_BLEND);
   float xf = 2.0F, yf = 2.0F, zf = 2.0F;
-
   glPushMatrix ();
   for (i = 0; i < maxfy; i ++)
   {
     glBegin (GL_QUAD_STRIP);
     for (i2 = 0; i2 < maxfx + 1; i2 ++)
     {
-      int r = col [i] [i2];
+      // rotate through fire colors (white-yellow-red-black-blue-black)
+      // col in [0...512]
+      int r = heat [i] [i2]; // blend out late for red->black
       if (r > 255) r = 255;
-      int g = col [i] [i2] - 255;
+      int g = heat [i] [i2] - 255; // blend out for yellow->red
       if (g > 255) g = 255;
       else if (g < 0) g = 0;
-      int b = col [i] [i2] - 512;
+      int b = heat [i] [i2] - 512; // blend out early to get white->yellow
       if (b > 255) b = 255;
-      else if (b < -462) b = (512 + b) * 5;
-      else if (b < -412) b = (-412 - b) * 5;
+      else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
+      else if (b < -412) b = (-412 - b) * 3;
       else if (b < 0) b = 0;
-      glColor4ub (r, g, b, r);
+      int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
+      glColor4ub (r, g, b, a);
       glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * i / maxfy, -zf);
-      r = col [i + 1] [i2];
+
+      // do the same for the next vertex
+      r = heat [i + 1] [i2];
       if (r > 255) r = 255;
-      g = col [i + 1] [i2] - 255;
+      g = heat [i + 1] [i2] - 255;
       if (g > 255) g = 255;
       else if (g < 0) g = 0;
-      b = col [i + 1] [i2] - 512;
+      b = heat [i + 1] [i2] - 512;
       if (b > 255) b = 255;
+      else if (b < -462) b = (512 + b) * 3;
+      else if (b < -412) b = (-412 - b) * 3;
       else if (b < 0) b = 0;
-      glColor4ub (r, g, b, r);
+      a = r >= b ? r : b;
+      glColor4ub (r, g, b, a);
       glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * (i + 1) / maxfy, -zf);
     }
     glEnd ();
@@ -5964,14 +5257,14 @@ void genFireLine ()
   int i, i2;
   for (i = 0; i < maxfx; i ++)
   {
-    col [maxfy - 1] [i] = myrandom (255 * 2);
+    heat [maxfy - 1] [i] = myrandom (255 * 2);
   }
   for (i = 0; i < 5; i ++)
   {
     int r = myrandom (maxfx + 1);
     for (i2 = 0; i2 <= 0; i2 ++)
     {
-      col [maxfy - 1] [r + i2] = 255 * 3 + 100;
+      heat [maxfy - 1] [r + i2] = 255 * 3 + 100; // insert hot spots at the bottom line
     }
   }
 }
@@ -5982,10 +5275,11 @@ void proceedFire ()
   for (i = maxfy - 2; i >= 0; i --)
     for (i2 = 1; i2 < maxfx - 1; i2 ++)
     {
-      col2 [i] [i2] = (col [i + 1] [i2 - 1] + 6 * col [i + 1] [i2] + col [i + 1] [i2 + 1]) / 8 - (int) (500.0F / maxfy);
-      if (col2 [i] [i2] < 0) col2 [i] [i2] = 0;
+      heat2 [i] [i2] = (heat [i + 1] [i2 - 1] + 6 * heat [i + 1] [i2] + heat [i + 1] [i2 + 1]) / 8; // heat diffusion
+      heat2 [i] [i2] -= (int) (500.0F / maxfy); // heat sink
+      if (heat2 [i] [i2] < 0) heat2 [i] [i2] = 0;
     }
-  memcpy (col, col2, maxfx * maxfy * sizeof (int));
+  memcpy (heat, heat2, maxfx * maxfy * sizeof (int)); // copy back buffer to heat array
 }
 
 int initsynchrotimer = 0;
@@ -6001,7 +5295,7 @@ void init_timer (Uint32 dt)
   else return;
 
   int r = myrandom (100);
-  if (r == 50) r = myrandom (100); // do not optimize this
+  if (r == 50) r = myrandom (100); // do not optimize this: random number generator initialization
 
   tl.x = 6.0 * pow (1.5, -(5 + tl.z)) - 0.4;
   tl.y = 0.9 * tl.x;
@@ -6023,8 +5317,8 @@ void init_timer (Uint32 dt)
 
   if (inittimer == 0)
   {
-    memset (col, 0, 20 * 40 * sizeof (int));
-    memset (col2, 0, 20 * 40 * sizeof (int));
+    memset (heat, 0, maxfx * maxfy * sizeof (int));
+    memset (heat2, 0, maxfx * maxfy * sizeof (int));
   }
 
   genFireLine ();
@@ -6053,6 +5347,12 @@ void init_timer (Uint32 dt)
   sdldisplay = true;
 #endif
 }
+
+
+
+/****************************************************************************
+  ABSTRACT EVENT BRANCHES
+****************************************************************************/
 
 static void myKeyboardFunc (unsigned char key, int x, int y)
 {
@@ -6115,6 +5415,10 @@ static void myPassiveMotionFunc (int x, int y)
     fame_mouse (-1, -1, x, y);
   else if (game == GAME_FIGHTER)
     fighter_mouse (-1, -1, x, y);
+  else if (game == GAME_CREATE)
+    create_mouse (-1, -1, x, y);
+  else if (game == GAME_JOIN)
+    join_mouse (-1, -1, x, y);
   else if (game == GAME_QUIT)
     quit_mouse (-1, -1, x, y);
 }
@@ -6149,6 +5453,14 @@ static void myMouseFunc (int button, int state, int x, int y)
   {
     fighter_mouse (button, state, x, y);
   }
+  else if (game == GAME_CREATE)
+  {
+    create_mouse (button, state, x, y);
+  }
+  else if (game == GAME_JOIN)
+  {
+    join_mouse (button, state, x, y);
+  }
   else if (game == GAME_QUIT)
   {
     quit_mouse (button, state, x, y);
@@ -6177,8 +5489,6 @@ static void myDisplayFunc ()
   {
     init_display ();
     game_view ();
-//    myInit();
-//    game = GAME_PLAY;
   }
   else if (game == GAME_PLAY)
   {
@@ -6207,7 +5517,6 @@ static void myDisplayFunc ()
   }
   else if (game == GAME_MISSION)
   {
-//    game_display ();
     mission_display ();
     game_view ();
   }
@@ -6226,6 +5535,16 @@ static void myDisplayFunc ()
   else if (game == GAME_FIGHTER)
   {
     fighter_display ();
+    game_view ();
+  }
+  else if (game == GAME_CREATE)
+  {
+    create_display ();
+    game_view ();
+  }
+  else if (game == GAME_JOIN)
+  {
+    join_display ();
     game_view ();
   }
   else if (game == GAME_FINISH)
@@ -6274,12 +5593,8 @@ static void myJoystickHatFunc (int hat)
   }
 }
 
-#define TIMER_INTERVAL 33
-#define GLUT_TIMER_INTERVAL 28
-
 static void myTimerFunc (int value)
 {
-//  fplayer->aiAction (l);
   Uint32 akttime, dt;
 #ifndef USE_GLUT
     akttime = SDL_GetTicks ();
@@ -6322,11 +5637,14 @@ static void myTimerFunc (int value)
     mission_timer (dt);
 
 #ifdef USE_GLUT
-  glutTimerFunc (GLUT_TIMER_INTERVAL, myTimerFunc, 0);
+  glutTimerFunc (1, myTimerFunc, 0); // do as many timer calls as possible
 #endif
 }
 
-static void sdlTimerFunc ()
+// sdlTimerFunc has been replaced by myTimerFunc
+//#define TIMER_INTERVAL 33
+//#define GLUT_TIMER_INTERVAL 28
+/*static void sdlTimerFunc ()
 {
   Uint32 akttime, dt;
 #ifndef USE_GLUT
@@ -6368,13 +5686,14 @@ static void sdlTimerFunc ()
     finish_timer (dt);
   else if (game == GAME_QUIT)
     mission_timer (dt);
-}
+}*/
 
 #ifndef USE_GLUT
 
 Uint32 nexttime = 0;
 
-Uint32 sdlTimeLeft ()
+// get time left until nexttime, obsolete
+/*Uint32 sdlTimeLeft ()
 {
   Uint32 now;
   now = SDL_GetTicks ();
@@ -6384,9 +5703,10 @@ Uint32 sdlTimeLeft ()
     return 0;
   }
   return nexttime - now;
-}
+}*/
 
-void sdlWaitTimer ()
+// delay loop, not elegant => obsolete
+/*void sdlWaitTimer ()
 {
   Uint32 now;
   now = SDL_GetTicks ();
@@ -6396,24 +5716,23 @@ void sdlWaitTimer ()
     now = SDL_GetTicks ();
   }
   nexttime = now + TIMER_INTERVAL;
-}
+}*/
 
-int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0;
+int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
 int joystickbutton = -1;
 
+// This loop emulates the glutMainLoop() of GLUT using SDL!!!
 void sdlMainLoop ()
 {
   SDL_Event event;
+  
   while (true)
   {
-    while (SDL_PollEvent (&event))
+    while (SDL_PollEvent (&event)) // process events
     {
       switch (event.type)
       {
         case SDL_MOUSEMOTION:
-/*          if (game == GAME_PLAY)
-            sdl_mousemotion (event.motion.xrel, event.motion.yrel);
-          else*/
           myPassiveMotionFunc (event.motion.x, event.motion.y);
           if (game == GAME_PLAY && controls == CONTROLS_MOUSE_EXP)
           {
@@ -6457,7 +5776,6 @@ void sdlMainLoop ()
             }
             if (joystickx > -3000 && joystickx < 3000) joystickx = 0;
             if (joysticky > -3000 && joysticky < 3000) joysticky = 0;
-//            printf ("\naxis=%d, val=%d", event.jaxis.axis, event.jaxis.value); 
           }
           break;
         case SDL_JOYBUTTONDOWN:
@@ -6477,7 +5795,7 @@ void sdlMainLoop ()
           break;
       }
     }
-//    printf ("\nx=%d, y=%d", joystickx, joysticky);
+    
     if (controls == CONTROLS_JOYSTICK)
     {
       myJoystickAxisFunc (joystickx, joysticky, joystickt, joystickr);
@@ -6486,20 +5804,144 @@ void sdlMainLoop ()
       else
         joystickbutton = -1;
     }
+    
     if (sdldisplay) myDisplayFunc ();
     sdldisplay = false;
     if (sdlreshape) myReshapeFunc (width, height);
     sdlreshape = false;
-//    SDL_Delay (sdlTimeLeft ());
-//    sdlWaitTimer ();
-    sdlTimerFunc ();
-/* Bernd: Please uncomment the following two lines! */
-//    if (game == GAME_PLAY)
-//      game_easymouse ();
+    myTimerFunc (1); // dummy value
   }
 }
 #endif
 
+
+
+/****************************************************************************
+  STARTUP METHODS
+****************************************************************************/
+
+// common GLUT screen init code, return 0 on error
+int setGlutScreen (int w, int h, int b, int f)
+{
+  char gamestr [256];
+  sprintf (gamestr, "%dx%d:%d", w, h, b);
+  glutGameModeString (gamestr);
+  if (f)
+  {
+    if (glutGameModeGet (GLUT_GAME_MODE_POSSIBLE))
+    {
+      glutEnterGameMode ();
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  else
+  {
+    glutInitWindowPosition (0, 0);
+    glutInitWindowSize (w, h);
+    glutwindow = glutCreateWindow ("GL-117");
+    if (glutwindow == GL_FALSE)
+      return 0;
+  }
+  return 1;
+}
+
+// set screen to (width, height, bpp, fullscreen), return 0 on error
+int setScreen (int w, int h, int b, int f)
+{
+
+#ifdef USE_GLUT
+
+  if (!setGlutScreen (w, h, b, f))
+  {
+    b = 16;
+    if (!setGlutScreen (w, h, b, f))
+    {
+      b = 8;
+      if (!setGlutScreen (w, h, b, f))
+      {
+        b = 2;
+        if (!setGlutScreen (w, h, b, f))
+        {
+          return 0;
+        }
+      }
+    }
+  }
+
+#else
+
+  Uint32 video_flags;
+  if (f)
+  {
+    video_flags = SDL_OPENGL | SDL_FULLSCREEN;
+  }
+  else
+  {
+    video_flags = SDL_OPENGL;
+  }
+  int rgb_size [3];
+  switch (b)
+  {
+    case 8:
+      rgb_size [0] = 2;
+      rgb_size [1] = 3;
+      rgb_size [2] = 3;
+      break;
+    case 15:
+    case 16:
+      rgb_size [0] = 5;
+      rgb_size [1] = 5;
+      rgb_size [2] = 5;
+      break;
+    default:
+      rgb_size [0] = 8;
+      rgb_size [1] = 8;
+      rgb_size [2] = 8;
+      break;
+  }
+  SDL_GL_SetAttribute (SDL_GL_RED_SIZE, rgb_size [0]);
+  SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, rgb_size [1]);
+  SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, rgb_size [2]);
+  SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16);
+  SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+  if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+  {
+    if ((b = SDL_VideoModeOK (w, h, b, video_flags)) != 0)
+    {
+      b = 16;
+      SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 5);
+      SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 5);
+      SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 5);
+      if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+      {
+        b = 8;
+        SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 2);
+        SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 3);
+        SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 3);
+        if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+        {
+          return 0;
+        }
+      }
+    }
+  }
+
+#endif
+
+  glViewport (0, 0, (GLint) w, (GLint) h);
+
+  // take over results in global variables
+  width = w;
+  height = h;
+  bpp = b;
+  fullscreen = f;
+  return 1;
+}
+
+// get approximate speed by drawing polygons (obsolete)
 int speedTest ()
 {
   int frames = 0, time2 = 0, time1 = 0;
@@ -6550,21 +5992,21 @@ int speedTest ()
   return frames;
 }
 
-bool configinit = false;
+bool configinit = false; // has GLUT/SDL already been inited?
 
+// test screen settings automatically
 void config_test (int argc, char **argv)
 {
   display ("No configuration file found. Testing...", LOG_MOST);
   char buf [STDSIZE];
   int bppi [4];
-//  memset (modes, 0, 4 * sizeof (int));
 
-#ifdef USE_GLUT
+#ifdef USE_GLUT // GLUT ONLY
   display ("Using GLUT only", LOG_MOST);
   glutInit (&argc, argv);
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
-#else
+#else // SDL
   display ("Using SDL and GLUT", LOG_MOST);
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
@@ -6575,21 +6017,19 @@ void config_test (int argc, char **argv)
   configinit = true;
 #endif
 
-  int valids = -1;
+  int valids = -1; // valid screen mode? (-1 = no mode)
   int n = 0;
   while (n < 4)
   {
     if (setScreen (resolution [n] [0], resolution [n] [1], resolution [n] [2], resolution [n] [3]))
     {
-//      modes [n] = speedTest (); // get fps for the current resulotion
       bppi [n] = bpp; // store bpp setting
       valids = n;
-      break;
+      break; // first mode found => exit loop
     }
     else
     {
       bppi [n] = -1;
-//      modes [n] = -1;
     }
     n ++;
   }
@@ -6600,20 +6040,16 @@ void config_test (int argc, char **argv)
     exit (EXIT_INIT);
   }
 
+  // start with lowest quality/view settings
   quality = 0;
-  view = 10;
+  view = 20;
   width = resolution [valids] [0];
   height = resolution [valids] [1];
   bpp = bppi [valids];
   fullscreen = resolution [valids] [3];
-
-#ifdef USE_GLUT
-//  glutDestroyWindow (glutwindow);
-#else
-//  SDL_Quit ();
-#endif
 }
 
+// get startup help screen
 void viewParameters ()
 {
   display (" ", LOG_NONE);
@@ -6627,15 +6063,16 @@ void viewParameters ()
 
 void checkargs (int argc, char **argv)
 {
-  char buf [STDSIZE];
-  int i;
-  for (i = 1; i < argc; i ++)
+  char buf [STDSIZE]; // temp buffer
+  int i; // temp counter
+
+  for (i = 1; i < argc; i ++) // for each arg (argument/parameter)
   {
-    if (argv [i] [1] == 'd')
+    if (argv [i] [1] == 'd') // change log/debug level
     {
       char *ptr = &argv [i] [2];
       debuglevel = atoi (ptr);
-      if (debuglevel < LOG_NONE || debuglevel > LOG_ALL)
+      if (debuglevel < LOG_NONE || debuglevel > LOG_ALL) // look at common.h for the constants
       {
         display ("Invalid debug level", LOG_FATAL);
         viewParameters ();
@@ -6647,12 +6084,12 @@ void checkargs (int argc, char **argv)
         display (buf, LOG_MOST);
       }
     }
-    else if (argv [i] [1] == 'v')
+    else if (argv [i] [1] == 'v') // display version string
     {
       display (VERSIONSTRING, LOG_NONE);
       exit (EXIT_NORMAL);
     }
-    else if (argv [i] [1] == 'h')
+    else if (argv [i] [1] == 'h') // display startup help screen
     {
       viewParameters ();
       exit (EXIT_NORMAL);
@@ -6666,11 +6103,17 @@ void checkargs (int argc, char **argv)
   }
 }
 
+
+
+/****************************************************************************
+  GL-117 ENTRY POINT
+****************************************************************************/
+
 int main (int argc, char **argv)
 {
-  char buf [STDSIZE];
+  char buf [STDSIZE]; // temp buffer
 
-  checkargs (argc, argv);
+  checkargs (argc, argv); // process command line parameters
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   display (buf, LOG_MOST);
@@ -6680,43 +6123,33 @@ int main (int argc, char **argv)
 #endif
 
   display ("Getting directory locations", LOG_ALL);
-  dirs = new Dirs (argv [0]);
+  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
   
-//  dirs->getSaves ("filename");
-
-  if (!load_config ())
+  if (!load_config ()) // try to load conf file (conf.cpp) and validate settings
   {
+    // no conf file found => create new one
     display ("Creating new configuration", LOG_ALL);
-    config_test (argc, argv);
-    firststart = true;
+    config_test (argc, argv); // do screen test
+    firststart = true; // enable adjusting quality/view/graphics automatically by the game
   }
 
-  save_config ();
+  save_config (); // save conf file (validated)
 
-  load_configInterface ();
-  save_configInterface ();
+  load_configInterface (); // load interface settings from conf.interface and validate
+  save_configInterface (); // save interface settings
 
-/*
-  time_t t;
-  time (&t);
-  srandom ((long) t);*/
-
-/*  int time;
-#ifndef USE_GLUT
-  time = SDL_GetTicks ();
-#else
-  time = glutGet (GLUT_ELAPSED_TIME);
-#endif
-
-  srand (time);*/
+// here srand should be called to initialize the random number generator
+// this is currently done by grabbing random numbers via the init methods (not very elegant)
 
   server = NULL;
   client = NULL;
 
   display ("Creating/Loading pilots list", LOG_ALL);
-  pilots = new PilotList (dirs->getSaves ("pilots"));
+  pilots = new PilotList (dirs->getSaves ("pilots")); // look at pilots.h
 
+// NO SDL FOUND => USE GLUT ONLY
 #ifdef USE_GLUT
+
   display ("Using GLUT only", LOG_MOST);
   if (!configinit)
   {
@@ -6733,7 +6166,7 @@ int main (int argc, char **argv)
   display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
 
-  display ("Creating sound system", LOG_ALL);
+  display ("Creating dummy sound system, install SDL to enable sound", LOG_ALL);
   sound = new SoundSystem ();
 
   display ("Registering GLUT callbacks", LOG_ALL);
@@ -6746,13 +6179,19 @@ int main (int argc, char **argv)
   glutIdleFunc (myIdleFunc);
   glutTimerFunc (20, myTimerFunc, 0);
 
-  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0); // should be sqrt(2) or 1.5
+  // parameters: visible angle, aspectracio, z-nearclip, z-farclip
+  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0);
+  
+  // no keyboard available with GLUT, as there are no KEY_DOWN/UP events
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
 
   display ("Entering GLUT main loop", LOG_ALL);
-  glutMainLoop();
+  glutMainLoop(); // give controls to GLUT
+
+// SDL FOUND
 #else
+
   display ("Using SDL and GLUT", LOG_MOST);
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
@@ -6762,9 +6201,10 @@ int main (int argc, char **argv)
       exit (EXIT_INIT);
     }
   atexit (SDL_Quit);
+
+// SDL_NET INSTALLED?
 #ifdef HAVE_SDL_NET
-  // initialize SDL_net
-  if (SDLNet_Init () == -1)
+  if (SDLNet_Init () == -1) // initialize SDL_net
   {
     sprintf (buf, "SDLNet_Init: %s", SDLNet_GetError ());
     display (buf, LOG_FATAL);
@@ -6784,16 +6224,16 @@ int main (int argc, char **argv)
   }
 
   display ("Setting SDL caption", LOG_ALL);
-  SDL_WM_SetCaption ("GL-117", "GL-117");
+  SDL_WM_SetCaption ("GL-117", "GL-117"); // window name
 
   SDL_ShowCursor (0);
 
   display ("Creating sound system", LOG_ALL);
-  sound = new SoundSystem ();
+  sound = new SoundSystem (); // look at audio.cpp
   sound->volumesound = volumesound;
   sound->volumemusic = volumemusic;
-  sound->setVolume ();
-  sound->setVolumeMusic ();
+  sound->setVolume (); // set all sound volumes
+  sound->setVolumeMusic (); // set all music volumes
 
   display ("Playing startup music", LOG_ALL);
   sound->playMusic ();
@@ -6814,22 +6254,25 @@ int main (int argc, char **argv)
   {
     display ("No joystick found", LOG_MOST);
     sdljoystick = NULL;
-    if (controls == 2)
+    if (controls == CONTROLS_JOYSTICK) // no joystick available, so switch to mouse controls
       controls = CONTROLS_MOUSE;
   }
 
-//  joystick = 0; // disable joystick manually
+// disable joystick manually
+//  joystick = 0;
 
   SDL_EnableUNICODE (1);
-  SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY,
-                       SDL_DEFAULT_REPEAT_INTERVAL);
+  SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
+// Restrict mouse to SDL window
 //  SDL_WM_GrabInput (SDL_GRAB_ON);
 
   display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
-  sdlMainLoop ();
+  sdlMainLoop (); // simulate GLUT's main loop (above)
+
 #endif
-  return 0;
+  
+  return 0; // exit without signaling errors
 }
 
 #endif

@@ -24,10 +24,11 @@
 #ifndef IS_NET_H
 #define IS_NET_H
 
+#include "common.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../config.h"
 
 #ifdef HAVE_SDL_NET
 extern int getMsg(TCPsocket sock, char *buf);
@@ -37,13 +38,30 @@ extern int putMsg(TCPsocket sock, char *buf);
 extern int port;
 extern char *message;
 
+class Client
+{
+  public:
+  Client();
+  bool getServer(char *hostname, char *name);
+  char *name;
+  void sendMessage (char *buf, int len);
+  int getMessage(char *buf);
+
+//  private:
+#ifdef HAVE_SDL_NET
+  IPaddress ip;
+  TCPsocket sock;
+  SDLNet_SocketSet set;
+#endif
+};
+
 class Server
 {
   public:
 #ifdef HAVE_SDL_NET
   typedef struct
   {
-    char *name;
+    char name [100];
     TCPsocket sock;
     int id;
   } Client;
@@ -59,32 +77,17 @@ class Server
   void sendMessage (int ip_client, char *message, int len);
   int id;
 
-  private:
+//  private:
   int num_clients;
-#ifdef HAVE_SDL_NET
   Client *clients;
-  TCPsocket server;
-   IPaddress ip;
-  SDLNet_SocketSet set;
-#endif
-};
-
-class Client
-{
-  public:
-  Client();
-  bool getServer(char *hostname, char *name);
-  char *name;
-  void sendMessage (char *buf, int len);
-  int getMessage(char *buf);
-
-  private:
 #ifdef HAVE_SDL_NET
-   IPaddress ip;
-  TCPsocket sock;
+  TCPsocket server;
+  IPaddress ip;
   SDLNet_SocketSet set;
 #endif
-
 };
+
+extern Server *server;
+extern Client *client;
 
 #endif

@@ -1207,15 +1207,15 @@ void Landscape::genLake (int depthpc)
           if (extent <= 0) break;
         }
       }
-      int waterlevel1 = 200;
-      int waterlevel2 = 450;
-      int waterlevel3 = 900;
-      int waterlevel4 = 1500;
+      int waterlevel1 = 300;
+      int waterlevel2 = 600;
+      int waterlevel3 = 1400;
+      int waterlevel4 = 2000;
       if (type == LAND_CANYON)
       {
-        waterlevel1 = 300;
-        waterlevel2 = 600;
-        waterlevel3 = 1400;
+        waterlevel1 = 400;
+        waterlevel2 = 800;
+        waterlevel3 = 1500;
         waterlevel4 = 2000;
       }
       for (i = 0; i <= MAXX; i ++)

@@ -63,6 +63,7 @@
 #define MISSION_DEATHMATCH1 85
 #define MISSION_DEATHMATCH2 86
 #define MISSION_TEAMBASE1 87
+#define MISSION_WAVES1 88
 #define MISSION_MULTIPLAYER 1000
 #define MISSION_MULTIPLAYER_DOGFIGHT 1000
 
@@ -157,6 +158,16 @@ class MissionTeamBase1 : public Mission
   int laststate, texttimer;
   int team1x, team1y, team2x, team2y;
   MissionTeamBase1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionWaves1 : public Mission
+{
+  public:
+  int laststate, texttimer;
+  MissionWaves1 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

@@ -572,7 +572,7 @@ void MissionDogfight1::start ()
     fighter [i]->o = &model_fige;
     fighter [i]->tl->x = -i * 10;
     fighter [i]->tl->z = -i * 10;
-    fighter [i]->newinit (FIGHTER_CROW, 0, 380);
+    fighter [i]->newinit (FIGHTER_CROW, 0, 395);
     fighter [i]->deactivate ();
   }
   fighter [1]->activate ();
@@ -914,7 +914,6 @@ MissionTeamBase1::MissionTeamBase1 ()
   
 void MissionTeamBase1::start ()
 {
-  int i;
   day = 1;
   clouds = 0;
   weather = WEATHER_SUNNY;
@@ -1153,6 +1152,137 @@ int MissionTeamBase1::processtimer (Uint32 dt)
 void MissionTeamBase1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionWaves1::MissionWaves1 ()
+{
+  id = MISSION_WAVES1;
+  strcpy (name, "WAVES");
+  strcpy (briefing, "THERE ARE TWO ENEMIES. IF YOU MANAGE TO TAKE THEM OUT, YOU PROCEED TO THE NEXT WAVE CONTAINING THREE OPPONENTS AND SO ON.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  maxtime = 10000 * timestep;
+}
+  
+void MissionWaves1::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 50;
+  heading = 220;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 20;
+  fplayer->tl->z = 70;
+  for (i = 1; i <= 9; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->tl->x = -i * 10;
+    fighter [i]->tl->z = -i * 10;
+    if (i <= 2)
+    {
+      fighter [i]->o = &model_fige;
+      fighter [i]->newinit (FIGHTER_CROW, 0, 395);
+    }
+    else if (i <= 5)
+    {
+      fighter [i]->o = &model_figa;
+      fighter [i]->newinit (FIGHTER_SWALLOW, 0, 395);
+      fighter [i]->deactivate ();
+    }
+    else if (i <= 9)
+    {
+      fighter [i]->o = &model_figd;
+      fighter [i]->newinit (FIGHTER_BUZZARD, 0, 395);
+      fighter [i]->deactivate ();
+    }
+  }
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionWaves1::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 9; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  state ++;
+  if (state == 1)
+  {
+    for (i = 3; i <= 5; i ++)
+    {
+      fighter [i]->activate ();
+      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
+      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
+      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+    }
+    playerInit ();
+    return 0;
+  }
+  else if (state == 2)
+  {
+    for (i = 6; i <= 9; i ++)
+    {
+      fighter [i]->activate ();
+      fighter [i]->tl->x = fplayer->tl->x + 50 + 10 * i;
+      fighter [i]->tl->z = fplayer->tl->z + 50 + 10 * i;
+      fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 15;
+    }
+    playerInit ();
+    return 0;
+  }
+  fplayer->shield = 1;
+  return 1;
+}
+
+void MissionWaves1::draw ()
+{
+  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
+
+  if (laststate != state)
+  {
+    texttimer = 1;
+    laststate = state;
+  }
+  if (texttimer > 0)
+  {
+    if (state == 1)
+    {
+      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", &textcolor);
+      return;
+    }
+    if (state == 2)
+    {
+      font1->drawTextCentered (0, 6, -2.5, "NEXT WAVE - YOU ARE FULLY REPAIRED", &textcolor);
+      return;
+    }
+  }
+
+  if (timer >= 0 && timer <= timeroff - timerlag)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }

@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-/* Display text on stdout/stderr */
+// Display text on stdout/stderr
 void display (char *str, int level)
 {
   int len = strlen (str);

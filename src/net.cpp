@@ -226,6 +226,7 @@ void Server::createSocketSet ()
 void Server::getClient()
 {
 #ifdef HAVE_SDL_NET
+  char buf [STDSIZE];
   TCPsocket newclient;
   IPaddress *remoteip;
   int active = SDLNet_CheckSockets (set, 0);
@@ -237,17 +238,18 @@ void Server::getClient()
       clients=(Client*)realloc(clients, (num_clients+1)*sizeof(Client));
 /*      if (!getMsg(newclient,&clients[num_clients].name)) printf ("name not received");
       else printf ("Name: %s", clients[num_clients].name);*/
-      clients[num_clients].name = "newclient";
       clients[num_clients].sock = newclient;
       id ++;
       clients[num_clients].id = id;
-      num_clients++;
       // get the clients IP and port number
-      remoteip = SDLNet_TCP_GetPeerAddress(clients[num_clients-1].sock);
+      remoteip = SDLNet_TCP_GetPeerAddress(clients[num_clients].sock);
       if(!remoteip)
       {
         printf("SDLNet_TCP_GetPeerAddress: %s\n",SDLNet_GetError());
       }
+      sprintf (buf, "CLIENT ID=%d IP=%d PORT=%d", id + 1, remoteip->host, remoteip->port);
+      strcpy (clients[num_clients].name, buf);
+      num_clients++;
       // print out the clients IP and port number
 /*      int ipaddr=SDL_SwapBE32(remoteip->host);
       printf("Accepted a connection from %d.%d.%d.%d port %hu\n",
@@ -345,12 +347,12 @@ Client::Client ()
 bool Client::getServer(char *hostname, char *name)
 {
 #ifdef HAVE_SDL_NET
-  printf("try join");
+  printf("try join,");
 
   if (sock != NULL) return true;
   IPaddress ip;
   //if(SDLNet_ResolveHost(&ip,hostname,port)==-1)
-  if(SDLNet_ResolveHost(&ip,"192.168.0.1",port)==-1)
+  if(SDLNet_ResolveHost(&ip,hostname,port)==-1)
   {
     printf("SDLNet_ResolveHost: %s\n",SDLNet_GetError());
     SDLNet_Quit();

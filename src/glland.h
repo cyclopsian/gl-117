@@ -36,6 +36,7 @@
 #include "effects.h"
 #include "land.h"
 #include "roam.h"
+#include "net.h"
 
 // exact landscape type
 #define LANDSCAPE_ALPINE 0
@@ -139,6 +140,7 @@ class GLLandscape : public Landscape
   void drawTexturedTriangle1 (int x, int y);
   void drawTexturedTriangle2 (int x, int y);
   
+  void viewculling ();
   void draw (int phi, int gamma); // draw ALL
 
   void calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile, DynamicObj **flare); // explosions light up the surface

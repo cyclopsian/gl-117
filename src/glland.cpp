@@ -2116,12 +2116,41 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   glEnd();
 }
 
+bool hb [100] [100];
+float hdeg [360];
+
+// in construction, enable some lines at #1
+void GLLandscape::viewculling ()
+{
+  memset (hb, 0, sizeof (bool) * 10000);
+  for (int s = 1; s < 50; s ++)
+  {
+    for (int i = -s; i < s; i ++)
+    {
+      int x, y, dx, dy;
+      x = 50 + i; y = 50 + s;
+      dx = x - 50; dy = y - 50;
+      float phi;
+      if (dx != 0) phi = atan ((float) dy / dx);
+      else phi = PI;
+      if (dx < 0) phi += 2.0F * PI;
+      float dist = sqrt (dx * dx + dy * dy);
+      float h = getHeight (camx + dx, camy + y);
+      hb [y] [x] = true;
+//      hb [50 - s] [50 + i]
+//      hb [50 + i] [50 + s]
+//      hb [50 - i] [50 + s]
+    }
+  }
+}
     
 void GLLandscape::draw (int phi, int gamma)
 {
   char buf [STDSIZE];
   int i, i2, x, y;
   int xs, ys;
+
+  viewculling ();
 
   float fac;
 
@@ -2685,6 +2714,11 @@ void GLLandscape::draw (int phi, int gamma)
                 zz1 ++;
                 int a;
                 a = selectColor (x, y);
+                // construction #1
+/*                int testx = (int) getCoord ((minx + maxx) / 2) - x + 100;
+                int testz = (int) getCoord ((miny + maxy) / 2) - y + 100;
+                testx /= 2; testz /= 2;
+                if (hb [testz] [testx])*/
                 if (a != 6 && a != 9)
                 {
                   if (drawrule [x] [y] == 0)
