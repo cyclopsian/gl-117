@@ -29,19 +29,19 @@
 
 FileTokenizer::FileTokenizer ()
 {
-  quoteremove = 0;
+  quoteRemove = 0;
   file = NULL;
   ptr = MAXLEN;
-  commentnum = 0;
-  bufferlen = MAXLEN;
+  commentNum = 0;
+  bufferLen = MAXLEN;
   line = 1;
-  currentquotes = 0;
-  currentcomment = 0;
-  bufferstart = 0;
-  bufferread = 0;
-  lastchar = 0;
+  currentQuotes = 0;
+  currentComment = 0;
+  bufferStart = 0;
+  bufferRead = 0;
+  lastChar = 0;
   reverse = 0;
-  tokenpos = 0;
+  tokenPos = 0;
 }
 
 void FileTokenizer::init ()
@@ -49,23 +49,23 @@ void FileTokenizer::init ()
   memset (whitespace, 0, 256);
   memset (separator, 0, 256);
   memset (quotes, 0, 256);
-  memset (commentstart, 0, MAXCOMMENTS * 256);
-  memset (commentend, 0, MAXCOMMENTS * 256);
-  commentnum = 0;
-  quoteremove = 0;
-  currentquotes = 0;
-  currentcomment = 0;
+  memset (commentStart, 0, MAXCOMMENTS * 256);
+  memset (commentEnd, 0, MAXCOMMENTS * 256);
+  commentNum = 0;
+  quoteRemove = 0;
+  currentQuotes = 0;
+  currentComment = 0;
   reverse = 0;
-  bufferread = 0;
-  bufferstart = 0;
+  bufferRead = 0;
+  bufferStart = 0;
   buffer [MAXLEN] = 0;
 }
 
 void FileTokenizer::initComments ()
 {
-  memset (commentstart, 0, MAXCOMMENTS * 256);
-  memset (commentend, 0, MAXCOMMENTS * 256);
-  commentnum = 0;
+  memset (commentStart, 0, MAXCOMMENTS * 256);
+  memset (commentEnd, 0, MAXCOMMENTS * 256);
+  commentNum = 0;
 }
 
 XLONG FileTokenizer::getPosition ()
@@ -95,12 +95,12 @@ void FileTokenizer::setSeparator (char *string)
 
 void FileTokenizer::addComment (char *startstring, char *endstring)
 {
-  if (commentnum >= MAXCOMMENTS) return;
-  strncpy (commentstart [commentnum], startstring, 256);
-  commentstart [commentnum] [255] = 0;
-  strncpy (commentend [commentnum], endstring, 256);
-  commentend [commentnum] [255] = 0;
-  commentnum ++;
+  if (commentNum >= MAXCOMMENTS) return;
+  strncpy (commentStart [commentNum], startstring, 256);
+  commentStart [commentNum] [255] = 0;
+  strncpy (commentEnd [commentNum], endstring, 256);
+  commentEnd [commentNum] [255] = 0;
+  commentNum ++;
 }
 
 void FileTokenizer::setQuotes (char *string)
@@ -138,25 +138,25 @@ int FileTokenizer::fillBuffer ()
 
   if (reverse)
   {
-    if (bufferstart - bytestoread - bufferread >= 0)
+    if (bufferStart - bytestoread - bufferRead >= 0)
     {
-      fseek (file, -bytestoread - bufferread, SEEK_CUR);
-      bufferstart += -bytestoread - bufferread;
+      fseek (file, -bytestoread - bufferRead, SEEK_CUR);
+      bufferStart += -bytestoread - bufferRead;
     }
     else
     {
-      bytestoread = (int) bufferstart - bufferread;
+      bytestoread = (int) bufferStart - bufferRead;
       fseek (file, 0, SEEK_SET);
-      bufferstart = 0;
+      bufferStart = 0;
       memset (&buffer [n + bytestoread], 0, MAXLEN - (n + bytestoread));
     }
   }
 
   bytesread = fread (&buffer [n], 1, bytestoread, file);
-  bufferlen = bufferlen + bytesread - ptr;
-  bufferread = bytesread;
+  bufferLen = bufferLen + bytesread - ptr;
+  bufferRead = bytesread;
   
-  bufferstart += bytesread;
+  bufferStart += bytesread;
   if (reverse)
   {
     if (bytesread > 0)
@@ -165,8 +165,8 @@ int FileTokenizer::fillBuffer ()
 
   if (bytesread != ptr)
   {
-    if (bufferlen >= 0 && bufferlen < MAXLEN)
-      buffer [bufferlen] = 0;
+    if (bufferLen >= 0 && bufferLen < MAXLEN)
+      buffer [bufferLen] = 0;
   }
   ptr = 0;
   return 1;
@@ -176,13 +176,13 @@ void FileTokenizer::revert ()
 {
   if (reverse)
   {
-    fseek (file, -bufferread - ptr + bufferlen, SEEK_CUR);
-    bufferstart += -bufferread - ptr + bufferlen;
+    fseek (file, -bufferRead - ptr + bufferLen, SEEK_CUR);
+    bufferStart += -bufferRead - ptr + bufferLen;
   }
-  bufferread = bufferlen - ptr;
+  bufferRead = bufferLen - ptr;
   reverse = !reverse;
   ptr = MAXLEN;
-  bufferlen = MAXLEN;
+  bufferLen = MAXLEN;
   fillBuffer ();
 }
 
@@ -213,10 +213,10 @@ int FileTokenizer::setPosition (XLONG pointer, int whence)
   }
   if (!fseek (file, (long) pointer, 1))
   {
-    bufferstart = ftell (file);
-    bufferread = 0;
+    bufferStart = ftell (file);
+    bufferRead = 0;
     ptr = MAXLEN;
-    bufferlen = MAXLEN;
+    bufferLen = MAXLEN;
     fillBuffer ();
     return 1;
   }
@@ -228,8 +228,8 @@ void FileTokenizer::rewind ()
   fseek (file, 0, SEEK_SET);
   reverse = 0;
   ptr = MAXLEN;
-  bufferlen = MAXLEN;
-  bufferstart = 0;
+  bufferLen = MAXLEN;
+  bufferStart = 0;
   fillBuffer ();
   line = 1;
 }
@@ -265,14 +265,14 @@ int FileTokenizer::isChar (char *string)
 int FileTokenizer::isCommentStart ()
 {
   int i, i2;
-  for (i = 0; i < commentnum; i ++)
+  for (i = 0; i < commentNum; i ++)
   {
-    for (i2 = 0; i2 < (int) strlen (commentstart [i]); i2 ++)
-      if (buffer [ptr + i2] != commentstart [i] [i2])
+    for (i2 = 0; i2 < (int) strlen (commentStart [i]); i2 ++)
+      if (buffer [ptr + i2] != commentStart [i] [i2])
         break;
-    if (i2 == (int) strlen (commentstart [i]))
+    if (i2 == (int) strlen (commentStart [i]))
     {
-      currentcomment = i;
+      currentComment = i;
       return 1;
     }
   }
@@ -282,11 +282,11 @@ int FileTokenizer::isCommentStart ()
 int FileTokenizer::isCommentEnd ()
 {
   int i, i2;
-  i = currentcomment;
-  for (i2 = 0; i2 < (int) strlen (commentend [i]); i2 ++)
-    if (buffer [ptr + i2] != commentend [i] [i2])
+  i = currentComment;
+  for (i2 = 0; i2 < (int) strlen (commentEnd [i]); i2 ++)
+    if (buffer [ptr + i2] != commentEnd [i] [i2])
       break;
-  if (i2 == (int) strlen (commentend [i]))
+  if (i2 == (int) strlen (commentEnd [i]))
   {
     for (i = 0; i < i2; i ++)
       (void) nextChar ();
@@ -308,8 +308,8 @@ int FileTokenizer::find (char *string)
     result = strstr (&buffer [ptr], string);
     if (result == NULL)
     {
-      ptr = bufferlen - stringlen;
-      if (bufferlen < MAXLEN)
+      ptr = bufferLen - stringlen;
+      if (bufferLen < MAXLEN)
         return 0;
       if (!fillBuffer ())
         return 0;
@@ -326,9 +326,9 @@ int FileTokenizer::find (char *string)
 
 int FileTokenizer::nextChar ()
 {
-  if (buffer [ptr] == '\n' && lastchar != 92)
+  if (buffer [ptr] == '\n' && lastChar != 92)
     line ++;
-  lastchar = buffer [ptr];
+  lastChar = buffer [ptr];
   ptr ++;
   return fillBuffer ();
 }
@@ -337,20 +337,20 @@ int FileTokenizer::fillToken (char *token, int tokenlen)
 {
   if (tokenlen == 0)
     return 0;
-  if (tokenpos >= tokenlen - 1)
+  if (tokenPos >= tokenlen - 1)
   {
     token [tokenlen - 1] = 0;
     return 0;
   }
-  token [tokenpos ++] = buffer [ptr];
-  token [tokenpos] = 0;
+  token [tokenPos ++] = buffer [ptr];
+  token [tokenPos] = 0;
   return 1;
 }
 
 int FileTokenizer::nextToken (char *token, int tokenlen)
 {
   char last = 0;
-  tokenpos = 0;
+  tokenPos = 0;
   if (tokenlen <= 0) return 1;
   token [0] = '\0';
 
@@ -384,8 +384,8 @@ int FileTokenizer::nextToken (char *token, int tokenlen)
     }
     else if (isChar (quotes))
     {
-      currentquotes = buffer [ptr];
-      if (!quoteremove)
+      currentQuotes = buffer [ptr];
+      if (!quoteRemove)
         if (!fillToken (token, tokenlen)) /* opening quotes */
           return 1;
       last = 0;
@@ -394,9 +394,9 @@ int FileTokenizer::nextToken (char *token, int tokenlen)
         last = buffer [ptr];
         if (!nextChar ())
           return 0;
-        if (buffer [ptr] == currentquotes && last != '\\')
+        if (buffer [ptr] == currentQuotes && last != '\\')
         {
-          if (!quoteremove)
+          if (!quoteRemove)
             if (!fillToken (token, tokenlen)) /* closing quotes */
               return 1;
           if (!nextChar ())

@@ -25,120 +25,142 @@
 #define IS_LAND_H
 
 // surface extents
-#define MAXX 512
-#define MAXX2 256
-#define MAXX_MASK 0x000001ff
-#define MAXX_8 64
-#define DIVISIONS 4
-#define DIVX 128
-#define DIVX_8 16
-#define LOG2MAXX 9 // number of iterations
-#define LOG2SPLINE 9 // number of iterations until spline interpolation
-#define HEIGHT 120
+const int MAXX      = 512;         ///< terrain dimensions: MAXX x MAXX
+const int MAXX_MASK = 0x000001ff;  ///< AND-mask to calculate modulo MAXX
+const int LOG2MAXX  = 9;           ///< number of iterations
+const int HEIGHT    = 120;         ///< height scaling factor
+//const int LOG2SPLINE = 9; // number of iterations until interpolation starts (obsolete)
 
 // landscapes
-#define LAND_ALPINE 0
-#define LAND_MOON 1
-#define LAND_CANYON 2
-#define LAND_DESERT 3
-#define LAND_ARCTIC 4
+const int LAND_ALPINE = 0;
+const int LAND_MOON   = 1;
+const int LAND_CANYON = 2;
+const int LAND_DESERT = 3;
+const int LAND_ARCTIC = 4;
 
 // maximum Gaussian convolution kernel extent
-#define MAXCORE 10
+const int MAXCORE     = 10;
 
 // fast coordinate cycle
 #define GETCOORD(x) (x & MAXX_MASK)
 
 // static ID values for the landscape type (array "f")
-#define GRASS 0
-#define CONIFEROUSWOODS0 1
-#define CONIFEROUSWOODS1 2
-#define CONIFEROUSWOODS2 3
-#define CONIFEROUSWOODS3 4
-#define DECIDUOUSWOODS0 5
-#define DECIDUOUSWOODS1 6
-#define DECIDUOUSWOODS2 7
-#define DECIDUOUSWOODS3 8
-#define MIXEDWOODS0 9
-#define MIXEDWOODS1 10
-#define MIXEDWOODS2 11
-#define MIXEDWOODS3 12
-#define DWARFPINES0 13
-#define DWARFPINES1 14
-#define DWARFPINES2 15
-#define DWARFPINES3 16
-#define BUSHES0 17
-#define BUSHES1 18
-#define BUSHES2 19
-#define BUSHES3 20
-#define CACTUS0 25
-#define ROCKS 30
-#define ROCKS2 31
-#define GLACIER 32
-#define GREYSAND 33
-#define GRAVEL 34
-#define REDSTONE 35
-#define REDSAND 36
-#define REDTREE0 37
-#define WATER 40
-#define SHALLOWWATER 41
-#define DEEPWATER 42
-#define XSHALLOWWATER 43
-#define XDEEPWATER 44
+const int GRASS            = 0;
+const int CONIFEROUSWOODS0 = 1;
+const int CONIFEROUSWOODS1 = 2;
+const int CONIFEROUSWOODS2 = 3;
+const int CONIFEROUSWOODS3 = 4;
+const int DECIDUOUSWOODS0  = 5;
+const int DECIDUOUSWOODS1  = 6;
+const int DECIDUOUSWOODS2  = 7;
+const int DECIDUOUSWOODS3  = 8;
+const int MIXEDWOODS0      = 9;
+const int MIXEDWOODS1      = 10;
+const int MIXEDWOODS2      = 11;
+const int MIXEDWOODS3      = 12;
+const int DWARFPINES0      = 13;
+const int DWARFPINES1      = 14;
+const int DWARFPINES2      = 15;
+const int DWARFPINES3      = 16;
+const int BUSHES0          = 17;
+const int BUSHES1          = 18;
+const int BUSHES2          = 19;
+const int BUSHES3          = 20;
+const int CACTUS0          = 25;
+const int ROCKS            = 30;
+const int ROCKS2           = 31;
+const int GLACIER          = 32;
+const int GREYSAND         = 33;
+const int GRAVEL           = 34;
+const int REDSTONE         = 35;
+const int REDSAND          = 36;
+const int REDTREE0         = 37;
+const int WATER            = 40;
+const int SHALLOWWATER     = 41;
+const int DEEPWATER        = 42;
+const int XSHALLOWWATER    = 43;
+const int XDEEPWATER       = 44;
 // Water until 49
-#define MOONSAND 50
-#define DESERTSAND 60
-#define TOWN 90
-#define TRYLAKE 100
+const int MOONSAND         = 50;
+const int DESERTSAND       = 60;
+const int TOWN             = 90;
+const int TRYLAKE          = 100;
 
 class Landscape
 {
   public:
-  // height values without fluids
-  unsigned short h [MAXX + 1] [MAXX + 1];
-  // height values including fluids
-  unsigned short hw [MAXX + 1] [MAXX + 1];
-  // landscape type (ID values)
-  unsigned char f [MAXX + 1] [MAXX + 1];
-  // landscape type (0=alpine, 1=moon, 2=canyon)
-  int type;
+
+    /// height values without fluids
+    unsigned short h [MAXX + 1] [MAXX + 1];
+    /// height values including fluids (water)
+    unsigned short hw [MAXX + 1] [MAXX + 1];
+    /// landscape type (ID values)
+    unsigned char f [MAXX + 1] [MAXX + 1];
+    /// landscape type (0=alpine, 1=moon, 2=canyon)
+    int type;
+
+    Landscape ();
+    ~Landscape ();
+
+    /// fast convolution function (isotropic), currently only radius in {1,2,3}
+    void convolveGauss (int radius, int hmin, int hmax);
+    /// 5x5 convolution (radius=3) for a single raster point
+    void gauss (int x, int y);
+    /// constant height for 2*dx x 2*dy fields
+    void flatten (int x, int y, int dx, int dy);
+    /// special erosion function
+    void smoothGlacier ();
+    /// check if type=f[][] is of a specific id
+    bool isType (unsigned char type, unsigned char id);
+    /// check if type=f[][] is woods
+    bool isWoods (int type);
+    /// check if type=f[][] is water
+    bool isWater (int type);
+    /// check if type=f[][] is glacier
+    bool isGlacier (int type);
+    /// reset data fields
+    void init ();
+    /// create alpine surface
+    void genSurface (int elevationpc, int *heightmap);
+    /// create alpine erosion surface
+    void genErosionSurface (int elevationpc, int *heightmap);
+    /// create arctic surface
+    void genArcticSurface (int elevationpc, int *heightmap);
+    /// create canyon surface
+    void genCanyonSurface (int elevationpc);
+    /// create moon surface
+    void genMoonSurface (int height);
+    /// create desert surface
+    void genDesertSurface (int elevationpc);
+    /// create a trench
+    void genTrench (int width, int height);
+    /// create percent rocks if landscape diff > diffmin
+    void genRocks (int diffmin, int percent);
+    /// create a lake
+    void genLake (int depthpc);
+    /// calculate woods on steep grass terrain
+    void calcWoods (int dy);
+    /// check if type=f[][] is solid ground
+    bool isGround (int x, int y);
+    /// search a plain
+    void searchPlain (int divx, int divy, int *x, int *y);
+//    bool riverCheck (int x, int y, int *fl, int z, int z2);
+//    void genRiver ();
+
+  protected:
+
+    int highestPoint;   ///< maximum evaluated point of the terrain
+    int lowestPoint;    ///< minimum evaluated point of the terrain
+
+    /// calculate a lake
+    int calcLake (int ys, int xs, unsigned short level, int num, int maxextent);
 
   private:
-  unsigned char ftry [MAXX + 1] [MAXX + 1]; // dummy data field
-  unsigned short hg [MAXX + 1] [MAXX + 1]; // dummy data field to apply convolution kernels
-  int rockborder;
-  int maxx; // same as MAXX, 512 is ideal
-  int hoehe, maxn, n; // surface extents
 
-  public:
-  int highestpoint, lowestpoint;
-  int getCoord (int a); // modulo MAXX
-  void convolveGauss (int radius, int hmin, int hmax); // fast convolution function (isotropic)
-  void gauss (int x, int y); // convolution for only one raster point
-  void flatten (int x, int y, int dx, int dy); // constant height for 2*dx x 2*dy fields
-  void smoothGlacier (); // special erosion function
-  bool isType (unsigned char type, unsigned char id);
-  bool isWoods (int type);
-  bool isWater (int type);
-  bool isGlacier (int type);
-  void init (); // reset data fields
-  void genSurface (int hoehepc, int *heightmap); // alpine
-  void genErosionSurface (int hoehepc, int *heightmap); // alpine and erosion
-  void genArcticSurface (int hoehepc, int *heightmap); // alpine
-  void genCanyonSurface (int hoehepc); // canyon
-  void genMoonSurface (int height); // moon
-  void genDesertSurface (int hoehepc); // desert
-  void genTrench (int width, int height);
-  void genRocks (int diffmin, int percent);
-  int calcLake (int ys, int xs, unsigned short level, int num, int maxextent);
-  void genLake (int depthpc);
-  void calcWoods (int dy); // calculate woods on steep grass terrain
-  bool isGround (int x, int y);
-  bool riverCheck (int x, int y, int *fl, int z, int z2);
-  void genRiver ();
-  void searchPlain (int divx, int divy, int *x, int *y); // search a plain
-  Landscape ();
-  ~Landscape ();
+    unsigned char ftry [MAXX + 1] [MAXX + 1]; ///< dummy data field
+    unsigned short hg [MAXX + 1] [MAXX + 1];  ///< dummy data field to apply convolution kernels
+    int rockBorder;     ///< min height value for creating rocks
+    int elevation;      ///< surface elevation extent (est. highest-lowest point)
 };
 
 #endif

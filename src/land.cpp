@@ -34,18 +34,6 @@
 
 
 /****************************************************************************
-  COMMON GLOBAL FUNCTIONS
-****************************************************************************/
-
-int Landscape::getCoord (int a)
-{
-  return (a & MAXX_MASK);
-//  return (a>=0)? a%MAXX : MAXX-a%MAXX; // more general version
-}
-
-
-
-/****************************************************************************
   SMOOTING, CONVOLUTION, EROSION
 ****************************************************************************/
 
@@ -228,7 +216,7 @@ bool Landscape::isGlacier (int type)
 
 bool Landscape::isGround (int x, int y)
 {
-  if (x < 0 || x > maxx || y < 0 || y > maxx) return false;
+  if (x < 0 || x > MAXX || y < 0 || y > MAXX) return false;
   int type = f [y] [x];
   if (!isWater (type))
     return true;
@@ -244,8 +232,8 @@ bool Landscape::isGround (int x, int y)
 void Landscape::init ()
 {
   int i, i2;
-  for (i = 0; i <= maxx; i ++)
-    for (i2 = 0; i2 <= maxx; i2 ++)
+  for (i = 0; i <= MAXX; i ++)
+    for (i2 = 0; i2 <= MAXX; i2 ++)
     {
       h [i] [i2] = 0; f [i] [i2] = 0;
     }
@@ -344,24 +332,25 @@ void Landscape::init ()
   }
 }*/
 
-void Landscape::genSurface (int hoehepc, int *heightmap)
+void Landscape::genSurface (int elevationpc, int *heightmap)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
+  int n = LOG2MAXX;
   type = LAND_ALPINE;
-  hoehe = hoehepc * 512;
+  elevation = elevationpc * 512;
   init ();
-  step = maxx / 4;
+  step = MAXX / 4;
   if (heightmap == NULL)
   {
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024 + extremerandom (64 * hoehe / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + extremerandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   else
@@ -372,8 +361,8 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
         h [i * step] [i2 * step] = heightmap [i * 8 + i2];
     for (i = 0; i < 9; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   for (i = 2; i < n; i ++)
@@ -385,18 +374,18 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         x = x + 2 * step;
       }
-      while (x != maxx + step);
+      while (x != MAXX + step);
       y = y + 2 * step;
     }
-    while (y < maxx);
-    for (x = step; x <= maxx - step; x += 2 * step)
-      h [x] [maxx] = h [x] [0];
+    while (y < MAXX);
+    for (x = step; x <= MAXX - step; x += 2 * step)
+      h [x] [MAXX] = h [x] [0];
     x = 0;
     do
     {
@@ -404,50 +393,51 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         y = y + 2 * step;
       }
-      while (y <= maxx);
+      while (y <= MAXX);
       x = x + step;
     }
-    while (x < maxx);
-    for (y = step; y <= maxx - step; y += 2 * step)
-      h [maxx] [y] = h [0] [y];
-    hoehe = (int) (hoehe / 1.1);
+    while (x < MAXX);
+    for (y = step; y <= MAXX - step; y += 2 * step)
+      h [MAXX] [y] = h [0] [y];
+    elevation = (int) (elevation / 1.1);
   }
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
-  highestpoint = 0;
-  lowestpoint = 65535;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  highestPoint = 0;
+  lowestPoint = 65535;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
-      if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
+      if (h [i] [i2] > highestPoint) highestPoint = h [i] [i2];
+      if (h [i] [i2] < lowestPoint) lowestPoint = h [i] [i2];
     }
 }
 
-void Landscape::genErosionSurface (int hoehepc, int *heightmap)
+void Landscape::genErosionSurface (int elevationpc, int *heightmap)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
+  int n = LOG2MAXX;
   type = LAND_ALPINE;
-  hoehe = hoehepc * 512;
+  elevation = elevationpc * 512;
   init ();
-  step = maxx / 4;
+  step = MAXX / 4;
   if (heightmap == NULL)
   {
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024 + extremerandom (64 * hoehe / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + extremerandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   else
@@ -458,8 +448,8 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
         h [i * step] [i2 * step] = heightmap [i * 8 + i2];
     for (i = 0; i < 9; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   for (i = 2; i < n; i ++)
@@ -471,18 +461,18 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         x = x + 2 * step;
       }
-      while (x != maxx + step);
+      while (x != MAXX + step);
       y = y + 2 * step;
     }
-    while (y < maxx);
-    for (x = step; x <= maxx - step; x += 2 * step)
-      h [x] [maxx] = h [x] [0];
+    while (y < MAXX);
+    for (x = step; x <= MAXX - step; x += 2 * step)
+      h [x] [MAXX] = h [x] [0];
     x = 0;
     do
     {
@@ -490,55 +480,56 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         y = y + 2 * step;
       }
-      while (y <= maxx);
+      while (y <= MAXX);
       x = x + step;
     }
-    while (x < maxx);
-    for (y = step; y <= maxx - step; y += 2 * step)
-      h [maxx] [y] = h [0] [y];
-    hoehe = (int) (hoehe / 1.1);
+    while (x < MAXX);
+    for (y = step; y <= MAXX - step; y += 2 * step)
+      h [MAXX] [y] = h [0] [y];
+    elevation = (int) (elevation / 1.1);
   }
-  highestpoint = 0;
-  lowestpoint = 65535;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  highestPoint = 0;
+  lowestPoint = 65535;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
-      if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
+      if (h [i] [i2] > highestPoint) highestPoint = h [i] [i2];
+      if (h [i] [i2] < lowestPoint) lowestPoint = h [i] [i2];
     }
-  int erosion = (highestpoint - lowestpoint) / 5 + lowestpoint;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  int erosion = (highestPoint - lowestPoint) / 5 + lowestPoint;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
       if (h [i] [i2] < erosion)
         h [i] [i2] = erosion - 30 + myrandom (60, i, i2);
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
 }
 
-void Landscape::genArcticSurface (int hoehepc, int *heightmap)
+void Landscape::genArcticSurface (int elevationpc, int *heightmap)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
+  int n = LOG2MAXX;
   type = LAND_ARCTIC;
-  hoehe = hoehepc * 512;
+  elevation = elevationpc * 512;
   init ();
-  step = maxx / 4;
+  step = MAXX / 4;
   if (heightmap == NULL)
   {
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024 + extremerandom (64 * hoehe / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + extremerandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   else
@@ -549,8 +540,8 @@ void Landscape::genArcticSurface (int hoehepc, int *heightmap)
         h [i * step] [i2 * step] = heightmap [i * 8 + i2];
     for (i = 0; i < 9; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   }
   for (i = 2; i < n; i ++)
@@ -562,18 +553,18 @@ void Landscape::genArcticSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         x = x + 2 * step;
       }
-      while (x != maxx + step);
+      while (x != MAXX + step);
       y = y + 2 * step;
     }
-    while (y < maxx);
-    for (x = step; x <= maxx - step; x += 2 * step)
-      h [x] [maxx] = h [x] [0];
+    while (y < MAXX);
+    for (x = step; x <= MAXX - step; x += 2 * step)
+      h [x] [MAXX] = h [x] [0];
     x = 0;
     do
     {
@@ -581,39 +572,39 @@ void Landscape::genArcticSurface (int hoehepc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         y = y + 2 * step;
       }
-      while (y <= maxx);
+      while (y <= MAXX);
       x = x + step;
     }
-    while (x < maxx);
-    for (y = step; y <= maxx - step; y += 2 * step)
-      h [maxx] [y] = h [0] [y];
-    hoehe = (int) (hoehe / 1.1);
+    while (x < MAXX);
+    for (y = step; y <= MAXX - step; y += 2 * step)
+      h [MAXX] [y] = h [0] [y];
+    elevation = (int) (elevation / 1.1);
   }
   convolveGauss (2, 0, 35000);
-  highestpoint = 0;
-  lowestpoint = 65535;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  highestPoint = 0;
+  lowestPoint = 65535;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
-      if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
+      if (h [i] [i2] > highestPoint) highestPoint = h [i] [i2];
+      if (h [i] [i2] < lowestPoint) lowestPoint = h [i] [i2];
       f [i] [i2] = GLACIER;
       if (abs (h [i] [i2] - h [i + 1] [i2]) > 300) f [i] [i2] = ROCKS;
       if (abs (h [i] [i2] - h [i] [i2 + 1]) > 300) f [i] [i2] = ROCKS;
-      if (h [i] [i2] < 32836 - hoehepc * 3)
+      if (h [i] [i2] < 32836 - elevationpc * 3)
       {
-        int dh = 32836 - hoehepc * 3 - h [i] [i2];
+        int dh = 32836 - elevationpc * 3 - h [i] [i2];
         if (dh < 2000)
           f [i] [i2] = SHALLOWWATER;
         else
           f [i] [i2] = DEEPWATER;
-        hw [i] [i2] = 32836 - hoehepc * 3;
+        hw [i] [i2] = 32836 - elevationpc * 3;
       }
     }
 }
@@ -623,6 +614,7 @@ void Landscape::genMoonSurface (int height)
   int i, i2, i3, x, y;
   int radius, rad, depth, depth2;
   double pi = 3.14;
+  int n = LOG2MAXX;
 
   type = LAND_MOON;
   for (i = 0; i <= MAXX; i ++)
@@ -650,7 +642,7 @@ void Landscape::genMoonSurface (int height)
            {
              depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
            }
-           h[getCoord(i2)][getCoord(i3)] -= depth2;
+           h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
          } 
       }
   }
@@ -676,7 +668,7 @@ void Landscape::genMoonSurface (int height)
            {
              depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
            }
-           h[getCoord(i2)][getCoord(i3)] -= depth2;
+           h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
          } 
       }
   
@@ -703,7 +695,7 @@ void Landscape::genMoonSurface (int height)
            {
              depth2 = (int) (0.6 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
            }
-           h[getCoord(i2)][getCoord(i3)] -= depth2;
+           h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
          } 
       }  
   }
@@ -723,7 +715,7 @@ void Landscape::genMoonSurface (int height)
          {
            if (rad < 0.67 * radius) depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
            else depth2 = (int) (sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
-           h[getCoord(i2)][getCoord(i3)] -= depth2;
+           h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
          } 
       }
   
@@ -731,27 +723,28 @@ void Landscape::genMoonSurface (int height)
   convolveGauss (2, 0, 65535);
 }
 
-void Landscape::genCanyonSurface (int hoehepc)
+void Landscape::genCanyonSurface (int elevationpc)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
+  int n = LOG2MAXX;
   type = LAND_CANYON;
-  hoehe = hoehepc * 512;
+  elevation = elevationpc * 512;
   init ();
-  step = maxx / 16;
+  step = MAXX / 16;
   int minh = 0;
-  int maxh = 127 * 256 + 64 * hoehe / 1024;
+  int maxh = 127 * 256 + 64 * elevation / 1024;
     for (i = 0; i < 16; i ++)
       for (i2 = 0; i2 < 16; i2 ++)
         if (h [i * step] [i2 * step] == 0)
           if (myrandom (2, i, i2))
-            h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024;
+            h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024;
           else
-            h [i * step] [i2 * step] = 127 * 256 + 64 * hoehe / 1024;
+            h [i * step] [i2 * step] = 127 * 256 + 64 * elevation / 1024;
     for (i = 0; i < 17; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   for (i = 4; i < n; i ++)
   {
@@ -762,18 +755,18 @@ void Landscape::genCanyonSurface (int hoehepc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
         x = x + 2 * step;
       }
-      while (x != maxx + step);
+      while (x != MAXX + step);
       y = y + 2 * step;
     }
-    while (y < maxx);
-    for (x = step; x <= maxx - step; x += 2 * step)
-      h [x] [maxx] = h [x] [0];
+    while (y < MAXX);
+    for (x = step; x <= MAXX - step; x += 2 * step)
+      h [x] [MAXX] = h [x] [0];
     x = 0;
     do
     {
@@ -781,23 +774,23 @@ void Landscape::genCanyonSurface (int hoehepc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
         y = y + 2 * step;
       }
-      while (y <= maxx);
+      while (y <= MAXX);
       x = x + step;
     }
-    while (x < maxx);
-    for (y = step; y <= maxx - step; y += 2 * step)
-      h [maxx] [y] = h [0] [y];
-    hoehe = (int) (hoehe / 1.1);
+    while (x < MAXX);
+    for (y = step; y <= MAXX - step; y += 2 * step)
+      h [MAXX] [y] = h [0] [y];
+    elevation = (int) (elevation / 1.1);
   }
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
-      if (h [i] [i2] > 32836 - hoehepc * 30)
+      if (h [i] [i2] > 32836 - elevationpc * 30)
         h [i] [i2] -= h [i] [i2] % 2600;
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
@@ -810,49 +803,50 @@ void Landscape::genCanyonSurface (int hoehepc)
       if (abs (h [i] [i2] - h [i + 1] [i2]) < 200 && abs (h [i] [i2] - h [i] [i2 + 1]) < 200)
       {
         f [i] [i2] = REDSAND;
-        if (h [i] [i2] > 30000 && !myrandom (80) && hoehepc > 20)
+        if (h [i] [i2] > 30000 && !myrandom (80) && elevationpc > 20)
           f [i] [i2] = REDTREE0;
       }
-      if (hoehepc > 20)
+      if (elevationpc > 20)
       {
-        if (h [i] [i2] < 32836 - hoehepc * 40)
+        if (h [i] [i2] < 32836 - elevationpc * 40)
         {
-          int dh = 32836 - hoehepc * 40 - h [i] [i2];
+          int dh = 32836 - elevationpc * 40 - h [i] [i2];
           if (dh < 1500)
             f [i] [i2] = SHALLOWWATER;
           else
             f [i] [i2] = DEEPWATER;
-          hw [i] [i2] = 32836 - hoehepc * 40;
+          hw [i] [i2] = 32836 - elevationpc * 40;
         }
       }
     }
 
-  highestpoint = 0;
-  lowestpoint = 65535;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  highestPoint = 0;
+  lowestPoint = 65535;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
-      if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
+      if (h [i] [i2] > highestPoint) highestPoint = h [i] [i2];
+      if (h [i] [i2] < lowestPoint) lowestPoint = h [i] [i2];
     }
 }
 
-void Landscape::genDesertSurface (int hoehepc)
+void Landscape::genDesertSurface (int elevationpc)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
+  int n = LOG2MAXX;
   type = LAND_DESERT;
-  hoehe = hoehepc * 512;
+  elevation = elevationpc * 512;
   init ();
-  step = maxx / 16;
+  step = MAXX / 16;
     for (i = 0; i < 16; i ++)
       for (i2 = 0; i2 < 16; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * hoehe / 1024 + extremerandom (64 * hoehe / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + extremerandom (64 * elevation / 512);
     for (i = 0; i < 17; i ++)
     {
-      h [maxx] [i * step] = h [0] [i * step];
-      h [i * step] [maxx] = h [i * step] [0];
+      h [MAXX] [i * step] = h [0] [i * step];
+      h [i * step] [MAXX] = h [i * step] [0];
     }
   for (i = 4; i < n; i ++)
   {
@@ -863,18 +857,18 @@ void Landscape::genDesertSurface (int hoehepc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         x = x + 2 * step;
       }
-      while (x != maxx + step);
+      while (x != MAXX + step);
       y = y + 2 * step;
     }
-    while (y < maxx);
-    for (x = step; x <= maxx - step; x += 2 * step)
-      h [x] [maxx] = h [x] [0];
+    while (y < MAXX);
+    for (x = step; x <= MAXX - step; x += 2 * step)
+      h [x] [MAXX] = h [x] [0];
     x = 0;
     do
     {
@@ -882,19 +876,19 @@ void Landscape::genDesertSurface (int hoehepc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * hoehe / 128 + myrandom ((128 >> i) * hoehe / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + myrandom ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
         y = y + 2 * step;
       }
-      while (y <= maxx);
+      while (y <= MAXX);
       x = x + step;
     }
-    while (x < maxx);
-    for (y = step; y <= maxx - step; y += 2 * step)
-      h [maxx] [y] = h [0] [y];
-    hoehe = (int) (hoehe / 1.5);
+    while (x < MAXX);
+    for (y = step; y <= MAXX - step; y += 2 * step)
+      h [MAXX] [y] = h [0] [y];
+    elevation = (int) (elevation / 1.5);
   }
   convolveGauss (2, 0, 65535);
   int i3;
@@ -933,13 +927,13 @@ void Landscape::genDesertSurface (int hoehepc)
       if (!myrandom (50))
         f [i] [i2] = CACTUS0;
     }
-  highestpoint = 0;
-  lowestpoint = 65535;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  highestPoint = 0;
+  lowestPoint = 65535;
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
-      if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
+      if (h [i] [i2] > highestPoint) highestPoint = h [i] [i2];
+      if (h [i] [i2] < lowestPoint) lowestPoint = h [i] [i2];
     }
 }
 
@@ -982,7 +976,7 @@ void Landscape::genTrench (int width, int height)
       h [i] [MAXX / 2] -= height;
     }
   }
-  lowestpoint -= height;
+  lowestPoint -= height;
 }
 
 
@@ -997,11 +991,11 @@ void Landscape::genRocks (int diffmin, int percent)
   long hmin, hmax;
   long htest;
   double r, rd;
-  rockborder = 65535;
-  hmax = highestpoint; hmin = lowestpoint;
+  rockBorder = 65535;
+  hmax = highestPoint; hmin = lowestPoint;
   if (hmax - hmin >= (long) diffmin * 256) // Generation
-    for (i = 0; i < maxx; i ++)
-      for (i2 = 0; i2 < maxx; i2 ++)
+    for (i = 0; i < MAXX; i ++)
+      for (i2 = 0; i2 < MAXX; i2 ++)
       {
         r = (hmax - hmin) / 100 * percent;
         rd = h [i] [i2];
@@ -1017,7 +1011,7 @@ void Landscape::genRocks (int diffmin, int percent)
             htest = h [i] [i2] - d + myrandom (d * 2);
             if (htest > 65535) htest = 65535;
             h [i] [i2] = (unsigned short) htest;
-            if (h [i] [i2] < rockborder) rockborder = h [i] [i2];
+            if (h [i] [i2] < rockBorder) rockBorder = h [i] [i2];
           }
           else if (rd + minrock >= 500 - 500 * (h [i] [i2] - r) / (hmax - r))
           {
@@ -1035,8 +1029,8 @@ void Landscape::genRocks (int diffmin, int percent)
           if (rd < 200 * (h [i] [i2] - r / 2) / (hmax - r / 2))
             f [i] [i2] = GLACIER;
       }
-  for (i = 1; i < maxx; i ++) // Lücken schließen
-    for (i2 = 1; i2 < maxx; i2 ++)
+  for (i = 1; i < MAXX; i ++) // Lücken schließen
+    for (i2 = 1; i2 < MAXX; i2 ++)
     {
       if (f [i] [i2] != ROCKS)
         if (f [i - 1] [i2] == ROCKS && f [i + 1] [i2] == ROCKS ||
@@ -1047,8 +1041,8 @@ void Landscape::genRocks (int diffmin, int percent)
             f [i] [i2 - 1] == GLACIER && f [i] [i2 + 1] == GLACIER)
           f [i] [i2] = GLACIER;
     }
-  for (i = 1; i < maxx; i ++) // Felsengebiet uneben
-    for (i2 = 1; i2 < maxx; i2 ++)
+  for (i = 1; i < MAXX; i ++) // Felsengebiet uneben
+    for (i2 = 1; i2 < MAXX; i2 ++)
       if (f [i] [i2] == ROCKS)
       {
         i5 = 0;
@@ -1079,28 +1073,28 @@ int Landscape::calcLake (int ys, int xs, unsigned short level, int num, int maxe
   w = 5;
   if (xs <= 0) xs = 1;
   if (ys <= 0) ys = 1;
-  if (xs >= maxx) xs = maxx - 1;
-  if (ys >= maxx) ys = maxx - 1;
+  if (xs >= MAXX) xs = MAXX - 1;
+  if (ys >= MAXX) ys = MAXX - 1;
   ftry [xs] [ys] = sn;
   do
   {
     timeout ++;
     i2 = 0; hits = false;
-    while (i2 < maxx * 2)
+    while (i2 < MAXX * 2)
     {
       i2 ++;
       n = i2;
-      if (n > maxx) n = n - maxx * 2 + 1;
-      for (i = xs; i < maxx; i ++)
+      if (n > MAXX) n = n - MAXX * 2 + 1;
+      for (i = xs; i < MAXX; i ++)
       {
-        if (ys - n >= 0 && ys - n < maxx)
+        if (ys - n >= 0 && ys - n < MAXX)
           if (h [i] [ys - n] < level && ftry [i] [ys - n] != sn)
             if ((ftry [i - 1] [ys - n] == sn) || (ftry [i] [ys - n + 1] == sn) ||
                 (ftry [i + 1] [ys - n + 1] == sn) || (ftry [i - 1] [ys - n + 1] == sn))
             {
               ftry [i] [ys - n] = sn; extent ++; hits = true;
             }
-        if (ys + n > 0 && ys + n <= maxx)
+        if (ys + n > 0 && ys + n <= MAXX)
           if (h [i] [ys + n] < level && ftry [i] [ys + n] != sn)
             if ((ftry [i - 1] [ys + n] == sn) || (ftry [i] [ys + n - 1] == sn) ||
                 (ftry [i + 1] [ys + n - 1] == sn) || (ftry [i - 1] [ys + n - 1] == sn))
@@ -1110,14 +1104,14 @@ int Landscape::calcLake (int ys, int xs, unsigned short level, int num, int maxe
       }
       for (i = xs; i > 0; i --)
       {
-        if (ys - n >= 0 && ys - n < maxx)
+        if (ys - n >= 0 && ys - n < MAXX)
           if (h [i] [ys - n] < level && ftry [i] [ys - n] != sn)
             if ((ftry [i + 1] [ys - n] == sn) || (ftry [i] [ys - n + 1] == sn) ||
                 (ftry [i + 1] [ys - n + 1] == sn) || (ftry [i - 1] [ys - n + 1] == sn))
             {
               ftry [i] [ys - n] = sn; extent ++; hits = true;
             }
-        if (ys + n > 0 && ys + n <= maxx)
+        if (ys + n > 0 && ys + n <= MAXX)
           if (h [i] [ys + n] < level && ftry [i] [ys + n] != sn)
             if ((ftry [i + 1] [ys + n] == sn) || (ftry [i] [ys + n - 1] == sn) ||
                 (ftry [i + 1] [ys + n - 1] == sn) || (ftry [i - 1] [ys + n - 1] == sn))
@@ -1125,16 +1119,16 @@ int Landscape::calcLake (int ys, int xs, unsigned short level, int num, int maxe
               ftry [i] [ys + n] = sn; extent ++; hits = true;
             }
       }
-      for (i = ys; i < maxx; i ++)
+      for (i = ys; i < MAXX; i ++)
       {
-        if (xs - n >= 0 && xs - n < maxx)
+        if (xs - n >= 0 && xs - n < MAXX)
           if (h [xs - n] [i] < level && ftry [xs - n] [i] != sn)
             if ((ftry [xs - n] [i - 1] == sn) || (ftry [xs - n + 1] [i] == sn) ||
                 (ftry [xs - n + 1] [i + 1] == sn) || (ftry [xs - n + 1] [i - 1] == sn))
             {
               ftry [xs - n] [i] = sn; extent ++; hits = true;
             }
-        if (xs + n > 0 && xs + n <= maxx)
+        if (xs + n > 0 && xs + n <= MAXX)
           if (h [xs + n] [i] < level && ftry [xs + n] [i] != sn)
             if ((ftry [xs + n] [i - 1] == sn) || (ftry [xs + n - 1] [i] == sn) ||
                 (ftry [xs + n - 1] [i + 1] == sn) || (ftry [xs + n - 1] [i - 1] == sn))
@@ -1144,14 +1138,14 @@ int Landscape::calcLake (int ys, int xs, unsigned short level, int num, int maxe
       }
       for (i = ys; i > 0; i --)
       {
-        if (xs - n >= 0 && xs - n < maxx)
+        if (xs - n >= 0 && xs - n < MAXX)
           if (h [xs - n] [i] < level && ftry [xs - n] [i] != sn)
             if ((ftry [xs - n] [i + 1] == sn) || (ftry [xs - n + 1] [i] == sn) ||
                 (ftry [xs - n + 1] [i + 1] == sn) || (ftry [xs - n + 1] [i - 1] == sn))
             {
               ftry [xs - n] [i] = sn; extent ++; hits = true;
             }
-        if (xs + n > 0 && xs + n <= maxx)
+        if (xs + n > 0 && xs + n <= MAXX)
           if (h [xs + n] [i] < level && ftry [xs + n] [i] != sn)
             if ((ftry [xs + n] [i - 1] == sn) || (ftry [xs + n - 1] [i] == sn) ||
                 (ftry [xs + n - 1] [i + 1] == sn) || (ftry [xs + n - 1] [i - 1] == sn))
@@ -1176,10 +1170,10 @@ void Landscape::genLake (int depthpc)
     int a1, i, i2;
     unsigned short level, zmin;
     int xs = 0, ys = 0;
-    unsigned short depth = (highestpoint - lowestpoint) * depthpc / 100;
+    unsigned short depth = (highestPoint - lowestPoint) * depthpc / 100;
     zmin = 65535;
     int radius = MAXX * 2 * depthpc / 100;
-    a1 = maxx / 8;
+    a1 = MAXX / 8;
     for (i = 0; i < 20; i ++)
     {
       xs = myrandom (MAXX - 2 * a1) + a1;
@@ -1365,49 +1359,49 @@ void Landscape::calcWoods (int dy)
 {
   int i, i2;
   int var = 2000;
-  for (i = 0; i < maxx; i ++)
-    for (i2 = 0; i2 < maxx; i2 ++)
+  for (i = 0; i < MAXX; i ++)
+    for (i2 = 0; i2 < MAXX; i2 ++)
     {
       if (fabs (h [i] [i2] - h [i + 1] [i2]) > dy)
         if (f [i] [i2] == 0)
         {
           int ra = myrandom (3);
-          if (h [i] [i2] >= rockborder + 3000 + myrandom (var)) f [i] [i2] = (DWARFPINES1 + ra);
-          else if (h [i] [i2] >= 15000 + myrandom (var) && h [i] [i2] < rockborder - 10000 + myrandom (var)) f [i] [i2] = (MIXEDWOODS1 + ra);
+          if (h [i] [i2] >= rockBorder + 3000 + myrandom (var)) f [i] [i2] = (DWARFPINES1 + ra);
+          else if (h [i] [i2] >= 15000 + myrandom (var) && h [i] [i2] < rockBorder - 10000 + myrandom (var)) f [i] [i2] = (MIXEDWOODS1 + ra);
           else if (h [i] [i2] < 15000 + var) f [i] [i2] = (CONIFEROUSWOODS1 + ra);
           else f [i] [i2] = (DECIDUOUSWOODS1 + ra);
         }
     }
-  for (i = 1; i < maxx; i ++)
-    for (i2 = 1; i2 < maxx; i2 ++)
+  for (i = 1; i < MAXX; i ++)
+    for (i2 = 1; i2 < MAXX; i2 ++)
       if (f [i] [i2] == 0)
         if (isWoods (f [i - 1] [i2]) && isWoods (f [i + 1] [i2]) ||
             isWoods (f [i] [i2 - 1]) && isWoods (f [i] [i2 + 1]))
         {
           int ra = myrandom (3);
-          if (h [i] [i2] >= rockborder + 3000 + myrandom (var)) f [i] [i2] = (DWARFPINES1 + ra);
-          else if (h [i] [i2] >= 15000 + myrandom (var) && h [i] [i2] < rockborder - 10000 + myrandom (var)) f [i] [i2] = (BUSHES1 + ra);
+          if (h [i] [i2] >= rockBorder + 3000 + myrandom (var)) f [i] [i2] = (DWARFPINES1 + ra);
+          else if (h [i] [i2] >= 15000 + myrandom (var) && h [i] [i2] < rockBorder - 10000 + myrandom (var)) f [i] [i2] = (BUSHES1 + ra);
           else if (h [i] [i2] < 15000 + var) f [i] [i2] = (BUSHES1 + ra);
           else f [i] [i2] = (BUSHES1 + ra);
         }
-  for (i = 4; i < maxx - 4; i ++)
-    for (i2 = 4; i2 < maxx - 4; i2 ++)
+  for (i = 4; i < MAXX - 4; i ++)
+    for (i2 = 4; i2 < MAXX - 4; i2 ++)
       if (isWoods (f [i - 4] [i2]) && isWoods (f [i + 4] [i2]) &&
           isWoods (f [i] [i2 - 4]) && isWoods (f [i] [i2 + 4]) &&
       	  isWoods (f [i] [i2]))
       {
         f [i] [i2] --;
       }
-  for (i = 1; i < maxx; i ++)
-    for (i2 = 1; i2 < maxx; i2 ++)
+  for (i = 1; i < MAXX; i ++)
+    for (i2 = 1; i2 < MAXX; i2 ++)
       if (f [i] [i2] == f [i + 1] [i2] && f [i] [i2] == f [i - 1] [i2] &&
           f [i] [i2] == f [i] [i2 + 1] && f [i] [i2] == f [i] [i2 - 1])
 	    {
         if ((f [i] [i2] & 4) == 1) f [i] [i2] ++;
         else if ((f [i] [i2] & 4) == 2) f [i] [i2] --;
       }
-  for (i = 1; i < maxx; i += 3)
-    for (i2 = 1; i2 < maxx; i2 += 3)
+  for (i = 1; i < MAXX; i += 3)
+    for (i2 = 1; i2 < MAXX; i2 += 3)
       if (isWater (f [i] [i2]))
       {
         if (f [i + 1] [i2] == GRASS) f [i + 1] [i2] = BUSHES1 + myrandom (3);
@@ -1423,9 +1417,9 @@ void Landscape::calcWoods (int dy)
   CREATE RIVERS
 ****************************************************************************/
 
-bool Landscape::riverCheck (int x, int y, int *fl, int z, int z2)
+/*bool Landscape::riverCheck (int x, int y, int *fl, int z, int z2)
 {
-  if (x <= 0 || x >= maxx || y <= 0 || y >= maxx)
+  if (x <= 0 || x >= MAXX || y <= 0 || y >= MAXX)
     return false;
   if (isType (f [x] [y], GRASS) || isWoods (f [x] [y]))
   {
@@ -1453,7 +1447,7 @@ void Landscape::genRiver ()
     abbruch ++;
     do
     {
-      xf = myrandom (maxx - 19) + 10; yf = myrandom (maxx - 19) + 10;
+      xf = myrandom (MAXX - 19) + 10; yf = myrandom (MAXX - 19) + 10;
     }
     while (!isGround (yf, xf));
     fl [200] [0] = xf; fl [200] [1] = yf;
@@ -1465,8 +1459,8 @@ void Landscape::genRiver ()
       ok = true;
       for (i = -1; i <= 1; i ++)
         for (i2 = -1; i2 <= 1; i2 ++)
-          if (xf + i >= 0 && xf + i <= maxx &&
-              yf + i2 >= 0 && yf + i2 <= maxx)
+          if (xf + i >= 0 && xf + i <= MAXX &&
+              yf + i2 >= 0 && yf + i2 <= MAXX)
             if (riverCheck (xf + i, yf + i2, &fl [0] [0], 200 - z, 200 + z2))
               if (h [xf + i] [yf + i2] < h [xf] [yf])
                 if (h [xf] [yf] - h [xf + i] [yf + i2] < h1)
@@ -1479,8 +1473,8 @@ void Landscape::genRiver ()
       ok2 = true;
       for (i = -1; i <= 1; i ++)
         for (i2 = -1; i2 <= 1; i2 ++)
-          if (xf2 + i >= 0 && xf2 + i <= maxx &&
-              yf2 + i2 >= 0 && yf2 + i2 <= maxx)
+          if (xf2 + i >= 0 && xf2 + i <= MAXX &&
+              yf2 + i2 >= 0 && yf2 + i2 <= MAXX)
             if (riverCheck (xf2 + i, yf2 + i2, &fl [0] [0], 200 - z, 200 + z2))
               if (h [xf2 + i] [yf2 + i2] > h [xf2] [yf2])
                 if (h [xf2 + i] [yf2 + i2] - h [xf2] [yf2] < h2)
@@ -1518,7 +1512,7 @@ void Landscape::genRiver ()
         int hf = h [xf] [yf];
         for (i2 = -1; i2 <= 1; i2 ++)
           for (i3 = -1; i3 <= 1; i3 ++)
-            if (xf + i2 >= 0 && xf + i2 <= maxx && yf + i3 >= 0 && yf + i3 < maxx)
+            if (xf + i2 >= 0 && xf + i2 <= MAXX && yf + i3 >= 0 && yf + i3 < MAXX)
               if (hf - h [xf + i2] [yf + i3] > 0
                   && !isWater (f [xf + i2] [yf + i3]))
               {
@@ -1536,7 +1530,7 @@ void Landscape::genRiver ()
     }
   }
 }
-
+*/
 
 
 /****************************************************************************
@@ -1547,9 +1541,11 @@ void Landscape::genRiver ()
 void Landscape::searchPlain (int divx, int divy, int *x, int *y)
 {
   int i, i2;
+  const int DIVX = MAXX / 4;
+
   if (divx == -1 || divy == -1)
   {
-    int val [MAXX_8] [MAXX_8];
+    int val [MAXX / 8] [MAXX / 8];
     for (i = 8; i <= MAXX - 8; i += 8)
       for (i2 = 8; i2 <= MAXX - 8; i2 += 8)
       {
@@ -1571,8 +1567,8 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
         }
       }
     int min = 100000;
-    for (i = 1; i < MAXX_8; i ++)
-      for (i2 = 1; i2 < MAXX_8; i2 ++)
+    for (i = 1; i < MAXX / 8; i ++)
+      for (i2 = 1; i2 < MAXX / 8; i2 ++)
       {
         if (val [i] [i2] < min)
         {
@@ -1582,9 +1578,9 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
         }
       }
   }
-  else if (divx < DIVISIONS && divy < DIVISIONS)
+  else if (divx < 4 && divy < 4)
   {
-    int val [DIVX_8] [DIVX_8];
+    int val [DIVX / 8] [DIVX / 8];
     for (i = 8 + divx * DIVX; i <= (divx + 1) * DIVX - 8; i += 8)
       for (i2 = 8 + divy * DIVX; i2 <= (divy + 1) * DIVX - 8; i2 += 8)
       {
@@ -1604,8 +1600,8 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
         }
       }
     int min = 100000;
-    for (i = 0; i < DIVX_8 - 1; i ++)
-      for (i2 = 0; i2 < DIVX_8 - 1; i2 ++)
+    for (i = 0; i < DIVX / 8 - 1; i ++)
+      for (i2 = 0; i2 < DIVX / 8 - 1; i2 ++)
       {
         if (val [i] [i2] < min)
         {
@@ -1625,17 +1621,12 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
 
 Landscape::Landscape ()
 {
-  maxx = MAXX;
-  n = LOG2SPLINE;
-  maxn = LOG2MAXX;
-  hoehe = HEIGHT * 256;
-  for (int i = 0; i <= MAXX; i ++)
-    for (int i2 = 0; i2 <= MAXX; i2 ++)
-    {
-      hw [i] [i2] = 0;
-      h [i] [i2] = 0;
-      f [i] [i2] = GRASS;
-    }
+//  n = LOG2MAXX; //LOG2SPLINE;
+  elevation = HEIGHT * 256;
+
+  memset (hw, 0, sizeof (unsigned short) * (MAXX + 1) * (MAXX + 1));
+  memset (h, 0, sizeof (unsigned short) * (MAXX + 1) * (MAXX + 1));
+  memset (f, 0, sizeof (unsigned char) * (MAXX + 1) * (MAXX + 1));
 }
 
 Landscape::~Landscape ()

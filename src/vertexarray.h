@@ -58,28 +58,28 @@ class VertexArray
   public:
 
     /// construct standard vertexarray using VERTEXARRAY_V3C4T2
-  VertexArray ();
+    VertexArray ();
     /// construct vertexarray with a custom prototype (see VERTEXARRAY_...)
-  VertexArray (int pref);
-  ~VertexArray ();
+    VertexArray (int pref);
+    ~VertexArray ();
 
-  void setPref (int pref);
-  void glBegin (int type);
-  void glVertex3f (float x, float y, float z);
-  void glVertex3fv (float *f);
-  void glNormal3f (float x, float y, float z);
-  void glColor4ub (int r, int g, int b, int a);
-  void glColor3ub (int r, int g, int b);
-  void glColor4f (float r, float g, float b, float a);
-  void glColor3f (float r, float g, float b);
-  void glColor4fv (float *f);
-  void glColor3fv (float *f);
-  void glTexCoord2f (float x, float y);
-  void glTexCoord2fv (float *f);
-  void glTexCoord2d (float x, float y);
+    void setPref (int pref);
+    void glBegin (int type);
+    void glVertex3f (float x, float y, float z);
+    void glVertex3fv (float *f);
+    void glNormal3f (float x, float y, float z);
+    void glColor4ub (int r, int g, int b, int a);
+    void glColor3ub (int r, int g, int b);
+    void glColor4f (float r, float g, float b, float a);
+    void glColor3f (float r, float g, float b);
+    void glColor4fv (float *f);
+    void glColor3fv (float *f);
+    void glTexCoord2f (float x, float y);
+    void glTexCoord2fv (float *f);
+    void glTexCoord2d (float x, float y);
     // ... add more primitives here ...
-  void reallocData ();
-  void glEnd ();
+    void reallocData ();
+    void glEnd ();
 
   protected:
 

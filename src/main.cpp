@@ -4313,6 +4313,7 @@ void myFirstInit ()
   texsun = new CTexture (std::string (dirs->getTextures ("sun2.tga")), -1, 0, true);
   texmoon = new CTexture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
   texearth = new CTexture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
+  // TODO: why doesn't !mipmap work for the flares???
   texflare1 = new CTexture (std::string (dirs->getTextures ("flare1.tga")), -1, 0, true);
   texflare2 = new CTexture (std::string (dirs->getTextures ("flare2.tga")), -1, 0, true);
   texflare3 = new CTexture (std::string (dirs->getTextures ("flare3.tga")), -1, 0, true);

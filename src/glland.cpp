@@ -285,7 +285,7 @@ void GLLandscape::precalculate ()
   int nlwater = 1200 - (int) (1000.0 * 2.0 * fabs ((90.0 - sungamma) * PI / 180.0) / PI);
 
   // precalculate a height average
-  int midheight = (highestpoint + lowestpoint) / 2;
+  int midheight = (highestPoint + lowestPoint) / 2;
 
   // set minimum ambient light
   int minambient = (int) (100.0 + sungamma * 4);
@@ -742,8 +742,8 @@ void GLLandscape::drawTreeQuad (int x, int y, int phi, bool hq)
 {
   int i;
   int rotval = (x + 2 * y) & 127;
-  int xs = getCoord (x);
-  int ys = getCoord (y);
+  int xs = GETCOORD(x);
+  int ys = GETCOORD(y);
   if (f [xs] [ys] >= CONIFEROUSWOODS0 && f [xs] [ys] <= CONIFEROUSWOODS3)
   {
     texturetree1 = textree2->textureID;
@@ -843,8 +843,8 @@ void GLLandscape::drawTreeQuad (int x, int y, int phi, bool hq)
 
 void GLLandscape::drawTown (int x, int y)
 {
-  int xs = getCoord (x);
-  int ys = getCoord (y);
+  int xs = GETCOORD(x);
+  int ys = GETCOORD(y);
   if (f [xs] [ys] == TOWN)
   {
     CVector3 tl;
@@ -2012,7 +2012,7 @@ void GLLandscape::draw (int phi, int gamma)
 
   glPushMatrix ();
 
-  glScalef (MAXX2, ZOOM, MAXX2);
+  glScalef (MAXX / 2, ZOOM, MAXX / 2);
   glPushMatrix ();
   glTranslatef (0, -zoomz2, 0);
   glScalef (hh2, zoomz, hh2);
@@ -2027,12 +2027,12 @@ void GLLandscape::draw (int phi, int gamma)
   int maxx = (int) (minx + radius * 2);
   int maxy = (int) (miny + radius * 2);
 
-  space->z1->x = minx - MAXX2;
-  space->z1->y = -MAXX2;
-  space->z1->z = maxy - MAXX2;
-  space->z2->x = maxx - MAXX2;
-  space->z2->y = MAXX2;
-  space->z2->z = miny - MAXX2;
+  space->z1->x = minx - MAXX / 2;
+  space->z1->y = -MAXX / 2;
+  space->z1->z = maxy - MAXX / 2;
+  space->z2->x = maxx - MAXX / 2;
+  space->z2->y = MAXX / 2;
+  space->z2->z = miny - MAXX / 2;
 
   if (camera == 50)
   {
@@ -2077,8 +2077,8 @@ void GLLandscape::draw (int phi, int gamma)
       for (int i3 = 0; i3 < zy - ay + 1; i3 += 4)
         for (int i4 = 0; i4 < zx - ax + 1; i4 += 4)
         {
-          int by = getCoord (ay + i3) / 4;
-          int bx = getCoord (ax + i4) / 4;
+          int by = GETCOORD(ay + i3) / 4;
+          int bx = GETCOORD(ax + i4) / 4;
           if (hcmin [bx] [by] < vmin [i] [i2]) vmin [i] [i2] = hcmin [bx] [by];
           if (hcmax [bx] [by] > vmax [i] [i2]) vmax [i] [i2] = hcmax [bx] [by];
         }
@@ -2390,11 +2390,11 @@ void GLLandscape::draw (int phi, int gamma)
           if (detail [i] [i2] > fardetail)
           {
             zy += fargridstep;
-//            if (gl->isSphereInFrustum ((ax+zx)/2, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)], ((float)(ay+zy)/2), (zx-ax)*2.0))
-            if (gl->isSphereInFrustum (ax, (float)hw[getCoord(ax)][getCoord(ay)], (float)(ay), 0.00001) ||
-                gl->isSphereInFrustum (ax, (float)hw[getCoord(ax)][getCoord(zy)], (float)(zy), 0.00001) ||
-                gl->isSphereInFrustum (zx, (float)hw[getCoord(zx)][getCoord(ay)], (float)(ay), 0.00001) ||
-                gl->isSphereInFrustum (zx, (float)hw[getCoord(zx)][getCoord(zy)], (float)(zy), 0.00001))
+//            if (gl->isSphereInFrustum ((ax+zx)/2, (float)hw[GETCOORD((ax+zx)/2)][GETCOORD((ay+zy)/2)], ((float)(ay+zy)/2), (zx-ax)*2.0))
+            if (gl->isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(ay)], (float)(ay), 0.00001) ||
+                gl->isSphereInFrustum (ax, (float)hw[GETCOORD(ax)][GETCOORD(zy)], (float)(zy), 0.00001) ||
+                gl->isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(ay)], (float)(ay), 0.00001) ||
+                gl->isSphereInFrustum (zx, (float)hw[GETCOORD(zx)][GETCOORD(zy)], (float)(zy), 0.00001))
             {
               drawQuadStrip (ax, ay, zx, zy);
             }
@@ -2993,7 +2993,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
     {
       genSurface (60, heightmask);
       genRocks (30, 70);
-      int diff = lowestpoint + (highestpoint - lowestpoint) * 3 / 4;
+      int diff = lowestPoint + (highestPoint - lowestPoint) * 3 / 4;
       for (i = 0; i <= MAXX; i ++)
         for (i2 = 0; i2 <= MAXX; i2 ++)
         {

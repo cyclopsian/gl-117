@@ -2245,7 +2245,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   float recheight2; // this is the height, the object wants to achieve
   int lsdist = 15;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
-  int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);
+  int flyxs = GETCOORD((int) flyx), flyzs = GETCOORD((int) flyz);
   {
     if (manoeverheight > 0)
     {
