@@ -80,6 +80,7 @@ class Pilot
   void save ();
   char *getRank ();
   Pilot (char *name);
+  ~Pilot ();
 };
 
 const int maxpilots = 5;

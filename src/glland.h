@@ -35,6 +35,7 @@
 #include "main.h"
 #include "roam.h"
 
+// exact landscape type
 #define LANDSCAPE_ALPINE 0
 #define LANDSCAPE_ALPINE_NOLAKE 1
 #define LANDSCAPE_LOW_ALPINE 2

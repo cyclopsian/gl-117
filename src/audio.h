@@ -79,6 +79,7 @@ class SoundSystem
   Mix_Music *musicstandby1, *musicwinner1, *musicdark1, *musicelectro1;
 #endif
   SoundSystem ();
+  ~SoundSystem ();
   void play (int sample);
   void playLoop (int sample);
   void stop (int sample);

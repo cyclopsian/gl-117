@@ -308,6 +308,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
     object->vertex [i].vector.y = object->vertex [i].vector.z;
     object->vertex [i].vector.z = -fTempY;
   }
+  delete p;
 }
 
 void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)

@@ -208,6 +208,13 @@ Pilot::Pilot (char *name)
   load ();
 }
 
+Pilot::~Pilot ()
+{
+  int i;
+  for (i = 0; i < 11; i ++)
+    delete (tp [i]);
+}
+
 
 
 void PilotList::load (char *fname)

@@ -1,4 +1,4 @@
-/* 
+/*
  * loader_tga.c - Loader for Truevision Targa images
  *
  * by Dan Maas <dmaas@dcine.com>   May 15, 2000
@@ -13,8 +13,8 @@
 
 #ifndef LOADER_TGA_H
 
-#include <stdio.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "loader_tga.h"
@@ -49,12 +49,12 @@
 static DATA32* flip(DATA32* in, int w, int h);
 
 /* TGA pixel formats */
-#define TGA_TYPE_MAPPED      1 
+#define TGA_TYPE_MAPPED      1
 #define TGA_TYPE_COLOR       2 
 #define TGA_TYPE_GRAY        3 
 #define TGA_TYPE_MAPPED_RLE  9 
 #define TGA_TYPE_COLOR_RLE  10 
-#define TGA_TYPE_GRAY_RLE   11 
+#define TGA_TYPE_GRAY_RLE   11
 
 /* TGA header flags */
 #define TGA_DESC_ABITS      0x0f 

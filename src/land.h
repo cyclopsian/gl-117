@@ -40,7 +40,13 @@
 #define LOG2SPLINE 9
 #define HEIGHT 120
 
-// Static ID values for the landscape type (array "f")
+// landscapes
+#define LAND_ALPINE 0
+#define LAND_MOON 1
+#define LAND_CANYON 2
+#define LAND_DESERT 3
+
+// static ID values for the landscape type (array "f")
 #define GRASS 0
 #define CONIFEROUSWOODS0 1
 #define CONIFEROUSWOODS1 2

@@ -263,6 +263,17 @@ SoundSystem::SoundSystem ()
 #endif
 };
 
+SoundSystem::~SoundSystem ()
+{
+  delete waveexplosion1;
+  delete waveclick1;
+  delete wavecannon1;
+  delete wavemissile1;
+  delete wavethunder1;
+  delete waveplane1;
+  delete wavehit1;
+}
+
 void SoundSystem::play (int sample)
 {
   if (!sound) return;

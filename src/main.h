@@ -76,6 +76,7 @@
 #define ZOOM 256
 #define VERSIONSTRING "GL-117 V. 0.6.5 (BETA) BY THOMAS A. DREXL"
 
+// game states
 #define GAME_INIT 0
 #define GAME_PLAY 1
 #define GAME_PAUSE 2
@@ -88,6 +89,16 @@
 #define GAME_FAME 9
 #define GAME_FIGHTER 10
 #define GAME_FINISH 11
+
+// weather
+#define WEATHER_SUNNY 0
+#define WEATHER_THUNDERSTORM 1
+#define WEATHER_CLOUDY 2
+
+// controls
+#define CONTROLS_KEYBOARD 0
+#define CONTROLS_MOUSE 1
+#define CONTROLS_JOYSTICK 2
 
 // mouse coordinates
 extern int mousex, mousey;

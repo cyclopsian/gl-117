@@ -432,7 +432,7 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
-  type = 0;
+  type = LAND_ALPINE;
   hoehe = hoehepc * 512;
   init ();
   step = maxx / 4;
@@ -527,7 +527,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
-  type = 0;
+  type = LAND_ALPINE;
   hoehe = hoehepc * 512;
   init ();
   step = maxx / 4;
@@ -628,7 +628,7 @@ void Landscape::genMoonSurface (int height)
   int radius, rad, depth, depth2;
   double pi = 3.14;
 
-  type = 1;
+  type = LAND_MOON;
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
       h[i][i2] = 30000 + random (300);    
@@ -740,7 +740,7 @@ void Landscape::genCanyonSurface (int hoehepc)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
-  type = 2;
+  type = LAND_CANYON;
   hoehe = hoehepc * 512;
   init ();
   step = maxx / 16;
@@ -844,7 +844,7 @@ void Landscape::genDesertSurface (int hoehepc)
 {
   int i, i2, x, y;
   int htest, h1, h2, step;
-  type = 0;
+  type = LAND_DESERT;
   hoehe = hoehepc * 512;
   init ();
   step = maxx / 16;
@@ -1441,8 +1441,8 @@ void Landscape::searchPlain (int divx, int divy, int *x, int *y)
     for (i = 8; i <= MAXX - 8; i += 8)
       for (i2 = 8; i2 <= MAXX - 8; i2 += 8)
       {
-        if ((type != 2 && f [i] [i2] == GRASS && f [i-4] [i2] == GRASS && f [i+4] [i2] == GRASS && f [i] [i2-4] == GRASS && f [i] [i2+4] == GRASS) ||
-            (type == 2 && f [i] [i2] == REDSAND && f [i-4] [i2] == REDSAND && f [i+4] [i2] == REDSAND && f [i] [i2-4] == REDSAND && f [i] [i2+4] == REDSAND))
+        if ((type != LAND_CANYON && f [i] [i2] == GRASS && f [i-4] [i2] == GRASS && f [i+4] [i2] == GRASS && f [i] [i2-4] == GRASS && f [i] [i2+4] == GRASS) ||
+            (type == LAND_CANYON && f [i] [i2] == REDSAND && f [i-4] [i2] == REDSAND && f [i+4] [i2] == REDSAND && f [i] [i2-4] == REDSAND && f [i] [i2+4] == REDSAND))
         {
           if (type != 2)
             val [i >> 3] [i2 >> 3] = h [i] [i2] / 4;

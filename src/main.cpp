@@ -45,8 +45,8 @@ bool debug = false;
 bool multiplayer = false, isserver = false;
 int fullscreen = 1;
 int day = 1;
-int weather = 0;
-int controls = 0;
+int weather = WEATHER_SUNNY;
+int controls = CONTROLS_MOUSE;
 float sungamma = 45.0;
 
 int camera = 0;
@@ -88,7 +88,7 @@ GL *gl;
 
 float getView ()
 {
-  if (weather == 1 && view > 40.0)
+  if (weather == WEATHER_THUNDERSTORM && view > 40.0)
     return 40.0;
   return view;
 }
@@ -181,6 +181,46 @@ class EditField
       buf [cursorpos + 1] = '\0';
     }
     font1->drawText (x, y, z, buf);
+  }
+};
+
+
+
+class InitKugel
+{
+  public:
+  int explosion;
+  CModel *m;
+  CVector3 tl;
+  InitKugel(){}
+
+  InitKugel (CModel *m)
+  {
+    tl.x = (int) (0.1 * myrandom(800) - 40);
+    tl.y = (int) (0.1 * myrandom(800) - 40);
+    tl.z = (int) (0.1 * myrandom(800) - 40);
+    this->m = m;
+    explosion = 0;
+  }
+
+  InitKugel (float x, float y, float z, CModel *m)
+  {
+    tl.x = x;
+    tl.y = y;
+    tl.z = z;
+    this->m = m;
+    explosion = 0;
+  }
+  
+  void draw()
+  {
+    if (explosion > 200) return;
+    if (explosion) explosion ++;
+    CVector3 tlnull;
+    CRotation rot;
+    glPushMatrix();
+    m->draw3 (&tlnull, &tl, &rot, 0.8, explosion);
+    glPopMatrix();
   }
 };
 
@@ -1258,6 +1298,11 @@ class AIObj : public DynamicObj
     smoke = new CSmoke (0);
     space->addObject (this);
   }
+
+  ~AIObj ()
+  {
+    delete smoke;
+  }
   
   void initValues (DynamicObj *dobj, float phi)
   {
@@ -1578,7 +1623,7 @@ class AIObj : public DynamicObj
             if (recheight < 20) recheight = 20;
         }
         float minh = 2.0 + 0.005 * aggressivity;
-        if (l->type == 2) minh = 5.0 + 0.005 * aggressivity;
+        if (l->type == LAND_CANYON) minh = 5.0 + 0.005 * aggressivity;
         if (fabs (l->getHeight (flyx, flyz) - myheight) < minh)
         {
           recheight = 8 + 0.01 * aggressivity;
@@ -2435,7 +2480,7 @@ class MissionDemo1 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 5;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -2502,7 +2547,7 @@ class MissionTutorial1 : public Mission
   virtual void start ()
   {
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -2721,7 +2766,7 @@ class MissionDogfight1 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
     if (l != NULL) delete l;
@@ -2841,7 +2886,7 @@ class MissionTransport : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -2919,7 +2964,7 @@ class MissionConvoy : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -3010,7 +3055,7 @@ class MissionDogfight2 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
     if (l != NULL) delete l;
@@ -3110,7 +3155,7 @@ class MissionAirBattle : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -3194,7 +3239,7 @@ class MissionGround1 : public Mission
   {
     int i;
     day = 0;
-    weather = 1;
+    weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 40;
     if (l != NULL) delete l;
@@ -3307,7 +3352,7 @@ class MissionScout : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
     if (l != NULL) delete l;
@@ -3379,7 +3424,7 @@ class MissionBase : public Mission
   {
     int i, i2;
     day = 0;
-    weather = 1;
+    weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 40;
     if (l != NULL) delete l;
@@ -3560,7 +3605,7 @@ class MissionDefend1 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -3656,7 +3701,7 @@ class MissionDogfight3 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 20;
     if (l != NULL) delete l;
@@ -3759,7 +3804,7 @@ class MissionTank1 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
     if (l != NULL) delete l;
@@ -3849,7 +3894,7 @@ class MissionShip1 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -3934,7 +3979,7 @@ class MissionShip2 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
     if (l != NULL) delete l;
@@ -4026,7 +4071,7 @@ class MissionShip3 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -4108,7 +4153,7 @@ class MissionCanyon1 : public Mission
   {
     int i, px, py;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
     if (l != NULL) delete l;
@@ -4220,7 +4265,7 @@ class MissionCanyon2 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
     if (l != NULL) delete l;
@@ -4321,7 +4366,7 @@ class MissionCanyon3 : public Mission
   {
     int i, px, py;
     day = 0;
-    weather = 1;
+    weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 45;
     if (l != NULL) delete l;
@@ -4435,7 +4480,7 @@ class MissionMoonDefense1 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -4520,7 +4565,7 @@ class MissionMoonDogfight1 : public Mission
   virtual void start ()
   {
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -4609,7 +4654,7 @@ class MissionMoonBase1 : public Mission
   {
     int i;
     day = 0;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -4690,7 +4735,7 @@ class MissionMoon1 : public Mission
   virtual void start ()
   {
     day = 0;
-    weather = 2;
+    weather = WEATHER_CLOUDY;
     camera = 0;
     sungamma = 50;
     if (l != NULL) delete l;
@@ -4751,7 +4796,7 @@ class MissionMultiDogfight1 : public Mission
   {
     int i;
     day = 1;
-    weather = 0;
+    weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
     if (l != NULL) delete l;
@@ -5265,7 +5310,12 @@ class ConfigFile
       length = fread (buf, 1, 32000, in);
       fclose (in);
     }
-    else buf [0] = 0;
+    else
+    {
+      fprintf (stderr, "\nCould not load %s.", fname);
+      fflush (stderr);
+      buf [0] = 0;
+    }
     for (int i = 0; i < length; i ++)
     {
       if (buf [i] == '#') commentmode = true;
@@ -5355,7 +5405,12 @@ void save_config ()
   char *confname = dirs->getSaves ("conf");
   printf ("\nSaving %s ", confname); fflush (stdout);
   int ret1 = cf->openOutput (confname);
-  if (ret1 == 0) return;
+  if (ret1 == 0)
+  {
+    fprintf (stderr, "\nCould not save configuration.");
+    fflush (stderr);
+    return;
+  }
   cf->writeText ("# Configuration\n");
   cf->writeText ("# Some possible width x height values for fullscreen mode:");
   cf->writeText ("#  640x480, 800x600, 1024x768");
@@ -5389,6 +5444,7 @@ void save_config ()
   cf->writeText ("# as graphic cards and drivers may differ some 100 times in speed");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
   cf->close ();
+  delete cf;
 }
 
 int load_config ()
@@ -5473,7 +5529,7 @@ int load_config ()
 
   cf->getString (str, "controls");
   if (str == NULL)
-  { controls = 1; }
+  { controls = CONTROLS_MOUSE; }
   else
   { controls = atoi (str); }
   if (controls < 0) controls = 0;
@@ -5510,6 +5566,8 @@ int load_config ()
   { modes [3] = -1; }
   else
   { modes [3] = atoi (str); }*/
+
+  delete cf;
 
   if (cf->buf [0] == 0) // no file found
     return 0;
@@ -5952,59 +6010,87 @@ void game_levelInit ()
     star [i]->size = 0.6 + 0.15 * myrandom (8);
   }
 
-  if (day && weather == 0)
+  CColor skycolor;
+
+  if (day && weather == WEATHER_SUNNY)
   {
     if (sungamma < 35)
-      objsphere->setColor (new CColor ((unsigned short) (127 + 70 - 2 * sungamma), 127, 127));
+    {
+      skycolor.setColor ((unsigned short) (127 + 70 - 2 * sungamma), 127, 127);
+      objsphere->setColor (&skycolor);
+    }
     else
-      objsphere->setColor (new CColor (127, 127, 127));
+    {
+      skycolor.setColor (127, 127, 127);
+      objsphere->setColor (&skycolor);
+    }
     if (sungamma < 35)
+    {
       gl->fogcolor [0] = (float) (127 + 70 - 2 * sungamma) / 256.0;
+    }
     else
+    {
       gl->fogcolor [0] = 0.5;
+    }
     gl->fogcolor [1] = 0.5;
     gl->fogcolor [2] = 0.5;
-    objsphere->setNorthPoleColor (new CColor (50, 200, 255), 1.8);
+    skycolor.setColor (50, 200, 255);
+    objsphere->setNorthPoleColor (&skycolor, 1.8);
     if (sungamma < 35)
-      objsphere->setPoleColor (90, (int) (90 - sungamma), new CColor ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180), 0.3);
+    {
+      skycolor.setColor ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180);
+      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
+    }
     else
-      objsphere->setPoleColor (90, (int) (90 - sungamma), new CColor (200, 200, 200), 0.3);
+    {
+      skycolor.setColor (200, 200, 200);
+      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
+    }
   }
-  else if (!day && weather == 0)
+  else if (!day && weather == WEATHER_SUNNY)
   {
-    objsphere->setColor (new CColor (64, 64, 64));
+    skycolor.setColor (64, 64, 64);
+    objsphere->setColor (&skycolor);
     gl->fogcolor [0] = 0.25;
     gl->fogcolor [1] = 0.25;
     gl->fogcolor [2] = 0.25;
-    if (l->type != 1) // no moon landscape
+    if (l->type != LAND_MOON)
     {
-      objsphere->setNorthPoleColor (new CColor (0, 0, 170), 1.8);
-      objsphere->setPoleColor (90, (int) (90 - sungamma), new CColor (64, 64, 64), 0.3);
+      skycolor.setColor (0, 0, 170);
+      objsphere->setNorthPoleColor (&skycolor, 1.8);
+      skycolor.setColor (64, 64, 64);
+      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
     }
     else
     {
-      objsphere->setNorthPoleColor (new CColor (0, 0, 0), 1.8);
+      skycolor.setColor (0, 0, 0);
+      objsphere->setNorthPoleColor (&skycolor, 1.8);
     }
   }
-  else if (day && weather == 1)
+  else if (day && weather == WEATHER_THUNDERSTORM)
   {
-    objsphere->setColor (new CColor (102, 102, 102));
+    skycolor.setColor (102, 102, 102);
+    objsphere->setColor (&skycolor);
     gl->fogcolor [0] = 0.4;
     gl->fogcolor [1] = 0.4;
     gl->fogcolor [2] = 0.4;
-    objsphere->setNorthPoleColor (new CColor (102, 102, 102), 1.8);
+    skycolor.setColor (102, 102, 102);
+    objsphere->setNorthPoleColor (&skycolor, 1.8);
   }
-  else if (!day && weather == 1)
+  else if (!day && weather == WEATHER_THUNDERSTORM)
   {
-    objsphere->setColor (new CColor (40, 40, 40));
+    skycolor.setColor (40, 40, 40);
+    objsphere->setColor (&skycolor);
     gl->fogcolor [0] = 0.16;
     gl->fogcolor [1] = 0.16;
     gl->fogcolor [2] = 0.16;
-    objsphere->setNorthPoleColor (new CColor (40, 40, 40), 1.8);
+    skycolor.setColor (40, 40, 40);
+    objsphere->setNorthPoleColor (&skycolor, 1.8);
   }
-  else if (weather == 2)
+  else if (weather == WEATHER_CLOUDY)
   {
-    objsphere->setColor (new CColor (20, 20, 20));
+    skycolor.setColor (20, 20, 20);
+    objsphere->setColor (&skycolor);
     gl->fogcolor [0] = 0.08;
     gl->fogcolor [1] = 0.08;
     gl->fogcolor [2] = 0.08;
@@ -6118,26 +6204,6 @@ void stats_reshape ()
 #ifndef USE_GLUT
   SDL_ShowCursor (0);
 #endif
-}
-
-void game_quit ()
-{
-  int i;
-  volumesound = sound->volumesound;
-  volumemusic = sound->volumemusic;
-  save_config ();
-  pilots->save (dirs->getSaves ("pilots"));
-  for (i = 0; i < maxfighter; i ++)
-    delete (fighter [i]);
-  delete pilots;
-// free allocated memory (optional)
-#ifndef USE_GLUT
-/*  SDL_CloseAudio();
-  SDL_FreeWAV(wave.sound);*/
-  SDL_Quit ();
-#endif
-  printf ("\n"); fflush (stdout);
-  exit (0);
 }
 
 void switch_menu ()
@@ -6643,7 +6709,7 @@ float dtheta = 0, dgamma = 0;
 
 void game_mousemotion (int x, int y)
 {
-  if (controls != 1) return;
+  if (controls != CONTROLS_MOUSE) return;
 
   float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
@@ -7526,6 +7592,60 @@ void fame_display ()
   drawMouseCursor ();
 }
 
+CModel *explsphere;
+CSphere *mysphere;
+InitKugel *mykugel [100];
+
+void game_quit ()
+{
+  int i;
+  volumesound = sound->volumesound;
+  volumemusic = sound->volumemusic;
+  save_config ();
+  pilots->save (dirs->getSaves ("pilots"));
+  for (i = 0; i < maxfighter; i ++)
+    delete (fighter [i]);
+  for (i = 0; i < maxlaser; i ++)
+    delete (laser [i]);
+  for (i = 0; i < maxmissile; i ++)
+    delete (missile [i]);
+  for (i = 0; i < maxexplosion; i ++)
+    delete (explosion [i]);
+  for (i = 0; i < maxstar; i ++)
+    delete (star [i]);
+  for (i = 0; i < maxgroundobj; i ++)
+    delete (groundobj [i]);
+  for (i = 0; i < maxblacksmoke; i ++)
+    delete (blacksmoke [i]);
+  for (i = 0; i < 100; i++)
+    delete (mykugel [i]);
+  delete pilots;
+  delete tlinf;
+  delete tlminf;
+  delete tlnull;
+  delete explsphere;
+  delete objsphere;
+  delete sphere;
+  delete flash1;
+  delete cockpit;
+  delete font1;
+  delete font2;
+  delete space;
+  delete dirs;
+  delete gl;
+  delete sine;
+  delete cosi;
+// free allocated memory (optional)
+#ifndef USE_GLUT
+/*  SDL_CloseAudio();
+  SDL_FreeWAV(wave.sound);*/
+  SDL_Quit ();
+  delete sound;
+#endif
+  printf ("\n"); fflush (stdout);
+  exit (0);
+}
+
 void menu_mouse (int button, int state, int x, int y)
 {
   int i;
@@ -8393,9 +8513,9 @@ void menu_display ()
     else
       font1->drawText (textx2, 8, -2, buf);
     strcpy (buf, "CONTROLS: ");
-    if (controls == 0) strcat (buf, "KEYBOARD");
-    else if (controls == 1) strcat (buf, "MOUSE");
-    else if (controls == 2) strcat (buf, "JOYSTICK");
+    if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
+    else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE");
+    else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
     if (menuitemselected == 12)
       font1->drawTextRotated (textx2, 6, -2, buf, &color2, -menutimer * 5);
     else
@@ -8542,7 +8662,7 @@ void game_display ()
 //    sunblinding = true;
 
 // calculate light factor
-  if (camera == 0 && sunblinding && day && weather == 0)
+  if (camera == 0 && sunblinding && day && weather == WEATHER_SUNNY)
   {
     float np = fplayer->phi;
     if (np >= 180) np -= 360;
@@ -8598,13 +8718,13 @@ void game_display ()
   gl->foglum = mylight;
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
 
-  if (weather == 0 || weather == 2)
+  if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
   if (!day)
   {
     glPointSize (1.0);
     int stars = maxstar;
-    if (weather != 2) stars = maxstar / 2;
+    if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
     for (i = 0; i < stars; i ++)
     {
       glPushMatrix ();
@@ -8633,7 +8753,7 @@ void game_display ()
   float fac = view, zfac = view * 0.2;
 //  if (camera != 1 && camera != 5)
 //    glRotatef (-camtheta, 0.0, 0.0, 1.0);
-  if (weather == 0 || weather == 2)
+  if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
   if (camera == 0)
     glRotatef (/*-fplayer->gamma + 180 +*/ sungamma, 1.0, 0.0, 0.0);
@@ -8642,7 +8762,7 @@ void game_display ()
 //  glRotatef (-camphi, 0.0, 1.0, 0.0);
   float zf = -11;
   if (day) zf = -12;
-  if (l->type == 1 && !day) zf = -8;
+  if (l->type == LAND_MOON && !day) zf = -8; // diplay bigger earth
   glTranslatef (0, 0, zf);
 /*  if (camera == 0)
     glRotatef (-fplayer->gamma + 180 + sungamma, 1.0, 0.0, 0.0);
@@ -8656,7 +8776,7 @@ void game_display ()
     sunvisible = true;
     glDisable (GL_DEPTH_TEST);
     if (day) gl->enableTextures (texsun->textureID);
-    else if (l->type != 1) gl->enableTextures (texmoon->textureID);
+    else if (l->type != LAND_MOON) gl->enableTextures (texmoon->textureID);
     else gl->enableTextures (texearth->textureID);
     if (day && l->type != 1)
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -8668,7 +8788,7 @@ void game_display ()
   //  glDisable (GL_DITHER);
     glBegin (GL_QUADS);
     fac = view; zfac = view * 3.5;
-    if (day && l->type != 1)
+    if (day && l->type != LAND_MOON)
     {
       float gm = (40.0 - sungamma) / 80.0;
       if (gm < 0) gm = 0;
@@ -9087,7 +9207,7 @@ void game_display ()
     font1->drawTextCentered (0, -4, -2, buf, &colred);
   }*/
 
-  if (controls == 1)
+  if (controls == CONTROLS_MOUSE)
     drawMouseCursor ();
 
   if (debug)
@@ -9121,7 +9241,7 @@ void game_timer ()
   if (debug)
     printf ("\nentering myTimerFunc()"); fflush (stdout);
 
-    if (weather == 1 && !flash && !myrandom (40))
+    if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (40))
     {
       flash = 10;
       int fphi = (int) camphi + myrandom (50) - 25;
@@ -9363,7 +9483,7 @@ int net_thread_main (void *data)
   if (debug)
     printf ("\nentering myTimerFunc()"); fflush (stdout);
 
-    if (weather == 1 && !flash && !myrandom (30))
+    if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (30))
     {
       flash = 10;
       int fphi = (int) camphi + myrandom (50) - 25;
@@ -9792,9 +9912,10 @@ void myInit ()
 /*  obj = new Model ();
   obj->loadFromFile ("./data/f4.v3d");*/
 
-  CModel *explsphere = new CSphere ();
+  explsphere = new CSphere ();
   ((CSphere *) explsphere)->init (1, 9);
-  explsphere->setColor (new CColor (255, 255, 1));
+  CColor explcolor (255, 255, 1);
+  explsphere->setColor (&explcolor);
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
     explsphere->object [0]->vertex [i].color.setColor (myrandom (100) + 155, myrandom (100) + 100, 0);
 //  ((CSphere *) explsphere)->invertNormals ();
@@ -9862,44 +9983,6 @@ void myInit ()
     printf ("\nleaving myInit()"); fflush (stdout);
 }
 
-class InitKugel
-{
-  public:
-  int explosion;
-  CModel *m;
-  CVector3 tl;
-  InitKugel(){}
-
-  InitKugel (CModel *m)
-  {
-    tl.x = (int) (0.1 * myrandom(800) - 40);
-    tl.y = (int) (0.1 * myrandom(800) - 40);
-    tl.z = (int) (0.1 * myrandom(800) - 40);
-    this->m = m;
-    explosion = 0;
-  }
-
-  InitKugel (float x, float y, float z, CModel *m)
-  {
-    tl.x = x;
-    tl.y = y;
-    tl.z = z;
-    this->m = m;
-    explosion = 0;
-  }
-  
-  void draw()
-  {
-    if (explosion > 200) return;
-    if (explosion) explosion ++;
-    CVector3 tlnull;
-    CRotation rot;
-    glPushMatrix();
-    m->draw3 (&tlnull, &tl, &rot, 0.8, explosion);
-    glPopMatrix();
-  }
-};
-
 
 CRotation rot;
 CRotation rot2;
@@ -9907,7 +9990,6 @@ CVector3 tl;
 CVector3 tl2;
 int initexplode = 0;
 int initexplode1 = 0;
-InitKugel *mykugel [100];
 int i;
 int inittimer = 0;
 
@@ -10060,11 +10142,11 @@ void myFirstInit ()
 
   init_reshape ();
 
-  CColor* mycolor = new CColor (200, 200, 0);
-  CColor* mycolor2 = new CColor (100, 100, 0);
-  CSphere *mysphere = new CSphere (1, 8, 1, 1, 1);
-  mysphere->setColor (mycolor2);
-  mysphere->setNorthPoleColor (mycolor, 1.9);
+  CColor mycolor (200, 200, 0);
+  CColor mycolor2 (100, 100, 0);
+  mysphere = new CSphere (1, 8, 1, 1, 1);
+  mysphere->setColor (&mycolor2);
+  mysphere->setNorthPoleColor (&mycolor, 1.9);
   for (i = 0; i < 100; i++)
   {
     mykugel [i] = new InitKugel (mysphere);
@@ -10622,7 +10704,7 @@ void sdlMainLoop ()
       }
     }
 //    printf ("\nx=%d, y=%d", joystickx, joysticky);
-    if (controls >= 2)
+    if (controls >= CONTROLS_JOYSTICK)
     {
       myJoystickAxisFunc (joystickx, joysticky, joystickt, joystickr);
       if (joystickbutton == 0)
@@ -10895,7 +10977,7 @@ int main (int argc, char **argv)
 
   gluPerspective (80.0, (float) width / height, 0.20, 50.0); // should be sqrt(2) or 1.5
   if (controls <= 0)
-    controls = 1;
+    controls = CONTROLS_MOUSE;
   glutMainLoop();
 #else
   printf ("\nUsing SDL and GLUT"); fflush (stdout);
@@ -11005,7 +11087,7 @@ printf ("\nEntering mode %dx%d:%d,%d ", width, height, bpp, video_flags); fflush
     printf ("\nNo joystick found."); fflush (stdout);
     sdljoystick = NULL;
     if (controls >= 2)
-      controls = 0;
+      controls = CONTROLS_MOUSE;
   }
 
 //  joystick = 0; // disable joystick manually
