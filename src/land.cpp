@@ -617,9 +617,10 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
 
 int Landscape::getX (int x)
 {
-  if (x < 0) return x + MAXX + 1;
+  return (x & MAXX_MASK);
+/*  if (x < 0) return x + MAXX + 1;
   else if (x > MAXX) return x - MAXX - 1;
-  return x;
+  return x;*/
 }
 
 void Landscape::genMoonSurface (int height)

@@ -1672,6 +1672,12 @@ void GLLandscape::draw (int phi, int gamma)
   if (quality < 4) gridstep = 2;
   else gridstep = 1;
 
+  if (phi < 0 || phi >= 360)
+  { fprintf (stderr, "\nError in file %s, line %s", __FILE__, __LINE__); }
+
+  if (gamma < 0 || gamma >= 360)
+  { fprintf (stderr, "\nError in file %s, line %s", __FILE__, __LINE__); }
+
   glPushMatrix ();
 /*  GLfloat mat_ambient[]  = { 0.7,0.7,0.7,1 };
   GLfloat mat_diffuse[]  = { 0.3,0.3,0.3,1 };

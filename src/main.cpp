@@ -5202,6 +5202,8 @@ void game_mouse (int button, int state, int x, int y)
     }
     else if (button == MOUSE_BUTTON_RIGHT)
     {
+      if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
+      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
       if (fplayer->missiles [fplayer->missiletype] > 0)
       {
         fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
@@ -5226,6 +5228,8 @@ void game_easymouse ()
 
   int t = (int) fplayer->theta; // roll angle
   if (t < 0) t += 360;
+  if (t < 0 || t >= 360)
+  { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
   float rx = dx * cosi [t] - dy * sine [t]; // rolled mouse x coordinate
   float ry = -dx * sine [t] + dy * cosi [t]; // rolled mouse y coordinate
 
@@ -5372,6 +5376,8 @@ void game_joystickbutton (int button)
   }
   else if (button == 2)
   {
+    if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
+    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); }
     if (fplayer->missiles [fplayer->missiletype] > 0)
     {
       fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
@@ -6801,7 +6807,10 @@ void stats_mouse (int button, int state, int x, int y)
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
-  CColor color2 (255, 255, (int) (255.0 * cosi [menutimer * 5 % 360]), 255);
+  int menutimernorm = menutimer * 5;
+  if (menutimernorm != 0) menutimernorm %= 360;
+  if (menutimernorm < 0) menutimernorm *= -1;
+  CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
   CColor coloryellow (255, 255, 0, 200);
   CColor colorgrey (150, 150, 150, 200);
   Pilot *p = pilots->pilot [pilots->aktpilot];
@@ -6943,7 +6952,10 @@ void menu_display ()
 /*  if (quality >= 2)
     gl->enableAntiAliasing ();*/
 
-  CColor color2 (255, 255, (int) (255.0 * cosi [menutimer * 5 % 360]), 255);
+  int menutimernorm = menutimer * 5;
+  if (menutimernorm != 0) menutimernorm %= 360;
+  if (menutimernorm < 0) menutimernorm *= -1;
+  CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
   CColor coloryellow (255, 255, 0, 200);
 
   int textx = -14, textx2 = 0;
