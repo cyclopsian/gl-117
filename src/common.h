@@ -49,7 +49,7 @@
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "GL-117 V. 0.9.2 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "V1.0.1"
 
 // data types
 #ifdef USE_GLUT
@@ -115,6 +115,7 @@ extern int mode; // always off=0, 1 would mean to calculate ROAM!
 extern float getView (); // return view dependant on weather
 
 extern int difficulty; // 0=easy, 1=normal, 2=hard
+extern int physics; // 0=action, 1=realistic
 extern int brightness; // brightness correction
 
 extern bool sunblinding; // viewer gazing into the sun?
@@ -130,7 +131,7 @@ extern float blackout, redout; // high force
 extern float view_x, view_y; // angles for joystick-controlled view
 
 // maximum constants for objects
-const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
+const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
 
 // sine and cosine table (obsolete)
 //#define SIN(x) sine[(int)x]

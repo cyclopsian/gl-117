@@ -251,6 +251,7 @@ void CExplosion::setExplosion (float x, float y, float z, float maxzoom, int len
   ttl = len;
   maxlen = len;
   draw = true;
+//  alpha = 1;
 }
 
 void CExplosion::move (Uint32 dt)
@@ -258,6 +259,7 @@ void CExplosion::move (Uint32 dt)
   if (ttl > 0)
   {
     zoom = sine [ttl * 180 / maxlen] * maxzoom;
+//    if (ttl / maxlen < 0.5) alpha = ttl / maxlen + 0.5;
     ttl -= dt;
     tl->y += 0.01 * dt / timestep;
     if (ttl <= 0)
@@ -821,6 +823,9 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
 
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, 0.05);
+  glDisable (GL_DEPTH_TEST);
 
   glPushMatrix ();
   glTranslatef (tl->x, tl->y, tl->z);
@@ -868,6 +873,8 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
   }
   glEnd();
 
+  glEnable (GL_DEPTH_TEST);
+  glDisable (GL_ALPHA_TEST);
   glDisable (GL_BLEND);
   glDisable (GL_TEXTURE_2D);
   glPopMatrix ();

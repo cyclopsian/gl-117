@@ -47,8 +47,8 @@ Mission::Mission ()
     selfighter [i] = 0;
   selfighter [0] = FIGHTER_FALCON;
   selfighter [1] = FIGHTER_HAWK;
-  selfighter [2] = FIGHTER_HAWK2;
-  selfighters = 2;
+  selfighter [2] = FIGHTER_STORM;
+  selfighters = 3;
   wantfighter = 0;
   selweapons = 3;
   selweapon [0] = MISSILE_AIR1;
@@ -75,6 +75,7 @@ void Mission::playerInit ()
   else if (selfighter [wantfighter] == FIGHTER_PHOENIX) fplayer->o = &model_figf;
   else if (selfighter [wantfighter] == FIGHTER_REDARROW) fplayer->o = &model_figg;
   else if (selfighter [wantfighter] == FIGHTER_BLACKBIRD) fplayer->o = &model_figh;
+  else if (selfighter [wantfighter] == FIGHTER_STORM) fplayer->o = &model_figi;
   fplayer->ai = false;
   for (i = 0; i < missiletypes; i ++)
     fplayer->missiles [i] = 0;
@@ -83,19 +84,22 @@ void Mission::playerInit ()
   if (selweapon [wantweapon] == MISSILE_AIR1)
   {
     if (selfighter [wantfighter] == FIGHTER_FALCON)
-    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 2;
-      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
     if (selfighter [wantfighter] == FIGHTER_HAWK)
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
+    if (selfighter [wantfighter] == FIGHTER_STORM)
     { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
       fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == FIGHTER_HAWK2)
-    { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
-      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 1; }
     if (selfighter [wantfighter] == FIGHTER_PHOENIX)
     { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
       fplayer->missilerack [0] = 2; fplayer->missilerack [1] = 7; fplayer->missilerack [2] = 7; fplayer->missilerack [3] = 2; }
     if (selfighter [wantfighter] == FIGHTER_REDARROW)
-    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 7; fplayer->missilerack [1] = 1; fplayer->missilerack [2] = 1; fplayer->missilerack [3] = 7; }
   }
   if (selweapon [wantweapon] == MISSILE_GROUND1)
@@ -106,6 +110,9 @@ void Mission::playerInit ()
     if (selfighter [wantfighter] == FIGHTER_HAWK)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 6; }
+    if (selfighter [wantfighter] == FIGHTER_STORM)
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 3; }
     if (selfighter [wantfighter] == FIGHTER_HAWK2)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 6; }
@@ -120,19 +127,22 @@ void Mission::playerInit ()
   {
     if (selfighter [wantfighter] == FIGHTER_FALCON)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
-      fplayer->missilerack [0] = 5; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 5; }
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == FIGHTER_HAWK)
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
+    if (selfighter [wantfighter] == FIGHTER_STORM)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
       fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 3; }
     if (selfighter [wantfighter] == FIGHTER_HAWK2)
-    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
-      fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 4; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
     if (selfighter [wantfighter] == FIGHTER_PHOENIX)
     { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
       fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 4; }
     if (selfighter [wantfighter] == FIGHTER_REDARROW)
     { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
-      fplayer->missilerack [0] = 5; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 5; }
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
   }
   fplayer->missileCount ();
 }
@@ -151,6 +161,7 @@ void Mission::alliedInit (int fighterid, int pilotid, AIObj *aiobj)
   else if (fighterid == FIGHTER_HAWK2) aiobj->o = &model_figc;
   else if (fighterid == FIGHTER_PHOENIX) aiobj->o = &model_figf;
   else if (fighterid == FIGHTER_REDARROW) aiobj->o = &model_figg;
+  else if (fighterid == FIGHTER_STORM) aiobj->o = &model_figi;
   aiobj->ai = true;
 }
 
@@ -169,6 +180,20 @@ int Mission::processtimer (Uint32 dt)
 
 void Mission::draw ()
 {
+}
+
+// invert y values of all fighters for this mission, only possible if no static buildings are placed on flat ground
+// missions were designed to fly towards the sun but since v1.0 the rendering coords have been mapped to the OpenGL coords
+// therefore a bug was introduced in v1.0 showing the sun from the wrong side
+// however this function should let the player fly into the sun in a couple of missions
+void Mission::invertZ ()
+{
+  int i;
+  for (i = 0; i < maxfighter; i ++)
+  {
+    fighter [i]->tl->z = -fighter [i]->tl->z;
+    fighter [i]->phi += 180;
+  }
 }
 
 void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points)
@@ -333,7 +358,7 @@ int MissionTutorial1::processtimer (Uint32 dt)
   timer += dt;
   if (!fplayer->active && fplayer->explode >= 35 * timestep)
     return 2;
-  if (!fighter [1]->active && !fighter [2]->active)
+  if (!fighter [1]->active && !fighter [2]->active && state == 1)
     return 1;
   return 0;
 }
@@ -481,7 +506,7 @@ void MissionTutorial1::draw ()
     else
     {
       getKeyString (key_firecannon, buf2);
-      sprintf (buf, "%s: FIRE CANNON (UNLIMITED AMMO)", buf2);
+      sprintf (buf, "%s: FIRE CANNON", buf2);
       font1->drawTextCentered (0, 7, -2.5, buf, &textcolor);
       getKeyString (key_selectmissile, buf2);
       sprintf (buf, "%s: CHOOSE MISSILE", buf2);
@@ -1542,7 +1567,7 @@ void MissionTest2::start ()
   fighter [1]->o = &model_fig;
   fighter [1]->tl->x = 0;
   fighter [1]->tl->z = 0;
-  fighter [1]->newinit (FIGHTER_HAWK, 0, 160);
+  fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
   fighter [1]->aggressivity = 0;
 //  fighter [1]->intelligence = 0;
 //  fighter [1]->precision = 0;
@@ -1553,6 +1578,7 @@ void MissionTest2::start ()
   fighter [1]->ammo = 0;
   fighter [1]->shield = 100000;
   fighter [1]->phi = 180;
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionTest2::processtimer (Uint32 dt)
@@ -1651,6 +1677,7 @@ void MissionTransport::start ()
     fighter [i]->tl->z = -i * 10;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 200);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionTransport::processtimer (Uint32 dt)
@@ -1817,6 +1844,7 @@ void MissionDogfight2::start ()
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionDogfight2::processtimer (Uint32 dt)
@@ -1923,6 +1951,7 @@ void MissionAirBattle::start ()
     }
     fighter [i]->newinit (FIGHTER_CROW, 0, 440 - i * 10);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionAirBattle::processtimer (Uint32 dt)
@@ -1958,7 +1987,7 @@ MissionGround1::MissionGround1 ()
 {
   id = MISSION_SADEFENSE;
   strcpy (name, "SA DEFENSE");
-  strcpy (briefing, "OUR ENEMY HAS BUILT UP A BASE AND SOME AIR DEFENCES AROUND. THE PILOTS OF OUR SQUADRON HAVE TO TAKE OUT THESE AIR DEFENCES.");
+  strcpy (briefing, "OUR ENEMY HAS BUILT UP A BASE WITH SOME AIR DEFENCES AROUND. THE PILOTS OF OUR SQUADRON HAVE TO TAKE OUT THESE AIR DEFENCES.");
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_PRIMETIME;
@@ -2091,6 +2120,7 @@ void MissionScout::start ()
     fighter [i]->tl->z = -i * 10;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionScout::processtimer (Uint32 dt)
@@ -2148,6 +2178,7 @@ void MissionBase::start ()
   l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
+  l->flatten (px, py, 8, 8);
   for (i = px - 6; i <= px + 6; i ++)
     for (i2 = py - 8; i2 <= py + 7; i2 ++)
     {
@@ -2301,6 +2332,217 @@ void MissionBase::draw ()
 
 
 
+MissionDepot::MissionDepot ()
+{
+  id = MISSION_DEPOT;
+  strcpy (name, "DEPOTS");
+  strcpy (briefing, "THERE IS STILL AN OUTPOST WITH SOME DEPOTS. DESTROY ALL THE DEPOTS. WE ARE NOT EXPECTING ANY AIR RESISTANCE.");
+  autoLFBriefing ();
+  alliedfighters = 2;
+  alliedpilot [0] = PILOT_PRIMETIME;
+  maxtime = 5500 * timestep;
+}
+
+void MissionDepot::start ()
+{
+  int i, i2;
+  day = 0;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 40;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  int px, py;
+  l->searchPlain (-1, -1, &px, &py);
+  l->flatten (px, py, 6, 6);
+  for (i = px - 5; i <= px + 5; i ++)
+    for (i2 = py - 6; i2 <= py + 6; i2 ++)
+    {
+      l->f [i] [i2] = GREYSAND;
+      int sum = (int) l->r [i] [i2] + l->g [i] [i2] + l->b [i] [i2];
+      sum /= 3;
+      l->r [i] [i2] = sum + 15;
+      l->g [i] [i2] = sum + 15;
+      l->b [i] [i2] = sum - 15;
+    }
+  playerInit ();
+  fplayer->tl->x = px + 10;
+  fplayer->tl->z = py + 130;
+  fplayer->target = fighter [4];
+  for (i = 1; i <= 1; i ++)
+  {
+    alliedInit (FIGHTER_STORM, alliedpilot [i - 1], fighter [i]);
+    fighter [i]->tl->x = px + 10 + i * 5;
+    fighter [i]->tl->z = py + 130 + i * 5;
+    fighter [i]->target = fighter [2];
+    fighter [i]->bomber = true;
+  }
+  int n = 2;
+  fighter [n]->tl->x = px - 4;
+  fighter [n]->tl->z = py;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_depot1;
+  fighter [n]->newinit (STATIC_DEPOT1, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py + 5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_depot1;
+  fighter [n]->newinit (STATIC_DEPOT1, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px + 2;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  n ++;
+/*  fighter [n]->tl->x = px + 4;
+  fighter [n]->tl->z = py - 1;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_hall1;
+  fighter [n]->newinit (STATIC_HALL1, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px - 1.5;
+  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  n ++;*/
+  fighter [n]->tl->x = px + 1.5;
+  fighter [n]->tl->z = py - 4.5;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px - 3;
+  fighter [n]->tl->z = py + 4;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+/*  n ++;
+  fighter [n]->tl->x = px - 5.5;
+  fighter [n]->tl->z = py + 4;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  n ++;
+  fighter [n]->tl->x = px - 4;
+  fighter [n]->tl->z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_tent4;
+  fighter [n]->newinit (STATIC_TENT4, 0, 400);
+  n ++;*/
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 90;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py - 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 0;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px + 6;
+  fighter [n]->tl->z = py - 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 270;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px + 6;
+  fighter [n]->tl->z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flak1;
+  fighter [n]->newinit (FLAK1, 0, 200);
+  fighter [n]->phi = 180;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px - 6;
+  fighter [n]->tl->z = py + 35;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [n]->phi = 180;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px + 6;
+  fighter [n]->tl->z = py + 35;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [n]->phi = 180;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px + 35;
+  fighter [n]->tl->z = py;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [n]->phi = 180;
+  fighter [n]->maxtheta = 0;
+  n ++;
+  fighter [n]->tl->x = px - 35;
+  fighter [n]->tl->z = py;
+  fighter [n]->target = fighter [0];
+  fighter [n]->o = &model_flarak1;
+  fighter [n]->newinit (FLARAK_AIR1, 0, 200);
+  fighter [n]->phi = 180;
+  fighter [n]->maxtheta = 0;
+  n ++;
+/*  for (i = n; i < n + 6; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [myrandom (4)];
+    fighter [i]->o = &model_fige;
+    fighter [i]->tl->x = px + i * 5 - 60;
+    fighter [i]->tl->z = py + i * 5 - 60;
+    fighter [i]->newinit (FIGHTER_CROW, 0, 180 + myrandom (200));
+  }*/
+}
+
+int MissionDepot::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 3; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionDepot::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
 MissionDefend1::MissionDefend1 ()
 {
   id = MISSION_DEFEND1;
@@ -2361,7 +2603,7 @@ void MissionDefend1::start ()
     fighter [i]->newinit (TANK_GROUND1, 0, 300);
     fighter [i]->target = fighter [i - 4];
   }
-  for (i = 11; i <= 13; i ++)
+  for (i = 11; i <= 15; i ++)
   {
     int off = 40;
     if (difficulty == 0) off = 55;
@@ -2381,6 +2623,7 @@ void MissionDefend1::start ()
     fighter [i]->target = fighter [i - 4];
     fighter [i]->deactivate ();
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionDefend1::processtimer (Uint32 dt)
@@ -2392,7 +2635,7 @@ int MissionDefend1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 13; i ++)
+  for (i = 0; i <= 15; i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -2416,6 +2659,8 @@ void MissionDefend1::draw ()
     fighter [11]->activate ();
     fighter [12]->activate ();
     fighter [13]->activate ();
+    fighter [14]->activate ();
+    fighter [15]->activate ();
   }
   if (timer >= 600 * timestep && timer <= 800 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", &textcolor);
@@ -2479,6 +2724,7 @@ void MissionDogfight3::start ()
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionDogfight3::processtimer (Uint32 dt)
@@ -2586,6 +2832,7 @@ void MissionTank1::start ()
     fighter [i]->tl->z = 60;
     fighter [i]->newinit (STATIC_CONTAINER1, 0, 0);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionTank1::processtimer (Uint32 dt)
@@ -2608,6 +2855,101 @@ int MissionTank1::processtimer (Uint32 dt)
 }
 
 void MissionTank1::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionConvoy2::MissionConvoy2 ()
+{
+  id = MISSION_CONVOY2;
+  strcpy (name, "SAM CONVOY");
+  strcpy (briefing, "THERE IS A CONVOY DELIVERING WEAPONS. DESTROY IT BUT CAUTION: THERE ARE MOBILE SAMS AND POSSIBLY ENEMY FIGHTERS IN THE REGION");
+  autoLFBriefing ();
+  alliedfighters = 2;
+  maxtime = 5000 * timestep;
+  selfighter [1] = FIGHTER_HAWK2;
+  alliedpilot [0] = PILOT_SHADOW;
+}
+  
+void MissionConvoy2::start ()
+{
+  int i;
+  day = 1;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 60;
+  heading = 230;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
+  int px = 200, py = 200;
+  playerInit ();
+  fplayer->tl->x = px;
+  fplayer->tl->z = py + 100;
+  alliedInit (FIGHTER_HAWK, alliedpilot [0], fighter [1]); // always match together 0<->1, 1<->2 etc.
+  fighter [1]->tl->x = px + 5;
+  fighter [1]->tl->z = py + 105;
+  for (i = 2; i <= 3; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_trsam;
+    int phi = (i - 2) * 180;
+    fighter [i]->newinit (TANK_TRSAM1, 0, 200);
+    fighter [i]->tl->x = px + sine [phi] * 5.0;
+    fighter [i]->tl->z = py + cosi [phi] * 5.0;
+//    fighter [i]->phi = 359 - phi;
+    fighter [i]->thrust = 0;
+    fighter [i]->maxthrust = 0;
+  }
+  for (i = 4; i <= 9; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
+    else fighter [i]->o = &model_truck2;
+    fighter [i]->tl->x = px + (i % 3) * 3 - 4;
+    fighter [i]->tl->z = py + (i / 3) * 3 - 4;
+    if (i == 6 || i == 7) fighter [i]->newinit (TANK_TRUCK1, 0, 400);
+    else fighter [i]->newinit (TANK_TRUCK2, 0, 400);
+  }
+  for (i = 10; i <= 12; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->o = &model_fige;
+    fighter [i]->tl->x = px - i * 10;
+    fighter [i]->tl->z = py - i * 10;
+    fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
+  }
+  invertZ (); // only invert if NO objects are mapped to flat ground
+}
+
+int MissionConvoy2::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 9; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionConvoy2::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {
@@ -2668,6 +3010,7 @@ void MissionShip1::start ()
     fighter [i]->tl->z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionShip1::processtimer (Uint32 dt)
@@ -2757,6 +3100,7 @@ void MissionShip2::start ()
     fighter [i]->tl->z = 0;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionShip2::processtimer (Uint32 dt)
@@ -2839,6 +3183,7 @@ void MissionShip3::start ()
     fighter [i]->tl->z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionShip3::processtimer (Uint32 dt)
@@ -2906,7 +3251,7 @@ void MissionCanyon1::start ()
   fighter [1]->tl->z = py + 1;
   fighter [1]->maxthrust = 0;
   fighter [1]->thrust = 0;
-  for (i = 2; i <= 4; i ++)
+  for (i = 2; i < 4; i ++)
   {
     fighter [i]->o = &model_radar;
     fighter [i]->newinit (STATIC_RADAR1, 0, 0);
@@ -3044,6 +3389,7 @@ void MissionCanyon2::start ()
       fighter [i]->newinit (FIGHTER_SWALLOW, 0, myrandom (120) + 200);
     }
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionCanyon2::processtimer (Uint32 dt)
@@ -3191,11 +3537,12 @@ void MissionCanyon3::draw ()
 MissionMoonDefense1::MissionMoonDefense1 ()
 {
   selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_PHOENIX;
+  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [2] = FIGHTER_PHOENIX;
   alliedpilot [0] = PILOT_LARA;
   id = MISSION_MOON1;
   strcpy (name, "TURRETS");
-  strcpy (briefing, "THE DESTINY OF OUR FUTURE IS SOMEWHERE ON THE MOON. OUR NEW BOMBER GL-117 WITH ITS SUPERIOR SHIELDS SHOULD BE EXTREMELY HELPFUL. AT FIRST, WE HAVE TO TAKE OUT THE TURRETS.");
+  strcpy (briefing, "THE DESTINY OF OUR FUTURE IS SOMEWHERE ON THE MOON. OUR NEW BOMBER GL-117 WITH ITS SUPERIOR SHIELDS SHOULD BE EXTREMELY HELPFUL. FIRSTLY, WE HAVE TO TAKE OUT THE TURRETS.");
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 5000 * timestep;
@@ -3242,6 +3589,7 @@ void MissionMoonDefense1::start ()
     fighter [i]->o = &model_mine1;
     fighter [i]->newinit (MISSILE_MINE1, 0, 220);
   }
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionMoonDefense1::processtimer (Uint32 dt)
@@ -3273,10 +3621,109 @@ void MissionMoonDefense1::draw ()
 
 
 
+MissionMoonBattle::MissionMoonBattle ()
+{
+  id = MISSION_MOONBATTLE;
+  strcpy (name, "MOON BATTLE");
+  strcpy (briefing, "THERE ARE HEAVY AIR FORCES ATTACKING. WE HAVE TO FACE THEM BEFORE THEY CAN REACH OUR HEADQUARTERS.");
+  autoLFBriefing ();
+  selfighter [0] = FIGHTER_REDARROW;
+  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [2] = FIGHTER_PHOENIX;
+  alliedfighters = 7;
+  maxtime = 6000 * timestep;
+  alliedpilot [0] = PILOT_MATRIX;
+  alliedpilot [1] = PILOT_SHADOW;
+  alliedpilot [2] = PILOT_FIREBIRD;
+  alliedpilot [3] = PILOT_HEPTARGON;
+  alliedpilot [4] = PILOT_LARA;
+  alliedpilot [5] = PILOT_DRDOOM;
+}
+
+void MissionMoonBattle::start ()
+{
+  int i;
+  day = 0;
+  clouds = 0;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 45;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 100;
+  for (i = 1; i <= 6; i ++)
+  {
+    alliedInit (FIGHTER_FALCON, alliedpilot [i - 1], fighter [i]);
+    if (i % 2)
+      fighter [i]->tl->x = ((i + 1) / 2) * 5;
+    else
+      fighter [i]->tl->x = -((i + 1) / 2) * 5;
+    fighter [i]->tl->z = 100 + i * 5;
+    fighter [i]->target = fighter [7 + i];
+  }
+  for (i = 7; i <= 25; i ++)
+  {
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [myrandom (7)];
+    fighter [i]->o = &model_fige;
+    fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 10);
+    if (i <= 16)
+    {
+      fighter [i]->tl->x = -i * 5;
+      fighter [i]->tl->z = -i * 5;
+    }
+    else if (i <= 24)
+    {
+      fighter [i]->tl->x = -i * 8 - 150;
+      fighter [i]->tl->z = -i * 8 - 150;
+      fighter [i]->o = &model_figh;
+      fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 450 - i * 10);
+    }
+    else
+    {
+      fighter [i]->tl->x = -i * 8 - 350;
+      fighter [i]->tl->z = -i * 8 - 350;
+    }
+  }
+  invertZ (); // only invert if NO objects are mapped to flat ground
+}
+
+int MissionMoonBattle::processtimer (Uint32 dt)
+{
+  bool b = false;
+  int i;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (i = 0; i <= 24; i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
+void MissionMoonBattle::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
 MissionMoonDogfight1::MissionMoonDogfight1 ()
 {
   selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_PHOENIX;
+  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [2] = FIGHTER_PHOENIX;
   alliedpilot [0] = PILOT_MATRIX;
   id = MISSION_MOON2;
   strcpy (name, "ELITE DOGFIGHT");
@@ -3329,6 +3776,7 @@ void MissionMoonDogfight1::start ()
   fighter [5]->phi = 200;
   fighter [5]->o = &model_figh;
   fighter [5]->newinit (FIGHTER_BLACKBIRD, 0, 140);
+  invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
 int MissionMoonDogfight1::processtimer (Uint32 dt)
@@ -3483,7 +3931,8 @@ void MissionTunnel1::draw ()
 MissionMoonBase1::MissionMoonBase1 ()
 {
   selfighter [0] = FIGHTER_REDARROW;
-  selfighter [1] = FIGHTER_PHOENIX;
+  selfighter [1] = FIGHTER_HAWK2;
+  selfighter [2] = FIGHTER_PHOENIX;
   id = MISSION_MOON3;
   strcpy (name, "SNEAKING");
   strcpy (briefing, "TIME TO ATTACK. THE BASE IS HEAVILY GUARDED BY BLACKBIRDS. USE AN ASTEROID FIELD TO GET NEAR THE BASE AND DESTROY IT.");

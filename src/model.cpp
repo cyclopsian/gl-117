@@ -199,8 +199,10 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
 
 void CTexture::getColor (CColor *c, int x, int y)
 {
-  if (x < 0 || x >= width) x = (unsigned int)x % width;
-  if (y < 0 || y >= height) y = (unsigned int)y % height;
+  if (x < 0) x = (int) -x % width;
+  if (y < 0) y = (int) -y % height;
+  if (x >= width) x = (int) x % width;
+  if (y >= height) y = (int) y % height;
   int offs = y * width + x;
   offs <<= 2;
   c->c [0] = data [offs];
@@ -294,6 +296,17 @@ void CVector3::take (CVector3 *v)
 }
 
 
+
+bool CVector2::isEqual (CVector2 *v)
+{
+  return x == v->x && y == v->y;
+}
+
+bool CVector2::isEqual (CVector2 *v, float tol)
+{
+  return x >= v->x - tol && x <= v->x + tol &&
+         y >= v->y - tol && y <= v->y + tol;
+}
 
 void CVector2::take (CVector2 *v)
 {
@@ -477,6 +490,16 @@ void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
 
 
 
+CMaterial::CMaterial ()
+{
+  uscale = 1;
+  vscale = 1;
+  uoffset = 0;
+  voffset = 0;
+  wrot = 0;
+}
+
+
 CObject::CObject ()
 {
   numVertices = 0;
@@ -519,6 +542,7 @@ CModel::CModel ()
   list1 = -1;
   list2 = -1;
   list3 = -1;
+  scale = 1.0F;
   name [0] = '0';
   nolight = false;
   alpha = false;
@@ -704,6 +728,7 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   }
 
 //  gl->shadeSmooth ();
+  zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
@@ -933,11 +958,12 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     }
   }
 
+  zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
+  glRotatef (rot->b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
@@ -1069,11 +1095,12 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   int i, j;
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
+  zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
+  glRotatef (rot->b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   if (alpha)
@@ -1155,11 +1182,12 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   int i, j;
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
+  zoom *= scale;
   glPushMatrix ();
   glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
-  glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
+  glRotatef (rot->b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;

@@ -36,6 +36,7 @@ int volumemusic = 100;
 int fullscreen = 1;
 int controls = CONTROLS_MOUSE;
 int difficulty = 1;
+int physics = 0;
 
 unsigned char key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
 unsigned char key_selectmissile = 'M', key_thrustup = 'I', key_thrustdown = 'D';
@@ -224,6 +225,8 @@ void save_config ()
   cf->write (" difficulty", difficulty);
   cf->writeText ("# Brightness: -50..50 per cent (default=0)");
   cf->write (" brightness", brightness);
+  cf->writeText ("# Physics: 0=action, 1=realistic");
+  cf->write (" physics", physics);
   cf->writeText ("\n# This file is meant to give sensible startup settings");
   cf->writeText ("# as graphic cards and drivers may differ some 100 times in speed");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
@@ -339,6 +342,14 @@ int load_config ()
   { brightness = atoi (str); }
   if (brightness < -50) brightness = -50;
   else if (brightness > 50) brightness = 50;
+
+  str = cf->getString (ret, "physics");
+  if (str == NULL)
+  { physics = 0; }
+  else
+  { physics = atoi (str); }
+  if (physics < 0) physics = 0;
+  else if (physics > 1) physics = 1;
 
   if (cf->buf [0] == 0) // no file found
   {

@@ -25,6 +25,8 @@
 
 #include "3ds.h"
 
+FILE *debugstream3ds = stdout;
+
 BinaryFile::BinaryFile (char *filename)
 {
   char buf [STDSIZE];
@@ -223,7 +225,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   char buf [STDSIZE];
   CObject newObject;
   CMaterial newTexture;
-  char buffer [50000] = {0};
+//  char buffer [50000] = {0};
 
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -231,7 +233,8 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   while (previousChunk->bytesRead < previousChunk->length)
   {
     ReadChunk(currentChunk);
-	if (currentChunk->ID == 0 && currentChunk->length == 0) exit (1000);
+  	if (currentChunk->ID == 0 && currentChunk->length == 0) exit (1000);
+    if (debug3ds) { fprintf (debugstream3ds, "%X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
@@ -242,6 +245,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
           sprintf (buf, "This 3DS file is over version 3 so it may load incorrectly");
           display (buf, LOG_WARN);
         }
+        if (debug3ds) { fprintf (debugstream3ds, "Version %d\n", version [0]); fflush (debugstream3ds); }
         break;
 
       case OBJECTINFO:
@@ -263,6 +267,13 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         ProcessNextObjectChunk (model, (model->object [model->numObjects - 1]), currentChunk);
         break;
 
+      case MAINSCALE:
+        float mainscale;
+        currentChunk->bytesRead += file->readFloat (&mainscale);
+        model->scale = mainscale;
+        currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
+        break;
+
       case EDITKEYFRAME:
 //        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
@@ -282,7 +293,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
 void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *previousChunk)
 {
-  char buffer[50000] = {0};
+//  char buffer[50000] = {0};
 
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -290,6 +301,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
   while (previousChunk->bytesRead < previousChunk->length)
   {
     ReadChunk(currentChunk);
+    if (debug3ds) { fprintf (debugstream3ds, "OBJ %X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
@@ -313,8 +325,13 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
         ReadUVCoordinates (object, currentChunk);
         break;
 
+      case OBJECT_MESHMATRIX:
+        ReadMeshMatrix (object, currentChunk);
+        break;
+
       default:
-        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -327,7 +344,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
 
 void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 {
-  char buffer[50000] = {0};
+//  char buffer[50000] = {0};
 
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -335,25 +352,26 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
   while (previousChunk->bytesRead < previousChunk->length)
   {
     ReadChunk(currentChunk);
+    if (debug3ds) { fprintf (debugstream3ds, "MAT %X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
-      case MATNAME:
+      case MAT_NAME:
         currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->name, 255, currentChunk->length - currentChunk->bytesRead);
         break;
 
-      case MATDIFFUSE:
-        ReadColorChunk ((model->material [model->numMaterials - 1]), currentChunk);
+      case MAT_DIFFUSE:
+        ReadColorChunk (model->material [model->numMaterials - 1], currentChunk);
         break;
     
-      case MATMAP:
+      case MAT_MAP:
         ProcessNextMaterialChunk (model, currentChunk);
         break;
 
-      case MATMAPFILE:
+      case MAT_MAPFILE:
         currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->filename, 255, currentChunk->length - currentChunk->bytesRead);
         {
-          char* str=model->material [model->numMaterials - 1]->filename;
+          char *str = model->material [model->numMaterials - 1]->filename;
           while (*str)
           {
             if (*str >= 'A' && *str <= 'Z')
@@ -363,8 +381,29 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         }
         break;
     
+      case MAT_USCALE:
+        ReadUScale (model->material [model->numMaterials - 1], currentChunk);
+        break;
+
+      case MAT_VSCALE:
+        ReadVScale (model->material [model->numMaterials - 1], currentChunk);
+        break;
+
+      case MAT_UOFFSET:
+        ReadUOffset (model->material [model->numMaterials - 1], currentChunk);
+        break;
+
+      case MAT_VOFFSET:
+        ReadVOffset (model->material [model->numMaterials - 1], currentChunk);
+        break;
+
+      case MAT_ROTATION:
+        ReadUVRotation (model->material [model->numMaterials - 1], currentChunk);
+        break;
+
       default:  
-        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+//        currentChunk->bytesRead += file->readString ((char *) buffer, 50000, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -380,10 +419,10 @@ void CLoad3DS::ReadChunk (Chunk *pChunk)
 //  unsigned char buf [10];
   pChunk->bytesRead = file->readUInt16 (&pChunk->ID);
   pChunk->bytesRead += file->readUInt32 (&pChunk->length);
-  if (pChunk->length > 128000)
+/*  if (pChunk->length > 128000)
   {
     display ("Chunk length exceeds 128K", LOG_WARN);
-  }
+  }*/
 }
 
 int CLoad3DS::GetString (char *buffer)
@@ -418,6 +457,43 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
       }
     }
   }
+}
+
+void CLoad3DS::ReadMeshMatrix (CObject *object, Chunk *previousChunk)
+{
+  float matrix [12];
+  previousChunk->bytesRead += file->readFloat ((float *) matrix, (previousChunk->length - previousChunk->bytesRead) / 4);
+  // Where to put theses coords???
+}
+
+void CLoad3DS::ReadUScale (CMaterial *material, Chunk *previousChunk)
+{
+  previousChunk->bytesRead += file->readFloat (&material->uscale, 1);
+  previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
+}
+
+void CLoad3DS::ReadVScale (CMaterial *material, Chunk *previousChunk)
+{
+  previousChunk->bytesRead += file->readFloat (&material->vscale, 1);
+  previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
+}
+
+void CLoad3DS::ReadUOffset (CMaterial *material, Chunk *previousChunk)
+{
+  previousChunk->bytesRead += file->readFloat (&material->uoffset, 1);
+  previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
+}
+
+void CLoad3DS::ReadVOffset (CMaterial *material, Chunk *previousChunk)
+{
+  previousChunk->bytesRead += file->readFloat (&material->voffset, 1);
+  previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
+}
+
+void CLoad3DS::ReadUVRotation (CMaterial *material, Chunk *previousChunk)
+{
+  previousChunk->bytesRead += file->readFloat (&material->wrot, 1);
+  previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
 void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
@@ -466,7 +542,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
 void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)
 {
   char materialName [255] = {0};
-  char buffer [50000] = {0};
+//  char buffer [50000] = {0};
   previousChunk->bytesRead += GetString (materialName);
 
   for (int i = 0; i < model->numMaterials; i ++)
@@ -487,19 +563,24 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
     }
   }
 
-  previousChunk->bytesRead += file->readString ((char *) buffer, 50000, previousChunk->length - previousChunk->bytesRead);
+//  previousChunk->bytesRead += file->readString ((char *) buffer, 50000, previousChunk->length - previousChunk->bytesRead);
+  currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }      
 
 void CLoad3DS::Compile (CModel *model)
 {
-  for (int i = 0; i < model->numObjects; i ++)
+  // Merge numerically equal vertices
+  // This is necessary to get a smooth shaded object
+  int i;
+  for (i = 0; i < model->numObjects; i ++)
   {
     CObject *co = model->object [i];
     for (int i2 = 1; i2 < co->numVertices; i2 ++)
     {
       for (int i3 = 0; i3 < i2; i3 ++)
       {
-        if (co->vertex [i2].vector.isEqual (&co->vertex [i3].vector))
+        if (co->vertex [i2].vector.isEqual (&co->vertex [i3].vector) &&   // same coordinates
+            co->vertex [i2].tex.isEqual (&co->vertex [i3].tex))           // same texture coordinates
         {
           for (int i4 = 0; i4 < co->numTriangles; i4 ++)
           {
@@ -509,6 +590,29 @@ void CLoad3DS::Compile (CModel *model)
           }
         }
       }
+    }
+  }
+
+  // Scale texture coordinated by uscale, vscale
+//  model->scaleTexture (uscale, vscale);
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    CObject *co = model->object [i];
+    float uscale = co->material->uscale;
+    float vscale = co->material->vscale;
+    float uoffset = co->material->uoffset;
+    float voffset = co->material->voffset;
+    for (int i2 = 0; i2 < co->numVertices; i2 ++)
+    {
+      float ax = co->vertex [i2].tex.x - 0.5;
+      float ay = co->vertex [i2].tex.y - 0.5;
+      float phi = -co->material->wrot;
+      co->vertex [i2].tex.x = ax * COS(phi) - ay * SIN(phi) + 0.5;
+      co->vertex [i2].tex.y = ax * SIN(phi) + ay * COS(phi) + 0.5;
+      co->vertex [i2].tex.x -= uoffset;
+      co->vertex [i2].tex.y += voffset;
+      co->vertex [i2].tex.x = (co->vertex [i2].tex.x - 0.5) * uscale + 0.5;
+      co->vertex [i2].tex.y = (co->vertex [i2].tex.y - 0.5) * vscale + 0.5;
     }
   }
 }
@@ -566,6 +670,8 @@ void CLoad3DS::LoadTextures (CModel *model)
       }
       
       model->object [i]->material->texture = gl->genTextureTGA (str, 0, -1, 1, false);
+      if (model->object [i]->material->texture == NULL)
+        model->object [i]->hasTexture = false;
     }
   }
 }

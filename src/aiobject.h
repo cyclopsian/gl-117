@@ -60,15 +60,19 @@
 #define FIGHTER_PHOENIX 206
 #define FIGHTER_REDARROW 207
 #define FIGHTER_BLACKBIRD 208
+#define FIGHTER_STORM 209
 #define FIGHTER_TRANSPORT 280
+#define FIGHTER_TRANSPORT2 281
 #define FIGHTER2 299
 // moving ground units from here
 #define MOVING_GROUND 500
 #define TANK1 700
 #define TANK_AIR1 700
 #define TANK_GROUND1 710
+#define TANK_TRSAM1 711
 #define TANK_PICKUP1 780
 #define TANK_TRUCK1 790
+#define TANK_TRUCK2 791
 #define TANK2 799
 // moving water units from here
 #define MOVING_WATER 800
@@ -93,6 +97,7 @@
 #define STATIC_COMPLEX1 10301
 #define STATIC_RADAR1 10302
 #define STATIC_BASE1 10303
+#define STATIC_DEPOT1 10304
 #define STATIC_BARRIER1 10400
 
 class DynamicObj : public CSpaceObj
@@ -139,6 +144,8 @@ class DynamicObj : public CSpaceObj
   DynamicObj *source; // missiles must keep track of the object they have been fired from -> statistics
   int bomber; // act as bomber and prefer groud targets
   char net [100];
+  int realism;
+  float accx, accy, accz;
   
   float shield, maxshield; // current and initial/maximum shield
 
@@ -152,6 +159,7 @@ class DynamicObj : public CSpaceObj
   void thrustUp ();
   void thrustDown ();
   float distance (DynamicObj *target);
+  float distanceXZ (DynamicObj *target);
   // check whether the object is exploding or sinking and deactivate if necessary
   void checkExplosion (Uint32 dt);
   // check the objects shield value and explode/sink if necessary
@@ -209,6 +217,8 @@ class AIObj : public DynamicObj
   int ttf; // time to fire missile, targeting mechanism
   CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
   Uint32 timer;
+  int statfirepower; // firepower (missiles) statistics, number of stars
+  bool dualshot; // one or two cannons?
 
   void aiinit (); // initialize variables
   void missileCount ();
@@ -243,6 +253,7 @@ class AIObj : public DynamicObj
   bool selectMissileGround (AIObj **missile);
   void targetNearestGroundEnemy (AIObj **f);
   void targetNearestEnemy (AIObj **f);
+  void targetNextEnemy (AIObj **f);
   void targetLockingEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);

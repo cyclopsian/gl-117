@@ -1256,6 +1256,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     pcx [j] = GETCOORD(px [j]);
     pcy [j] = GETCOORD(py [j]);
   }
+//  glFogf (GL_FOG_END, (float) h [pcx [0]] [pcy [0]] * 100 / 65536 * GLOBALSCALE);
   int x = GETCOORD(pcx [0]);
   int y = GETCOORD(pcy [0]);
   float minh = h [x] [y];
@@ -1386,8 +1387,8 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 //    if (lz1 <= 5 || lz2 <= 5)
     {
       float divdy = 1.0F / dy * 200;
-      float dx1 = ((float) camz - ys);
-      float dx2 = ((float) camz - ys - step);
+      float dx1 = ((float) -camz + ys);
+      float dx2 = ((float) -camz + ys + step);
 //      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
       float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
       float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
@@ -2669,8 +2670,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
   {
     if (explo [i]->ttl > 0)
     {
-      int mx = MAXX / 2 + (int) explo [i]->tl->x;
-      int mz = MAXX / 2 - (int) explo [i]->tl->z;
+      int mx = (int) explo [i]->tl->x;
+      int mz = (int) explo [i]->tl->z;
       float h = explo [i]->tl->y - getHeight (explo [i]->tl->x, explo [i]->tl->z);
       if (h < 0) h = 0;
       float radius = h / 2 + 3;
@@ -2699,8 +2700,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
     {
       if (cannon [i]->draw && cannon [i]->active)
       {
-        int mx = MAXX / 2 + (int) cannon [i]->tl->x;
-        int mz = MAXX / 2 - (int) cannon [i]->tl->z;
+        int mx = (int) cannon [i]->tl->x;
+        int mz = (int) cannon [i]->tl->z;
         float h = cannon [i]->tl->y - getHeight (cannon [i]->tl->x, cannon [i]->tl->z);
         if (h < 0) h = 0;
         float radius = h / 2 + 3;
@@ -2728,8 +2729,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
   {
     if (missile [i]->draw && missile [i]->active)
     {
-      int mx = MAXX / 2 + (int) missile [i]->tl->x;
-      int mz = MAXX / 2 - (int) missile [i]->tl->z;
+      int mx = (int) missile [i]->tl->x;
+      int mz = (int) missile [i]->tl->z;
       float h = missile [i]->tl->y - getHeight (missile [i]->tl->x, missile [i]->tl->z);
       if (h < 0) h = 0;
       float radius = h / 2 + 3;
@@ -2758,8 +2759,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
   {
     if (flare [i]->draw && flare [i]->active)
     {
-      int mx = MAXX / 2 + (int) flare [i]->tl->x;
-      int mz = MAXX / 2 - (int) flare [i]->tl->z;
+      int mx = (int) flare [i]->tl->x;
+      int mz = (int) flare [i]->tl->z;
       float h = flare [i]->tl->y - getHeight (flare [i]->tl->x, flare [i]->tl->z);
       if (h < 0) h = 0;
       float radius = h / 2 + 3;

@@ -111,14 +111,14 @@ void Pilot::load ()
   if (tp == NULL)
   {
     tp = new TeamPilot *[11];
-    tp [0] = new TeamPilot (5, "PRIMETIME", 200, 100, 150, 25);
-    tp [1] = new TeamPilot (1, "HEPTARGON", 80, 220, 300, 5);
-    tp [2] = new TeamPilot (2, "LARA", 180, 160, 50, 10);
-    tp [3] = new TeamPilot (7, "SHARK", 70, 90, 120, 35);
-    tp [4] = new TeamPilot (3, "BOSS", 250, 180, 80, 12);
+    tp [0] = new TeamPilot (5, "PRIMETIME", 200, 100, 150, 20);
+    tp [1] = new TeamPilot (1, "HEPTARGON", 80, 220, 300, 3);
+    tp [2] = new TeamPilot (2, "LARA", 180, 160, 50, 8);
+    tp [3] = new TeamPilot (7, "SHARK", 70, 90, 120, 25);
+    tp [4] = new TeamPilot (3, "BOSS", 250, 180, 80, 10);
     tp [5] = new TeamPilot (1, "DR DOOM", 320, 210, 20, 2);
-    tp [6] = new TeamPilot (4, "SHADOW", 130, 200, 320, 16);
-    tp [7] = new TeamPilot (6, "MATRIX", 40, 80, 180, 28);
+    tp [6] = new TeamPilot (4, "SHADOW", 130, 200, 320, 15);
+    tp [7] = new TeamPilot (6, "MATRIX", 40, 80, 180, 22);
     tp [8] = new TeamPilot (3, "FIREBIRD", 250, 140, 100, 8);
     tp [9] = new TeamPilot (5, "THUNDER", 150, 170, 60, 20);
     tp [10] = new TeamPilot (0, "PLAYER", 0, 0, 0, 0);
@@ -195,7 +195,7 @@ char *Pilot::getRank ()
   else if (sum < 4500)
   { ranking = 5; return "MAJOR"; }
   else if (sum < 5500)
-  { ranking = 6; return "LIEUTNANT COLONEL"; }
+  { ranking = 6; return "LT COLONEL"; }
   else
   { ranking = 7; return "COLONEL"; }
 }
@@ -290,7 +290,12 @@ PilotList::~PilotList ()
 
 void PilotList::rm ()
 {
-  int i;
+  int i, z = 0;
+  for (i = 0; i < maxpilots; i ++)
+  {
+    if (pilot [i] != NULL) z ++;
+  }
+  if (z <= 1) return;
   if (pilot [aktpilot] != NULL)
   {
     char buf [4096];

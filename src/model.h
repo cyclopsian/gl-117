@@ -25,6 +25,7 @@
 #define IS_MODEL_H
 
 #include "common.h"
+#include "mathtab.h"
 #include "loader_tga.h"
 
 // CColor stores color information
@@ -93,6 +94,8 @@ class CVector2
   public:
   float x, y; // coordinates
   void take (CVector2 *v);
+  bool isEqual (CVector2 *v);
+  bool isEqual (CVector2 *v, float tol);
 };
 
 // CVertex represents a vertex which may take inforamtion about color, location, normal, texture, number of surrounding triangles
@@ -160,11 +163,14 @@ class CMaterial
   char filename [255]; // unique file name
   CColor color; // uniform color
   CTexture *texture; // reference to a texture
-  private:
-  float uTile; // tiling coordinates
-  float vTile;
-  float uOffset; // offsets
-  float vOffset;
+  float utile; // tiling coordinates
+  float vtile;
+  float uoffset; // offsets
+  float voffset;
+  float uscale; // scale
+  float vscale;
+  float wrot; // rotation in degree
+  CMaterial ();
 };
 
 // CObject stores the material, vertices, and faces (triangles, quads) of an object
@@ -212,6 +218,7 @@ class CModel
   bool alpha; // use alpha blending?
   int numRefpoints;
   CVector3 *refpoint;
+  float scale;
 
   CModel ();
   void setName (char *name);

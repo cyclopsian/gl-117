@@ -25,14 +25,11 @@
 
 /*
 TODO:
+- correct transport2 (left side corrupt in VRML) and add mission with transport2
 - southern seashore landscape (additional missions)
-- alpine snow landscape
+- alpine snow landscape (additional missions)
 - tree colors (fall, spring), draw more tree textures
-- torpedo, water
-- little bigger gauss filter for light mask, 2x2 grid does not look good ???
-- clouds to fly through
-- particle systems
-- ROAM code Norbert (test)
+- particle systems: rain, clouds to fly through
 */
 
 #ifndef IS_MAIN_H
@@ -69,7 +66,6 @@ float nearclippingplane = 0.25; // do NOT lower this!
 bool sunblinding = false;
 
 Dirs *dirs;
-
 Server *server = NULL;
 Client *client = NULL;
 
@@ -107,7 +103,6 @@ CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
 
 CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
-
 CTexture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
@@ -117,6 +112,7 @@ CBlackSmoke *blacksmoke [maxblacksmoke];
 GLLandscape *l = NULL;
 Font *font1, *font2;
 
+CTexture *textitle;
 
 Uint32 lasttime = 0;
 
@@ -261,9 +257,13 @@ CModel model_fige;
 CModel model_figf;
 CModel model_figg;
 CModel model_figh;
+CModel model_figi;
 CModel model_figt;
+CModel model_figu;
 CModel model_cannon1;
 CModel model_cannon2;
+CModel model_cannon1b;
+CModel model_cannon2b;
 CModel model_flare1;
 CModel model_chaff1;
 CModel model_missile1;
@@ -283,6 +283,8 @@ CModel model_gl117;
 CModel model_tank1;
 CModel model_container1;
 CModel model_truck1;
+CModel model_truck2;
+CModel model_trsam;
 CModel model_pickup1;
 CModel model_pickup2;
 CModel model_tank2;
@@ -297,6 +299,7 @@ CModel model_aster1;
 CModel model_base1;
 CModel model_barrier1;
 CModel model_rubble1;
+CModel model_depot1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -352,6 +355,7 @@ CColor colororange (255, 150, 100, 255);
 CColor colorred (255, 0, 0, 255);
 CColor coloryellow (255, 255, 0, 200);
 CColor colorgrey (150, 150, 150, 200);
+CColor colorlightgrey (210, 210, 210, 255);
 
 
 void drawRank (float xp, float yp, float zp, int rank, float zoom)
@@ -563,7 +567,9 @@ CModel *getModel (int id)
   else if (id == FIGHTER_PHOENIX) return &model_figf;
   else if (id == FIGHTER_REDARROW) return &model_figg;
   else if (id == FIGHTER_BLACKBIRD) return &model_figh;
+  else if (id == FIGHTER_STORM) return &model_figi;
   else if (id == FIGHTER_TRANSPORT) return &model_figt;
+  else if (id == FIGHTER_TRANSPORT2) return &model_figu;
   else if (id == MISSILE_AIR1) return &model_missile1;
   else if (id == MISSILE_AIR2) return &model_missile2;
   else if (id == MISSILE_AIR3) return &model_missile3;
@@ -626,9 +632,9 @@ void game_levelInit ()
   else if (clouds == 3) highclouds->setTexture (texclouds3);
 
   if (clouds == 0) highclouds2->setTexture (NULL);
-  else if (clouds == 1) highclouds2->setTexture (texclouds1);
-  else if (clouds == 2) highclouds2->setTexture (texclouds2);
-  else if (clouds == 3) highclouds2->setTexture (texclouds3);
+  else if (clouds == 1) highclouds2->setTexture (texclouds2);
+  else if (clouds == 2) highclouds2->setTexture (NULL);
+  else if (clouds == 3) highclouds2->setTexture (NULL);
 
   // place missiles to racks
   for (i = 0; i < maxfighter; i ++)
@@ -708,6 +714,10 @@ void game_levelInit ()
     {
       fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.5 * fighter [i]->zoom;
     }
+    else if (fighter [i]->id == STATIC_DEPOT1)
+    {
+      fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.5 * fighter [i]->zoom;
+    }
     else if (fighter [i]->id == STATIC_BARRIER1)
     {
       fighter [i]->tl->y = l->getExactHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 0.3 * fighter [i]->zoom;
@@ -732,13 +742,13 @@ void game_levelInit ()
     if (day)
     {
       laser [i]->o = &model_cannon1;
-      laser [i]->zoom = 0.04;
+      laser [i]->zoom = 0.08;
       laser [i]->drawlight = false;
     }
     else
     {
       laser [i]->o = &model_cannon2;
-      laser [i]->zoom = 0.08;
+      laser [i]->zoom = 0.1;
     }
   }
 
@@ -798,12 +808,12 @@ void game_levelInit ()
     if (sungamma < 35)
     {
       skycolor.setColor ((unsigned short) (180 + 70 - 2 * sungamma), 180, 180);
-      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
     }
     else
     {
       skycolor.setColor (200, 200, 200);
-      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
     }
   }
   else if (!day && weather == WEATHER_SUNNY)
@@ -818,7 +828,7 @@ void game_levelInit ()
       skycolor.setColor (0, 0, 170);
       objsphere->setNorthPoleColor (&skycolor, 1.8);
       skycolor.setColor (64, 64, 64);
-      objsphere->setPoleColor (90, (int) (90 - sungamma), &skycolor, 0.3);
+      objsphere->setPoleColor (270, (int) (90 - sungamma), &skycolor, 0.3);
     }
     else
     {
@@ -886,6 +896,9 @@ void game_levelInit ()
   lastshield = (int) fplayer->shield;
 
   fps = 30;
+  
+  if (!fplayer->ai)
+    fplayer->realism = physics;
 
 /*#ifdef HAVE_SDL_NET
   if (multiplayer)
@@ -1053,9 +1066,11 @@ void createMission (int missionid)
   else if (missionid == MISSION_SADEFENSE) missionnew = new MissionGround1 ();
   else if (missionid == MISSION_SCOUT) missionnew = new MissionScout ();
   else if (missionid == MISSION_BASE) missionnew = new MissionBase ();
+  else if (missionid == MISSION_DEPOT) missionnew = new MissionDepot ();
   else if (missionid == MISSION_DEFEND1) missionnew = new MissionDefend1 ();
   else if (missionid == MISSION_DOGFIGHT3) missionnew = new MissionDogfight3 ();
   else if (missionid == MISSION_TANK1) missionnew = new MissionTank1 ();
+  else if (missionid == MISSION_CONVOY2) missionnew = new MissionConvoy2 ();
   else if (missionid == MISSION_SHIP1) missionnew = new MissionShip1 ();
   else if (missionid == MISSION_SHIP2) missionnew = new MissionShip2 ();
   else if (missionid == MISSION_SHIP3) missionnew = new MissionShip3 ();
@@ -1064,6 +1079,7 @@ void createMission (int missionid)
   else if (missionid == MISSION_CANYON3) missionnew = new MissionCanyon3 ();
   else if (missionid == MISSION_TUNNEL1) missionnew = new MissionTunnel1 ();
   else if (missionid == MISSION_MOON1) missionnew = new MissionMoonDefense1 ();
+  else if (missionid == MISSION_MOONBATTLE) missionnew = new MissionMoonBattle ();
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
   else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
@@ -1158,6 +1174,7 @@ void switch_credits ()
     sound->haltMusic ();
   sound->playMusic (MUSIC_WINNER1);*/
   sound->stop (SOUND_PLANE1);
+  sound->stop (SOUND_CANNON1);
 }
 
 void switch_finish ()
@@ -1171,6 +1188,7 @@ void switch_finish ()
   sound->loadMusic (MUSIC_ELECTRO1);
   sound->playMusic ();
   sound->stop (SOUND_PLANE1);
+  sound->stop (SOUND_CANNON1);
 }
 
 void switch_quit ()
@@ -1189,6 +1207,9 @@ void switch_game ()
     sound->haltMusic ();
   sound->playLoop (SOUND_PLANE1);
   setPlaneVolume ();
+  if (fplayer)
+    if (!fplayer->ai)
+      fplayer->realism = physics;
 #ifdef HAVE_SDL
   SDL_WM_GrabInput (SDL_GRAB_ON);
 #endif
@@ -1366,6 +1387,21 @@ void game_key (unsigned char key, int x, int y)
       fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
       sound->play (SOUND_CLICK1);
     }
+/*    else if (hikey == 'X')
+    {
+      sphere->rot->a += 90;
+      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
+    }
+    else if (hikey == 'C')
+    {
+      sphere->rot->b += 90;
+      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
+    }
+    else if (hikey == 'V')
+    {
+      sphere->rot->c += 90;
+      printf ("rot: a=%d, b=%d, c=%d", sphere->rot->a % 360, sphere->rot->b % 360, sphere->rot->c % 360);
+    }*/
 /*    else if (key == 'a')
     {
       fplayer->ai = !fplayer->ai;
@@ -1701,31 +1737,12 @@ int getJoystickAxisIndex (int n)
   return idx;
 }
 
-void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
+void game_joystickaxis (int x, int y, int rudder, int throttle)
 {
   if (fplayer->ai) return;
-/*  int axis [4];
-  axis [0] = axis1;
-  axis [1] = axis2;
-  axis [2] = axis3;
-  axis [3] = axis4;*/
-  int x = jaxis [getJoystickAxisIndex (joystick_aileron)];
-  int y = jaxis [getJoystickAxisIndex (joystick_elevator)];
-  int rudder = jaxis [getJoystickAxisIndex (joystick_rudder)];
-  int throttle = jaxis [getJoystickAxisIndex (joystick_throttle)];
-  view_x = (float) jaxis [getJoystickAxisIndex (joystick_view_x)]/(-328.0);
-  view_y = (float) jaxis [getJoystickAxisIndex (joystick_view_y)]/(-328.0);
-/*  int t = (int) fplayer->theta;
-  if (t < 0) t += 360;
-  float rx = x * cosi [t] - y * sine [t];
-  float ry = x * sine [t] + y * cosi [t];*/
   float xx = x / 32768.0;
   xx *= fabs (xx);
   fplayer->rolleffect = (float) -xx;
-//  fplayer->rectheta -= (float) xx * 6.0F;
-/*  fplayer->recgamma += (float) ry / 5000;
-  if (fplayer->recgamma > 225) fplayer->recgamma = 225;
-  if (fplayer->recgamma < 135) fplayer->recgamma = 135;*/
   fplayer->elevatoreffect = (float) y / 30000;
   if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
   else if (fplayer->elevatoreffect < -1.0) fplayer->elevatoreffect = -1.0;
@@ -1733,7 +1750,6 @@ void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
   fplayer->ruddereffect = (float) rudder / 30000;
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
-//  fplayer->elevatoreffect = 0;
   fplayer->recthrust = fplayer->maxthrust * 0.75 - fplayer->maxthrust / 4 * throttle / 32638;
 }
 
@@ -2117,6 +2133,8 @@ char *getModelName (int id)
     return "GL-15 REDARROW";
   else if (id == FIGHTER_PHOENIX)
     return "GL-117 PHOENIX";
+  else if (id == FIGHTER_STORM)
+    return "GL-50 STORM";
   else if (id == FIGHTER_CROW)
     return "CROW";
   else if (id == FIGHTER_BUZZARD)
@@ -2168,19 +2186,19 @@ void mission_mouse (int button, int state, int x, int y)
   missionmenufighterselected = -1;
   if (ry >= 0.55 && ry <= 0.75)
   {
-    if (rx >= 0.1 && rx < 0.25)
+    if (rx >= 0.1 && rx < 0.23)
     {
       missionmenufighterselected = 0;
       if (state == MOUSE_DOWN)
         missionnew->wantfighter = 0;
     }
-    if (rx >= 0.25 && rx < 0.4 && missionnew->selfighters >= 2)
+    if (rx >= 0.23 && rx < 0.36 && missionnew->selfighters >= 2)
     {
       missionmenufighterselected = 1;
       if (state == MOUSE_DOWN)
         missionnew->wantfighter = 1;
     }
-    if (rx >= 0.4 && rx < 0.55 && missionnew->selfighters >= 3)
+    if (rx >= 0.36 && rx < 0.5 && missionnew->selfighters >= 3)
     {
       missionmenufighterselected = 2;
       if (state == MOUSE_DOWN)
@@ -2336,12 +2354,12 @@ void mission_display ()
   tl.x = 4.5;
   model_gl117.draw2 (&vec, &tl, &rot, 1.0, 0);
   
-  tl.x = -20; tl.y = -2.4; tl.z = -8.5;
-  rot.a = 245;
+  tl.x = -20; tl.y = -2.4; tl.z = -9.2;
+  rot.a = 300;
   rot.b = 0;
   for (i = 0; i < missionnew->selfighters; i ++)
   {
-    tl.x = -5 + (float) i * 2.3;
+    tl.x = -5.6 + (float) i * 2.1;
     if (missionnew->wantfighter == i)
       rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
@@ -2350,7 +2368,7 @@ void mission_display ()
   }
 
   tl.x = 0; tl.y = -2.4; tl.z = -8.5;
-  rot.a = 245;
+  rot.a = 300;
   rot.b = 0;
   for (i = 0; i < missionnew->selweapons; i ++)
   {
@@ -2549,9 +2567,9 @@ void fighter_mouse (int button, int state, int x, int y)
   float ry = (float) y / height;
   missionmenuitemselected = -1;
 
-  int maxfighter = 5;
+  int maxfighter = 6;
   Pilot *p = pilots->pilot [pilots->aktpilot];
-  if (p->mission_state [MISSION_BASE] == 1) maxfighter ++;
+  if (p->mission_state [MISSION_DEPOT] == 1) maxfighter ++;
   if (p->mission_state [MISSION_SHIP1] == 1) maxfighter ++;
   if (p->mission_state [MISSION_CANYON3] == 1) maxfighter ++;
   if (p->mission_state [MISSION_MOON1] == 1) maxfighter ++;
@@ -2594,6 +2612,7 @@ void fighter_mouse (int button, int state, int x, int y)
 void fighter_display ()
 {
   char buf [256];
+  int i;
 //  Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorblue;
 
@@ -2642,10 +2661,10 @@ void fighter_display ()
 
   CVector3 vec;
   CVector3 tl;
-  tl.y = -0.4;
+  tl.y = -0.45;
   tl.z = -3;
   CRotation rot;
-  rot.a = 310;
+  rot.a = 300;
   rot.b = 0;
   rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
   CModel *model;
@@ -2653,12 +2672,13 @@ void fighter_display ()
   if (aktfighter == 0) { model = &model_fig; id = FIGHTER_FALCON; }
   else if (aktfighter == 1) { model = &model_fige; id = FIGHTER_CROW; }
   else if (aktfighter == 2) { model = &model_figb; id = FIGHTER_HAWK; }
-  else if (aktfighter == 3) { model = &model_figa; id = FIGHTER_SWALLOW; }
-  else if (aktfighter == 4) { model = &model_figd; id = FIGHTER_BUZZARD; }
-  else if (aktfighter == 5) { model = &model_figc; id = FIGHTER_HAWK2; }
-  else if (aktfighter == 6) { model = &model_figg; id = FIGHTER_REDARROW; }
-  else if (aktfighter == 7) { model = &model_figf; id = FIGHTER_PHOENIX; }
-  else { model = &model_figh; id = FIGHTER_BLACKBIRD; }
+  else if (aktfighter == 3) { model = &model_figi; id = FIGHTER_STORM; }
+  else if (aktfighter == 4) { model = &model_figa; id = FIGHTER_SWALLOW; }
+  else if (aktfighter == 5) { model = &model_figd; id = FIGHTER_BUZZARD; }
+  else if (aktfighter == 6) { model = &model_figc; id = FIGHTER_HAWK2; }
+  else if (aktfighter == 7) { model = &model_figg; id = FIGHTER_REDARROW; }
+  else if (aktfighter == 8) { model = &model_figf; id = FIGHTER_PHOENIX; }
+  else if (aktfighter == 9) { model = &model_figh; id = FIGHTER_BLACKBIRD; }
 
 /* Some code to get screenshots of missiles
 glClearColor (1, 1, 1, 1);
@@ -2678,33 +2698,35 @@ model = &model_missile7; */
   strcpy (buf, "TYPE: ");
   if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_CROW || fplayer->id == FIGHTER_BUZZARD || fplayer->id == FIGHTER_REDARROW || fplayer->id == FIGHTER_BLACKBIRD)
     strcat (buf, "FIGHTER");
+  else if (fplayer->id == FIGHTER_HAWK || fplayer->id == FIGHTER_HAWK2)
+    strcat (buf, "FIGHTER-BOMBER");
   else
     strcat (buf, "BOMBER");
   font1->drawText (-10, yf, -2.5, buf);
   yf -= 1.5;
   strcpy (buf, "SPEED: ");
-  if (fplayer->maxthrust < 0.20) strcat (buf, "VERY SLOW");
-  else if (fplayer->maxthrust < 0.25) strcat (buf, "SLOW");
-  else if (fplayer->maxthrust < 0.3) strcat (buf, "MEDIUM");
-  else if (fplayer->maxthrust < 0.33) strcat (buf, "FAST");
-  else strcat (buf, "EXTREMELY FAST");
+  int stars = (int) ((fplayer->maxthrust - 0.2) * 40);
   font1->drawText (-10, yf, -2.5, buf);
+  for (i = 0; i < stars; i ++)
+    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
   yf -= 1.5;
-  strcpy (buf, "MANOEVERABILITY: ");
-  if (fplayer->manoeverability <= 0.25) strcat (buf, "VERY BAD");
-  else if (fplayer->manoeverability <= 0.33) strcat (buf, "BAD");
-  else if (fplayer->manoeverability <= 0.42) strcat (buf, "MEDIUM");
-  else if (fplayer->manoeverability <= 0.5) strcat (buf, "HIGH");
-  else strcat (buf, "EXTREMELY HIGH");
+  strcpy (buf, "NIMBILITY: ");
+  stars = (int) ((fplayer->manoeverability - 0.3) * 20 + 1);
   font1->drawText (-10, yf, -2.5, buf);
+  for (i = 0; i < stars; i ++)
+    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
   yf -= 1.5;
   strcpy (buf, "SHIELD: ");
-  if (fplayer->maxshield <= 70) strcat (buf, "VERY LOW");
-  else if (fplayer->maxshield <= 100) strcat (buf, "LOW");
-  else if (fplayer->maxshield <= 130) strcat (buf, "MEDIUM");
-  else if (fplayer->maxshield <= 160) strcat (buf, "STRONG");
-  else strcat (buf, "EXTREMELY STRONG");
+  stars = (int) ((fplayer->maxshield - 30) / 30);
   font1->drawText (-10, yf, -2.5, buf);
+  for (i = 0; i < stars; i ++)
+    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
+  yf -= 1.5;
+  strcpy (buf, "FIREPOWER: ");
+  stars = fplayer->statfirepower;
+  font1->drawText (-10, yf, -2.5, buf);
+  for (i = 0; i < stars; i ++)
+    drawMedal (3 + i * 1.5, yf + 0.7, -2.5, 0, 1.3, MISSION_CAMPAIGN1);
 
   if (missionmenuitemselected == 0)
     font1->drawTextScaled (-2, -12, -2, "BACK", colorstd, -missionmenutimer * 5);
@@ -3043,10 +3065,11 @@ void menu_mouse (int button, int state, int x, int y)
   if (menuitem == 2)
   {
     Pilot *p = pilots->pilot [pilots->aktpilot];
+    float ydiff1 = 0.02F, ydiff2 = 0.026F;
     if (rx >= 0.48 && rx <= 0.85)
     {
       float ryu = 0.12F;
-      if (ry >= ryu && ry <= ryu + 0.02F)
+      if (ry >= ryu && ry <= ryu + ydiff1)
       {
         menuitemselected = 10;
         if (state == MOUSE_DOWN)
@@ -3054,8 +3077,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TEST1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TEST1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TEST1] == 1)
       {
         menuitemselected = 11;
         if (state == MOUSE_DOWN)
@@ -3063,8 +3086,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TEST2);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TEST2] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TEST2] == 1)
       {
         menuitemselected = 12;
         if (state == MOUSE_DOWN)
@@ -3072,8 +3095,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TRANSPORT);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TRANSPORT] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TRANSPORT] == 1)
       {
         menuitemselected = 13;
         if (state == MOUSE_DOWN)
@@ -3081,8 +3104,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CONVOY);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CONVOY] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CONVOY] == 1)
       {
         menuitemselected = 14;
         if (state == MOUSE_DOWN)
@@ -3090,8 +3113,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT2);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DOGFIGHT2] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DOGFIGHT2] == 1)
       {
         menuitemselected = 15;
         if (state == MOUSE_DOWN)
@@ -3099,8 +3122,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_AIRBATTLE);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_AIRBATTLE] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_AIRBATTLE] == 1)
       {
         menuitemselected = 16;
         if (state == MOUSE_DOWN)
@@ -3108,8 +3131,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SADEFENSE);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SADEFENSE] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SADEFENSE] == 1)
       {
         menuitemselected = 17;
         if (state == MOUSE_DOWN)
@@ -3117,8 +3140,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SCOUT);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SCOUT] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SCOUT] == 1)
       {
         menuitemselected = 18;
         if (state == MOUSE_DOWN)
@@ -3126,8 +3149,17 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_BASE);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_BASE] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_BASE] == 1)
+      {
+        menuitemselected = 19;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_DEPOT);
+        }
+      }
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DEPOT] == 1)
       {
         menuitemselected = 20;
         if (state == MOUSE_DOWN)
@@ -3135,8 +3167,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DEFEND1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DEFEND1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DEFEND1] == 1)
       {
         menuitemselected = 21;
         if (state == MOUSE_DOWN)
@@ -3144,8 +3176,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT3);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DOGFIGHT3] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_DOGFIGHT3] == 1)
       {
         menuitemselected = 22;
         if (state == MOUSE_DOWN)
@@ -3153,8 +3185,17 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TANK1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TANK1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TANK1] == 1)
+      {
+        menuitemselected = 23;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_CONVOY2);
+        }
+      }
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CONVOY2] == 1)
       {
         menuitemselected = 25;
         if (state == MOUSE_DOWN)
@@ -3162,8 +3203,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP1] == 1)
       {
         menuitemselected = 26;
         if (state == MOUSE_DOWN)
@@ -3171,8 +3212,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP2);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP2] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP2] == 1)
       {
         menuitemselected = 27;
         if (state == MOUSE_DOWN)
@@ -3180,8 +3221,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP3);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP3] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_SHIP3] == 1)
       {
         menuitemselected = 30;
         if (state == MOUSE_DOWN)
@@ -3189,8 +3230,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON1] == 1)
       {
         menuitemselected = 31;
         if (state == MOUSE_DOWN)
@@ -3198,8 +3239,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON2);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON2] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON2] == 1)
       {
         menuitemselected = 36;
         if (state == MOUSE_DOWN)
@@ -3207,8 +3248,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TUNNEL1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TUNNEL1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_TUNNEL1] == 1)
       {
         menuitemselected = 32;
         if (state == MOUSE_DOWN)
@@ -3216,8 +3257,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON3);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON3] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_CANYON3] == 1)
       {
         menuitemselected = 33;
         if (state == MOUSE_DOWN)
@@ -3225,8 +3266,17 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_MOON1);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_MOON1] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOON1] == 1)
+      {
+        menuitemselected = 37;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_MOONBATTLE);
+        }
+      }
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOONBATTLE] == 1)
       {
         menuitemselected = 34;
         if (state == MOUSE_DOWN)
@@ -3234,8 +3284,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_MOON2);
         }
       }
-      ryu += 0.03F;
-      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_MOON2] == 1)
+      ryu += ydiff2;
+      if (ry >= ryu && ry <= ryu + ydiff1 && p->mission_state [MISSION_MOON2] == 1)
       {
         menuitemselected = 35;
         if (state == MOUSE_DOWN)
@@ -3431,6 +3481,17 @@ void menu_mouse (int button, int state, int x, int y)
           {
             brightness -= 10;
             if (brightness < -50) brightness = 50;
+          }
+        }
+      }
+      else if (ry >= 0.64 && ry <= 0.69)
+      {
+        menuitemselected = 18;
+        if (state == MOUSE_DOWN)
+        {
+          if (button == MOUSE_BUTTON_LEFT)
+          {
+            physics = !physics;
           }
         }
       }
@@ -3789,33 +3850,48 @@ void menu_display ()
   else if (menuitem == 2)
   {
     Pilot *p = pilots->pilot [pilots->aktpilot];
-    float zf = -3.0, yf = 18;
+    float zf = -3.0, yf = 18, ydiff = 1.3;
     if (menuitemselected == 10)
       font1->drawTextScaled (textx2, yf, zf, "EAGLE TEST1", &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yf, zf, "EAGLE TEST1");
     drawMedal (textx2 - 0.8, yf + 0.6, zf, getMedal (p->mission_score [MISSION_TEST1]), 1.0, MISSION_TEST1);
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SADEFENSE, MISSION_AIRBATTLE, 16, "SURFACE-AIR DEFENSE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SCOUT, MISSION_SADEFENSE, 17, "VETERAN DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_BASE, MISSION_SCOUT, 18, "BASE ATTACK");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_DEFEND1, MISSION_BASE, 20, "DEFEND SAM");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_DOGFIGHT3, MISSION_DEFEND1, 21, "DESERT DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TANK1, MISSION_DOGFIGHT3, 22, "TANK ASSAUT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SHIP1, MISSION_TANK1, 25, "DESTROYERS");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SHIP2, MISSION_SHIP1, 26, "OILRIG");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON2, MISSION_MOON1, 34, "ELITE DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TEST2, MISSION_TEST1, 11, "EAGLE TEST2");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TRANSPORT, MISSION_TEST2, 12, "TRANSPORT");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CONVOY, MISSION_TRANSPORT, 13, "CONVOY");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT2, MISSION_CONVOY, 14, "DOGFIGHT");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_AIRBATTLE, MISSION_DOGFIGHT2, 15, "AIR BATTLE");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SADEFENSE, MISSION_AIRBATTLE, 16, "SURFACE-AIR DEFENSE");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SCOUT, MISSION_SADEFENSE, 17, "VETERAN DOGFIGHT");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_BASE, MISSION_SCOUT, 18, "BASE ATTACK");
+    drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEPOT, MISSION_BASE, 19, "DEPOTS");
+    if (p->mission_state [MISSION_DEPOT] == 1)
+    {
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DEFEND1, MISSION_DEPOT, 20, "DEFEND SAM");
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_DOGFIGHT3, MISSION_DEFEND1, 21, "DESERT DOGFIGHT");
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TANK1, MISSION_DOGFIGHT3, 22, "TANK ASSAUT");
+      drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CONVOY2, MISSION_TANK1, 23, "SAM CONVOY");
+      if (p->mission_state [MISSION_CONVOY2] == 1)
+      {
+        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP1, MISSION_CONVOY2, 25, "DESTROYERS");
+        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP2, MISSION_SHIP1, 26, "OILRIG");
+        drawMissionElement (textx2, yf -= ydiff, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
+        if (p->mission_state [MISSION_SHIP3] == 1)
+        {
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
+          drawMissionElement (textx2, yf -= ydiff, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
+          if (p->mission_state [MISSION_CANYON3] == 1)
+          {
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOONBATTLE, MISSION_MOON1, 37, "MOON BATTLE");
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON2, MISSION_MOONBATTLE, 34, "ELITE DOGFIGHT");
+            drawMissionElement (textx2, yf -= ydiff, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
+          }
+        }
+      }
+    }
     zf = -2;
     if (menuitemselected == 100)
       font1->drawTextScaled (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
@@ -3890,47 +3966,55 @@ void menu_display ()
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
+    if (!physics) sprintf (buf, "PHYSICS: ACTION");
+    else sprintf (buf, "PHYSICS: SIM");
+    if (menuitemselected == 18)
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yt -= 2, -2, buf);
   }
   else if (menuitem == 4)
   {
     int xs = -4, ys = 15;
     char buf [100];
     char text [100];
-    font1->drawText (xs, ys --, -3, "KEYS:");
+  	CColor *col = &colorlightgrey;
+  	CColor *col2 = &colorwhite;
+    font1->drawText (xs, ys --, -3, "KEYS:", col2);
     sprintf (text, "%s\tFIRE CANNON", getKeyString (key_firecannon, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tFIRE MISSILE", getKeyString (key_firemissile, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tDROP CHAFF", getKeyString (key_dropchaff, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tDROP FLARE", getKeyString (key_dropflare, buf));
-    font1->drawText (xs, ys --, -3, text);
-    font1->drawText (xs, ys --, -3, "1..9\tCHANGE THROTTLE");
+    font1->drawText (xs, ys --, -3, text, col);
+    font1->drawText (xs, ys --, -3, "1..9\tCHANGE THROTTLE", col);
     sprintf (text, "%s\tINCREASE THROTTLE", getKeyString (key_thrustup, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tDECREASE THROTTLE", getKeyString (key_thrustdown, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tSELECT MISSILE", getKeyString (key_selectmissile, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tTARGET NEAREST ENEMY", getKeyString (key_targetnearest, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tTARGET LOCKING ENEMY", getKeyString (key_targetlocking, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tTARGET NEXT", getKeyString (key_targetnext, buf));
-    font1->drawText (xs, ys --, -3, text);
+    font1->drawText (xs, ys --, -3, text, col);
     sprintf (text, "%s\tTARGET PREVIOUS", getKeyString (key_targetprevious, buf));
-    font1->drawText (xs, ys --, -3, text);
-    font1->drawText (xs, ys --, -3, "F1..8\tCAMERAS");
-    font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU");
-    font1->drawText (xs, (-- ys) --, -3, "MOUSE:");
-    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
-    font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:");
-    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
-    font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN");
+    font1->drawText (xs, ys --, -3, text, col);
+    font1->drawText (xs, ys --, -3, "F1..8\tCAMERAS", col);
+    font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU", col);
+    font1->drawText (xs, (-- ys) --, -3, "MOUSE:", col2);
+    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
+    font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:", col);
+    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"", col);
+    font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN", col);
     strcpy (buf, dirs->getSaves (""));
     for (i = 0; i < (int) strlen (buf); i ++)
       buf [i] = toupper (buf [i]);
-    font1->drawTextCentered (0, -18.5, -3, buf);
+    font1->drawTextCentered (0, -18.5, -3, buf, col);
   }
   else if (menuitem == 7)
   {
@@ -3974,6 +4058,7 @@ void credits_display ()
   font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", col);
   font2->drawTextCentered (0, yt -= 2, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
   font1->drawTextCentered (0, yt -= 2, zf, "THOMAS A. DREXL", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "SPECIAL THANKS TO...", col);
   font2->drawTextCentered (0, yt -= 4, zf, "LENS FLARES & FURTHER DEBUGGING", col);
   font1->drawTextCentered (0, yt -= 2, zf, "PIOTR PAWLOW", col2);
   font2->drawTextCentered (0, yt -= 4, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", col);
@@ -3982,8 +4067,9 @@ void credits_display ()
   font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", col2);
   font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", col);
   font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "IMPROVEMENTS TO PHYSICAL MODEL & COCKPIT", col);
+  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL (ACTION) & COCKPIT IMPROVEMENTS", col);
   font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "...AND TAHNKS ALL THOSE GIVING FEEDBACK AND ADVICE", col);
 }
 
 void finish_display ()
@@ -4079,7 +4165,7 @@ void game_display ()
   // calculate light factor
   if (camera == 0 && sunblinding && day && weather == WEATHER_SUNNY)
   {
-    float np = fplayer->phi;
+    float np = fplayer->phi - 180;
     if (np >= 180) np -= 360;
     float sunfactor = fabs (np) + fabs (fplayer->gamma - 180 - sungamma);
     if (sunfactor < 50)
@@ -4175,26 +4261,6 @@ void game_display ()
   gl->foglum = mylight;
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
 
-  if (quality >= 1 && clouds > 0)
-  {
-    gl->enableFog (pseudoview);
-
-    if (quality >= 3)
-    {
-      highclouds2->zoom = 350;
-      float ch2 = -332 - fplayer->tl->y / 10.5;
-      CVector3 tlsphere3 (0, ch2, 0);
-      highclouds2->drawGL (&tlsphere3, fplayer->tl);
-    }
-
-    highclouds->zoom = 300;
-    float ch2 = -288 - fplayer->tl->y / 10.0;
-    CVector3 tlsphere2 (0, ch2, 0);
-    highclouds->drawGL (&tlsphere2, fplayer->tl);
-
-    glDisable (GL_FOG);
-  }
-
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
     if (!day)
@@ -4217,11 +4283,31 @@ void game_display ()
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_FOG);
 
+  if (quality >= 1 && clouds > 0)
+  {
+    gl->enableFog (pseudoview);
+
+    if (quality >= 3 && clouds == 1)
+    {
+      highclouds2->zoom = 350;
+      float ch2 = -332 - fplayer->tl->y / 10.5;
+      CVector3 tlsphere3 (0, ch2, 0);
+      highclouds2->drawGL (&tlsphere3, fplayer->tl);
+    }
+
+    highclouds->zoom = 300;
+    float ch2 = -288 - fplayer->tl->y / 10.0;
+    CVector3 tlsphere2 (0, ch2, 0);
+    highclouds->drawGL (&tlsphere2, fplayer->tl);
+
+    glDisable (GL_FOG);
+  }
 
 // draw sun or moon (or earth)
   float fac = view, zfac = view * 0.2;
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
+    glRotatef (180, 0.0, 1.0, 0.0);
     if (camera == 0)
       glRotatef (sungamma, 1.0, 0.0, 0.0);
     else
@@ -4481,7 +4567,9 @@ void game_display ()
     cockpit->drawTargetedElement ();
     cockpit->drawWeapon ();
     cockpit->drawCounter ();
-  }
+    cockpit->drawThrustBar ();
+    cockpit->drawRelativeHeightBar ();
+   }
 
   // draw blackout/redout (blending)
   if (camera == 0)
@@ -4738,9 +4826,12 @@ void game_timer (int dt)
   camtheta = fplayer->theta;
   if (camera == 0)  // cockpit
   {
-    camx = fplayer->tl->x + cf * SIN(fplayer->phi);
-    camy = fplayer->tl->y + fplayer->zoom / 3.0;
-    camz = fplayer->tl->z + cf * COS(fplayer->phi);
+    float cgamma = fplayer->gamma + 25.0F * COS(fplayer->theta);
+    float cphi = fplayer->phi + 25.0F * SIN(fplayer->theta);
+    float fac = fplayer->zoom / 2;
+    camx = fplayer->tl->x + COS(cgamma) * SIN(cphi) * fac;
+    camy = fplayer->tl->y - SIN(cgamma) * fac;
+    camz = fplayer->tl->z + COS(cgamma) * COS(cphi) * fac;
     camphi = fplayer->phi;
     camgamma = -fplayer->gamma + 180;
     fplayer->draw = 0;
@@ -4983,7 +5074,7 @@ void mission_timer (Uint32 dt)
 void credits_timer (Uint32 dt)
 {
   creditstimer += dt;
-  if (creditstimer > 550 * timestep)
+  if (creditstimer > 650 * timestep)
     creditstimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5080,6 +5171,7 @@ void myInit ()
   int i, i2;
 
   // create textures (OpenGL)
+  display ("Loading textures", LOG_ALL);
   texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
   texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
   texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
@@ -5110,7 +5202,7 @@ void myInit ()
   texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
   texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 0, true);
   texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 0, true);
-  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, 4, 1, true);
+  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, -1, 1, true);
   texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
   texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
@@ -5169,7 +5261,9 @@ void myInit ()
 
   objsphere = new CSphere (1, 9, 1, 1, 1);
   sphere = new CSpaceObj (objsphere, 10.0);
+  sphere->rot->a = 90;
   sphere->rot->b = 90;
+  sphere->rot->c = 270;
   sphere->draw = 2;
   sphere->drawlight = false;
 
@@ -5251,50 +5345,53 @@ void myFirstInit ()
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 
-  display ("Loading 3ds models", LOG_ALL);
-//  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig1.3ds"));
+  display ("Loading 3ds models:", LOG_ALL);
+  display (" * gl-16.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_fig, dirs->getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
-  model_fig.scaleTexture (0.3, 0.3);
-//  g_Load3ds.Import3DS (&model_figa, dirs->getModels ("fig4.3ds"));
+  display (" * gl-15.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figa, dirs->getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
-  model_figa.scaleTexture (0.3, 0.3);
-//  g_Load3ds.Import3DS (&model_figb, dirs->getModels ("fig2.3ds"));
+  display (" * gl-14c.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figb, dirs->getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
-  model_figb.scaleTexture (0.2, 0.2);
-//  g_Load3ds.Import3DS (&model_figc, dirs->getModels ("fig3.3ds"));
+  display (" * gl-14d.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figc, dirs->getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
-  model_figc.scaleTexture (0.2, 0.2);
-//  g_Load3ds.Import3DS (&model_figd, dirs->getModels ("fig1.3ds"));
+  display (" * gl-21b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figd, dirs->getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
-  model_figd.scaleTexture (0.3, 0.3);
-//  g_Load3ds.Import3DS (&model_fige, dirs->getModels ("fig6.3ds"));
+  display (" * gl-21.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_fige, dirs->getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
-  model_fige.scaleTexture (0.3, 0.3);
-//  g_Load3ds.Import3DS (&model_figf, dirs->getModels ("fig8.3ds"));
+  display (" * gl-14b.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figf, dirs->getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
-  model_figf.scaleTexture (0.2, 0.2);
-//  g_Load3ds.Import3DS (&model_figg, dirs->getModels ("fig9.3ds"));
+  display (" * gl-14.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figg, dirs->getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
-  model_figg.scaleTexture (0.2, 0.2);
-//  g_Load3ds.Import3DS (&model_figh, dirs->getModels ("fig5.3ds"));
+  display (" * gl-29.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_figh, dirs->getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
   model_figh.scaleTexture (0.3, 0.3);
-  g_Load3ds.Import3DS (&model_figt, dirs->getModels ("transp1.3ds"));
+  display (" * gl-50.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_figi, dirs->getModels ("gl-50.3ds"));
+  model_figi.setName ("STORM");
+  display (" * transp2.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_figt, dirs->getModels ("transp2.3ds"));
   model_figt.setName ("TRANSPORT");
+  display (" * transp4.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_figu, dirs->getModels ("transp4.3ds"));
+  model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
+  display (" * cannon1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+  display (" * cannon1b.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
 
   // cannon at night
+  display (" * cannon2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_cannon2, dirs->getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
   model_cannon2.alpha = true;
@@ -5308,83 +5405,142 @@ void myFirstInit ()
   model_cannon2.object [0]->vertex [1].color.c [3] = 50;
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
 
+  display (" * cannon2b.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
+  model_cannon2b.nolight = true;
+  model_cannon2b.alpha = true;
+  for (int i2 = 0; i2 < 2; i2 ++)
+  {
+    for (i = 0; i < 4; i ++)
+    {
+      model_cannon2b.object [i2]->vertex [i].color.c [0] = 255;
+      model_cannon2b.object [i2]->vertex [i].color.c [1] = 255;
+      model_cannon2b.object [i2]->vertex [i].color.c [2] = 0;
+      model_cannon2b.object [i2]->vertex [i].color.c [3] = 255;
+    }
+    model_cannon2b.object [i2]->vertex [1].color.c [3] = 50;
+    model_cannon2b.object [i2]->vertex [2].color.c [3] = 50;
+  }
+
+  display (" * flare1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
   model_flare1.nolight = true;
+  display (" * chaff1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_chaff1, dirs->getModels ("chaff1.3ds"));
   model_chaff1.setName ("CHAFF");
   model_chaff1.alpha = true;
   model_chaff1.nolight = true;
+  display (" * missile1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile1, dirs->getModels ("missile1.3ds"));
   model_missile1.setName ("AAM HS MK1");
+  display (" * missile2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile2, dirs->getModels ("missile2.3ds"));
   model_missile2.setName ("AAM HS MK2");
+  display (" * missile3.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile3, dirs->getModels ("missile3.3ds"));
   model_missile3.setName ("AAM HS MK3");
+  display (" * missile4.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile4, dirs->getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
+  display (" * missile5.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile5, dirs->getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
+  display (" * missile6.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile6, dirs->getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
+  display (" * missile7.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile7, dirs->getModels ("missile7.3ds"));
   model_missile7.setName ("AAM FF MK1");
+  display (" * missile8.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_missile8, dirs->getModels ("missile8.3ds"));
   model_missile8.setName ("AAM FF MK2");
+  display (" * flak2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_flak1, dirs->getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
+  display (" * flarak1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_flarak1, dirs->getModels ("flarak1.3ds"));
   model_flarak1.setName ("SAM");
+  display (" * ship1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_ship1, dirs->getModels ("ship1.3ds"));
   model_ship1.setName ("CRUISER");
+  display (" * tent1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_tent1, dirs->getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
+  display (" * gl-117.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_gl117, dirs->getModels ("gl-117.3ds"));
   model_gl117.displaylist = false;
-//  model_gl117.scaleTexture (0.10, 0.10);
+  display (" * tank1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_tank1, dirs->getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
+  display (" * container1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_container1, dirs->getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
+  display (" * ship2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_ship2, dirs->getModels ("ship2.3ds"));
   model_ship2.setName ("LIGHT DESTROYER");
+  display (" * truck1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_truck1, dirs->getModels ("truck1.3ds"));
   model_truck1.setName ("TRUCK");
+  display (" * truck2.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_truck2, dirs->getModels ("truck2.3ds"));
+  model_truck2.setName ("TRUCK");
+  display (" * trsam.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_trsam, dirs->getModels ("trsam.3ds"));
+  model_trsam.setName ("MOBILE SAM");
+  display (" * pickup1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_pickup1, dirs->getModels ("pickup1.3ds"));
   model_pickup1.setName ("PICKUP");
+  display (" * pickup2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_pickup2, dirs->getModels ("pickup2.3ds"));
   model_pickup2.setName ("PICKUP");
+  display (" * tank2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_tank2, dirs->getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
   model_tank2.scaleTexture (0.5, 0.5);
+  display (" * tent4.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_tent4, dirs->getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
+  display (" * hall1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_hall1, dirs->getModels ("hall1.3ds"));
   model_hall1.setName ("HALL");
+  display (" * hall2.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_hall2, dirs->getModels ("hall2.3ds"));
   model_hall2.setName ("HALL");
+  display (" * oilrig.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_oilrig, dirs->getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
   model_oilrig.alpha = true;
+  display (" * egg.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_egg, dirs->getModels ("egg.3ds"));
-  model_egg.scaleTexture (8, 8);
+  model_egg.scaleTexture (0.08, 0.08);
   model_egg.setName ("COMPLEX");
+  display (" * radar.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_radar, dirs->getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
+  display (" * mine1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_mine1, dirs->getModels ("mine1.3ds"));
   model_mine1.setName ("MINE");
+  display (" * aster1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_aster1, dirs->getModels ("aster1.3ds"));
   model_aster1.setName ("ASTEROID");
+  display (" * base1.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_base1, dirs->getModels ("base1.3ds"));
   model_base1.setName ("MOON BASE");
+  display (" * barrier.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_barrier1, dirs->getModels ("barrier.3ds"));
   model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
+  display (" * rubble.3ds", LOG_ALL);
   g_Load3ds.Import3DS (&model_rubble1, dirs->getModels ("rubble.3ds"));
   model_base1.setName ("RUBBLE");
+  display (" * depot1.3ds", LOG_ALL);
+  g_Load3ds.Import3DS (&model_depot1, dirs->getModels ("depot1.3ds"));
+  model_depot1.setName ("DEPOT");
+  model_depot1.scaleTexture (2, 2);
 
   setMissiles (&model_fig);
   setMissiles (&model_figa);
@@ -5395,6 +5551,7 @@ void myFirstInit ()
   setMissiles (&model_figf);
   setMissiles (&model_figg);
   setMissiles (&model_figh);
+  setMissiles (&model_figi);
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);
@@ -5429,6 +5586,9 @@ void myFirstInit ()
   rot2.b = 270;
   initexplode = 0;
   initexplode1 = 0;
+
+  textitle = new CTexture ();
+  textitle = gl->genTextureTGA (dirs->getTextures ("title.tga"), 0, 0, 0, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -5468,8 +5628,42 @@ int heat2 [maxfy] [maxfx];
 
 void init_display ()
 {
+/*  glClearColor (0, 0, 0, 0);
+  gl->clearScreen (); // exit intro
+  glDisable (GL_LIGHTING);
+  float xf = 0.1, zf = 10.0;
+
+  glPushMatrix ();
+
+  for (float xb = -5; xb <= 5; xb += 1)
+  {
+  glPushMatrix ();
+  glTranslatef (xb, 0, -5);
+  glRotatef (inittimer_gl117 / 3 - xb * 10, 0, 0, 1);
+  glColor4ub (255, 255, 0, 255);
+  glBegin (GL_QUADS);
+  glVertex3f (-xf, -zf, 0);
+  glVertex3f (-xf, zf, 0);
+  glVertex3f (xf, zf, 0);
+  glVertex3f (xf, -zf, 0);
+  glEnd ();
+  glPopMatrix ();
+  }
+
+  glPopMatrix ();
+*/
   CVector3 vec;
   CColor color (200, 200, 200, 255);
+
+  if (inittimer_gl117 > 2000)
+  {
+    float xf = 1.0F, yf = 1.0F, zf = 2.0F;
+    float col = (inittimer_gl117 - 2000) / 2;
+    col = 255 - col;
+    if (col < 0) col = 0;
+    col /= 256;
+    glClearColor (col, col, col, 1);
+  }
   
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
@@ -5486,20 +5680,47 @@ void init_display ()
   model_fig.draw (&vec, &tl, &rot, 1.0, 2.0, initexplode1);
   glPopMatrix ();
 
+  glDisable (GL_DEPTH_TEST);
+  glEnable (GL_BLEND);
+
+  if (inittimer_gl117 > 2000)
+  {
+    float xf = 1.0F, yf = 1.0F, zf = 2.0F;
+/*    int col = (inittimer_gl117 - 2000) / 2;
+    if (col < 0 || col > 255) col = 255;
+    glColor3ub (col, col, col);*/
+    glPushMatrix ();
+    glTranslatef (0, 0.2F, 0);
+    gl->enableTextures (textitle->textureID);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glBegin (GL_QUADS);
+    glTexCoord2d (0, 1);
+    glVertex3f (-xf, yf, -zf);
+    glTexCoord2d (1, 1);
+    glVertex3f (xf, yf, -zf);
+    glTexCoord2d (1, 0);
+    glVertex3f (xf, -yf, -zf);
+    glTexCoord2d (0, 0);
+    glVertex3f (-xf, -yf, -zf);
+    glEnd ();
+    glPopMatrix ();
+    glDisable (GL_BLEND);
+  }
+  
   // draw gl-117 logo
-  if (initexplode1 < 0)
+/*  if (initexplode1 < 0)
   {
     gl117_rotateColors (inittimer_gl117);
     glPushMatrix ();
     glTranslatef (0, 0, -5);
     model_gl117.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
     glPopMatrix ();
-  }
+  }*/
 
   glDisable (GL_LIGHTING);
   glPopMatrix ();
 
-  glPopMatrix ();
+//  glPopMatrix ();
 
   // draw fire (heat array)
   glDisable (GL_DEPTH_TEST);
@@ -5519,50 +5740,10 @@ void init_display ()
   glTexCoord2d (0, 0);
   glVertex3f (-xf, yf, -zf);
   glEnd ();
-/*  for (i = 0; i < maxfy; i ++)
-  {
-    glBegin (GL_QUAD_STRIP);
-    for (i2 = 0; i2 < maxfx + 1; i2 ++)
-    {
-      // rotate through fire colors (white-yellow-red-black-blue-black)
-      // col in [0...512]
-      int yind = i;
-      int r = heat [yind] [i2]; // blend out late for red->black
-      if (r > 255) r = 255;
-      int g = heat [yind] [i2] - 255; // blend out for yellow->red
-      if (g > 255) g = 255;
-      else if (g < 0) g = 0;
-      int b = heat [yind] [i2] - 512; // blend out early to get white->yellow
-      if (b > 255) b = 255;
-      else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
-      else if (b < -412) b = (-412 - b) * 3;
-      else if (b < 0) b = 0;
-      int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
-      glColor4ub (r, g, b, a);
-      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * yind / maxfy, -zf);
-
-      // do the same for the next vertex
-      yind = i + 1;
-      r = heat [yind] [i2];
-      if (r > 255) r = 255;
-      g = heat [yind] [i2] - 255;
-      if (g > 255) g = 255;
-      else if (g < 0) g = 0;
-      b = heat [yind] [i2] - 512;
-      if (b > 255) b = 255;
-      else if (b < -462) b = (512 + b) * 3;
-      else if (b < -412) b = (-412 - b) * 3;
-      else if (b < 0) b = 0;
-      a = r >= b ? r : b;
-      glColor4ub (r, g, b, a);
-      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * yind / maxfy, -zf);
-    }
-    glEnd ();
-  }*/
   glPopMatrix ();
   glDisable (GL_BLEND);
 
-  font2->drawText (-20, 20, -3, VERSIONSTRING, &color);
+  font2->drawText (20, -20, -3, VERSIONSTRING, &color);
 }
 
 void genFireLine ()
@@ -5624,8 +5805,6 @@ void proceedFire ()
       b = h - 256; // blend out early to get white->yellow
       if (b > 255) b = 255;
     }
-/*      else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
-      else if (b < -412) b = (-412 - b) * 3;*/
     else if (b < 0) b = 0;
     int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
     glColor4ub (r, g, b, a);
@@ -5941,11 +6120,11 @@ static void myIdleFunc ()
 #endif
 }
 
-static void myJoystickAxisFunc (/*int x, int y, int t, int r*/)
+static void myJoystickAxisFunc (int x, int y, int t, int r)
 {
   if (game == GAME_PLAY)
   {
-    game_joystickaxis (/*x, y, t, r*/);
+    game_joystickaxis (x, y, t, r);
   }
 }
 
@@ -6101,7 +6280,7 @@ Uint32 nexttime = 0;
 }*/
 
 //int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
-unsigned int joystickbutton = -1;
+int joystickbutton = -1;
 bool joystickfirebutton = false;
 
 // This loop emulates the glutMainLoop() of GLUT using SDL!!!
@@ -6201,10 +6380,15 @@ void sdlMainLoop ()
     
     if (controls == CONTROLS_JOYSTICK)
     {
-      myJoystickAxisFunc (/*joystickx, joysticky, joystickt, joystickr*/);
+      int x = jaxis [getJoystickAxisIndex (joystick_aileron)];
+      int y = jaxis [getJoystickAxisIndex (joystick_elevator)];
+      int rudder = jaxis [getJoystickAxisIndex (joystick_rudder)];
+      int throttle = jaxis [getJoystickAxisIndex (joystick_throttle)];
+      myJoystickAxisFunc (x, y, rudder, throttle);
+      view_x = (float) jaxis [getJoystickAxisIndex (joystick_view_x)]/(-328.0);
+      view_y = (float) jaxis [getJoystickAxisIndex (joystick_view_y)]/(-328.0);
       if (joystickfirebutton)
         myJoystickButtonFunc (joystick_firecannon);
-//      joystickbutton = -1;
     }
     
     if (sdldisplay) myDisplayFunc ();

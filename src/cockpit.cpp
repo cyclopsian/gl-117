@@ -46,6 +46,7 @@ void Cockpit::setColor (int alpha)
   else if (fplayer->o == &model_figb) glColor4ub (255, 150, 100, alpha);
   else if (fplayer->o == &model_figc) glColor4ub (200, 200, 100, alpha);
   else if (fplayer->o == &model_figg) glColor4ub (255, 0, 0, alpha);
+  else if (fplayer->o == &model_figi) glColor4ub (200, 200, 100, alpha);
   else glColor4ub (100, 100, 255, alpha);
 }
 
@@ -55,6 +56,7 @@ void Cockpit::setColor (CColor *color, int alpha)
   else if (fplayer->o == &model_figb) color->setColor (255, 150, 100, alpha);
   else if (fplayer->o == &model_figc) color->setColor (200, 200, 100, alpha);
   else if (fplayer->o == &model_figg) color->setColor (255, 0, 0, alpha);
+  else if (fplayer->o == &model_figi) color->setColor (200, 200, 100, alpha);
   else color->setColor (100, 100, 255, alpha);
 }
 
@@ -313,13 +315,13 @@ void Cockpit::drawHeading ()
       glVertex3f (xf * 0.1, yf * 0.1, zf);
       glEnd ();
       if (i == mission->heading)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "N", &color);
-      else if (i == mission->heading + 90 || i == mission->heading - 270)
-        font1->drawText (xf - 0.5, yf - 2.0, zf, "W", &color);
-      else if (i == mission->heading + 180 || i == mission->heading - 180)
         font1->drawText (xf - 0.5, yf - 2.0, zf, "S", &color);
-      else if (i == mission->heading + 270 || i == mission->heading - 90)
+      else if (i == mission->heading + 90 || i == mission->heading - 270)
         font1->drawText (xf - 0.5, yf - 2.0, zf, "E", &color);
+      else if (i == mission->heading + 180 || i == mission->heading - 180)
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "N", &color);
+      else if (i == mission->heading + 270 || i == mission->heading - 90)
+        font1->drawText (xf - 0.5, yf - 2.0, zf, "W", &color);
     }
   }
 
@@ -498,11 +500,7 @@ void Cockpit::drawTargetedElement ()
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
       font1->drawText (-24.0, -25.0, -4.0, str, &color);
     }
-/*    color.setColor (255, 255, 255);
-  sprintf (str, "MISSILES: %d", fplayer->missiles);
-  font1->drawText (20.0, -25.0, -4.0, str, &color);*/
   glDisable (GL_DEPTH_TEST);
-//    font1->drawText (0, 0, -5.0, "ABCDEFG", &color);
 }
 
 void Cockpit::drawWeapon ()
@@ -600,7 +598,7 @@ void Cockpit::drawRadar ()
     {
       int aw = fplayer->getAngle (fighter [i]);
       if (aw < 0) aw += 360;
-      float d = fplayer->distance (fighter [i]) / 100.0 * radarzoom;
+      float d = fplayer->distanceXZ (fighter [i]) / 100.0 * radarzoom;
       float px = -d * sine [aw];
       float py = yf + d * cosi [aw];
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
@@ -637,6 +635,79 @@ void Cockpit::drawRadar ()
     }
   }
   glEnd ();
+  gl->disableAlphaBlending ();
+}
+
+void Cockpit::drawRelativeHeightBar()
+{
+  char str [STDSIZE];
+  CColor color;
+  int alpha = 175;
+  setColor (&color, alpha);
+  setColor (alpha);
+  glDisable (GL_LIGHTING);
+  glLineWidth (LINEWIDTH(1.0F));
+  glDisable (GL_DEPTH_TEST);
+  gl->enableAlphaBlending ();
+  
+  float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
+  float px = fplayer->tl->x, py = fplayer->tl->y, pz = fplayer->tl->z;
+  float lh = l->getExactHeight(px, pz);
+  setColor(80); //low alpha for better visibility
+  // add 100.0 to each player_y and land_h to avoid values <= 0.0
+  float rel_height = ((100.0F+py)/(100.0F+lh) * 100.0F) - 100.0F;	
+
+  // turn 0 -> 50.0 range to -0.7 -> 0.7 for drawing, 1.4/50=0.0208
+  float yfv = (rel_height * 0.0208F)-0.7F;
+  // cap max-min values  
+  if(yfv >  0.7F) yfv =  0.7F;
+  if(yfv < -0.7F) yfv = -0.7F;
+  
+  glBegin (GL_QUADS);
+  glVertex3f (xf - xfl, yf - yfl, zf);  // fixed
+  glVertex3f (xf + xfl, yf - yfl, zf);  // fixed
+  glVertex3f (xf + xfl, yf + yfv, zf);  // var
+  glVertex3f (xf - xfl, yf + yfv, zf);  // var
+  glEnd ();
+  setColor(alpha);
+  
+  sprintf (str, "RHEIGHT");
+  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
+  glEnd();
+  gl->disableAlphaBlending ();
+}
+
+void Cockpit::drawThrustBar()
+{
+  char str [STDSIZE];
+  CColor color;
+  int alpha = 175;
+  setColor (&color, alpha);
+  setColor (alpha);
+  glDisable (GL_LIGHTING);
+  glLineWidth (LINEWIDTH(1.0F));
+  glDisable (GL_DEPTH_TEST);
+  gl->enableAlphaBlending ();
+
+  setColor(80); // don't block visibility too much
+  float xf = -1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
+  
+  // turn 0.5 -> 1.0 range to -0.7 -> 0.7 for drawing
+  float yfv = fplayer->thrust / fplayer->maxthrust * 2.8F - 2.1F;
+  // cap max-min values
+  if(yfv >  0.7F) yfv =  0.7F;
+  if(yfv < -0.7F) yfv = -0.7F;
+  glBegin (GL_QUADS);
+  glVertex3f (xf - xfl, yf - yfl, zf);  // fixed
+  glVertex3f (xf + xfl, yf - yfl, zf);  // fixed
+  glVertex3f (xf + xfl, yf + yfv, zf);  // var
+  glVertex3f (xf - xfl, yf + yfv, zf);  // var
+  glEnd ();
+  setColor(alpha);
+  sprintf (str, "THRUST");
+  font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
+
+  glEnd();
   gl->disableAlphaBlending ();
 }
 

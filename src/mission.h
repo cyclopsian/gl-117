@@ -40,9 +40,11 @@
 #define MISSION_SADEFENSE 14
 #define MISSION_SCOUT 15
 #define MISSION_BASE 16
+#define MISSION_DEPOT 17
 #define MISSION_DEFEND1 20
 #define MISSION_DOGFIGHT3 21
 #define MISSION_TANK1 22
+#define MISSION_CONVOY2 23
 #define MISSION_SHIP1 25
 #define MISSION_SHIP2 26
 #define MISSION_SHIP3 27
@@ -51,6 +53,7 @@
 #define MISSION_TUNNEL1 36
 #define MISSION_CANYON3 32
 #define MISSION_MOON1 33
+#define MISSION_MOONBATTLE 37
 #define MISSION_MOON2 34
 #define MISSION_MOON3 35
 #define MISSION_CAMPAIGN2 40
@@ -93,6 +96,7 @@ class Mission
   virtual void start (); // custom definitions for a mission
   virtual int processtimer (Uint32 dt); // custom definitions controlled by the timer, mission success/failure
   virtual void draw (); // custom definitions that have to be drawn
+  void invertZ (); // invert Z coordinate of all fighters and objects
   void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate);
@@ -261,6 +265,15 @@ class MissionBase : public Mission
   virtual void draw ();
 };
 
+class MissionDepot : public Mission
+{
+  public:
+  MissionDepot ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
 class MissionDefend1 : public Mission
 {
   public:
@@ -283,6 +296,15 @@ class MissionTank1 : public Mission
 {
   public:
   MissionTank1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionConvoy2 : public Mission
+{
+  public:
+  MissionConvoy2 ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();
@@ -346,6 +368,15 @@ class MissionMoonDefense1 : public Mission
 {
   public:
   MissionMoonDefense1 ();
+  virtual void start ();
+  virtual int processtimer (Uint32 dt);
+  virtual void draw ();
+};
+
+class MissionMoonBattle : public Mission
+{
+  public:
+  MissionMoonBattle ();
   virtual void start ();
   virtual int processtimer (Uint32 dt);
   virtual void draw ();

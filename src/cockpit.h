@@ -47,6 +47,8 @@ class Cockpit
   void drawTargetedElement ();
   void drawWeapon ();
   void drawRadar ();
+  void drawRelativeHeightBar();
+  void drawThrustBar();
 };
 
 #endif

@@ -135,8 +135,14 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
   if (!tex [texnum]->loadFromTGA (fname, quality, alphatype, mipmap2))
   {
     sprintf (buf, "Texture %s not found", fname);
-    display (buf, LOG_FATAL);
-    exit (EXIT_LOADFILE);
+    display (buf, LOG_ERROR);
+//    exit (EXIT_LOADFILE);
+    // If texture cannot be loaded, allocate dummy tex buffer
+    tex [texnum]->width = 8; tex [texnum]->height = 8;
+    int buflen = tex [texnum]->width * tex [texnum]->height * 4;
+    tex [texnum]->data = (unsigned char *) malloc (buflen);
+    if (tex [texnum] == NULL) error_outofmemory ();
+    memset (tex [texnum]->data, 0, buflen);
   }
   tex [texnum]->alpha = alpha;
   tex [texnum]->textureID = texnum;
