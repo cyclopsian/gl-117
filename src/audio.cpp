@@ -450,6 +450,18 @@ void SoundSystem::playMusic ()
 #endif
 }
 
+void SoundSystem::playMusic (int times)
+{
+  if (!audio) return;
+  if (!music) return;
+  if (volumemusic == 0) return;
+#ifdef HAVE_SDL_MIXER
+  musicplaying = true;
+  Mix_PlayMusic (music1, times);
+  setVolumeMusic ();
+#endif
+}
+
 void SoundSystem::haltMusic ()
 {
   if (!audio) return;

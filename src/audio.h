@@ -94,6 +94,7 @@ class SoundSystem
   void stop (int sample);
   void stopAll ();
   void playMusic ();
+  void playMusic (int times);
   void loadMusic (int music);
   void haltMusic ();
   void setVolume (int sample, int level);

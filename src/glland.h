@@ -84,7 +84,7 @@ class GLLandscape : public Landscape
   float glittering; // water glittering
 
   private:
-  float hh, hh2, zoomz2;
+//  float hh, hh2, zoomz2;
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
   float mat [MAXMATERIAL] [4]; // materials=colors of landscape IDs
   CTexture *texmap [MAXMATERIAL]; // texture for material

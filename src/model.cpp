@@ -713,7 +713,9 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
                 glColor4ub (color [0] + rotcol, color [1] + rotcol, color [2] + rotcol * 3, 255);
               }
               else
+              {
                 glColor4ub (color [0], color [1], color [2], color [3]);
+              }
             }
           }
     //    glColor3ub (255, 255, 0);
@@ -758,6 +760,70 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 
 //  drawVertexNormals (cm, zoom);
     }
+
+/*  if (quality >= 4)
+  {
+    ld [0] = 0.01; ld [1] = ld [0]; ld [2] = ld [0];
+    glLightfv (GL_LIGHT0, GL_SPECULAR, ld);
+    glLighti (GL_LIGHT0, GL_SPOT_EXPONENT, 0);
+    glDisable (GL_TEXTURE_2D);
+
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE);
+
+	  for (i = 0; i < numObjects; i ++)
+	  {
+      if (numObjects <= 0) break;
+	    cm = object [i];
+      glColor4ub (255, 255, 255, 0);
+
+      CVector3 shift;
+
+      glBegin (GL_TRIANGLES);
+      for (j = 0; j < cm->numTriangles; j++)
+      {
+        CVertex *v = cm->triangle [j].v [0];
+        if (explode > 0)
+        {
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
+        }
+        for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
+        {
+          v = cm->triangle [j].v [whichVertex];
+          glNormal3f (v->normal.x, v->normal.y, v->normal.z);
+          glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
+        }
+      }
+      glEnd();
+
+      glBegin (GL_QUADS);
+      for (j = 0; j < cm->numQuads; j++)
+      {
+        CVertex *v = cm->quad [j].v [0];
+        if (explode > 0)
+        {
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
+        }
+        for (int whichVertex = 0; whichVertex < 4; whichVertex++)
+        {
+          v = cm->quad [j].v [whichVertex];
+          glNormal3f (v->normal.x, v->normal.y, v->normal.z);
+          glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
+        }
+      }
+      glEnd();
+
+//  drawVertexNormals (cm, zoom);
+    }
+
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable (GL_BLEND);
+  }*/
+
 
     if (alpha)
     { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }

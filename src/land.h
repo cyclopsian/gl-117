@@ -33,6 +33,7 @@
 
 // surface extents
 #define MAXX 512
+#define MAXX2 256
 #define MAXX_MASK 0x000001ff
 #define MAXX_8 64
 #define DIVISIONS 4

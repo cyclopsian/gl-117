@@ -372,6 +372,7 @@ void Server::sendMessage(int id_client, char *buf, int len)
 }
 
 
+
 Client::Client ()
 {
 #ifdef HAVE_SDL_NET

@@ -25,6 +25,8 @@
 
 /*
 TODO:
+- bug: selected item & enemy drawn out of radar
+- mouse sensitivity (annoying to control on big monitors)
 - southern seashore landscape (additional missions)
 - alpine snow landscape
 - tree colors (fall, spring), draw more tree textures
@@ -32,9 +34,7 @@ TODO:
 - little bigger gauss filter for light mask, 2x2 grid does not look good ???
 - clouds to fly through
 - particle systems
-- pseudo random number generator
 - ROAM code Norbert (test)
-- occlusion culling correction
 */
 
 #ifndef IS_MAIN_H
@@ -985,7 +985,10 @@ void playRandomMusic ()
     sound->loadMusic (MUSIC_SOFTTEC1);
   else
     sound->loadMusic (MUSIC_AMBIENT1);
-  sound->playMusic ();
+  sound->playMusic (1);
+#ifdef HAVE_SDL_MIXER
+  Mix_HookMusicFinished (playRandomMusic);
+#endif
 }
 
 void switch_menu ()
@@ -2656,7 +2659,7 @@ model = &model_missile7; */
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
-  model->draw (&vec, &tl, &rot, 1.0, 1.0, 0);
+  model->draw (&vec, &tl, &rot, 1.0, 2.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
 
@@ -4926,12 +4929,12 @@ void menu_timer (Uint32 dt)
         if (fps > 40)
         {
           if (view < quality * 10 + 60) view += 10;
-          else { quality ++; view = quality * 10 + 30; }
+          else if (quality < 5) { quality ++; view = quality * 10 + 30; }
         }
         else if (fps < 30)
         {
           if (view > quality * 10 + 30) view -= 10;
-          else { quality --; view = quality * 10 + 60; }
+          else if (quality > 0) { quality --; view = quality * 10 + 60; }
         }
         menu_reshape ();
       }
@@ -5440,8 +5443,8 @@ void init_mouse (int button, int state, int x, int y)
   init_key (32, x, y);
 }
 
-const int maxfx = 100;
-const int maxfy = 30;
+const int maxfx = 256;
+const int maxfy = 64;
 
 int heat [maxfy] [maxfx];
 int heat2 [maxfy] [maxfx];
@@ -5464,7 +5467,7 @@ void init_display ()
   // draw fighter
   glPushMatrix ();
   glTranslatef (0, 0, -5);
-  model_fig.draw (&vec, &tl, &rot, 1.0, 1.0, initexplode1);
+  model_fig.draw (&vec, &tl, &rot, 1.0, 2.0, initexplode1);
   glPopMatrix ();
 
   // draw gl-117 logo
@@ -5485,9 +5488,22 @@ void init_display ()
   // draw fire (heat array)
   glDisable (GL_DEPTH_TEST);
   glEnable (GL_BLEND);
-  float xf = 2.0F, yf = 2.0F, zf = 2.0F;
+
+  float xf = 1.75F, yf = 1.78F, zf = 2.0F;
   glPushMatrix ();
-  for (i = 0; i < maxfy; i ++)
+  gl->enableTextures (5000);
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+  glBegin (GL_QUADS);
+  glTexCoord2d (0, 1);
+  glVertex3f (-xf, -yf, -zf);
+  glTexCoord2d (1, 1);
+  glVertex3f (xf, -yf, -zf);
+  glTexCoord2d (1, 0);
+  glVertex3f (xf, yf, -zf);
+  glTexCoord2d (0, 0);
+  glVertex3f (-xf, yf, -zf);
+  glEnd ();
+/*  for (i = 0; i < maxfy; i ++)
   {
     glBegin (GL_QUAD_STRIP);
     for (i2 = 0; i2 < maxfx + 1; i2 ++)
@@ -5526,11 +5542,11 @@ void init_display ()
       glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * yind / maxfy, -zf);
     }
     glEnd ();
-  }
+  }*/
   glPopMatrix ();
   glDisable (GL_BLEND);
 
-  font2->drawText (-20, -20, -3, VERSIONSTRING, &color);
+  font2->drawText (-20, 20, -3, VERSIONSTRING, &color);
 }
 
 void genFireLine ()
@@ -5538,29 +5554,73 @@ void genFireLine ()
   int i, i2;
   for (i = 0; i < maxfx; i ++)
   {
-    heat [maxfy - 1] [i] = myrandom (255 * 2);
+    heat [maxfy - 1] [i] = myrandom (400);
   }
   for (i = 0; i < 5; i ++)
   {
-    int r = myrandom (maxfx + 1);
-    for (i2 = 0; i2 <= 0; i2 ++)
+    int r = myrandom (maxfx - 7) + 3;
+    for (i2 = -3; i2 <= 3; i2 ++)
     {
-      heat [maxfy - 1] [r + i2] = 255 * 3 + 100; // insert hot spots at the bottom line
+      heat [maxfy - 1] [r + i2] = 1200; // insert hot spots at the bottom line
     }
   }
 }
 
+unsigned char firetex [maxfx * maxfy * 4];
+
 void proceedFire ()
 {
   int i, i2;
-  for (i = maxfy - 2; i >= 0; i --)
+  for (i = maxfy - 2; i >= 1; i --)
     for (i2 = 2; i2 < maxfx - 2; i2 ++)
     {
-      heat2 [i] [i2] = (heat [i + 1] [i2 - 2] + 3 * heat [i + 1] [i2 - 1] + 8 * heat [i + 1] [i2] + 3 * heat [i + 1] [i2 + 1] + heat [i + 1] [i2 + 2]) / 16; // heat diffusion
-      heat2 [i] [i2] -= (int) (500.0F / maxfy); // heat sink
+      heat2 [i] [i2] = 0 * heat [i + 1] [i2 - 2] + 4 * heat [i + 1] [i2 - 1] + 16 * heat [i + 1] [i2] + 4 * heat [i + 1] [i2 + 1] + 0 * heat [i + 1] [i2 + 2]; // heat diffusion
+      heat2 [i] [i2] += 0 * heat [i] [i2 - 2] + 4 * heat [i] [i2 - 1] + 16 * heat [i] [i2] + 4 * heat [i] [i2 + 1] + 0 * heat [i] [i2 + 2]; // heat diffusion
+	  heat2 [i] [i2] /= 48;
+      heat2 [i] [i2] -= (int) (300.0F / maxfy); // heat sink
       if (heat2 [i] [i2] < 0) heat2 [i] [i2] = 0;
     }
   memcpy (heat, heat2, maxfx * maxfy * sizeof (int)); // copy back buffer to heat array
+
+  
+  for (i = 0; i < maxfy; i ++)
+  {
+    for (i2 = 0; i2 < maxfx + 1; i2 ++)
+    {
+      // rotate through fire colors (white-yellow-red-black-blue-black)
+      // col in [0...512]
+      int yind = i;
+	  int h = heat [yind] [i2];
+	  int b = h * 8;
+	  if (h > 30) b = (60 - h) * 8;
+	  if (h >= 60) b = 0;
+	  h -= 50;
+      int r = h * 2; // blend out late for red->black
+      if (r > 255) r = 255;
+	  else if (r < 0) r = 0;
+	  h -= 127;
+      int g = h * 2; // blend out for yellow->red
+      if (g > 255) g = 255;
+      else if (g < 0) g = 0;
+	  h -= 127;
+      b = h - 256; // blend out early to get white->yellow
+      if (b > 255) b = 255;
+/*      else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
+      else if (b < -412) b = (-412 - b) * 3;*/
+      else if (b < 0) b = 0;
+      int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
+      glColor4ub (r, g, b, a);
+	  firetex [(i * maxfx + i2) * 4] = r;
+	  firetex [(i * maxfx + i2) * 4 + 1] = g;
+	  firetex [(i * maxfx + i2) * 4 + 2] = b;
+	  firetex [(i * maxfx + i2) * 4 + 3] = a;
+    }
+    glEnd ();
+  }
+  glPopMatrix ();
+  glBindTexture (GL_TEXTURE_2D, 5000);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexImage2D (GL_TEXTURE_2D, 0, 4, maxfx, maxfy, 0, GL_RGBA, GL_UNSIGNED_BYTE, firetex);
 }
 
 int initsynchrotimer = 0;
@@ -5569,19 +5629,19 @@ void init_timer (Uint32 dt)
 {
   inittimer_gl117 += dt;
   initsynchrotimer += dt;
-  if (initsynchrotimer > 30)
+  if (initsynchrotimer > 20)
   {
-    initsynchrotimer -= 30;
-    dt = 30;
+    initsynchrotimer -= 20;
+    dt = 20;
   }
   else return;
 
   int r = myrandom (100);
   if (r == 50) r = myrandom (100); // do not optimize this: random number generator initialization
 
-  tl.x = 6.0 * pow (1.5, -(5 + tl.z)) - 0.4;
-  tl.y = 0.9 * tl.x;
-  tl.z += 0.15;
+  tl.x = 6.0 * pow (1.5, -(5 + tl.z));
+  tl.y = (tl.z + 3) * (tl.z + 3) * 0.02 - 0.8; //0.9 * tl.x;
+  tl.z += 0.14;
 
   if (initexplode1 == -1 && tl2.z < 3)
   {
@@ -5611,12 +5671,12 @@ void init_timer (Uint32 dt)
     initexplode1 = -1;
   }
 
-  if (inittimer >= 150)
+  if (inittimer >= 350)
   {
     initexplode += dt;
   }
 
-  if (inittimer >= 200)
+  if (inittimer >= 400)
   {
     init_key (27, 0, 0); // switch to menu
   }
@@ -6558,7 +6618,10 @@ int main (int argc, char **argv)
   sound->setVolumeMusic (); // set all music volumes
 
   display ("Playing startup music", LOG_ALL);
-  sound->playMusic ();
+  sound->playMusic (1);
+#ifdef HAVE_SDL_MIXER
+  Mix_HookMusicFinished (playRandomMusic);
+#endif
 
   display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();

@@ -1909,16 +1909,91 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   {
     return;
   }
-
+  
   // do expensive calculations only once
   float myheight = l->getExactHeight (tl->x, tl->z);
   float targetheight = tl->y;
   if (target != NULL)
     targetheight = l->getExactHeight (target->tl->x, target->tl->z);
+  if (target != NULL)
+    disttarget = distance (target); // distance to target
+  else
+    disttarget = 1;
+
+  // get a new target if necessary
+  if (target == NULL)
+  {
+    if (bomber)
+      targetNearestGroundEnemy (f);
+    else
+      targetNearestEnemy (f);
+  }
+  if (target != NULL)
+    if (!target->active)
+    {
+      if (bomber)
+        targetNearestGroundEnemy (f);
+      else
+        targetNearestEnemy (f);
+    }
+
+  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  {
+    if (haveMissile () && target != NULL)
+    {
+      float dgamma = atan ((target->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
+      float dphi = getAngle (target);
+      if (missiletype == MISSILE_DF1 - MISSILE1)
+      {
+        ttf = 0;
+      }
+      else if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
+      {
+        if (disttarget < 50)
+        {
+          if (ttf > 0)
+          {
+            if (missiletype >= 0 && missiletype <= 2)
+            {
+              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+              {
+                float dphi = fabs (phi - target->phi);
+                if (dphi > 270) dphi = 360 - dphi;
+                if (dphi < 45)
+                  ttf -= 3 * dt;
+                else
+                  ttf = 50 * timestep;
+              }
+            }
+            else if (missiletype == 6 || missiletype == 7)
+            {
+              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+              {
+                ttf -= 3 * dt;
+              }
+            }
+            else
+            {
+              if (target->id > FIGHTER2)
+              {
+                ttf -= 3 * dt;
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        ttf = 50 * timestep;
+      }
+    }
+  }
+
+  if (!ai) return;
 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  int lsdist = 20;
+  int lsdist = 10;
 //  if (id == 200) printf ("%1.2f, %1.2F  ", lsdist * forcex, lsdist * forcez);
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
@@ -1940,19 +2015,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       else
       {
         // precalculated height
-        float flyx2 = tl->x + forcex * lsdist * 2.5, flyz2 = tl->z + forcez * lsdist * 2.5;
-        float h1 = l->getHeight (flyx, flyz), h2 = l->getHeight (flyx2, flyz2);
-        recheight2 = recheight + (h1 > h2 ? h1 : h2);
+        float flyx2 = tl->x + forcex * lsdist * 3, flyz2 = tl->z + forcez * lsdist * 3;
+        float flyx3 = tl->x + forcex * lsdist * 8, flyz3 = tl->z + forcez * lsdist * 8;
+        float h1 = l->getHeight (flyx, flyz);
+        float h2 = l->getHeight (flyx2, flyz2);
+        float h3 = l->getHeight (flyx3, flyz3);
+        h1 = h1 > h2 ? h1 : h2;
+        h1 = h1 > h3 ? h1 : h3;
+        recheight2 = recheight + h1;
       }
     }
   }
   if (ttl <= 0 && id >= MISSILE1 && id <= MISSILE2)
     recheight2 = -100;
-
-  if (target != NULL)
-    disttarget = distance (target); // distance to target
-  else
-    disttarget = 1;
 
   // calculate the recommended height, recheight2 depends on it
   if (manoeverheight > 0) manoeverheight -= dt;
@@ -2108,23 +2183,6 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
   }
 
-  // get a new target if necessary
-  if (target == NULL)
-  {
-    if (bomber)
-      targetNearestGroundEnemy (f);
-    else
-      targetNearestEnemy (f);
-  }
-  if (target != NULL)
-    if (!target->active)
-    {
-      if (bomber)
-        targetNearestGroundEnemy (f);
-      else
-        targetNearestEnemy (f);
-    }
-
   if (target == NULL) return;
 
   // fighter's targeting mechanism for missiles
@@ -2140,54 +2198,6 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       else
       {
         selectMissileGround (m);
-      }
-    }
-    if (haveMissile ())
-    {
-      float dgamma = atan ((target->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
-      float dphi = getAngle (target);
-      if (missiletype == MISSILE_DF1 - MISSILE1)
-      {
-        ttf = 0;
-      }
-      else if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
-      {
-        if (disttarget < 50)
-        {
-          if (ttf > 0)
-          {
-            if (missiletype >= 0 && missiletype <= 2)
-            {
-              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
-              {
-                float dphi = fabs (phi - target->phi);
-                if (dphi > 270) dphi = 360 - dphi;
-                if (dphi < 45)
-                  ttf -= 3 * dt;
-                else
-                  ttf = 50 * timestep;
-              }
-            }
-            else if (missiletype == 6 || missiletype == 7)
-            {
-              if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
-              {
-                ttf -= 3 * dt;
-              }
-            }
-            else
-            {
-              if (target->id > FIGHTER2)
-              {
-                ttf -= 3 * dt;
-              }
-            }
-          }
-        }
-      }
-      else
-      {
-        ttf = 50 * timestep;
       }
     }
   }
@@ -2238,6 +2248,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   {
     float t = 10.0 * disttarget; // generous time to new position
     if (t > 60) t = 60; // higher values will not make sense
+    t *= (float) (400 - precision) / 400;
     int tt = (int) target->theta;
     if (tt < 0) tt += 360;
     float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
@@ -2410,7 +2421,7 @@ m [0]->tl->y = target->tl->y;
   // thrust and manoever calculations
   if (id >= FIGHTER1 && id <= FIGHTER2) // fighters
   {
-    if (disttarget > 2.5 + aggressivity / 10)
+    if (disttarget > 5 + aggressivity / 12) // 2.5 seems to be best, but fighters become far too strong
     {
       if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
         recthrust = maxthrust / (2 - intelligence * 0.001);
@@ -2450,7 +2461,7 @@ m [0]->tl->y = target->tl->y;
     float agr = 4.0 - (float) aggressivity / 100;
     if (firecannonttl <= 0)
     {
-      if (fabs (rectheta - theta) < 2 + agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
+      if (fabs (rectheta - theta) < agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
         fireCannon (c);
       else if (disttarget < 2 + agr && fabs (aw) < 20 + agr * 4)
         fireCannon (c);
@@ -2464,7 +2475,7 @@ m [0]->tl->y = target->tl->y;
 //          if (!(l->lsticker & 7))
           {
             fireMissile (m, (AIObj *) target);
-            firemissilettl += aggressivity / 3 * timestep;
+            firemissilettl += aggressivity / 2 * timestep;
           }
       }
       else // ground target
@@ -2473,7 +2484,7 @@ m [0]->tl->y = target->tl->y;
           if (!(l->lsticker & 7))
           {
             fireMissileGround (m);
-            firemissilettl += aggressivity / 3 * timestep;
+            firemissilettl += aggressivity / 2 * timestep;
           }
       }
     }
