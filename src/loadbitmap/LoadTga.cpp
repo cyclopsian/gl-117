@@ -94,17 +94,18 @@ inline void LoadTga::writeRGBA (Uint32 *p, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
   Uint8 *dp = (Uint8 *)p;
 
-#ifndef WORDS_BIGENDIAN
+// removed check according to Allen Braunsdorf
+//#ifndef WORDS_BIGENDIAN
   dp[0] = r;
   dp[1] = g;
   dp[2] = b;
   dp[3] = a;
-#else
+/*#else
   dp[0] = a;
   dp[1] = b;
   dp[2] = g;
   dp[3] = r;
-#endif
+#endif*/
 }
 
 unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
