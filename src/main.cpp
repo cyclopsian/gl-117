@@ -25,8 +25,6 @@
 
 /*
 TODO:
-- speedUp and speedDown buttons or 1...9 remap (bug Slackware7 French keyboard)
-- arctic landscape (texture bug)
 - southern seashore landscape (additional missions)
 - alpine snow landscape
 - tree colors (fall, spring), draw more tree textures
@@ -1760,6 +1758,10 @@ void game_joystickbutton (int button)
   {
     event_targetNearest ();
   }
+  if (button == joystick_targetlocking)
+  {
+    event_targetLocking ();
+  }
   if (button == joystick_targetnext)
   {
     event_targetNext ();
@@ -1767,6 +1769,14 @@ void game_joystickbutton (int button)
   if (button == joystick_targetprevious)
   {
     event_targetPrevious ();
+  }
+  if (button == joystick_thrustup)
+  {
+    event_thrustUp ();
+  }
+  if (button == joystick_thrustdown)
+  {
+    event_thrustDown ();
   }
 }
 
@@ -1779,22 +1789,7 @@ void game_joystickhat (int hat)
   if (hat % 1000 == SDL_HAT_LEFT) normhat = 102;
   if (hat % 1000 == SDL_HAT_DOWN) normhat = 103;
   normhat += (hat / 1000) * 1000;
-  if (normhat == joystick_selectmissile)
-  {
-    event_selectMissile ();
-  }
-  if (normhat == joystick_targetnext)
-  {
-    event_targetNext ();
-  }
-  if (normhat == joystick_targetprevious)
-  {
-    event_targetPrevious ();
-  }
-  if (normhat == joystick_targetnearest)
-  {
-    event_targetNearest ();
-  }
+  game_joystickbutton (normhat);
 #endif
 }
 

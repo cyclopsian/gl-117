@@ -41,8 +41,8 @@ unsigned char key_selectmissile = 'M', key_thrustup = 'I', key_thrustdown = 'D';
 unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P', key_targetlocking = 'L';
 
 unsigned int joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
-unsigned int joystick_selectmissile = 1;
-unsigned int joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102;
+unsigned int joystick_selectmissile = 1, joystick_thrustup = 4, joystick_thrustdown = 5;
+unsigned int joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102, joystick_targetlocking = 103;
 unsigned int joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
 
 unsigned char mouse_firecannon = MOUSE_BUTTON_LEFT, mouse_firemissile = MOUSE_BUTTON_RIGHT;
@@ -416,17 +416,19 @@ void save_configInterface ()
   writeJoystick (cf, " joystick_elevator", joystick_elevator);
   writeJoystick (cf, " joystick_throttle", joystick_throttle);
   writeJoystick (cf, " joystick_rudder", joystick_rudder);
-  cf->writeText ("\n# Buttons: 0...MAX-1");
+  cf->writeText ("\n# Buttons: 0...MAX-1, Coolie: 100=Right, 101=Up, 102=Left, 103=Down");
   writeJoystick (cf, " joystick_firecannon", joystick_firecannon);
   writeJoystick (cf, " joystick_firemissile", joystick_firemissile);
   cf->writeText ("# Dropping chaff AND flare may be preferred");
   writeJoystick (cf, " joystick_dropflare", joystick_dropflare);
   writeJoystick (cf, " joystick_dropchaff", joystick_dropchaff);
-  cf->writeText ("\n# Buttons: 0...MAX-1, Coolie: 100=Right, 101=Up, 102=Left, 103=Down");
   writeJoystick (cf, " joystick_selectmissile", joystick_selectmissile);
   writeJoystick (cf, " joystick_targetnearest", joystick_targetnearest);
+  writeJoystick (cf, " joystick_targetlocking", joystick_targetlocking);
   writeJoystick (cf, " joystick_targetnext", joystick_targetnext);
   writeJoystick (cf, " joystick_targetprevious", joystick_targetprevious);
+  writeJoystick (cf, " joystick_incthrust", joystick_thrustup);
+  writeJoystick (cf, " joystick_decthrust", joystick_thrustdown);
   cf->writeText ("\n# This file is meant to give sensible custom interface settings");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
   cf->close ();
@@ -567,11 +569,20 @@ int load_configInterface ()
   str = cf->getString (ret, "joystick_targetnearest");
   joystick_targetnearest = getJoystick (str, 101);
 
+  str = cf->getString (ret, "joystick_targetlocking");
+  joystick_targetlocking = getJoystick (str, 103);
+
   str = cf->getString (ret, "joystick_targetnext");
   joystick_targetnext = getJoystick (str, 100);
 
   str = cf->getString (ret, "joystick_targetprevious");
   joystick_targetprevious = getJoystick (str, 102);
+
+  str = cf->getString (ret, "joystick_incthrust");
+  joystick_thrustup = getJoystick (str, 4);
+
+  str = cf->getString (ret, "joystick_decthrust");
+  joystick_thrustdown = getJoystick (str, 5);
 
   if (cf->buf [0] == 0) // no file found
   {

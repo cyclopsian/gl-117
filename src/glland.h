@@ -87,6 +87,7 @@ class GLLandscape : public Landscape
   float hh, hh2, zoomz2;
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
   float mat [MAXMATERIAL] [4]; // materials=colors of landscape IDs
+  CTexture *texmap [MAXMATERIAL]; // texture for material
 //  float mata [MAXMATERIAL] [4];
   Space *space; // space of all objects
   CColor treecolor;

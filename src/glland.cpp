@@ -350,23 +350,28 @@ void GLLandscape::precalculate ()
       }
       else if (isWater (f1))
       {
-/*          if (isWater (f2) && isWater (f3) && isWater (f4))
-          tex1 [i] [i2] = texwater;
-        else*/
         if (type == 0 || type == 2)
           tex1 [i] [i2] = texgrass->textureID;
-        else if (type == 1)
+        else
           tex1 [i] [i2] = 0xFF;
       }
       else if (isType (f1, ROCKS) || isType (f1, ROCKS2))
+      {
         tex1 [i] [i2] = texrocks->textureID;
+      }
       else if (isType (f1, REDSTONE))
+      {
         tex1 [i] [i2] = texredstone->textureID;
+      }
       else if (isType (f1, DESERTSAND))
+      {
         tex1 [i] [i2] = texsand->textureID;
+      }
       else
+      {
         tex1 [i] [i2] = 0xFF;
-     
+      }
+
 /*        if (!isWater (f1) && isWater (f2) && isWater (f3) && isWater (f4))
       { drawrule [i] [i2] = 1; tex1 [i] [i2] = texgrass; tex2 [i] [i2] = texwater; }
       if (isWater (f1) && !isWater (f2) && !isWater (f3) && !isWater (f4))
@@ -746,8 +751,8 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             last = true;
             glBegin (GL_QUAD_STRIP);
           }
-          tex = NULL;
-          if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+          tex = texmap [a];
+/*          if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
             tex = texgrass;
           else if (a == 2 || a == 7)
             tex = texrocks;
@@ -756,7 +761,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
           else if (a == 11)
             tex = texredstone;
           else if (a == 13)
-            tex = texsand;
+            tex = texsand;*/
           if (tex == NULL)
           {
             texred = 1.0F;
@@ -837,32 +842,6 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
               last = true;
               glBegin (GL_QUAD_STRIP);
             }
-
-/*
-  float li [4] = {1, 1, 1, 1};
-  float lz1 = fabs ((float) MAXX/2 + camx - xs);
-  float lz2 = fabs ((float) MAXX/2 + camx - xs - step);
-  if (lz1 <= 5 || lz2 <= 5)
-  {
-    float dx1 = -((float) MAXX/2 - camz - ys);
-    float dx2 = -((float) MAXX/2 - camz - ys - step);
-    float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
-    float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
-//    float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
-    dgamma1 /= 4;
-//    dgamma2 /= 5;
-    float test;
-    test = (5.0 - dgamma1) * (5.0 - lz1);
-    if (test > 1.0 && dgamma1 < 5.0 && lz1 < 5.0) li [0] *= test;
-    test = (5.0 - dgamma1) * (5.0 - lz2);
-    if (test > 1.0 && dgamma1 < 5.0 && lz2 < 5.0) li [1] *= test;
-//    test = (5.0 - dgamma2) * (5.0 - lz1);
-//    if (test > 1.0 && dgamma2 < 5.0 && lz1 < 5.0) li [3] *= test;
-//    test = (5.0 - dgamma2) * (5.0 - lz2);
-//    if (test > 1.0 && dgamma2 < 5.0 && lz2 < 5.0) li [2] *= test;
-  }
-// do not forget to multiply li array
-*/
 
             texlight = texwater->texlight;
             float d = watergreen * (h1 - h [x] [y]);
@@ -979,8 +958,8 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
     return;
   int a = selectColor (x, y);
-  tex = NULL;
-  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+  tex = texmap [a];
+  /*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
     tex = texgrass;
   else if (a == 2 || a == 7)
     tex = texrocks;
@@ -989,7 +968,7 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   else if (a == 11)
     tex = texredstone;
   else if (a == 13)
-    tex = texsand;
+    tex = texsand;*/
   if (tex == NULL)
   {
     texred = 1.0F;
@@ -1059,8 +1038,8 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
     return;
   int a = selectColor (x, y);
-  tex = NULL;
-  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+  tex = texmap [a];
+/*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
     tex = texgrass;
   else if (a == 2 || a == 7)
     tex = texrocks;
@@ -1069,7 +1048,7 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   else if (a == 11)
     tex = texredstone;
   else if (a == 13)
-    tex = texsand;
+    tex = texsand;*/
   if (tex == NULL)
   {
     texred = 1.0F;
@@ -1112,9 +1091,6 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
 {
   int j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1210,9 +1186,6 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
 {
   int j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [3] [3];
   float pos [3] [3];
@@ -1307,9 +1280,6 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
 {
   int j;
   int step = gridstep;
-//    int tx, ty;
-//    float tfx, tfy, tfinc;
-//  float texlight = 1.0;
   bool texture = false;
   float col [4] [3];
   float pos [4] [3];
@@ -1317,17 +1287,23 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = GETCOORD(xs);
-  int y = GETCOORD(ys);
+  int pcx [4], pcy [4];
   px [0] = xs; py [0] = ys;
   px [1] = xs + step; py [1] = ys;
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
-  float minh = h[x][y];
+  for (j = 0; j < 4; j ++)
+  {
+    pcx [j] = GETCOORD(px [j]);
+    pcy [j] = GETCOORD(py [j]);
+  }
+  int x = GETCOORD(pcx [0]);
+  int y = GETCOORD(pcy [0]);
+  float minh = h [x] [y];
   float maxh = minh;
   for (j = 1; j < 4; j ++)
   {
-    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
+    int h1 = h [pcx [j]] [pcy [j]];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -1337,6 +1313,8 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     size = hh2 / 2 * step;
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
     return;
+//  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, h [x] [y] * zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
+//    return;
   if (tex1 [x] [y] == 0xFF)
   {
     texture = false;
@@ -1364,11 +1342,11 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
-    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
+    int mx = pcx [j], my = pcy [j];
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
-    col [j] [0] = r [mx] [my] * fac;
-    col [j] [1] = g [mx] [my] * fac;
-    col [j] [2] = b [mx] [my] * fac;
+    col [j] [0] = (float) r [mx] [my] * fac;
+    col [j] [1] = (float) g [mx] [my] * fac;
+    col [j] [2] = (float) b [mx] [my] * fac;
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
     if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
     if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
@@ -1386,7 +1364,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     else
     {
       tf [j] [0] = (float) px [j] * texzoom;
-      tf [j] [1] = (float) h [GETCOORD(px [j])] [GETCOORD(py [j])] * texzoom / 400.0;
+      tf [j] [1] = (float) h [pcx [j]] [pcy [j]] * texzoom / 400.0;
     }
   }
   glBegin (GL_QUADS);
@@ -2038,14 +2016,20 @@ void GLLandscape::draw (int phi, int gamma)
   float dy = (float) (maxy - miny + 1) / parts;
 
 
+#ifndef FASTCPU
+  // Efficient occlusion culling (kind of ray casting technique):
+  // Run from inner grid point (viewer) to outer grid parts and check if grid points are hidden
+  // This is currently not completely correct (needs two comparisons of inner fields), but
+  // it already works very well, so I negligate the second comparison, as it would double the code
 
-  for (i = 0; i < parts; i ++)
+  // precalculate min and max values in the grid parts
+/*  for (i = 0; i < parts; i ++)
     for (i2 = 0; i2 < parts; i2 ++)
     {
       int ax = getCoord (minx + (int) (dx * (float) i2));
       int ay = getCoord (miny + (int) (dy * (float) i));
       int zx = getCoord (minx + (int) (dx * (float) (i2 + 1)));
-      int zy = getCoord (miny + (int) (dy * (float) (i + 1))/* + gridstep*/);
+      int zy = getCoord (miny + (int) (dy * (float) (i + 1)));
       vmin [i] [i2] = hw [ax] [ay];
       if (hw [ax] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [ax] [zy];
       if (hw [zx] [zy] < vmin [i] [i2]) vmin [i] [i2] = hw [zx] [zy];
@@ -2054,12 +2038,27 @@ void GLLandscape::draw (int phi, int gamma)
       if (hw [ax] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [ax] [zy];
       if (hw [zx] [zy] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [zy];
       if (hw [zx] [ay] > vmax [i] [i2]) vmax [i] [i2] = hw [zx] [ay];
+    }*/
+  for (i = 0; i < parts; i ++)
+    for (i2 = 0; i2 < parts; i2 ++)
+    {
+      int ax = minx + (int) (dx * (float) i2);
+      int ay = miny + (int) (dy * (float) i);
+      int zx = minx + (int) (dx * (float) (i2 + 1));
+      int zy = miny + (int) (dy * (float) (i + 1));
+      vmin [i] [i2] = 65535;
+      vmax [i] [i2] = 0;
+      for (int i3 = 0; i3 < zy - ay + 1; i3 += 4)
+        for (int i4 = 0; i4 < zx - ax + 1; i4 += 4)
+        {
+          int by = getCoord (ay + i3);
+          int bx = getCoord (ax + i4);
+          if (hw [bx] [by] < vmin [i] [i2]) vmin [i] [i2] = hw [bx] [by];
+          if (hw [bx] [by] > vmax [i] [i2]) vmax [i] [i2] = hw [bx] [by];
+        }
     }
 
-  // Efficient occlusion culling (kind of ray casting technique):
-  // Run from inner grid point (viewer) to outer grid parts and check if grid points are hidden
-  // This is currently not completely correct (needs two comparisons of inner fields), but
-  // it already works very well, so I negligate the second comparison, as it would double the code
+  // ray casting
   int count = 0;
   bool set = true;
   memset (vis, 0, PARTS * PARTS * sizeof (bool));
@@ -2074,6 +2073,8 @@ void GLLandscape::draw (int phi, int gamma)
       int lastx = 0;
       if (i2 < cx) lastx = -1;
       if (i2 > cx) lastx = 1;
+/*      if (i2 == cx - 1 && i2 > parts - i - 1) lastx = 0;
+      if (i2 == cx + 1 && i2 < i - 1) lastx = 0;*/
       int vminref = vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
@@ -2087,6 +2088,37 @@ void GLLandscape::draw (int phi, int gamma)
         dhp = -30000;
       int h1 = vminref + dhp;
       if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+
+/*      // also test non-diagonal element if available
+      bool secondtest = false;
+      if (i2 < cx && i2 > parts - i - 1)
+      {
+        lastx = 0;
+        secondtest = true;
+      }
+      if (i2 > cx && i2 < i + 1)
+      {
+        lastx = 0;
+        secondtest = true;
+      }
+      if (secondtest)
+      {
+        vminref = vh [i - lasty] [i2 - lastx];
+        deltax = cx - i2 + lastx;
+        deltay = cy - i + lasty;
+        dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+        dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+        dh1 = vminref - ch;
+        dhp;
+        if (dist1 > 1E-4)
+          dhp = (int) (dist2 * dh1 / dist1);
+        else
+          dhp = -30000;
+        int h11 = vminref + dhp;
+        if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
+        if (h11 > h1) h1 = h11;
+      }*/
+
       vh [i] [i2] = h1;
       if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
       else
@@ -2099,6 +2131,8 @@ void GLLandscape::draw (int phi, int gamma)
       int lastx = 0;
       if (i2 < cx) lastx = -1;
       if (i2 > cx) lastx = 1;
+      if (i2 == cx - 1 && i2 > i) lastx = 0;
+      if (i2 == cx + 1 && i2 < parts - 1) lastx = 0;
       int vminref = vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
@@ -2112,6 +2146,37 @@ void GLLandscape::draw (int phi, int gamma)
         dhp = -30000;
       int h1 = vminref + dhp;
       if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+
+/*      // also test non-diagonal element if available
+      bool secondtest = false;
+      if (i2 < cx && i2 > i)
+      {
+        lastx = 0;
+        secondtest = true;
+      }
+      if (i2 > cx && i2 < parts - i)
+      {
+        lastx = 0;
+        secondtest = true;
+      }
+      if (secondtest)
+      {
+        vminref = vh [i - lasty] [i2 - lastx];
+        deltax = cx - i2 + lastx;
+        deltay = cy - i + lasty;
+        dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+        dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+        dh1 = vminref - ch;
+        dhp;
+        if (dist1 > 1E-4)
+          dhp = (int) (dist2 * dh1 / dist1);
+        else
+          dhp = -30000;
+        int h11 = vminref + dhp;
+        if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
+        if (h11 > h1) h1 = h11;
+      }*/
+
       vh [i] [i2] = h1;
       if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
       else
@@ -2124,6 +2189,8 @@ void GLLandscape::draw (int phi, int gamma)
       int lastx = 1;
       if (i < cy) lasty = -1;
       if (i > cy) lasty = 1;
+      if (i == cy - 1 && i > parts - i2) lasty = 0;
+      if (i == cy + 1 && i < i2) lasty = 0;
       int vminref = vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
@@ -2137,6 +2204,37 @@ void GLLandscape::draw (int phi, int gamma)
         dhp = -30000;
       int h1 = vminref + dhp;
       if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+
+/*      // also test non-diagonal element if available
+      bool secondtest = false;
+      if (i < cy && i > parts - i2)
+      {
+        lasty = 0;
+        secondtest = true;
+      }
+      if (i > cy && i < i2)
+      {
+        lasty = 0;
+        secondtest = true;
+      }
+      if (secondtest)
+      {
+        vminref = vh [i - lasty] [i2 - lastx];
+        deltax = cx - i2 + lastx;
+        deltay = cy - i + lasty;
+        dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+        dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+        dh1 = vminref - ch;
+        dhp;
+        if (dist1 > 1E-4)
+          dhp = (int) (dist2 * dh1 / dist1);
+        else
+          dhp = -30000;
+        int h11 = vminref + dhp;
+        if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
+        if (h11 > h1) h1 = h11;
+      }*/
+
       vh [i] [i2] = h1;
       if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
       else
@@ -2149,6 +2247,8 @@ void GLLandscape::draw (int phi, int gamma)
       int lastx = -1;
       if (i < cy) lasty = -1;
       if (i > cy) lasty = 1;
+      if (i == cy - 1 && i > i2 - 1) lasty = 0;
+      if (i == cy + 1 && i < parts - i2 - 1) lasty = 0;
       int vminref = vh [i - lasty] [i2 - lastx];
       int deltax = cx - i2 + lastx;
       int deltay = cy - i + lasty;
@@ -2162,13 +2262,46 @@ void GLLandscape::draw (int phi, int gamma)
         dhp = -30000;
       int h1 = vminref + dhp;
       if (h1 < vmin [i] [i2]) h1 = vmin [i] [i2];
+
+/*      // also test non-diagonal element if available
+      bool secondtest = false;
+      if (i < cy && i > i2 + 1)
+      {
+        lasty = 0;
+        secondtest = true;
+      }
+      if (i > cy && i < parts - i2 - 1)
+      {
+        lasty = 0;
+        secondtest = true;
+      }
+      if (secondtest)
+      {
+        vminref = vh [i - lasty] [i2 - lastx];
+        deltax = cx - i2 + lastx;
+        deltay = cy - i + lasty;
+        dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
+        dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
+        dh1 = vminref - ch;
+        dhp;
+        if (dist1 > 1E-4)
+          dhp = (int) (dist2 * dh1 / dist1);
+        else
+          dhp = -30000;
+        int h11 = vminref + dhp;
+        if (h11 < vmin [i] [i2]) h11 = vmin [i] [i2];
+        if (h11 > h1) h1 = h11;
+      }*/
+
       vh [i] [i2] = h1;
       if (vmax [i] [i2] >= h1) vis [i] [i2] = set;
       else
       { vis [i] [i2] = !set; count ++; }
     }
 //  printf ("c=%d ", count);
-
+#else
+  memset (vis, 1, PARTS * PARTS * sizeof (bool));
+#endif
 
 /*  float fx, fy;
   for (i = 0; i < parts; i ++)
@@ -3382,6 +3515,22 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
 /*  for (i = 0; i < 7; i ++)
     for (i2 = 0; i2 < 4; i2 ++)
       mata [i] [i2] = mat [i] [i2] / 2.0;*/
+  texmap [0] = texmap [1] = texmap [10] = texmap [12] = texmap [13] = texgrass;
+  texmap [2] = texmap [7] = texrocks;
+  texmap [4] = texmap [5] = texmap [6] = texmap [8] = texmap [9] = texwater;
+  texmap [11] = texredstone;
+  texmap [13] = texsand;
+  texmap [3] = texmap [14] = texmap [15] = NULL;
+/*  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+    tex = texgrass;
+  else if (a == 2 || a == 7)
+    tex = texrocks;
+  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
+    tex = texgrass; // not texwater!
+  else if (a == 11)
+    tex = texredstone;
+  else if (a == 13)
+    tex = texsand;*/
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
       if (hw [i] [i2] == 0)

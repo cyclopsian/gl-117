@@ -1896,7 +1896,7 @@ void MissionAirBattle::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ARCTIC, NULL);
+  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;

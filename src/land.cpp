@@ -613,14 +613,16 @@ void Landscape::genArcticSurface (int hoehepc, int *heightmap)
       if (h [i] [i2] > highestpoint) highestpoint = h [i] [i2];
       if (h [i] [i2] < lowestpoint) lowestpoint = h [i] [i2];
       f [i] [i2] = GLACIER;
-      if (h [i] [i2] < 32836 - hoehepc * 40)
+      if (abs (h [i] [i2] - h [i + 1] [i2]) > 300) f [i] [i2] = ROCKS;
+      if (abs (h [i] [i2] - h [i] [i2 + 1]) > 300) f [i] [i2] = ROCKS;
+      if (h [i] [i2] < 32836 - hoehepc * 3)
       {
-        int dh = 32836 - hoehepc * 40 - h [i] [i2];
+        int dh = 32836 - hoehepc * 3 - h [i] [i2];
         if (dh < 2000)
           f [i] [i2] = SHALLOWWATER;
         else
           f [i] [i2] = DEEPWATER;
-        hw [i] [i2] = 32836 - hoehepc * 40;
+        hw [i] [i2] = 32836 - hoehepc * 3;
       }
     }
 }

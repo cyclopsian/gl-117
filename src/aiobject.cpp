@@ -1742,7 +1742,7 @@ void AIObj::targetNearestEnemy (AIObj **f)
       }
     }
   }
-  if (!ai)
+  if (!ai && target)
     if (distance (target) > 200)
       target = NULL;
 }
