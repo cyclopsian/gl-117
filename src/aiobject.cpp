@@ -1885,6 +1885,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 //  if (id == 200) printf ("%1.2f, %1.2F  ", lsdist * forcex, lsdist * forcez);
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
+  float flyx2 = tl->x + forcex * lsdist * 2, flyz2 = tl->z + forcez * lsdist * 2;
   int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);
   {
     if (manoeverheight > 0)
@@ -1903,7 +1904,8 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       else
       {
         // precalculated height
-        recheight2 = l->getExactHeight (flyx, flyz) + recheight;
+        float h1 = l->getHeight (flyx, flyz), h2 = l->getHeight (flyx2, flyz2);
+        recheight2 = recheight + (h1 > h2 ? h1 : h2);
       }
     }
   }
@@ -1935,7 +1937,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         if (maxgamma < 40) // transporters have to stay higher
           if (recheight < 20) recheight = 20;
       }
-      float minh = 3.5 + 0.005 * aggressivity; // minimum height
+      float minh = 4.5 + 0.005 * aggressivity; // minimum height
       if (l->type == LAND_CANYON) minh = 5.5 + 0.005 * aggressivity; // stay higher in canyons
       if (fabs (tl->y - myheight) < minh)
       {
@@ -1945,7 +1947,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       }
       if (disttarget < 50 && fabs (tl->y - myheight) > 20)
       {
-        recheight = 4 + 0.02 * aggressivity;
+        recheight = 5 + 0.02 * aggressivity;
         manoeverheight = 15 * timestep;
       }
     }
@@ -2381,7 +2383,7 @@ m [0]->tl->y = target->tl->y;
   // thrust and manoever calculations
   if (id >= FIGHTER1 && id <= FIGHTER2) // fighters
   {
-    if (disttarget > 2.5 + aggressivity / 100)
+    if (disttarget > 2.5 + aggressivity / 20)
     {
       if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
         recthrust = maxthrust / (2 - intelligence * 0.001);

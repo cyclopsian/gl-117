@@ -1896,7 +1896,7 @@ void MissionAirBattle::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GLLandscape (space, LANDSCAPE_ARCTIC, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -3377,29 +3377,28 @@ void MissionMoonDogfight1::draw ()
 
 
 
-MissionMoonTunnel1::MissionMoonTunnel1 ()
+MissionTunnel1::MissionTunnel1 ()
 {
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_PHOENIX;
-  id = MISSION_MOON4;
-  strcpy (name, "TURRETS");
-  strcpy (briefing, "THE FIRST STEP TO MOVE FURTHER TOWARDS THE ENEMY BASE IS A TRENCH YOU HAVE TO PROTUDE.");
+  id = MISSION_TUNNEL1;
+  strcpy (name, "TUNNEL");
+  strcpy (briefing, "THE TERRAIN TO GET NEAR THE ENEMY'S HQ IS GUARDED BY ELITE BUZZARD FIGHTERS. BUT THERE IS A TRENCH WE CAN PROTUDE TO GET NEAR THEIR BASE WITHOUT BEING SIGHTED. FLY AHEAD TO SCOUT THE TRENCH. JUST MAKE YOUR WAY THROUGH!");
   autoLFBriefing ();
   alliedfighters = 1;
   maxtime = 5000 * timestep;
 }
 
-void MissionMoonTunnel1::start ()
+void MissionTunnel1::start ()
 {
   int i;
   day = 0;
   clouds = 0;
   weather = WEATHER_SUNNY;
   camera = 0;
-  sungamma = 50;
+  sungamma = 60;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
-  l->genTrench (16, 4000);
+  l = new GLLandscape (space, LANDSCAPE_CANYON_TRENCH, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 0;
@@ -3422,13 +3421,13 @@ void MissionMoonTunnel1::start ()
   fighter [i]->newinit (FLARAK_AIR1, 0, 200);
   for (i = 11; i <= 15; i ++)
   {
-    int ix = (i - 11) * 5 - 40;
-    int iy = 0;
+    int ix = (i - 11) * 10 - 100;
+    int iy = (i % 2) * 3 - 3;
     fighter [i]->tl->x = ix;
     fighter [i]->tl->z = iy;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_mine1;
-    fighter [i]->newinit (MISSILE_MINE1, 0, 220);
+    fighter [i]->o = &model_flak1;
+    fighter [i]->newinit (FLAK_AIR1, 0, 300);
   }
   fighter [i]->tl->x = -250;
   fighter [i]->tl->z = -2;
@@ -3446,14 +3445,18 @@ void MissionMoonTunnel1::start ()
   fighter [i]->tl->z = 0;
   fighter [i]->o = &model_barrier1;
   fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
-  i ++;
-  fighter [i]->tl->x = -80;
-  fighter [i]->tl->z = 0;
-  fighter [i]->o = &model_barrier1;
-  fighter [i]->newinit (STATIC_BARRIER1, 0, 100);
+  for (i = 19; i < 26; i ++)
+  {
+    fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 8);
+    fighter [i]->target = fighter [0];
+    fighter [i]->o = &model_figd;
+    fighter [i]->tl->x = 0;
+    fighter [i]->tl->z = 0;
+    fighter [i]->deactivate ();
+  }
 }
 
-int MissionMoonTunnel1::processtimer (Uint32 dt)
+int MissionTunnel1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -3466,9 +3469,20 @@ int MissionMoonTunnel1::processtimer (Uint32 dt)
 //  if (timer > 40 * timestep)
   {
     if (fplayer->tl->y - l->getHeight (fplayer->tl->x, fplayer->tl->z) > 15)
-      return 2;
+    {
+      if (!fighter [24]->active && fighter [24]->shield > 0)
+      {
+        for (i = 19; i < 26; i ++)
+        {
+          fighter [i]->activate ();
+          fighter [i]->tl->x = fplayer->tl->x - 80 - (i - 18) * 8;
+          fighter [i]->tl->z = fplayer->tl->z - 20;
+          fighter [i]->tl->y = l->getHeight (fighter [i]->tl->x, fighter [i]->tl->z) + 25;
+        }
+      }
+    }
   }
-  if (fplayer->tl->x < -380)
+  if (fplayer->tl->x < -450)
     return 1;
   return 0;
 /*  for (i = 0; i <= 10; i ++)
@@ -3481,7 +3495,7 @@ int MissionMoonTunnel1::processtimer (Uint32 dt)
   return 1;*/
 }
 
-void MissionMoonTunnel1::draw ()
+void MissionTunnel1::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {

@@ -133,6 +133,10 @@ void GLLandscape::precalculate ()
       {
         a = 11;
       }
+      else if (type == 4 && a == 4)
+      {
+        a = 2;
+      }
       if (day)
       {
         r [x] [z] = (unsigned char) (mat [a] [0] * 255.9);
@@ -863,17 +867,23 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             texlight = texwater->texlight;
             float d = watergreen * (h1 - h [x] [y]);
             if (d > 0.75) d = 0.75;
-            if (type == 0)
+            if (type == LAND_ALPINE)
             {
               cr = 0.1 * 256;
               cg = (0.85 - d) * 256;
               cb = (0.6 + d) * 256;
             }
-            else if (type == 2)
+            else if (type == LAND_CANYON)
             {
               cr = (0.55 - d/2) * 256;
               cg = (0.55 - d/2) * 256;
               cb = (0.6 + d) * 256;
+            }
+            else if (type == LAND_ARCTIC)
+            {
+              cr = (0.7 - d/2) * 256;
+              cg = (0.7 - d/2) * 256;
+              cb = (0.7 + d / 2) * 256;
             }
             float fac = 0.001 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight / 256.0 * texlight;
             cr = (float) cr * fac;
@@ -888,17 +898,23 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 
             d = watergreen * (h1 - h [xstep] [y]);
             if (d > 0.75) d = 0.75;
-            if (type == 0)
+            if (type == LAND_ALPINE)
             {
               cr = 0.1 * 256;
               cg = (0.85 - d) * 256;
               cb = (0.6 + d) * 256;
             }
-            else if (type == 2)
+            else if (type == LAND_CANYON)
             {
               cr = (0.55 - d/2) * 256;
               cg = (0.55 - d/2) * 256;
               cb = (0.6 + d) * 256;
+            }
+            else if (type == LAND_ARCTIC)
+            {
+              cr = (0.7 - d/2) * 256;
+              cg = (0.7 - d/2) * 256;
+              cb = (0.7 + d / 2) * 256;
             }
             fac = 0.001 * (nl [xstep] [y] + (short) dl [xstep] [y] * 16) * sunlight / 256.0 * texlight;
             cr = (float) cr * fac;
@@ -1511,17 +1527,23 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     float d = watergreen * (h1 - h [mx] [my]);
     if (d > 0.75) d = 0.75;
     fac = fac2 * li [j];
-    if (type == 0)
+    if (type == LAND_ALPINE)
     {
       col [j] [0] = 0.1 * fac;
       col [j] [1] = (0.85 - d) * fac;
       col [j] [2] = (0.6 + d) * fac;
     }
-    else if (type == 2)
+    else if (type == LAND_CANYON)
     {
       col [j] [0] = (0.55 - d/2) * fac;
       col [j] [1] = (0.55 - d/2) * fac;
       col [j] [2] = (0.6 + d) * fac;
+    }
+    else if (type == LAND_ARCTIC)
+    {
+      col [j] [0] = (0.7 - d/2) * fac;
+      col [j] [1] = (0.7 - d/2) * fac;
+      col [j] [2] = (0.7 + d / 2) * fac;
     }
 //    col [j] [3] = (float) abs (h1 - h [px [j]] [py [j]]) / 200 + 0.5;
     if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
@@ -3155,6 +3177,15 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
     else if (type == LANDSCAPE_CANYON)
     {
       genCanyonSurface (120);
+    }
+    else if (type == LANDSCAPE_ARCTIC)
+    {
+      genArcticSurface (60, NULL);
+    }
+    else if (type == LANDSCAPE_CANYON_TRENCH)
+    {
+      genCanyonSurface (10);
+      genTrench (20, 3800);
     }
     else if (type == LANDSCAPE_DESERT)
     {

@@ -333,7 +333,7 @@ GLfloat light_position0[] = { 0.0, 0.5, -1.0, 0 };
 
 int NX, NY;
 
-int joystick;
+int joysticks;
 
 Mission *mission = NULL;
 Mission *missionnew = NULL;
@@ -517,8 +517,9 @@ void adjustBrightness ()
 
 
 
+const int maxjoysticks = 10;
 #ifndef USE_GLUT
-SDL_Joystick *sdljoystick;
+SDL_Joystick *sdljoystick [maxjoysticks];
 #endif
 int sdldisplay = true;
 int sdlreshape = true;
@@ -1060,10 +1061,10 @@ void createMission (int missionid)
   else if (missionid == MISSION_CANYON1) missionnew = new MissionCanyon1 ();
   else if (missionid == MISSION_CANYON2) missionnew = new MissionCanyon2 ();
   else if (missionid == MISSION_CANYON3) missionnew = new MissionCanyon3 ();
+  else if (missionid == MISSION_TUNNEL1) missionnew = new MissionTunnel1 ();
   else if (missionid == MISSION_MOON1) missionnew = new MissionMoonDefense1 ();
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
-  else if (missionid == MISSION_MOON4) missionnew = new MissionMoonTunnel1 ();
   else if (missionid == MISSION_TUTORIAL) missionnew = new MissionTutorial1 ();
   else if (missionid == MISSION_DOGFIGHT) missionnew = new MissionDogfight1 ();
   else if (missionid == MISSION_FREEFLIGHT1) missionnew = new MissionFreeFlight1 ();
@@ -1646,18 +1647,26 @@ void game_mousemotion (int x, int y)
 #endif
 }
 
-void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
+const int maxjaxis = 10;
+int jaxis [maxjaxis * maxjoysticks];
+
+int getJoystickAxisIndex (int n)
+{
+  return (n / 1000) * 10 + (n % 1000);
+}
+
+void game_joystickaxis (/*int axis1, int axis2, int axis3, int axis4*/)
 {
   if (fplayer->ai) return;
-  int axis [4];
+/*  int axis [4];
   axis [0] = axis1;
   axis [1] = axis2;
   axis [2] = axis3;
-  axis [3] = axis4;
-  int x = axis [joystick_aileron];
-  int y = axis [joystick_elevator];
-  int rudder = axis [joystick_rudder];
-  int throttle = axis [joystick_throttle];
+  axis [3] = axis4;*/
+  int x = jaxis [getJoystickAxisIndex (joystick_aileron)];
+  int y = jaxis [getJoystickAxisIndex (joystick_elevator)];
+  int rudder = jaxis [getJoystickAxisIndex (joystick_rudder)];
+  int throttle = jaxis [getJoystickAxisIndex (joystick_throttle)];
 /*  int t = (int) fplayer->theta;
   if (t < 0) t += 360;
   float rx = x * cosi [t] - y * sine [t];
@@ -1729,12 +1738,13 @@ void game_joystickbutton (int button)
 
 void game_joystickhat (int hat)
 {
-  int normhat = -1;
+  int normhat = hat;
 #ifndef USE_GLUT
-  if (hat == SDL_HAT_RIGHT) normhat = 100;
-  if (hat == SDL_HAT_UP) normhat = 101;
-  if (hat == SDL_HAT_LEFT) normhat = 102;
-  if (hat == SDL_HAT_DOWN) normhat = 103;
+  if (hat % 1000 == SDL_HAT_RIGHT) normhat = 100;
+  if (hat % 1000 == SDL_HAT_UP) normhat = 101;
+  if (hat % 1000 == SDL_HAT_LEFT) normhat = 102;
+  if (hat % 1000 == SDL_HAT_DOWN) normhat = 103;
+  normhat += (hat / 1000) * 1000;
   if (normhat == joystick_selectmissile)
   {
     event_selectMissile ();
@@ -2985,7 +2995,8 @@ void menu_mouse (int button, int state, int x, int y)
     Pilot *p = pilots->pilot [pilots->aktpilot];
     if (rx >= 0.48 && rx <= 0.85)
     {
-      if (ry >= 0.12 && ry <= 0.14)
+      float ryu = 0.12F;
+      if (ry >= ryu && ry <= ryu + 0.02F)
       {
         menuitemselected = 10;
         if (state == MOUSE_DOWN)
@@ -2993,7 +3004,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TEST1);
         }
       }
-      if (ry >= 0.15 && ry <= 0.17 && p->mission_state [MISSION_TEST1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TEST1] == 1)
       {
         menuitemselected = 11;
         if (state == MOUSE_DOWN)
@@ -3001,7 +3013,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TEST2);
         }
       }
-      if (ry >= 0.18 && ry <= 0.20 && p->mission_state [MISSION_TEST2] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TEST2] == 1)
       {
         menuitemselected = 12;
         if (state == MOUSE_DOWN)
@@ -3009,7 +3022,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TRANSPORT);
         }
       }
-      if (ry >= 0.21 && ry <= 0.23 && p->mission_state [MISSION_TRANSPORT] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TRANSPORT] == 1)
       {
         menuitemselected = 13;
         if (state == MOUSE_DOWN)
@@ -3017,7 +3031,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CONVOY);
         }
       }
-      if (ry >= 0.24 && ry <= 0.26 && p->mission_state [MISSION_CONVOY] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CONVOY] == 1)
       {
         menuitemselected = 14;
         if (state == MOUSE_DOWN)
@@ -3025,7 +3040,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT2);
         }
       }
-      if (ry >= 0.27 && ry <= 0.29 && p->mission_state [MISSION_DOGFIGHT2] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DOGFIGHT2] == 1)
       {
         menuitemselected = 15;
         if (state == MOUSE_DOWN)
@@ -3033,7 +3049,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_AIRBATTLE);
         }
       }
-      if (ry >= 0.30 && ry <= 0.32 && p->mission_state [MISSION_AIRBATTLE] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_AIRBATTLE] == 1)
       {
         menuitemselected = 16;
         if (state == MOUSE_DOWN)
@@ -3041,7 +3058,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SADEFENSE);
         }
       }
-      if (ry >= 0.33 && ry <= 0.35 && p->mission_state [MISSION_SADEFENSE] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SADEFENSE] == 1)
       {
         menuitemselected = 17;
         if (state == MOUSE_DOWN)
@@ -3049,7 +3067,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SCOUT);
         }
       }
-      if (ry >= 0.36 && ry <= 0.38 && p->mission_state [MISSION_SCOUT] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SCOUT] == 1)
       {
         menuitemselected = 18;
         if (state == MOUSE_DOWN)
@@ -3057,7 +3076,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_BASE);
         }
       }
-      if (ry >= 0.39 && ry <= 0.41 && p->mission_state [MISSION_BASE] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_BASE] == 1)
       {
         menuitemselected = 20;
         if (state == MOUSE_DOWN)
@@ -3065,7 +3085,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DEFEND1);
         }
       }
-      if (ry >= 0.42 && ry <= 0.44 && p->mission_state [MISSION_DEFEND1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DEFEND1] == 1)
       {
         menuitemselected = 21;
         if (state == MOUSE_DOWN)
@@ -3073,7 +3094,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_DOGFIGHT3);
         }
       }
-      if (ry >= 0.45 && ry <= 0.47 && p->mission_state [MISSION_DOGFIGHT3] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_DOGFIGHT3] == 1)
       {
         menuitemselected = 22;
         if (state == MOUSE_DOWN)
@@ -3081,7 +3103,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_TANK1);
         }
       }
-      if (ry >= 0.48 && ry <= 0.50 && p->mission_state [MISSION_TANK1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TANK1] == 1)
       {
         menuitemselected = 25;
         if (state == MOUSE_DOWN)
@@ -3089,7 +3112,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP1);
         }
       }
-      if (ry >= 0.51 && ry <= 0.53 && p->mission_state [MISSION_SHIP1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP1] == 1)
       {
         menuitemselected = 26;
         if (state == MOUSE_DOWN)
@@ -3097,7 +3121,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP2);
         }
       }
-      if (ry >= 0.54 && ry <= 0.56 && p->mission_state [MISSION_SHIP2] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP2] == 1)
       {
         menuitemselected = 27;
         if (state == MOUSE_DOWN)
@@ -3105,7 +3130,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_SHIP3);
         }
       }
-      if (ry >= 0.57 && ry <= 0.59 && p->mission_state [MISSION_SHIP3] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_SHIP3] == 1)
       {
         menuitemselected = 30;
         if (state == MOUSE_DOWN)
@@ -3113,7 +3139,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON1);
         }
       }
-      if (ry >= 0.60 && ry <= 0.62 && p->mission_state [MISSION_CANYON1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON1] == 1)
       {
         menuitemselected = 31;
         if (state == MOUSE_DOWN)
@@ -3121,7 +3148,17 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON2);
         }
       }
-      if (ry >= 0.63 && ry <= 0.65 && p->mission_state [MISSION_CANYON2] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON2] == 1)
+      {
+        menuitemselected = 36;
+        if (state == MOUSE_DOWN)
+        {
+          switch_mission (MISSION_TUNNEL1);
+        }
+      }
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_TUNNEL1] == 1)
       {
         menuitemselected = 32;
         if (state == MOUSE_DOWN)
@@ -3129,7 +3166,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_CANYON3);
         }
       }
-      if (ry >= 0.66 && ry <= 0.68 && p->mission_state [MISSION_CANYON3] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_CANYON3] == 1)
       {
         menuitemselected = 33;
         if (state == MOUSE_DOWN)
@@ -3137,7 +3175,8 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_MOON1);
         }
       }
-      if (ry >= 0.69 && ry <= 0.71 && p->mission_state [MISSION_MOON1] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_MOON1] == 1)
       {
         menuitemselected = 34;
         if (state == MOUSE_DOWN)
@@ -3145,17 +3184,10 @@ void menu_mouse (int button, int state, int x, int y)
           switch_mission (MISSION_MOON2);
         }
       }
-      if (ry >= 0.72 && ry <= 0.74 && p->mission_state [MISSION_MOON2] == 1)
+      ryu += 0.03F;
+      if (ry >= ryu && ry <= ryu + 0.02F && p->mission_state [MISSION_MOON2] == 1)
       {
         menuitemselected = 35;
-        if (state == MOUSE_DOWN)
-        {
-          switch_mission (MISSION_MOON4);
-        }
-      }
-      if (ry >= 0.75 && ry <= 0.77 && p->mission_state [MISSION_MOON4] == 1)
-      {
-        menuitemselected = 36;
         if (state == MOUSE_DOWN)
         {
           switch_mission (MISSION_MOON3);
@@ -3247,7 +3279,7 @@ void menu_mouse (int button, int state, int x, int y)
             else if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_JOYSTICK;
             else if (controls == CONTROLS_JOYSTICK) controls = CONTROLS_MOUSE;
             if (controls > 4) controls = 0;
-            if (controls == CONTROLS_JOYSTICK && !joystick) controls = CONTROLS_KEYBOARD;
+            if (controls == CONTROLS_JOYSTICK && !joysticks) controls = CONTROLS_KEYBOARD;
 #ifdef USE_GLUT
             if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
             if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_MOUSE;
@@ -3729,11 +3761,11 @@ void menu_display ()
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_SHIP3, MISSION_SHIP2, 27, "CRUISER");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON1, MISSION_SHIP3, 30, "RADAR BASE");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON2, MISSION_CANYON1, 31, "CANYON BATTLE");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON3, MISSION_CANYON2, 32, "MAIN BASE");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_TUNNEL1, MISSION_CANYON2, 36, "TUNNEL");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_CANYON3, MISSION_TUNNEL1, 32, "MAIN BASE");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON1, MISSION_CANYON3, 33, "TURRETS");
     drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON2, MISSION_MOON1, 34, "ELITE DOGFIGHT");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON4, MISSION_MOON2, 35, "TUNNEL");
-    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON4, 36, "SNEAKING");
+    drawMissionElement (textx2, yf -= 1.5, zf, MISSION_MOON3, MISSION_MOON2, 35, "SNEAKING");
     zf = -2;
     if (menuitemselected == 100)
       font1->drawTextScaled (-2, -12, zf, "PILOTS", &color2, -menutimer * 5);
@@ -5760,11 +5792,11 @@ static void myIdleFunc ()
 #endif
 }
 
-static void myJoystickAxisFunc (int x, int y, int t, int r)
+static void myJoystickAxisFunc (/*int x, int y, int t, int r*/)
 {
   if (game == GAME_PLAY)
   {
-    game_joystickaxis (x, y, t, r);
+    game_joystickaxis (/*x, y, t, r*/);
   }
 }
 
@@ -5795,6 +5827,16 @@ static void myTimerFunc (int value)
   if (lasttime == 0) dt = 1;
   else dt = akttime - lasttime;
   lasttime = akttime;
+
+  if (dt > 1000)
+  {
+    dt = 1;
+    if (game == GAME_PLAY && multiplayer)
+    {
+      display ("Out of sync", LOG_ERROR);
+      switch_menu ();
+    }
+  }
 
   if (game == GAME_PLAY)
     game_timer (dt);
@@ -5909,7 +5951,7 @@ Uint32 nexttime = 0;
   nexttime = now + TIMER_INTERVAL;
 }*/
 
-int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
+//int joystickx = 0, joysticky = 0, joystickt = 0, joystickr = 0; // the joystick axes
 int joystickbutton = -1;
 
 // This loop emulates the glutMainLoop() of GLUT using SDL!!!
@@ -5950,7 +5992,10 @@ void sdlMainLoop ()
           break;
         case SDL_JOYAXISMOTION:
 //          if (abs (event.jaxis.value) > 500)
-          {
+          jaxis [event.jaxis.axis + event.jaxis.which * 10] = event.jaxis.value;
+          if (abs (event.jaxis.value) < 1000)
+            jaxis [event.jaxis.axis + event.jaxis.which * 10] = 0;
+/*          {
             if (event.jaxis.axis == 0)
             {
               joystickx = event.jaxis.value;
@@ -5969,18 +6014,18 @@ void sdlMainLoop ()
             }
             if (joystickx > -3000 && joystickx < 3000) joystickx = 0;
             if (joysticky > -3000 && joysticky < 3000) joysticky = 0;
-          }
+          }*/
           break;
         case SDL_JOYBUTTONDOWN:
-          joystickbutton = event.jbutton.button;
-          if (joystickbutton >= 2)
-            myJoystickButtonFunc (joystickbutton);
+          joystickbutton = event.jbutton.button + event.jbutton.which * 1000;
+//          if (joystickbutton >= 2)
+          myJoystickButtonFunc (joystickbutton);
           break;
         case SDL_JOYBUTTONUP:
           joystickbutton = -1;
           break;
         case SDL_JOYHATMOTION:
-          myJoystickHatFunc (event.jhat.value);
+          myJoystickHatFunc (event.jhat.value + event.jhat.which * 1000);
           break;
         case SDL_ACTIVEEVENT:
           sdlreshape = true;
@@ -5991,7 +6036,7 @@ void sdlMainLoop ()
     
     if (controls == CONTROLS_JOYSTICK)
     {
-      myJoystickAxisFunc (joystickx, joysticky, joystickt, joystickr);
+      myJoystickAxisFunc (/*joystickx, joysticky, joystickt, joystickr*/);
       if (joystickbutton == 0)
         myJoystickButtonFunc (0);
       else
@@ -6436,17 +6481,22 @@ int main (int argc, char **argv)
   myReshapeFunc (width, height);
 
   display ("Querying joystick", LOG_ALL);
-  joystick = SDL_NumJoysticks ();
-  if (joystick > 0)
+  joysticks = SDL_NumJoysticks ();
+  memset (jaxis, 0, maxjaxis * maxjoysticks * sizeof (int));
+  if (joysticks > 0)
   {
-    SDL_JoystickEventState (SDL_ENABLE);
-    sdljoystick = SDL_JoystickOpen (0);
-    display ("Joystick detected", LOG_MOST);
+    for (i = 0; i < joysticks; i ++)
+    {
+      SDL_JoystickEventState (SDL_ENABLE);
+      sdljoystick [i] = SDL_JoystickOpen (i);
+      sprintf (buf, "Joystick \"%s\" detected", SDL_JoystickName (i));
+      display (buf, LOG_MOST);
+    }
   }
   else
   {
     display ("No joystick found", LOG_MOST);
-    sdljoystick = NULL;
+//    sdljoystick [0] = NULL;
     if (controls == CONTROLS_JOYSTICK) // no joystick available, so switch to mouse controls
       controls = CONTROLS_MOUSE;
   }

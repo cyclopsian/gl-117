@@ -40,10 +40,10 @@ unsigned char key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', ke
 unsigned char key_selectmissile = 'M';
 unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P';
 
-unsigned char joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
-unsigned char joystick_selectmissile = 1;
-unsigned char joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102;
-unsigned char joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
+unsigned int joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
+unsigned int joystick_selectmissile = 1;
+unsigned int joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102;
+unsigned int joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
 
 unsigned char mouse_firecannon = MOUSE_BUTTON_LEFT, mouse_firemissile = MOUSE_BUTTON_RIGHT;
 unsigned char mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
@@ -348,6 +348,13 @@ int load_config ()
   return 1;
 }
 
+void writeJoystick (ConfigFile *cf, char *str, int jn)
+{
+  char buf [STDSIZE];
+  sprintf (buf, "%s = %c%d", str, 'A' + (jn / 1000), jn % 1000);
+  cf->writeText (buf);
+}
+
 void save_configInterface ()
 {
   char buf [STDSIZE];
@@ -396,23 +403,25 @@ void save_configInterface ()
   cf->writeText ("\n# ---------------------------------------------------------------------");
   cf->writeText ("# Joystick section");
   cf->writeText ("# ---------------------------------------------------------------------\n");
-  cf->writeText ("# The number of axis, buttons, and the coolie hat depends on your joystick!");
+  cf->writeText ("# The number of axes, buttons, and the coolie hat depends on your joystick!");
+  cf->writeText ("# Numbers start with A=first joystick, B=second joystick...J=10th joystick");
+  cf->writeText ("#  followed by a number to identify axes, buttons, and coolie hat\n");
   cf->writeText ("# Axis: 0...MAX-1 (maybe 0=aileron 1=elevator 2=throttle 3=rudder)");
-  cf->write (" joystick_aileron", joystick_aileron);
-  cf->write (" joystick_elevator", joystick_elevator);
-  cf->write (" joystick_throttle", joystick_throttle);
-  cf->write (" joystick_rudder", joystick_rudder);
+  writeJoystick (cf, " joystick_aileron", joystick_aileron);
+  writeJoystick (cf, " joystick_elevator", joystick_elevator);
+  writeJoystick (cf, " joystick_throttle", joystick_throttle);
+  writeJoystick (cf, " joystick_rudder", joystick_rudder);
   cf->writeText ("\n# Buttons: 0...MAX-1");
-  cf->write (" joystick_firecannon", joystick_firecannon);
-  cf->write (" joystick_firemissile", joystick_firemissile);
+  writeJoystick (cf, " joystick_firecannon", joystick_firecannon);
+  writeJoystick (cf, " joystick_firemissile", joystick_firemissile);
   cf->writeText ("# Dropping chaff AND flare may be preferred");
-  cf->write (" joystick_dropflare", joystick_dropflare);
-  cf->write (" joystick_dropchaff", joystick_dropchaff);
+  writeJoystick (cf, " joystick_dropflare", joystick_dropflare);
+  writeJoystick (cf, " joystick_dropchaff", joystick_dropchaff);
   cf->writeText ("\n# Buttons: 0...MAX-1, Coolie: 100=Right, 101=Up, 102=Left, 103=Down");
-  cf->write (" joystick_selectmissile", joystick_selectmissile);
-  cf->write (" joystick_targetnearest", joystick_targetnearest);
-  cf->write (" joystick_targetnext", joystick_targetnext);
-  cf->write (" joystick_targetprevious", joystick_targetprevious);
+  writeJoystick (cf, " joystick_selectmissile", joystick_selectmissile);
+  writeJoystick (cf, " joystick_targetnearest", joystick_targetnearest);
+  writeJoystick (cf, " joystick_targetnext", joystick_targetnext);
+  writeJoystick (cf, " joystick_targetprevious", joystick_targetprevious);
   cf->writeText ("\n# This file is meant to give sensible custom interface settings");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
   cf->close ();
@@ -433,6 +442,23 @@ int getKey (char *str, int n)
     return n;
   }
   return tmp;
+}
+
+int getJoystick (char *str, int n)
+{
+  int tmp, jn = 0;
+  if (str == NULL) return n;
+  int str0 = toupper (str [0]) - (int) 'A';
+  if (str0 >= 0 && str0 < 10)
+    jn = str0;
+  else
+    return n;
+  tmp = atoi (&str [1]);
+/*  if (tmp == 0) // problem: tmp=0 is valid!
+  {
+    return n;
+  }*/
+  return jn * 1000 + tmp;
 }
 
 int load_configInterface ()
@@ -498,76 +524,40 @@ int load_configInterface ()
   else mouse_selectmissile = MOUSE_BUTTON_LEFT;
 
   str = cf->getString (ret, "joystick_aileron");
-  if (str == NULL)
-  { joystick_aileron = 0; }
-  else
-  { joystick_aileron = atoi (str); }
+  joystick_aileron = getJoystick (str, 0);
 
   str = cf->getString (ret, "joystick_elevator");
-  if (str == NULL)
-  { joystick_elevator = 1; }
-  else
-  { joystick_elevator = atoi (str); }
+  joystick_elevator = getJoystick (str, 1);
 
   str = cf->getString (ret, "joystick_throttle");
-  if (str == NULL)
-  { joystick_throttle = 2; }
-  else
-  { joystick_throttle = atoi (str); }
+  joystick_throttle = getJoystick (str, 2);
 
   str = cf->getString (ret, "joystick_rudder");
-  if (str == NULL)
-  { joystick_rudder = 3; }
-  else
-  { joystick_rudder = atoi (str); }
+  joystick_rudder = getJoystick (str, 3);
 
   str = cf->getString (ret, "joystick_firecannon");
-  if (str == NULL)
-  { joystick_firecannon = 0; }
-  else
-  { joystick_firecannon = atoi (str); }
+  joystick_firecannon = getJoystick (str, 0);
 
   str = cf->getString (ret, "joystick_firemissile");
-  if (str == NULL)
-  { joystick_firemissile = 2; }
-  else
-  { joystick_firemissile = atoi (str); }
+  joystick_firemissile = getJoystick (str, 2);
 
   str = cf->getString (ret, "joystick_dropchaff");
-  if (str == NULL)
-  { joystick_dropchaff = 3; }
-  else
-  { joystick_dropchaff = atoi (str); }
+  joystick_dropchaff = getJoystick (str, 3);
 
   str = cf->getString (ret, "joystick_dropflare");
-  if (str == NULL)
-  { joystick_dropflare = 3; }
-  else
-  { joystick_dropflare = atoi (str); }
+  joystick_dropflare = getJoystick (str, 3);
 
   str = cf->getString (ret, "joystick_selectmissile");
-  if (str == NULL)
-  { joystick_selectmissile = 1; }
-  else
-  { joystick_selectmissile = atoi (str); }
+  joystick_selectmissile = getJoystick (str, 1);
 
   str = cf->getString (ret, "joystick_targetnearest");
-  if (str == NULL)
-  { joystick_targetnearest = 101; }
-  else
-  { joystick_targetnearest = atoi (str); }
+  joystick_targetnearest = getJoystick (str, 101);
 
   str = cf->getString (ret, "joystick_targetnext");
-  if (str == NULL)
-  { joystick_targetnext = 100; }
-  else
-  { joystick_targetnext = atoi (str); }
+  joystick_targetnext = getJoystick (str, 100);
 
   str = cf->getString (ret, "joystick_targetprevious");
-  if (str == NULL)
-  { joystick_targetprevious = 102; }
-  else
-  { joystick_targetprevious = atoi (str); }
+  joystick_targetprevious = getJoystick (str, 102);
 
   if (cf->buf [0] == 0) // no file found
   {

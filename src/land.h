@@ -47,6 +47,7 @@
 #define LAND_MOON 1
 #define LAND_CANYON 2
 #define LAND_DESERT 3
+#define LAND_ARCTIC 4
 
 // maximum Gaussian convolution kernel extent
 #define MAXCORE 10
@@ -128,6 +129,7 @@ class Landscape
   void init (); // reset data fields
   void genSurface (int hoehepc, int *heightmap); // alpine
   void genErosionSurface (int hoehepc, int *heightmap); // alpine and erosion
+  void genArcticSurface (int hoehepc, int *heightmap); // alpine
   void genCanyonSurface (int hoehepc); // canyon
   void genMoonSurface (int height); // moon
   void genDesertSurface (int hoehepc); // desert

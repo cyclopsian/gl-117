@@ -51,7 +51,7 @@
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "GL-117 V. 0.8.8 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.9 (BETA) BY THOMAS A. DREXL"
 
 // data types
 #ifdef USE_GLUT
