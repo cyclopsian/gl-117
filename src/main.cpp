@@ -23,8 +23,6 @@
 
 /*
 TODO:
-- lighted cannon fire using alpha values
-- source code: MissionX => mission.cpp
 - southern seashore landscape (additional missions)
 - torpedo, water
 - faster gaussian convolution (isotropic)
@@ -75,7 +73,7 @@ int net_thread_main (void *data);
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_ALL;
+int debuglevel = LOG_MOST;
 int brightness = 0;
 
 SoundSystem *sound = NULL;
@@ -1368,14 +1366,14 @@ void game_key (unsigned char key, int x, int y)
       fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
       sound->play (SOUND_CLICK1);
     }
-    else if (key == 'a')
+/*    else if (key == 'a')
     {
       fplayer->ai = !fplayer->ai;
       if (!fplayer->ai) fplayer->easymodel = 2;
       else fplayer->easymodel = 1;
       if (controls == 100)
         fplayer->easymodel = true;
-    }
+    }*/
 /*    else if (key == 'p')
     {
       if (game == GAME_PLAY) game = GAME_PAUSE;
@@ -3101,13 +3099,13 @@ void menu_mouse (int button, int state, int x, int y)
           if (button == MOUSE_BUTTON_LEFT)
           {
             view += 10;
-            if (view > 100) view = 20;
+            if (view > 100) view = 30;
             menu_reshape ();
           }
           else
           {
             view -= 10;
-            if (view < 20) view = 100;
+            if (view < 30) view = 100;
             menu_reshape ();
           }
         }
@@ -5222,15 +5220,15 @@ void menu_timer (Uint32 dt)
       if (lastfps != fps)
       {
         lastfps = fps;
-        if (fps >= 29)
+        if (fps > 40)
         {
-          if (view < quality * 10 + 50) view += 10;
-          else { quality ++; view = quality * 10 + 20; }
+          if (view < quality * 10 + 60) view += 10;
+          else { quality ++; view = quality * 10 + 30; }
         }
-        else if (fps <= 23)
+        else if (fps < 30)
         {
-          if (view > quality * 10 + 20) view -= 10;
-          else { quality --; view = quality * 10 + 50; }
+          if (view > quality * 10 + 30) view -= 10;
+          else { quality --; view = quality * 10 + 60; }
         }
         menu_reshape ();
       }
@@ -5763,9 +5761,6 @@ void myFirstInit ()
 
 void init_key (int key, int x, int y)
 {
-//  game_quit ();
-//  gl->clearScreen ();
-//  glutSwapBuffers ();
   gl->clearScreen ();
   myInit ();
   switch_menu ();
@@ -5776,6 +5771,11 @@ void init_key (int key, int x, int y)
 #else
   starttime = glutGet (GLUT_ELAPSED_TIME);
 #endif
+}
+
+void init_mouse (int button, int state, int x, int y)
+{
+  init_key (32, x, y);
 }
 
 const int maxfx = 80;
@@ -6023,6 +6023,10 @@ static void myMouseFunc (int button, int state, int x, int y)
   if (game == GAME_PLAY)
   {
     game_mouse (button, state, x, y);
+  }
+  else if (game == GAME_INIT)
+  {
+    init_mouse (button, state, x, y);
   }
   else if (game == GAME_MENU)
   {

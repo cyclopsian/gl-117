@@ -27,7 +27,7 @@
 
 #include "glland.h"
 
-const float smokezoom[] = { 0.02, 0.027, 0.035, 0.042, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.11, 0.1, 0.09, 0.08, 0.06, 0.03 };
+const float smokezoom[] = { 0.02, 0.025, 0.03, 0.035, 0.04, 0.045, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
@@ -54,12 +54,12 @@ void CSmoke::setSmoke (float x, float y, float z, int myphi, int mytime)
   phi [last] = myphi;
 }
 
-void CSmoke::move (Uint32 dt)
+void CSmoke::move (Uint32 dt, int dec)
 {
   for (int i = 0; i < maxsmokeelem; i ++)
     if (time [i] > 0)
     {
-      time [i] -= 4;
+      time [i] -= dec;
       if (time [i] < 0) time [i] = 0;
     }
 }
@@ -68,18 +68,34 @@ void CSmoke::drawElem (int n)
 {
 //    glRotatef (phi [n], 0, 1, 0);
   if (n < 0 || n >= maxsmokeelem) return;
-  glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, time [n] * 10 + 55);
   float myzoom = smokezoom [time [n]];
-  glTexCoord2f (0, 0);
+  glPushMatrix ();
+  glTranslatef (v [n].x, v [n].y, v [n].z);
+  glRotatef (camphi, 0.0, 1.0, 0.0);
+  glRotatef (-camgamma, 1.0, 0.0, 0.0);
+  glScalef (myzoom, myzoom, myzoom);
+  glBegin (GL_QUADS);
+  glColor4ub (255, 255, 255, time [n] * 5 + 100);
+/*  glTexCoord2f (0, 0);
   glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y + myzoom, v [n].z + myzoom * sine [phi [n]]);
   glTexCoord2f (1, 0);
   glVertex3f (v [n].x + myzoom * cosi [phi [n]], v [n].y + myzoom, v [n].z - myzoom * sine [phi [n]]);
   glTexCoord2f (1, 1);
   glVertex3f (v [n].x + myzoom * cosi [phi [n]], v [n].y - myzoom, v [n].z - myzoom * sine [phi [n]]);
   glTexCoord2f (0, 1);
-  glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y - myzoom, v [n].z + myzoom * sine [phi [n]]);
+  glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y - myzoom, v [n].z + myzoom * sine [phi [n]]);*/
+  float cg = 1;
+  float cg2 = 0;
+  glTexCoord2f (0, 0);
+  glVertex3f (1, 1, 0);
+  glTexCoord2f (1, 0);
+  glVertex3f (1, -1, 0);
+  glTexCoord2f (1, 1);
+  glVertex3f (-1, -1, 0);
+  glTexCoord2f (0, 1);
+  glVertex3f (-1, 1, 0);
   glEnd ();
+  glPopMatrix ();
 }
 
 void CSmoke::drawElemHQ (int n)

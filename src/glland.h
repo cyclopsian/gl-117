@@ -75,7 +75,9 @@ class GLLandscape : public Landscape
   unsigned char tex2 [MAXX] [MAXX]; // texture for triangle2 if needed
   unsigned char dl [MAXX + 1] [MAXX + 1]; // dynamic light mask (explosions)
   int lsticker; // a timer increased every time draw() is called
-  int gridstep; // landscape grid resolution (1=fine or 2=coarse)
+  int neargridstep; // landscape near grid resolution (1=fine ... 4=coarse)
+  int fargridstep; // landscape far grid resolution (1=fine ... 4=coarse)
+  int gridstep; // landscape raster block grid resolution (1=fine ... 4=coarse)
   float glittering; // water glittering
 
   private:
@@ -126,7 +128,11 @@ class GLLandscape : public Landscape
   void drawCloudQuadStrip (int x1, int y1, int x2, int y2); // not used
 
   void drawQuadStrip (int x1, int y1, int x2, int y2); // fast quad strip without textures
+  void drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+  void drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3);
   void drawTexturedQuad (int x, int y);
+  void drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, int y3);
+  void drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
   void drawWaterTexturedQuad (int x, int y);
   void drawTexturedTriangle1 (int x, int y);
   void drawTexturedTriangle2 (int x, int y);

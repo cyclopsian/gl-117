@@ -257,6 +257,8 @@ void GL::enableFog (float view)
   glFogfv (GL_FOG_COLOR, fcol);
   glFogf (GL_FOG_DENSITY, 0.1);
   glFogi (GL_FOG_MODE, GL_LINEAR);
+//  glFogf (GL_FOG_DENSITY, 0.018);
+//  glFogi (GL_FOG_MODE, GL_EXP2);
   if (quality <= 5)
     glHint (GL_FOG_HINT, GL_FASTEST);
   else

@@ -1738,7 +1738,7 @@ void MissionShip1::start ()
   for (i = 2; i <= 3; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [myrandom (2)];
+    fighter [i]->target = fighter [i - 2];
     fighter [i]->o = &model_ship2;
     fighter [i]->tl->x = -i * 4;
     fighter [i]->tl->z = -i * 4;
@@ -1881,7 +1881,7 @@ MissionShip3::MissionShip3 ()
 {
   id = MISSION_SHIP3;
   strcpy (name, "CRUISER ATTACK");
-  strcpy (briefing, "THE CRUISER C-15 ARAKON HAS ENTERED NEUTRAL TERRITORY WATERS AND MUST BE ELIMINATED.");
+  strcpy (briefing, "THE CRUISER C-15 ARAKON HAS ENTERED NEUTRAL TERRITORY WATERS AND MUST BE ELIMINATED. BEWARE OF HIS FRONT MISSILE LAUNCHER.");
   autoLFBriefing ();
   alliedfighters = 2;
   maxtime = 2500 * timestep;

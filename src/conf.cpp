@@ -91,6 +91,13 @@ char *ConfigFile::skipnum (char *str)
   return str;
 }
 
+char *ConfigFile::skipalphanum (char *str)
+{
+  while (*str >= '0' && *str <= 'z')
+    str ++;
+  return str;
+}
+
 char *ConfigFile::getString (char *dest, char *str)
 {
   char *strf, *stre;
@@ -112,7 +119,7 @@ char *ConfigFile::getString (char *dest, char *str)
   if (*strf == 0) { return NULL; }
   strf = skipwhite (strf);
   if (*strf == 0) { return NULL; }
-  stre = skipnum (strf);
+  stre = skipalphanum (strf);
   if (stre - strf >= 256) { return NULL; }
   if (*strf == 0) { return NULL; }
   for (i = 0; i < (int) (stre - strf); i ++)
@@ -141,6 +148,20 @@ int ConfigFile::write (char *str1, int n)
   char str [256];
   if (strlen (str1) + 8 > 256) return 0;
   sprintf (str, "%s = %d\n", str1, n);
+  fwrite (str, 1, strlen (str), out);
+  return 1;
+}
+
+int ConfigFile::write (char *str1, char c)
+{
+  char str [256];
+  if (c <= 32 || c >= 97)
+  {
+    write (str1, (int) c);
+    return 1;
+  }
+  if (strlen (str1) + 8 > 256) return 0;
+  sprintf (str, "%s = %c\n", str1, c);
   fwrite (str, 1, strlen (str), out);
   return 1;
 }
@@ -261,9 +282,9 @@ int load_config ()
   { view = 50; }
   else
   { view = atoi (str); }
-  if (view < 20)
+  if (view < 30)
   {
-    view = 20;
+    view = 30;
 //    firststart = true;
   }
   else if (view > 100)
@@ -346,14 +367,14 @@ void save_configInterface ()
   cf->writeText ("# ---------------------------------------------------------------------\n");
   cf->writeText ("# Use ASCII-Code values to remap");
   cf->writeText ("#  8=BACKSPACE, 13=ENTER, 32=SPACE, 65=A...90=Z (NOT case sensitive)");
-  cf->write (" key_firecannon", key_firecannon);
-  cf->write (" key_firemissile", key_firemissile);
-  cf->write (" key_dropflare", key_dropflare);
-  cf->write (" key_dropchaff", key_dropchaff);
-  cf->write (" key_selectmissile", key_selectmissile);
-  cf->write (" key_targetnearest", key_targetnearest);
-  cf->write (" key_targetnext", key_targetnext);
-  cf->write (" key_targetprevious", key_targetprevious);
+  cf->write (" key_firecannon", (char) key_firecannon);
+  cf->write (" key_firemissile", (char) key_firemissile);
+  cf->write (" key_dropflare", (char) key_dropflare);
+  cf->write (" key_dropchaff", (char) key_dropchaff);
+  cf->write (" key_selectmissile", (char) key_selectmissile);
+  cf->write (" key_targetnearest", (char) key_targetnearest);
+  cf->write (" key_targetnext", (char) key_targetnext);
+  cf->write (" key_targetprevious", (char) key_targetprevious);
   cf->writeText ("# All other piloting keys (CURSORS, PGUP/DN) are fixed.");
   cf->writeText ("\n# ---------------------------------------------------------------------");
   cf->writeText ("# Mouse section");
@@ -398,6 +419,22 @@ void save_configInterface ()
   delete cf;
 }
 
+int getKey (char *str, int n)
+{
+  int tmp;
+  if (str == NULL) return n;
+  tmp = atoi (str);
+  if (tmp == 0)
+  {
+    if (str [0] >= 33)
+    {
+      return toupper (str [0]);
+    }
+    return n;
+  }
+  return tmp;
+}
+
 int load_configInterface ()
 {
   char buf [STDSIZE];
@@ -409,52 +446,28 @@ int load_configInterface ()
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "key_firecannon");
-  if (str == NULL)
-  { key_firecannon = 32; }
-  else
-  { key_firecannon = atoi (str); }
+  key_firecannon = getKey (str, 32);
 
   str = cf->getString (ret, "key_firemissile");
-  if (str == NULL)
-  { key_firemissile = 13; }
-  else
-  { key_firemissile = atoi (str); }
+  key_firemissile = getKey (str, 13);
 
   str = cf->getString (ret, "key_dropchaff");
-  if (str == NULL)
-  { key_dropchaff = 'C'; }
-  else
-  { key_dropchaff = atoi (str); }
+  key_dropchaff = getKey (str, 'C');
 
   str = cf->getString (ret, "key_dropflare");
-  if (str == NULL)
-  { key_dropflare = 'F'; }
-  else
-  { key_dropflare = atoi (str); }
+  key_dropflare = getKey (str, 'F');
 
   str = cf->getString (ret, "key_selectmissile");
-  if (str == NULL)
-  { key_selectmissile = 'M'; }
-  else
-  { key_selectmissile = atoi (str); }
+  key_selectmissile = getKey (str, 'M');
 
   str = cf->getString (ret, "key_targetnearest");
-  if (str == NULL)
-  { key_targetnearest = 'E'; }
-  else
-  { key_targetnearest = atoi (str); }
+  key_targetnearest = getKey (str, 'E');
 
   str = cf->getString (ret, "key_targetnext");
-  if (str == NULL)
-  { key_targetnext = 'T'; }
-  else
-  { key_targetnext = atoi (str); }
+  key_targetnext = getKey (str, 'T');
 
   str = cf->getString (ret, "key_targetprevious");
-  if (str == NULL)
-  { key_targetprevious = 'P'; }
-  else
-  { key_targetprevious = atoi (str); }
+  key_targetprevious = getKey (str, 'P');
 
   int mousebutton = 1;
   str = cf->getString (ret, "mouse_firecannon");

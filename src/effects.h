@@ -44,7 +44,7 @@
 #include "mathtab.h"
 #include "object.h"
 
-const int maxsmokeelem = 20;
+const int maxsmokeelem = 30;
 
 extern CTexture *texsmoke, *texsmoke2, *texsmoke3;
 extern const float smokezoom[];
@@ -61,7 +61,7 @@ class CSmoke
   int type;
   CSmoke (int type);
   void setSmoke (float x, float y, float z, int myphi, int mytime);
-  void move (Uint32 dt);
+  void move (Uint32 dt, int dec);
   void drawElem (int n);
   void drawElemHQ (int n);
   void draw ();

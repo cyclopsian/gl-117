@@ -753,7 +753,7 @@ void GLLandscape::drawCloudQuadStrip (int x1, int y1, int x2, int y2)
 {
   int x, y, xs, ys;
   float cr;
-  int step = gridstep;
+  int step = neargridstep;
 
   glDisable (GL_TEXTURE_2D);
   glPushMatrix ();
@@ -798,7 +798,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
   float cr, cg, cb;
   bool water = false;
   bool last = false;
-  int step = gridstep;
+  int step = fargridstep;
   float texred, texgreen, texblue;
 
   glDisable (GL_TEXTURE_2D);
@@ -1014,6 +1014,362 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
       xs += step;
     }
   }
+}
+
+// Draw a single untextured quad
+void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+  int j;
+  int step = fargridstep;
+  float texred, texgreen, texblue;
+  CTexture *tex = NULL;
+  float col [4] [3];
+  float pos [4] [3];
+  float fac;
+  int px [4], py [4];
+  int xs = x1, ys = y1;
+  int x = getCoord (xs);
+  int y = getCoord (ys);
+  px [0] = x1; py [0] = y1;
+  px [1] = x2; py [1] = y2;
+  px [2] = x3; py [2] = y3;
+  px [3] = x4; py [3] = y4;
+  float minh = h[x][y];
+  float maxh = minh;
+  for (j = 1; j < 4; j ++)
+  {
+    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    if (h1 > maxh) maxh = h1;
+    else if (h1 < minh) minh = h1;
+  }
+  float midh = (minh + maxh) / 2 * zoomz - zoomz2;
+  float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
+  if (size < hh2 / 2 * step)
+    size = hh2 / 2 * step;
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+    return;
+  int a = selectColor (x, y);
+  tex = NULL;
+  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+    tex = texgrass;
+  else if (a == 2 || a == 7)
+    tex = texrocks;
+  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
+    tex = texgrass; // not texwater!
+  else if (a == 11)
+    tex = texredstone;
+  else if (a == 13)
+    tex = texsand;
+  if (tex == NULL)
+  {
+    texred = 1.0F;
+    texgreen = 1.0F;
+    texblue = 1.0F;
+  }
+  else
+  {
+    texred = tex->texred;
+    texgreen = tex->texgreen;
+    texblue = tex->texblue;
+  }
+  glDisable (GL_TEXTURE_2D);
+  float fac2 = 0.001F * sunlight / 256.0F;
+  for (j = 0; j < 4; j ++)
+  {
+    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
+    col [j] [0] = r [mx] [my] * fac * texred;
+    col [j] [1] = g [mx] [my] * fac * texgreen;
+    col [j] [2] = b [mx] [my] * fac * texblue;
+    if (col [j] [0] >= texred) col [j] [0] = texred;
+    if (col [j] [1] >= texgreen) col [j] [1] = texgreen;
+    if (col [j] [2] >= texblue) col [j] [2] = texblue;
+    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
+    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+  }
+  glBegin (GL_QUADS);
+  for (j = 0; j < 4; j ++)
+  {
+    glColor3fv (col [j]);
+    glVertex3fv (pos [j]);
+  }
+  glEnd();
+}
+
+// Draw a single untextured triangle
+void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
+{
+  int j;
+  int step = fargridstep;
+  float texred, texgreen, texblue;
+  CTexture *tex = NULL;
+  float col [3] [3];
+  float pos [3] [3];
+  float fac;
+  int px [3], py [3];
+  int xs = x1, ys = y1;
+  int x = getCoord (xs);
+  int y = getCoord (ys);
+  px [0] = x1; py [0] = y1;
+  px [1] = x2; py [1] = y2;
+  px [2] = x3; py [2] = y3;
+  float minh = h[x][y];
+  float maxh = minh;
+  for (j = 1; j < 3; j ++)
+  {
+    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    if (h1 > maxh) maxh = h1;
+    else if (h1 < minh) minh = h1;
+  }
+  float midh = (minh + maxh) / 2 * zoomz - zoomz2;
+  float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
+  if (size < hh2 / 2 * step)
+    size = hh2 / 2 * step;
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+    return;
+  int a = selectColor (x, y);
+  tex = NULL;
+  if (a == 0 || a == 1 || a == 10 || a == 12 || a == 13)
+    tex = texgrass;
+  else if (a == 2 || a == 7)
+    tex = texrocks;
+  else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
+    tex = texgrass; // not texwater!
+  else if (a == 11)
+    tex = texredstone;
+  else if (a == 13)
+    tex = texsand;
+  if (tex == NULL)
+  {
+    texred = 1.0F;
+    texgreen = 1.0F;
+    texblue = 1.0F;
+  }
+  else
+  {
+    texred = tex->texred;
+    texgreen = tex->texgreen;
+    texblue = tex->texblue;
+  }
+  glDisable (GL_TEXTURE_2D);
+  float fac2 = 0.001F * sunlight / 256.0F;
+  for (j = 0; j < 3; j ++)
+  {
+    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
+    col [j] [0] = r [mx] [my] * fac * texred;
+    col [j] [1] = g [mx] [my] * fac * texgreen;
+    col [j] [2] = b [mx] [my] * fac * texblue;
+    if (col [j] [0] >= texred) col [j] [0] = texred;
+    if (col [j] [1] >= texgreen) col [j] [1] = texgreen;
+    if (col [j] [2] >= texblue) col [j] [2] = texblue;
+    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
+    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+  }
+  glBegin (GL_TRIANGLES);
+  for (j = 0; j < 3; j ++)
+  {
+    glColor3fv (col [j]);
+    glVertex3fv (pos [j]);
+  }
+  glEnd();
+}
+
+// Draw a single textured quad
+void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+{
+  int j;
+  int step = gridstep;
+//    int tx, ty;
+//    float tfx, tfy, tfinc;
+//  float texlight = 1.0;
+  bool texture = false;
+  float col [4] [3];
+  float pos [4] [3];
+  float tf [4] [2];
+  float fac;
+  float texzoom;
+  int px [4], py [4];
+  int x = getCoord (x2);
+  int y = getCoord (y2);
+  px [0] = x1; py [0] = y1;
+  px [1] = x2; py [1] = y2;
+  px [2] = x3; py [2] = y3;
+  px [3] = x4; py [3] = y4;
+  float minh = h[x][y];
+  float maxh = minh;
+  for (j = 1; j < 4; j ++)
+  {
+    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    if (h1 > maxh) maxh = h1;
+    else if (h1 < minh) minh = h1;
+  }
+  float midh = (minh + maxh) / 2 * zoomz - zoomz2;
+  float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
+  if (size < hh2 / 2 * step)
+    size = hh2 / 2 * step;
+  if (!gl->isSphereInFrustum (hh2*(0.5+x2) - 1.0, midh, hh2*(MAXX-(0.5+y2)) - 1.0, size * 2))
+    return;
+  if (tex1 [x] [y] == 0xFF)
+  {
+    texture = false;
+    glDisable (GL_TEXTURE_2D);
+  }
+  else
+  {
+    texture = true;
+    gl->enableTextures (tex1 [x] [y]);
+  }
+  int texcoord = 0;
+  if (tex1 [x] [y] == texredstone->textureID)
+  {
+    texzoom = 0.5;
+    texcoord = 1;
+  }
+  else if (tex1 [x] [y] != texgrass->textureID)
+  {
+    texzoom = 0.5;
+  }
+  else
+  {
+    texzoom = 0.25;
+  }
+  float fac2 = 0.001F * sunlight / 256.0F;
+  for (j = 0; j < 4; j ++)
+  {
+    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
+    col [j] [0] = r [mx] [my] * fac;
+    col [j] [1] = g [mx] [my] * fac;
+    col [j] [2] = b [mx] [my] * fac;
+    if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
+    if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
+    if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
+    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
+    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+  }
+  for (j = 0; j < 4; j ++)
+  {
+    if (texcoord == 0)
+    {
+      tf [j] [0] = (float) px [j] * texzoom;
+      tf [j] [1] = (float) py [j] * texzoom;
+    }
+    else
+    {
+      tf [j] [0] = (float) px [j] * texzoom;
+      tf [j] [1] = (float) h [getCoord (px [j])] [getCoord (py [j])] * texzoom / 400.0;
+    }
+  }
+  glBegin (GL_QUADS);
+  for (j = 0; j < 4; j ++)
+  {
+    if (texture)
+      glTexCoord2fv (tf [j]);
+    glColor3fv (col [j]);
+    glVertex3fv (pos [j]);
+  }
+  glEnd();
+}
+
+// Draw a single textured triangle
+void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
+{
+  int j;
+  int step = gridstep;
+//    int tx, ty;
+//    float tfx, tfy, tfinc;
+//  float texlight = 1.0;
+  bool texture = false;
+  float col [3] [3];
+  float pos [3] [3];
+  float tf [3] [2];
+  float fac;
+  float texzoom;
+  int px [3], py [3];
+  int x = getCoord (x2);
+  int y = getCoord (y2);
+  px [0] = x1; py [0] = y1;
+  px [1] = x2; py [1] = y2;
+  px [2] = x3; py [2] = y3;
+  float minh = h[x][y];
+  float maxh = minh;
+  for (j = 1; j < 3; j ++)
+  {
+    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    if (h1 > maxh) maxh = h1;
+    else if (h1 < minh) minh = h1;
+  }
+  float midh = (minh + maxh) / 2 * zoomz - zoomz2;
+  float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
+  if (size < hh2 / 2 * step)
+    size = hh2 / 2 * step;
+  if (!gl->isSphereInFrustum (hh2*(0.5+x2) - 1.0, midh, hh2*(MAXX-(0.5+y2)) - 1.0, size * 2))
+    return;
+  if (tex1 [x] [y] == 0xFF)
+  {
+    texture = false;
+    glDisable (GL_TEXTURE_2D);
+  }
+  else
+  {
+    texture = true;
+    gl->enableTextures (tex1 [x] [y]);
+  }
+  int texcoord = 0;
+  if (tex1 [x] [y] == texredstone->textureID)
+  {
+    texzoom = 0.5;
+    texcoord = 1;
+  }
+  else if (tex1 [x] [y] != texgrass->textureID)
+  {
+    texzoom = 0.5;
+  }
+  else
+  {
+    texzoom = 0.25;
+  }
+  float fac2 = 0.001F * sunlight / 256.0F;
+  for (j = 0; j < 3; j ++)
+  {
+    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
+    col [j] [0] = r [mx] [my] * fac;
+    col [j] [1] = g [mx] [my] * fac;
+    col [j] [2] = b [mx] [my] * fac;
+    if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
+    if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
+    if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
+    pos [j] [0] = hh2*px[j] - 1.0;
+    pos [j] [1] = (float)h[mx][my]*zoomz - zoomz2;
+    pos [j] [2] = hh2*(MAXX-py[j]) - 1.0;
+  }
+  for (j = 0; j < 3; j ++)
+  {
+    if (texcoord == 0)
+    {
+      tf [j] [0] = (float) px [j] * texzoom;
+      tf [j] [1] = (float) py [j] * texzoom;
+    }
+    else
+    {
+      tf [j] [0] = (float) px [j] * texzoom;
+      tf [j] [1] = (float) h [getCoord (px [j])] [getCoord (py [j])] * texzoom / 400.0;
+    }
+  }
+  glBegin (GL_TRIANGLES);
+  for (j = 0; j < 3; j ++)
+  {
+    if (texture)
+      glTexCoord2fv (tf [j]);
+    glColor3fv (col [j]);
+    glVertex3fv (pos [j]);
+  }
+  glEnd();
 }
 
 // Draw a single textured quad
@@ -1725,9 +2081,22 @@ void GLLandscape::draw (int phi, int gamma)
 
   float fac;
 
-  if (quality >= 0 && quality <= 1) gridstep = 3;
-  else if (quality >= 2 && quality <= 4) gridstep = 2;
-  else gridstep = 1;
+  int fardetail = quality;
+  int middetail = quality;
+  int lineardetail = -1;
+
+  if (quality == 0)
+  { neargridstep = 3; fargridstep = 3; middetail = -1; fardetail = -1; lineardetail = -1; }
+  else if (quality == 1)
+  { neargridstep = 2; fargridstep = 4; middetail = 2; fardetail = 2; lineardetail = -1; }
+  else if (quality == 2)
+  { neargridstep = 2; fargridstep = 4; middetail = 5; fardetail = 5; lineardetail = -1; }
+  else if (quality == 3)
+  { neargridstep = 2; fargridstep = 4; middetail = 7; fardetail = 7; lineardetail = 0; }
+  else if (quality == 4)
+  { neargridstep = 2; fargridstep = 2; middetail = -1; fardetail = 7; lineardetail = 0; }
+  else
+  { neargridstep = 1; fargridstep = 2; middetail = 3; fardetail = 7; lineardetail = 0; }
 
   if (phi < 0) phi += 360;
   else if (phi >= 360) phi -= 360;
@@ -1844,18 +2213,26 @@ void GLLandscape::draw (int phi, int gamma)
   parts *= 2;
   parts ++;
 
+  int mp = parts / 2;
+  for (i = 0; i < parts; i ++)
+    for (i2 = 0; i2 < parts; i2 ++)
+    {
+      float d = dist (mp - i, mp - i2);
+      detail [i] [i2] = (int) (d * 200.0F / pseudoview);
+    }
+
   float dx = (float) (maxx - minx + 1) / parts;
   float dy = (float) (maxy - miny + 1) / parts;
-  float fx, fy;
+/*  float fx, fy;
   for (i = 0; i < parts; i ++)
     for (i2 = 0; i2 < parts; i2 ++)
     {
       fx = (float) minx + (float) (dx * (0.5 + (float) i2));
       fy = (float) miny + (float) (dy * (0.5 + (float) i));
-      float d = dist (camx + MAXX/2 - fx, MAXX/2 - camz - fy);
-      detail [i] [i2] = (int) ((d - dx/2) / 12.0);
+      float d = dist (camx + MAXX/2 - fx, (float) MAXX/2 - camz - fy);
+      detail [i] [i2] = (int) ((d - dx/2) / 8.0);
       if (detail [i] [i2] < 0) detail [i] [i2] = 0;
-    }
+    }*/
 
 /*    float zoomz2 = 32768.0 * zoomz;
     int step = 1;
@@ -1883,12 +2260,11 @@ void GLLandscape::draw (int phi, int gamma)
 //  float cr, cg, cb;
 //  int step = 1;
   int zz1 = 0, zz2 = 0, zz = 0;
-  if (quality == 0)
+/*  if (quality == 0)
   {
-//    step = 2;
     minx -= (minx & 1); // modulo 2
     miny -= (miny & 1);
-  }
+  }*/
 
 /*  if (camera == 50)
   {
@@ -1900,12 +2276,6 @@ void GLLandscape::draw (int phi, int gamma)
       step = 2;
   }*/
 
-  int fardetail = quality;
-//  if (quality == 2) fardetail ++;
-//  if (quality < 2) fardetail = 2;
-
-  int lineardetail = -1;
-  if (quality >= 2) lineardetail = 0;
 /*  unsigned char done [400] [400];
   for (x = 0; x < 400; x ++)
   memset (&done [x], 0, 400*sizeof (unsigned char));*/
@@ -2115,23 +2485,26 @@ void GLLandscape::draw (int phi, int gamma)
           int ay = (miny + (int) (dy * (float) i));
           int zx = (minx + (int) (dx * (float) (i2 + 1)));
           int zy = (miny + (int) (dy * (float) (i + 1))/* + gridstep*/);
-          if (gridstep == 2)
+
+          if (fargridstep == 2)
           {
             ax -= ax & 1; ay -= ay & 1;
             zx -= zx & 1; zy -= zy & 1;
           }
-          else if (gridstep == 3)
+          else if (fargridstep == 3)
           {
             ax -= ax % 3; ay -= ay % 3;
             zx -= zx % 3; zy -= zy % 3;
           }
+          else if (fargridstep == 4)
+          {
+            ax -= ax & 3; ay -= ay & 3;
+            zx -= zx & 3; zy -= zy & 3;
+          }
+
           if (detail [i] [i2] > fardetail)
           {
-            zy += gridstep;
-/*      if (gl->isPointInFrustum (hh2*ax - 1.0, (float)hw[getCoord(ax)][getCoord(ay)]*zoomz - zoomz2, hh2*((float)MAXX-ay) - 1.0) ||
-          gl->isPointInFrustum (hh2*ax - 1.0, (float)hw[getCoord(ax)][getCoord(zy)]*zoomz - zoomz2, hh2*((float)MAXX-zy) - 1.0) ||
-          gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(zy)]*zoomz - zoomz2, hh2*((float)MAXX-zy) - 1.0) ||
-          gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(ay)]*zoomz - zoomz2, hh2*((float)MAXX-ay) - 1.0))*/
+            zy += fargridstep;
             if (gl->isSphereInFrustum (hh2*(ax+zx)/2 - 1.0, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)]*zoomz - zoomz2, hh2*((float)MAXX-(ay+zy)/2) - 1.0, hh2*(zx-ax)*1.5))
               drawQuadStrip (ax, ay, zx, zy);
           }
@@ -2155,6 +2528,110 @@ void GLLandscape::draw (int phi, int gamma)
               gl->disableLinearTexture (texwater->textureID);
               gl->disableLinearTexture (texredstone->textureID);
             }
+            if (detail [i] [i2] <= middetail)
+            {
+            if (i > 0) // south
+            {
+              if (detail [i - 1] [i2] > middetail)
+              {
+                if (fargridstep == 3 * neargridstep)
+                {
+                  ys = ay;
+                  for (xs = ax; xs < zx;)
+                  {
+                    drawTexturedQuad (xs, ys, xs + 3 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
+                    xs += fargridstep;
+                  }
+                }
+                else if (fargridstep == 2 * neargridstep)
+                {
+                  ys = ay;
+                  for (xs = ax; xs < zx;)
+                  {
+                    drawTexturedTriangle (xs, ys, xs + 2 * neargridstep, ys, xs + 1 * neargridstep, ys);
+                    xs += fargridstep;
+                  }
+                }
+              }
+            }
+            if (i < parts - 1) // north
+            {
+              if (detail [i + 1] [i2] > middetail)
+              {
+                if (fargridstep == 3 * neargridstep)
+                {
+                  ys = zy;
+                  for (xs = ax; xs < zx;)
+                  {
+                    drawTexturedQuad (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys, xs + 3 * neargridstep, ys);
+                    xs += fargridstep;
+                  }
+                }
+                else if (fargridstep == 2 * neargridstep)
+                {
+                  ys = zy;
+                  for (xs = ax; xs < zx;)
+                  {
+                    drawTexturedTriangle (xs, ys, xs + 1 * neargridstep, ys, xs + 2 * neargridstep, ys);
+                    xs += fargridstep;
+                  }
+                }
+              }
+            }
+            if (i2 > 0) // east
+            {
+              if (detail [i] [i2 - 1] > middetail)
+              {
+                if (fargridstep == 3 * neargridstep)
+                {
+                  xs = ax;
+                  for (ys = ay; ys < zy;)
+                  {
+                    drawTexturedQuad (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 3 * neargridstep);
+                    ys += fargridstep;
+                  }
+                }
+                else if (fargridstep == 2 * neargridstep)
+                {
+                  xs = ax;
+                  for (ys = ay; ys < zy;)
+                  {
+                    drawTexturedTriangle (xs, ys, xs, ys + 1 * neargridstep, xs, ys + 2 * neargridstep);
+                    ys += fargridstep;
+                  }
+                }
+              }
+            }
+            if (i2 < parts - 1) // west
+            {
+              if (detail [i] [i2 + 1] > middetail)
+              {
+                if (fargridstep == 3 * neargridstep)
+                {
+                  xs = zx;
+                  for (ys = ay; ys < zy;)
+                  {
+                    drawTexturedQuad (xs, ys, xs, ys + 3 * neargridstep, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
+                    ys += fargridstep;
+                  }
+                }
+                else if (fargridstep == 2 * neargridstep)
+                {
+                  xs = zx;
+                  for (ys = ay; ys < zy;)
+                  {
+                    drawTexturedTriangle (xs, ys, xs, ys + 2 * neargridstep, xs, ys + 1 * neargridstep);
+                    ys += fargridstep;
+                  }
+                }
+              }
+            }
+              gridstep = neargridstep;
+            }
+            else
+            {
+              gridstep = fargridstep;
+            }
             for (xs = ax; xs < zx;)
             {
               x = getCoord (xs);
@@ -2166,7 +2643,6 @@ void GLLandscape::draw (int phi, int gamma)
                 a = selectColor (x, y);
                 if (a != 6 && a != 9)
                 {
-//                  drawTexturedQuad (x, y, step);
                   if (drawrule [x] [y] == 0)
                     drawTexturedQuad (xs, ys);
                   else if (drawrule [x] [y] == 2)
@@ -2207,9 +2683,9 @@ void GLLandscape::draw (int phi, int gamma)
 //  gl->disableAlphaBlending ();
           }
 
-        }
+        } // for i2
 
-    }
+    } // if mode
 
 /*
     if (mode == 1) // ROAM mode, currently not used
@@ -2408,7 +2884,7 @@ void GLLandscape::draw (int phi, int gamma)
     int cutdep = 1500;
 
     int lineartree = -1;
-    if (quality >= 2) lineartree = 0;
+    if (quality >= 3) lineartree = 0;
 
     float x21 = 0.3, y21 = -0.32;
     float x22 = -0.21, y22 = 0.22;
@@ -2422,6 +2898,10 @@ void GLLandscape::draw (int phi, int gamma)
     for (i = 0; i < parts; i ++)
       for (i2 = 0; i2 < parts; i2 ++)
       {
+        if (detail [i] [i2] > middetail)
+          gridstep = fargridstep;
+        else
+          gridstep = neargridstep;
         if (detail [i] [i2] <= lineartree)
         {
           gl->enableLinearTexture (textree->textureID);
@@ -2429,6 +2909,11 @@ void GLLandscape::draw (int phi, int gamma)
           gl->enableLinearTexture (textree3->textureID);
           gl->enableLinearTexture (textree4->textureID);
           gl->enableLinearTexture (texcactus1->textureID);
+          gl->enableLinearTexture (textreeu->textureID);
+          gl->enableLinearTexture (textreeu2->textureID);
+          gl->enableLinearTexture (textreeu3->textureID);
+          gl->enableLinearTexture (textreeu4->textureID);
+          gl->enableLinearTexture (texcactusu1->textureID);
         }
         else
         {
@@ -2437,6 +2922,11 @@ void GLLandscape::draw (int phi, int gamma)
           gl->disableLinearTexture (textree3->textureID);
           gl->disableLinearTexture (textree4->textureID);
           gl->disableLinearTexture (texcactus1->textureID);
+          gl->disableLinearTexture (textreeu->textureID);
+          gl->disableLinearTexture (textreeu2->textureID);
+          gl->disableLinearTexture (textreeu3->textureID);
+          gl->disableLinearTexture (textreeu4->textureID);
+          gl->disableLinearTexture (texcactusu1->textureID);
         }
         int ax = minx + (int) (dx * (float) i2);
         int ay = miny + (int) (dy * (float) i);
@@ -2648,6 +3138,8 @@ void GLLandscape::draw (int phi, int gamma)
     
   glPopMatrix ();
 //    printf ("\n%d, %d + %d", zz, zz1, zz2);
+
+  gridstep = neargridstep; // set to finer grid for ground collision detection
 }
 
 GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)

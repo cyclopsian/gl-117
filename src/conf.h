@@ -55,10 +55,12 @@ class ConfigFile
   ConfigFile (char *fname);
   char *skipwhite (char *str);
   char *skipnum (char *str);
+  char *skipalphanum (char *str);
   char *getString (char *dest, char *str);
   int getValue (char *str);
   int openOutput (char *fname);
   int write (char *str1, int n);
+  int write (char *str1, char c);
   void writeText (char *str);
   void close ();
 };
