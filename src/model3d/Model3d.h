@@ -31,6 +31,12 @@
 extern int antialiasing;
 extern int timestep;
 
+/*
+TODO list:
+- introduce class Transformation and pack together translation/rotation/scaling
+- SpaceObj: refModels are SpaceObjs itself! Refactor SpaceObj => constructor with more params!
+*/
+
 /* Currently models are normalized to the (-1,-1,-1)-(1,1,1) cube and static!
    The model represents the "class" description of a static model's geometry and colors.
    It is "instanciated" using a DynamicObj which has a reference to the model,

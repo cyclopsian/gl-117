@@ -53,11 +53,8 @@ void Sphere::init (float radius, int segments, float dx, float dy, float dz, int
 {
   Object3d co;
   co.vertex = new Vertex [segments * segments * 2 + 2];
-  if (co.vertex == NULL) exit (100);
   co.triangle = new Triangle [segments * 4];
-  if (co.triangle == NULL) exit (100);
   co.quad = new Quad [segments * segments * 2];
-  if (co.quad == NULL) exit (100);
 
   this->radius = radius;
   this->segments = segments;

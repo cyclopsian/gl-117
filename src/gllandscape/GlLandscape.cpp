@@ -44,8 +44,8 @@ Texture *texglitter1;
 
 VertexArray *va;
 VertexArray vertexarrayquadstrip;
-VertexArray vertexarrayquad [20];
-VertexArray vertexarraytriangle [20];
+VertexArray vertexarrayquad [30];
+VertexArray vertexarraytriangle [30];
 VertexArray vertexarrayglitter [2];
 
 /*class IndexCounter

@@ -22,7 +22,7 @@
 /* To fully understand the GL-117 code, please read the methods from bottom to top! */
 
 /*
-TODO:
+TODO list:
 - BlackSmoke is not drawn!
 - joystick update (mail)
 - joystick in menu
