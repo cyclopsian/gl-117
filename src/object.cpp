@@ -74,7 +74,7 @@ void CSpaceObj::addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float 
   }
   refmodel [numRefModels] = model;
   reftl [numRefModels].take (*tl);
-  refrot [numRefModels].take (rot);
+  refrot [numRefModels].take (*rot);
   refscale [numRefModels] = scale;
   numRefModels ++;
 }

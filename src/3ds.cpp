@@ -624,7 +624,7 @@ void CLoad3DS::ComputeNormals (CModel *model)
     CObject *object = (model->object [i]);
     for (i2 = 0; i2 < object->numTriangles; i2 ++)
     {
-      object->triangle [i2].getNormal (&n);
+      object->triangle [i2].calcNormal (&n);
       for (i3 = 0; i3 < 3; i3 ++)
       {
         object->triangle [i2].v [i3]->addNormal (n);

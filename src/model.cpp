@@ -324,7 +324,7 @@ bool CVector3::isEqual (const CVector3 &v, float tolerance) const
          z >= v.z - tolerance && z <= v.z + tolerance;
 }
 
-void CVector3::take (CVector3 &v)
+void CVector3::take (const CVector3 &v)
 {
   x = v.x;
   y = v.y;
@@ -364,18 +364,18 @@ void CVector2::set (float x, float y)
   this->y = y;
 }
 
-bool CVector2::isEqual (CVector2 &v) const
+bool CVector2::isEqual (const CVector2 &v) const
 {
   return x == v.x && y == v.y;
 }
 
-bool CVector2::isEqual (CVector2 &v, float tolerance) const
+bool CVector2::isEqual (const CVector2 &v, float tolerance) const
 {
   return x >= v.x - tolerance && x <= v.x + tolerance &&
          y >= v.y - tolerance && y <= v.y + tolerance;
 }
 
-void CVector2::take (CVector2 &v)
+void CVector2::take (const CVector2 &v)
 {
   x = v.x;
   y = v.y;
@@ -388,7 +388,7 @@ CVertex::CVertex ()
   triangles = 0;
 }
 
-CVertex::CVertex (CVertex &v)
+CVertex::CVertex (const CVertex &v)
 {
   take (v);
 }
@@ -397,7 +397,7 @@ CVertex::~CVertex ()
 {
 }
 
-void CVertex::addNormal (CVector3 &n)
+void CVertex::addNormal (const CVector3 &n)
 {
   triangles ++;
   normal.x = (normal.x * (triangles - 1) + n.x) / (float) triangles;
@@ -405,7 +405,7 @@ void CVertex::addNormal (CVector3 &n)
   normal.z = (normal.z * (triangles - 1) + n.z) / (float) triangles;
 }
 
-void CVertex::addColor (CColor &color)
+void CVertex::addColor (const CColor &color)
 {
   triangles ++;
   for (int i = 0; i < 4; i ++)
@@ -415,7 +415,7 @@ void CVertex::addColor (CColor &color)
   }
 }
 
-void CVertex::take (CVertex &v)
+void CVertex::take (const CVertex &v)
 {
   vector.take (v.vector);
   normal.take (v.normal);
@@ -430,42 +430,28 @@ void CVertex::take (CVertex &v)
 
 CRotation::CRotation ()
 {
-  a = b = c = 0;
+  a = 0;
+  b = 0;
+  c = 0;
   calcRotation ();
-/*  pitab = 4 * atan (1);
-  for (int i = 0; i < 360; i ++)
-  {
-    sintab [i] = sin (pitab / 180 * i);
-    costab [i] = cos (pitab / 180 * i);
-  }*/
 }
 
-CRotation::~CRotation () {}
-
-void CRotation::setAngles (short a, short b, short c)
+CRotation::~CRotation ()
 {
-  a %= 360;
-  if (a < 0) a += 360;
-  b %= 360;
-  if (b < 0) b += 360;
-  c %= 360;
-  if (c < 0) c += 360;
+}
+
+void CRotation::setAngles (float a, float b, float c)
+{
   this->a = a;
   this->b = b;
   this->c = c;
 }
 
-void CRotation::addAngles (short a, short b, short c)
+void CRotation::addAngles (float a, float b, float c)
 {
   this->a += a;
   this->b += b;
   this->c += c;
-  this->a %= 360;
-  if (this->a < 0) this->a += 360;
-  this->b %= 360;
-  if (this->b < 0) this->b += 360;
-  this->c %= 360;
-  if (this->c < 0) this->c += 360;
 }
 
 void CRotation::calcRotation ()
@@ -481,41 +467,42 @@ void CRotation::calcRotation ()
   rot [2] [2] = COS(a) * COS(b);
 }
 
-float CRotation::rotateX (CVector3 *v)
+float CRotation::rotateX (const CVector3 &v) const
 {
-  return v->x * rot [0] [0] + v->y * rot [0] [1] + v->z * rot [0] [2];
+  return v.x * rot [0] [0] + v.y * rot [0] [1] + v.z * rot [0] [2];
 }
 
-float CRotation::rotateY (CVector3 *v)
+float CRotation::rotateY (const CVector3 &v) const
 {
-  return v->x * rot [1] [0] + v->y * rot [1] [1] + v->z * rot [1] [2];
+  return v.x * rot [1] [0] + v.y * rot [1] [1] + v.z * rot [1] [2];
 }
 
-float CRotation::rotateZ (CVector3 *v)
+float CRotation::rotateZ (const CVector3 &v) const
 {
-  return v->x * rot [2] [0] + v->y * rot [2] [1] + v->z * rot [2] [2];
+  return v.x * rot [2] [0] + v.y * rot [2] [1] + v.z * rot [2] [2];
 }
 
-float CRotation::getsintab (int a)
+void CRotation::take (const CRotation &r)
 {
-  if (a >= 0 && a < 360) return SIN(a);
-  return 0;
-}
-
-float CRotation::getcostabntab (int a)
-{
-  if (a >= 0 && a < 360) return COS(a);
-  return 0;
-}
-
-void CRotation::take (CRotation *r)
-{
-  a = r->a; b = r->b; c = r->c;
+  a = r.a;
+  b = r.b;
+  c = r.c;
 }
 
 
 
-void CTriangle::getNormal (CVector3 *n)
+CTriangle::CTriangle ()
+{
+  v [0] = NULL;
+  v [1] = NULL;
+  v [2] = NULL;
+}
+
+CTriangle::~CTriangle ()
+{
+}
+
+void CTriangle::calcNormal (CVector3 *n)
 {
   CVector3 dummy;
   n->take (v [1]->vector);
@@ -529,17 +516,34 @@ void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
 {
   int i;
   CVector3 dummy;
-  v [0] = a; v [1] = b; v [2] = c;
-  getNormal (&dummy);
+  v [0] = a;
+  v [1] = b;
+  v [2] = c;
+  calcNormal (&dummy);
   dummy.norm ();
-  if (dummy.z > 0) dummy.neg ();
+  if (dummy.z > 0)
+    dummy.neg ();
   for (i = 0; i < 3; i ++)
-  { v [i]->addNormal (dummy); }
+  {
+    v [i]->addNormal (dummy);
+  }
 }
 
 
 
-void CQuad::getNormal (CVector3 *n)
+CQuad::CQuad ()
+{
+  v [0] = NULL;
+  v [1] = NULL;
+  v [2] = NULL;
+  v [3] = NULL;
+}
+
+CQuad::~CQuad ()
+{
+}
+
+void CQuad::calcNormal (CVector3 *n)
 {
   CVector3 dummy;
   n->take (v [1]->vector);
@@ -553,12 +557,18 @@ void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
 {
   int i;
   CVector3 dummy;
-  v [0] = a; v [1] = b; v [2] = c; v [3] = d;
-  getNormal (&dummy);
+  v [0] = a;
+  v [1] = b;
+  v [2] = c;
+  v [3] = d;
+  calcNormal (&dummy);
   dummy.norm ();
-  if (dummy.z > 0) dummy.neg ();
+  if (dummy.z > 0)
+    dummy.neg ();
   for (i = 0; i < 4; i ++)
-  { v [i]->addNormal (dummy); }
+  {
+    v [i]->addNormal (dummy);
+  }
 }
 
 
@@ -1436,23 +1446,23 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
     for (float i2 = 0; i2 < 360; i2 += step)
     {
       int a = ((int) i) % 360, b = ((int) i2) % 360;
-      float si = rot->getsintab (a), ci = rot->getcostabntab (a);
-      float si2 = rot->getsintab (b), ci2 = rot->getcostabntab (b);
+      float si = SIN(a), ci = COS(a);
+      float si2 = SIN(b), ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       p [0] = co->addVertex (w);
       a = ((int) (i + step)) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step - 1)
@@ -1578,23 +1588,23 @@ void CSpherePart::init (float radius, int segments, float phi)
     for (float i2 = 0; i2 < 360; i2 += step)
     {
       int a = ((int) i) % 360, b = ((int) i2) % 360;
-      float si = rot->getsintab (a), ci = rot->getcostabntab (a);
-      float si2 = rot->getsintab (b), ci2 = rot->getcostabntab (b);
+      float si = SIN(a), ci = COS(a);
+      float si2 = SIN(b), ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       p [0] = co->addVertex (w);
       a = ((int) (i + step2)) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
-      si = rot->getsintab (a); ci = rot->getcostabntab (a);
-      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      si = SIN(a); ci = COS(a);
+      si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
       p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step2 - 0.2)

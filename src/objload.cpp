@@ -170,7 +170,7 @@ void CLoadOBJ::ComputeNormals (CModel *model)
     CObject *object = (model->object [i]);
     for (i2 = 0; i2 < object->numTriangles; i2 ++)
     {
-      object->triangle [i2].getNormal (&n);
+      object->triangle [i2].calcNormal (&n);
       if (n.x == 0 && n.y == 0 && n.z == 0) n.z = 1;
       for (i3 = 0; i3 < 3; i3 ++)
       {
@@ -179,7 +179,7 @@ void CLoadOBJ::ComputeNormals (CModel *model)
     }
     for (i2 = 0; i2 < object->numQuads; i2 ++)
     {
-      object->quad [i2].getNormal (&n);
+      object->quad [i2].calcNormal (&n);
       for (i3 = 0; i3 < 4; i3 ++)
       {
         object->quad [i2].v [i3]->addNormal (n);

@@ -134,7 +134,7 @@ class CVector3
   bool isEqual (const CVector3 &v) const;
   /// numerically equal, use a tolerance like 1E-8
   bool isEqual (const CVector3 &v, float tolerance) const;
-  void take (CVector3 &v); // copy data from v
+  void take (const CVector3 &v); // copy data from v
 };
 
 /**
@@ -157,11 +157,11 @@ class CVector2
   void set (const CVector2 &v);
   void set (float x, float y);
   /// exactly equal in memory (no sense for comparisons)
-  bool isEqual (CVector2 &v) const;
+  bool isEqual (const CVector2 &v) const;
   /// numerically equal, use a tolerance like 1E-8
-  bool isEqual (CVector2 &v, float tolerance) const;
+  bool isEqual (const CVector2 &v, float tolerance) const;
   /// copy data from v
-  void take (CVector2 &v);
+  void take (const CVector2 &v);
 };
 
 /**
@@ -183,47 +183,61 @@ class CVertex
   CVector2 tex;
   
   CVertex ();
-  CVertex (CVertex &v);
+  CVertex (const CVertex &v);
   virtual ~CVertex ();
   
   /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
-  void addNormal (CVector3 &n); 
+  void addNormal (const CVector3 &n); 
   /// the color of a vertex can be calculated as average of all adjacent plane colors
-  void addColor (CColor &c);
+  void addColor (const CColor &c);
   /// copy data from v
-  void take (CVertex &v);
+  void take (const CVertex &v);
 };
 
-//extern double pitab; // pi=atan(1)
-//extern float sintab [360], costab [360]; // table for sine, cosine functions (obsolete, use COS(), SIN() instead)
-
-// CRotation stores one (x,y,z)-rotation
+/**
+* CRotation stores one (x,y,z)-rotation.
+* Access angles a,b,c directly.
+*/
 class CRotation
 {
-  private:
-  float rot [3] [3]; // rotation matrix
   public:
-  short a, b, c; // rotation angles for each plane of the carthesian cosy
+  /// rotation angle for a plane of the coordinate system
+  float a;
+  /// rotation angle for a plane of the coordinate system
+  float b;
+  /// rotation angle for a plane of the coordinate system
+  float c;
+  
   CRotation ();
-  ~CRotation ();
-  void setAngles (short a, short b, short c);
-  void addAngles (short a, short b, short c);
+  virtual ~CRotation ();
+  
+  void setAngles (float a, float b, float c);
+  void addAngles (float a, float b, float c);
   void calcRotation ();
-  float rotateX (CVector3 *v);
-  float rotateY (CVector3 *v);
-  float rotateZ (CVector3 *v);
-  float getsintab (int a);
-  float getcostabntab (int a);
-  void take (CRotation *r);
+  float rotateX (const CVector3 &v) const;
+  float rotateY (const CVector3 &v) const;
+  float rotateZ (const CVector3 &v) const;
+  void take (const CRotation &r);
+
+  protected:
+  /// the rotation matrix of this rotation
+  float rot [3] [3];
 };
 
-// CTriangle stores references to the vertices of the triangle/face
+/**
+* CTriangle stores references to the vertices of the triangle/face.
+*/
 class CTriangle
 {
   public:
-  CVertex *v [3]; // references to the three vertices
-  void getNormal (CVector3 *n);
-  void setVertices (CVertex *a, CVertex *b, CVertex *c);
+  /// references to the three vertices
+  CVertex *v [3];
+  
+  CTriangle ();
+  virtual ~CTriangle ();
+  
+  void calcNormal (CVector3 *n);
+  void setVertices (CVertex *a, CVertex *b, CVertex *c); // not const as a,b,c may be altered
 };
 
 // CQuad stores references to the vertices of the quad/square/face
@@ -231,8 +245,12 @@ class CQuad
 {
   public:
   CVertex *v [4]; // references to the four vertices
-  void getNormal (CVector3 *n);
-  void setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d);
+  
+  CQuad ();
+  virtual ~CQuad ();
+
+  void calcNormal (CVector3 *n);
+  void setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d); // not const as a,b,c,d may be altered
 };
 
 // CMaterial stores the name, filename, color, and texture of a material
