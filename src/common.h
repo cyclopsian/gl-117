@@ -58,6 +58,7 @@
 #define CONTROLS_MOUSE 1
 #define CONTROLS_JOYSTICK 2
 #define CONTROLS_MOUSE_REVERSE 3
+#define CONTROLS_MOUSE_EXP 4
 
 // preferences
 extern int quality;

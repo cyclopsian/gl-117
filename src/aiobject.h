@@ -114,7 +114,7 @@ class DynamicObj : public CSpaceObj
   float recgamma; // elevation the fighter wants to reach
   float maxtheta; // a maximum roll angle the object may achieve, easymodel only!
   float maxgamma; // a maximum elevation the object may achieve, easymodel only!
-  float aileroneffect; // number between 1.0 and -0.5, as diving should be less
+  float elevatoreffect; // number between 1.0 and -0.5, as diving should be less
   float ruddereffect;
   float rolleffect;
   int party; // usually 0 for enemies, 1 for allieds

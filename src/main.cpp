@@ -49,7 +49,7 @@ bool multiplayer = false, isserver = false;
 int fullscreen = 1;
 int day = 1;
 int weather = WEATHER_SUNNY;
-int controls = CONTROLS_MOUSE;
+int controls = CONTROLS_MOUSE_EXP;
 float sungamma = 45.0;
 
 int camera = 0;
@@ -3775,7 +3775,7 @@ int load_config ()
   else
   { controls = atoi (str); }
   if (controls < 0) controls = 0;
-  else if (controls > 3) controls = 0;
+  else if (controls > 4) controls = 0;
 
   str = cf->getString (ret, "difficulty");
   if (str == NULL)
@@ -4693,6 +4693,9 @@ void switch_menu ()
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
     playRandomMusic ();
+#ifdef HAVE_SDL
+  SDL_WM_GrabInput (SDL_GRAB_OFF);
+#endif
 }
 
 bool ispromoted;
@@ -4855,6 +4858,9 @@ void switch_game ()
     sound->haltMusic ();
   sound->playLoop (SOUND_PLANE1);
   setPlaneVolume ();
+#ifdef HAVE_SDL
+  SDL_WM_GrabInput (SDL_GRAB_ON);
+#endif
 }
 
 void event_fireCannon ()
@@ -5077,12 +5083,12 @@ void game_keyspecialup (int key, int x, int y)
   case KEY_UP:
 //    fplayer->speedUp ();
 //    sound->play (SOUND_CLICK1);
-    fplayer->aileroneffect = 0.0;
+    fplayer->elevatoreffect = 0.0;
     break;
   case KEY_DOWN:
 //    fplayer->speedDown ();
 //    sound->play (SOUND_CLICK1);
-    fplayer->aileroneffect = 0.0;
+    fplayer->elevatoreffect = 0.0;
     break;
   case KEY_LEFT:
     fplayer->rolleffect = 0;
@@ -5114,12 +5120,12 @@ void game_keyspecial (int key, int x, int y)
   case KEY_UP:
 //    fplayer->speedUp ();
 //    sound->play (SOUND_CLICK1);
-    fplayer->aileroneffect = -0.5;
+    fplayer->elevatoreffect = -0.5;
     break;
   case KEY_DOWN:
 //    fplayer->speedDown ();
 //    sound->play (SOUND_CLICK1);
-    fplayer->aileroneffect = 1.0;
+    fplayer->elevatoreffect = 1.0;
     break;
   case KEY_LEFT:
     fplayer->rolleffect = 10;
@@ -5228,22 +5234,70 @@ void game_easymouse ()
   lastmousex = mousex; // save last mouse x coordinate to detect an event
 
   // calculate the aileron effect every time
-  fplayer->aileroneffect = 0.005F * ry;
-  if (fplayer->aileroneffect > 1.0) fplayer->aileroneffect = 1.0;
-  else if (fplayer->aileroneffect < -0.5) fplayer->aileroneffect = -0.5;
+  fplayer->elevatoreffect = 0.005F * ry;
+  if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
+  else if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
 }
 
 /*void sdl_mousemotion (int xrel, int yrel)
 {
   fplayer->rectheta -= xrel / 2;
-  fplayer->aileroneffect += 0.005F * yrel;
-  if (fplayer->aileroneffect > 1.0) fplayer->aileroneffect = 1.0;
-  if (fplayer->aileroneffect < -0.5) fplayer->aileroneffect = -0.5;
+  fplayer->elevatoreffect += 0.005F * yrel;
+  if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
+  if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
 }*/
+
+int lastmx = 0, lastmy = 0;
+
+void game_mouserelmotion (int xrel, int yrel)
+{
+  if (controls != CONTROLS_MOUSE_EXP) return;
+  float xr = (float) xrel / width, yr = (float) yrel / height;
+  
+  float roll = (float) -xr * 120;
+  if (fabs (roll) < 1.0F) roll = 1.0F;
+  if (roll > 0) roll -= 1.0F;
+  else roll += 1.0F;
+
+  if (roll > 6.0F) roll = 6.0F;
+  else if (roll < -6.0F) roll = -6.0F;
+  fplayer->rectheta += roll;
+  if (roll < 1E-3)
+    fplayer->ruddereffect = (float) xr * 200;
+  else 
+    fplayer->ruddereffect = 0.0f; 
+  if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
+  else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
+
+  fplayer->elevatoreffect = (float) yr * fabs (yr) * 5000;
+  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
+  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
+}
+
+void game_mousemotion2 (int x, int y)
+{
+  float dx = mousex - lastmx;
+  float dy = mousey - lastmy;
+
+  fplayer->rolleffect = (float) -(mousex - width / 2) * 0.02;
+
+  fplayer->elevatoreffect = (float) (mousey - height / 2) * 0.01;
+  if (fplayer->elevatoreffect > 1.0f) 
+    fplayer->elevatoreffect = 1.0f; 
+  else if (fplayer->elevatoreffect < -0.5f) 
+    fplayer->elevatoreffect = -0.5f; 
+
+  lastmx = x;
+  lastmy = y;
+}
+
 
 void game_mousemotion (int x, int y)
 {
   if (controls != CONTROLS_MOUSE && controls != CONTROLS_MOUSE_REVERSE) return;
+
+//  game_mouserelmotion (x, y);
+//  return;
 
   float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
@@ -5285,12 +5339,12 @@ void game_mousemotion (int x, int y)
   } 
   else 
     fplayer->rolleffect = 0.0f; 
+  if (fplayer->rolleffect > 70) fplayer->rolleffect = 70; 
+  if (fplayer->rolleffect < -70) fplayer->rolleffect = -70; 
 
-  fplayer->aileroneffect = dy / height * 2.5; 
-  if (fplayer->aileroneffect > 1.0f) 
-    fplayer->aileroneffect = 1.0f; 
-  else if (fplayer->aileroneffect < -0.5f) 
-    fplayer->aileroneffect = -0.5f; 
+  fplayer->elevatoreffect = dy / height * 2.5; 
+  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
+  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
 
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5321,14 +5375,14 @@ void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
 /*  fplayer->recgamma += (float) ry / 5000;
   if (fplayer->recgamma > 225) fplayer->recgamma = 225;
   if (fplayer->recgamma < 135) fplayer->recgamma = 135;*/
-  fplayer->aileroneffect = (float) y / 30000;
-  if (fplayer->aileroneffect > 1.0) fplayer->aileroneffect = 1.0;
-  else if (fplayer->aileroneffect < -1.0) fplayer->aileroneffect = -1.0;
-  if (fplayer->aileroneffect < -0.5) fplayer->aileroneffect = -0.5;
+  fplayer->elevatoreffect = (float) y / 30000;
+  if (fplayer->elevatoreffect > 1.0) fplayer->elevatoreffect = 1.0;
+  else if (fplayer->elevatoreffect < -1.0) fplayer->elevatoreffect = -1.0;
+  if (fplayer->elevatoreffect < -0.5) fplayer->elevatoreffect = -0.5;
   fplayer->ruddereffect = (float) rudder / 30000;
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
-//  fplayer->aileroneffect = 0;
+//  fplayer->elevatoreffect = 0;
   fplayer->recspeed = fplayer->maxspeed * 0.75 - fplayer->maxspeed / 4 * throttle / 32638;
 }
 
@@ -6659,15 +6713,17 @@ void menu_mouse (int button, int state, int x, int y)
           {
             fplayer->rolleffect = 0;
             fplayer->ruddereffect = 0;
-            fplayer->aileroneffect = 0;
+            fplayer->elevatoreffect = 0;
             if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
             else if (controls == CONTROLS_MOUSE) controls = CONTROLS_MOUSE_REVERSE;
-            else if (controls == CONTROLS_MOUSE_REVERSE) controls = CONTROLS_JOYSTICK;
-            else if (controls == CONTROLS_JOYSTICK) controls = 0;
-            if (controls > 3) controls = 0;
-            if (controls == 2 && !joystick) controls = 0;
+            else if (controls == CONTROLS_MOUSE_REVERSE) controls = CONTROLS_MOUSE_EXP;
+            else if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_JOYSTICK;
+            else if (controls == CONTROLS_JOYSTICK) controls = CONTROLS_MOUSE;
+            if (controls > 4) controls = 0;
+            if (controls == CONTROLS_JOYSTICK && !joystick) controls = CONTROLS_KEYBOARD;
 #ifdef USE_GLUT
-            if (controls == 0) controls = 1;
+            if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
+            if (controls == CONTROLS_MOUSE_EXP) controls = CONTROLS_MOUSE;
 #endif
           }
         }
@@ -7185,6 +7241,7 @@ void menu_display ()
     else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE EASY");
     else if (controls == CONTROLS_JOYSTICK) strcat (buf, "JOYSTICK");
     else if (controls == CONTROLS_MOUSE_REVERSE) strcat (buf, "MOUSE REVERSE");
+    else if (controls == CONTROLS_MOUSE_EXP) strcat (buf, "MOUSE RELATIVE");
     if (menuitemselected == 13)
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
@@ -7408,7 +7465,8 @@ void game_display ()
     /*printf ("\nlight=%f", sunlight); fflush (stdout);*/ }
     else sunfactor = 1.0;
     sunlight = sunfactor;
-    pseudoview /= sunfactor;
+    if (game == GAME_PLAY)
+      pseudoview /= sunfactor;
   }
   else
   {
@@ -9232,6 +9290,12 @@ static void mySpecialFuncUp (int key, int x, int y)
     game_keyspecialup (key, x, y);
 }
 
+static void myPassiveRelMotionFunc (int xrel, int yrel)
+{
+  if (game == GAME_PLAY)
+    game_mouserelmotion (xrel, yrel);
+}
+
 static void myPassiveMotionFunc (int x, int y)
 {
   mousex = x; mousey = y;
@@ -9522,6 +9586,13 @@ void sdlMainLoop ()
             sdl_mousemotion (event.motion.xrel, event.motion.yrel);
           else*/
           myPassiveMotionFunc (event.motion.x, event.motion.y);
+          if (game == GAME_PLAY)
+          {
+            fplayer->rolleffect = 0;
+            fplayer->elevatoreffect = 0;
+            fplayer->ruddereffect = 0;
+          }
+          myPassiveRelMotionFunc (event.motion.xrel, event.motion.yrel);
           break;
         case SDL_MOUSEBUTTONDOWN:
           myMouseFunc (event.button.button, event.button.state, event.button.x, event.button.y);

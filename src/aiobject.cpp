@@ -96,7 +96,7 @@ void DynamicObj::dinit ()
   points = 0;
   party = 0;
   easymodel = true;
-  aileroneffect = 0;
+  elevatoreffect = 0;
   ruddereffect = 0;
   rolleffect = 0;
   maxgamma = 80;
@@ -456,8 +456,8 @@ void DynamicObj::move ()
     // change heading and elevation due to ailerons and rudder
     if (maxspeed + speed <= -0.00001 || maxspeed + speed >= 0.00001)
     {
-      phi += vz * SIN(theta0) * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
-      gamma += COS(theta0) * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
+      phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
+      gamma += COS(theta0) * elevatoreffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
       phi += -vz * COS(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
       gamma += SIN(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
     }
@@ -628,7 +628,7 @@ void AIObj::aiinit ()
   source = NULL;
   points = 0;
   easymodel = true;
-  aileroneffect = 0;
+  elevatoreffect = 0;
   ruddereffect = 0;
   gamma = 180;
   theta = 0;
@@ -1366,7 +1366,7 @@ bool AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             else
             {
-              if (myrandom ((int) (fabs (aileroneffect) * 90 + 20)) > 50) hit = true;
+              if (myrandom ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
@@ -1409,7 +1409,7 @@ bool AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             else
             {
-              if (myrandom ((int) (fabs (aileroneffect) * 90 + 20)) > 50) hit = true;
+              if (myrandom ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
