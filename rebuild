@@ -1,0 +1,16 @@
+rm Makefile
+rm Makefile.in
+rm config.log
+rm config.h
+rm config.status
+rm configure
+rm configure.in.save
+rm stamp-h
+rm stamp-h1
+rm src/Makefile
+rm src/Makefile.in
+aclocal
+autoheader
+autoconf
+automake
+
