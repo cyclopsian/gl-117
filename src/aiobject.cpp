@@ -1433,6 +1433,7 @@ bool AIObj::fireMissileAir (AIObj **missile, AIObj *target)
     return fireMissile (MISSILE_AIR2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_AIR1))
     return fireMissile (MISSILE_AIR1, missile, (AIObj *) target);
+  return false;
 }
 
 bool AIObj::selectMissileAir (AIObj **missile)
@@ -1451,6 +1452,7 @@ bool AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
     return fireMissile (MISSILE_FF2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_FF1))
     return fireMissile (MISSILE_FF1, missile, (AIObj *) target);
+  return false;
 }
 
 bool AIObj::selectMissileAirFF (AIObj **missile)
@@ -1468,6 +1470,7 @@ bool AIObj::fireMissileGround (AIObj **missile)
     return fireMissile (MISSILE_GROUND2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_GROUND1))
     return fireMissile (MISSILE_GROUND1, missile, (AIObj *) target);
+  return false;
 }
 
 bool AIObj::selectMissileGround (AIObj **missile)
