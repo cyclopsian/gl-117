@@ -66,7 +66,7 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
-float nearclippingplane = 0.1;
+float nearclippingplane = 0.05;
 
 bool sunblinding=false;
 
@@ -4738,11 +4738,11 @@ void game_key (unsigned char key, int x, int y)
       fplayer->targetNext ((AIObj **) fighter);
       sound->play (SOUND_CLICK1);
     }
-    else if (key == 'k')
+/*    else if (key == 'k')
     {
       if (fplayer->target != NULL)
         fplayer->target->shield = 0;
-    }
+    }*/
 /*    else if (key == 'g')
     {
       if (polygonMode==GL_FILL)
@@ -4903,11 +4903,11 @@ void game_keyspecial (int key, int x, int y)
     camera = 50;
     game_reshape ();
     break;
-  case KEY_F9:
+/*  case KEY_F9:
     aktcam ++;
     if (aktcam > 7) aktcam = 0;
     camera = 3;
-    break;
+    break;*/
   default:
     return;
   }
