@@ -452,43 +452,46 @@ void Cockpit::drawWeapon ()
   font1->drawText (16.0, -22.0, -4.0, missile->name, &color);
   sprintf (str, "N %d", fplayer->missiles [fplayer->missiletype]);
   font1->drawText (16.0, -24.0, -4.0, str, &color);
+  sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
+  font1->drawText (16.0, -27.0, -4.0, str, &color);
 }
 
 void Cockpit::drawRadar ()
 {
   int i;
   float yf = -4.2, zf = -7.0;
-gl->enableAlphaBlending ();
-glEnable (GL_ALPHA_TEST);
-glAlphaFunc (GL_GEQUAL, 0.1);
-glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-setColor (150);
-float xl, yl;
-int type;
-if (fplayer->o == &model_fig || fplayer->o == &model_figg)
-{
-  gl->enableTextures (texradar2->textureID);
-  xl = 1.4; yl = 1.3;
-  type = 0;
-}
-else
-{
-  gl->enableTextures (texradar1->textureID);
-  xl = 1.5; yl = 1.2;
-  type = 1;
-}
-glBegin (GL_QUADS);
-glTexCoord2d (0, 0);
-glVertex3f (-xl, yf - yl, zf);
-glTexCoord2d (0, 1);
-glVertex3f (-xl, yf + yl, zf);
-glTexCoord2d (1, 1);
-glVertex3f (xl, yf + yl, zf);
-glTexCoord2d (1, 0);
-glVertex3f (xl, yf - yl, zf);
-glEnd ();
-glDisable (GL_ALPHA_TEST);
-glDisable (GL_TEXTURE_2D);
+
+  gl->enableAlphaBlending ();
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, 0.1);
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  setColor (150);
+  float xl, yl;
+  int type;
+  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  {
+    gl->enableTextures (texradar2->textureID);
+    xl = 1.4; yl = 1.3;
+    type = 0;
+  }
+  else
+  {
+    gl->enableTextures (texradar1->textureID);
+    xl = 1.5; yl = 1.2;
+    type = 1;
+  }
+  glBegin (GL_QUADS);
+  glTexCoord2d (0, 0);
+  glVertex3f (-xl, yf - yl, zf);
+  glTexCoord2d (0, 1);
+  glVertex3f (-xl, yf + yl, zf);
+  glTexCoord2d (1, 1);
+  glVertex3f (xl, yf + yl, zf);
+  glTexCoord2d (1, 0);
+  glVertex3f (xl, yf - yl, zf);
+  glEnd ();
+  glDisable (GL_ALPHA_TEST);
+  glDisable (GL_TEXTURE_2D);
 //  gl->disableAlphaBlending ();
 /*    gl->enableAlphaBlending ();
   glDisable (GL_DEPTH_TEST);

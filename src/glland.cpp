@@ -587,7 +587,7 @@ void GLLandscape::drawRotatedTree (float x, float y, float htree, float wtree, i
   float zy = 0;
   if (weather == 1) // stormy weather
   {
-    myticker = (int) (0.05 / htree * lsticker + 1000 * wtree + (x + y) * 50);
+    myticker = (int) (0.05 / htree * lsticker / timestep + 1000 * wtree + (x + y) * 50);
     if (myticker != 0)
       myticker %= 360;
     zy = 0.2 * (2.0 + sine [myticker]);
@@ -628,7 +628,7 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
   float zy = 0;
   if (weather == 1)
   {
-    myticker = (int) (0.05 / htree * lsticker + 1000 * wtree + (x + y) * 50);
+    myticker = (int) (0.05 / htree * lsticker / timestep + 1000 * wtree + (x + y) * 50);
     if (myticker != 0)
       myticker %= 360;
     zy = 0.2 * (2.0 + sine [myticker]);
@@ -1202,7 +1202,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   {
     float waterspeed = 0.008;
     if (weather == 1) waterspeed = 0.016;
-    tf [j] [0] = (float) px [j] * texzoom + waterspeed * lsticker;
+    tf [j] [0] = (float) px [j] * texzoom + waterspeed * lsticker / timestep;
     tf [j] [1] = (float) py [j] * texzoom;
   }
   
@@ -1237,8 +1237,8 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     {
       if (texture)
       {
-        tf [j] [0] = (px [j] * texzoom) + (float) ((lsticker / 2) & 7) * 0.6;
-        tf [j] [1] = (py [j] * texzoom) + (float) ((lsticker / 2) & 7) * 0.6;
+        tf [j] [0] = (px [j] * texzoom) + (float) ((lsticker / timestep / 2) & 7) * 0.6;
+        tf [j] [1] = (py [j] * texzoom) + (float) ((lsticker / timestep / 2) & 7) * 0.6;
         glTexCoord2fv (tf [j]);
       }
       col [j] [3] = glitter [j] - 1.0;
@@ -1665,10 +1665,6 @@ void GLLandscape::draw (int phi, int gamma)
   int xs, ys;
 
   float fac;
-
-  lsticker ++;
-  if (lsticker >= 36000000)
-    lsticker = 0;
 
   if (quality < 4) gridstep = 2;
   else gridstep = 1;

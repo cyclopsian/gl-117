@@ -4598,6 +4598,9 @@ void game_timer (float dt)
 
   gametimer += dt;
   cockpit->dt = dt;
+  l->lsticker += dt;
+  if (l->lsticker >= 36000000)
+    l->lsticker = 0;
 
   if (vibration > 0)
   {
@@ -4731,9 +4734,9 @@ void game_timer (float dt)
   camtheta = fplayer->theta;
   if (camera == 0)  // cockpit
   {
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + fplayer->zoom / 3.0;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi;
     camgamma = -fplayer->gamma + 180;
     fplayer->draw = 0;
@@ -4741,9 +4744,9 @@ void game_timer (float dt)
   if (camera == 1) // chase
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 20;
@@ -4751,9 +4754,9 @@ void game_timer (float dt)
   else if (camera == 2) // backwards
   {
     cf = -fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi + 180.0;
     fplayer->draw = 1;
     camgamma = 20;
@@ -4761,9 +4764,9 @@ void game_timer (float dt)
   else if (camera == 3) // other players
   {
     cf = fighter [aktcam]->zoom * 2;
-    camx = fighter [aktcam]->tl->x + cf * sine [(int) fighter [aktcam]->phi];// * MAXX / zoom / 2;
+    camx = fighter [aktcam]->tl->x + cf * SIN(fighter [aktcam]->phi);// * MAXX / zoom / 2;
     camy = fighter [aktcam]->tl->y + fighter [aktcam]->zoom;
-    camz = fighter [aktcam]->tl->z + cf * cosi [(int) fighter [aktcam]->phi];// * MAXX / zoom / 2;
+    camz = fighter [aktcam]->tl->z + cf * COS(fighter [aktcam]->phi);// * MAXX / zoom / 2;
     camphi = fighter [aktcam]->phi;
     camgamma = 20;
     camtheta = fighter [aktcam]->theta;
@@ -4772,18 +4775,18 @@ void game_timer (float dt)
   else if (camera == 4) // missile
   {
     cf = missile [0]->zoom * 10;
-    camx = missile [0]->tl->x + cf * sine [(int) missile [0]->phi];// * MAXX / zoom / 2;
+    camx = missile [0]->tl->x + cf * SIN(missile [0]->phi);// * MAXX / zoom / 2;
     camy = missile [0]->tl->y + fplayer->zoom * 2;
-    camz = missile [0]->tl->z + cf * cosi [(int) missile [0]->phi];// * MAXX / zoom / 2;
+    camz = missile [0]->tl->z + cf * COS(missile [0]->phi);// * MAXX / zoom / 2;
     camphi = missile [0]->phi;
     fplayer->draw = 1;
   }
   else if (camera == 5) // top
   {
     cf = fplayer->zoom * 15;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + 5.5;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4794,9 +4797,9 @@ void game_timer (float dt)
     camphi = fplayer->phi + 90.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * sine [(int) camphi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(camphi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) camphi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(camphi);// * MAXX / zoom / 2;
     fplayer->draw = 1;
     camgamma = 20;
   }
@@ -4806,18 +4809,18 @@ void game_timer (float dt)
     camphi = fplayer->phi + 270.0;
     if (camphi >= 360) camphi -= 360;
     else if (camphi < 0) camphi += 360;
-    camx = fplayer->tl->x + cf * sine [(int) camphi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(camphi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + fplayer->zoom;
-    camz = fplayer->tl->z + cf * cosi [(int) camphi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(camphi);// * MAXX / zoom / 2;
     fplayer->draw = 1;
     camgamma = 20;
   }
   else if (camera == 8) // top near
   {
     cf = fplayer->zoom * 5;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + 2.5;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
@@ -4825,9 +4828,9 @@ void game_timer (float dt)
   else if (camera == 9) // top very near
   {
     cf = fplayer->zoom * 2;
-    camx = fplayer->tl->x + cf * sine [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camx = fplayer->tl->x + cf * SIN(fplayer->phi);// * MAXX / zoom / 2;
     camy = fplayer->tl->y + 1.0;
-    camz = fplayer->tl->z + cf * cosi [(int) fplayer->phi];// * MAXX / zoom / 2;
+    camz = fplayer->tl->z + cf * COS(fplayer->phi);// * MAXX / zoom / 2;
     camphi = fplayer->phi;
     fplayer->draw = 1;
     camgamma = 50;
