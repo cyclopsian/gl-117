@@ -27,10 +27,11 @@
 
 Space::Space ()
 {
+  o.clear ();
 //  no = 0;
 //  alpha = 1;
-  lum = 1;
-  drawLight = true;
+//  lum = 1;
+//  drawLight = true;
 }
 
 /*Space::Space (Vector3 &v, Vector3 &w)
@@ -59,7 +60,7 @@ void Space::addObject (SpaceObj *o)
 
 bool Space::removeObject (SpaceObj *o2)
 {
-  int i, i2;
+  unsigned i, i2;
   for (i = 0; i < o.size (); i ++)
     if (o [i] == o2)
     {
@@ -80,10 +81,10 @@ void Space::removeAllObjects ()
 //  no = 0;
 }
 
-void Space::translate (Vector3 &v)
+/*void Space::translate (Vector3 &v)
 {
   tl.set (v);
-}
+}*/
 
 /*void Space::drawGL ()
 {

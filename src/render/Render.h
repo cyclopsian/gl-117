@@ -653,10 +653,9 @@ class OpenGlRenderer : public Renderer
     
     virtual void draw(const Space &space, const Landscape &landscape) const
     {
-      int i;
       frustum.extractFrustum ();
 
-      for (i = 0; i < space.o.size (); i ++)
+      for (unsigned i = 0; i < space.o.size (); i ++)
       {
         SpaceObj *spaceobj = space.o [i];
         Model3d *model = spaceobj->o;

@@ -2140,7 +2140,7 @@ void myFirstInit ()
 
   logging.display ("Setting up world geometry", LOG_ALL);
   space = new Space ();
-  space->drawLight = true;
+//  space->drawLight = true;
 //  space->z1.set (-ZOOM, -ZOOM, -ZOOM);
 //  space->z2.set (ZOOM, ZOOM, ZOOM);
 /*  clip1 = space->z1;

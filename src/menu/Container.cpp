@@ -45,10 +45,9 @@ void Container::add (Component *component)
 
 void Container::draw ()
 {
-  int i;
   if (active && visible)
   {
-    for (i = 0; i < components.size (); i ++)
+    for (unsigned i = 0; i < components.size (); i ++)
     {
       components [i]->draw ();
     }
@@ -62,7 +61,7 @@ int Container::getNumberOfComponents ()
 
 void Container::eventMouse (int x, int y, int button)
 {
-  int i, i2;
+  unsigned i, i2;
 
 //  glutSwapBuffers ();
 	GLuint selectBuff [20 * 4];
@@ -104,8 +103,8 @@ void Container::eventMouse (int x, int y, int button)
   int pick [128];
 	if (hits > 0)
   {
-    int i;
-    for (i = 0; i < hits; i ++)
+    unsigned i;
+    for (i = 0; i < (unsigned) hits; i ++)
     {
       int names = *ptr;
       ptr ++;
@@ -126,7 +125,7 @@ void Container::eventMouse (int x, int y, int button)
   for (i = 0; i < components.size (); i ++)
   {
     components [i]->setHighlight (false);
-    for (i2 = 0; i2 < hits; i2 ++)
+    for (i2 = 0; i2 < (unsigned) hits; i2 ++)
     {
       if (components [i]->contains (pick [i2]))
       {
@@ -138,8 +137,7 @@ void Container::eventMouse (int x, int y, int button)
 
 void Container::triggerMouse (int id, int button)
 {
-  int i;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
     if (components [i]->contains (id))
     {
       components [i]->triggerMouse (id, button);
@@ -148,9 +146,8 @@ void Container::triggerMouse (int id, int button)
 
 void Container::setVisible (bool value)
 {
-  int i;
   visible = value;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->setVisible (value);
   }
@@ -158,9 +155,8 @@ void Container::setVisible (bool value)
 
 void Container::setActive (bool value)
 {
-  int i;
   active = value;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->setActive (value);
   }
@@ -168,9 +164,8 @@ void Container::setActive (bool value)
 
 void Container::setHighlight (bool value)
 {
-  int i;
   highlight = value;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->setHighlight (value);
   }
@@ -178,9 +173,8 @@ void Container::setHighlight (bool value)
 
 bool Container::contains (int id)
 {
-  int i;
   bool ret = false;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     ret |= components [i]->contains (id);
   }
@@ -189,8 +183,7 @@ bool Container::contains (int id)
 
 void Container::eventKey (unsigned char key)
 {
-  int i;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->eventKey (key);
   }
@@ -198,8 +191,7 @@ void Container::eventKey (unsigned char key)
 
 void Container::eventSpecial (int key)
 {
-  int i;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->eventSpecial (key);
   }
@@ -207,8 +199,7 @@ void Container::eventSpecial (int key)
 
 void Container::eventJoystick (int button)
 {
-  int i;
-  for (i = 0; i < components.size (); i ++)
+  for (unsigned i = 0; i < components.size (); i ++)
   {
     components [i]->eventJoystick (button);
   }

@@ -431,7 +431,7 @@ class SpaceObj
     int draw;       ///< draw/hide
     int explode;    ///< explosion stadium (0=no explosion)
     bool drawLight; ///< draw with/without light
-    float alpha;    ///< overall alpha value (should be 1.0)
+//    float alpha;    ///< overall alpha value (should be 1.0)
     float lum;      ///< luminance (default 1.0)
     Model3d *o;     ///< pointer to a model
     Transformation trafo; ///< transformation
@@ -461,11 +461,11 @@ class Space
   public:
 
 //    int no;         ///< number of objects in space
-    bool drawLight; ///< draw with/without light
+//    bool drawLight; ///< draw with/without light
 //    float alpha;
-    float lum;      ///< luminance
+//    float lum;      ///< luminance
     std::vector<SpaceObj *> o; ///< reference to all objects in space
-    Vector3 tl;    ///< translation
+//    Vector3 tl;    ///< translation
   
     Space ();
     virtual ~Space ();
@@ -474,7 +474,7 @@ class Space
     void addObject (SpaceObj *o);
     bool removeObject (SpaceObj *o2);
     void removeAllObjects ();
-    void translate (Vector3 &v);
+//    void translate (Vector3 &v);
 //    virtual void drawGL ();
 };
 

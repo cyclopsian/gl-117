@@ -39,7 +39,7 @@ BlackSmoke::BlackSmoke (Space *space)
   draw = false;
   trafo.scaling.x = 0.1;
   drawLight = false;
-  alpha = -1;
+//  alpha = -1;
 }
 
 void BlackSmoke::setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len)

@@ -1828,12 +1828,12 @@ void StatePlay::display ()
   frustum.extractFrustum ();
   if (camera != 50)
   {
-    space->lum = sunlight;
+//    space->lum = sunlight;
     float dayfac = 1.0;
     if (!day) dayfac = 0.5;
     if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
     {
-      for (i = 0; i < space->o.size (); i ++)
+      for (unsigned i = 0; i < space->o.size (); i ++)
       {
         if (space->o [i]->trafo.translation.y < l->getExactRayHeight (space->o [i]->trafo.translation.x, space->o [i]->trafo.translation.z))
           space->o [i]->lum = 0.5 * dayfac;
@@ -1843,7 +1843,7 @@ void StatePlay::display ()
     }
     else
     {
-      for (i = 0; i < space->o.size (); i ++)
+      for (unsigned i = 0; i < space->o.size (); i ++)
         space->o [i]->lum = dayfac;
     }
 //    printf ("%2.1f*%2.1f ", fplayer->lum, sunlight);
@@ -1864,7 +1864,7 @@ void StatePlay::display ()
 //      space->drawGL (); // draw all objects
       glDisable (GL_LIGHTING);
       glDepthMask (GL_FALSE);
-      for (i = 0; i < space->o.size (); i ++)
+      for (unsigned i = 0; i < space->o.size (); i ++)
       {
         AIObj *dobj = (AIObj *) space->o [i];
         if (dobj->id >= MISSILE1)

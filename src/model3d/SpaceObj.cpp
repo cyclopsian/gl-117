@@ -29,7 +29,7 @@
 SpaceObj::SpaceObj ()
 {
   o = 0L;
-  alpha = 1;
+//  alpha = 1;
   draw = 1;
   lum = 1;
   drawLight = true;
@@ -39,7 +39,7 @@ SpaceObj::SpaceObj ()
 SpaceObj::SpaceObj (const SpaceObj &that)
 {
   o = that.o;
-  alpha = that.alpha;
+//  alpha = that.alpha;
   draw = that.draw;
   lum = that.lum;
   drawLight = that.drawLight;
@@ -50,7 +50,7 @@ SpaceObj::SpaceObj (const SpaceObj &that)
 SpaceObj::SpaceObj (Model3d *o, const Transformation &trafo)
 {
   this->o = o;
-  alpha = 1;
+//  alpha = 1;
   draw = 1;
   lum = 1;
   drawLight = true;
