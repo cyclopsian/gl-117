@@ -43,8 +43,8 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   filepointer = fopen (filename, "rb");
   if (!filepointer) 
   {
-    sprintf (message, "Unable to find the file: %s!", filename);
-    printf ("%s", message);
+    sprintf (message, "\nUnable to find the file: %s!", filename);
+    fprintf (stderr, "%s", message);
     fflush (stdout);
     return false;
   }
@@ -53,8 +53,8 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   // Make sure this is a 3DS file
   if (currentChunk->ID != PRIMARY)
   {
-    sprintf (message, "Unable to load PRIMARY chuck from file: %s!", filename);
-    printf ("%s", message);
+    sprintf (message, "\nUnable to load PRIMARY chuck from file: %s!", filename);
+    fprintf (stderr, "%s", message);
     fflush (stdout);
     return false;
   }
@@ -102,7 +102,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         currentChunk->bytesRead += fread (&version, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
         if (version > 0x03)
         {
-          printf ("Warning: This 3DS file is over version 3 so it may load incorrectly");
+          fprintf (stderr, "\nWarning: This 3DS file is over version 3 so it may load incorrectly");
           fflush (stdout);
         }
         break;

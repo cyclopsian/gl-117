@@ -9,7 +9,7 @@ CFile::CFile (char *filename)
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    fprintf (stderr, "Kann Datei %s nicht laden!\n", filename);
+    fprintf (stderr, "\nCannot open file %s!", filename);
     fflush (stderr);
     return;
   }

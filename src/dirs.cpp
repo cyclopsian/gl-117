@@ -215,7 +215,7 @@ found:;
   else
   {
 //      strcpy (myfile, "/home/tom/gl-117_0_4_9/");
-    printf ("\nFound gl-117 data directory %s ", myfile); fflush (stdout);
+    fprintf (stdout, "\nFound gl-117 data directory %s ", myfile); fflush (stdout);
     strcpy (textures, myfile);
     strcpy (music, myfile);
     strcpy (sound, myfile);

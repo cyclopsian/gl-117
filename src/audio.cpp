@@ -119,7 +119,7 @@ void WaveFile::load (char *filename)
   chunk = Mix_LoadWAV (filename);
   if (chunk == NULL)
   {
-    printf ("\nMixLoad %s", Mix_GetError ());
+    fprintf (stderr, "\nError: %s", Mix_GetError ());
     exit (1);
   }
 #endif
@@ -227,7 +227,7 @@ SoundSystem::SoundSystem ()
   }
   delete waveclick1;
 #else
-  printf ("\nUsing SDL_mixer"); fflush (stdout);
+  fprintf (stdout, "\nUsing SDL_mixer"); fflush (stdout);
   if (Mix_OpenAudio (22050, AUDIO_S16, 2, 4096))
   {
     fprintf (stderr, "\nUnable to open audio device!");

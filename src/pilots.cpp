@@ -253,7 +253,7 @@ void PilotList::save (char *fname)
   FILE *out = fopen (fname, "wb");
   if (out == NULL)
   {
-    fprintf (stderr, "Warning: Could not write saves/pilots!");
+    fprintf (stderr, "\nWarning: Could not write saves/pilots!");
     return;
   }
   sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);
