@@ -7098,7 +7098,6 @@ void game_display ()
   if (gl->isPointInFrustum (-1, 1, 0) || gl->isPointInFrustum (-1, -1, 0) ||
       gl->isPointInFrustum (1, -1, 0) || gl->isPointInFrustum (1, 1, 0))
   {
-    sunvisible = true;
     glDisable (GL_DEPTH_TEST);
     if (day) gl->enableTextures (texsun->textureID);
     else if (l->type != LAND_MOON) gl->enableTextures (texmoon->textureID);
@@ -7143,6 +7142,7 @@ void game_display ()
   glGetDoublev( GL_MODELVIEW_MATRIX, modl );
   glGetIntegerv( GL_VIEWPORT, vp );
   gluProject (0, 0, 0, modl, proj, vp, &sunx, &suny, &sunz);
+    if ((sunx>=vp[0])&&(suny>=vp[1])&&(sunx<(vp[0]+vp[2]))&&(suny<(vp[1]+vp[3]))) sunvisible = true;
 
     glDisable (GL_ALPHA_TEST);
     glEnable (GL_DEPTH_TEST);
