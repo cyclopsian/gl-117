@@ -8888,7 +8888,7 @@ void game_display ()
   glEnd ();*/
 
 // draw flares
-  if (sunblinding && day)
+  if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
   {
   CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
   double fl_position[]=   {0.2,      1.6,      3.2,      8.1,      -1.4,     -2.2,     -3.5,     0};
