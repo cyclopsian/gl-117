@@ -239,10 +239,10 @@ void GLLandscape::precalculate ()
   for (x = 0; x <= MAXX; x ++)
     for (z = 0; z <= MAXX; z ++)
     {
-      int xm1 = getCoord (x - 1);
-      int xp1 = getCoord (x + 1);
-      int zm1 = getCoord (z - 1);
-      int zp1 = getCoord (z + 1);
+      int xm1 = GETCOORD(x - 1);
+      int xp1 = GETCOORD(x + 1);
+      int zm1 = GETCOORD(z - 1);
+      int zp1 = GETCOORD(z + 1);
 
       // Calculate the normal vectors
       a[0] = 0;
@@ -408,8 +408,8 @@ void GLLandscape::precalculate ()
 // Get height over landscape/water, no interpolation (fast)
 float GLLandscape::getHeight (float x, float z)
 {
-  int mx = getCoord ((int)x+MAXX/2);
-  int mz = getCoord (MAXX/2-(int)z);
+  int mx = GETCOORD((int)x+MAXX/2);
+  int mz = GETCOORD(MAXX/2-(int)z);
   return (ZOOM * ((float)hw[mx][mz]*zoomz - zoomz2));
 }
 
@@ -424,10 +424,10 @@ float GLLandscape::getExactHeight2 (float x, float z)
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
   int mz2 = mz1 + 2;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2/4*zoomz - zoomz2));
@@ -444,10 +444,10 @@ float GLLandscape::getExactHeight3 (float x, float z)
   mz1 -= mz1 % 3;
   int mx2 = mx1 + 3;
   int mz2 = mz1 + 3;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2/9*zoomz - zoomz2));
@@ -464,10 +464,10 @@ float GLLandscape::getExactHeight4 (float x, float z)
   mz1 -= mz1 & 3;
   int mx2 = mx1 + 4;
   int mz2 = mz1 + 4;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2/16*zoomz - zoomz2));
@@ -485,10 +485,10 @@ float GLLandscape::getExactHeight (float x, float z)
   int mz1 = (int) mz;
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2*zoomz - zoomz2));
@@ -507,10 +507,10 @@ float GLLandscape::getExactLSHeight2 (float x, float z)
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
   int mz2 = mz1 + 2;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2/4*zoomz - zoomz2);
@@ -529,10 +529,10 @@ float GLLandscape::getExactLSHeight3 (float x, float z)
   mz1 -= mz1 % 3;
   int mx2 = mx1 + 3;
   int mz2 = mz1 + 3;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2/9*zoomz - zoomz2);
@@ -551,10 +551,10 @@ float GLLandscape::getExactLSHeight4 (float x, float z)
   mz1 -= mz1 & 3;
   int mx2 = mx1 + 4;
   int mz2 = mz1 + 4;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2/16*zoomz - zoomz2);
@@ -574,10 +574,10 @@ float GLLandscape::getExactLSHeight (float x, float z)
   int mz1 = (int) mz;
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2*zoomz - zoomz2);
@@ -586,8 +586,8 @@ float GLLandscape::getExactLSHeight (float x, float z)
 // Get height of lowest sunray, no interpolation
 float GLLandscape::getRayHeight (float x, float z)
 {
-  int mx = getCoord ((int)x+MAXX/2);
-  int mz = getCoord (MAXX/2-(int)z);
+  int mx = GETCOORD((int)x+MAXX/2);
+  int mz = GETCOORD(MAXX/2-(int)z);
   return (ZOOM * ((float)hray[mx][mz]*zoomz - zoomz2));
 }
 
@@ -600,10 +600,10 @@ float GLLandscape::getExactRayHeight (float x, float z)
   int mx2 = mx1 + 1;
   int mz1 = (int) mz;
   int mz2 = mz1 + 1;
-  int ax1 = getCoord (mx1);
-  int ax2 = getCoord (mx2);
-  int az1 = getCoord (mz1);
-  int az2 = getCoord (mz2);
+  int ax1 = GETCOORD(mx1);
+  int ax2 = GETCOORD(mx2);
+  int az1 = GETCOORD(mz1);
+  int az2 = GETCOORD(mz2);
   float h2 = (float)hray[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hray[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
              (float)hray[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hray[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2*zoomz - zoomz2));
@@ -725,13 +725,13 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
   for (xs = x1; xs < x2;)
   {
 //    glBegin (GL_QUAD_STRIP);
-    x = getCoord (xs);
+    x = GETCOORD(xs);
     for (ys = y1; ys < y2;)
     {
-      y = getCoord (ys);
+      y = GETCOORD(ys);
       if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*4*step))
       {
-        int xstep = getCoord (x + step);
+        int xstep = GETCOORD(x + step);
         int a = selectColor (x, y);
         if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
           water = true;
@@ -809,14 +809,14 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
     if (day) watergreen = 0.0004;
     for (xs = x1; xs < x2;)
     {
-      x = getCoord (xs);
+      x = GETCOORD(xs);
 //      glBegin (GL_QUAD_STRIP);
       for (ys = y1; ys < y2;)
       {
-        y = getCoord (ys);
-        int xstep = getCoord (x + step);
-        int ystep = getCoord (y + step);
-        int ymstep = getCoord (y - step);
+        y = GETCOORD(ys);
+        int xstep = GETCOORD(x + step);
+        int ystep = GETCOORD(y + step);
+        int ymstep = GETCOORD(y - step);
         if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]) ||
             isWater (f [x] [ymstep]) || isWater (f [xstep] [ymstep]))
         {
@@ -942,8 +942,8 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   float fac;
   int px [4], py [4];
   int xs = x1, ys = y1;
-  int x = getCoord (xs);
-  int y = getCoord (ys);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
   px [0] = x1; py [0] = y1;
   px [1] = x2; py [1] = y2;
   px [2] = x3; py [2] = y3;
@@ -952,7 +952,7 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   float maxh = minh;
   for (j = 1; j < 4; j ++)
   {
-    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -990,7 +990,7 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac * texred;
     col [j] [1] = g [mx] [my] * fac * texgreen;
@@ -1023,8 +1023,8 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   float fac;
   int px [3], py [3];
   int xs = x1, ys = y1;
-  int x = getCoord (xs);
-  int y = getCoord (ys);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
   px [0] = x1; py [0] = y1;
   px [1] = x2; py [1] = y2;
   px [2] = x3; py [2] = y3;
@@ -1032,7 +1032,7 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   float maxh = minh;
   for (j = 1; j < 3; j ++)
   {
-    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -1070,7 +1070,7 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 3; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac * texred;
     col [j] [1] = g [mx] [my] * fac * texgreen;
@@ -1106,8 +1106,8 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = getCoord (x2);
-  int y = getCoord (y2);
+  int x = GETCOORD(x2);
+  int y = GETCOORD(y2);
   px [0] = x1; py [0] = y1;
   px [1] = x2; py [1] = y2;
   px [2] = x3; py [2] = y3;
@@ -1116,7 +1116,7 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
   float maxh = minh;
   for (j = 1; j < 4; j ++)
   {
-    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -1153,7 +1153,7 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac;
     col [j] [1] = g [mx] [my] * fac;
@@ -1175,7 +1175,7 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
     else
     {
       tf [j] [0] = (float) px [j] * texzoom;
-      tf [j] [1] = (float) h [getCoord (px [j])] [getCoord (py [j])] * texzoom / 400.0;
+      tf [j] [1] = (float) h [GETCOORD(px [j])] [GETCOORD(py [j])] * texzoom / 400.0;
     }
   }
   glBegin (GL_QUADS);
@@ -1204,8 +1204,8 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
   float fac;
   float texzoom;
   int px [3], py [3];
-  int x = getCoord (x2);
-  int y = getCoord (y2);
+  int x = GETCOORD(x2);
+  int y = GETCOORD(y2);
   px [0] = x1; py [0] = y1;
   px [1] = x2; py [1] = y2;
   px [2] = x3; py [2] = y3;
@@ -1213,7 +1213,7 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
   float maxh = minh;
   for (j = 1; j < 3; j ++)
   {
-    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -1250,7 +1250,7 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 3; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac;
     col [j] [1] = g [mx] [my] * fac;
@@ -1272,7 +1272,7 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
     else
     {
       tf [j] [0] = (float) px [j] * texzoom;
-      tf [j] [1] = (float) h [getCoord (px [j])] [getCoord (py [j])] * texzoom / 400.0;
+      tf [j] [1] = (float) h [GETCOORD(px [j])] [GETCOORD(py [j])] * texzoom / 400.0;
     }
   }
   glBegin (GL_TRIANGLES);
@@ -1301,8 +1301,8 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = getCoord (xs);
-  int y = getCoord (ys);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
   px [0] = xs; py [0] = ys;
   px [1] = xs + step; py [1] = ys;
   px [2] = xs + step; py [2] = ys + step;
@@ -1311,7 +1311,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float maxh = minh;
   for (j = 1; j < 4; j ++)
   {
-    int h1 = h [getCoord (px [j])] [getCoord (py [j])];
+    int h1 = h [GETCOORD(px [j])] [GETCOORD(py [j])];
     if (h1 > maxh) maxh = h1;
     else if (h1 < minh) minh = h1;
   }
@@ -1348,7 +1348,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac;
     col [j] [1] = g [mx] [my] * fac;
@@ -1370,7 +1370,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     else
     {
       tf [j] [0] = (float) px [j] * texzoom;
-      tf [j] [1] = (float) h [getCoord (px [j])] [getCoord (py [j])] * texzoom / 400.0;
+      tf [j] [1] = (float) h [GETCOORD(px [j])] [GETCOORD(py [j])] * texzoom / 400.0;
     }
   }
   glBegin (GL_QUADS);
@@ -1400,10 +1400,10 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = getCoord (xs);
-  int y = getCoord (ys);
-  int xstep = getCoord (xs + step);
-  int ystep = getCoord (ys + step);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
+  int xstep = GETCOORD(xs + step);
+  int ystep = GETCOORD(ys + step);
   px [0] = xs; py [0] = ys; li [0] = (nl [x] [y] + (short) dl [x] [y] * 16);
   px [1] = xs + step; py [1] = ys; li [1] = (nl [xstep] [y] + (short) dl [xstep] [y] * 16);
   px [2] = xs + step; py [2] = ys + step; li [2] = (nl [xstep] [ystep] + (short) dl [xstep] [ystep] * 16);
@@ -1412,8 +1412,8 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   float h1 = hw [x] [y];
   for (i = 1; i <= 3; i ++)
   {
-    int mx = getCoord (px [i]);
-    int my = getCoord (py [i]);
+    int mx = GETCOORD(px [i]);
+    int my = GETCOORD(py [i]);
     if (hw [mx] [my] < h1/* && isWater (f [px [i]] [py [i]])*/)
     {
       h1 = hw [mx] [my];
@@ -1499,7 +1499,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   float fac2 = 0.001 * sunlight/* * texlight*/;
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     float d = watergreen * (h1 - h [mx] [my]);
     if (d > 0.75) d = 0.75;
     fac = fac2 * li [j];
@@ -1599,8 +1599,8 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = getCoord (xs);
-  int y = getCoord (ys);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
   px [0] = xs; py [0] = ys;
   px [1] = xs + step; py [1] = ys;
   px [2] = xs + step; py [2] = ys + step;
@@ -1632,7 +1632,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
 
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my] * 16);
     col [j] [0] = r [mx] [my] * fac;
     col [j] [1] = g [mx] [my] * fac;
@@ -1717,8 +1717,8 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   float fac;
   float texzoom;
   int px [4], py [4];
-  int x = getCoord (xs);
-  int y = getCoord (ys);
+  int x = GETCOORD(xs);
+  int y = GETCOORD(ys);
   px [0] = xs; py [0] = ys;
   px [1] = xs + step; py [1] = ys;
   px [2] = xs + step; py [2] = ys + step;
@@ -1750,7 +1750,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   float fac2 = 0.001F * sunlight / 256.0F;
   for (j = 0; j < 4; j ++)
   {
-    int mx = getCoord (px [j]), my = getCoord (py [j]);
+    int mx = GETCOORD(px [j]), my = GETCOORD(py [j]);
     fac = fac2 * (nl [mx] [my] + (short) dl [mx] [my]);
     col [j] [0] = r [mx] [my] * fac;
     col [j] [1] = g [mx] [my] * fac;
@@ -2393,16 +2393,16 @@ void GLLandscape::draw (int phi, int gamma)
             }
             for (xs = ax; xs < zx;)
             {
-              x = getCoord (xs);
+              x = GETCOORD(xs);
               for (ys = ay; ys < zy;)
               {
-                y = getCoord (ys);
+                y = GETCOORD(ys);
                 zz1 ++;
                 int a;
                 a = selectColor (x, y);
                 // construction #1
-/*                int testx = (int) getCoord ((minx + maxx) / 2) - x + 100;
-                int testz = (int) getCoord ((miny + maxy) / 2) - y + 100;
+/*                int testx = (int) GETCOORD((minx + maxx) / 2) - x + 100;
+                int testz = (int) GETCOORD((miny + maxy) / 2) - y + 100;
                 testx /= 2; testz /= 2;
                 if (hb [testz] [testx])*/
                 if (a != 6 && a != 9)
@@ -2424,13 +2424,13 @@ void GLLandscape::draw (int phi, int gamma)
 //    gl->enableAlphaBlending ();
             for (xs = ax; xs < zx;)
             {
-              x = getCoord (xs);
+              x = GETCOORD(xs);
               for (ys = ay; ys < zy;)
               {
-                y = getCoord (ys);
+                y = GETCOORD(ys);
                 zz1 ++;
-                int xstep = getCoord (xs + gridstep);
-                int ystep = getCoord (ys + gridstep);
+                int xstep = GETCOORD(xs + gridstep);
+                int ystep = GETCOORD(ys + gridstep);
         //        int a = 0;
                 if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]))
         //          a = selectColor (x, y);
@@ -2703,12 +2703,12 @@ void GLLandscape::draw (int phi, int gamma)
         for (xs = ax; xs < ex;)
 //      for (x = maxx; x >= minx;)
         {
-          x = getCoord (xs);
+          x = GETCOORD(xs);
           zz = 0;
           for (ys = ay; ys <= ey;)
 //        for (y = maxy; y >= miny;)
           {
-            y = getCoord (ys);
+            y = GETCOORD(ys);
 //            if (detail [i] [i2] <= fardetail + 1)
             float tdx = camx + MAXX/2 - xs;
             float tdy = MAXX/2 - camz - ys;
@@ -2925,8 +2925,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
         for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
           for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
           {
-            int xn = getCoord (x);
-            int yn = getCoord (y);
+            int xn = GETCOORD(x);
+            int yn = GETCOORD(y);
             int dx = x - mx, dy = y - mz;
             float dist = sqrt (dx*dx + dy*dy);
             if (dist < radius)
@@ -2955,8 +2955,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
           for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
             for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
             {
-              int xn = getCoord (x);
-              int yn = getCoord (y);
+              int xn = GETCOORD(x);
+              int yn = GETCOORD(y);
               int dx = x - mx, dy = y - mz;
               float dist = sqrt (dx*dx + dy*dy);
               if (dist < radius)
@@ -2984,8 +2984,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
         for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
           for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
           {
-            int xn = getCoord (x);
-            int yn = getCoord (y);
+            int xn = GETCOORD(x);
+            int yn = GETCOORD(y);
             int dx = x - mx, dy = y - mz;
             float dist = sqrt (dx*dx + dy*dy);
             if (dist < radius)
@@ -3014,8 +3014,8 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
         for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
           for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
           {
-            int xn = getCoord (x);
-            int yn = getCoord (y);
+            int xn = GETCOORD(x);
+            int yn = GETCOORD(y);
             int dx = x - mx, dy = y - mz;
             float dist = sqrt (dx*dx + dy*dy);
             if (dist < radius)

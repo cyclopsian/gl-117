@@ -81,7 +81,7 @@ SDL_Thread *threadnet = NULL;
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_ALL;
+int debuglevel = LOG_MOST;
 int brightness = 0;
 
 SoundSystem *sound = NULL;
@@ -879,7 +879,7 @@ void game_levelInit ()
 
   fplayer->missiletype = fplayer->firstMissile ();
   initing = false;
-  lastshield = fplayer->shield;
+  lastshield = (int) fplayer->shield;
 
   fps = 30;
 
@@ -4487,7 +4487,7 @@ void game_timer (int dt)
   if (lastshield > fplayer->shield && !fplayer->ai)
   {
     sound->play (SOUND_HIT1);
-    lastshield = fplayer->shield;
+    lastshield = (int) fplayer->shield;
     vibration = 25 * timestep;
   }
 

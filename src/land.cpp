@@ -31,7 +31,7 @@
   COMMON GLOBAL FUNCTIONS
 ****************************************************************************/
 
-inline int Landscape::getCoord (int a)
+int Landscape::getCoord (int a)
 {
   return (a & MAXX_MASK);
 //  return (a>=0)? a%MAXX : MAXX-a%MAXX; // more general version
@@ -86,7 +86,7 @@ void Landscape::convolveGauss (int radius, int hmin, int hmax) // only convolve 
       summe [y] = 0;
       for (i = mincorex; i <= maxcorex; i ++)
       {
-        mx = getCoord (x - MAXCORE / 2 + i);
+        mx = GETCOORD(x - MAXCORE / 2 + i);
         my = y;
         summe [y] += core_u [i] * h [mx] [my];
       }
@@ -98,7 +98,7 @@ void Landscape::convolveGauss (int radius, int hmin, int hmax) // only convolve 
         sum = 0;
         for (i = mincorey; i <= maxcorey; i ++)
         {
-          my = getCoord (y - MAXCORE / 2 + i);
+          my = GETCOORD(y - MAXCORE / 2 + i);
           sum += core_v [i] * summe [my];
         }
         hg [x] [y] = (int) sum;
@@ -811,7 +811,7 @@ void Landscape::genDesertSurface (int hoehepc)
       const int range = 11;
       int ha [range];
       for (i3 = 0; i3 < range; i3 ++)
-        ha [i3] = h [i] [getCoord (i2 + i3 - range / 2)];
+        ha [i3] = h [i] [GETCOORD(i2 + i3 - range / 2)];
       int hmin = 65000, hmax = 0;
       for (i3 = 0; i3 < range; i3 ++)
       {

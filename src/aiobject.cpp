@@ -299,11 +299,11 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
       if (d->source->party != party) // calculate points
       {
         if (maxshield < 2000)
-          d->source->points += impact; // extra points for shooting an enemy object
+          d->source->points += (int) impact; // extra points for shooting an enemy object
       }
       else
       {
-        d->source->points -= impact; // subtract points for shooting an own object
+        d->source->points -= (int) impact; // subtract points for shooting an own object
       }
 
       if (shield <= 0)
@@ -370,7 +370,7 @@ int DynamicObj::getAngle (DynamicObj *o)
 int DynamicObj::getAngleH (DynamicObj *o)
 {
   float disttarget = distance (o);
-  return atan ((o->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
+  return (int) (atan ((o->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180));
 }
 
 // check for a looping, this is tricky :-)
@@ -2254,7 +2254,7 @@ m [0]->tl->y = target->tl->y;
         }
         else // otherwise fly to target direction
         {
-          int maw = aw > 90 ? 90 : aw;
+          int maw = aw > 90 ? 90 : (int) aw;
           maw = 90 - maw;
           rectheta = 90 - maw * intelligence / 400;
         }
@@ -2276,7 +2276,7 @@ m [0]->tl->y = target->tl->y;
         }
         else
         {
-          int maw = aw < -90 ? -90 : aw;
+          int maw = aw < -90 ? -90 : (int) aw;
           maw = -90 - maw;
           rectheta = -90 - maw * intelligence / 400;
         }
@@ -2288,7 +2288,7 @@ m [0]->tl->y = target->tl->y;
   }
   else if (id >= MISSILE1 && id <= MISSILE2) // for missiles do the following
   {
-    if (abs (aw) < 50 && disttarget > 10) // target in front and minimum distance, then no roll
+    if (fabs (aw) < 50 && disttarget > 10) // target in front and minimum distance, then no roll
       rectheta = 0;
     else // otherwise chase target
     {
@@ -2355,7 +2355,7 @@ m [0]->tl->y = target->tl->y;
   {
     if (disttarget > 2.5 + aggressivity / 100)
     {
-      if (disttarget < 50 && abs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
+      if (disttarget < 50 && fabs (aw) > 30 && manoeverthrust <= 0) // low thrust for faster heading changes in melee combat
         recthrust = maxthrust / (2 - intelligence * 0.001);
       else thrustUp (); // otherwise fly faster
     }
@@ -2370,7 +2370,7 @@ m [0]->tl->y = target->tl->y;
         thrustUp ();
       }
     }
-    if (disttarget > 50 && abs (aw) < 20) // high distance and target in front, then fly straight
+    if (disttarget > 50 && fabs (aw) < 20) // high distance and target in front, then fly straight
       rectheta = 0;
 /*    if (disttarget < 5 && abs (aw) > 50 && (target->id < FIGHTER1 || target->id > FIGHTER2)) // avoid collisions
     {
@@ -2380,7 +2380,7 @@ m [0]->tl->y = target->tl->y;
       recthrust = maxthrust;
     }*/
     if (manoeverthrust <= 0)
-      if (disttarget < 25 && abs (aw) > 160 && target->id >= TANK1) // avoid collisions
+      if (disttarget < 25 && fabs (aw) > 160 && target->id >= TANK1) // avoid collisions
       {
         manoeverthrust = 25 * timestep;
         recthrust = maxthrust;

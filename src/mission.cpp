@@ -230,7 +230,7 @@ int Mission::getScore (int missionstate, int timebonus, int fighterkills, int sh
 
 int Mission::getScore (int missionstate)
 {
-  int shieldbonus = fplayer->shield * 100 / fplayer->maxshield;
+  int shieldbonus = (int) (fplayer->shield * 100 / fplayer->maxshield);
   int timebonus = 0;
   if (timer < maxtime)
     timebonus = (maxtime - timer) * 100 / maxtime;

@@ -51,6 +51,9 @@
 // maximum Gaussian convolution kernel extent
 #define MAXCORE 10
 
+// fast coordinate cycle
+#define GETCOORD(x) (x & MAXX_MASK)
+
 // static ID values for the landscape type (array "f")
 #define GRASS 0
 #define CONIFEROUSWOODS0 1
