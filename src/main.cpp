@@ -279,28 +279,46 @@ class InitKugel
 class DynamicObj : public CSpaceObj
 {
   public:
-  int id;
-  bool controls;
-  bool active;
+  int id; // object type: FLARAK_AIR1, STATIC_TENT1, FIGHTER_SWALLOW, ...
+//  bool controls;
+  bool active; // deactivated means no AI, no collision control and so on
+  // easymodel is the ancient core of the game ;-)
+  // true means that thetha will directly alter phi! Computer AI uses this model!
+  // false means the realistic model with ailerons, elevator, rudder
   bool easymodel;
-  int ttl, immunity;
-  int impact;
-  float phi, theta, gamma, speed, acceleration, realspeed; //, height;
-  float forcex, forcez, forcey;
-  float braking, manoeverability, maxspeed;
-  float rectheta, recspeed, recheight, maxtheta, maxgamma;
-  float recgamma, nimbility;
-  float aileroneffect, ruddereffect, rolleffect;
-  int party;
-  int points, fighterkills, shipkills, tankkills, otherkills;
-  int sink;
-  bool killed;
-  Space *space;
-  DynamicObj *source;
+  int ttl; // time to live: cannon and missiles will only live a short time, missiles will sink when ttl<=0
+  int immunity; // immunity means the object cannot collide with others, needed for shooting missiles/cannon
+  int impact; // this value will be subtracted from the other objects shield when colliding
+  // Imagine a carthesian coordinate system in the landscape, the y-axis pointing up
+  float phi; // angle in x-z plane (polar coordinates)
+  float gamma; // orthogonal angle (polar coordinates)
+  float theta; // roll angle of the fighter!
+  float speed; // current thrust, not the speed itself!
+  float realspeed; // the current speed, we only want to calculate this once per time step
+  float forcex, forcez, forcey; // the force vectors (orthogonal, should be clear)
+  float braking; // far away from reality: this factorizes the last speed vector with the current conditions (see move method)
+  float manoeverability; // how fast a fighter can alter its direction
+  float nimbility; // how fast a fighter responds to alterations of recXXX
+  float maxspeed; // maximum throttle value
+  float rectheta; // roll angle the fighter/object wants to reach
+  float recspeed; // throttle the fighter/object wants to reach
+  float recheight; // height above ground the fighter wants to reach
+  float recgamma; // elevation the fighter wants to reach
+  float maxtheta; // a maximum roll angle the object may achieve, easymodel only!
+  float maxgamma; // a maximum elevation the object may achieve, easymodel only!
+  float aileroneffect; // number between 1.0 and -0.5, as diving should be less
+  float ruddereffect;
+  float rolleffect;
+  int party; // usually 0 for enemies, 1 for allieds
+  int points, fighterkills, shipkills, tankkills, otherkills; // statistics
+  int sink; // ships will not explode but sink
+  bool killed; // statistics
+  Space *space; // in which space is this object, there is only one ;-)
+  DynamicObj *source; // missiles must keep track of the object they have been fired from -> statistics
   char net [100];
 //  GLLandscape *l;
   
-  int shield, maxshield;
+  int shield, maxshield; // current and initial/maximum shield
 
   int net_write ()
   {
@@ -358,12 +376,11 @@ class DynamicObj : public CSpaceObj
     tl->z = 0; tl->x = 0;
     forcex = 0; forcez = 0; forcey = 0;
     maxspeed = 0.3; braking = 0.5; manoeverability = 0.5;
-    acceleration = maxspeed / 10;
     speed = maxspeed; recspeed = speed; recheight = 5.0;// height = 5.0;
     ttl = -1;
     shield = 1; maxshield = 1;
     immunity = 0;
-    controls = false;
+//    controls = false;
     recgamma = 180;
     id = CANNON1;
     impact = 10;
@@ -402,7 +419,7 @@ class DynamicObj : public CSpaceObj
     space->addObject (this);
   }
 
-  void toLeft ()
+/*  void toLeft ()
   {
     rectheta += manoeverability * 4;
 //  if (theta > 360.0) theta -= 360.0;
@@ -412,17 +429,17 @@ class DynamicObj : public CSpaceObj
   {
     rectheta -= manoeverability * 4;
 //    if (theta < -360.0) theta += 360.0;
-  }
+  }*/
 
   void speedUp ()
   {
-    recspeed += acceleration;
+    recspeed += maxspeed / 12;
     if (recspeed > maxspeed) recspeed = maxspeed;
   }
 
   void speedDown ()
   {
-    recspeed -= acceleration;
+    recspeed -= maxspeed / 12;
     if (recspeed < maxspeed / 2) recspeed = maxspeed / 2;
   }
 
@@ -433,6 +450,7 @@ class DynamicObj : public CSpaceObj
     return sqrt (dx * dx + dz * dz);
   }
 
+  // check whether the object is exploding or sinking and deactivate if necessary
   void checkExplosion ()
   {
     if (explode > 0)
@@ -478,6 +496,7 @@ class DynamicObj : public CSpaceObj
     }
   }
 
+  // check the objects shield value and explode/sink if necessary
   void checkShield ()
   {
     if (shield <= 0)
@@ -503,6 +522,7 @@ class DynamicObj : public CSpaceObj
 //    printf ("\nshield=%d", shield); fflush (stdout);
   }
   
+  // check whether the object collides on the ground and alter gamma and y-translation
   void crashGround ()
   {
     if ((id >= SHIP1 && id <= SHIP2) || (id >= FLAK1 && id <= FLAK2) || id >= STATIC || (id >= TANK1 && id <= TANK2))
@@ -530,9 +550,12 @@ class DynamicObj : public CSpaceObj
       shield -= 1;
 //      shield += (int) height - 2;
     }
+    // restrict to a maximum height, we want an action game!!!
     if (height > 50) tl->y = l->getHeight (tl->x, tl->z) + 50;
   }
   
+  // check for collision, simplified model, each model is surrounded by a cube
+  // this works pretty well, but we must use more than one model for complex models or scenes
   void collide (DynamicObj *d) // d must be the medium (laser, missile)
   {
     if (immunity > 0 || d->immunity > 0) return;
@@ -540,7 +563,7 @@ class DynamicObj : public CSpaceObj
     float z = d->zoom > zoom ? d->zoom : zoom;
     if ((id >= MISSILE1 && id <= MISSILE2) || (d->id >= MISSILE1 && d->id <= MISSILE2))
     {
-      z *= 2;
+      z *= 2; // missiles need not really hit the fighter, but will explode near it
     }
     if ((id >= SHIP1 && id <= SHIP2) || (d->id >= SHIP1 && d->id <= SHIP2))
       z *= 0.3;
@@ -557,12 +580,12 @@ class DynamicObj : public CSpaceObj
       shield -= d->impact;
       d->shield -= impact;
 //      printf (" c(%d,%d)=>s(%d,%d)\n", id, d->id, shield, d->shield);
-      if (d->source != NULL && active)
+      if (d->source != NULL && active) // only for missiles/cannons
       {
         if (d->source->party != party && maxshield < 2000) // calculate points
-          d->source->points += impact;
+          d->source->points += impact; // extra points for shooting an enemy object
         else
-          d->source->points -= impact;
+          d->source->points -= impact; // subtract points for shooting an own object
         
         if (d->source->party != party && active && draw && !killed)
           if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
@@ -587,7 +610,7 @@ class DynamicObj : public CSpaceObj
   void setExplosion (float maxzoom, int len)
   {
     int i;
-    for (i = 0; i < maxexplosion; i ++)
+    for (i = 0; i < maxexplosion; i ++) // search a free explosion instance
       if (explosion [i]->ttl <= 0)
         break;
     if (i >= maxexplosion) i = 0;
@@ -597,13 +620,14 @@ class DynamicObj : public CSpaceObj
   void setBlackSmoke (float maxzoom, int len)
   {
     int i;
-    for (i = 0; i < maxblacksmoke; i ++)
+    for (i = 0; i < maxblacksmoke; i ++) // search a free blacksmoke instance
       if (blacksmoke [i]->ttl <= 0)
         break;
     if (i >= maxblacksmoke) i = 0;
     blacksmoke [i]->setBlackSmoke (tl->x, tl->y, tl->z, phi, maxzoom, len);
   }
 
+  // return heading difference towards enemy
   int getAngle (DynamicObj *o)
   {
     float dx2 = o->tl->x - tl->x, dz2 = o->tl->z - tl->z;
@@ -622,6 +646,7 @@ class DynamicObj : public CSpaceObj
     return aw;
   }
 
+  // check for a looping, this is tricky :-)
   bool checkLooping ()
   {
     if (gamma > 270)
@@ -660,17 +685,22 @@ class DynamicObj : public CSpaceObj
     }
     if (!active) return;
 
-    if (id >= STATIC)
+    if (id >= STATIC) // only buildings, static objects
     {
       if (id == STATIC_TENT1) theta = 178;
+      // set the correct angles to diplay
       rot->setAngles ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
       checkShield ();
-      return;
+      return; // and exit this function (optimization)
     }
 
-    int theta0 = (int) theta;
+    int theta0 = (int) theta; // get a normalized theta, as our sine/cosi tables only reach from 0 to 359
     while (theta0 < 0) theta0 += 360;
     while (theta0 > 360) theta0 -= 360;
+    // the core of directional alterations and force calculations:
+    // easymodels change heading due to roll angle
+    // this may seem complete nonsense for fighters, but it is just a simplification!!!
+    // angle / aileron = constant, thats enough for a simple AI
     if (easymodel)
     {
       if (id >= FLAK1 && id <= FLAK2)
@@ -684,11 +714,12 @@ class DynamicObj : public CSpaceObj
         phi += sine [(int) theta0] * manoeverability * 10.0 * maxspeed / div;
       }
     }
-    else
+    else // now this is much more general:
     {
       int vz = 1;
       if (gamma < 90 || gamma > 270)
         vz = -1;
+      // change heading and elevation due to ailerons and rudder
       if (maxspeed + speed <= -0.00001 || maxspeed + speed >= 0.00001)
       {
         phi += vz * sine [(int) theta0] * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
@@ -696,6 +727,7 @@ class DynamicObj : public CSpaceObj
         phi += -vz * cosi [(int) theta0] * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
         gamma += sine [(int) theta0] * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
       }
+      // change roll due to roll ;-)
       if (rolleffect)
       {
         rectheta += rolleffect;
@@ -704,7 +736,7 @@ class DynamicObj : public CSpaceObj
     if (phi < 0) phi += 360.0;
     else if (phi >= 360.0) phi -= 360.0;
 
-    if (easymodel)
+    if (easymodel) // easymodel restrictions
     {
       if (rectheta > maxtheta) rectheta = maxtheta;
       else if (rectheta < -maxtheta) rectheta = -maxtheta;
@@ -719,34 +751,35 @@ class DynamicObj : public CSpaceObj
       { rectheta -= 360; theta -= 360; }
     }
 
-    if (controls)
+/*    if (controls)
     {
-    }
+    }*/
 
-    if (recspeed > maxspeed)
+    if (recspeed > maxspeed) // check maximum throttle
       recspeed = maxspeed;
-    if (recspeed > speed)
-      speed += acceleration / 5;
+    if (recspeed > speed) // alter throttle effect slowly
+      speed += maxspeed / 60;
     else if (recspeed < speed)
-      speed -= acceleration / 5;
+      speed -= maxspeed / 60;
 
+    // axis pointing through the fighter's nose
     CVector3 vaxis (cosi [(int) gamma] * sine [(int) phi], sine [(int) gamma], cosi [(int) gamma] * cosi [(int) phi]);
 
-    // Throttle
+    // add throttle force
     forcez += speed * vaxis.z;
     forcex += speed * vaxis.x;
     forcey -= speed * vaxis.y;
 
     if (id >= FIGHTER1 && id <= FIGHTER1 + 50)
     {
-      // Normal
-      int ngamma = (int) gamma + 90;
+      // lift force
+      int ngamma = (int) gamma + 90; // get normalized gamma (0 <= ngamma < 360)
       if (ngamma >= 360) ngamma -= 360;
       else if (ngamma < 0) ngamma += 360;
       CVector3 vx (cosi [ngamma] * sine [(int) phi], sine [ngamma], cosi [ngamma] * cosi [(int) phi]);
       CVector3 x1;
       x1.take (&vx);
-      int mytheta = (int) -theta;
+      int mytheta = (int) -theta; // get normalized theta (0 <= mytheta < 360)
       while (mytheta < 0) mytheta += 360;
       while (mytheta >= 360) mytheta -= 360;
       x1.x *= cosi [mytheta];
@@ -758,23 +791,23 @@ class DynamicObj : public CSpaceObj
       vx.z *= sine [mytheta];
       vx.add (&x1);
       float addy = speed * vx.x * 0.3;
-      if (addy >= -100 && addy <= 100)
+      if (addy >= -100 && addy <= 100) // valid values??? addy should be < 1.0
       {
-        forcex += speed * vx.x * 0.35;
+        forcex += speed * vx.x * 0.35; // add the lifting force
         forcey -= speed * vx.y * 0.35;
         forcez += speed * vx.z * 0.35;
 
-        // Weight
+        // weight force (directly subtract)
         forcey -= 0.06;
       }
 //      cosi [(int) phi]
     }
 
-    // Drag
+    // drag force simulated by just halving the vector, this is not realistic, yet easy to play
     forcex *= braking; forcez *= braking; forcey *= braking;
 
     bool stop = false;
-    if (id >= TANK1 && id <= TANK2)
+    if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
     {
       float newy = l->getExactHeight (tl->x + forcex, tl->z + forcez) + zoom / 2;
       if (fabs (newy - tl->y) > 0.025)
@@ -784,13 +817,14 @@ class DynamicObj : public CSpaceObj
     }
     if (!stop)
     {
-      tl->x += forcex;
+      tl->x += forcex; // add our vector to the translation
       tl->z += forcez;
       tl->y += forcey;
     }
 //  tl->y = l->getHeight (tl->x, tl->z)+5;
 //  gamma = 180;
 
+    // objects moving on the ground should always change their elevation due to the surface
     if (id >= TANK1 && id <= TANK2 && speed > 0 && !stop)
     {
       float newy = l->getExactHeight (tl->x, tl->z) + zoom / 2;
@@ -805,28 +839,30 @@ class DynamicObj : public CSpaceObj
 
     if (id != ASTEROID)
     {
+      // set angles to correctly display the object
       rot->setAngles ((short) (90 + gamma - 180), (short) theta + 180, (short) -phi);
     }
-    else
+    else // asteroids should rotate around their center of weight, as we must not change theta/gamma, we do this here
     {
-      ttl --;
+      ttl --; // we use the ttl value as timer, for other methods ttl<0 is the same as ttl=-1
       if (ttl <= -360) ttl = -1;
       int rot1 = (int) (sin ((zoom - 1.3) * 8) * 4);
       int rot2 = (int) (cos ((zoom - 1.3) * 8) * 4);
       rot->setAngles ((short) (90 + gamma + ttl * rot1 - 180), (short) theta + ttl * rot2 + 180, (short) -phi);
     }
 
+    // calculate the objects real speed only once
     realspeed = sqrt (forcex * forcex + forcez * forcez);
 
-    if (ttl > 0) ttl --;
+    if (ttl > 0) ttl --; // decrease time to live
     if (ttl == 0)
     {
-      if (id >= MISSILE1 && id <= MISSILE2) recheight = -10;
-      else deactivate ();
+      if (id >= MISSILE1 && id <= MISSILE2) recheight = -10; // missiles drop
+      else deactivate (); // cannon shots vanish
     }
-    checkShield ();
-    crashGround ();
-    if (immunity > 0) immunity --;
+    checkShield (); // check shield issues
+    crashGround (); // check ground collision
+    if (immunity > 0) immunity --; // decrease immunity
   }
 
 };
@@ -863,7 +899,7 @@ class AIObj : public DynamicObj
     active = true;
     draw = true;
     target = NULL;
-    controls = true;
+//    controls = true;
     dtheta = 0;
     dgamma = 0;
     id = MISSILE1;
@@ -1023,7 +1059,6 @@ class AIObj : public DynamicObj
     }
     if (id >= FIGHTER1 && id <= FIGHTER2)
     {
-      acceleration = maxspeed / 12.0;
       recspeed = maxspeed / 2.0;
       shield = maxshield;
       speed = recspeed = maxspeed / 2;
@@ -1099,7 +1134,6 @@ class AIObj : public DynamicObj
     if (id == SHIP_CRUISER)
     {
       zoom = 4.0;
-      acceleration = 0;
       maxspeed = 0;
       speed = 0;
       maxgamma = 0;
@@ -1112,7 +1146,6 @@ class AIObj : public DynamicObj
     else if (id == SHIP_DESTROYER1)
     {
       zoom = 2.0;
-      acceleration = 0;
       maxspeed = 0;
       speed = 0;
       maxgamma = 0;
