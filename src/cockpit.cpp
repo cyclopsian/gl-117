@@ -776,3 +776,4 @@ void Cockpit::drawThrustBar()
 }
 
 #endif
+//vim:sw=2 cino=c5,:.4s,=.2s,(0,u0,g0,h2,+2
