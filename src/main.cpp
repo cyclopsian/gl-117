@@ -66,7 +66,7 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
-float nearclippingplane = 0.15; // do NOT lower this!
+float nearclippingplane = 0.2; // do NOT lower this!
 
 bool sunblinding=false;
 
@@ -3642,8 +3642,8 @@ void save_config ()
   cf->write (" quality", quality);
   cf->writeText ("# Far clipping plane: 20..100 (default=50)");
   cf->write (" view", (int) view);
-//  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
-//  cf->write (" dithering", dithering);
+  cf->writeText ("# Dithering: 0=off, 1=on (default=0)");
+  cf->write (" dithering", dithering);
 #ifdef HAVE_SDL_MIXER
   cf->writeText ("# Sound volume: 0..100 (default=100) per cent");
   cf->write (" sound", (int) volumesound);
@@ -3728,9 +3728,9 @@ int load_config ()
     view = 100;
   }
 
-/*  str = cf->getString (ret, "dithering");
-  dithering = (str == NULL)? 0 : atoi(str);
-  if (dithering) dithering = 1;*/
+  str = cf->getString (ret, "dithering");
+  dithering = (str == NULL) ? 1 : atoi (str);
+  if (dithering) dithering = 1;
 
 #ifdef HAVE_SDL_MIXER
   str = cf->getString (ret, "sound");
@@ -6290,14 +6290,14 @@ void menu_mouse (int button, int state, int x, int y)
           }
         }
       }
-/*      else if (ry >= 0.28 && ry <= 0.33)
+      else if (ry >= 0.28 && ry <= 0.33)
       {
         menuitemselected = 12;
         if (state == MOUSE_DOWN)
         {
           dithering = (dithering == 0 ? 1 : 0);
         }
-      }*/
+      }
       else if (ry >= 0.34 && ry <= 0.39)
       {
         menuitemselected = 13;
@@ -6803,13 +6803,13 @@ void menu_display ()
       font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
-/*    strcpy (buf, "DITHERING: ");
+    strcpy (buf, "DITHERING: ");
     if (dithering) strcat (buf, "ON");
     else strcat (buf, "OFF");
     if (menuitemselected == 12)
       font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
-      font1->drawText (textx2, yt -= 2, -2, buf);*/
+      font1->drawText (textx2, yt -= 2, -2, buf);
     yt -= 2;
     strcpy (buf, "CONTROLS: ");
     if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
@@ -6932,6 +6932,7 @@ void finish_display ()
 }
 
 int vibration = 0;
+int starttime;
 
 void game_display ()
 {
@@ -6941,8 +6942,8 @@ void game_display ()
   if (debug)
     printf ("\nentering myDisplayFunc()"); fflush (stdout);
 
-  if (quality > 0) dithering = 1;
-  else dithering = 0;
+//  if (quality > 0) dithering = 1;
+//  else dithering = 0;
   if (dithering) glEnable(GL_DITHER);
   else glDisable(GL_DITHER);
 
@@ -7489,13 +7490,33 @@ if (quality > 0)
     font1->drawText (-25, 25, -3.5, buf, &col);
   }
   else
+  {
     font1->drawText (-25, 25, -3.5, "FPS: PERFECT", &col);
-  if (fps <= 20)
+  }
+  bool write = false;
+  if (firststart)
+  {
+    int akttime;
+#ifndef USE_GLUT
+    akttime = SDL_GetTicks ();
+#else
+    akttime = glutGet (GLUT_ELAPSED_TIME);
+#endif
+    if (akttime - starttime < 15000)
+    {
+      CColor colorred (255, 0, 0, 255);
+      font1->drawTextCentered (0, -8, -2, "PLEASE WAIT WHILE", &colorred);
+      font1->drawTextCentered (0, -9, -2, "ADJUSTING QUALITY", &colorred);
+      write = true;
+    }
+  }
+  if (fps <= 20 && !write)
   {
     CColor colorred (255, 0, 0, 255);
     font1->drawTextCentered (0, -8, -2, "FPS TOO LOW", &colorred);
     font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
   }
+
 
 /*  if (missionstate == 1)
   {
@@ -8028,7 +8049,6 @@ int net_thread_main (void *data)
   }
 }
 
-int starttime;
 float lastfps = -1;
 
 void menu_timer ()
@@ -8053,29 +8073,41 @@ void menu_timer ()
   akttime = glutGet (GLUT_ELAPSED_TIME);
 #endif
   if (firststart)
-    if (akttime - starttime < 10000)
+    if (akttime - starttime < 15000)
+    {
       if (lastfps != fps)
       {
         lastfps = fps;
         if (fps >= 29)
         {
+          if (view < quality * 10 + 50) view += 10;
+          else { quality ++; view = quality * 10 + 20; }
+/*
           if (view <= 40) view += 10; // view 50 erreichen
+          else if (quality <= 1) quality ++; // quality 2 erreichen
+          else if (view <= 60) view += 10; // view 70 erreichen
           else if (quality <= 3) quality ++; // quality 4 erreichen
           else if (view <= 60) view += 10; // view 70 erreichen
           else if (quality <= 4) quality ++; // quality 5 erreichen
           else if (view <= 90) view += 10; // view 100 erreichen
+*/
         }
         else if (fps <= 23)
         {
+          if (view > quality * 10 + 20) view -= 10;
+          else { quality --; view = quality * 10 + 50; }
+/*
           if (quality >= 5) quality --; // quality 4 erreichen
           else if (view >= 60) view -= 10; // view 50 erreichen
           else if (quality >= 3) quality --; // quality 2 erreichen
           else if (view >= 50) view -= 10; // view 40 erreichen
           else if (quality >= 1) quality --; // quality 0 erreichen
           else if (view >= 30) view -= 10; // view 20 erreichen
+*/
         }
         menu_reshape ();
       }
+    }
 #ifdef USE_GLUT
   glutPostRedisplay();
 #else
