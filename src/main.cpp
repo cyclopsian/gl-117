@@ -45,7 +45,7 @@ TODO:
 #include "configuration/Dirs.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
-#include "net.h"
+#include "net/net.h"
 #include "math/Math.h"
 #include "cockpit.h"
 #include "configuration/Configuration.h"
@@ -54,8 +54,6 @@ TODO:
 #include "logging/Logging.h"
 
 #include <ctype.h>
-
-const int timestep = 34;
 
 int mousex, mousey;
 
@@ -66,6 +64,9 @@ const int maxjoysticks = 10;
 int debug = 1;
 bool multiplayer = false;
 //bool isserver = false;
+
+Server *server;
+Client *client;
 
 //float cam.x = 0, cam.y = 0, cam.z = 0
 float camphi = 0, camgamma = 0, camtheta = 0;
@@ -89,8 +90,6 @@ float nearclippingplane = 0.25; // do NOT lower this!
 bool sunblinding = false;
 
 //Dirs *dirs;
-Server *server = NULL;
-Client *client = NULL;
 
 /*#ifdef HAVE_SDL
 SDL_Thread *threadnet = NULL;
@@ -403,7 +402,7 @@ int getMedal (int score)
   return -1;
 }
 
-void gl117_rotateColors (int inittimer_gl117)
+/*void gl117_rotateColors (int inittimer_gl117)
 {
   int i;
   for (i = 0; i < model_gl117.numObjects; i ++)
@@ -415,7 +414,7 @@ void gl117_rotateColors (int inittimer_gl117)
       model_gl117.object [i]->vertex [i2].color.c [2] = 100;
     }
   }
-}
+}*/
 
 void adjustBrightness ()
 {
@@ -1083,7 +1082,7 @@ void switch_stats ()
   game = GAME_STATS;
   statsitemselected = 0;
   int lastrank = pilots->pilot [pilots->aktpilot]->ranking;
-  (void) pilots->pilot [pilots->aktpilot]->getRank ();
+  (void) pilots->pilot [pilots->aktpilot]->getRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1);
   ispromoted = false;
   if (lastrank < pilots->pilot [pilots->aktpilot]->ranking)
     ispromoted = true;
@@ -2298,7 +2297,7 @@ void mission_display ()
   }
   
   font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", *col);
-  strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank ());
+  strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1));
   strcat (buf, " ");
   strcat (buf, pilots->pilot [pilots->aktpilot]->name);
   font2->drawText ((textx + 1.5) / fontscale, (piloty - 0.8) / fontscale, -2, buf, *col);
@@ -2766,7 +2765,7 @@ void stats_display ()
     yf = -6;
     font1->drawTextCentered (0, yf, zf, "PROMOTED TO", *color);
     yf -= 1.5;
-    sprintf (buf, "%s", p->getRank ());
+    sprintf (buf, "%s", p->getRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1));
     font1->drawTextCentered (0, yf, zf, buf, *color);
     drawRank (-11, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
     drawRank (7, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
@@ -5881,11 +5880,11 @@ void setpilotstext ()
 {
   char buf [64];
   int i;
-  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (), pilots->pilot [pilots->aktpilot]->name);
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [pilots->aktpilot]->name);
   ((Label *) submenu [0]->components [1])->setText (buf);
   for (i = 0; i < pilots->aktpilots; i ++)
   {
-    sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (), pilots->pilot [i]->name);
+    sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [i]->name);
     ((Label *) submenu [0]->components [i + 2])->setText (buf);
   }
   for (; i < 5; i ++)
@@ -6552,7 +6551,7 @@ void createMenu ()
   submenu [0]->add (label);
   yf -= yfstep;
 
-  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (), pilots->pilot [pilots->aktpilot]->name);
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [pilots->aktpilot]->name);
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   submenu [0]->add (label);
@@ -6561,7 +6560,7 @@ void createMenu ()
   for (i = 0; i < 5; i ++)
   {
     if (i < pilots->aktpilots)
-      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (), pilots->pilot [i]->name);
+      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [i]->name);
     else
       sprintf (buf, "N/A");
     button = new Button (buf);

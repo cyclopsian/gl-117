@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mission.h"
-#include "main.h"
+//#include "main.h"
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"

@@ -36,6 +36,7 @@
 Configuration conf;
 
 // definition of global variables needed by basic packages
+int timestep = 34;
 int quality = 3;
 float view = 50.0;
 int antialiasing = 1;
@@ -57,7 +58,7 @@ int volumemusic = 100;
 int dithering = 1;
 int dynamiclighting = 1;
 int fullscreen = 1;
-int lighting; // 1=on, 0=off (obsolete)
+int lighting = 1; // 1=on, 0=off (obsolete)
 
 int difficulty = 1; // 0=easy, 1=normal, 2=hard
 int physics = 0; // 0=action, 1=realistic

@@ -41,8 +41,11 @@ extern char *message;
 class Client
 {
   public:
+
   bool isready;
+
   Client();
+  
   bool getServer(char *hostname, char *name);
   char *name;
   void sendMessage (char *buf, int len);
@@ -59,7 +62,9 @@ class Client
 class Server
 {
   public:
+
   bool isready;
+
 #ifdef HAVE_SDL_NET
   typedef struct
   {
@@ -68,7 +73,9 @@ class Server
     int id;
   } MyClient;
 #endif
+
   Server();
+
   char *name;
   int getMessage(int ip_client, char *buf);
   int getClientFromID(int id_client);
@@ -91,8 +98,5 @@ class Server
   SDLNet_SocketSet set;
 #endif
 };
-
-extern Server *server;
-extern Client *client;
 
 #endif

@@ -44,7 +44,7 @@
 #include "effects/Effects.h" // ok
 #include "sound/SoundSystem.h" // ok
 #include "configuration/Dirs.h" // ok
-#include "pilots.h" // ok
+#include "pilot/Pilot.h" // ok
 
 //extern Dirs *dirs; ///< paths to directories with game data or saves
 extern Font *font1, *font2;

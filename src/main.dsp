@@ -390,6 +390,46 @@ SOURCE=.\configuration\Dirs.cpp
 SOURCE=.\configuration\Dirs.h
 # End Source File
 # End Group
+# Begin Group "net"
+
+# PROP Default_Filter "*"
+# Begin Source File
+
+SOURCE=.\net\Client.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\net\net.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\net\net.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\net\Server.cpp
+# End Source File
+# End Group
+# Begin Group "pilot"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\pilot\Pilot.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\pilot\Pilot.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pilot\PilotList.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\pilot\TeamPilot.cpp
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\aiobject.cpp
@@ -429,22 +469,6 @@ SOURCE=.\mission.cpp
 # Begin Source File
 
 SOURCE=.\mission.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\net.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\net.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\pilots.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\pilots.h
 # End Source File
 # End Target
 # End Project

@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include "cockpit.h"
 #include "main.h"
-#include "pilots.h"
+#include "pilot/Pilot.h"
 #include "math/Math.h"
 #include "mission.h"
 #include "opengl/GlPrimitives.h"
@@ -35,6 +35,8 @@
 
 #define TRIANGLE_BLIP 1
 #define SQUARE_BLIP   2
+
+
 
 Cockpit::Cockpit ()
 {
