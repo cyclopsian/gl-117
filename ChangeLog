@@ -1,0 +1,63 @@
+Version 0.6:
+	- two new missions (one still missing)
+	- list of pilots and fighter
+	- adjusted (easier) missions
+	- improved mouse and joystick interface
+	- better graphics detection system
+
+Version 0.5.5:
+	- two new missions
+	- introduced three difficulty levels
+	- graphics auto detection at first startup
+	- bugfixes
+
+Version 0.5:
+	- lots of new missions
+	- one new soundtrack
+	- "make install" now available for root (linux)
+	- player specific data is stored to the home dir (linux)
+	- lots of minor improvements
+
+Version 0.4.5:
+	- replaced missions by the first seven official missions
+	- added documentation
+	- important bugfixes
+
+Version 0.4:
+	- definition of pilots and stats
+	- better interface: keyboard and mouse, try out the tutorial
+	- nicer fonts
+	- added simple desert landscape
+	- bugfixes and minor updates
+
+Version 0.3.5:
+	- rearranged source code
+	- nicer Intro
+	- two new bombers
+	- advanced missile AI and different missile types
+	- replaced font
+	- updated configure.in
+	- new "standby.s3m"
+	- some bugfixes
+
+Version 0.3:
+	- added audio volume control (only SDL_mixer)
+	- enabled rolling and loopings
+	- added moon terrain
+	- added canyon
+	- added cruiser
+	- visual improvements
+	- new demo missions
+
+Version 0.2:
+	- SDL is now optional
+	- added SDL mixer support, multi-cannel sound
+	- simple background music (tracker modules)
+	- added lightning/thunderstorm
+	- added air defence
+
+Version 0.1:
+	- first public release
+	- two simple demo missions
+	- some sound samples
+	- joystick support

@@ -1,0 +1,312 @@
+/*
+    GL-117
+    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+
+    This file is part of GL-117.
+
+    GL-117 is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    GL-117 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GL-117; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/* This file handles all pilots data. */
+
+#ifndef IS_PILOTS_H
+
+#include "pilots.h"
+
+TeamPilot::TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills)
+{
+  this->ranking = ranking;
+  strcpy (this->name, name);
+  this->intelligence = intelligence;
+  this->precision = precision;
+  this->aggressivity = aggressivity;
+  this->fighterkills = fighterkills;
+}
+
+void TeamPilot::flyMission (int averagekills)
+{
+  float f = (float) (intelligence + precision + aggressivity);
+  f /= 1000;
+  f = 1.0F - f;
+  f *= (float) averagekills;
+  if (f < 0) f = 0;
+  fighterkills += (int) f;
+}
+
+char *TeamPilot::getRank ()
+{
+  if (ranking == 0) return "2ND AIRMAN";
+  else if (ranking == 1) return "1ST AIRMAN";
+  else if (ranking == 2) return "2ND LIEUTNANT";
+  else if (ranking == 3) return "1ST LIEUTNANT";
+  else if (ranking == 4) return "CAPTAIN";
+  else if (ranking == 5) return "MAJOR";
+  else if (ranking == 6) return "LIEUTNANT COLONEL";
+  else return "COLONEL";
+}
+
+char *TeamPilot::getName ()
+{
+  strcpy (fullname, getRank ());
+  strcat (fullname, " ");
+  strcat (fullname, name);
+  return fullname;
+}
+
+void TeamPilot::load (FILE *in)
+{
+  fread (&ranking, sizeof (int), 1, in);
+  int len;
+  fread (&len, sizeof (int), 1, in);
+  if (len > 50) return;
+  fread (name, sizeof (char), len, in);
+  fread (&intelligence, sizeof (int), 1, in);
+  fread (&precision, sizeof (int), 1, in);
+  fread (&aggressivity, sizeof (int), 1, in);
+  fread (&fighterkills, sizeof (int), 1, in);
+}
+
+void TeamPilot::save (FILE *out)
+{
+  fwrite (&ranking, sizeof (int), 1, out);
+  int len = strlen (name);
+  fwrite (&len, sizeof (int), 1, out);
+  fwrite (name, sizeof (char), len, out);
+  fwrite (&intelligence, sizeof (int), 1, out);
+  fwrite (&precision, sizeof (int), 1, out);
+  fwrite (&aggressivity, sizeof (int), 1, out);
+  fwrite (&fighterkills, sizeof (int), 1, out);
+}
+
+
+
+void Pilot::load ()
+{
+  int i;
+  for (i = 0; i < maxpilotdata; i ++)
+  {
+    mission_state [i] = 0;
+    mission_time [i] = 0;
+    mission_fighterkills [i] = 0;
+    mission_shipkills [i] = 0;
+    mission_tankkills [i] = 0;
+    mission_otherkills [i] = 0;
+    mission_shield [i] = 0;
+    mission_points [i] = 0;
+    mission_score [i] = 0;
+  }
+  if (tp == NULL)
+  {
+    tp = new TeamPilot *[11];
+    tp [0] = new TeamPilot (5, "PRIMETIME", 200, 20, 100, 25);
+    tp [1] = new TeamPilot (2, "HEPTARGON", 80, 200, 300, 5);
+    tp [2] = new TeamPilot (2, "LARA", 200, 100, 0, 10);
+    tp [3] = new TeamPilot (7, "SHARK", 20, 20, 50, 35);
+    tp [4] = new TeamPilot (3, "BOSS", 250, 150, 100, 12);
+    tp [5] = new TeamPilot (1, "DR DOOM", 300, 150, 0, 2);
+    tp [6] = new TeamPilot (4, "SHADOW", 100, 200, 300, 16);
+    tp [7] = new TeamPilot (6, "MATRIX", 0, 0, 60, 28);
+    tp [8] = new TeamPilot (3, "FIREBIRD", 250, 50, 100, 8);
+    tp [9] = new TeamPilot (5, "THUNDER", 150, 100, 50, 20);
+    tp [10] = new TeamPilot (0, "PLAYER", 0, 0, 0, 0);
+  }
+
+  char buf [4096];
+  strcpy (buf, dirs->getSaves (name));
+//    strcat (buf, name);
+  FILE *in = fopen (buf, "rb");
+  if (in == NULL)
+  {
+    fprintf (stderr, "\nWarning: Could not load pilot!");
+    return;
+  }
+  char saveversion [20];
+  fread (saveversion, sizeof (char), strlen (SAVEVERSION), in);
+  fread (mission_state, sizeof (int), maxpilotdata, in);
+  fread (mission_time, sizeof (int), maxpilotdata, in);
+  fread (mission_fighterkills, sizeof (int), maxpilotdata, in);
+  fread (mission_shipkills, sizeof (int), maxpilotdata, in);
+  fread (mission_tankkills, sizeof (int), maxpilotdata, in);
+  fread (mission_otherkills, sizeof (int), maxpilotdata, in);
+  fread (mission_shield, sizeof (int), maxpilotdata, in);
+  fread (mission_points, sizeof (int), maxpilotdata, in);
+  fread (mission_score, sizeof (int), maxpilotdata, in);
+  for (i = 0; i < 10; i ++)
+    tp [i]->load (in);
+  fclose (in);
+}
+
+void Pilot::save ()
+{
+  int i;
+  char buf [4096];
+  strcpy (buf, dirs->getSaves (name));
+//    strcat (buf, name);
+  FILE *out = fopen (buf, "wb");
+  if (out == NULL)
+  {
+    fprintf (stderr, "\nWarning: Could not write pilot!");
+    return;
+  }
+  fwrite (SAVEVERSION, sizeof (char), strlen (SAVEVERSION), out);
+  fwrite (mission_state, sizeof (int), maxpilotdata, out);
+  fwrite (mission_time, sizeof (int), maxpilotdata, out);
+  fwrite (mission_fighterkills, sizeof (int), maxpilotdata, out);
+  fwrite (mission_shipkills, sizeof (int), maxpilotdata, out);
+  fwrite (mission_tankkills, sizeof (int), maxpilotdata, out);
+  fwrite (mission_otherkills, sizeof (int), maxpilotdata, out);
+  fwrite (mission_shield, sizeof (int), maxpilotdata, out);
+  fwrite (mission_points, sizeof (int), maxpilotdata, out);
+  fwrite (mission_score, sizeof (int), maxpilotdata, out);
+  for (i = 0; i < 10; i ++)
+    tp [i]->save (out);
+  fclose (out);
+}
+
+char *Pilot::getRank ()
+{
+  int i, sum = 0;
+  for (i = 0; i < 100; i ++)
+  {
+    if (mission_score [i] > 0 && mission_score [i] < 2000)
+      sum += mission_score [i];
+  }
+  if (sum < 500)
+  { ranking = 0; return "2ND AIRMAN"; }
+  else if (sum < 1000)
+  { ranking = 1; return "1ST AIRMAN"; }
+  else if (sum < 1500)
+  { ranking = 2; return "2ND LIEUTNANT"; }
+  else if (sum < 2500)
+  { ranking = 3;  return "1ST LIEUTNANT"; }
+  else if (sum < 3500)
+  { ranking = 4;  return "CAPTAIN"; }
+  else if (sum < 4500)
+  { ranking = 5;  return "MAJOR"; }
+  else if (sum < 5500)
+  { ranking = 6;  return "LIEUTNANT COLONEL"; }
+  else
+  { ranking = 7; return "COLONEL"; }
+}
+
+Pilot::Pilot (char *name)
+{
+  tp = NULL;
+  strcpy (this->name, name);
+  load ();
+}
+
+
+
+void PilotList::load (char *fname)
+{
+  char buf [16];
+  int i;
+  FILE *in = fopen (fname, "rb");
+  if (in == NULL)
+  {
+    fprintf (stderr, "\nWarning: Could not load saves/pilots!");
+    aktpilots = 0;
+    add ("PLAYER");
+    return;
+  }
+  fgets (buf, 16, in);
+  aktpilots = atoi (buf);
+  fgets (buf, 16, in);
+  aktpilot = atoi (buf);
+  int z = 0;
+  while (fgets (buf, 16, in) && z < maxpilots)
+  {
+    for (i = 0; i < (int) strlen (buf); i ++)
+      if (buf [i] == '\n')
+        buf [i] = '\0';
+    pilot [z] = new Pilot (buf);
+    z ++;
+  }
+  fclose (in);
+}
+
+void PilotList::save (char *fname)
+{
+  char buf [256];
+  int i;
+  
+  FILE *out = fopen (fname, "wb");
+  if (out == NULL)
+  {
+    fprintf (stderr, "Warning: Could not write saves/pilots!");
+    return;
+  }
+  sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);
+  fwrite (buf, 1, strlen (buf), out);
+  for (i = 0; i < aktpilots; i ++)
+  {
+    sprintf (buf, "%s\n", pilot [i]->name);
+    fwrite (buf, 1, strlen (buf), out);
+  }
+  fclose (out);
+  
+  for (i = 0; i < aktpilots; i ++)
+  {
+    pilot [i]->save ();
+  }
+}
+
+PilotList::PilotList (char *fname)
+{
+  int i;
+  for (i = 0; i < maxpilots; i ++)
+    pilot [i] = NULL;
+  load (fname);
+}
+
+PilotList::~PilotList ()
+{
+  int i;
+  for (i = 0; i < aktpilots; i ++)
+  {
+    if (pilot [i] != NULL)
+      delete pilot [i];
+  }
+}
+
+void PilotList::rm ()
+{
+  int i;
+  if (pilot [aktpilot] != NULL)
+  {
+    char buf [4096];
+    strcpy (buf, dirs->getSaves (pilot [aktpilot]->name));
+    remove (buf);
+    delete pilot [aktpilot];
+    pilot [aktpilot] = NULL;
+  }
+  for (i = aktpilot; i < aktpilots; i ++)
+    pilot [i] = pilot [i + 1];
+  pilot [aktpilots] = NULL;
+  aktpilots --;
+  if (aktpilots < 0) aktpilots = 0;
+  aktpilot = 0;
+}
+
+void PilotList::add (char *name)
+{
+  if (aktpilots >= maxpilots) return;
+  aktpilot = aktpilots;
+  pilot [aktpilot] = new Pilot (name);
+  aktpilots ++;
+}
+
+#endif
