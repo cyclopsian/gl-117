@@ -1513,7 +1513,7 @@ void AIObj::targetNext (AIObj **f)
 
 void AIObj::targetPrevious (AIObj **f)
 {
-  int i, lastfighter = 0;
+/*  int i, lastfighter = 0;
 //    float d = 10000;
   if (target == NULL) target = f [0];
   for (i = maxfighter - 1; i >= 0; i --)
@@ -1529,6 +1529,23 @@ void AIObj::targetPrevious (AIObj **f)
   if (i >= 0) i = lastfighter;
   if (target == this) i --;
   if (i >= 0) i = lastfighter;
+  target = f [i];*/
+  int i;
+//    float d = 10000;
+  ttf = 50;
+  if (target == NULL) target = f [0];
+  for (i = 0; i < maxfighter; i ++)
+    if (target == f [i])
+      break;
+  int z = 0;
+  do
+  {
+    i --;
+    if (i < 0) i = maxfighter - 1;
+    if (f [i] == this)
+    { i --; z ++; }
+    if (i < 0) i = maxfighter - 1;
+  } while (!f [i]->active && z <= 1);
   target = f [i];
 }
 

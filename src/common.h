@@ -81,4 +81,48 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
 #define SIN(x) sin(x*PI/180.0)
 #define COS(x) cos(x*PI/180.0)
 
+#ifdef USE_GLUT
+  #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON
+  #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON
+  #define MOUSE_BUTTON_RIGHT GLUT_RIGHT_BUTTON
+  #define MOUSE_UP GLUT_UP
+  #define MOUSE_DOWN GLUT_DOWN
+  #define KEY_F1 GLUT_KEY_F1
+  #define KEY_F2 GLUT_KEY_F2
+  #define KEY_F3 GLUT_KEY_F3
+  #define KEY_F4 GLUT_KEY_F4
+  #define KEY_F5 GLUT_KEY_F5
+  #define KEY_F6 GLUT_KEY_F6
+  #define KEY_F7 GLUT_KEY_F7
+  #define KEY_F8 GLUT_KEY_F8
+  #define KEY_F9 GLUT_KEY_F9
+  #define KEY_UP GLUT_KEY_UP
+  #define KEY_DOWN GLUT_KEY_DOWN
+  #define KEY_LEFT GLUT_KEY_LEFT
+  #define KEY_RIGHT GLUT_KEY_RIGHT
+  #define KEY_PGUP GLUT_KEY_PAGE_UP
+  #define KEY_PGDOWN GLUT_KEY_PAGE_DOWN
+#else
+  #define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
+  #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
+  #define MOUSE_BUTTON_RIGHT SDL_BUTTON_RIGHT
+  #define MOUSE_UP SDL_RELEASED
+  #define MOUSE_DOWN SDL_PRESSED
+  #define KEY_F1 SDLK_F1
+  #define KEY_F2 SDLK_F2
+  #define KEY_F3 SDLK_F3
+  #define KEY_F4 SDLK_F4
+  #define KEY_F5 SDLK_F5
+  #define KEY_F6 SDLK_F6
+  #define KEY_F7 SDLK_F7
+  #define KEY_F8 SDLK_F8
+  #define KEY_F9 SDLK_F9
+  #define KEY_UP SDLK_UP
+  #define KEY_DOWN SDLK_DOWN
+  #define KEY_LEFT SDLK_LEFT
+  #define KEY_RIGHT SDLK_RIGHT
+  #define KEY_PGUP SDLK_PAGEUP
+  #define KEY_PGDOWN SDLK_PAGEDOWN
+#endif
+
 #endif

@@ -99,7 +99,17 @@ float getView ()
 
 int clouds = 0;
 
+unsigned char key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
+unsigned char key_selectmissile = 'M';
+unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P';
 
+unsigned char joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
+unsigned char joystick_selectmissile = 1;
+unsigned char joystick_targetnearest = 101, joystick_targetnext = 100, joystick_targetprevious = 102;
+unsigned char joystick_aileron = 0, joystick_elevator = 1, joystick_rudder = 3, joystick_throttle = 2;
+
+unsigned char mouse_firecannon = MOUSE_BUTTON_LEFT, mouse_firemissile = MOUSE_BUTTON_RIGHT;
+unsigned char mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
 
 
 
@@ -3619,7 +3629,7 @@ void save_config ()
   cf->write (" bpp", bpp);
   cf->writeText ("# Try to go fullscreen = 1, game in window = 0");
   cf->write (" fullscreen", fullscreen);
-  cf->writeText ("# Quality: 0=software rendered up to 5=best (default=3)");
+  cf->writeText ("# Quality: 0=software rendered up to 5=best (default=2)");
   cf->write (" quality", quality);
   cf->writeText ("# Far clipping plane: 20..100 (default=50)");
   cf->write (" view", (int) view);
@@ -3635,11 +3645,6 @@ void save_config ()
   cf->write (" controls", controls);
   cf->writeText ("# Difficulty level: 0=easy, 1=medium, 2=hard");
   cf->write (" difficulty", difficulty);
-/*  cf->writeText ("# Available display modes, do not alter these!");
-  cf->write (" mode0", modes [0]);
-  cf->write (" mode1", modes [1]);
-  cf->write (" mode2", modes [2]);
-  cf->write (" mode3", modes [3]);*/
   cf->writeText ("\n# This file is meant to give sensible startup settings");
   cf->writeText ("# as graphic cards and drivers may differ some 100 times in speed");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
@@ -3747,29 +3752,241 @@ int load_config ()
   if (difficulty < 0) difficulty = 0;
   else if (difficulty > 2) difficulty = 0;
 
-/*  str = cf->getString (ret, "mode0");
-  if (str == NULL)
-  { modes [0] = -1; }
-  else
-  { modes [0] = atoi (str); }
+  if (cf->buf [0] == 0) // no file found
+  {
+    delete cf;
+    return 0;
+  }
 
-  str = cf->getString (ret, "mode1");
-  if (str == NULL)
-  { modes [1] = -1; }
-  else
-  { modes [1] = atoi (str); }
+  delete cf;
+  return 1;
+}
 
-  str = cf->getString (ret, "mode2");
-  if (str == NULL)
-  { modes [2] = -1; }
-  else
-  { modes [2] = atoi (str); }
+void save_configInterface ()
+{
+  ConfigFile *cf = new ConfigFile ();
+  char *confname = dirs->getSaves ("conf.interface");
+  fprintf (stdout, "\nSaving %s ", confname); fflush (stdout);
+  int ret1 = cf->openOutput (confname);
+  if (ret1 == 0)
+  {
+    fprintf (stderr, "\nCould not save interface configuration.");
+    fflush (stderr);
+    return;
+  }
+  cf->writeText ("# Interface configuration\n");
+  cf->writeText ("# ---------------------------------------------------------------------");
+  cf->writeText ("# Keyboard section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# Use ASCII-Code values to remap");
+  cf->writeText ("#  8=BACKSPACE, 13=ENTER, 32=SPACE, 65=A...90=Z (NOT case sensitive)");
+  cf->write (" key_firecannon", key_firecannon);
+  cf->write (" key_firemissile", key_firemissile);
+  cf->write (" key_dropflare", key_dropflare);
+  cf->write (" key_dropchaff", key_dropchaff);
+  cf->write (" key_selectmissile", key_selectmissile);
+  cf->write (" key_targetnearest", key_targetnearest);
+  cf->write (" key_targetnext", key_targetnext);
+  cf->write (" key_targetprevious", key_targetprevious);
+  cf->writeText ("# All other piloting keys (CURSORS, PGUP/DN) are fixed.");
+  cf->writeText ("\n# ---------------------------------------------------------------------");
+  cf->writeText ("# Mouse section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# Buttons: 1=Left, 2=Middle, 3=Right");
+  int mousebutton = 1;
+  if (mouse_firecannon == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_firecannon == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_firecannon", mousebutton);
+  if (mouse_firemissile == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_firemissile == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_firemissile", mousebutton);
+  if (mouse_selectmissile == MOUSE_BUTTON_MIDDLE) mousebutton = 2;
+  else if (mouse_selectmissile == MOUSE_BUTTON_RIGHT) mousebutton = 3;
+  else mousebutton = 1;
+  cf->write (" mouse_selectmissile", mousebutton);
+  cf->writeText ("\n# ---------------------------------------------------------------------");
+  cf->writeText ("# Joystick section");
+  cf->writeText ("# ---------------------------------------------------------------------\n");
+  cf->writeText ("# The number of axis, buttons, and the coolie hat depends on your joystick!");
+  cf->writeText ("# Axis: 0...MAX-1 (maybe 0=aileron 1=elevator 2=throttle 3=rudder)");
+  cf->write (" joystick_aileron", joystick_aileron);
+  cf->write (" joystick_elevator", joystick_elevator);
+  cf->write (" joystick_throttle", joystick_throttle);
+  cf->write (" joystick_rudder", joystick_rudder);
+  cf->writeText ("\n# Buttons: 0...MAX-1");
+  cf->write (" joystick_firecannon", joystick_firecannon);
+  cf->write (" joystick_firemissile", joystick_firemissile);
+  cf->writeText ("# Dropping chaff AND flare may be preferred");
+  cf->write (" joystick_dropflare", joystick_dropflare);
+  cf->write (" joystick_dropchaff", joystick_dropchaff);
+  cf->writeText ("\n# Buttons: 0...MAX-1, Coolie: 100=Right, 101=Up, 102=Left, 103=Down");
+  cf->write (" joystick_selectmissile", joystick_selectmissile);
+  cf->write (" joystick_targetnearest", joystick_targetnearest);
+  cf->write (" joystick_targetnext", joystick_targetnext);
+  cf->write (" joystick_targetprevious", joystick_targetprevious);
+  cf->writeText ("\n# This file is meant to give sensible custom interface settings");
+  cf->writeText ("\n# To get back to default settings, just delete this file!");
+  cf->close ();
+  delete cf;
+}
 
-  str = cf->getString (ret, "mode3");
+int load_configInterface ()
+{
+  char ret [256];
+  char *str;
+  char *confname = dirs->getSaves ("conf.interface");
+  fprintf (stdout, "\nLoading %s ", confname); fflush (stdout);
+  ConfigFile *cf = new ConfigFile (confname);
+
+  str = cf->getString (ret, "key_firecannon");
   if (str == NULL)
-  { modes [3] = -1; }
+  { key_firecannon = 32; }
   else
-  { modes [3] = atoi (str); }*/
+  { key_firecannon = atoi (str); }
+
+  str = cf->getString (ret, "key_firemissile");
+  if (str == NULL)
+  { key_firemissile = 13; }
+  else
+  { key_firemissile = atoi (str); }
+
+  str = cf->getString (ret, "key_dropchaff");
+  if (str == NULL)
+  { key_dropchaff = 'C'; }
+  else
+  { key_dropchaff = atoi (str); }
+
+  str = cf->getString (ret, "key_dropflare");
+  if (str == NULL)
+  { key_dropflare = 'F'; }
+  else
+  { key_dropflare = atoi (str); }
+
+  str = cf->getString (ret, "key_selectmissile");
+  if (str == NULL)
+  { key_selectmissile = 'M'; }
+  else
+  { key_selectmissile = atoi (str); }
+
+  str = cf->getString (ret, "key_targetnearest");
+  if (str == NULL)
+  { key_targetnearest = 'E'; }
+  else
+  { key_targetnearest = atoi (str); }
+
+  str = cf->getString (ret, "key_targetnext");
+  if (str == NULL)
+  { key_targetnext = 'T'; }
+  else
+  { key_targetnext = atoi (str); }
+
+  str = cf->getString (ret, "key_targetprevious");
+  if (str == NULL)
+  { key_targetprevious = 'P'; }
+  else
+  { key_targetprevious = atoi (str); }
+
+  int mousebutton = 1;
+  str = cf->getString (ret, "mouse_firecannon");
+  if (str == NULL)
+  { mousebutton = 1; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_firecannon = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_firecannon = MOUSE_BUTTON_RIGHT;
+  else mouse_firecannon = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "mouse_firemissile");
+  if (str == NULL)
+  { mousebutton = 3; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_firemissile = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_firemissile = MOUSE_BUTTON_RIGHT;
+  else mouse_firemissile = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "mouse_selectmissile");
+  if (str == NULL)
+  { mousebutton = 2; }
+  else
+  { mousebutton = atoi (str); }
+  if (mousebutton == 2) mouse_selectmissile = MOUSE_BUTTON_MIDDLE;
+  else if (mousebutton == 3) mouse_selectmissile = MOUSE_BUTTON_RIGHT;
+  else mouse_selectmissile = MOUSE_BUTTON_LEFT;
+
+  str = cf->getString (ret, "joystick_aileron");
+  if (str == NULL)
+  { joystick_aileron = 0; }
+  else
+  { joystick_aileron = atoi (str); }
+
+  str = cf->getString (ret, "joystick_elevator");
+  if (str == NULL)
+  { joystick_elevator = 1; }
+  else
+  { joystick_elevator = atoi (str); }
+
+  str = cf->getString (ret, "joystick_throttle");
+  if (str == NULL)
+  { joystick_throttle = 2; }
+  else
+  { joystick_throttle = atoi (str); }
+
+  str = cf->getString (ret, "joystick_rudder");
+  if (str == NULL)
+  { joystick_rudder = 3; }
+  else
+  { joystick_rudder = atoi (str); }
+
+  str = cf->getString (ret, "joystick_firecannon");
+  if (str == NULL)
+  { joystick_firecannon = 0; }
+  else
+  { joystick_firecannon = atoi (str); }
+
+  str = cf->getString (ret, "joystick_firemissile");
+  if (str == NULL)
+  { joystick_firemissile = 2; }
+  else
+  { joystick_firemissile = atoi (str); }
+
+  str = cf->getString (ret, "joystick_dropchaff");
+  if (str == NULL)
+  { joystick_dropchaff = 3; }
+  else
+  { joystick_dropchaff = atoi (str); }
+
+  str = cf->getString (ret, "joystick_dropflare");
+  if (str == NULL)
+  { joystick_dropflare = 3; }
+  else
+  { joystick_dropflare = atoi (str); }
+
+  str = cf->getString (ret, "joystick_selectmissile");
+  if (str == NULL)
+  { joystick_selectmissile = 1; }
+  else
+  { joystick_selectmissile = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetnearest");
+  if (str == NULL)
+  { joystick_targetnearest = 101; }
+  else
+  { joystick_targetnearest = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetnext");
+  if (str == NULL)
+  { joystick_targetnext = 100; }
+  else
+  { joystick_targetnext = atoi (str); }
+
+  str = cf->getString (ret, "joystick_targetprevious");
+  if (str == NULL)
+  { joystick_targetprevious = 102; }
+  else
+  { joystick_targetprevious = atoi (str); }
 
   if (cf->buf [0] == 0) // no file found
   {
@@ -3780,6 +3997,8 @@ int load_config ()
   delete cf;
   return 1;
 }
+
+
 
 
 
@@ -4603,15 +4822,79 @@ void switch_game ()
   setPlaneVolume ();
 }
 
+void event_fireCannon ()
+{
+  if (!fplayer->active) return;
+#ifdef USE_GLUT
+  fplayer->fireCannon (laser);
+  sound->play (SOUND_CANNON1);
+#else
+  if (fplayer->autofire)
+    fplayer->autofire = false;
+  else
+    fplayer->autofire = true;
+#endif
+}
+
+void event_fireMissile ()
+{
+  if (!fplayer->active) return;
+  fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
+  sound->play (SOUND_MISSILE1);
+}
+
+void event_fireChaff ()
+{
+  if (!fplayer->active) return;
+  fplayer->fireChaff (chaff, missile);
+  sound->play (SOUND_CHAFF1);
+}
+
+void event_fireFlare ()
+{
+  if (!fplayer->active) return;
+  fplayer->fireFlare (flare, missile);
+  sound->play (SOUND_CHAFF1);
+}
+
+void event_selectMissile ()
+{
+  if (!fplayer->active) return;
+  fplayer->missiletype = fplayer->nextMissile (fplayer->missiletype);
+}
+
+void event_targetNearest ()
+{
+  if (!fplayer->active) return;
+  fplayer->targetNearestEnemy ((AIObj **) fighter);
+  sound->play (SOUND_CLICK1);
+}
+
+void event_targetNext ()
+{
+  if (!fplayer->active) return;
+  fplayer->targetNext ((AIObj **) fighter);
+  sound->play (SOUND_CLICK1);
+}
+
+void event_targetPrevious ()
+{
+  if (!fplayer->active) return;
+  fplayer->targetPrevious ((AIObj **) fighter);
+  sound->play (SOUND_CLICK1);
+}
+
 void game_key (unsigned char key, int x, int y)
 {
+  int hikey = toupper (key);
+  int lokey = tolower (key);
   if (camera == 50 && game == GAME_PAUSE)
   {
     camera = 0;
     game = GAME_PLAY;
     return;
   }
-  if (key == 'v')
+/*  if (key == 'v')
   {
     view += 10.0;
     if (view > 100) view = 20;
@@ -4626,43 +4909,31 @@ void game_key (unsigned char key, int x, int y)
     else space->drawlight = true;
     sound->play (SOUND_CLICK1);
 //      printf ("\nQuality = %d", quality); fflush (stdout);
-  }
+  }*/
   else if (key == 27)
   {
     switch_menu ();
   }
-  else if (key == 13)
+  else if (hikey == key_firemissile || lokey == key_firemissile)
   {
-    fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
-    sound->play (SOUND_MISSILE1);
+    event_fireMissile ();
   }
-  else if (key == 'f')
+  else if (hikey == key_dropflare || lokey == key_dropflare)
   {
-    fplayer->fireFlare (flare, missile);
-    sound->play (SOUND_CHAFF1);
+    event_fireFlare ();
   }
-  else if (key == 'c')
+  else if (hikey == key_dropchaff || lokey == key_dropchaff)
   {
-    fplayer->fireChaff (chaff, missile);
-    sound->play (SOUND_CHAFF1);
+    event_fireChaff ();
   }
-  else if (key == ' ' && fplayer->active)
+  else if (hikey == key_firecannon || lokey == key_firecannon)
   {
-#ifdef USE_GLUT
-    fplayer->fireCannon (laser);
-    sound->play (SOUND_CANNON1);
-#else
-    if (fplayer->autofire)
-      fplayer->autofire = false;
-    else
-      fplayer->autofire = true;
-#endif
+    event_fireCannon ();
   }
-    else if (key == 'm')
-    {
-      fplayer->missiletype = fplayer->nextMissile (fplayer->missiletype);
-//      printf ("%d missiles left\n", fplayer->missiles);
-    }
+  else if (hikey == key_selectmissile || lokey == key_selectmissile)
+  {
+    event_selectMissile ();
+  }
 /*    else if (key == 'l')
     {
       if (lighting == 0) lighting = 1;
@@ -4685,16 +4956,11 @@ void game_key (unsigned char key, int x, int y)
       if (controls == 100)
         fplayer->easymodel = true;
     }*/
-    else if (key == 'p')
+/*    else if (key == 'p')
     {
-/*      printf ("pos: x=%f, z=%f\n", fplayer->tl->x, fplayer->tl->z);
-      printf ("mouse: x=%d, y=%d\n", mousex, mousey);
-      printf ("gamma: f=%d, cam=%d\n", (int) fplayer->gamma, (int) camgamma);*/
-//      printf ("speed: f=%f\n", fplayer->speed);
-//      fflush (stdout);
       if (game == GAME_PLAY) game = GAME_PAUSE;
       else game = GAME_PLAY;
-    }
+    }*/
 /*    else if (key == 'w')
     {
       fplayer->speedUp ();
@@ -4733,23 +4999,23 @@ void game_key (unsigned char key, int x, int y)
       sdlreshape = true;
 #endif
     }*/
-    else if (key == 'e')
+    else if (hikey == key_targetnearest || lokey == key_targetnearest)
     {
-      fplayer->targetNearestEnemy ((AIObj **) fighter);
-//      explosion [0]->setExplosion (fplayer->tl->x, fplayer->tl->y, fplayer->tl->z, 1.0);
-//      fplayer->explode ++;
-      sound->play (SOUND_CLICK1);
+      event_targetNearest ();
     }
-    else if (key == 't')
+    else if (hikey == key_targetnext || lokey == key_targetnext)
     {
-      fplayer->targetNext ((AIObj **) fighter);
-      sound->play (SOUND_CLICK1);
+      event_targetNext ();
     }
-    else if (key == 'k')
+    else if (hikey == key_targetprevious || lokey == key_targetprevious)
+    {
+      event_targetPrevious ();
+    }
+/*    else if (key == 'k')
     {
       if (fplayer->target != NULL)
         fplayer->target->shield = 0;
-    }
+    }*/
 /*    else if (key == 'g')
     {
       if (polygonMode==GL_FILL)
@@ -4766,50 +5032,6 @@ void game_key (unsigned char key, int x, int y)
 }
 
 int aktcam = 0;
-
-#ifdef USE_GLUT
-  #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON
-  #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON
-  #define MOUSE_BUTTON_RIGHT GLUT_RIGHT_BUTTON
-  #define MOUSE_UP GLUT_UP
-  #define MOUSE_DOWN GLUT_DOWN
-  #define KEY_F1 GLUT_KEY_F1
-  #define KEY_F2 GLUT_KEY_F2
-  #define KEY_F3 GLUT_KEY_F3
-  #define KEY_F4 GLUT_KEY_F4
-  #define KEY_F5 GLUT_KEY_F5
-  #define KEY_F6 GLUT_KEY_F6
-  #define KEY_F7 GLUT_KEY_F7
-  #define KEY_F8 GLUT_KEY_F8
-  #define KEY_F9 GLUT_KEY_F9
-  #define KEY_UP GLUT_KEY_UP
-  #define KEY_DOWN GLUT_KEY_DOWN
-  #define KEY_LEFT GLUT_KEY_LEFT
-  #define KEY_RIGHT GLUT_KEY_RIGHT
-  #define KEY_PGUP GLUT_KEY_PAGE_UP
-  #define KEY_PGDOWN GLUT_KEY_PAGE_DOWN
-#else
-  #define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
-  #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
-  #define MOUSE_BUTTON_RIGHT SDL_BUTTON_RIGHT
-  #define MOUSE_UP SDL_RELEASED
-  #define MOUSE_DOWN SDL_PRESSED
-  #define KEY_F1 SDLK_F1
-  #define KEY_F2 SDLK_F2
-  #define KEY_F3 SDLK_F3
-  #define KEY_F4 SDLK_F4
-  #define KEY_F5 SDLK_F5
-  #define KEY_F6 SDLK_F6
-  #define KEY_F7 SDLK_F7
-  #define KEY_F8 SDLK_F8
-  #define KEY_F9 SDLK_F9
-  #define KEY_UP SDLK_UP
-  #define KEY_DOWN SDLK_DOWN
-  #define KEY_LEFT SDLK_LEFT
-  #define KEY_RIGHT SDLK_RIGHT
-  #define KEY_PGUP SDLK_PAGEUP
-  #define KEY_PGDOWN SDLK_PAGEDOWN
-#endif
 
 void game_keyspecialup (int key, int x, int y)
 {
@@ -4930,21 +5152,17 @@ void game_mouse (int button, int state, int x, int y)
 {
   if (state == MOUSE_DOWN && fplayer->active)
   {
-    if (button == MOUSE_BUTTON_LEFT)
+    if (button == mouse_firecannon)
     {
 //      fplayer->fireCannon (laser);
 //      sound->play (SOUND_CANNON1);
       fplayer->autofire = !fplayer->autofire;
     }
-    else if (button == MOUSE_BUTTON_RIGHT)
+    else if (button == mouse_firemissile)
     {
-      if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
-      if (fplayer->missiles [fplayer->missiletype] > 0)
-      {
-        fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
-        sound->play (SOUND_MISSILE1);
-      }
+/*      if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
+      { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }*/
+      event_fireMissile ();
     }
   }
 }
@@ -5046,9 +5264,18 @@ void game_mousemotion (int x, int y)
 #endif
 }
 
-void game_joystickaxis (int x, int y, int throttle, int rudder)
+void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
 {
   if (fplayer->ai) return;
+  int axis [4];
+  axis [0] = axis1;
+  axis [1] = axis2;
+  axis [2] = axis3;
+  axis [3] = axis4;
+  int x = axis [joystick_aileron];
+  int y = axis [joystick_elevator];
+  int rudder = axis [joystick_rudder];
+  int throttle = axis [joystick_throttle];
 /*  int t = (int) fplayer->theta;
   if (t < 0) t += 360;
   float rx = x * cosi [t] - y * sine [t];
@@ -5071,45 +5298,66 @@ void game_joystickaxis (int x, int y, int throttle, int rudder)
 void game_joystickbutton (int button)
 {
   if (!fplayer->active) return;
-  if (button == 0)
+  if (button == joystick_firecannon)
   {
     fplayer->fireCannon (laser);
     sound->play (SOUND_CANNON1);
   }
-  else if (button == 1)
+  else if (button == joystick_firemissile)
   {
-    fplayer->targetNearestEnemy ((AIObj **) fighter);
-    sound->play (SOUND_CLICK1);
+/*    if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
+    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }*/
+    event_fireMissile ();
   }
-  else if (button == 2)
+  else if (button == joystick_dropflare)
   {
-    if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
-    { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }
-    if (fplayer->missiles [fplayer->missiletype] > 0)
-    {
-      fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
-      sound->play (SOUND_MISSILE1);
-    }
+    event_fireFlare ();
   }
-  else if (button == 3)
+  else if (button == joystick_dropchaff)
   {
-    fplayer->missiletype = fplayer->nextMissile (fplayer->missiletype);
-    sound->play (SOUND_CLICK1);
+    event_fireChaff ();
+  }
+  else if (button == joystick_selectmissile)
+  {
+    event_selectMissile ();
+  }
+  else if (button == joystick_targetnearest)
+  {
+    event_targetNearest ();
+  }
+  else if (button == joystick_targetnext)
+  {
+    event_targetNext ();
+  }
+  else if (button == joystick_targetprevious)
+  {
+    event_targetPrevious ();
   }
 }
 
 void game_joystickhat (int hat)
 {
+  int normhat = -1;
 #ifndef USE_GLUT
-  if (hat == SDL_HAT_LEFT)
+  if (hat == SDL_HAT_RIGHT) normhat = 100;
+  if (hat == SDL_HAT_UP) normhat = 101;
+  if (hat == SDL_HAT_LEFT) normhat = 102;
+  if (hat == SDL_HAT_DOWN) normhat = 103;
+  if (normhat == joystick_selectmissile)
   {
-    fplayer->targetPrevious ((AIObj **) fighter);
-    sound->play (SOUND_CLICK1);
+    event_selectMissile ();
   }
-  else if (hat == SDL_HAT_RIGHT)
+  else if (normhat == joystick_targetnext)
   {
-    fplayer->targetNext ((AIObj **) fighter);
-    sound->play (SOUND_CLICK1);
+    event_targetNext ();
+  }
+  else if (normhat == joystick_targetprevious)
+  {
+    event_targetPrevious ();
+  }
+  else if (normhat == joystick_targetnearest)
+  {
+    event_targetNearest ();
   }
 #endif
 }
@@ -5906,6 +6154,7 @@ void game_quit ()
   volumesound = sound->volumesound;
   volumemusic = sound->volumemusic;
   save_config ();
+  save_configInterface ();
   pilots->save (dirs->getSaves ("pilots"));
   fprintf (stdout, "\nPilots saved"); fflush (stdout);
   for (i = 0; i < maxfighter; i ++)
@@ -6689,6 +6938,19 @@ void stats_display ()
   drawMouseCursor ();
 }
 
+char *getKeyString (int key, char *str)
+{
+  if (key == 8) sprintf (str, "%s", "BKSPC");
+  else if (key == 13) sprintf (str, "%s", "ENTER");
+  else if (key == 32) sprintf (str, "%s", "SPACE");
+  else
+  {
+    int upkey = toupper (key);
+    sprintf (str, "%c", upkey);
+  }
+  return str;
+}
+
 void menu_display ()
 {
   char buf [100];
@@ -6951,24 +7213,32 @@ void menu_display ()
   else if (menuitem == 4)
   {
     int xs = -4, ys = 15;
+    char buf [100];
+    char text [100];
     font1->drawText (xs, ys --, -3, "KEYS:");
-    font1->drawText (xs, ys --, -3, "T\tNEXT TARGET");
-    font1->drawText (xs, ys --, -3, "E\tTARGET NEAREST ENEMY");
-    font1->drawText (xs, ys --, -3, "M\tSWITCH WEAPON");
+    sprintf (text, "%s\tFIRE CANNON", getKeyString (key_firecannon, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tFIRE MISSILE", getKeyString (key_firemissile, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tDROP CHAFF", getKeyString (key_dropchaff, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tDROP FLARE", getKeyString (key_dropflare, buf));
+    font1->drawText (xs, ys --, -3, text);
     font1->drawText (xs, ys --, -3, "1..9\tCHANGE SPEED");
+    sprintf (text, "%s\tSELECT MISSILE", getKeyString (key_selectmissile, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tTARGET NEAREST ENEMY", getKeyString (key_targetnearest, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tTARGET NEXT", getKeyString (key_targetnext, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tTARGET PREVIOUS", getKeyString (key_targetprevious, buf));
+    font1->drawText (xs, ys --, -3, text);
     font1->drawText (xs, ys --, -3, "F1..8\tCAMERAS");
     font1->drawText (xs, ys --, -3, "ESC\tMAIN MENU");
-    font1->drawText (xs, ys --, -3, "SPACE\tFIRE CANNON");
-    font1->drawText (xs, ys --, -3, "ENTER\tFIRE MISSILE");
     font1->drawText (xs, (-- ys) --, -3, "MOUSE:");
-    font1->drawText (xs, ys --, -3, "LEFT B.\tFIRE CANNON");
-    font1->drawText (xs, ys --, -3, "RIGHT B.\tFIRE MISSILE");
+    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
     font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:");
-    font1->drawText (xs, ys --, -3, "BUTTON1\tFIRE CANNON");
-    font1->drawText (xs, ys --, -3, "BUTTON2\tTARGET NEAREST ENEMY");
-    font1->drawText (xs, ys --, -3, "BUTTON3\tFIRE MISSILE");
-    font1->drawText (xs, ys --, -3, "BUTTON4\tSWITCH WEAPON");
-    font1->drawText (xs, ys --, -3, "COOLIE\tNEXT/PREV TARGET");
+    font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
   }
 
   drawMouseCursor ();
@@ -9503,6 +9773,9 @@ int main (int argc, char **argv)
   }
 
   save_config ();
+
+  load_configInterface ();
+  save_configInterface ();
 
 /*
   time_t t;
