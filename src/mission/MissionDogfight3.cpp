@@ -62,13 +62,13 @@ void MissionDogfight3::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (FalconDescriptor, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
-  alliedInit (FalconDescriptor, alliedpilot [1], 2);
+  alliedInit (FalconDescriptor, alliedpilot [1]);
   fighter [2]->trafo.translation.x = 10;
   fighter [2]->trafo.translation.z = 110;
-  alliedInit (FalconDescriptor, alliedpilot [2], 3);
+  alliedInit (FalconDescriptor, alliedpilot [2]);
   fighter [3]->trafo.translation.x = 15;
   fighter [3]->trafo.translation.z = 115;
   for (i = 4; i <= 8; i ++)

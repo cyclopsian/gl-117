@@ -254,7 +254,7 @@ void Mission::selectMissiles (AiObj &aiobj)
   }
 }
 
-void Mission::alliedInit (const UnitDescriptor &id, int pilotid, int n)
+void Mission::alliedInit (const UnitDescriptor &id, int pilotid)
 {
   Fighter *aiobj = new Fighter (id);
   fighter.add (aiobj);
@@ -282,7 +282,7 @@ void Mission::alliedInit (const UnitDescriptor &id, int pilotid, int n)
   }
 }
 
-void Mission::objectInit (AiObj *aiobj, int party, int ailevel, int n)
+void Mission::objectInit (AiObj *aiobj, int party, int ailevel)
 {
   fighter.add (aiobj);
 

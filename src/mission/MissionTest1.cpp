@@ -64,12 +64,9 @@ void MissionTest1::start ()
   }
   for (i = 1; i <= 6; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_pickup1;
+    objectInit (new StaticPassive (PickupDescriptor), 0, 400);
     fighter [i]->trafo.translation.x = px + 4 - ((i - 1) / 2) * 4;
     fighter [i]->trafo.translation.z = py + 4 - ((i - 1) & 1) * 8;
-    fighter [i]->newinit (PickupDescriptor, 0, 400);
   }
 }
 

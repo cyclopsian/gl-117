@@ -232,11 +232,11 @@ void setpilotstext ()
 {
   char buf [64];
   int i;
-  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [pilots->aktpilot]->name);
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [pilots->aktpilot]->name.c_str ());
   ((Label *) submenu [0]->components [1])->setText (buf);
   for (i = 0; i < pilots->aktpilots; i ++)
   {
-    sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [i]->name);
+    sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [i]->name.c_str ());
     ((Label *) submenu [0]->components [i + 2])->setText (buf);
   }
   for (; i < 5; i ++)

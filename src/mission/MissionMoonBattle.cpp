@@ -66,7 +66,7 @@ void MissionMoonBattle::start ()
   fplayer->trafo.translation.z = 100;
   for (i = 1; i <= 6; i ++)
   {
-    alliedInit (FalconDescriptor, alliedpilot [i - 1], i);
+    alliedInit (FalconDescriptor, alliedpilot [i - 1]);
     if (i % 2)
       fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
     else

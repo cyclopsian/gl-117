@@ -62,7 +62,7 @@ void MissionShip2::start ()
   fplayer->trafo.translation.x = 80;
   fplayer->trafo.translation.z = 0;
   fplayer->currot.phi = 90;
-  alliedInit (RedArrowDescriptor, alliedpilot [0], 1);
+  alliedInit (RedArrowDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;

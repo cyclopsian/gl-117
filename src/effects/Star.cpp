@@ -38,15 +38,4 @@ Star::Star (int phi, int gamma, float size)
   this->size = size;
 }
 
-void Star::draw ()
-{
-  glPointSize (size * 1.5); // TODO: should depend on screen resolution!
-//    gl.enableAntiAliasing ();
-  glBegin (GL_POINTS);
-  glColor3ub (255, 255, 255);
-  glVertex3f (0, 0, 0);
-  glEnd ();
-//    gl.disableAntiAliasing ();
-}
-
 #endif

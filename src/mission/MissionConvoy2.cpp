@@ -59,7 +59,7 @@ void MissionConvoy2::start ()
   playerInit ();
   fplayer->trafo.translation.x = px;
   fplayer->trafo.translation.z = py + 100;
-  alliedInit (HawkDescriptor, alliedpilot [0], 1); // always match together 0<->1, 1<->2 etc.
+  alliedInit (HawkDescriptor, alliedpilot [0]); // always match together 0<->1, 1<->2 etc.
   fighter [1]->trafo.translation.x = px + 5;
   fighter [1]->trafo.translation.z = py + 105;
   for (i = 2; i <= 3; i ++)

@@ -38,8 +38,6 @@ AiObjPrototype::AiObjPrototype (const UnitDescriptor &desc)
     maxammo = 0;
   if (!file->getInteger ("weight", weight))
     weight = 1000;
-  if (!file->getInteger ("ttl", maxttl))
-    maxttl = -1;
 }
 
 AiObjPrototype::~AiObjPrototype ()

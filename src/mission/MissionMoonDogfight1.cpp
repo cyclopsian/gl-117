@@ -64,7 +64,7 @@ void MissionMoonDogfight1::start ()
   fighter [1]->trafo.translation.z = -110;
   fighter [1]->currot.phi = 200;
   fighter [1]->target = fighter [3];
-  alliedInit (RedArrowDescriptor, alliedpilot [0], 1);
+  alliedInit (RedArrowDescriptor, alliedpilot [0]);
   fighter [2]->trafo.translation.x = 0;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->target = fighter [0];

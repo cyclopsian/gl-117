@@ -102,6 +102,7 @@ class DynamicObjPrototype : public UnitPrototype
     float maxshield; ///< maximum shield
     Rotation maxrot; ///< only used for easymodel calculations, no use of getPrototype ()->maxrot.phi
     float maxzoom;
+    int maxttl;
     Vector3 cube;
 
     DynamicObjPrototype (const UnitDescriptor &desc);
@@ -115,7 +116,6 @@ class AiObjPrototype : public DynamicObjPrototype
     bool dualshot;      ///< one or two cannons?
     int maxammo;
     int weight;
-    int maxttl;
     
     AiObjPrototype (const UnitDescriptor &desc);
     virtual ~AiObjPrototype ();

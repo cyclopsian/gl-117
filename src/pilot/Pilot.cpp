@@ -185,7 +185,7 @@ std::string Pilot::getShortRank (int lomissionid, int himissionid)
 Pilot::Pilot (const std::string &name)
 {
   tp = NULL;
-  this->name, name.c_str ();
+  this->name = name;
   load ();
 }
 

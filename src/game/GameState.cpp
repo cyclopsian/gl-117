@@ -1539,18 +1539,8 @@ void StateQuit::display ()
   drawMouseCursor ();
 }
 
-void StatePlay::display ()
+void StatePlay::calcVibration (Rotation &mycamrot)
 {
-  unsigned i;
-  double sunx = 0, suny = 0, sunz;
-
-  if (dithering) glEnable (GL_DITHER);
-  else glDisable (GL_DITHER);
-
-  bool sunvisible = false;
-  float pseudoview = l->getView ();
-
-  Rotation mycamrot;
   mycamrot.set (camrot.gamma + view_y, camrot.theta, camrot.phi + view_x);
 
   if (vibration > 0)
@@ -1562,9 +1552,10 @@ void StatePlay::display ()
       mycamrot.gamma += 0.2 * vibration * sinvib / timestep;
     }
   }
+}
 
-
-  // calculate light factor
+void StatePlay::calcLightFactor (float &pseudoview)
+{
   if (camera == 0 && sunblinding && day && weather == WEATHER_SUNNY)
   {
     float np = fplayer->currot.phi - 180;
@@ -1589,37 +1580,54 @@ void StatePlay::display ()
       sunlight_dest = (float) flash / timestep;
     }
   }
+}
 
-  // show a short flash when an object explodes
-  if (dynamiclighting)
+void StatePlay::calcFlash ()
+{
+  for (unsigned i = 0; i < fighter.size (); i ++)
   {
-    for (unsigned i = 0; i < fighter.size (); i ++)
-    {
-      if (fighter [i]->draw)
-        if (fighter [i]->explode > 0)
-          if (fighter [i] != fplayer)
+    if (fighter [i]->draw)
+      if (fighter [i]->explode > 0)
+        if (fighter [i] != fplayer)
+        {
+          float dgamma = fabs ((float) fplayer->getAngleH (fighter [i]));
+          float dphi = fabs ((float) fplayer->getAngle (fighter [i]));
+          if (dphi < 45 && dgamma < 45)
           {
-            float dgamma = fabs ((float) fplayer->getAngleH (fighter [i]));
-            float dphi = fabs ((float) fplayer->getAngle (fighter [i]));
-            if (dphi < 45 && dgamma < 45)
+            float ddist = fplayer->distance (fighter [i]);
+            if (ddist < 40)
             {
-              float ddist = fplayer->distance (fighter [i]);
-              if (ddist < 40)
-              {
-                ddist /= 15;
-                ddist ++;
-                dphi /= 25;
-                dphi ++;
-                dgamma /= 25;
-                dgamma ++;
-                if (fighter [i]->explode < 8 * timestep)
-                  sunlight_dest = (float) fighter [i]->explode / timestep * 4 / ddist / dphi / dgamma;
-                else if (fighter [i]->explode < 16 * timestep)
-                  sunlight_dest = (16.0 - fighter [i]->explode / timestep) * 4 / ddist / dphi / dgamma;
-              }
+              ddist /= 15;
+              ddist ++;
+              dphi /= 25;
+              dphi ++;
+              dgamma /= 25;
+              dgamma ++;
+              if (fighter [i]->explode < 8 * timestep)
+                sunlight_dest = (float) fighter [i]->explode / timestep * 4 / ddist / dphi / dgamma;
+              else if (fighter [i]->explode < 16 * timestep)
+                sunlight_dest = (16.0 - fighter [i]->explode / timestep) * 4 / ddist / dphi / dgamma;
             }
           }
-    }
+        }
+  }
+}
+
+void StatePlay::display ()
+{
+  unsigned i;
+  double sunx = 0, suny = 0, sunz;
+  bool sunvisible = false;
+
+  Rotation mycamrot;
+  calcVibration (mycamrot); // add vibration to camera if player is hit
+
+  float pseudoview = l->getView ();
+  calcLightFactor (pseudoview); // calculate sunlight factor from angle to sun
+  
+  if (dynamiclighting)
+  {
+    calcFlash (); // show a short flash when an object explodes => add to sunfactor
   }
 
   // sunlight for glittering does not look good
@@ -1641,6 +1649,8 @@ void StatePlay::display ()
 
   glScalef (GLOBALSCALE, GLOBALSCALE, GLOBALSCALE);
 
+  if (dithering) glEnable (GL_DITHER);
+  else glDisable (GL_DITHER);
   glShadeModel (GL_SMOOTH);
 
   glPushMatrix (); // PUSH -> 1
@@ -1664,24 +1674,16 @@ void StatePlay::display ()
   gl.setFogLuminance (mylight);
   Model3dRealizer mr;
   mr.drawNoTexture (*sphere->o, sphere->trafo, mylight, 0);
-//  sphere->drawGL (tlnull, 1.0, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
     if (!day)
     {
-      int stars = maxstar;
-      if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
-      for (i = 0; i < stars; i ++)
-      {
-        glPointSize (LINEWIDTH(1.0F));
-        glPushMatrix (); // PUSH -> 2
-        glRotatef (star [i]->phi, 0.0, 1.0, 0.0);
-        glRotatef (star [i]->gamma, 1.0, 0.0, 0.0);
-        glTranslatef (0, 0, -10);
-        star [i]->draw ();
-        glPopMatrix (); // POP -> 1
-      }
+      unsigned stars = maxstar;
+      if (weather != WEATHER_CLOUDY)
+        stars = maxstar / 2;
+      StarsRealizer sr;
+      sr.draw (stars, star);
     }
   }
 
@@ -1706,17 +1708,19 @@ void StatePlay::display ()
   float fac = ::view, zfac = ::view * 0.2;
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
-    glRotatef (180, 0.0, 1.0, 0.0);
-    if (camera == 0)
-      glRotatef (sungamma, 1.0, 0.0, 0.0);
-    else
-      glRotatef (mycamrot.gamma + sungamma, 1.0, 0.0, 0.0);
     float zf = -11;
     if (day)
       zf = -10;
     if (l->type == LAND_MOON && !day)
       zf = -8; // diplay bigger earth
+
+    glRotatef (180, 0.0, 1.0, 0.0);
+    if (camera == 0)
+      glRotatef (sungamma, 1.0, 0.0, 0.0);
+    else
+      glRotatef (mycamrot.gamma + sungamma, 1.0, 0.0, 0.0);
     glTranslatef (0, 0, zf);
+
     frustum.extractFrustum ();
     if (frustum.isPointInFrustum (-1, 1, 0) || frustum.isPointInFrustum (-1, -1, 0) ||
         frustum.isPointInFrustum (1, -1, 0) || frustum.isPointInFrustum (1, 1, 0))
@@ -1761,7 +1765,8 @@ void StatePlay::display ()
       glGetDoublev( GL_MODELVIEW_MATRIX, modl );
       glGetIntegerv( GL_VIEWPORT, vp );
       gluProject (0, 0, 0, modl, proj, vp, &sunx, &suny, &sunz);
-      if ((sunx>=vp[0])&&(suny>=vp[1])&&(sunx<(vp[0]+vp[2]))&&(suny<(vp[1]+vp[3]))) sunvisible = true;
+      if ((sunx>=vp[0])&&(suny>=vp[1])&&(sunx<(vp[0]+vp[2]))&&(suny<(vp[1]+vp[3])))
+        sunvisible = true;
 
       glDisable (GL_ALPHA_TEST);
       glEnable (GL_DEPTH_TEST);

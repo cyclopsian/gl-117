@@ -899,21 +899,8 @@ int game_levelInit ()
 
 void playRandomMusic ()
 {
-  int r = Math::random (7);
-  if (r == 0)
-    sound->loadMusic (MUSIC_DARK1);
-  else if (r == 1)
-    sound->loadMusic (MUSIC_STANDBY1);
-  else if (r == 2)
-    sound->loadMusic (MUSIC_ELECTRO1);
-  else if (r == 3)
-    sound->loadMusic (MUSIC_STARS1);
-  else if (r == 4)
-    sound->loadMusic (MUSIC_SOFTTEC1);
-  else if (r == 5)
-    sound->loadMusic (MUSIC_AMBIENT1);
-  else
-    sound->loadMusic (MUSIC_COMPUTA2);
+  int r = Math::random (10) + 1;
+  sound->loadMusic (static_cast<MusicId>(r));
   sound->playMusic (1);
 #ifdef HAVE_SDL_MIXER
   Mix_HookMusicFinished (playRandomMusic);
@@ -1890,11 +1877,13 @@ void myFirstInit ()
   DISPLAY_DEBUG(" * cannon1.3ds");
   model = Model3dFactory::getModel (Directory::getModels ("cannon1.3ds"));
 //  model->setName ("CANNON");
+  model->nolight = true;
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1", model);
   
   DISPLAY_DEBUG(" * cannon1b.3ds");
   model = Model3dFactory::getModel (Directory::getModels ("cannon1b.3ds"));
+  model->nolight = true;
 //  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1b", model);
@@ -1904,7 +1893,7 @@ void myFirstInit ()
   model = Model3dFactory::getModel (Directory::getModels ("cannon2.3ds"));
   model->nolight = true;
   model->alpha = true;
-  for (i = 0; i < 4; i ++)
+  for (i = 0; i < model->object [0]->numVertices; i ++)
   {
     model->object [0]->vertex [i].color.c [0] = 255;
     model->object [0]->vertex [i].color.c [1] = 255;

@@ -136,8 +136,6 @@ class Star
   
     Star (int phi, int gamma, float size);
     virtual ~Star () {}
-
-    void draw ();
 };
 
 /**

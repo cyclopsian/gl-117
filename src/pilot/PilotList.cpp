@@ -33,7 +33,7 @@
 
 void PilotList::load (const std::string &fname)
 {
-  char buf [16];
+  char buf [4096];
   int i;
   FILE *in = fopen (fname.c_str (), "rb");
   if (in == NULL)
@@ -43,16 +43,11 @@ void PilotList::load (const std::string &fname)
     add ("PLAYER");
     return;
   }
-  fgets (buf, 16, in);
-  aktpilots = atoi (buf);
-  fgets (buf, 16, in);
-  aktpilot = atoi (buf);
-  int z = 0;
-  while (fgets (buf, 16, in) && z < maxpilots)
+  fscanf (in, "%d %d ", &aktpilots, &aktpilot);
+  unsigned z = 0;
+  while (z < maxpilots)
   {
-    for (i = 0; i < (int) strlen (buf); i ++)
-      if (buf [i] == '\n')
-        buf [i] = '\0';
+    fscanf (in, "%s ", buf);
     pilot [z] = new Pilot (buf);
     z ++;
   }
@@ -70,12 +65,10 @@ void PilotList::save (const std::string &fname)
     DISPLAY_WARN("Could not write saves/pilots");
     return;
   }
-  sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);
-  fwrite (buf, 1, strlen (buf), out);
+  fprintf (out, "%d %d ", aktpilots, aktpilot);
   for (i = 0; i < aktpilots; i ++)
   {
-    sprintf (buf, "%s\n", pilot [i]->name.c_str ());
-    fwrite (buf, 1, strlen (buf), out);
+    fprintf (out, "%s ", pilot [i]->name.c_str ());
   }
   fclose (out);
   

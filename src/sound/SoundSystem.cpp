@@ -132,6 +132,22 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (Directory::getMusic ("strife.it").c_str ());
+  if (music1 == NULL)
+  {
+    assert (false);
+    DISPLAY_FATAL(FormatString ("Cannot open strife.it: %s", Mix_GetError ()));
+    exit (EXIT_LOADFILE);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (Directory::getMusic ("sunarmada.it").c_str ());
+  if (music1 == NULL)
+  {
+    assert (false);
+    DISPLAY_FATAL(FormatString ("Cannot open sunarmada.it: %s", Mix_GetError ()));
+    exit (EXIT_LOADFILE);
+  }
+  Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (Directory::getMusic ("softtec.s3m").c_str ());
   if (music1 == NULL)
   {
@@ -269,7 +285,7 @@ void SoundSystem::haltMusic ()
 #endif
 }
 
-void SoundSystem::loadMusic (int sample)
+void SoundSystem::loadMusic (MusicId sample)
 {
   if (!audio) return;
 #ifdef HAVE_SDL_MIXER
@@ -303,6 +319,12 @@ void SoundSystem::loadMusic (int sample)
       break;
     case MUSIC_COMPUTA2:
       music1 = Mix_LoadMUS (Directory::getMusic ("computa2.xm").c_str ());
+      break;
+    case MUSIC_STRIFE:
+      music1 = Mix_LoadMUS (Directory::getMusic ("strife.it").c_str ());
+      break;
+    case MUSIC_SUNARMADA:
+      music1 = Mix_LoadMUS (Directory::getMusic ("sunarmada.it").c_str ());
       break;
   }
 #endif

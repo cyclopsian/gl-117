@@ -58,7 +58,7 @@ void MissionTank1::start ()
   playerInit ();
   fplayer->trafo.translation.x = 0;
   fplayer->trafo.translation.z = 100;
-  alliedInit (Hawk2Descriptor, alliedpilot [0], 1);
+  alliedInit (Hawk2Descriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 5;
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 7; i ++)

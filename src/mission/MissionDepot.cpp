@@ -72,7 +72,7 @@ void MissionDepot::start ()
   fplayer->target = fighter [4];
   for (i = 1; i <= 1; i ++)
   {
-    alliedInit (StormDescriptor, alliedpilot [i - 1], 1);
+    alliedInit (StormDescriptor, alliedpilot [i - 1]);
     fighter [i]->trafo.translation.x = px + 10 + i * 5;
     fighter [i]->trafo.translation.z = py + 130 + i * 5;
     fighter [i]->target = fighter [2];

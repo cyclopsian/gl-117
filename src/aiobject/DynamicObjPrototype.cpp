@@ -49,6 +49,9 @@ DynamicObjPrototype::DynamicObjPrototype (const UnitDescriptor &desc)
   maxrot.phi = 0; // no restriction for the heading
   if (!file->getFloat ("zoom", maxzoom))
     maxzoom = 0.35;
+  if (!file->getInteger ("ttl", maxttl))
+    maxttl = -1;
+
   float xyzcube;
   if (!file->getFloat ("cube", xyzcube))
   {

@@ -66,7 +66,7 @@ void MissionCanyon3::start ()
   fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
-    alliedInit (RedArrowDescriptor, alliedpilot [i - 1], i);
+    alliedInit (RedArrowDescriptor, alliedpilot [i - 1]);
     if (i % 2)
       fighter [i]->trafo.translation.x = px + 100 + ((i + 1) / 2) * 5;
     else

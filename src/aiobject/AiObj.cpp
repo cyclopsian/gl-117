@@ -175,7 +175,6 @@ void AiObj::initPrototype ()
   ammo = getPrototype ()->maxammo;
   recthrust = getPrototype ()->maxthrust / 2.0;
   force.z = recthrust;
-  ttl = getPrototype ()->maxttl * timestep;
 }
 
 void AiObj::init ()
@@ -847,8 +846,8 @@ void AiObj::fireCannon (DynamicObj *l, float phi)
   else
     l->currot.gamma = currot.gamma; // + 90.0;
   l->party = party;
-  l->ttl = 80 * timestep;
-  l->shield = 1;
+//  l->ttl = 80 * timestep;
+//  l->shield = 1;
   l->immunity = (int) (trafo.scaling.x * 12) * timestep;
   l->source = this;
   l->currot.phi = phi;

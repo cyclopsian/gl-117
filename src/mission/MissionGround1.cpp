@@ -63,7 +63,7 @@ void MissionGround1::start ()
   fplayer->trafo.translation.x = px + 10;
   fplayer->trafo.translation.z = py + 80;
   fplayer->target = fighter [2];
-  alliedInit (FalconDescriptor, alliedpilot [0], 1);
+  alliedInit (FalconDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = px + 20;
   fighter [1]->trafo.translation.z = py + 90;
   fighter [1]->target = fighter [2];

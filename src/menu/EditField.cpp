@@ -120,14 +120,15 @@ void EditField::eventKey (unsigned char key)
 //  if (ptr >= 62) return;
   if (key >= 32)
   {
-    text [ptr] = key;
+    text.insert (text.end (), 1, key);
     ptr ++;
-    text [ptr] = 0;
+//    text [ptr] = 0;
   }
-  else if (key == 8 && ptr > 0)
+  else if (key == 8 && !text.empty ())
   {
+    text.erase (text.end () - 1);
     ptr --;
-    text [ptr] = 0;
+//    text [ptr] = 0;
   }
 }
 

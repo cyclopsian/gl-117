@@ -622,6 +622,9 @@
 			Name="render"
 			Filter="">
 			<File
+				RelativePath=".\render\Realizer.h">
+			</File>
+			<File
 				RelativePath=".\render\Render.cpp">
 			</File>
 			<File

@@ -63,7 +63,7 @@ void MissionAirBattle::start ()
   fplayer->trafo.translation.z = 100;
   for (i = 1; i <= 6; i ++)
   {
-    alliedInit (FalconDescriptor, alliedpilot [i - 1], i);
+    alliedInit (FalconDescriptor, alliedpilot [i - 1]);
     
     if (i % 2)
       fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
@@ -73,7 +73,7 @@ void MissionAirBattle::start ()
   }
   for (i = 7; i <= 25; i ++)
   {
-    objectInit (new Fighter (CrowDescriptor), 0, 440 - i * 10, i);
+    objectInit (new Fighter (CrowDescriptor), 0, 440 - i * 10);
     fighter [i]->target = fighter [Math::random (7)];
     if (i <= 13)
     {

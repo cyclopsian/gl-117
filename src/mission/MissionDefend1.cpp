@@ -59,7 +59,7 @@ void MissionDefend1::start ()
   fplayer->trafo.translation.x = 10;
   fplayer->trafo.translation.z = 90;
   fplayer->target = fighter [7];
-  alliedInit (Hawk2Descriptor, alliedpilot [0], 1);
+  alliedInit (Hawk2Descriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 20;
   fighter [1]->trafo.translation.z = 100;
   fighter [1]->target = fighter [8];

@@ -55,25 +55,34 @@ class WaveFile
     void setVolume (int level);
 };
 
-#define SOUND_EXPLOSION1 1000
-#define SOUND_CLICK1 1
-#define SOUND_CANNON1 2
-#define SOUND_MISSILE1 3
-#define SOUND_THUNDER1 4
-#define SOUND_PLANE1 5
-#define SOUND_HIT1 6
-#define SOUND_BEEP1 7
-#define SOUND_CHAFF1 8
-#define SOUND_BEEP2 9
-#define MUSIC_DARK1 0
-#define MUSIC_WINNER1 1
-#define MUSIC_STANDBY1 2
-#define MUSIC_ELECTRO1 3
-#define MUSIC_STARS1 4
-#define MUSIC_LOSER1 5
-#define MUSIC_SOFTTEC1 6
-#define MUSIC_AMBIENT1 7
-#define MUSIC_COMPUTA2 8
+enum SoundId
+{
+  SOUND_EXPLOSION1 = 1000,
+  SOUND_CLICK1 = 1,
+  SOUND_CANNON1 = 2,
+  SOUND_MISSILE1 = 3,
+  SOUND_THUNDER1 = 4,
+  SOUND_PLANE1 = 5,
+  SOUND_HIT1 = 6,
+  SOUND_BEEP1 = 7,
+  SOUND_CHAFF1 = 8,
+  SOUND_BEEP2 = 9
+};
+
+enum MusicId
+{
+  MUSIC_DARK1,
+  MUSIC_WINNER1,
+  MUSIC_STANDBY1,
+  MUSIC_ELECTRO1,
+  MUSIC_STARS1,
+  MUSIC_LOSER1,
+  MUSIC_SOFTTEC1,
+  MUSIC_AMBIENT1,
+  MUSIC_COMPUTA2,
+  MUSIC_STRIFE,
+  MUSIC_SUNARMADA
+};
 
 /**
 * This class manages all wave and tracker files for GL-117.
@@ -104,7 +113,7 @@ class SoundSystem
     void stopAll ();
     void playMusic ();
     void playMusic (int times);
-    void loadMusic (int music);
+    void loadMusic (MusicId music);
     void haltMusic ();
     void setVolume (int sample, int level);
     void setVolume ();

@@ -92,6 +92,7 @@ void DynamicObj::initPrototype ()
   shield = getPrototype ()->maxshield;
   trafo.scaling.set (getPrototype ()->maxzoom, getPrototype ()->maxzoom, getPrototype ()->maxzoom);
   o->cube.set (getPrototype ()->cube);
+  ttl = getPrototype ()->maxttl * timestep;
 }
 
 void DynamicObj::init ()
@@ -439,6 +440,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
   float brakepower = 1.0F;
   float timefac = (float) dt / (float) timestep;
 
+  crashGround (dt); // check ground collision before moving = after all other collision tests are done!
   checkExplosion (dt); // check if this object is exploding
   if (sink > 0) // only ships (they will not explode)
   {
@@ -722,7 +724,6 @@ cannondone:;
     }
   }
   checkShield (); // check shield issues
-  crashGround (dt); // check ground collision
   if (immunity > 0) immunity -= dt; // decrease immunity
 }
 

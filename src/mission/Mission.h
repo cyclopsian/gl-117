@@ -107,8 +107,8 @@ class Mission
 
     void playerInit ();
     void selectMissiles (AiObj &aiobj);
-    void alliedInit (const UnitDescriptor &id, int pilotid, int i);
-    void objectInit (AiObj *aiobj, int party, int ailevel, int n);
+    void alliedInit (const UnitDescriptor &id, int pilotid);
+    void objectInit (AiObj *aiobj, int party, int ailevel);
   //  virtual void init () = 0;
     virtual void start () = 0; // custom definitions for a mission
     virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure

@@ -61,14 +61,12 @@ void MissionTest2::start ()
     fplayer->missiles [i] = 0;
   }
   fplayer->ammo = 0;
-  fighter [1]->party = 0;
-  fighter [1]->target = fighter [0];
+
+  objectInit (new Fighter (HawkDescriptor), 0, 170);
+  fighter [1]->target = fplayer;
   fighter [1]->trafo.translation.x = 0;
   fighter [1]->trafo.translation.z = 0;
-  fighter [1]->newinit (HawkDescriptor, 0, 170);
   fighter [1]->aggressivity = 0;
-//  fighter [1]->intelligence = 0;
-//  fighter [1]->precision = 0;
   for (i = 0; i < missiletypes; i ++)
   {
     fighter [1]->missiles [i] = 0;

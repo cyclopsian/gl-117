@@ -62,7 +62,7 @@ void MissionMoonDefense1::start ()
   fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [6];
-  alliedInit (PhoenixDescriptor, alliedpilot [0], 1);
+  alliedInit (PhoenixDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 105;
   fighter [1]->trafo.translation.z = 105;
   fighter [1]->target = fighter [6];

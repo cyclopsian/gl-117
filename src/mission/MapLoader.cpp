@@ -1035,7 +1035,7 @@ void MissionCustom::start ()
     if (obj [i].id < FighterBeginDescriptor) obj [i].id = FalconDescriptor;
     if (obj [i].id >= FighterBeginDescriptor && obj [i].id <= FighterEndDescriptor && fplayer->party == obj [i].party)
     {
-      alliedInit (obj [i].id, alliedpilot [alliedz], i);
+      alliedInit (obj [i].id, alliedpilot [alliedz]);
       if (alliedz < maxpilots - 1)
         alliedz ++;
     }
