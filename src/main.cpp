@@ -4350,7 +4350,7 @@ void game_display ()
     else if (red > 0)
     {
       glColor4ub (255, 0, 0, red);
-      printf ("red=%d\n", red);
+//      printf ("red=%d\n", red);
     }
     if (black > 0 || red > 0)
     {
@@ -4595,12 +4595,12 @@ void game_timer ()
   float testout;
   if (redout < 1)
   {
-    testout = (fplayer->thrust * fplayer->elevatoreffect - 0.15F) * 40.0F;
+    testout = (fplayer->realspeed * fplayer->elevatoreffect - 0.15F) * 40.0F;
     if (testout > 0) blackout += testout;
   }
   if (blackout < 1)
   {
-    testout = (fplayer->thrust * fplayer->elevatoreffect + 0.075F) * 80.0F;
+    testout = (fplayer->realspeed * fplayer->elevatoreffect + 0.075F) * 80.0F;
     if (testout < 0) redout -= testout;
   }
 

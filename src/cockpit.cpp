@@ -277,7 +277,7 @@ void Cockpit::drawHeading ()
       setColor (alpha);
       glBegin (GL_LINES);
       glVertex3f (xf * 0.1, (yf - g) * 0.1, zf);
-      glVertex3f (xf * 0.1, (yf + g) * 0.1, zf);
+      glVertex3f (xf * 0.1, yf * 0.1, zf);
       glEnd ();
       if (i == mission->heading)
         font1->drawText (xf - 0.5, yf - 2.0, zf, "N", &color);
@@ -350,7 +350,7 @@ void Cockpit::drawHeading ()
       setColor (alpha);
       glBegin (GL_LINES);
       glVertex3f ((yf - g) * 0.1, xf * 0.1, zf);
-      glVertex3f ((yf + g) * 0.1, xf * 0.1, zf);
+      glVertex3f (yf * 0.1, xf * 0.1, zf);
       glEnd ();
       yf = -8.5;
       if (i == 120)

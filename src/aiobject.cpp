@@ -83,7 +83,7 @@ void DynamicObj::dinit ()
   rectheta = 0;
   tl->z = 0; tl->x = 0;
   forcex = 0; forcez = 0; forcey = 0;
-  maxthrust = 0.3; braking = 0.5; manoeverability = 0.5;
+  maxthrust = 0.3; braking = 0.99; manoeverability = 0.5;
   thrust = maxthrust; recthrust = thrust; recheight = 5.0;// height = 5.0;
   ttl = -1;
   shield = 1; maxshield = 1;
@@ -155,7 +155,8 @@ float DynamicObj::distance (DynamicObj *target)
 {
   float dx = target->tl->x - tl->x;
   float dz = target->tl->z - tl->z;
-  return sqrt (dx * dx + dz * dz);
+  float dy = target->tl->y - tl->y;
+  return sqrt (dx * dx + dz * dz + dy * dy);
 }
 
 // check whether the object is exploding or sinking and deactivate if necessary
@@ -258,8 +259,8 @@ void DynamicObj::crashGround ()
     shield -= 1;
 //      shield += (int) height - 2;
   }
-  // restrict to a maximum height, we want an action game!!!
-  if (height > 50) tl->y = l->getHeight (tl->x, tl->z) + 50;
+  // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 100
+  if (height > 100) tl->y = l->getHeight (tl->x, tl->z) + 100;
 }
 
 // check for collision, simplified model, each model is surrounded by a cube
@@ -302,7 +303,7 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
       {
         d->source->points -= impact; // subtract points for shooting an own object
       }
-      
+
       if (d->source->party != party && active && draw && !killed)
         if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
         {
@@ -434,7 +435,7 @@ void DynamicObj::move ()
   int theta0 = (int) theta;
   while (theta0 < 0) theta0 += 360;
   while (theta0 >= 360) theta0 -= 360;
-  
+
   // the core of directional alterations and force calculations:
   // easymodel==1 means to change heading due to roll angle
   // this may seem complete nonsense for fighters, but it is just a simplification!!!
@@ -460,10 +461,11 @@ void DynamicObj::move ()
     // change heading and elevation due to ailerons and rudder
     if (maxthrust + thrust <= -0.00001 || maxthrust + thrust >= 0.00001)
     {
-      phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 6.67; //10.0 * maxthrust / (maxthrust + thrust);
-      gamma += COS(theta0) * elevatoreffect * manoeverability * 6.67; //10.0 * maxthrust / (maxthrust + thrust);
-      phi += -vz * COS(theta0) * ruddereffect * manoeverability * 1.33; //2.0 * maxthrust / (maxthrust + thrust);
-      gamma += SIN(theta0) * ruddereffect * manoeverability * 1.33; //2.0 * maxthrust / (maxthrust + thrust);
+      phi += vz * SIN(theta0) * elevatoreffect * manoeverability * 6.67; // 10.0 * maxthrust / (maxthrust + thrust);
+      gamma += COS(theta0) * elevatoreffect * manoeverability * 6.67; // 10.0 * maxthrust / (maxthrust + thrust);
+      phi += -vz * COS(theta0) * ruddereffect * manoeverability * 1.33; // 2.0 * maxthrust / (maxthrust + thrust);
+      gamma += SIN(theta0) * ruddereffect * manoeverability * 1.33; // 2.0 * maxthrust / (maxthrust + thrust);
+      gamma -= sqrt (SIN(theta0) * SIN(theta0) * COS(gamma) * COS(gamma)); // realistic modification
     }
     // change roll due to roll ;-)
     if (rolleffect)
@@ -502,14 +504,50 @@ void DynamicObj::move ()
 
   // PHYSICS (simplified model)
 
+  bool stop;
+  float gravityforce;
+
   // axis pointing through the fighter's nose
   CVector3 vaxis (COS(gamma) * SIN(phi), SIN(gamma), COS(gamma) * COS(phi));
 
-  // add throttle force
-  forcez += thrust * vaxis.z;
-  forcex += thrust * vaxis.x;
-  forcey -= thrust * vaxis.y;
+  realspeed = sqrt (forcex * forcex + forcez * forcez +forcey*forcey);
 
+  if (id <= CANNON2)
+  {
+    tl->x += forcex; // add our vector to the translation
+    tl->z += forcez;
+    tl->y += forcey;
+    goto cannondone; // jump down to decrease ttl and test collision
+  }
+
+  /*
+  printf (" %0.2f", forcez - vaxis.z * realspeed);
+  printf (" %0.2f", forcex - vaxis.x * realspeed);
+  printf (" %0.2f", forcey - vaxis.y * realspeed);
+  printf ("\n");
+ */
+  // and correct the speedvector
+
+  forcez=vaxis.z*realspeed;
+  forcex=vaxis.x*realspeed;
+  forcey=-vaxis.y*realspeed;
+
+  // add throttle force
+
+  forcez += thrust * vaxis.z * 0.01; //0.03 and braking=0.97 by try and error
+  forcex += thrust * vaxis.x * 0.01;
+  forcey -= thrust * vaxis.y * 0.01;
+
+
+
+  gravityforce = sqrt(realspeed) * vaxis.y *0.001; //0.006 by try and error
+ //   printf ("id: %d %f \n ",id, gravityforce); fflush (stdout);
+  forcez += gravityforce * vaxis.z;
+  forcex += gravityforce * vaxis.x;
+  forcey -= gravityforce * vaxis.y;
+
+
+  /*
   if (id >= FIGHTER1 && id <= FIGHTER1 + 50)
   {
     // lift force
@@ -542,11 +580,15 @@ void DynamicObj::move ()
     }
 //      cosi [(int) phi]
   }
+*/
 
   // drag force simulated by just halving the vector, this is not realistic, yet easy to play
-  forcex *= braking; forcez *= braking; forcey *= braking;
+  // braking = 0.97
 
-  bool stop = false;
+forcex *= braking; forcez *= braking; forcey *= braking;
+
+
+  stop = false;
   if (id >= TANK1 && id <= TANK2) // tanks cannot climb steep faces
   {
     float newy = l->getExactHeight (tl->x + forcex, tl->z + forcez) + zoom / 2;
@@ -563,6 +605,15 @@ void DynamicObj::move ()
   }
 //  tl->y = l->getHeight (tl->x, tl->z)+5;
 //  gamma = 180;
+
+
+
+  // calculate the objects real thrust only once
+  realspeed = sqrt (forcex * forcex + forcez * forcez +forcey*forcey);
+
+    // printf ("id: %d %f \n ",id, realspeed); fflush (stdout);
+
+
 
   // objects moving on the ground should always change their elevation due to the surface
   if (id >= TANK1 && id <= TANK2 && thrust > 0 && !stop)
@@ -591,9 +642,7 @@ void DynamicObj::move ()
     rot->setAngles ((short) (90 + gamma + ttl * rot1 - 180), (short) theta + ttl * rot2 + 180, (short) -phi);
   }
 
-  // calculate the objects real thrust only once
-  realspeed = sqrt (forcex * forcex + forcez * forcez);
-
+cannondone:;
   if (ttl > 0) ttl --; // decrease time to live
   if (ttl == 0)
   {
@@ -1130,11 +1179,10 @@ void AIObj::initValues (DynamicObj *dobj, float phi)
 
 void AIObj::fireCannon (DynamicObj *laser, float phi)
 {
-  laser->thrust = thrust + 0.4;
-  laser->realspeed = realspeed + 0.4;
+  laser->thrust = 0;
   laser->recthrust = laser->thrust;
   laser->manoeverability = 0.0;
-  laser->maxthrust = 1.0;
+  laser->maxthrust = 0;
   if (target != NULL && ai)
   {
     if (target->active)
@@ -1156,6 +1204,11 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
   laser->source = this;
   laser->phi = phi;
   initValues (laser, phi);
+  float fac = 0.47F;
+  if (id >= FIGHTER1 && id <= FIGHTER2) fac = 0.37F;
+  laser->forcex += COS(gamma) * SIN(phi) * fac;
+  laser->forcey -= SIN(gamma) * fac;
+  laser->forcez += COS(gamma) * COS(phi) * fac;
   laser->activate ();
 }
 
@@ -1519,7 +1572,7 @@ bool AIObj::selectMissileGround (AIObj **missile)
 void AIObj::targetNearestEnemy (AIObj **f)
 {
   int i;
-  float d = 10000;
+  float d = 100000; //10000 is too low
   ttf = 50;
   for (i = 0; i < maxfighter; i ++)
   {
@@ -1647,7 +1700,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  float flyx = tl->x + forcex * 6, flyz = tl->z + forcez * 6;
+  float flyx = tl->x + forcex * 30, flyz = tl->z + forcez * 30;
   int flyxs = l->getX ((int) flyx), flyzs = l->getX ((int) flyz);
   if (ttl != 0)
   {
