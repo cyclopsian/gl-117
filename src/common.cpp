@@ -43,10 +43,11 @@ void display (char *str, int level)
 
     if (!display_out)
     {
-      if ((display_out = fopen (dirs->getSaves ("logfile.txt"), "wt")) != NULL)
-      {
-        display_stream (display_out, str, level);
-      }
+      if (dirs)
+        if ((display_out = fopen (dirs->getSaves ("logfile.txt"), "wt")) != NULL)
+        {
+          display_stream (display_out, str, level);
+        }
     }
     else
     {
