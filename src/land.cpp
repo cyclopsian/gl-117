@@ -141,12 +141,12 @@ void Landscape::smoothGlacier ()
   for (i = 0; i <= MAXX - 1; i ++)
     for (i2 = 0; i2 <= MAXX - 1; i2 ++)
     {
-      if (f[i][i2] == GLACIER)
+      if (f [i] [i2] == GLACIER)
       {
         int min = h[i][i2];
-        min = min<h[i+1][i2]?min:h[i+1][i2];
-        min = min<h[i][i2+1]?min:h[i][i2+1];
-        min = min<h[i+1][i2+1]?min:h[i+1][i2+1];
+        min = min < h[i+1][i2] ? min : h[i+1][i2];
+        min = min < h[i][i2+1] ? min : h[i][i2+1];
+        min = min < h[i+1][i2+1] ? min : h[i+1][i2+1];
         h[i][i2] = min;
       }
     }
@@ -443,7 +443,7 @@ void Landscape::genSurface (int hoehepc, int *heightmap)
       h [maxx] [y] = h [0] [y];
     hoehe = (int) (hoehe / 1.1);
   }
-  smoothGlacier ();
+//  smoothGlacier ();
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
   highestpoint = 0;
@@ -530,7 +530,7 @@ void Landscape::genErosionSurface (int hoehepc, int *heightmap)
       h [maxx] [y] = h [0] [y];
     hoehe = (int) (hoehe / 1.1);
   }
-  smoothGlacier ();
+//  smoothGlacier ();
   highestpoint = 0;
   lowestpoint = 65535;
   for (i = 0; i < maxx; i ++)
@@ -944,6 +944,7 @@ void Landscape::genRocks (int diffmin, int percent)
         if (htest > 65535) htest = 65535;
         h [i] [i2] = (unsigned short) htest;
       }
+  smoothGlacier ();
 }
 
 

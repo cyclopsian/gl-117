@@ -528,13 +528,11 @@ void DynamicObj::move (Uint32 dt)
 
   // PHYSICS (simplified model)
 
+  CVector3 vaxis, uaxis, utemp, utemp2, utemp3;
+  float gammaup, phiup, thetaup;
+
   bool stop;
   float gravityforce;
-
-  // axis pointing through the fighter's nose
-  CVector3 vaxis (COS(gamma) * SIN(phi), SIN(gamma), COS(gamma) * COS(phi));
-
-  realspeed = sqrt (forcex * forcex + forcez * forcez + forcey * forcey);
 
   if (id <= CANNON2)
   {
@@ -543,6 +541,52 @@ void DynamicObj::move (Uint32 dt)
     tl->y += forcey * timefac;
     goto cannondone; // jump down to decrease ttl and test collision
   }
+
+  // axis pointing through the fighter's nose
+  vaxis.set (COS(gamma) * SIN(phi), SIN(gamma), COS(gamma) * COS(phi));
+
+/*
+  // axis pointing upwards through the cockpit
+  gammaup = gamma + 90;
+  thetaup = theta;
+  phiup = phi;
+  uaxis.set (COS(gammaup) * SIN(phiup), SIN(gammaup), COS(gammaup) * COS(phiup)); // upward axis (theta = 0)
+  // now rotate around vaxis using theta
+  utemp.take (&uaxis);
+  utemp.mul (COS(thetaup));
+  utemp2.take (&vaxis);
+  utemp2.mul ((1 - COS(thetaup)) * uaxis.dotproduct (&vaxis));
+  utemp3.take (&uaxis);
+  utemp3.crossproduct (&vaxis);
+  utemp3.mul (SIN(thetaup));
+  utemp.add (&utemp2);
+  utemp.add (&utemp3);
+  uaxis.take (&utemp);
+*/
+
+  realspeed = sqrt (forcex * forcex + forcez * forcez + forcey * forcey);
+
+/*
+// Proposal:
+  // add drag force
+  forcex *= 0.1;
+  forcey *= 0.1;
+  forcez *= 0.1;
+  // add throttle force
+  forcez += thrust * vaxis.z * 0.02;
+  forcex += thrust * vaxis.x * 0.02;
+  forcey -= thrust * vaxis.y * 0.02;
+  // add elevation force
+  forcez -= thrust * uaxis.z * 0.006;
+  forcex -= thrust * uaxis.x * 0.006;
+  forcey -= thrust * uaxis.y * 0.006;
+  // add gravity force
+  forcey -= 0.0012;
+  // add our vector to the translation
+  tl->x += forcex * timefac * timefac * 30;
+  tl->z += forcez * timefac * timefac * 30;
+  tl->y += forcey * timefac * timefac * 30;
+*/
 
   // and correct the speedvector
 
@@ -556,48 +600,13 @@ void DynamicObj::move (Uint32 dt)
   forcex += thrust * vaxis.x * 0.01 * timefac;
   forcey -= thrust * vaxis.y * 0.01 * timefac;
 
-  gravityforce = sqrt (realspeed) * vaxis.y * 0.0012 * timefac; //0.006 by try and error
+  gravityforce = sqrt (realspeed) * vaxis.y * 0.0012 * timefac;
  //   printf ("id: %d %f \n ",id, gravityforce); fflush (stdout);
   forcez += gravityforce * vaxis.z;
   forcex += gravityforce * vaxis.x;
   forcey -= gravityforce * vaxis.y;
 
-/*  if (id >= FIGHTER1 && id <= FIGHTER1 + 50)
-  {
-    // lift force
-    float ngamma = gamma + 90; // get normalized gamma (0 <= ngamma < 360)
-    if (ngamma >= 360) ngamma -= 360;
-    else if (ngamma < 0) ngamma += 360;
-    CVector3 vx (COS(ngamma) * SIN(phi), SIN(ngamma), COS(ngamma) * COS(phi));
-    CVector3 x1;
-    x1.take (&vx);
-    float mytheta = -theta; // get normalized theta (0 <= mytheta < 360)
-    while (mytheta < 0) mytheta += 360;
-    while (mytheta >= 360) mytheta -= 360;
-    x1.x *= COS(mytheta);
-    x1.y *= COS(mytheta);
-    x1.z *= COS(mytheta);
-    vx.crossproduct (&vaxis);
-    vx.x *= SIN(mytheta);
-    vx.y *= SIN(mytheta);
-    vx.z *= SIN(mytheta);
-    vx.add (&x1);
-    float addy = thrust * vx.x * 0.3;
-    if (addy >= -100 && addy <= 100) // valid values??? addy should be < 1.0
-    {
-      force.x -= realspeed * vx.x * 0.35; // add the lifting force
-      force.y -= realspeed * vx.y * 0.35;
-      force.z += realspeed * vx.z * 0.35;
-
-      // weight force (directly subtract)
-//      forcey -= 0.06;
-    }
-//      cosi [(int) phi]
-  }
-*/
-
-  // drag force simulated by just halving the vector, this is not realistic, yet easy to play
-  // braking = 0.97
+  // drag force simulated by adjusting the vector
 
   braking = (fabs (ruddereffect) + fabs (elevatoreffect)) * realspeed / 50;
   brakepower = pow (0.9915 - braking, timefac);
@@ -622,15 +631,11 @@ void DynamicObj::move (Uint32 dt)
 //  tl->y = l->getHeight (tl->x, tl->z)+5;
 //  gamma = 180;
 
-
-
   // calculate the objects real thrust only once
   realspeed = sqrt (forcex * forcex + forcez * forcez + forcey * forcey);
 
 //  if (id == 200)
 //    printf ("%d: (%f, %f, %f), %f\n", dt, forcex, forcey, forcez, realspeed); fflush (stdout);
-
-
 
   // objects moving on the ground should always change their elevation due to the surface
   if (id >= TANK1 && id <= TANK2 && thrust > 0 && !stop)
@@ -2032,9 +2037,15 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   if (id >= MISSILE1 && id <= MISSILE2)
   {
     if (target == NULL)
+    {
+      ttl = 0;
       return;
+    }
     else if (target->active == false)
+    {
+      ttl = 0;
       return;
+    }
   }
 
   // get a new target if necessary

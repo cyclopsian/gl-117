@@ -150,7 +150,6 @@ void WaveFile::playLoop ()
 {
 #ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
-  // No loop sounds on one channel
 #else
   channel = Mix_PlayChannel (-1, chunk, -1);
 #endif

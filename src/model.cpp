@@ -204,6 +204,9 @@ CVector3::CVector3 (CVector3 *v)
   x = v->x; y = v->y; z = v->z;
 }
 
+void CVector3::set (float x, float y, float z)
+{ this->x = x; this->y = y; this->z = z; }
+
 void CVector3::neg ()
 { x = -x; y = -y; z = -z; }
 
@@ -212,6 +215,9 @@ void CVector3::add (CVector3 *v)
 
 void CVector3::sub (CVector3 *v)
 { x -= v->x; y -= v->y; z -= v->z; }
+
+void CVector3::mul (float fac)
+{ x *= fac; y *= fac; z *= fac; }
 
 void CVector3::crossproduct (CVector3 *v)
 {

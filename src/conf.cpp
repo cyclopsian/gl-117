@@ -365,7 +365,7 @@ void save_configInterface ()
   cf->writeText ("# ---------------------------------------------------------------------");
   cf->writeText ("# Keyboard section");
   cf->writeText ("# ---------------------------------------------------------------------\n");
-  cf->writeText ("# Use ASCII-Code values to remap");
+  cf->writeText ("# Use ASCII-Code values or letters to remap");
   cf->writeText ("#  8=BACKSPACE, 13=ENTER, 32=SPACE, 65=A...90=Z (NOT case sensitive)");
   cf->write (" key_firecannon", (char) key_firecannon);
   cf->write (" key_firemissile", (char) key_firemissile);

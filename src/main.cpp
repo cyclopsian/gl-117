@@ -1133,6 +1133,8 @@ void switch_game ()
 #endif
 }
 
+bool startcannon = false;
+
 void event_fireCannon ()
 {
   if (!fplayer->active) return;
@@ -1140,13 +1142,14 @@ void event_fireCannon ()
   if (fplayer->ammo == 0) return;
 #ifdef USE_GLUT
   fplayer->fireCannon (laser);
-  sound->play (SOUND_CANNON1);
 #else
-  if (fplayer->autofire)
-    fplayer->autofire = false;
-  else
-    fplayer->autofire = true;
+  fplayer->autofire = true;
 #endif
+}
+
+void event_stopCannon ()
+{
+  fplayer->autofire = false;
 }
 
 void event_fireMissile ()
@@ -1341,6 +1344,21 @@ void game_key (unsigned char key, int x, int y)
         polygonMode=GL_FILL;
       glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
     }*/
+#ifdef USE_GLUT
+    glutPostRedisplay();
+#else
+    sdldisplay = true;
+#endif
+}
+
+void game_keyup (unsigned char key, int x, int y)
+{
+  int hikey = toupper (key);
+  int lokey = tolower (key);
+  if (hikey == key_firecannon || lokey == key_firecannon)
+  {
+    event_stopCannon ();
+  }
 #ifdef USE_GLUT
     glutPostRedisplay();
 #else
@@ -1606,7 +1624,16 @@ void game_joystickbutton (int button)
   if (button == joystick_firecannon)
   {
     fplayer->fireCannon (laser);
+//    sound->play (SOUND_CANNON1);
+#ifdef HAVE_SDL_MIXER
+    if (!startcannon)
+    {
+      sound->playLoop (SOUND_CANNON1);
+      startcannon = true;
+    }
+#else
     sound->play (SOUND_CANNON1);
+#endif
   }
   if (button == joystick_firemissile)
   {
@@ -4326,9 +4353,27 @@ void game_timer (int dt)
     if (fplayer->ammo != 0)
     {
       fplayer->fireCannon (laser);
+#ifdef HAVE_SDL_MIXER
+      if (!startcannon)
+      {
+        sound->playLoop (SOUND_CANNON1);
+        startcannon = true;
+      }
+#else
       sound->play (SOUND_CANNON1);
+#endif
     }
   }
+#ifdef HAVE_SDL_MIXER
+  else
+  {
+    if (startcannon)
+    {
+      startcannon = false;
+      sound->stop (SOUND_CANNON1);
+    }
+  }
+#endif
 
   if (lastshield > fplayer->shield && !fplayer->ai)
   {
@@ -5386,6 +5431,12 @@ static void myKeyboardFunc (unsigned char key, int x, int y)
     quit_key (key, x, y);
 }
 
+static void myKeyboardFuncUp (unsigned char key, int x, int y)
+{
+  if (game == GAME_PLAY || game == GAME_PAUSE)
+    game_keyup (key, x, y);
+}
+
 static void mySpecialFunc (int key, int x, int y)
 {
   if (game == GAME_PLAY || game == GAME_PAUSE)
@@ -5762,6 +5813,8 @@ void sdlMainLoop ()
         case SDL_KEYUP:
           if (!event.key.keysym.unicode)
             mySpecialFuncUp (event.key.keysym.sym, 0, 0);
+          else
+            myKeyboardFuncUp (event.key.keysym.sym, 0, 0);
           break;
         case SDL_JOYAXISMOTION:
 //          if (abs (event.jaxis.value) > 500)

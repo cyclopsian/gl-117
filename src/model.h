@@ -73,9 +73,11 @@ class CVector3
   CVector3 ();
   CVector3 (float x, float y, float z);
   CVector3 (CVector3 *v);
+  void set (float x, float y, float z);
   void neg ();
   void add (CVector3 *v);
   void sub (CVector3 *v);
+  void mul (float fac);
   void crossproduct (CVector3 *v);
   float dotproduct (CVector3 *v);
   float length ();
