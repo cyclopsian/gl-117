@@ -74,6 +74,7 @@
 #define ROCKS2 31
 #define GLACIER 32
 #define GREYSAND 33
+#define GRAVEL 34
 #define REDSTONE 35
 #define REDSAND 36
 #define REDTREE0 37

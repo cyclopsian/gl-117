@@ -27,7 +27,7 @@ TODO:
 - source code: MissionX => mission.cpp
 - southern seashore landscape (additional missions)
 - torpedo, water
-- clouds
+- faster gaussian convolution (isotropic)
 */
 
 #ifndef IS_MAIN_H
@@ -7120,13 +7120,15 @@ void game_display ()
   {
     float np = fplayer->phi;
     if (np >= 180) np -= 360;
-    sunlight = fabs (np) + fabs (fplayer->gamma - 180 - sungamma);
+    float sunfactor = fabs (np) + fabs (fplayer->gamma - 180 - sungamma);
 //  printf ("\nphi=%f, gamma=%f", fplayer->phi, fplayer->gamma);
-    if (sunlight < 90)
-    { sunlight = (90 - sunlight) / 20;
-      if (sunlight < 1.0) sunlight = 1.0;
+    if (sunfactor < 50)
+    { sunfactor = (50 - sunfactor) / 10;
+      if (sunfactor < 1.0) sunfactor = 1.0;
     /*printf ("\nlight=%f", sunlight); fflush (stdout);*/ }
-    else sunlight = 1.0;
+    else sunfactor = 1.0;
+    sunlight = sunfactor;
+    pseudoview /= sunfactor;
   }
   else
   {
@@ -7166,7 +7168,7 @@ void game_display ()
   float mylight = sunlight;
   if (!day) mylight /= 0.75;
   if (mylight > 1.0 && day)
-    mylight = mylight / 20.0 + 0.95;
+    mylight = mylight / 5.0 + 0.8;
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
   gl->foglum = mylight;
@@ -8406,9 +8408,10 @@ void myInit ()
   texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 0, 1, false);
   texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 0, 1, false);
   texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 0, 1, false);
+  texredsand = gl->genTextureTGA (dirs->getTextures ("redsand1.tga"), 0, 0, 1, false);
   texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1, false);
-  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, 3, 1, true);
-  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, 3, 1, true);
+  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, -1, 1, true);
+  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, -1, 1, true);
   textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
   textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
   texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
@@ -8424,7 +8427,8 @@ void myInit ()
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
   texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
   texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
-//  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 1, true);
+  texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
+  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
 /*  for (i = 0; i < maxchars; i ++)
   {

@@ -26,8 +26,8 @@
 #include "glland.h"
 
 float zoomz = 1.0/(100.0*MAXX);
-CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand;
-//CTexture *texglitter1;
+CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand, *texredsand, *texgravel1;
+CTexture *texglitter1;
 
 void GLLandscape::norm (float *c)
 {
@@ -64,6 +64,7 @@ float *GLLandscape::selectMaterial (int x, int y)
   else if (f [x] [y] == REDSAND || f [x] [y] == REDTREE0) return mata [12];
   else if (f [x] [y] == DESERTSAND || f [x] [y] == CACTUS0) return mata [13];
   else if (f [x] [y] == GREYSAND) return mata [14];
+  else if (f [x] [y] == GRAVEL) return mata [15];
   else return mat [0];
 }
 
@@ -85,6 +86,7 @@ int GLLandscape::selectColor (int x, int y)
   else if (f [x] [y] == REDSAND || f [x] [y] == REDTREE0) return 12;
   else if (f [x] [y] == DESERTSAND || f [x] [y] == CACTUS0) return 13;
   else if (f [x] [y] == GREYSAND) return 14;
+  else if (f [x] [y] == GRAVEL) return 15;
   else return 0;
 }
 
@@ -300,9 +302,17 @@ void GLLandscape::precalculate ()
       drawrule [i] [i2] = 0;
       
       int f1 = f [i] [i2], f2 = f [i + 1] [i2], f3 = f [i] [i2 + 1], f4 = f [i + 1] [i2 + 1];
-      if (isType (f1, GRASS) || isWoods (f1) || isType (f1, MOONSAND) || isType (f1, REDSAND) || isType (f1, REDTREE0) || isType (f1, CACTUS0) || isType (f1, GREYSAND))
+      if (isType (f1, GRASS))
       {
         tex1 [i] [i2] = texgrass->textureID;
+      }
+      else if (isWoods (f1) || isType (f1, MOONSAND) || isType (f1, REDSAND) || isType (f1, REDTREE0) || isType (f1, CACTUS0) || isType (f1, GREYSAND))
+      {
+        tex1 [i] [i2] = texredsand->textureID;
+      }
+      else if (isType (f1, GRAVEL))
+      {
+        tex1 [i] [i2] = texgravel1->textureID;
       }
       else if (isWater (f1))
       {
@@ -826,7 +836,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 */
 
             texlight = texwater->texlight;
-            float d = 0.0005 * (h1 - h [x] [y]);
+            float d = 0.00025 * (h1 - h [x] [y]);
             if (d > 0.75) d = 0.75;
             if (type == 0)
             {
@@ -851,7 +861,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             glColor3f (cr, cg, cb);
             glVertex3f (hh2*xs - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
 
-            d = 0.0005 * (h1 - h [xstep] [y]);
+            d = 0.00025 * (h1 - h [xstep] [y]);
             if (d > 0.75) d = 0.75;
             if (type == 0)
             {
@@ -1031,39 +1041,51 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     }
   }
 
-  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float) h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
     return;
 
-/*  float glitter [4] = { 1, 1, 1, 1 };
-  float lz1 = fabs ((float) MAXX/2 + camx - xs);
-  float lz2 = fabs ((float) MAXX/2 + camx - xs - step);
-  if (lz1 <= 16 || lz2 <= 16)
+  bool glittering = false;
+  float glitter [4] = { 1, 1, 1, 1 };
+  if (quality >= 2)
   {
-    float dx1 = -((float) MAXX/2 - camz - ys);
-    float dx2 = -((float) MAXX/2 - camz - ys - step);
-    float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
-    float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
-    float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
-    dgamma1 /= 4; dgamma2 /= 4;
-    float sc = 10.0;
-    float test;
-    test = sc * exp ((-dgamma1 * dgamma1 - lz1 * lz1) / 10.0) + 0.5;
-//    test = (5.0 - dgamma1) * (5.0 - lz1);
-    if (test > 1.0 && dgamma1 < 88.0 && lz1 < 85.0) glitter [0] = test;
-    test = sc * exp ((-dgamma1 * dgamma1 - lz2 * lz2) / 10.0) + 0.5;
-//    test = (5.0 - dgamma1) * (5.0 - lz2);
-    if (test > 1.0 && dgamma1 < 88.0 && lz2 < 85.0) glitter [1] = test;
-    test = sc * exp ((-dgamma2 * dgamma2 - lz1 * lz1) / 10.0) + 0.5;
-//    test = (5.0 - dgamma2) * (5.0 - lz1);
-    if (test > 1.0 && dgamma2 < 88.0 && lz1 < 5.0) glitter [3] = test;
-    test = sc * exp ((-dgamma2 * dgamma2 - lz2 * lz2) / 10.0) + 0.5;
-//    test = (5.0 - dgamma2) * (5.0 - lz2);
-    if (test > 1.0 && dgamma2 < 88.0 && lz2 < 85.0) glitter [2] = test;
-    li [0] *= glitter [0];
-    li [1] *= glitter [1];
-    li [2] *= glitter [2];
-    li [3] *= glitter [3];
-  }*/
+    float lz1 = fabs ((float) MAXX/2 + camx - xs);
+    float lz2 = fabs ((float) MAXX/2 + camx - xs - step);
+    if (lz1 <= 5 || lz2 <= 5)
+    {
+      float dx1 = -((float) MAXX/2 - camz - ys);
+      float dx2 = -((float) MAXX/2 - camz - ys - step);
+      float dy = fabs (camy - (h1*zoomz - zoomz2) * ZOOM);
+      float dgamma1 = fabs (atan (dy / dx1) * 180.0 / PI - sungamma);
+      float dgamma2 = fabs (atan (dy / dx2) * 180.0 / PI - sungamma);
+      dgamma1 /= 4; dgamma2 /= 4;
+      float sc = 2.0;
+      float test;
+      if (h1 >= hray [x] [y])
+      {
+        test = sc * exp ((-dgamma1 * dgamma1 - lz1 * lz1) / 8.0) + 0.9;
+        if (test > 1.0) { glitter [0] = test; glittering = true; }
+      }
+      if (h1 >= hray [xstep] [y])
+      {
+        test = sc * exp ((-dgamma1 * dgamma1 - lz2 * lz2) / 8.0) + 0.9;
+        if (test > 1.0) { glitter [1] = test; glittering = true; }
+      }
+      if (h1 >= hray [x] [ystep])
+      {
+        test = sc * exp ((-dgamma2 * dgamma2 - lz1 * lz1) / 8.0) + 0.9;
+        if (test > 1.0) { glitter [3] = test; glittering = true; }
+      }
+      if (h1 >= hray [xstep] [ystep])
+      {
+        test = sc * exp ((-dgamma2 * dgamma2 - lz2 * lz2) / 8.0) + 0.9;
+        if (test > 1.0) { glitter [2] = test; glittering = true; }
+      }
+/*      li [0] *= glitter [0];
+      li [1] *= glitter [1];
+      li [2] *= glitter [2];
+      li [3] *= glitter [3];*/
+    }
+  }
 
   texture = true;
 //  glActiveTextureARB(100);
@@ -1074,7 +1096,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   for (j = 0; j < 4; j ++)
   {
     int mx = getCoord (px [j]), my = getCoord (py [j]);
-    float d = 0.0005 * (h1 - h [mx] [my]);
+    float d = 0.00025 * (h1 - h [mx] [my]);
     if (d > 0.75) d = 0.75;
     fac = fac2 * li [j];
     if (type == 0)
@@ -1122,31 +1144,39 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   }
   glEnd();
 
-/*  glDisable (GL_DEPTH_TEST);
-  glEnable (GL_BLEND);
-  glBlendFunc (GL_ONE, GL_SRC_ALPHA);
-  glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.5);
-//  glBlendFunc (GL_ONE, GL_ONE);
-  gl->enableTextures (texglitter1->textureID);
-  glBegin (GL_QUADS);
-  for (j = 0; j < 4; j ++)
+//  glDisable (GL_DEPTH_TEST);
+
+  if (quality >= 2 && glittering)
   {
-    if (texture)
+    glEnable (GL_BLEND);
+    glDepthFunc (GL_LEQUAL);
+    glBlendFunc (GL_ONE, GL_SRC_ALPHA);
+    glEnable (GL_ALPHA_TEST);
+    glAlphaFunc (GL_GEQUAL, 0.5);
+  //  glBlendFunc (GL_ONE, GL_ONE);
+    gl->enableTextures (texglitter1->textureID);
+    gl->enableLinearTexture (texglitter1->textureID);
+    glBegin (GL_QUADS);
+    for (j = 0; j < 4; j ++)
     {
-      glTexCoord2fv (tf [j]);
+      if (texture)
+      {
+        tf [j] [0] = (px [j] * texzoom) + (float) ((lsticker / 2) & 7) * 0.6;
+        tf [j] [1] = (py [j] * texzoom) + (float) ((lsticker / 2) & 7) * 0.6;
+        glTexCoord2fv (tf [j]);
+      }
+      col [j] [3] = glitter [j] - 1.0;
+      col [j] [0] = 1.0;
+      col [j] [1] = 1.0;
+      col [j] [2] = 1.0;
+      glColor4fv (col [j]);
+      glVertex3fv (pos [j]);
     }
-    col [j] [3] = glitter [j] - 1.0;
-    col [j] [0] = 1.0;
-    col [j] [1] = 1.0;
-    col [j] [2] = 1.0;
-    glColor4fv (col [j]);
-    glVertex3fv (pos [j]);
+    glEnd();
+    glDisable (GL_ALPHA_TEST);
+    glDisable (GL_BLEND);
+//  glEnable (GL_DEPTH_TEST);
   }
-  glEnd();
-  glDisable (GL_ALPHA_TEST);
-  glDisable (GL_BLEND);
-  glEnable (GL_DEPTH_TEST);*/
 
 /*  float h2 = h1;
   if (h [x] [y + 2*step] < h2) h2 = h [x] [y + 2*step];
@@ -1956,6 +1986,8 @@ void GLLandscape::draw (int phi, int gamma)
             if (detail [i] [i2] <= lineardetail)
             {
               gl->enableLinearTexture (texgrass->textureID);
+              gl->enableLinearTexture (texgravel1->textureID);
+              gl->enableLinearTexture (texredsand->textureID);
               gl->enableLinearTexture (texrocks->textureID);
               gl->enableLinearTexture (texwater->textureID);
               gl->enableLinearTexture (texredstone->textureID);
@@ -1963,6 +1995,8 @@ void GLLandscape::draw (int phi, int gamma)
             else
             {
               gl->disableLinearTexture (texgrass->textureID);
+              gl->disableLinearTexture (texgravel1->textureID);
+              gl->disableLinearTexture (texredsand->textureID);
               gl->disableLinearTexture (texrocks->textureID);
               gl->disableLinearTexture (texwater->textureID);
               gl->disableLinearTexture (texredstone->textureID);
@@ -2547,8 +2581,10 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   zoomz2 = 32768.0 * zoomz;
   hh2 = 2.0*hh;
   lv [0] = 0.0; lv [1] = 1.0; lv [2] = 1.0;
-  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
+  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
+/*  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
   mat [2] [0] = 0.7; mat [2] [1] = 0.7; mat [2] [2] = 0.7; mat [2] [3] = 1.0;
   mat [3] [0] = 1.0; mat [3] [1] = 1.0; mat [3] [2] = 1.0; mat [3] [3] = 1.0;
   mat [4] [0] = 0.25; mat [4] [1] = 1.0; mat [4] [2] = 0.25; mat [4] [3] = 1.0;
@@ -2561,7 +2597,8 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   mat [11] [0] = 0.95; mat [11] [1] = 0.6; mat [11] [2] = 0.4; mat [11] [3] = 1.0;
   mat [12] [0] = 0.9; mat [12] [1] = 0.75; mat [12] [2] = 0.55; mat [12] [3] = 1.0;
   mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
-  mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [15] [3] = 1.0;
+  mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
+  mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
   for (i = 0; i < 7; i ++)
     for (i2 = 0; i2 < 4; i2 ++)
       mata [i] [i2] = mat [i] [i2] / 2.0;

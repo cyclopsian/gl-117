@@ -37,7 +37,7 @@
 #endif
 #endif
 
-#define PARTS 20
+#define PARTS 20 // maximum LOD parts
 
 #include <string.h>
 
@@ -61,7 +61,8 @@
 #define LANDSCAPE_DESERT 40
 
 // textures are loaded in main.cpp
-extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand;
+extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand, *texredsand, *texgravel1;
+extern CTexture *texglitter1;
 
 class GLLandscape : public Landscape
 {
@@ -75,14 +76,14 @@ class GLLandscape : public Landscape
   unsigned char drawrule [MAXX] [MAXX]; // draw triangles or quads?
   unsigned char tex1 [MAXX] [MAXX]; // texture for quad or triangle1
   unsigned char tex2 [MAXX] [MAXX]; // texture for triangle2 if needed
-  unsigned char dl [MAXX + 1] [MAXX + 1];
+  unsigned char dl [MAXX + 1] [MAXX + 1]; // dynamic light mask (explosions)
   int lsticker; // a timer increased every time draw() is called
-  int gridstep;
+  int gridstep; // landscape grid resolution (1=fine or 2=coarse)
 
   private:
   float hh, hh2, zoomz2;
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
-  float mat [15] [4], mata [15] [4]; // materials=colors of landscape IDs
+  float mat [16] [4], mata [16] [4]; // materials=colors of landscape IDs
   Space *space; // space of all objects
   CColor treecolor;
 
@@ -92,8 +93,8 @@ class GLLandscape : public Landscape
   float *selectMaterial (int x, int y);
   int selectColor (int x, int y);
   
-  unsigned short lg [MAXX + 1] [MAXX + 1];
-  void precalculate ();
+  unsigned short lg [MAXX + 1] [MAXX + 1]; // gaussian filter result
+  void precalculate (); // precalculate everything (colors, light mask)
 
   // obsolete, I used this to test quadtrees
   void subdivide (int x1, int y1, int x2, int y2);
@@ -125,7 +126,7 @@ class GLLandscape : public Landscape
 
   void drawCloudQuadStrip (int x1, int y1, int x2, int y2); // not used
 
-  void drawQuadStrip (int x1, int y1, int x2, int y2);
+  void drawQuadStrip (int x1, int y1, int x2, int y2); // fast quad strip without textures
   void drawTexturedQuad (int x, int y);
   void drawWaterTexturedQuad (int x, int y);
   void drawTexturedTriangle1 (int x, int y);

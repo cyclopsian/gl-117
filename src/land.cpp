@@ -968,6 +968,7 @@ void Landscape::genRocks (int diffmin, int percent)
         rd = rd - h [i + 1] [i2] / 3 - h [i] [i2 + 1] / 3 - h [i + 1] [i2 + 1] / 3;
         rd = fabs (rd);
         if (h [i] [i2] > hmax - r)
+        {
           if (rd >= 800 - 800 * (h [i] [i2] - r) / (hmax - r))
           {
             f [i] [i2] = ROCKS + random (2);
@@ -976,6 +977,11 @@ void Landscape::genRocks (int diffmin, int percent)
             h [i] [i2] = (unsigned short) htest;
             if (h [i] [i2] < rockborder) rockborder = h [i] [i2];
           }
+          else if (rd >= 500 - 500 * (h [i] [i2] - r) / (hmax - r))
+          {
+            f [i] [i2] = GRAVEL;
+          }
+        }
         if (abs (h [i] [i2] - h [i + 1] [i2]) >= 600 || abs (h [i] [i2] - h [i] [i2 + 1]) >= 600)
         {
           f [i] [i2] = ROCKS + random (2);
