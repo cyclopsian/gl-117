@@ -29,7 +29,7 @@
 #include "game/globals.h"
 #include "math/Math.h"
 
-#include "assert.h"
+#include <cassert>
 
 
 Fighter::Fighter () : AIObj ()
@@ -74,10 +74,10 @@ void Fighter::placeMissiles ()
 void Fighter::fireFlare2 (DynamicObj *flare)
 {
   char buf [4096];
-  if (logging.loglevel == LOG_ALL)
+  if (logging.loglevel == LOG_DEBUG)
   {
     sprintf (buf, "Flare: party=%d", party);
-    logging.display (buf, LOG_ALL);
+    DISPLAY_DEBUG(buf);
   }
   flare->init ();
   flare->thrust = 0;
@@ -102,7 +102,7 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
 {
   char buf [4096];
   sprintf (buf, "Chaff: party=%d", party);
-  logging.display (buf, LOG_ALL);
+  DISPLAY_DEBUG(buf);
   chaff->init ();
   chaff->thrust = 0;
   chaff->realspeed = 0;
@@ -155,7 +155,7 @@ bool Fighter::fireFlare (DynamicObj **flare, AIObj **missile)
             }
             if (hit)
             {
-              logging.display ("Missile to flare", LOG_ALL);
+              DISPLAY_DEBUG("Missile to flare");
               missile [i2]->target = flare [i];
             }
           }
@@ -198,7 +198,7 @@ bool Fighter::fireChaff (DynamicObj **chaff, AIObj **missile)
             }
             if (hit)
             {
-              logging.display ("Missile to chaff", LOG_ALL);
+              DISPLAY_DEBUG("Missile to chaff");
               missile [i2]->target = chaff [i];
             }
           }
@@ -607,7 +607,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
         if (fabs (trafo.translation.y - myheight) < minh * 0.3)
         {
           manoeverstate = 10;
-          logging.display ("Manoever: Vertical climb", LOG_ALL);
+          DISPLAY_DEBUG("Manoever: Vertical climb");
         }
         else
         {
@@ -689,7 +689,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (!manoeverstate)
           {
             manoeverstate = 1;
-            logging.display ("Manoever: Immelmann", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Immelmann");
           }
         }
         else if (aw > 160.0F + 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
@@ -697,7 +697,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (!manoeverstate)
           {
             manoeverstate = 1;
-            logging.display ("Manoever: Immelmann", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Immelmann");
           }
         }
         else if (aw > 160 && disttarget < 25) // target is at the back
@@ -705,7 +705,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (fabs (trafo.translation.y - myheight) > 7 && currot.gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
-            logging.display ("Manoever: Roll", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Roll");
           }
           else
           {
@@ -713,14 +713,14 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8)); // turn hard left or right
-              logging.display ("Manoever: Turn", LOG_ALL);
+              DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015); // fly faster
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
-              logging.display ("Manoever: Height change", LOG_ALL);
+              DISPLAY_DEBUG("Manoever: Height change");
             } // stay low
           }
         }
@@ -753,7 +753,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (!manoeverstate)
           {
             manoeverstate = 1;
-            logging.display ("Manoever: Immelmann", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Immelmann");
           }
         }
         else if (aw < -160.0F - 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
@@ -761,7 +761,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (!manoeverstate)
           {
             manoeverstate = 1;
-            logging.display ("Manoever: Immelmann", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Immelmann");
           }
         }
         else if (aw < -160 && disttarget < 25)
@@ -769,7 +769,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
           if (fabs (trafo.translation.y - myheight) > 7 && currot.gamma >= 175 + intelligence / 100) // high enough over ground
           {
             manoeverstate = 20; // roll
-            logging.display ("Manoever: Roll", LOG_ALL);
+            DISPLAY_DEBUG("Manoever: Roll");
           }
           else
           {
@@ -777,14 +777,14 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
             if (manoevertheta <= 0)
             {
               manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8));
-              logging.display ("Manoever: Turn", LOG_ALL);
+              DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
               recthrust = maxthrust / (1.05F + (float) intelligence * 0.0015);
             if (intelligence < 280 && manoeverheight <= 0)
             {
               recheight = 5; manoeverheight = timestep * (20 - intelligence / 50);
-              logging.display ("Manoever: Height change", LOG_ALL);
+              DISPLAY_DEBUG("Manoever: Height change");
             }
           }
         }

@@ -38,7 +38,7 @@ void PilotList::load (char *fname)
   FILE *in = fopen (fname, "rb");
   if (in == NULL)
   {
-    logging.display ("Could not load saves/pilots", LOG_WARN);
+    DISPLAY_WARN("Could not load saves/pilots");
     aktpilots = 0;
     add ("PLAYER");
     return;
@@ -67,7 +67,7 @@ void PilotList::save (char *fname)
   FILE *out = fopen (fname, "wb");
   if (out == NULL)
   {
-    logging.display ("Could not write saves/pilots", LOG_WARN);
+    DISPLAY_WARN("Could not write saves/pilots");
     return;
   }
   sprintf (buf, "%d\n%d\n", aktpilots, aktpilot);

@@ -23,7 +23,7 @@
 
 #include "loadbitmap/Bitmap.h"
 
-#include <assert.h>
+#include <cassert>
 
 
 

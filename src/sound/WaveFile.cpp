@@ -22,6 +22,7 @@
 #ifndef IS_SOUNDSYSTEM_H
 
 #include <stdlib.h>
+#include <cassert>
 
 #include "SoundSystem.h"
 #include "logging/Logging.h"
@@ -138,7 +139,8 @@ void WaveFile::load (char *filename)
   if (chunk == NULL)
   {
     sprintf (buf, "SDL_Mixer: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
 #endif

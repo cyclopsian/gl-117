@@ -1,0 +1,236 @@
+/* -*- mode: c;   -*- ********************************************************
+Path:  shaders
+File:  tree.cg
+
+GL-117
+
+    Copyright 2004 Jean-Marc Le Peuvedic
+
+    This file is part of GL-117.
+
+    GL-117 is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    GL-117 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GL-117; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+******************************************************************************/
+
+//----------------------------------------------------------------------
+// Define inputs from application
+// The application draws all the trees in a quad in a single batch.
+// A single display list draws a tree.
+// A single GL_QUADS primitive draws a group of trees.
+
+// Per vertex varying information :
+// Position can *ONLY* be used for constant information (in display lists)
+// Position[0]  vertex index from 0 to 7, 0 to 3 being the vertical quad
+// Position[1]  vertical position of horizontal quad for hq trees
+#define  INDEX IN.Position[0]
+#define  HQUAD IN.Position[1]
+#define  TREE  IN.Position[2]
+
+//----------------------------------------------------------------------
+// Per terrain quad varying information
+
+// Random is taken from glTexCoord4f
+// Random[0]  transparency
+// Random[1]  shade (lighting)
+// Random[2]  quad scaled x position
+// Random[3]  quad scaled y position
+#define TRANSP IN.Random.x
+#define SHADE  IN.Random.y
+#define QUADXY IN.Random.zw
+#define QUADX  IN.Random.z
+#define QUADY  IN.Random.w
+
+// Data is taken from glColor4f
+// Slope[0]   elevation of corner (0,0) of quad
+// Slope[1]   elevation of corner (0,1) of quad
+// Slope[2]   elevation of corner (1,0) of quad
+// Slope[3]   elevation of corner (1,1) of quad
+#define SLOPE00_01 IN.Data.xy
+#define SLOPE10_11 IN.Data.zw
+
+//----------------------------------------------------------------------
+// Per batch (same kind of tree) uniform information
+// Variation[0]  average tree height
+// Variation[1]  tree height variation unit
+// Variation[2]  tree height variation base random coefficient
+// Variation[4]  tree width to height ratio
+#define AVG_HT    Variation.x
+#define HT_STEP   Variation.y
+#define WHRATIO   Variation.z
+
+// 
+struct appin
+{
+  float4 Position     : POSITION;
+  float4 Data         : COLOR0;
+  float4 Random       : TEXCOORD0;
+};
+
+//----------------------------------------------------------------------
+// Per frame uniform information
+// RotPhi matrix float2x3
+// Fog data :
+//   Draws fog as in GL mode GL_LINEAR, with START=1.
+//   END and COLOR are variable, but change rarely.
+#define FOGEND   Fog.w
+#define FOGCOLOR Fog.xyz
+
+//----------------------------------------------------------------------
+// Compile time constants :
+
+// posoffsetxy  array of offsets from quad position (implicitly stored in MVP)
+// vxtex        array of position and texture coordinates of vertices
+// hh2          a constant which might change, scenery horizontal scaling
+#define C_HH2    c_constants.x
+#define C_ZOOMZ  c_constants.y
+#define C_ZOOMZ2 c_constants.z
+
+// define outputs from vertex shader
+struct vertout
+{
+  float4 HPosition    : POSITION;
+  float4 Color        : COLOR0;
+  float4 FogColor     : COLOR1;   // simply added to textured fragment
+  float4 TexCoord     : TEXCOORD0;
+  //float  FogCoord     : FOGC;
+};
+
+float
+modulo(float x, float y)
+{
+  float r = fmod(x,y);
+  return (x>=0.0f) ? r : y + r;
+}
+
+vertout main( in            appin    IN,
+	      in            float3   Variation,
+	            uniform float4   c_posoffsetxy[67], 
+	            uniform float4   c_vxtex[8],
+	      const uniform float4   c_constants,
+	      const uniform float4x4 ModelViewProj,
+	      const uniform float4x4 ModelView,
+	            uniform float2x3 RotPhi,
+	            uniform float4   Fog)
+{
+  vertout OUT;
+  
+  float  index = INDEX;
+  OUT.TexCoord  = float4(c_vxtex[index].zw, float2(0.0f,1.0f));
+  
+  // compute pseudo random tree position
+  float rand = modulo(QUADX + 2 * QUADY, 128.0f);
+  if(rand < 0) rand += 128.0f;
+  float rotval;
+  float fraction = modf((rand + TREE)/2.0f, rotval);
+  float4 packedoffsets = c_posoffsetxy[rotval];
+  float2 offsets = ((fraction<0.5) ? packedoffsets.xy : packedoffsets.zw);
+
+  // Based on offsets in current quad, interpolate terrain elevation
+  float2 vpos2 = lerp(SLOPE00_01, SLOPE10_11, offsets.x);
+  float vpos = lerp(vpos2.x, vpos2.y, offsets.y) * C_ZOOMZ - C_ZOOMZ2;
+
+  // depending on whether the quad drawn is vertical or horizontal,
+  // the packed vertex coordinates are read into xy or xz.
+  float3 tmppos2 = float3( c_vxtex[index].xy, HQUAD );
+  float3 tmppos3 = ((index >= 4) ? tmppos2.xzy : tmppos2.xyz);
+
+  // Compute eyepos, later used for fog (color) computations
+  float4 eyepos = mul(ModelView, float4(QUADX*C_HH2, vpos, QUADY*C_HH2, 1.0f));
+  // Find the projected position of tree on the horizon
+  float2 sincosh = normalize(float2(ModelView._m11,-ModelView._m01));
+  float proj = dot(eyepos.xy,sincosh);
+  // Find the extra angle to rotate the tree to make it face the eye
+  // Trees do not all just face direction indicated by phi : they are
+  // arranged in an arc in front of the eye.
+  float2 sincosv = normalize(float2(proj,eyepos.z-0.5));
+  float2x2 rotAlpha = float2x2(-sincosv.yx, sincosv.x, -sincosv.y);
+  tmppos3.xz  = mul(rotAlpha, tmppos3.xz);
+
+  // Rotate vertices of the model around the vertical axis going
+  // through the origin of the model. Scale
+  tmppos3.xz  = mul(RotPhi, tmppos3);
+
+  // Compute height and width
+  float htrand = (3*QUADX + 5*QUADY);
+  float height = HT_STEP*modulo(htrand - TREE, 8)+AVG_HT;
+  float width  = height * WHRATIO;
+  // Compute storm induced slant
+  // depends on varying position and uniform time
+  float windsl = 0.0f; // TODO : weather routine
+
+  // Apply storm effect (westerly wind), which is just a slant
+  tmppos3.x += tmppos3.y*windsl;
+
+  //tmppos3.xz *= width;
+  tmppos3.xz *= width;
+
+  // move tree to current quad and position
+  tmppos3.xz += (offsets + QUADXY) * C_HH2;
+
+  // Scale height and adjust position with respect to terrain
+  //tmppos3.y = tmppos3.y * height + vpos;
+  tmppos3.y = tmppos3.y * height + vpos;
+
+  // transform vertex position into homogenous clip-space
+  OUT.HPosition = mul(ModelViewProj, float4(tmppos3, 1.0f));
+
+  // compute fog (from Z distance in eye coordinates)
+  // fog coordinate is computed and output in case a pixel shader 
+  // implements per-pixel fog later. The fixed pipeline pixel shader 
+  // does not do per-pixel fog.
+  float end = FOGEND;
+  float f = (end - length(eyepos))/(end - 1.0f);
+  f = clamp(f, 0.0f, 1.0f);
+  //OUT.FogCoord = f;		// not used by fixed function pixel shader
+  // We want to make trees lose contrast in the fog. Per-pixel fog
+  // would do it because it would be applied after the textures.
+  // But we do the same per-vertex.
+  // We are going to scale down Color according to fog
+  OUT.Color     = float4(f*SHADE.xxx, TRANSP);
+  // Color gets modulated by the texture map.
+  // Then we add an untextured base fog color, scaled by 1-f
+  OUT.FogColor  = float4((1.0f-f)*FOGCOLOR, 0.0f);
+  // No fog output:
+  //OUT.Color     = float4(SHADE.xxx, TRANSP);
+  //OUT.FogColor  = 0.0f;
+
+  // various optional colorized diagnostics
+  //OUT.Color.r=0.5+proj/2.0f;
+  //OUT.Color.r=0.5+(eyepos.y*-ModelView._m01)/1024.0f;
+  //OUT.Color.r+=(eyepos.x* ModelView._m11)/1024.0f;
+  //if(dot(eyepos.xy,float2(ModelView._m11,-ModelView._m01)) > 0)
+  //OUT.Color.r = 1.0;
+  //else
+  //OUT.Color.b = 1.0;
+  //if(IN.Data[0] == 0.0f) OUT.Color.r = RAND;
+  //OUT.Color     = float4(offset.x,offset.y,0.0,1.0);
+  //OUT.Color     = float4(random.x/32.0f, 0.0, random.x/32.0f, 1.0);
+  //OUT.TexCoord  = IN.TexCoord;
+  return OUT;
+}
+
+//----------------------------------------------------------------------
+// enhancement ideas :
+//
+// sinphi, cosphi are constants : precompute on CPU. The best is to
+// preload a float2x2 2D rotation matrix. All program instructions
+// must involve a varying parameter, or depend on one.
+// 7 insns to save.
+//
+// tree slant for bad weather can be computed here from a time
+// information.
+//
+// instead of implementing per vertex lighting on the CPU, add an array
+// of normal vectors and compute vertex lighting here!

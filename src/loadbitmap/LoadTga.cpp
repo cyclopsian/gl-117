@@ -36,7 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <assert.h>
+#include <cassert>
 
 
 
@@ -121,8 +121,6 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
   fp = fopen(im_file, "rb"); 
   if(!fp)
   {
-    Logging l; // TODO: implement logging
-    l.display("File not found", LOG_ERROR);
     assert(false);
     return 0;
   }

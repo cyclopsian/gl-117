@@ -48,7 +48,7 @@ ConfigFile::ConfigFile (char *fname)
   else
   {
     sprintf (buf2, "Could not load %s", fname);
-    logging.display (buf2, LOG_WARN);
+    DISPLAY_WARN(buf2);
     buf [0] = 0;
   }
   for (int i = 0; i < length; i ++)

@@ -30,7 +30,7 @@
 #include "math/Math.h"
 #include "loadmodel/Model3dFactory.h"
 
-#include "assert.h"
+#include <cassert>
 
 
 AIObj::AIObj ()
@@ -815,10 +815,10 @@ void AIObj::fireCannon (DynamicObj **laser)
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
   char buf [4096];
-  if (logging.loglevel == LOG_ALL)
+  if (logging.loglevel == LOG_DEBUG)
   {
     sprintf (buf, "Missile: party=%d, id=%d", party, id);
-    logging.display (buf, LOG_ALL);
+    DISPLAY_DEBUG(buf);
   }
   ttf = 50 * timestep;
   missile->init ();
@@ -878,7 +878,7 @@ bool AIObj::haveMissile (int id)
   if (id < 0 || id >= missiletypes)
   {
     sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    logging.display (buf, LOG_ERROR);
+    DISPLAY_ERROR(buf);
   }
   if (missiles [id] > 0)
     return true;
@@ -900,7 +900,7 @@ void AIObj::decreaseMissile (int id)
   if (id < 0 || id >= missiletypes)
   {
     sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
-    logging.display (buf, LOG_ERROR);
+    DISPLAY_ERROR(buf);
   }
   missiles [id] --;
   int ptrrack = 0, maxrack = 0;
@@ -1480,7 +1480,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         if (fabs (trafo.translation.y - myheight) < minh * 0.3)
         {
           manoeverstate = 10;
-          logging.display ("Manoever: Vertical climb", LOG_ALL);
+          DISPLAY_DEBUG("Manoever: Vertical climb");
         }
         else
         {

@@ -39,6 +39,7 @@ class Dirs
     char sound [4096];
     char models [4096];
     char maps [4096];
+    char shaders [4096];
 
     Dirs ();
     virtual ~Dirs ();
@@ -53,6 +54,7 @@ class Dirs
     char *getMusic (char *name);
     char *getModels (char *name);
     char *getMaps (char *name);
+    char *getShaders (char *name);
   
   protected:
 

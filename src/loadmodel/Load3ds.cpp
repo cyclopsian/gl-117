@@ -29,17 +29,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cassert>
 
 
 
 FILE *debugstream3ds = stdout;
-
-void ErrorOutOfMemory ()
-{
-  fprintf (stderr, "Out of memory\n");
-  fflush (stdout);
-  exit (-1);
-}
 
 /****************************************************************************
 3DS LOADER
@@ -49,11 +43,7 @@ void ErrorOutOfMemory ()
 Load3ds::Load3ds ()
 {
   currentChunk = new Chunk3ds;
-  if (currentChunk == NULL)
-    ErrorOutOfMemory ();
   tempChunk = new Chunk3ds;
-  if (tempChunk == NULL)
-    ErrorOutOfMemory ();
 }
 
 void Load3ds::setTextureDir (std::string texDir)
@@ -67,8 +57,6 @@ bool Load3ds::import3ds (Model3d *model, const char *filename)
   char message [4096] = {0};
 
   file = new BinaryFile3ds (filename);
-  if (file == NULL)
-    ErrorOutOfMemory ();
 
   // Read the first chuck
   readChunk(currentChunk);
@@ -76,7 +64,8 @@ bool Load3ds::import3ds (Model3d *model, const char *filename)
   if (currentChunk->ID != PRIMARY)
   {
     sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
-    logging.display (message, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(message);
     exit (EXIT_LOADFILE);
   }
   // Load objects recursively
@@ -116,19 +105,20 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
   Material newTexture;
 
   currentChunk = new Chunk3ds;
-  if (currentChunk == NULL)
-    ErrorOutOfMemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
     readChunk(currentChunk);
     if (currentChunk->length > file->getSize ())
     {
-      if (debug3ds) { fprintf (debugstream3ds, "ERROR=>cancel "); fflush (debugstream3ds); }
+      if (debug3ds)
+      { fprintf (debugstream3ds, "ERROR=>cancel "); fflush (debugstream3ds); }
       return;
     }
-    if (currentChunk->ID == 0 && currentChunk->length == 0) exit (1000);
-    if (debug3ds) { fprintf (debugstream3ds, "%X: ", currentChunk->ID); fflush (debugstream3ds); }
+    if (currentChunk->ID == 0 && currentChunk->length == 0)
+      exit (1000);
+    if (debug3ds)
+    { fprintf (debugstream3ds, "%X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
@@ -136,7 +126,7 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
         currentChunk->bytesRead += file->readString (version, 10, currentChunk->length - currentChunk->bytesRead);
         if (version [0] > 0x03)
         {
-          logging.display ("This 3DS file is over version 3 so it may load incorrectly", LOG_WARN);
+          DISPLAY_WARN("This 3DS file is over version 3 so it may load incorrectly");
         }
         if (debug3ds) { fprintf (debugstream3ds, "Version %d\n", version [0]); fflush (debugstream3ds); }
         break;
@@ -189,12 +179,12 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
 void Load3ds::processNextObjectChunk (Model3d *model, Object3d *object, Chunk3ds *previousChunk)
 {
   currentChunk = new Chunk3ds;
-  if (currentChunk == NULL) ErrorOutOfMemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
     readChunk(currentChunk);
-    if (debug3ds) { fprintf (debugstream3ds, "OBJ %X: ", currentChunk->ID); fflush (debugstream3ds); }
+    if (debug3ds)
+    { fprintf (debugstream3ds, "OBJ %X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
@@ -238,12 +228,12 @@ void Load3ds::processNextMaterialChunk (Model3d *model, Chunk3ds *previousChunk)
 {
   char buf [256];
   currentChunk = new Chunk3ds;
-  if (currentChunk == NULL) ErrorOutOfMemory ();
 
   while (previousChunk->bytesRead < previousChunk->length)
   {
     readChunk(currentChunk);
-    if (debug3ds) { fprintf (debugstream3ds, "MAT %X: ", currentChunk->ID); fflush (debugstream3ds); }
+    if (debug3ds)
+    { fprintf (debugstream3ds, "MAT %X: ", currentChunk->ID); fflush (debugstream3ds); }
 
     switch (currentChunk->ID)
     {
@@ -330,7 +320,6 @@ void Load3ds::readVertexIndices (Object3d *object, Chunk3ds *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTriangles);
 
   object->triangle = new Triangle [object->numTriangles];
-  if (object->triangle == NULL) ErrorOutOfMemory ();
   memset (object->triangle, 0, sizeof (Triangle) * object->numTriangles);
 
   for (int i = 0; i < object->numTriangles; i ++)
@@ -388,7 +377,6 @@ void Load3ds::readUVCoordinates (Object3d *object, Chunk3ds *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTexVertex);
 
   Vector2 *p = new Vector2 [object->numTexVertex];
-  if (p == NULL) ErrorOutOfMemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
   
@@ -403,11 +391,9 @@ void Load3ds::readVertices (Object3d *object, Chunk3ds *previousChunk)
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numVertices);
 
   object->vertex = new Vertex [object->numVertices];
-  if (object->vertex == NULL) ErrorOutOfMemory ();
   memset (object->vertex, 0, sizeof (Vertex) * object->numVertices);
 
   Vector3 *p = new Vector3 [object->numVertices];
-  if (p == NULL) ErrorOutOfMemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
     

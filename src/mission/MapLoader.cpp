@@ -35,6 +35,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cassert>
 
 
 
@@ -122,7 +123,7 @@ void MissionCustom::error (char *msg)
   char buf [TOKENLEN];
   reterror = 1;
   sprintf (buf, "Line %d: %s", maploader->file.getLine (), msg);
-  logging.display (buf, LOG_ERROR);
+  DISPLAY_ERROR(buf);
 }
 
 void MissionCustom::toUpper (char *str)
@@ -875,7 +876,8 @@ void MissionCustom::start ()
 //    map = LoadTga::load (dirs.getMaps (mapfile), &mapx, &mapy);
     if (map == NULL)
     {
-      logging.display ("Map has a valid bpp entry but seems to be corrupt", LOG_FATAL);
+      DISPLAY_FATAL("Map has a valid bpp entry but seems to be corrupt");
+      assert (false);
       exit (1);
     }
 

@@ -657,7 +657,7 @@ void StateStats::key (int key, int x, int y)
   if (key == 27)
   {
     pleaseWait ();
-    logging.display ("Initing new mission", LOG_MOST);
+    DISPLAY_INFO("Initing new mission");
     missionactive = false;
     createMission (MISSION_DEMO);
     game_levelInit ();

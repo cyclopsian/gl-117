@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <cassert>
 
 
 
@@ -273,7 +274,11 @@ void GlLandscape::precalculate ()
     }*/
 
   // Set the height mask for the lowest sunrays touching the landscape's surface
-  // This is just an approximation presuming the sun is a vertical line
+  // This is just an approximation presuming the sun is a vertical
+  // line
+  // This surface is the bottom of the volume lit by direct sunrays
+  // The algorithm is just a constant slope from high point kind,
+  // simplified for the case where the sunrays are along the z axis.
   float m1 = mzoom / hh;
   float ih = tan ((sungamma + 5) * PI / 180) / m1; // 0 degree vertical sun radius
   for (x = 0; x <= MAXX; x ++)
@@ -460,16 +465,16 @@ void GlLandscape::precalculate ()
 // Get height over landscape/water, no interpolation (fast)
 float GlLandscape::getMinHeight (float x, float z)
 {
-  int mx = GETCOORD((int)floor (x));
-  int mz = GETCOORD((int)floor (z));
+  int mx = GETCOORD((int)floorf(x));
+  int mz = GETCOORD((int)floorf(z));
   return (ZOOM * ((float)hcmin[mx/4][mz/4]*zoomz - zoomz2));
 }
 
 // Get height over landscape/water, no interpolation (fast)
 float GlLandscape::getMaxHeight (float x, float z)
 {
-  int mx = GETCOORD((int)floor (x));
-  int mz = GETCOORD((int)floor (z));
+  int mx = GETCOORD((int)floorf(x));
+  int mz = GETCOORD((int)floorf(z));
   return (ZOOM * ((float)hcmax[mx/4][mz/4]*zoomz - zoomz2));
 }
 
@@ -569,8 +574,8 @@ float GlLandscape::getExactLSHeight2 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) floor (mx);
-  int mz1 = (int) floor (mz);
+  int mx1 = (int) floorf(mx);
+  int mz1 = (int) floorf(mz);
   mx1 -= mx1 & 1;
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
@@ -591,8 +596,8 @@ float GlLandscape::getExactLSHeight3 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) floor (mx);
-  int mz1 = (int) floor (mz);
+  int mx1 = (int) floorf(mx);
+  int mz1 = (int) floorf(mz);
   mx1 -= mx1 % 3;
   mz1 -= mz1 % 3;
   int mx2 = mx1 + 3;
@@ -613,8 +618,8 @@ float GlLandscape::getExactLSHeight4 (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) floor (mx);
-  int mz1 = (int) floor (mz);
+  int mx1 = (int) floorf(mx);
+  int mz1 = (int) floorf(mz);
   mx1 -= mx1 & 3;
   mz1 -= mz1 & 3;
   int mx2 = mx1 + 4;
@@ -638,8 +643,8 @@ float GlLandscape::getExactLSHeight (float x, float z)
   else if (gridstep == 4) return getExactLSHeight4 (x, z);
   float mx = x;
   float mz = z;
-  int mx1 = (int) floor (mx);
-  int mz1 = (int) floor (mz);
+  int mx1 = (int) floorf(mx);
+  int mz1 = (int) floorf(mz);
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
   int ax1 = GETCOORD(mx1);
@@ -654,8 +659,8 @@ float GlLandscape::getExactLSHeight (float x, float z)
 // Get height of lowest sunray, no interpolation
 float GlLandscape::getRayHeight (float x, float z)
 {
-  int mx = GETCOORD((int)floor (x));
-  int mz = GETCOORD((int)floor (z));
+  int mx = GETCOORD((int)floorf(x));
+  int mz = GETCOORD((int)floorf(z));
   return (ZOOM * ((float)hray[mx][mz]*zoomz - zoomz2));
 }
 
@@ -664,9 +669,9 @@ float GlLandscape::getExactRayHeight (float x, float z)
 {
   float mx = x;
   float mz = z;
-  int mx1 = (int) floor (mx);
+  int mx1 = (int) floorf(mx);
   int mx2 = mx1 + 1;
-  int mz1 = (int) floor (mz);
+  int mz1 = (int) floorf(mz);
   int mz2 = mz1 + 1;
   int ax1 = GETCOORD(mx1);
   int ax2 = GETCOORD(mx2);
@@ -2023,13 +2028,13 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   if (phi < 0 || phi >= 360)
   {
     sprintf (buf, "Phi exceeds in file %s, line %d, val %d", __FILE__, __LINE__, phi);
-    logging.display (buf, LOG_ERROR);
+    DISPLAY_ERROR(buf);
   }
 
   if (gamma < 0 || gamma >= 360)
   {
     sprintf (buf, "Gamma exceeds in file %s, line %d, val %d", __FILE__, __LINE__, gamma);
-    logging.display (buf, LOG_ERROR);
+    DISPLAY_ERROR(buf);
   }
 
   glPushMatrix ();
@@ -2068,7 +2073,8 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   parts ++;
   if (parts >= PARTS)
   {
-    logging.display ("view exceeds ray casting blocks - not implemented", LOG_FATAL);
+    DISPLAY_FATAL("view exceeds ray casting blocks - not implemented");
+    assert (false);
     exit (6);
   }
 
@@ -2694,12 +2700,18 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl.enableTexture (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    float mydep = 1000;
-    if (quality == 2) mydep = 1800;
-    else if (quality == 3) mydep = 2500;
-    else if (quality == 4) mydep = 3200;
-    else if (quality == 5) mydep = 3800;
+#ifdef HAVE_CGGL
+      // load transform in the tree shader
+      shaders->loadFrameUniformParams(phi);
+      shaders->drawTrees(minx, maxx, miny, maxy, treestep);
+#else
+      // how many trees added ? increases like mydep (the square of the
+      // depth is homogenous to a surface)
+      float mydep = 1000;		         // base 1
+      if (quality == 2) mydep = 1800;      // x 1.8
+      else if (quality == 3) mydep = 2500; // x 1.4
+      else if (quality == 4) mydep = 3200; // x 1.3
+      else if (quality == 5) mydep = 3800; // x 1.2  
     if (mydep > view * view) mydep = view * view;
     int cutdep = 800;
 
@@ -2784,10 +2796,15 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
                 {
                   float cg = g [x] [y];
                   fac = treelightfac * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;
-                  cg = (float) cg * fac;
+                  cg *= fac;
+# ifdef HAVE_CGGL
+			    // another supported CGGL option, also faster
+			    shaders->drawTreeQuad(xs, ys, cg/255.0, dep<cutdep);
+# else
                   if (cg >= 256.0) cg = 255.0;
                   treecolor.c [0] = treecolor.c [1] = treecolor.c [2] = (int) cg;
                   drawTreeQuad (xs, ys, phi, dep < cutdep);
+# endif			    
                 }
             ys += treestep;
           } // ys for
@@ -2803,6 +2820,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
         }
 
     }
+#endif
 
     glDisable (GL_ALPHA_TEST);
     glPopMatrix ();
@@ -3143,6 +3161,9 @@ GlLandscape::GlLandscape (int type, int *heightmask)
   }
 
   if (type >= 0) precalculate (); // do not precalculate anything for custom height maps
+#ifdef HAVE_CGGL
+  shaders = createShaders(*this);
+#endif
 }
 
 #endif

@@ -25,6 +25,7 @@
 #include "logging/Logging.h"
 
 #include <stdio.h>
+#include <cassert>
 
 
 
@@ -35,7 +36,8 @@ TextFileObj::TextFileObj (char *filename)
   if (in == NULL)
   {
     sprintf (buf, "%s %d: Cannot open file %s", __FILE__, __LINE__, filename);
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
     return;
   }

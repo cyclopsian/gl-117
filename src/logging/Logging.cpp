@@ -38,7 +38,7 @@ std::string Logging::filename; */
 Logging::Logging ()
 {
   displayOut = NULL;
-  loglevel = LOG_MOST;
+  loglevel = LOG_INFO;
   filename = "logfile.txt";
 }
 
@@ -58,19 +58,19 @@ void Logging::setFile (const std::string &filename)
   Logging::filename = filename;
 }
 
-void Logging::displayStream (FILE *stream, const std::string &str, int level)
+void Logging::displayStream (FILE *stream, const std::string &str, int level, char *file, int line)
 {
-  if (level == LOG_NONE) fprintf (stream, "%s\n", str.c_str ());
-  else if (level == LOG_FATAL) fprintf (stream, "Fatal: %s\n", str.c_str ());
-  else if (level == LOG_ERROR) fprintf (stream, "Error: %s\n", str.c_str ());
-  else if (level == LOG_WARN) fprintf (stream, "Warning: %s\n", str.c_str ());
-  else if (level == LOG_MOST) fprintf (stream, "Info: %s\n", str.c_str ());
-  else fprintf (stream, "Debug: %s\n", str.c_str ());
+  if (level == LOG_NONE) fprintf (stream, "%s@%d: %s\n", file, line, str.c_str ());
+  else if (level == LOG_FATAL) fprintf (stream, "Fatal: %s@%d: %s\n", file, line, str.c_str ());
+  else if (level == LOG_ERROR) fprintf (stream, "Error: %s@%d: %s\n", file, line, str.c_str ());
+  else if (level == LOG_WARN) fprintf (stream, "Warning: %s@%d: %s\n", file, line, str.c_str ());
+  else if (level == LOG_INFO) fprintf (stream, "Info: %s@%d: %s\n", file, line, str.c_str ());
+  else fprintf (stream, "Debug: %s@%d: %s\n", file, line, str.c_str ());
   fflush (stream);
 }
 
 // display log/debug message
-void Logging::display (const std::string &str, int level)
+void Logging::display (const std::string &str, int level, char *file, int line)
 {
   int len = str.length ();
   if (!len) return;
@@ -80,27 +80,20 @@ void Logging::display (const std::string &str, int level)
     FILE *stream = stdout;
     if (level == LOG_FATAL || level == LOG_ERROR || level == LOG_WARN)
       stream = stderr;
-    displayStream (stream, str, level);
+    displayStream (stream, str, level, file, line);
 
     if (!displayOut)
     {
       if ((displayOut = fopen (filename.c_str (), "wt")) != NULL)
       {
-        displayStream (displayOut, str, level);
+        displayStream (displayOut, str, level, file, line);
       }
     }
     else
     {
-      displayStream (displayOut, str, level);
+      displayStream (displayOut, str, level, file, line);
     }
   }
-}
-
-// display "out of memory" error and exit
-void Logging::errorOutOfMemory ()
-{
-  logging.display ("Out of memory", LOG_FATAL);
-  exit (EXIT_ALLOC);
 }
 
 #endif

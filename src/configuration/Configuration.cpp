@@ -70,7 +70,7 @@ int game = GAME_INIT; // see GAME-constants
 int clouds = 0;
 int camera = 0;
 bool isserver = false;
-int loglevel = LOG_ALL;
+int loglevel = LOG_DEBUG;
 
 // use 0...255 for one byte keys, 256... for special (two byte) beys
 unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
@@ -102,11 +102,11 @@ void Configuration::saveConfig ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("conf");
   sprintf (buf, "Saving %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    logging.display ("Could not save configuration", LOG_ERROR);
+    DISPLAY_ERROR("Could not save configuration");
     fflush (stderr);
     return;
   }
@@ -159,11 +159,11 @@ void Configuration::saveSaveConfig ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("saveconf");
   sprintf (buf, "Saving %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    logging.display ("Could not save working graphics mode configuration", LOG_ERROR);
+    DISPLAY_ERROR("Could not save working graphics mode configuration");
     fflush (stderr);
     return;
   }
@@ -184,7 +184,7 @@ int Configuration::loadConfig ()
   char *str;
   char *confname = dirs.getSaves ("conf");
   sprintf (buf, "Loading %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -326,7 +326,7 @@ int Configuration::loadSaveConfig ()
   char *str;
   char *confname = dirs.getSaves ("saveconf");
   sprintf (buf, "Loading %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   ConfigFile *cf = new ConfigFile (confname);
 
   if (cf->buf [0] == 0) // no file found
@@ -383,11 +383,11 @@ void Configuration::saveConfigInterface ()
   ConfigFile *cf = new ConfigFile ();
   char *confname = dirs.getSaves ("conf.interface");
   sprintf (buf, "Saving %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   int ret1 = cf->openOutput (confname);
   if (ret1 == 0)
   {
-    logging.display ("Could not save interface configuration", LOG_ERROR);
+    DISPLAY_ERROR("Could not save interface configuration");
     return;
   }
   cf->writeText ("# Interface configuration\n");
@@ -503,7 +503,7 @@ int Configuration::loadConfigInterface ()
   char *str;
   char *confname = dirs.getSaves ("conf.interface");
   sprintf (buf, "Loading %s ", confname);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
   ConfigFile *cf = new ConfigFile (confname);
 
   str = cf->getString (ret, "key_firecannon");

@@ -3,7 +3,7 @@
 
 /* Use nVidia C for Graphics (shaders) */
 #define HAVE_CGGL 1
-
+#undef HAVE_CGGL
 /* Use GL library */
 #define HAVE_GL 1
 

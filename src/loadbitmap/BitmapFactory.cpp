@@ -23,7 +23,7 @@
 
 #include "Bitmap.h"
 
-#include <assert.h>
+#include <cassert>
 
 BitmapList BitmapFactory::bitmapList = BitmapList ();
 

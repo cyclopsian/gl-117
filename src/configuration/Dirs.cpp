@@ -34,6 +34,8 @@
 #include "configuration/Dirs.h"
 #include "logging/Logging.h"
 
+#include <cassert>
+
 
 
 Dirs dirs;
@@ -97,8 +99,9 @@ void Dirs::init (char *arg)
   }
   else
   {
-    logging.display ("Binary file has no context to the data files", LOG_FATAL);
-    logging.display ("Do not execute from console, just doubleclick", LOG_MOST);
+    DISPLAY_FATAL("Binary file has no context to the data files");
+    DISPLAY_WARN("Do not execute from console, just doubleclick");
+    assert (false);
     exit (EXIT_CONTEXT);
   }
   strcpy (textures, path);
@@ -107,6 +110,7 @@ void Dirs::init (char *arg)
   strcpy (models, path);
   strcpy (saves, path);
   strcpy (maps, path);
+  strcpy (shaders, path);
   append (saves, "saves");
 #else
   char buf [4096];
@@ -217,6 +221,7 @@ void Dirs::init (char *arg)
     strcpy (sound, env);
     strcpy (models, env);
     strcpy (maps, env);
+    strcpy (shaders, path);
   }
   else
   {
@@ -227,6 +232,7 @@ void Dirs::init (char *arg)
     strcpy (sound, myfile);
     strcpy (models, myfile);
     strcpy (maps, myfile);
+    strcpy (shaders, myfile);
   }
 #endif
   append (textures, "textures");
@@ -234,6 +240,7 @@ void Dirs::init (char *arg)
   append (sound, "sounds");
   append (models, "models");
   append (maps, "maps");
+  append (shaders, "shaders");
 }
 
 Dirs::~Dirs ()
@@ -278,6 +285,13 @@ char *Dirs::getModels (char *name)
 char *Dirs::getMaps (char *name)
 {
   strcpy (dir, maps);
+  strcat (dir, name);
+  return dir;
+}
+
+char *Dirs::getShaders (char *name)
+{
+  strcpy (dir, shaders);
   strcat (dir, name);
   return dir;
 }

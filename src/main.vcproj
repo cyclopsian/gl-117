@@ -78,7 +78,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\cygwin\home\Tom\gl-117\gl-117\src&quot;;&quot;C:\cygwin\home\Primetime\gl-117\gl-117\src&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Programme\NVIDIA Corporation\Cg\include&quot;;&quot;C:\cygwin\home\Tom\gl-117\gl-117\src&quot;;&quot;C:\cygwin\home\Primetime\gl-117\gl-117\src&quot;"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -99,10 +99,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib cg.lib cggl.lib"
 				OutputFile=".\Debug/main.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="&quot;C:\Programme\NVIDIA Corporation\Cg\lib&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/main.pdb"
 				SubSystem="1"/>
@@ -632,6 +633,16 @@
 			</File>
 			<File
 				RelativePath=".\effects\Star.cpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="shader"
+			Filter="">
+			<File
+				RelativePath=".\shader\GlShaders.cpp">
+			</File>
+			<File
+				RelativePath=".\shader\GlShaders.h">
 			</File>
 		</Filter>
 	</Files>

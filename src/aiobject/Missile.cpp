@@ -29,7 +29,7 @@
 #include "game/globals.h"
 #include "math/Math.h"
 
-#include "assert.h"
+#include <cassert>
 
 
 Missile::Missile () : AIObj ()

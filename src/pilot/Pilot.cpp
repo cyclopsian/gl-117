@@ -67,7 +67,7 @@ void Pilot::load ()
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
-    logging.display ("Could not load pilot", LOG_WARN);
+    DISPLAY_WARN("Could not load pilot");
     return;
   }
   char saveversion [20];
@@ -94,7 +94,7 @@ void Pilot::save ()
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {
-    logging.display ("Could not write pilot", LOG_WARN);
+    DISPLAY_WARN("Could not write pilot");
     return;
   }
   fwrite (SAVEVERSION, sizeof (char), strlen (SAVEVERSION), out);

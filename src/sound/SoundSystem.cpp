@@ -26,6 +26,7 @@
 #include "SoundSystem.h"
 #include "logging/Logging.h"
 #include "configuration/Dirs.h"
+#include <cassert>
 
 
 
@@ -55,10 +56,10 @@ SoundSystem::SoundSystem ()
   }
   delete waveclick1;
 #else
-  logging.display ("Using SDL_mixer", LOG_MOST);
+  DISPLAY_INFO("Using SDL_mixer");
   if (Mix_OpenAudio (22050, AUDIO_S16, 2, 4096))
   {
-    logging.display ("Unable to open audio device", LOG_ERROR);
+    DISPLAY_ERROR("Unable to open audio device");
     audio = false;
     return;
   }
@@ -70,7 +71,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open winner.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -78,7 +80,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open loser.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -86,7 +89,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open dark.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -94,7 +98,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open stars.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -102,7 +107,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open ambient.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -110,7 +116,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -118,7 +125,17 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
+    exit (EXIT_LOADFILE);
+  }
+  Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs.getMusic ("computa2.xm"));
+  if (music1 == NULL)
+  {
+    sprintf (buf, "Cannot open computa2.xm: %s", Mix_GetError ());
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
@@ -126,7 +143,8 @@ SoundSystem::SoundSystem ()
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_LOADFILE);
   }
   playtime = 0;

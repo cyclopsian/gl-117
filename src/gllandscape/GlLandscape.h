@@ -28,6 +28,7 @@
 
 #include "model3d/Model3d.h" // ok
 #include "landscape/Landscape.h" // ok
+#include "shader/GlShaders.h"
 
 
 
@@ -107,9 +108,22 @@ class GlLandscape : public Landscape
     float sunlight;
 //    Space *space;
 
+#ifdef HAVE_CGGL
+    GlShaders * shaders;
+#endif
+
   public:
 
+    friend class TreeShader;
+
     GlLandscape (int type, int *heightmask);
+    ~GlLandscape()
+    {
+#ifdef HAVE_CGGL
+      destroyShaders(shaders);
+      shaders = 0;
+#endif
+    }
 
     void precalculate (); ///< precalculate everything (colors, light mask)
     float getView (); ///< get current view depth depending on the weather

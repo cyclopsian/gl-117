@@ -58,6 +58,7 @@ TODO list:
 #include "loadmodel/Model3dFactory.h"
 
 #include <ctype.h>
+#include <cassert>
 
 
 
@@ -655,7 +656,7 @@ int game_levelInit ()
     {
       if (((MissionCustom *) mission)->reterror)
       {
-        logging.display ("Could not startup mission", LOG_ERROR);
+        DISPLAY_ERROR("Could not startup mission");
         delete mission;
         mission = missionold;
         return 0;
@@ -1093,7 +1094,7 @@ void switch_mission (int missionid)
   {
     if (((MissionCustom *) missionnew)->reterror)
     {
-      logging.display ("Could not init mission", LOG_ERROR);
+      DISPLAY_ERROR("Could not init mission");
       // play error sound
       switch_menu ();
       return;
@@ -1583,7 +1584,7 @@ void game_quit ()
   conf.saveConfig ();
   conf.saveConfigInterface ();
   pilots->save (dirs.getSaves ("pilots"));
-  logging.display ("Pilots saved", LOG_MOST);
+  DISPLAY_INFO("Pilots saved");
   for (i = 0; i < maxlaser; i ++)
     delete (laser [i]);
   for (i = 0; i < maxmissile; i ++)
@@ -1710,7 +1711,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 
   char buf [4096];
   sprintf (buf, "selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift);
-  logging.display (buf, LOG_ALL);
+  DISPLAY_DEBUG(buf);
   return pickz2;
 }
 
@@ -1859,15 +1860,15 @@ int inittimer_gl117 = 0;
 // load game data (this method does not really belong to the intro itself)
 void myFirstInit ()
 {
-  logging.display ("Creating calculation tables", LOG_ALL);
+  DISPLAY_DEBUG("Creating calculation tables");
 //  mathtab_init ();
 
-  logging.display ("Creating advanced OpenGL methods", LOG_ALL);
+  DISPLAY_DEBUG("Creating advanced OpenGL methods");
 //  gl = new GlPrimitives ();
 //  frustum = new Frustum ();
 
   // create textures (OpenGL)
-  logging.display ("Loading textures", LOG_ALL);
+  DISPLAY_DEBUG("Loading textures");
   load3ds.setTextureDir (std::string (dirs.getTextures ("")));
   texgrass = new Texture (std::string (dirs.getTextures ("grass1.tga")), 0, 1, false);
   texrocks = new Texture (std::string (dirs.getTextures ("rocks1.tga")), 0, 1, false);
@@ -1911,61 +1912,61 @@ void myFirstInit ()
   texradar2 = new Texture (std::string (dirs.getTextures ("radar1.tga")), -1, 0, true);
   texarrow = new Texture (std::string (dirs.getTextures ("arrow.tga")), -1, 0, true);
 
-  logging.display ("Loading Fonts", LOG_ALL);
+  DISPLAY_DEBUG("Loading Fonts");
   font1 = new Font (dirs.getTextures ("font1.tga"), 32, '!', 64);
 //  font1 = new Font (dirs.getTextures ("font3.tga"), 37, '!', 100);
   font2 = new Font (dirs.getTextures ("font2.tga"), 32, '!', 64);
 
-  logging.display ("Loading 3ds models:", LOG_ALL);
-  logging.display (" * gl-14c.3ds", LOG_ALL);
+  DISPLAY_DEBUG("Loading 3ds models:");
+  DISPLAY_DEBUG(" * gl-14c.3ds");
   load3ds.import3ds (&model_figb, dirs.getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
-  logging.display (" * gl-16.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-16.3ds");
   load3ds.import3ds (&model_fig, dirs.getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
-  logging.display (" * gl-15.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-15.3ds");
   load3ds.import3ds (&model_figa, dirs.getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
-  logging.display (" * gl-14d.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-14d.3ds");
   load3ds.import3ds (&model_figc, dirs.getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
-  logging.display (" * gl-21b.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-21b.3ds");
   load3ds.import3ds (&model_figd, dirs.getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
-  logging.display (" * gl-21.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-21.3ds");
   load3ds.import3ds (&model_fige, dirs.getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
-  logging.display (" * gl-14b.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-14b.3ds");
   load3ds.import3ds (&model_figf, dirs.getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
-  logging.display (" * gl-14.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-14.3ds");
   load3ds.import3ds (&model_figg, dirs.getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
-  logging.display (" * gl-29.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-29.3ds");
   load3ds.import3ds (&model_figh, dirs.getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
   model_figh.scaleTexture (0.3, 0.3);
-  logging.display (" * gl-50.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-50.3ds");
   load3ds.import3ds (&model_figi, dirs.getModels ("gl-50.3ds"));
   model_figi.setName ("STORM");
-  logging.display (" * transp2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * transp2.3ds");
   load3ds.import3ds (&model_figt, dirs.getModels ("transp2.3ds"));
   model_figt.setName ("TRANSPORT");
-  logging.display (" * transp4.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * transp4.3ds");
   load3ds.import3ds (&model_figu, dirs.getModels ("transp4.3ds"));
   model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
   float cannoncube = 0.025;
-  logging.display (" * cannon1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * cannon1.3ds");
   load3ds.import3ds (&model_cannon1, dirs.getModels ("cannon1.3ds"));
   model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
-  logging.display (" * cannon1b.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * cannon1b.3ds");
   load3ds.import3ds (&model_cannon1b, dirs.getModels ("cannon1b.3ds"));
   model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
 
   // cannon at night
-  logging.display (" * cannon2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * cannon2.3ds");
   load3ds.import3ds (&model_cannon2, dirs.getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
   model_cannon2.alpha = true;
@@ -1980,7 +1981,7 @@ void myFirstInit ()
   model_cannon2.object [0]->vertex [2].color.c [3] = 50;
   model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
 
-  logging.display (" * cannon2b.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * cannon2b.3ds");
   load3ds.import3ds (&model_cannon2b, dirs.getModels ("cannon2b.3ds"));
   model_cannon2b.nolight = true;
   model_cannon2b.alpha = true;
@@ -1998,122 +1999,122 @@ void myFirstInit ()
   }
   model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
 
-  logging.display (" * flare1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * flare1.3ds");
   load3ds.import3ds (&model_flare1, dirs.getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
   model_flare1.nolight = true;
-  logging.display (" * chaff1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * chaff1.3ds");
   load3ds.import3ds (&model_chaff1, dirs.getModels ("chaff1.3ds"));
   model_chaff1.setName ("CHAFF");
   model_chaff1.alpha = true;
   model_chaff1.nolight = true;
-  logging.display (" * missile1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile1.3ds");
   load3ds.import3ds (&model_missile1, dirs.getModels ("missile1.3ds"));
   model_missile1.setName ("AAM HS MK1");
-  logging.display (" * missile2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile2.3ds");
   load3ds.import3ds (&model_missile2, dirs.getModels ("missile2.3ds"));
   model_missile2.setName ("AAM HS MK2");
-  logging.display (" * missile3.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile3.3ds");
   load3ds.import3ds (&model_missile3, dirs.getModels ("missile3.3ds"));
   model_missile3.setName ("AAM HS MK3");
-  logging.display (" * missile4.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile4.3ds");
   load3ds.import3ds (&model_missile4, dirs.getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
-  logging.display (" * missile5.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile5.3ds");
   load3ds.import3ds (&model_missile5, dirs.getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
-  logging.display (" * missile6.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile6.3ds");
   load3ds.import3ds (&model_missile6, dirs.getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
-  logging.display (" * missile7.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile7.3ds");
   load3ds.import3ds (&model_missile7, dirs.getModels ("missile7.3ds"));
   model_missile7.setName ("AAM FF MK1");
-  logging.display (" * missile8.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * missile8.3ds");
   load3ds.import3ds (&model_missile8, dirs.getModels ("missile8.3ds"));
   model_missile8.setName ("AAM FF MK2");
-  logging.display (" * flak2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * flak2.3ds");
   load3ds.import3ds (&model_flak1, dirs.getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
-  logging.display (" * flarak1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * flarak1.3ds");
   load3ds.import3ds (&model_flarak1, dirs.getModels ("flarak1.3ds"));
   model_flarak1.setName ("SAM");
-  logging.display (" * ship1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * ship1.3ds");
   load3ds.import3ds (&model_ship1, dirs.getModels ("ship1.3ds"));
   model_ship1.setName ("CRUISER");
-  logging.display (" * tent1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * tent1.3ds");
   load3ds.import3ds (&model_tent1, dirs.getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
-  logging.display (" * gl-117.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * gl-117.3ds");
   load3ds.import3ds (&model_gl117, dirs.getModels ("gl-117.3ds"));
 //  model_gl117.displaylist = false;
-  logging.display (" * tank1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * tank1.3ds");
   load3ds.import3ds (&model_tank1, dirs.getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
-  logging.display (" * container1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * container1.3ds");
   load3ds.import3ds (&model_container1, dirs.getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
-  logging.display (" * ship2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * ship2.3ds");
   load3ds.import3ds (&model_ship2, dirs.getModels ("ship2.3ds"));
   model_ship2.setName ("LIGHT DESTROYER");
-  logging.display (" * truck1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * truck1.3ds");
   load3ds.import3ds (&model_truck1, dirs.getModels ("truck1.3ds"));
   model_truck1.setName ("TRUCK");
-  logging.display (" * truck2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * truck2.3ds");
   load3ds.import3ds (&model_truck2, dirs.getModels ("truck2.3ds"));
   model_truck2.setName ("TRUCK");
-  logging.display (" * trsam.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * trsam.3ds");
   load3ds.import3ds (&model_trsam, dirs.getModels ("trsam.3ds"));
   model_trsam.setName ("MOBILE SAM");
-  logging.display (" * pickup1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * pickup1.3ds");
   load3ds.import3ds (&model_pickup1, dirs.getModels ("pickup1.3ds"));
   model_pickup1.setName ("PICKUP");
-  logging.display (" * pickup2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * pickup2.3ds");
   load3ds.import3ds (&model_pickup2, dirs.getModels ("pickup2.3ds"));
   model_pickup2.setName ("PICKUP");
-  logging.display (" * tank2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * tank2.3ds");
   load3ds.import3ds (&model_tank2, dirs.getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
   model_tank2.scaleTexture (0.5, 0.5);
-  logging.display (" * tent4.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * tent4.3ds");
   load3ds.import3ds (&model_tent4, dirs.getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
-  logging.display (" * hall1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * hall1.3ds");
   load3ds.import3ds (&model_hall1, dirs.getModels ("hall1.3ds"));
   model_hall1.setName ("HALL");
-  logging.display (" * hall2.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * hall2.3ds");
   load3ds.import3ds (&model_hall2, dirs.getModels ("hall2.3ds"));
   model_hall2.setName ("HALL");
-  logging.display (" * oilrig.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * oilrig.3ds");
   load3ds.import3ds (&model_oilrig, dirs.getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
   model_oilrig.alpha = true;
-  logging.display (" * egg.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * egg.3ds");
   load3ds.import3ds (&model_egg, dirs.getModels ("egg.3ds"));
   model_egg.scaleTexture (0.08, 0.08);
   model_egg.setName ("COMPLEX");
-  logging.display (" * radar.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * radar.3ds");
   load3ds.import3ds (&model_radar, dirs.getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
-  logging.display (" * mine1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * mine1.3ds");
   load3ds.import3ds (&model_mine1, dirs.getModels ("mine1.3ds"));
   model_mine1.setName ("MINE");
-  logging.display (" * aster1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * aster1.3ds");
   load3ds.import3ds (&model_aster1, dirs.getModels ("aster1.3ds"));
   model_aster1.setName ("ASTEROID");
-  logging.display (" * base1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * base1.3ds");
   load3ds.import3ds (&model_base1, dirs.getModels ("base1.3ds"));
   model_base1.setName ("MOON BASE");
-  logging.display (" * barrier.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * barrier.3ds");
   load3ds.import3ds (&model_barrier1, dirs.getModels ("barrier.3ds"));
   model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
-  logging.display (" * rubble.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * rubble.3ds");
   load3ds.import3ds (&model_rubble1, dirs.getModels ("rubble.3ds"));
   model_base1.setName ("RUBBLE");
-  logging.display (" * depot1.3ds", LOG_ALL);
+  DISPLAY_DEBUG(" * depot1.3ds");
   load3ds.import3ds (&model_depot1, dirs.getModels ("depot1.3ds"));
   model_depot1.setName ("DEPOT");
   model_depot1.scaleTexture (2, 2);
@@ -2137,7 +2138,7 @@ void myFirstInit ()
   // fill polygons (GL_LINE for wireframe models)
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
-  logging.display ("Setting up world geometry", LOG_ALL);
+  DISPLAY_DEBUG("Setting up world geometry");
   space = new Space ();
 //  space->drawLight = true;
 //  space->z1.set (-ZOOM, -ZOOM, -ZOOM);
@@ -2578,7 +2579,7 @@ static void myTimerFunc (int value)
     dt = 1;
     if (gamestate == &stateplay && multiplayer)
     {
-      logging.display ("Out of sync", LOG_ERROR);
+      DISPLAY_ERROR("Out of sync");
       switch_menu ();
     }
   }
@@ -2896,7 +2897,7 @@ bool configinit = false; // has GLUT/SDL already been inited?
 // test screen settings automatically
 void config_test (int argc, char **argv)
 {
-  logging.display ("No configuration file found. Testing...", LOG_MOST);
+  DISPLAY_INFO("No configuration file found. Testing...");
   int bppi [4];
 
 #ifdef USE_GLUT // GLUT ONLY
@@ -2906,11 +2907,12 @@ void config_test (int argc, char **argv)
   configinit = true;
 #else // SDL
   char buf [4096];
-  logging.display ("Using SDL and GLUT", LOG_MOST);
+  DISPLAY_INFO("Using SDL and GLUT");
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
     sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
-    logging.display (buf, LOG_FATAL);
+    assert (false);
+    DISPLAY_FATAL(buf);
     exit (EXIT_INIT);
   }
   configinit = true;
@@ -2935,7 +2937,8 @@ void config_test (int argc, char **argv)
 
   if (valids == -1)
   {
-    logging.display ("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.", LOG_FATAL);
+    DISPLAY_FATAL("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.");
+    assert (false);
     exit (EXIT_INIT);
   }
 
@@ -2954,13 +2957,13 @@ void config_test (int argc, char **argv)
 // get startup help screen
 void viewParameters ()
 {
-  logging.display (" ", LOG_NONE);
-  logging.display ("Usage: gl-117 [-h -v -dLEVEL]", LOG_NONE);
-  logging.display (" ", LOG_NONE);
-  logging.display ("-h: Display this help screen and quit", LOG_NONE);
-  logging.display ("-v: Display version string and quit", LOG_NONE);
-  logging.display ("-dLEVEL: Set debug LEVEL to 0=silent...5=log all", LOG_NONE);
-  logging.display (" ", LOG_NONE);
+  DISPLAY(" ", LOG_NONE);
+  DISPLAY("Usage: gl-117 [-h -v -dLEVEL]", LOG_NONE);
+  DISPLAY(" ", LOG_NONE);
+  DISPLAY("-h: Display this help screen and quit", LOG_NONE);
+  DISPLAY("-v: Display version string and quit", LOG_NONE);
+  DISPLAY("-dLEVEL: Set debug LEVEL to 0=silent...5=log all", LOG_NONE);
+  DISPLAY(" ", LOG_NONE);
 }
 
 void checkargs (int argc, char **argv)
@@ -2974,21 +2977,21 @@ void checkargs (int argc, char **argv)
     {
       char *ptr = &argv [i] [2];
       loglevel = atoi (ptr);
-      if (loglevel < LOG_NONE || loglevel > LOG_ALL) // look at common.h for the constants
+      if (loglevel < LOG_NONE || loglevel > LOG_DEBUG) // look at common.h for the constants
       {
-        logging.display ("Invalid debug level", LOG_FATAL);
+        DISPLAY_FATAL("Invalid debug level");
         viewParameters ();
         exit (EXIT_COMMAND);
       }
       else
       {
         sprintf (buf, "Entering debug level %d", loglevel);
-        logging.display (buf, LOG_MOST);
+        DISPLAY_INFO(buf);
       }
     }
     else if (argv [i] [1] == 'v') // display version string
     {
-      logging.display (VERSIONSTRING, LOG_NONE);
+      DISPLAY(VERSIONSTRING, LOG_NONE);
       exit (EXIT_NORMAL);
     }
     else if (argv [i] [1] == 'h') // display startup help screen
@@ -2998,7 +3001,7 @@ void checkargs (int argc, char **argv)
     }
     else
     {
-      logging.display ("Invalid command line parameter", LOG_FATAL);
+      DISPLAY_FATAL("Invalid command line parameter");
       viewParameters ();
       exit (EXIT_COMMAND);
     }
@@ -3984,18 +3987,18 @@ int main (int argc, char **argv)
   logging.setLevel (loglevel);
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
-  logging.display (buf, LOG_MOST);
+  DISPLAY_INFO(buf);
 
 #ifdef _MSC_VER
-  logging.display ("Windows detected ", LOG_MOST);
+  DISPLAY_INFO("Windows detected");
 #endif
 
-  logging.display ("Getting directory locations", LOG_ALL);
+  DISPLAY_DEBUG("Getting directory locations");
   
   if (!conf.loadConfig ()) // try to load conf file (conf.cpp) and validate settings
   {
     // no conf file found => create new one
-    logging.display ("Creating new configuration", LOG_ALL);
+    DISPLAY_DEBUG("Creating new configuration");
     config_test (argc, argv); // do screen test
     firststart = true; // enable adjusting quality/view/graphics automatically by the game
   }
@@ -4013,7 +4016,7 @@ int main (int argc, char **argv)
   server = NULL;
   client = NULL;
 
-  logging.display ("Creating/Loading pilots list", LOG_ALL);
+  DISPLAY_DEBUG("Creating/Loading pilots list");
   pilots = new PilotList (dirs.getSaves ("pilots")); // look at pilots.h
 
   gamestate = &stateinit;
@@ -4069,12 +4072,13 @@ int main (int argc, char **argv)
 // SDL FOUND
 #else
 
-  logging.display ("Using SDL and GLUT", LOG_MOST);
+  DISPLAY_INFO("Using SDL and GLUT");
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
       sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
-      logging.display (buf, LOG_FATAL);
+      assert (false);
+      DISPLAY_FATAL(buf);
       exit (EXIT_INIT);
     }
   atexit (SDL_Quit);
@@ -4098,35 +4102,36 @@ int main (int argc, char **argv)
       if (!setScreen (width, height, bpp, fullscreen))
       {
         sprintf (buf, "No working display mode %dx%d found.", width, height);
-        logging.display (buf, LOG_FATAL);
+        assert (false);
+        DISPLAY_FATAL(buf);
         exit (EXIT_INIT);
       }
     }
   }
 
-  logging.display ("Setting SDL caption", LOG_ALL);
+  DISPLAY_DEBUG("Setting SDL caption");
   SDL_WM_SetCaption ("GL-117", "GL-117"); // window name
 
   SDL_ShowCursor (0);
 
-  logging.display ("Creating sound system", LOG_ALL);
+  DISPLAY_DEBUG("Creating sound system");
   sound = new SoundSystem (); // look at audio.cpp
   sound->volumesound = volumesound;
   sound->volumemusic = volumemusic;
   sound->setVolume (); // set all sound volumes
   sound->setVolumeMusic (); // set all music volumes
 
-  logging.display ("Playing startup music", LOG_ALL);
+  DISPLAY_DEBUG("Playing startup music");
   sound->playMusic (1);
 #ifdef HAVE_SDL_MIXER
   Mix_HookMusicFinished (playRandomMusic);
 #endif
 
-  logging.display ("Calling main initialization method", LOG_ALL);
+  DISPLAY_DEBUG("Calling main initialization method");
   myFirstInit ();
   myReshapeFunc (width, height);
 
-  logging.display ("Querying joystick", LOG_ALL);
+  DISPLAY_DEBUG("Querying joystick");
   joysticks = SDL_NumJoysticks ();
   memset (jaxis, 0, maxjaxis * maxjoysticks * sizeof (int));
   if (joysticks > 0)
@@ -4137,12 +4142,12 @@ int main (int argc, char **argv)
       sdljoystick [i] = SDL_JoystickOpen (i);
       sdljoystickaxes [i] = SDL_JoystickNumAxes (sdljoystick [i]);
       sprintf (buf, "Joystick \"%s\" detected", SDL_JoystickName (i));
-      logging.display (buf, LOG_MOST);
+      DISPLAY_INFO(buf);
     }
   }
   else
   {
-    logging.display ("No joystick found", LOG_MOST);
+    DISPLAY_INFO("No joystick found");
 //    sdljoystick [0] = NULL;
     if (controls == CONTROLS_JOYSTICK) // no joystick available, so switch to mouse controls
       controls = CONTROLS_MOUSE;
@@ -4163,7 +4168,7 @@ int main (int argc, char **argv)
 
   createMenu ();
 
-  logging.display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
+  DISPLAY_DEBUG("Entering SDL main loop (GLUT emulation)");
   sdlMainLoop (); // simulate GLUT's main loop (above)
 
 #endif

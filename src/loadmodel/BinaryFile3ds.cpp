@@ -25,7 +25,7 @@
 #include "logging/Logging.h"
 
 #include <stdio.h>
-
+#include <cassert>
 
 
 BinaryFile3ds::BinaryFile3ds (const char *filename)
@@ -35,7 +35,8 @@ BinaryFile3ds::BinaryFile3ds (const char *filename)
   if (in == NULL)
   {
     sprintf (buf, "Cannot open file %s", filename);
-    logging.display (buf, LOG_FATAL);
+    DISPLAY_FATAL(buf, LOG_FATAL);
+    assert (false);
     exit (EXIT_LOADFILE);
     return;
   }
@@ -43,8 +44,6 @@ BinaryFile3ds::BinaryFile3ds (const char *filename)
   size = ftell (in);
   fseek (in, 0, SEEK_SET);
   data = new unsigned char [size];
-  if (data == NULL)
-    ErrorOutOfMemory ();
   memset (data, 0, size);
   Uint32 z = 0;
   while (z < size)
@@ -67,6 +66,7 @@ BinaryFile3ds::~BinaryFile3ds ()
 
 int BinaryFile3ds::readFloat (float *f)
 {
+  assert (filepointer < size);
 #ifdef WORDS_BIGENDIAN
   ret [0] = data [filepointer + 3];
   ret [1] = data [filepointer + 2];
@@ -83,6 +83,7 @@ int BinaryFile3ds::readFloat (float *f)
 
 int BinaryFile3ds::readFloat (float *f, const int n)
 {
+  assert (filepointer < size);
   int i;
   for (i = 0; i < n; i ++)
   {
@@ -93,6 +94,7 @@ int BinaryFile3ds::readFloat (float *f, const int n)
 
 int BinaryFile3ds::readUInt32 (Uint32 *i)
 {
+  assert (filepointer < size);
 #ifdef WORDS_BIGENDIAN
   ret [0] = data [filepointer + 3];
   ret [1] = data [filepointer + 2];
@@ -109,6 +111,7 @@ int BinaryFile3ds::readUInt32 (Uint32 *i)
 
 int BinaryFile3ds::readUInt16 (Uint16 *i)
 {
+  assert (filepointer < size);
 #ifdef WORDS_BIGENDIAN
   ret [0] = data [filepointer + 1];
   ret [1] = data [filepointer + 0];
@@ -123,6 +126,7 @@ int BinaryFile3ds::readUInt16 (Uint16 *i)
 
 int BinaryFile3ds::readString (char *ptr, const int ptrmax, const int len)
 {
+  assert (filepointer < size);
   int n = len;
   if (n <= 0) return 0;
   if (filepointer + n > size)
@@ -135,6 +139,7 @@ int BinaryFile3ds::readString (char *ptr, const int ptrmax, const int len)
 
 int BinaryFile3ds::readString (char *ptr, const int len)
 {
+  assert (filepointer < size);
   int n = len;
   if (n <= 0) return 0;
   if (filepointer + n > size)
@@ -146,6 +151,7 @@ int BinaryFile3ds::readString (char *ptr, const int len)
 
 int BinaryFile3ds::readString (char *ptr)
 {
+  assert (filepointer < size);
   int i = 0;
   while (data [filepointer] != 0 && filepointer < size)
   {
@@ -161,6 +167,7 @@ int BinaryFile3ds::readString (char *ptr)
 
 int BinaryFile3ds::skip (const int len)
 {
+  assert (filepointer < size);
   int n = len;
   if (filepointer + n > size)
     n = size - filepointer;
