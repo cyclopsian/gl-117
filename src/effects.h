@@ -26,11 +26,12 @@
 
 #include "model.h" // ok
 #include "object.h" // ok
+#include "mathtab.h" // ok
 
-const int maxsmokeelem = 30; // smoke quads to be rendered
+//const int maxsmokeelem = 40;
 
-extern CTexture *texsmoke, *texsmoke2, *texsmoke3; // some smoke textures
-extern const float smokezoom[]; // zoom values of the smoke quads
+extern CTexture *texsmoke, *texsmoke2, *texsmoke3;
+//extern const float smokezoom[];
 
 // Smoke of missiles and fighters
 class CSmoke
@@ -130,7 +131,7 @@ class Font
 
   bool isPixel (int x, int y); // is pixel set in the texture?
   void extractLetters (int height, char start, int num); // extract the letters
-  
+
   // some custom OpenGL output methods
   void drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol);
   void drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);

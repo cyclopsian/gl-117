@@ -215,6 +215,7 @@ int MissionCustom::parseMapData ()
       else if (!strcmp (value, "ALPINE_LOW")) map_type = LANDSCAPE_LOW_ALPINE;
       else if (!strcmp (value, "ALPINE_EROSION")) map_type = LANDSCAPE_ALPINE_EROSION;
       else if (!strcmp (value, "ALPINE_SEA")) map_type = LANDSCAPE_ALPINE_SEA;
+      else if (!strcmp (value, "ALPINE_ROCKY")) map_type = LANDSCAPE_ALPINE_ROCKY;
       else if (!strcmp (value, "SEA")) map_type = LANDSCAPE_SEA;
       else if (!strcmp (value, "MOON")) map_type = LANDSCAPE_MOON;
       else if (!strcmp (value, "MOON_FLAT")) map_type = LANDSCAPE_FLAT_MOON;

@@ -65,7 +65,9 @@ class ConfigFile
 
 // special config files of GL-117: conf and conf.interface
 extern void save_config ();
+extern void save_saveconfig ();
 extern int load_config ();
+extern int load_saveconfig ();
 extern void save_configInterface ();
 extern int load_configInterface ();
 

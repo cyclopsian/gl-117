@@ -35,4 +35,7 @@ extern int extremerandom (int n, int x, int y); // random integer number [0;n-1]
 extern float dist (float dx, float dy); // distance (Euklidean norm, 2D vector)
 extern int randptr;
 
+extern const int maxsmokeelem = 40;
+extern float smokezoom [maxsmokeelem];
+
 #endif

@@ -837,7 +837,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 20;
     chaffs = 20;
     statfirepower = 1;
-    ammo = 1000;
+    ammo = 1200;
   }
   else if (id == FIGHTER_SWALLOW)
   {
@@ -854,7 +854,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 20;
     bomber = 1;
     statfirepower = 3;
-    ammo = 1000;
+    ammo = 1200;
   }
   else if (id == FIGHTER_HAWK)
   {
@@ -871,7 +871,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 20;
     bomber = 1;
     statfirepower = 2;
-    ammo = 1000;
+    ammo = 1200;
   }
   else if (id == FIGHTER_HAWK2)
   {
@@ -888,7 +888,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 20;
     bomber = 1;
     statfirepower = 3;
-    ammo = 1200;
+    ammo = 1400;
     dualshot = true;
   }
   else if (id == FIGHTER_TRANSPORT)
@@ -935,7 +935,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 20;
     chaffs = 20;
     statfirepower = 2;
-    ammo = 1000;
+    ammo = 1200;
   }
   else if (id == FIGHTER_CROW)
   {
@@ -951,7 +951,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 20;
     chaffs = 20;
     statfirepower = 1;
-    ammo = 800;
+    ammo = 1000;
   }
   else if (id == FIGHTER_STORM)
   {
@@ -967,7 +967,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 25;
     chaffs = 25;
     statfirepower = 4;
-    ammo = 1500;
+    ammo = 1800;
   }
   else if (id == FIGHTER_PHOENIX)
   {
@@ -984,7 +984,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     chaffs = 25;
     bomber = 1;
     statfirepower = 5;
-    ammo = 1500;
+    ammo = 2000;
     dualshot = true;
   }
   else if (id == FIGHTER_REDARROW)
@@ -1001,7 +1001,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 25;
     chaffs = 25;
     statfirepower = 2;
-    ammo = 1200;
+    ammo = 1400;
     dualshot = true;
   }
   else if (id == FIGHTER_BLACKBIRD)
@@ -1018,7 +1018,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     flares = 25;
     chaffs = 25;
     statfirepower = 2;
-    ammo = 1200;
+    ammo = 1400;
     dualshot = true;
   }
   if (id >= FIGHTER1 && id <= FIGHTER2)
@@ -2012,12 +2012,21 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     float sz = COS(gamma) * COS(phi) * zoom * 1.1; // polar (spherical) coordinates
     float sy = -SIN(gamma) * zoom * 1.1;
     float sx = COS(gamma) * SIN(phi) * zoom * 1.1;
-    // four smoke elements per discrete movement
-    smoke->setSmoke (tl->x - sx - forcex * 0.75, tl->y - sy - forcey * 0.75, tl->z - sz - forcez * 0.75, (int) phi, 26);
-    smoke->setSmoke (tl->x - sx - forcex * 0.5, tl->y - sy - forcey * 0.5, tl->z - sz - forcez * 0.5, (int) phi, 27);
-    smoke->setSmoke (tl->x - sx - forcex * 0.25, tl->y - sy - forcey * 0.25, tl->z - sz - forcez * 0.25, (int) phi, 28);
-    smoke->setSmoke (tl->x - sx, tl->y - sy, tl->z - sz, (int) phi, 29);
-    smoke->move (dt, 4);
+    
+    // some smoke elements per discrete movement
+    float fg = sqrt (forcex * forcex + forcey * forcey + forcez * forcez) * 13;
+    if (fg >= maxsmokeelem) fg = (float) maxsmokeelem - 0.5;
+    for (i = 0; i < (int) fg; i ++)
+    {
+      float fac = (float) i / fg;
+      smoke->setSmoke (tl->x - sx - forcex * fac, tl->y - sy - forcey * fac, tl->z - sz - forcez * fac, (int) phi, 39 - i);
+    }
+/*    smoke->setSmoke (tl->x - sx - forcex * 0.6, tl->y - sy - forcey * 0.6, tl->z - sz - forcez * 0.6, (int) phi, 36);
+    smoke->setSmoke (tl->x - sx - forcex * 0.4, tl->y - sy - forcey * 0.4, tl->z - sz - forcez * 0.4, (int) phi, 37);
+    smoke->setSmoke (tl->x - sx - forcex * 0.2, tl->y - sy - forcey * 0.2, tl->z - sz - forcez * 0.2, (int) phi, 38);
+    smoke->setSmoke (tl->x - sx, tl->y - sy, tl->z - sz, (int) phi, 39);
+    smoke->move (dt, 5);*/
+    smoke->move (dt, (int) fg + 1);
     smokettl += timestep;
   }
 

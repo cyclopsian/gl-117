@@ -2402,7 +2402,7 @@ void GLLandscape::draw (int phi, int gamma)
             {
               float sl = sunlight;
               sunlight = 10.0;
-              drawQuadStrip (ax, ay, zx, zy);
+//              drawQuadStrip (ax, ay, zx, zy);
               sunlight = sl;
             }
           }
@@ -2992,7 +2992,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
     else if (type == LANDSCAPE_ALPINE_SEA)
     {
       genSurface (60, heightmask);
-      genRocks (30, 80);
+      genRocks (30, 70);
       int diff = lowestpoint + (highestpoint - lowestpoint) * 3 / 4;
       for (i = 0; i <= MAXX; i ++)
         for (i2 = 0; i2 <= MAXX; i2 ++)
@@ -3006,6 +3006,20 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
               f [i] [i2] = DEEPWATER;
           }
         }
+    }
+    else if (type == LANDSCAPE_ALPINE_ROCKY)
+    {
+      genSurface (60, heightmask);
+      genRocks (1, 99);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      genLake (10);
+      calcWoods (200);
     }
     else if (type == LANDSCAPE_SEA)
     {

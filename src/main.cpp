@@ -25,6 +25,7 @@
 
 /*
 TODO:
+- options => video => resolution and fullscreen (both with restart)
 - correct transport2 (left side corrupt in VRML) and add mission with transport2
 - southern seashore landscape (additional missions)
 - alpine snow landscape (additional missions)
@@ -1274,6 +1275,7 @@ void switch_quit ()
 {
   lasttime = 0;
   game = GAME_QUIT;
+  save_saveconfig (); // this configuration seems to work => save it
 }
 
 void switch_game ()
@@ -4989,6 +4991,8 @@ static void myReshapeFunc (int width, int height)
 {
   ::width = width;
   ::height = height;
+  ::wantwidth = width;
+  ::wantheight = height;
   if (game == GAME_PLAY || game == GAME_PAUSE)
     game_reshape ();
   else if (game == GAME_MENU || game == GAME_MISSION || game == GAME_QUIT)
@@ -5446,6 +5450,9 @@ int setScreen (int w, int h, int b, int f)
   height = h;
   bpp = b;
   fullscreen = f;
+  wantwidth = w; // requested values for next restart
+  wantheight = h;
+  wantfullscreen = f;
   return 1;
 }
 
@@ -5555,6 +5562,9 @@ void config_test (int argc, char **argv)
   height = resolution [valids] [1];
   bpp = bppi [valids];
   fullscreen = resolution [valids] [3];
+  wantwidth = width; // requested values for next restart
+  wantheight = height;
+  wantfullscreen = fullscreen;
 }
 
 // get startup help screen
@@ -6193,6 +6203,50 @@ void callbackBrightness (Component *comp, int key)
   ((Label *) optmenu [0]->components [13])->setText (buf);
 }
 
+void callbackResolution (Component *comp, int key)
+{
+  const int numres = 4;
+  int resx [numres] = { 640, 800, 1024, 1280 };
+  int resy [numres] = { 480, 600, 800, 1024 };
+  int found = 0;
+  char buf [256];
+
+  if (key == MOUSE_BUTTON_LEFT)
+  {
+    for (int i = 0; i < numres; i ++)
+      if (wantwidth == resx [i])
+      {
+        found = i + 1;
+      }
+  }
+  else
+  {
+    for (int i = 0; i < numres; i ++)
+      if (wantwidth == resx [i])
+      {
+        found = i - 1;
+      }
+  }
+  
+  if (found < 0) found = numres - 1;
+  else if (found >= numres) found = 0;
+  
+  wantwidth = resx [found];
+  wantheight = resy [found];
+  
+  sprintf (buf, "%d*%d", wantwidth, wantheight);
+  ((Label *) optmenu [0]->components [16])->setText (buf);
+}
+
+void callbackFullscreen (Component *comp, int key)
+{
+  if (wantfullscreen) wantfullscreen = 0;
+  else wantfullscreen = 1;
+
+  if (wantfullscreen) ((Label *) optmenu [0]->components [18])->setText ("YES");
+  else ((Label *) optmenu [0]->components [18])->setText ("NO");
+}
+
 void callbackDynamicLighting (Component *comp, int key)
 {
   char buf [256];
@@ -6269,6 +6323,7 @@ void callbackQuality (Component *comp, int key)
 void callbackTraining (Component *comp, int key)
 {
   allmenus.setVisible (false);
+
   switch_mission (getTrainingIdFromValue (comp->id - trainingstartid));
 }
 
@@ -6685,6 +6740,39 @@ void createMenu ()
   optmenu [0]->add (button);
 
   sprintf (buf, "%d%%", brightness);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  yf -= yfstep / 2;
+  sprintf (buf, "NEED RESTART:");
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf, yf, 2, yfstep - 0.3);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("RESOLUTION");
+  button->setFunction (callbackResolution);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  sprintf (buf, "%d*%d", wantwidth, wantheight);
+  label = new Label (buf);
+  label->setTransparent (true);
+  label->setBounds (xf + xfstep - xftab * 2, yf, 2, yfstep - 0.1);
+  optmenu [0]->add (label);
+  yf -= yfstep;
+
+  button = new Button ("FULLSCREEN");
+  button->setFunction (callbackFullscreen);
+  button->setBounds (xf, yf, xfstep, yfstep - 0.1);
+  optmenu [0]->add (button);
+
+  if (wantfullscreen) sprintf (buf, "YES");
+  else sprintf (buf, "NO");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -7242,6 +7330,7 @@ void createMenu ()
 }
 
 
+
 /****************************************************************************
   GL-117 ENTRY POINT
 ****************************************************************************/
@@ -7253,7 +7342,7 @@ int main (int argc, char **argv)
   checkargs (argc, argv); // process command line parameters
 
   dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
-  atexit (display_exit);
+
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   display (buf, LOG_MOST);
@@ -7298,9 +7387,13 @@ int main (int argc, char **argv)
     glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
     if (!setScreen (width, height, bpp, fullscreen))
     {
-      sprintf (buf, "No working display mode %dx%d found", width, height);
-      display (buf, LOG_FATAL);
-      exit (EXIT_INIT);
+      load_saveconfig ();
+      if (!setScreen (width, height, bpp, fullscreen))
+      {
+        sprintf (buf, "No working display mode %dx%d found", width, height);
+        display (buf, LOG_FATAL);
+        exit (EXIT_INIT);
+      }
     }
   }
 
@@ -7360,9 +7453,13 @@ int main (int argc, char **argv)
   {
     if (!setScreen (width, height, bpp, fullscreen))
     {
-      sprintf (buf, "No working display mode %dx%d found", width, height);
-      display (buf, LOG_FATAL);
-      exit (EXIT_INIT);
+      load_saveconfig ();
+      if (!setScreen (width, height, bpp, fullscreen))
+      {
+        sprintf (buf, "No working display mode %dx%d found.", width, height);
+        display (buf, LOG_FATAL);
+        exit (EXIT_INIT);
+      }
     }
   }
 

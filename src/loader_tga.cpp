@@ -54,11 +54,11 @@ WRITE_RGBA(DATA32 *p, DATA8 r, DATA8 g, DATA8 b, DATA8 a)
 
 #endif
 
-/*#define WRITE_RGBA(p, r, g, b, a) \
-   R_VAL(p) = (r); \
-   G_VAL(p) = (g); \
-   B_VAL(p) = (b); \
-   A_VAL(p) = (a);*/
+//#define WRITE_RGBA(p, r, g, b, a) \
+//   R_VAL(p) = (r); \
+//   G_VAL(p) = (g); \
+//   B_VAL(p) = (b); \
+//   A_VAL(p) = (a);
 }
 
 /* flip an inverted image - see RLE reading below */

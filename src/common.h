@@ -92,6 +92,7 @@
 extern int quality;
 extern float view;
 extern int width, height, bpp;
+extern int wantwidth, wantheight, wantfullscreen; // requested values for next restart
 extern int volumesound;
 extern int volumemusic;
 extern int dithering;
