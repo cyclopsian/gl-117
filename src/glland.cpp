@@ -2906,166 +2906,6 @@ void GLLandscape::draw (int phi, int gamma)
   gridstep = neargridstep; // set to finer grid for ground collision detection
 }
 
-GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
-{
-  int i, i2;
-  lsticker = 0;
-  space = space2;
-  if (!multiplayer || isserver)
-  {
-    if (type == LANDSCAPE_ALPINE || type == LANDSCAPE_ALPINE_NOLAKE || type == LANDSCAPE_LOW_ALPINE)
-    {
-      if (type == 0 || type == 1)
-      {
-        genSurface (60, heightmask);
-        genRocks (30, 40);
-      }
-      else
-      {
-        genSurface (40, heightmask);
-        genRocks (30, 10);
-      }
-      if (type == 0 || type == 2)
-      {
-        int lakes = myrandom (20) + 20;
-        genLake (lakes);
-        genLake (lakes / 3);
-        genLake (lakes / 4);
-        genLake (lakes / 4);
-        genLake (2);
-        genLake (2);
-        genLake (2);
-        genLake (2);
-        genLake (2);
-      }
-      calcWoods (150);
-    }
-    else if (type == LANDSCAPE_ALPINE_EROSION)
-    {
-      genErosionSurface (50, heightmask);
-      genRocks (30, 25);
-      calcWoods (150);
-    }
-    else if (type == LANDSCAPE_ALPINE_SEA)
-    {
-      genSurface (60, heightmask);
-      genRocks (30, 80);
-      int diff = lowestpoint + (highestpoint - lowestpoint) * 3 / 4;
-      for (i = 0; i <= MAXX; i ++)
-        for (i2 = 0; i2 <= MAXX; i2 ++)
-        {
-          if (h [i] [i2] < diff)
-          {
-            hw [i] [i2] = diff;
-            if (diff - h [i] [i2] < 1000)
-              f [i] [i2] = SHALLOWWATER;
-            else
-              f [i] [i2] = DEEPWATER;
-          }
-        }
-    }
-    else if (type == LANDSCAPE_SEA)
-    {
-      for (i = 0; i <= MAXX; i ++)
-        for (i2 = 0; i2 <= MAXX; i2 ++)
-        {
-          f [i] [i2] = DEEPWATER;
-          h [i] [i2] = 10000;
-          hw [i] [i2] = 30000;
-        }
-    }
-    else if (type == LANDSCAPE_MOON)
-    {
-      genMoonSurface (60);
-      for (i = 0; i <= MAXX; i ++)
-        for (i2 = 0; i2 <= MAXX; i2 ++)
-        {
-          f [i] [i2] = MOONSAND;
-        }
-    }
-    else if (type == LANDSCAPE_FLAT_MOON)
-    {
-      genMoonSurface (30);
-      for (i = 0; i <= MAXX; i ++)
-        for (i2 = 0; i2 <= MAXX; i2 ++)
-        {
-          f [i] [i2] = MOONSAND;
-        }
-    }
-    else if (type == LANDSCAPE_CANYON)
-    {
-      genCanyonSurface (120);
-    }
-    else if (type == LANDSCAPE_DESERT)
-    {
-      genDesertSurface (20);
-    }
-  }
-#ifdef HAVE_SDL_NET
-  if (isserver)
-  {
-// Send map data to all clients
-    char buf [10];
-    for (i = 0; i <= MAXX; i ++)
-    {
-    printf (" %d ", i);
-      server->sendMessage (1, (char *) h [i], (MAXX + 1) * 2);
-      server->sendMessage (1, (char *) hw [i], (MAXX + 1) * 2);
-      server->sendMessage (1, (char *) f [i], (MAXX + 1) * 1);
-      while (!server->getMessage (1, buf)) ;
-    }
-  }
-  if (multiplayer && !isserver)
-  {
-//    for (;;)
-//    {
-    for (i = 0; i <= MAXX; i ++)
-    {
-//    printf (" %d ", i);
-      while (!client->getMessage ((char *) h [i])) ;
-      while (!client->getMessage ((char *) hw [i])) ;
-      while (!client->getMessage ((char *) f [i])) ;
-      client->sendMessage (".", 1);
-    }
-  
-  }
-#endif
-  hh = (float) 1 / (float) MAXX;
-  zoomz2 = 32768.0 * zoomz;
-  hh2 = 2.0*hh;
-  lv [0] = 0.0; lv [1] = 1.0; lv [2] = 1.0;
-  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.3; mat [1] [1] = 0.55; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
-/*  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
-/*  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
-  mat [2] [0] = 0.7; mat [2] [1] = 0.7; mat [2] [2] = 0.7; mat [2] [3] = 1.0;
-  mat [3] [0] = 1.0; mat [3] [1] = 1.0; mat [3] [2] = 1.0; mat [3] [3] = 1.0;
-  mat [4] [0] = 0.25; mat [4] [1] = 1.0; mat [4] [2] = 0.25; mat [4] [3] = 1.0;
-  mat [5] [0] = 0.2; mat [5] [1] = 1.0; mat [5] [2] = 0.2; mat [5] [3] = 1.0;
-  mat [6] [0] = 0.1; mat [6] [1] = 0.25; mat [6] [2] = 1.0; mat [6] [3] = 1.0;
-  mat [7] [0] = 0.5; mat [7] [1] = 0.5; mat [7] [2] = 0.5; mat [7] [3] = 1.0;
-  mat [8] [0] = 0.3; mat [8] [1] = 1.0; mat [8] [2] = 0.3; mat [8] [3] = 1.0;
-  mat [9] [0] = 0.1; mat [9] [1] = 0.15; mat [9] [2] = 1.0; mat [9] [3] = 1.0;
-  mat [10] [0] = 0.8; mat [10] [1] = 0.8; mat [10] [2] = 0.8; mat [10] [3] = 1.0;
-  mat [11] [0] = 0.95; mat [11] [1] = 0.6; mat [11] [2] = 0.4; mat [11] [3] = 1.0;
-  mat [12] [0] = 0.9; mat [12] [1] = 0.75; mat [12] [2] = 0.55; mat [12] [3] = 1.0;
-  mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
-  mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
-  mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
-/*  for (i = 0; i < 7; i ++)
-    for (i2 = 0; i2 < 4; i2 ++)
-      mata [i] [i2] = mat [i] [i2] / 2.0;*/
-  for (i = 0; i <= MAXX; i ++)
-    for (i2 = 0; i2 <= MAXX; i2 ++)
-      if (hw [i] [i2] == 0)
-      {
-        hw [i] [i2] = h [i] [i2];
-      }
-  precalculate ();
-}
-
 void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile, DynamicObj **flare)
 {
   int i, x, y;
@@ -3188,6 +3028,170 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
       }
     }
   }
+}
+
+GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
+{
+  int i, i2;
+  lsticker = 0;
+  space = space2;
+  randptr = 0;
+//  if (!multiplayer || isserver)
+  {
+    if (type == LANDSCAPE_ALPINE || type == LANDSCAPE_ALPINE_NOLAKE || type == LANDSCAPE_LOW_ALPINE)
+    {
+      if (type == 0 || type == 1)
+      {
+        genSurface (60, heightmask);
+        genRocks (30, 40);
+      }
+      else
+      {
+        genSurface (40, heightmask);
+        genRocks (30, 10);
+      }
+      if (type == 0 || type == 2)
+      {
+        int lakes = myrandom (20) + 20;
+        genLake (lakes);
+        genLake (lakes / 3);
+        genLake (lakes / 4);
+        genLake (lakes / 4);
+        genLake (2);
+        genLake (2);
+        genLake (2);
+        genLake (2);
+        genLake (2);
+      }
+      calcWoods (150);
+    }
+    else if (type == LANDSCAPE_ALPINE_EROSION)
+    {
+      genErosionSurface (50, heightmask);
+      genRocks (30, 25);
+      calcWoods (150);
+    }
+    else if (type == LANDSCAPE_ALPINE_SEA)
+    {
+      genSurface (60, heightmask);
+      genRocks (30, 80);
+      int diff = lowestpoint + (highestpoint - lowestpoint) * 3 / 4;
+      for (i = 0; i <= MAXX; i ++)
+        for (i2 = 0; i2 <= MAXX; i2 ++)
+        {
+          if (h [i] [i2] < diff)
+          {
+            hw [i] [i2] = diff;
+            if (diff - h [i] [i2] < 1000)
+              f [i] [i2] = SHALLOWWATER;
+            else
+              f [i] [i2] = DEEPWATER;
+          }
+        }
+    }
+    else if (type == LANDSCAPE_SEA)
+    {
+      for (i = 0; i <= MAXX; i ++)
+        for (i2 = 0; i2 <= MAXX; i2 ++)
+        {
+          f [i] [i2] = DEEPWATER;
+          h [i] [i2] = 10000;
+          hw [i] [i2] = 30000;
+        }
+    }
+    else if (type == LANDSCAPE_MOON)
+    {
+      genMoonSurface (60);
+      for (i = 0; i <= MAXX; i ++)
+        for (i2 = 0; i2 <= MAXX; i2 ++)
+        {
+          f [i] [i2] = MOONSAND;
+        }
+    }
+    else if (type == LANDSCAPE_FLAT_MOON)
+    {
+      genMoonSurface (30);
+      for (i = 0; i <= MAXX; i ++)
+        for (i2 = 0; i2 <= MAXX; i2 ++)
+        {
+          f [i] [i2] = MOONSAND;
+        }
+    }
+    else if (type == LANDSCAPE_CANYON)
+    {
+      genCanyonSurface (120);
+    }
+    else if (type == LANDSCAPE_DESERT)
+    {
+      genDesertSurface (20);
+    }
+  }
+/*#ifdef HAVE_SDL_NET
+  if (isserver)
+  {
+// Send map data to all clients
+    char buf [10];
+    for (i = 0; i <= MAXX; i ++)
+    {
+    printf (" %d ", i);
+      server->sendMessage (1, (char *) h [i], (MAXX + 1) * 2);
+      server->sendMessage (1, (char *) hw [i], (MAXX + 1) * 2);
+      server->sendMessage (1, (char *) f [i], (MAXX + 1) * 1);
+      while (!server->getMessage (1, buf)) ;
+    }
+  }
+  if (multiplayer && !isserver)
+  {
+//    for (;;)
+//    {
+    for (i = 0; i <= MAXX; i ++)
+    {
+//    printf (" %d ", i);
+      while (!client->getMessage ((char *) h [i])) ;
+      while (!client->getMessage ((char *) hw [i])) ;
+      while (!client->getMessage ((char *) f [i])) ;
+      client->sendMessage (".", 1);
+    }
+  
+  }
+#endif*/
+  hh = (float) 1 / (float) MAXX;
+  zoomz2 = 32768.0 * zoomz;
+  hh2 = 2.0*hh;
+  lv [0] = 0.0; lv [1] = 1.0; lv [2] = 1.0;
+  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.3; mat [1] [1] = 0.55; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
+/*  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
+/*  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
+  mat [2] [0] = 0.7; mat [2] [1] = 0.7; mat [2] [2] = 0.7; mat [2] [3] = 1.0;
+  mat [3] [0] = 1.0; mat [3] [1] = 1.0; mat [3] [2] = 1.0; mat [3] [3] = 1.0;
+  mat [4] [0] = 0.25; mat [4] [1] = 1.0; mat [4] [2] = 0.25; mat [4] [3] = 1.0;
+  mat [5] [0] = 0.2; mat [5] [1] = 1.0; mat [5] [2] = 0.2; mat [5] [3] = 1.0;
+  mat [6] [0] = 0.1; mat [6] [1] = 0.25; mat [6] [2] = 1.0; mat [6] [3] = 1.0;
+  mat [7] [0] = 0.5; mat [7] [1] = 0.5; mat [7] [2] = 0.5; mat [7] [3] = 1.0;
+  mat [8] [0] = 0.3; mat [8] [1] = 1.0; mat [8] [2] = 0.3; mat [8] [3] = 1.0;
+  mat [9] [0] = 0.1; mat [9] [1] = 0.15; mat [9] [2] = 1.0; mat [9] [3] = 1.0;
+  mat [10] [0] = 0.8; mat [10] [1] = 0.8; mat [10] [2] = 0.8; mat [10] [3] = 1.0;
+  mat [11] [0] = 0.95; mat [11] [1] = 0.6; mat [11] [2] = 0.4; mat [11] [3] = 1.0;
+  mat [12] [0] = 0.9; mat [12] [1] = 0.75; mat [12] [2] = 0.55; mat [12] [3] = 1.0;
+  mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
+  mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
+  mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
+/*  for (i = 0; i < 7; i ++)
+    for (i2 = 0; i2 < 4; i2 ++)
+      mata [i] [i2] = mat [i] [i2] / 2.0;*/
+  for (i = 0; i <= MAXX; i ++)
+    for (i2 = 0; i2 <= MAXX; i2 ++)
+      if (hw [i] [i2] == 0)
+      {
+        hw [i] [i2] = h [i] [i2];
+      }
+  precalculate ();
+//  printf ("h: %d %d %d %d %d\n", h[0][0],h[100][50],h[200][200],h[350][300],h[400][400]);
+//  printf ("f: %d %d %d %d %d\n", f[0][0],f[100][50],f[200][200],f[350][300],f[400][400]);
+//  printf ("randptr = %d\n", randptr);
 }
 
 #endif

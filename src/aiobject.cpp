@@ -306,19 +306,20 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
         d->source->points -= impact; // subtract points for shooting an own object
       }
 
-      if (d->source->party != party && active && draw && !killed)
-        if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
-        {
-          killed = true;
-          if (id >= FIGHTER1 && id <= FIGHTER2)
-            d->source->fighterkills ++;
-          else if (id >= SHIP1 && id <= SHIP2)
-            d->source->shipkills ++;
-          else if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
-            d->source->tankkills ++;
-          else
-            d->source->otherkills ++;
-        }
+      if (shield <= 0)
+        if (d->source->party != party && active && draw && !killed)
+          if (d->source->id >= FIGHTER1 && d->source->id <= FIGHTER2)
+          {
+            killed = true;
+            if (id >= FIGHTER1 && id <= FIGHTER2)
+              d->source->fighterkills ++;
+            else if (id >= SHIP1 && id <= SHIP2)
+              d->source->shipkills ++;
+            else if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+              d->source->tankkills ++;
+            else
+              d->source->otherkills ++;
+          }
     }
     setExplosion (0.2, 20 * timestep);
     setBlackSmoke (0.5, 30 * timestep);
@@ -1852,7 +1853,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
-  int lsdist = 20;
+  int lsdist = 30;
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
   int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);

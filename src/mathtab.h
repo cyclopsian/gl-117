@@ -27,11 +27,15 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "common.h"
+
 extern float sine[], cosi[]; // sine and cosine tables (only use for approximations)
 extern float PI;
 
 extern void mathtab_init (); // calculate tables
 extern int myrandom (int n); // random integer number [0;n-1]
+extern int extremerandom (int n); // random integer number [0;n-1], prefer extremely low/high values
 extern float dist (float dx, float dy); // distance (Euklidean norm, 2D vector)
+extern int randptr;
 
 #endif

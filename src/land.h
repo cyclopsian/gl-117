@@ -29,6 +29,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "mathtab.h"
+
 // surface extents
 #define MAXX 512
 #define MAXX_MASK 0x000001ff
@@ -107,8 +109,6 @@ class Landscape
   int rockborder;
   int maxx; // same as MAXX, 512 is ideal
   int hoehe, maxn, n; // surface extents
-  int random (int n); // get random numbers between 0 and n-1
-  int extremerandom (int n); // same but numbers are often near 0 or n-1
 
   protected:
   int highestpoint, lowestpoint;

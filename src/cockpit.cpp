@@ -560,6 +560,13 @@ void Cockpit::drawRadar ()
   glEnd ();
   glDisable (GL_ALPHA_TEST);
   glDisable (GL_TEXTURE_2D);
+  glLineWidth (1.0);
+  glBegin (GL_LINES);
+  glVertex3f (0, yf - yl * 0.9, zf);
+  glVertex3f (0, yf + yl * 0.9, zf);
+  glVertex3f (-xl * 0.9, yf, zf);
+  glVertex3f (xl * 0.9, yf, zf);
+  glEnd ();
 //  gl->disableAlphaBlending ();
 /*    gl->enableAlphaBlending ();
   glDisable (GL_DEPTH_TEST);
@@ -570,7 +577,9 @@ void Cockpit::drawRadar ()
   glVertex3f (1.2, yf + 1.0, zf);
   glVertex3f (-1.2, yf + 1.0, zf);
   glEnd ();*/
-  glPointSize (2.0);
+  int radarzoom = 1;
+  if (fplayer->disttarget < 40) radarzoom = 2;
+  glPointSize (2.5);
   glBegin (GL_POINTS);
   glColor4ub (255, 255, 255, 255);
   glVertex3f (0.0, yf, zf);
@@ -579,20 +588,42 @@ void Cockpit::drawRadar ()
     {
       int aw = fplayer->getAngle (fighter [i]);
       if (aw < 0) aw += 360;
-      float d = fplayer->distance (fighter [i]) / 100.0;
+      float d = fplayer->distance (fighter [i]) / 100.0 * radarzoom;
       float px = -d * sine [aw];
       float py = yf + d * cosi [aw];
       if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
       {
         if (fighter [i] == fplayer->target)
+        {
           glColor4ub (255, 200, 0, 255);
+        }
         else if (fighter [i]->party != fplayer->party)
+        {
           glColor4ub (255, 0, 0, 255);
+        }
         else
+        {
           glColor4ub (0, 0, 255, 255);
+        }
         glVertex3f (px, py, zf);
       }
     }
+  for (i = 0; i < maxmissile; i ++)
+  {
+    if (missile [i]->target == fplayer)
+    {
+      int aw = fplayer->getAngle (missile [i]);
+      if (aw < 0) aw += 360;
+      float d = fplayer->distance (missile [i]) / 100.0 * radarzoom;
+      float px = -d * sine [aw];
+      float py = yf + d * cosi [aw];
+      if ((type == 0 && d < 1.2) || (type == 1 && px >= -1.2 && px <= 1.2 && py >= yf - 1.1 && py <= yf + 1.1))
+      {
+        glColor4ub (255, 255, 255, 255);
+      }
+      glVertex3f (px, py, zf);
+    }
+  }
   glEnd ();
   gl->disableAlphaBlending ();
 }

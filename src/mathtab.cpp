@@ -26,8 +26,10 @@
 #include "mathtab.h"
 
 float PI;
-float sine[360];
-float cosi[360];
+float sine [360];
+float cosi [360];
+int randnum [100];
+int randptr = 0;
 
 void mathtab_init ()
 {
@@ -38,12 +40,44 @@ void mathtab_init ()
     sine [i] = (float) sin ((float) i / 180.0 * PI);
     cosi [i] = (float) cos ((float) i / 180.0 * PI);
   }
+  for (i = 0; i < 100; i ++)
+    randnum [i] = (i * 2000) % 32678;
 }
 
+// return random number
 int myrandom (int n)
 {
   if (n == 0) return 0;
-  return rand () % n;
+  if (!multiplayer)
+  {
+    return rand () % n;
+  }
+  randptr ++;
+  if (randptr >= 100) randptr = 0;
+  return randnum [randptr] % n;
+}
+
+// return random number, but prefer extremely high and low values
+int extremerandom (int n)
+{
+  if (n == 0) return 0;
+  int ret;
+  if (!multiplayer)
+  {
+    ret = rand () % n;
+  }
+  else
+  {
+    randptr ++;
+    if (randptr >= 100) randptr = 0;
+    ret = randnum [randptr] % n;
+  }
+  if ((ret % 5) <= 4)
+  {
+    if (ret > n/2 && ret < 3*n/4) return ret + n/4;
+    else if (ret < n/2 && ret > n/4) return ret - n/4;
+  }
+  return ret;
 }
 
 float dist (float dx, float dy)

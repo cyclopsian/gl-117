@@ -99,7 +99,7 @@ float getView ()
 
 int clouds = 0;
 
-CTexture *texradar1, *texradar2;//, *texcounter;
+CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
 
 
@@ -461,6 +461,56 @@ int getMedal (int score)
   return -1;
 }
 
+void gl117_rotateColors (int inittimer_gl117)
+{
+  int i;
+  for (i = 0; i < model_gl117.numObjects; i ++)
+  {
+    for (int i2 = 0; i2 < model_gl117.object [i]->numVertices; i2 ++)
+    {
+      model_gl117.object [i]->vertex [i2].color.c [0] = (int) (75.0F * SIN(i2 * 100 + inittimer_gl117 / 2) + 155.0F);
+      model_gl117.object [i]->vertex [i2].color.c [1] = model_gl117.object [i]->vertex [i2].color.c [0];
+      model_gl117.object [i]->vertex [i2].color.c [2] = 100;
+    }
+  }
+}
+
+void adjustBrightness ()
+{
+  // adjust brightness setting (blending)
+  if (brightness < 0)
+  {
+    glColor4ub (0, 0, 0, -brightness);
+    float xf = 2.0, yf = 1.5, zf = 1.0;
+    glDisable (GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBegin (GL_QUADS);
+    glVertex3f (-xf, -yf, -zf);
+    glVertex3f (-xf, yf, -zf);
+    glVertex3f (xf, yf, -zf);
+    glVertex3f (xf, -yf, -zf);
+    glEnd ();
+    glDisable (GL_BLEND);
+//    glEnable (GL_DEPTH_TEST);
+  }
+  else if (brightness > 0)
+  {
+    glColor4ub (255, 255, 255, brightness);
+    float xf = 2.0, yf = 1.5, zf = 1.0;
+    glDisable (GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBegin (GL_QUADS);
+    glVertex3f (-xf, -yf, -zf);
+    glVertex3f (-xf, yf, -zf);
+    glVertex3f (xf, yf, -zf);
+    glVertex3f (xf, -yf, -zf);
+    glEnd ();
+    glDisable (GL_BLEND);
+//    glEnable (GL_DEPTH_TEST);
+  }
+}
 
 
 
@@ -1820,8 +1870,8 @@ void drawPlasma (CColor *colorstd)
       if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
       else glColor3f (intens, 0, intens2);
       glVertex3f (xf, yf, zf1);
-      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
-      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
+      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer / timestep)) * 0.16 + 0.16;
+      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer / timestep)) * 0.08 + 0.08;
       if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
       else glColor3f (intens, 0, intens2);
       glVertex3f (xf, yf + 0.25, zf1);
@@ -1938,6 +1988,7 @@ void create_key (unsigned char key, int x, int y)
 {
   if (key == 's')
   {
+    server->sendMessage (0, "s", 1);
     createMission (MISSION_MULTIPLAYER_DOGFIGHT);
     game_levelInit ();
     switch_game ();
@@ -2095,6 +2146,42 @@ void mission_mouse (int button, int state, int x, int y)
   }
 }
 
+void drawArrow (float x, float y, float w, float h)
+{
+  float zf = -3;
+  gl->enableTextures (texarrow->textureID);
+  gl->enableAlphaBlending ();
+  glBegin (GL_QUADS);
+  glColor3ub (180, 180, 180);
+
+  if (w > h)
+  {
+    glTexCoord2f (0, 1);
+    glVertex3f (x, y, zf);
+    glTexCoord2f (0, 0);
+    glVertex3f (x + w, y, zf);
+    glTexCoord2f (1, 0);
+    glVertex3f (x + w, y + h, zf);
+    glTexCoord2f (1, 1);
+    glVertex3f (x, y + h, zf);
+  }
+  else
+  {
+    glTexCoord2f (1, 0);
+    glVertex3f (x, y - h, zf);
+    glTexCoord2f (1, 1);
+    glVertex3f (x, y, zf);
+    glTexCoord2f (0, 1);
+    glVertex3f (x + w, y, zf);
+    glTexCoord2f (0, 0);
+    glVertex3f (x + w, y - h, zf);
+  }
+
+  glEnd ();
+  glDisable (GL_BLEND);
+  glDisable (GL_TEXTURE_2D);
+}
+
 void mission_display ()
 {
   char buf [256];
@@ -2113,9 +2200,26 @@ void mission_display ()
   glLoadIdentity ();
   glPushMatrix ();
 
+  gl117_rotateColors (missionmenutimer);
+
   drawPlasma (colorstd);
 
-  glLineWidth (2.0);
+  drawArrow (-2.1, 1.6, 1, 0.05);
+  drawArrow (-2.3, 1.6, 0.05, 0.6);
+
+  drawArrow (-2.1, 0.8, 1, 0.05);
+  drawArrow (-2.3, 0.8, 0.05, 0.9);
+
+  drawArrow (0.2, 0.8, 1, 0.05);
+  drawArrow (0, 0.8, 0.05, 0.9);
+
+  drawArrow (-2.1, -0.3, 1, 0.05);
+  drawArrow (-2.3, -0.3, 0.05, 0.9);
+
+  drawArrow (0.2, -0.3, 1, 0.05);
+  drawArrow (0, -0.3, 0.05, 0.9);
+
+/*  glLineWidth (2.0);
   glColor4ub (180, 180, 180, 255);
   glBegin (GL_LINE_STRIP);
   glVertex3f (-2.3, 0.8, zf);
@@ -2141,7 +2245,7 @@ void mission_display ()
   glBegin (GL_LINE_STRIP);
   glVertex3f (0, 0.8, zf);
   glVertex3f (0, -1.5, zf);
-  glEnd ();
+  glEnd ();*/
 
   CVector3 vec;
   CVector3 tl (-4.5, 5.5, -8.0);
@@ -2237,6 +2341,8 @@ void mission_display ()
   font2->drawText (xstats + 2, -14, -3, getModelName (missionnew->selweapon [missionnew->wantweapon]));
   glPopMatrix ();
 
+  adjustBrightness ();
+
   drawMouseCursor ();
 }
 
@@ -2306,6 +2412,8 @@ void create_display ()
 
   glPopMatrix ();
 
+  adjustBrightness ();
+
   drawMouseCursor ();
 }
 
@@ -2347,6 +2455,8 @@ void join_display ()
     font1->drawText (-2, -12, -2, "BACK");
 
   glPopMatrix ();
+
+  adjustBrightness ();
 
   drawMouseCursor ();
 }
@@ -2523,6 +2633,8 @@ model = &model_missile7; */
 
   glPopMatrix ();
 
+  adjustBrightness ();
+
   drawMouseCursor ();
 }
 
@@ -2576,6 +2688,8 @@ void fame_display ()
     font1->drawText (-2, -10, -2, "BACK");
 
   glPopMatrix ();
+
+  adjustBrightness ();
 
   drawMouseCursor ();
 }
@@ -4250,39 +4364,9 @@ void game_display ()
     }
   }
 
-  // adjust brightness setting (blending)
-  if (brightness < 0)
+  if (brightness)
   {
-    glColor4ub (0, 0, 0, -brightness);
-    float xf = 2.0, yf = 1.5, zf = 1.0;
-    glDisable (GL_DEPTH_TEST);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin (GL_QUADS);
-    glVertex3f (-xf, -yf, -zf);
-    glVertex3f (-xf, yf, -zf);
-    glVertex3f (xf, yf, -zf);
-    glVertex3f (xf, -yf, -zf);
-    glEnd ();
-    gl->disableAlphaBlending ();
-    glDisable (GL_BLEND);
-    glEnable (GL_DEPTH_TEST);
-  }
-  else if (brightness > 0)
-  {
-    glColor4ub (255, 255, 255, brightness);
-    float xf = 2.0, yf = 1.5, zf = 1.0;
-    glDisable (GL_DEPTH_TEST);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin (GL_QUADS);
-    glVertex3f (-xf, -yf, -zf);
-    glVertex3f (-xf, yf, -zf);
-    glVertex3f (xf, yf, -zf);
-    glVertex3f (xf, -yf, -zf);
-    glEnd ();
-    gl->disableAlphaBlending ();
-    glDisable (GL_BLEND);
+    adjustBrightness ();
     glEnable (GL_DEPTH_TEST);
   }
 
@@ -4778,9 +4862,18 @@ void create_timer (Uint32 dt)
 void join_timer (Uint32 dt)
 {
 #ifndef USE_GLUT
+  char buf [STDSIZE];
   client->getServer ("127.0.0.1", "client1");
   SDL_Delay (100);
   mission_timer (dt);
+  client->getMessage (buf);
+  if (buf [0] == 's')
+  {
+    createMission (MISSION_MULTIPLAYER_DOGFIGHT);
+    game_levelInit ();
+    switch_game ();
+    missionactive = true;
+  }
 #endif
 }
 
@@ -4863,6 +4956,7 @@ void myInit ()
   texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
   texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
   texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
+  texarrow = gl->genTextureTGA (dirs->getTextures ("arrow.tga"), 0, -1, 0, true);
 
   // useful global variables/constants
   tlinf = new CVector3 (1E10, 1E10, 1E10);
@@ -5229,15 +5323,7 @@ void init_display ()
   // draw gl-117 logo
   if (initexplode1 < 0)
   {
-    for (i = 0; i < model_gl117.numObjects; i ++)
-    {
-      for (int i2 = 0; i2 < model_gl117.object [i]->numVertices; i2 ++)
-      {
-        model_gl117.object [i]->vertex [i2].color.c [0] = (int) (127.0F * SIN(i2 * 100 + inittimer_gl117 / 2) + 128.0F);
-        model_gl117.object [i]->vertex [i2].color.c [1] = model_gl117.object [i]->vertex [i2].color.c [0];
-        model_gl117.object [i]->vertex [i2].color.c [2] = 50;
-      }
-    }
+    gl117_rotateColors (inittimer_gl117);
     glPushMatrix ();
     glTranslatef (0, 0, -5);
     model_gl117.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
