@@ -906,19 +906,45 @@ void MissionCustom::start ()
         int r = map [addr];
         int g = map [addr + 1];
         int b = map [addr + 2];
-        l->f [x] [y] = GRASS;
-        if (r <= 50 && g <= 50 && b >= 200)
-          l->f [x] [y] = WATER;
-        else if (r <= 50 && g >= 50 && g <= 200 && b <= 50)
-          l->f [x] [y] = DECIDUOUSWOODS0;
-        else if (r <= 120 && g <= 120 && b <= 120)
-          l->f [x] [y] = ROCKS;
-        else if (r <= 210 && g <= 210 && b <= 210)
-          l->f [x] [y] = GRAVEL;
-        else if (r > 210 && g > 210 && b > 210)
-          l->f [x] [y] = GLACIER;
-        else if (r > 210 && g < 50 && b < 50)
-          l->f [x] [y] = TOWN;
+
+        if (map_type < LANDSCAPE_MOON) // alpine
+        {
+          l->f [x] [y] = GRASS;
+          if (r <= 50 && g <= 50 && b >= 200)
+            l->f [x] [y] = WATER;
+          else if (r <= 50 && g >= 50 && g <= 200 && b <= 50)
+            l->f [x] [y] = DECIDUOUSWOODS0;
+          else if (r <= 120 && g <= 120 && b <= 120)
+            l->f [x] [y] = ROCKS;
+          else if (r <= 210 && g <= 210 && b <= 210)
+            l->f [x] [y] = GRAVEL;
+          else if (r > 210 && g > 210 && b > 210)
+            l->f [x] [y] = GLACIER;
+          else if (r > 210 && g < 50 && b < 50)
+            l->f [x] [y] = TOWN;
+        }
+        else if (map_type < LANDSCAPE_CANYON) // moon
+        {
+          l->f [x] [y] = MOONSAND;
+        }
+        else if (map_type < LANDSCAPE_DESERT) // canyon
+        {
+          l->f [x] [y] = REDSTONE;
+          if (r <= 50 && g <= 50 && b >= 200)
+            l->f [x] [y] = WATER;
+          else if (r > 210 && g > 210 && b > 210)
+            l->f [x] [y] = REDSAND;
+          else if (r > 150 && g > 150 && b < 50)
+            l->f [x] [y] = REDTREE0;
+        }
+        else if (map_type < LANDSCAPE_ARCTIC) // desert
+        {
+          l->f [x] [y] = DESERTSAND;
+          if (r <= 50 && g <= 50 && b >= 200)
+            l->f [x] [y] = WATER;
+          else if (r <= 50 && g >= 50 && b <= 50)
+            l->f [x] [y] = CACTUS0;
+        }
       }
 
 /*    for (i = 1; i < mapcy - 1; i ++)

@@ -75,7 +75,7 @@ SDL_Thread *threadnet = NULL;
 
 int game = GAME_INIT;
 
-int debuglevel = LOG_ALL;
+int debuglevel = LOG_MOST;
 int showcollision = 0;
 int brightness = 0;
 
@@ -1620,11 +1620,11 @@ void game_key (int key, int x, int y)
   {
     event_targetLocking ();
   }
-  else if (key == 'K')
+/*  else if (key == 'K')
   {
     if (fplayer->target != NULL)
       fplayer->target->shield = -1;
-  }
+  }*/
   else if (hikey == key_firecannon || lokey == key_firecannon)
   {
     fplayer->autofire = false;

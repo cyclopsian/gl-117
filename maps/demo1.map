@@ -32,11 +32,12 @@
 ###############################################################################
 
 INFO
-  NAME = "DEMO1"
+  name = "DEMO1"
   briefing = "We place an enemy fighter near the player and a surface air cannon to flat ground. After 15 seconds dr doom will appear near the player and help."
   PiLoT1 = DRDOOM
   pilot2 = primetime
   maxtime = 150
+
 
 
 ###############################################################################
@@ -44,6 +45,14 @@ INFO
 #   TYPE: Type of landscape to be randomly generated
 #     ALPINE (predefined), ALPINE_LOW, ALPINE_EROSION, ALPINE_SEA, SEA, MOON,
 #     CANYON, DESERT
+#   FILE: 32 bit TGA file, alpha channel=height values, RGB=landscape type
+#     The colors for landscape types depend on the landscape type
+#     Alpine: blue=water, dark green=woods, light green=grass, white=glacier,
+#             grey=gravel, dark grey=rocks
+#     Canyon: blue=water, white=sand, red=stone/rocks, brown=tree&sand
+#     Desert: blue=water, green=cactus, yellow=sand
+#   SCALEHEIGHT: Scaling factor for height values
+#   TREE[0-2]: tree borders for deciduous, coniferious, mixed, pine woods
 #   HEADING: Degree of northern direction, 0...360, 0 is predefined
 #   WEATHER: SUNNY, CLEAR, CLOUDY, DULL, THUNDERSTORM
 #   TIME: Time of the day (hours) in [0...24], determines day/night, sun level
@@ -79,7 +88,7 @@ TERRAIN
 OBJECT		# Player
   x = 0
   y = 0
-  # always: type from selection, party=1, inittime=0, critical=1
+  # always: type is taken from selection, party=1, inittime=0, critical=1
 
 OBJECT		# The first enemy
   type = crow
@@ -104,7 +113,8 @@ OBJECT		# The first enemy
 
 RELCOORDS
   find = flatterrain
-  quadrant = 1	# player at (0,0) is at the corner of the first quadrant
+  quadrant = 1	# player is at the corner of the first quadrant
+			# so lets set (0,0) to flat terrain somewhere in quadrant 1
 
 
 OBJECT		# place a surface-air-cannon
@@ -118,7 +128,7 @@ OBJECT		# place a surface-air-cannon
 
 
 RELCOORDS
-  find = player	# set player to the origin of the coordinate system
+  find = player	# set player as the origin of the coordinate system
 
 OBJECT		# get DrDoom (see INFO) as reinforcement after 15 seconds
   type = falcon

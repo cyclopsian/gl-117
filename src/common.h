@@ -49,7 +49,7 @@
 
 #define ZOOM 256
 #define GLOBALSCALE 1
-#define VERSIONSTRING "V1.1"
+#define VERSIONSTRING "V1.2"
 
 // data types
 #ifdef USE_GLUT
