@@ -211,6 +211,14 @@ SOURCE=.\loadmodel\Model3dFactory.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\loadmodel\Model3dRegistry.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\Model3dRegistry.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\loadmodel\TextFileObj.cpp
 # End Source File
 # End Group
@@ -408,6 +416,14 @@ SOURCE=.\configuration\Dirs.cpp
 # Begin Source File
 
 SOURCE=.\configuration\Dirs.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\OptionFile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\OptionFileFactory.cpp
 # End Source File
 # End Group
 # Begin Group "net"
@@ -643,11 +659,23 @@ SOURCE=.\aiobject\AiObj.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\aiobject\AiObjPrototype.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\aiobject\DynamicObj.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\aiobject\DynamicObjPrototype.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\aiobject\Fighter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\FighterPrototype.cpp
 # End Source File
 # Begin Source File
 
@@ -668,6 +696,18 @@ SOURCE=.\aiobject\StaticPassive.cpp
 # Begin Source File
 
 SOURCE=.\aiobject\Tank.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\UnitDescriptor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\UnitDescriptorRegistry.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject\UnitPrototype.h
 # End Source File
 # End Group
 # Begin Group "game"
@@ -716,6 +756,18 @@ SOURCE=.\render\Render.cpp
 # Begin Source File
 
 SOURCE=.\render\Render.h
+# End Source File
+# End Group
+# Begin Group "util"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\util\StringUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\util\Util.h
 # End Source File
 # End Group
 # End Target

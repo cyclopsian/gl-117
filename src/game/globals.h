@@ -53,17 +53,16 @@ extern ObjectList<BlackSmoke *> blacksmoke;
 // all other models
 extern ObjectList<DynamicObj *> flare;
 extern ObjectList<DynamicObj *> chaff;
-extern ObjectList<AIObj *> missile;
+extern ObjectList<AiObj *> missile;
 extern ObjectList<DynamicObj *> laser;
-extern ObjectList<AIObj *> fighter;
-//extern std::vector<AIObj *> fighter;
-extern ObjectList<Star *> star; // the stars at night
+extern ObjectList<AiObj *> fighter;
+extern std::vector<Star *> star; // the stars at night, no objects => not in ObjectList
 extern ObjectList<DynamicObj *> groundobj;
 extern Flash *flash1; // the thunderstorm flash
 
 extern Space *space; // the scene (everything) without the landscape
 
-extern AIObj *fplayer; // the player himself
+extern AiObj *fplayer; // the player himself
 
 extern SoundSystem *sound;
 

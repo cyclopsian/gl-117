@@ -22,7 +22,9 @@
 #ifndef IS_MODEL3D_H
 #define IS_MODEL3D_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include "opengl/includegl.h"
 #include "opengl/GlPrimitives.h"
@@ -422,6 +424,8 @@ class SpherePart : public Model3d
 
 // More models could be added here, esp. for importing complex non-polygonal formats (obj, wrl)
 
+class Space; // forward reference
+
 /**
 * SpaceObj represents an abstract object (like a cannon shot or a complete fighter).
 */
@@ -437,6 +441,7 @@ class SpaceObj
     float lum;      ///< luminance (default 1.0)
     Model3d *o;     ///< pointer to a model
     Transformation trafo; ///< transformation
+    Space *space;
   
     /// reference models (e.g. missiles for fighters)
     std::vector<SpaceObj> ref;

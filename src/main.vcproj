@@ -561,10 +561,19 @@
 				RelativePath=".\aiobject\AiObj.h">
 			</File>
 			<File
+				RelativePath=".\aiobject\AiObjPrototype.cpp">
+			</File>
+			<File
 				RelativePath=".\aiobject\DynamicObj.cpp">
 			</File>
 			<File
+				RelativePath=".\aiobject\DynamicObjPrototype.cpp">
+			</File>
+			<File
 				RelativePath=".\aiobject\Fighter.cpp">
+			</File>
+			<File
+				RelativePath=".\aiobject\FighterPrototype.cpp">
 			</File>
 			<File
 				RelativePath=".\aiobject\Missile.cpp">
@@ -586,6 +595,9 @@
 			</File>
 			<File
 				RelativePath=".\aiobject\UnitDescriptorRegistry.cpp">
+			</File>
+			<File
+				RelativePath=".\aiobject\UnitPrototype.h">
 			</File>
 		</Filter>
 		<Filter

@@ -117,7 +117,7 @@ Font::~Font ()
 
 void Font::drawText (float x, float y, float z, const std::string &str, const Color &c, bool centered, int highlight, const Color &highlightcol)
 {
-  int len = str.length ();
+  size_t len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);
@@ -131,7 +131,7 @@ void Font::drawText (float x, float y, float z, const std::string &str, const Co
   if (centered)
   {
     float xw = 0;
-    for (int i = 0; i < len; i ++)
+    for (size_t i = 0; i < len; i ++)
     {
       if (str [i] >= start && str [i] < start + n)
       {
@@ -153,7 +153,7 @@ void Font::drawText (float x, float y, float z, const std::string &str, const Co
     xz -= xw / 2;
   }
 
-  for (int i = 0; i < len; i ++)
+  for (size_t i = 0; i < len; i ++)
   {
     if (str [i] >= start && str [i] < start + n)
     {
@@ -263,7 +263,7 @@ void Font::drawTextCentered (float x, float y, float z, const std::string &str)
 
 void Font::drawTextRotated (float x, float y, float z, const std::string &str, const Color &color, int timer)
 {
-  int len = str.length ();
+  size_t len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);
@@ -271,7 +271,7 @@ void Font::drawTextRotated (float x, float y, float z, const std::string &str, c
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   float xz = x * 0.1, yz = y * 0.1;
-  for (int i = 0; i < len; i ++)
+  for (size_t i = 0; i < len; i ++)
   {
     if (str [i] >= start && str [i] <= start + n)
     {
@@ -318,8 +318,8 @@ void Font::drawTextRotated (float x, float y, float z, const std::string &str, c
 
 void Font::drawTextScaled (float x, float y, float z, const std::string &str, const Color &color, int timer, int highlight, const Color &highlightcol)
 {
-  int i;
-  int len = str.length ();
+  size_t i;
+  size_t len = str.length ();
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
   gl.enableTexture (texture->textureID);

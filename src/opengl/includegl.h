@@ -25,3 +25,7 @@
 #endif
 #endif
 #endif // __APPLE__
+
+#ifdef _MSC_VER
+  #pragma warning(disable:4786) // workaround for MSVC6 bug, needs service pack
+#endif

@@ -32,7 +32,6 @@
 
 TextFileObj::TextFileObj (char *filename)
 {
-  char buf [4096];
   in = fopen (filename, "rb");
   if (in == NULL)
   {

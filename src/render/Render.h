@@ -110,10 +110,10 @@ class Model3dRealizer
 
       VertexArray va1;
       VertexArray *va = &va1;
-      int alpha = 1;
-      int nolight = 0;
+//      int alpha = 0;
+//      int nolight = 0;
 
-      if (nolight) // if model wants to be rendered without light, call draw2
+      if (model.nolight) // if model wants to be rendered without light, call draw2
       {
         glDisable (GL_LIGHTING);
     //    drawNoLight (tl, tl2, rot, zoom, explode);
@@ -124,7 +124,7 @@ class Model3dRealizer
       int i, j;
       Object3d *cm;
       float la [4] = { 0.2, 0.2, 0.2, 1.0};
-      if (lum >= 1)
+      if (lum > 1)
       {
         float addl = lum;
         if (addl >= 5) addl = 5;
@@ -206,7 +206,7 @@ class Model3dRealizer
       else
         glShadeModel (GL_SMOOTH);
 
-      if (alpha)
+      if (model.alpha)
       { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
       for (i = 0; i < model.numObjects; i ++)
@@ -227,10 +227,10 @@ class Model3dRealizer
 
         if (cm->material != NULL)
         {
-          if (cm->material->color.c [0] > 190 && cm->material->color.c [1] > 190 && cm->material->color.c [2] < 20)
+/*          if (cm->material->color.c [0] > 190 && cm->material->color.c [1] > 190 && cm->material->color.c [2] < 20)
             glDisable (GL_LIGHTING);
           else
-            glEnable (GL_LIGHTING);
+            glEnable (GL_LIGHTING);*/
         }
 
         Vector3 shift;
@@ -316,7 +316,40 @@ class Model3dRealizer
         va->glEnd ();
       }
 
-      if (alpha)
+      // DEBUG: show normal vectors
+      for (i = 0; i < model.numObjects; i ++)
+      {
+        if (model.numObjects <= 0) break;
+        cm = model.object [i];
+        glBegin (GL_LINES);
+        for (j = 0; j < cm->numTriangles; j++)
+        {
+          Vertex *v = cm->triangle [j].v [0];
+          for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
+          {
+            v = cm->triangle [j].v [whichVertex];
+            glColor3ub (255, 255, 0);
+            glVertex3f (v->vector.x, v->vector.y, v->vector.z);
+            glVertex3f (v->vector.x + v->normal.x, v->vector.y + v->normal.y, v->vector.z + v->normal.z);
+          }
+        }
+        glEnd ();
+
+        glBegin (GL_LINES);
+        for (j = 0; j < cm->numQuads; j++)
+        {
+          Vertex *v = cm->quad [j].v [0];
+          for (int whichVertex = 0; whichVertex < 4; whichVertex++)
+          {
+            v = cm->quad [j].v [whichVertex];
+            glVertex3f (v->vector.x, v->vector.y, v->vector.z);
+            glVertex3f (v->vector.x + v->normal.x, v->vector.y + v->normal.y, v->vector.z + v->normal.z);
+          }
+        }
+        glEnd ();
+      }
+
+      if (model.alpha)
       { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
       glPopMatrix ();

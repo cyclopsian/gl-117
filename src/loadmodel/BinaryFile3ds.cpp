@@ -31,7 +31,6 @@
 
 BinaryFile3ds::BinaryFile3ds (const char *filename)
 {
-  char buf [4096];
   in = fopen (filename, "rb");
   if (in == NULL)
   {
@@ -48,7 +47,7 @@ BinaryFile3ds::BinaryFile3ds (const char *filename)
   Uint32 z = 0;
   while (z < size)
   {
-    int tmp;
+    size_t tmp;
     if (size - z >= 4096)
       tmp = fread (&data [z], 1, 4096, in);
     else

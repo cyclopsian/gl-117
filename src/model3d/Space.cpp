@@ -28,39 +28,21 @@
 Space::Space ()
 {
   o.clear ();
-//  no = 0;
-//  alpha = 1;
-//  lum = 1;
-//  drawLight = true;
 }
-
-/*Space::Space (Vector3 &v, Vector3 &w)
-{
-  no = 0;
-  alpha = 1;
-  lum = 1;
-  drawLight = true;
-}*/
 
 Space::~Space ()
 {
 }
 
-/*void Space::init ()
-{
-  removeAllObjects ();
-//  no = 0;
-}*/
-
 void Space::addObject (SpaceObj *o)
 {
   this->o.push_back (o);
-//  no ++;
+  o->space = this;
 }
 
 bool Space::removeObject (SpaceObj *o2)
 {
-  unsigned debugsize = o.size ();
+  size_t debugsize = o.size ();
   std::vector <SpaceObj *>::iterator it = o.begin ();
   for (; it != o.end (); it ++)
     if (*it == o2)
@@ -69,25 +51,11 @@ bool Space::removeObject (SpaceObj *o2)
       return true;
     }
   return false;
-/*  unsigned i, i2;
-  for (i = 0; i < o.size (); i ++)
-    if (o [i] == o2)
-    {
-      for (i2 = i + 1; i2 < o.size (); i2 ++)
-      {
-        o [i2 - 1] = o [i2];
-      }
-//      no --;
-      o.pop_back ();
-      return true;
-    }
-  return false;*/
 }
 
 void Space::removeAllObjects ()
 {
   o.clear ();
-//  no = 0;
 }
 
 /*void Space::translate (Vector3 &v)

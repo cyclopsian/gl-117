@@ -28,6 +28,8 @@
 
 
 
+const bool UseVertexArray = false;
+
 VertexArray::VertexArray ()
 {
   max = 0;
@@ -168,29 +170,47 @@ void VertexArray::glEnd ()
 {
   if (n == 0) return;
 
-  glEnableClientState (GL_VERTEX_ARRAY);
-
-  if (pref != VERTEXARRAY_V3C4T2 && pref != VERTEXARRAY_V3C4)
-    glEnableClientState (GL_NORMAL_ARRAY);
+  if (!UseVertexArray)
+  {
+    ::glBegin (type);
+    for (int i = 0; i < n; i ++)
+    {
+      if (pref != VERTEXARRAY_V3C4T2 && pref != VERTEXARRAY_V3C4)
+        ::glNormal3fv (&data [stride * i + 3]);
+      if (pref != VERTEXARRAY_V3N3T2)
+        ::glColor3fv (&data [stride * i + 6]);
+	    if (pref != VERTEXARRAY_V3N3C4 && pref != VERTEXARRAY_V3C4)
+        ::glTexCoord2fv (&data [stride * i + 10]);
+      ::glVertex3fv (&data [stride * i]);
+    }
+    ::glEnd ();
+  }
   else
-    glDisableClientState (GL_NORMAL_ARRAY);
+  {
+    glEnableClientState (GL_VERTEX_ARRAY);
 
-	if (pref != VERTEXARRAY_V3N3T2)
-    glEnableClientState (GL_COLOR_ARRAY);
-  else
-    glDisableClientState (GL_COLOR_ARRAY);
+    if (pref != VERTEXARRAY_V3C4T2 && pref != VERTEXARRAY_V3C4)
+      glEnableClientState (GL_NORMAL_ARRAY);
+    else
+      glDisableClientState (GL_NORMAL_ARRAY);
 
-	if (pref != VERTEXARRAY_V3N3C4 && pref != VERTEXARRAY_V3C4)
-    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  else
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-  
-  glVertexPointer (3,	GL_FLOAT,	sizeof (float) * stride, &data [0]);
-  glNormalPointer (GL_FLOAT, sizeof (float) * stride, &data [3]);
-  glColorPointer (4, GL_FLOAT, sizeof (float) * stride, &data [6]);
-  glTexCoordPointer (2, GL_FLOAT, sizeof (float) * stride, &data [10]);
+	  if (pref != VERTEXARRAY_V3N3T2)
+      glEnableClientState (GL_COLOR_ARRAY);
+    else
+      glDisableClientState (GL_COLOR_ARRAY);
 
-  glDrawArrays (type, 0, n);
+	  if (pref != VERTEXARRAY_V3N3C4 && pref != VERTEXARRAY_V3C4)
+      glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+    else
+      glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+    
+    glVertexPointer (3,	GL_FLOAT,	sizeof (float) * stride, &data [0]);
+    glNormalPointer (GL_FLOAT, sizeof (float) * stride, &data [3]);
+    glColorPointer (4, GL_FLOAT, sizeof (float) * stride, &data [6]);
+    glTexCoordPointer (2, GL_FLOAT, sizeof (float) * stride, &data [10]);
+
+    glDrawArrays (type, 0, n);
+  }
 }
 
 #endif

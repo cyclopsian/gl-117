@@ -34,6 +34,7 @@ SpaceObj::SpaceObj ()
   lum = 1;
   drawLight = true;
   explode = 0;
+  space = NULL;
 }
 
 SpaceObj::SpaceObj (const SpaceObj &that)
@@ -45,6 +46,7 @@ SpaceObj::SpaceObj (const SpaceObj &that)
   drawLight = that.drawLight;
   explode = that.explode;
   trafo.set (that.trafo);
+  space = that.space;
 }
 
 SpaceObj::SpaceObj (Model3d *o, const Transformation &trafo)
@@ -56,6 +58,7 @@ SpaceObj::SpaceObj (Model3d *o, const Transformation &trafo)
   drawLight = true;
   explode = 0;
   this->trafo.set (trafo);
+  space = NULL;
 }
 
 SpaceObj::~SpaceObj ()
@@ -65,11 +68,6 @@ SpaceObj::~SpaceObj ()
 void SpaceObj::addRefModel (const SpaceObj &ref2)
 {
   ref.push_back (ref2);
-/*  refModel.push_back (model);
-  refTl.push_back (Vector3 (tl));
-  refRot.push_back (Rotation (rot));
-  refScale.push_back (scale);
-  numRefModels ++; */
 }
 
 void SpaceObj::translate (Vector3 &v)

@@ -22,7 +22,9 @@
 #ifndef IS_CONFIGURATION_H
 #define IS_CONFIGURATION_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include "../config.h" // defines HAVE_SDL, HAVE_SDL_MIXER
 #include "opengl/includegl.h"

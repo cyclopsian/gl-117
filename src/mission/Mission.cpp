@@ -68,21 +68,51 @@ Mission::Mission ()
   state = 0;
 }
 
+void setIntelligence (AiObj &obj, int intelligence, int precision, int aggressivity)
+{
+  if (difficulty == 0) // easy
+  {
+    intelligence = 400 - (400 - intelligence) * 1 / 3;
+    precision = 400 - (400 - precision) * 1 / 3;
+    aggressivity = 400 - (400 - aggressivity) * 1 / 3;
+    if (obj.party != 1 && obj.shield > 10) // not player party
+    {
+      obj.shield = obj.shield * 8 / 10;
+//      obj.getPrototype ()->maxshield = obj.shield;
+    }
+  }
+  else if (difficulty == 1) // normal
+  {
+    intelligence = 400 - (400 - intelligence) * 2 / 3;
+    precision = 400 - (400 - precision) * 2 / 3;
+    aggressivity = 400 - (400 - aggressivity) * 2 / 3;
+  }
+  else if (difficulty == 2) // hard
+  {
+  }
+
+//  trafo.scaling.set (zoom, zoom, zoom);
+  obj.intelligence = intelligence;
+  obj.precision = precision;
+  obj.aggressivity = aggressivity;
+}
+
 void Mission::playerInit ()
 {
 //  space->removeObject (fighter [0]);
 //  delete fighter [0];
   Fighter *f = new Fighter (selfighter [wantfighter]);
-  f->space = space;
-  space->addObject (f);
-  fighter.push_back (f);
+  fighter.add (f);
 
   int i;
   fplayer = f;
   if (controls != 100)
     fplayer->easymodel = 2;
   fplayer->target = NULL;
-  fplayer->newinit (selfighter [wantfighter], 1, 0);
+  setIntelligence (*fplayer, 0, 0, 0);
+  fplayer->missileCount ();
+  fplayer->party = 1;
+//  fplayer->newinit (selfighter [wantfighter], 1, 0);
   fplayer->ai = false;
   for (i = 0; i < missiletypes; i ++)
     fplayer->missiles [i] = 0;
@@ -154,12 +184,12 @@ void Mission::playerInit ()
   fplayer->missileCount ();
 
   // place missiles to racks
-//  Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+//  Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AiObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
 //  if (f)
     f->placeMissiles ();
 }
 
-void Mission::selectMissiles (AIObj &aiobj)
+void Mission::selectMissiles (AiObj &aiobj)
 {
   UnitDescriptor id = aiobj.id;
   if (id == FalconDescriptor)
@@ -216,14 +246,11 @@ void Mission::selectMissiles (AIObj &aiobj)
 
 void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
 {
-//  AIObj *aiobj = fighter [n];
+//  AiObj *aiobj = fighter [n];
 //  space->removeObject (aiobj);
 //  delete aiobj;
   Fighter *aiobj = new Fighter (fighterid);
-  aiobj->space = space;
-  space->addObject (aiobj);
-  fighter.push_back (aiobj);
-//  fighter [n] = aiobj;
+  fighter.add (aiobj);
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
   aiobj->easymodel = 1;
@@ -231,7 +258,10 @@ void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
   int intelligence = p->tp [pilotid]->intelligence;
   int precision = p->tp [pilotid]->precision;
   int aggressivity = p->tp [pilotid]->aggressivity;
-  aiobj->newinit (fighterid, 1, intelligence, precision, aggressivity);
+  setIntelligence (*aiobj, intelligence, precision, aggressivity);
+  aiobj->missileCount ();
+  aiobj->party = 1;
+//  aiobj->newinit (fighterid, 1, intelligence, precision, aggressivity);
   aiobj->ai = true;
 
   selectMissiles (*aiobj);
@@ -239,30 +269,31 @@ void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
   // place missiles to racks
   if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
-//    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+//    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AiObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
 //    if (f)
       aiobj->placeMissiles ();
   }
 }
 
-void Mission::objectInit (AIObj *aiobj, int party, int ailevel, int n)
+void Mission::objectInit (AiObj *aiobj, int party, int ailevel, int n)
 {
 //  space->removeObject (aiobj);
 //  delete fighter [n];
 //  fighter [n] = aiobj;
 //  fighter [n]->space = space;
-  fighter.push_back (aiobj);
-  space->addObject (aiobj);
-  aiobj->space = space;
+  fighter.add (aiobj);
 
-  aiobj->newinit (aiobj->id, party, ailevel);
+  setIntelligence (*aiobj, ailevel, ailevel, ailevel);
+  aiobj->missileCount ();
+  aiobj->party = party;
+//  aiobj->newinit (aiobj->id, party, ailevel);
   
   selectMissiles (*aiobj);
 
   // place missiles to racks
   if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
-    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
+    Fighter *f = dynamic_cast<Fighter *>(aiobj); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AiObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
     if (f)
       f->placeMissiles ();
   }

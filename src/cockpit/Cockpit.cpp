@@ -110,12 +110,11 @@ void Cockpit::setColor (Color *color, int alpha)
 
 void Cockpit::drawCounter ()
 {
-  int i;
   char buf [4096];
   float xf = 2.8F, yf = -1.0F, zf = -4.0F, yf2 = -1.3F, xfl = 0.4F, yfl = 0.1F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   bool flarewarn = false, chaffwarn = false;
-  for (i = 0; i < missile.size (); i ++)
+  for (unsigned i = 0; i < missile.size (); i ++)
     if (missile [i]->active)
       if (missile [i]->target == fplayer)
       {
@@ -261,7 +260,7 @@ void Cockpit::drawCounter ()
       float radius = object_radius * second_descale + 4.0f;
 
       bool full = false;
-      if (static_cast <AIObj*> (fplayer->target)->party != fplayer->party)
+      if (static_cast <AiObj*> (fplayer->target)->party != fplayer->party)
       {
         if (fplayer->ttf < 0 && fplayer->missiletype != DfmDescriptor - MissileBeginDescriptor)
         {
@@ -343,7 +342,7 @@ void Cockpit::drawTargeter ()
     float ez = o->trafo.scaling.z;
     gl.enableAlphaBlending ();
     bool full = false;
-    if (((AIObj *) fplayer->target)->party != fplayer->party)
+    if (((AiObj *) fplayer->target)->party != fplayer->party)
     {
       if (fplayer->ttf <= 0 && fplayer->missiletype != DfmDescriptor.id - MissileBeginDescriptor.id)
       {
@@ -588,7 +587,7 @@ void Cockpit::drawTargetedElement ()
                Vector3(0.05)), 0.3, 0);
 //      fplayer->target->o->draw (n, tl, fplayer->target->trafo.rotation, 0.05, 0.3, 0);
       glDisable (GL_LIGHTING);
-      if (((AIObj *) fplayer->target)->party == fplayer->party)
+      if (((AiObj *) fplayer->target)->party == fplayer->party)
         color.set (0, 0, 255);
       font1->drawText (-24.0, -23.0, -4.0, const_cast<char *>(fplayer->target->id.displayedName.c_str ()), color);
       sprintf (str, "%d", (int) (15.0 * fplayer->distance (fplayer->target)));
@@ -626,6 +625,7 @@ void Cockpit::drawWeapon ()
 
 void Cockpit::drawRadar ()
 {
+  unsigned i;
   float yf = -4.2, zf = -7.0;
 
   gl.enableAlphaBlending ();
@@ -668,7 +668,7 @@ void Cockpit::drawRadar ()
   glEnd ();
   int radarzoom = 1;
   if (fplayer->disttarget < 40) radarzoom = 2;
-  for (unsigned i = 0; i < fighter.size (); i ++)
+  for (i = 0; i < fighter.size (); i ++)
     if (fighter [i] != fplayer && fighter [i]->active)
     {
       int aw = fplayer->getAngle (fighter [i]);
@@ -692,7 +692,7 @@ void Cockpit::drawRadar ()
         }
       }
     }
-  for (unsigned i = 0; i < missile.size (); i ++)
+  for (i = 0; i < missile.size (); i ++)
   {
     if (missile [i]->target == fplayer && missile [i]->active)
     {

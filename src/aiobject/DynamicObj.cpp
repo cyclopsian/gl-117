@@ -41,7 +41,7 @@ DynamicObj::DynamicObj ()
 DynamicObj::DynamicObj (const UnitDescriptor &desc)
 {
   id = desc;
-  proto = new DynamicUnitPrototype (id);
+  proto = new DynamicObjPrototype (id);
   
   init ();
   initPrototype ();
@@ -50,7 +50,7 @@ DynamicObj::DynamicObj (const UnitDescriptor &desc)
 DynamicObj::DynamicObj (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
 {
   id = desc;
-  proto = new DynamicUnitPrototype (id);
+  proto = new DynamicObjPrototype (id);
   space = space2;
   o = o2;
   trafo.scaling.set (zoom2, zoom2, zoom2);
@@ -80,7 +80,7 @@ void DynamicObj::deactivate ()
   draw = false;
 }
 
-DynamicUnitPrototype *DynamicObj::getPrototype ()
+DynamicObjPrototype *DynamicObj::getPrototype ()
 {
   return proto;
 }
@@ -353,8 +353,8 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 void DynamicObj::setExplosion (float maxzoom, int len)
 {
   Explosion *expl = new Explosion (space, Model3dRegistry::get (ExplosionDescriptor.name));
-  space->addObject (expl);
-  explosion.push_back (expl);
+  explosion.add (expl);
+
 /*  int i;
   for (i = 0; i < maxexplosion; i ++) // search a free explosion instance
     if (explosion [i]->ttl <= 0)
@@ -366,8 +366,8 @@ void DynamicObj::setExplosion (float maxzoom, int len)
 void DynamicObj::setBlackSmoke (float maxzoom, int len)
 {
   BlackSmoke *bs = new BlackSmoke (space);
-  space->addObject (bs);
-  blacksmoke.push_back (bs);
+
+  blacksmoke.add (bs);
 /*  int i;
   for (i = 0; i < maxblacksmoke; i ++) // search a free blacksmoke instance
     if (blacksmoke [i]->ttl <= 0)

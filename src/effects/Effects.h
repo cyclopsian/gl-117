@@ -24,7 +24,9 @@
 #ifndef IS_EFFECTS_H
 #define IS_EFFECTS_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include "model3d/Model3d.h" // ok
 #include "math/Math.h" // ok

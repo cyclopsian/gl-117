@@ -62,7 +62,7 @@ class MissionCustom : public Mission
   int map_type;
   int save_map_type;
   int weather, clouds;
-  AIObj obj [maxfighter];
+  AiObj obj [maxfighter];
   int numobjects;
   int relx, rely;
   char text [maxtext] [TOKENLEN];

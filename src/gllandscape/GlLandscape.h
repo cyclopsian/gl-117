@@ -22,7 +22,9 @@
 #ifndef IS_GLLANDSCAPE_H
 #define IS_GLLANDSCAPE_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include <string.h>
 

@@ -1977,7 +1977,6 @@ void GlLandscape::drawTexturedTriangle2 (int xs, int ys)
 
 void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 {
-  char buf [4096];
   int i, i2, i3, x, y;
   int xs, ys;
 

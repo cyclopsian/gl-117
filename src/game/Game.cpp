@@ -144,17 +144,16 @@ Uint32 lasttime = 0;
 
 ObjectList<DynamicObj *> flare;
 ObjectList<DynamicObj *> chaff;
-ObjectList<AIObj *> missile;
+ObjectList<AiObj *> missile;
 ObjectList<DynamicObj *> laser;
-//std::vector<AIObj *> fighter;
-ObjectList<AIObj *> fighter;
-ObjectList<Star *> star;
+ObjectList<AiObj *> fighter;
+std::vector<Star *> star; // not an object => not in ObjectList
 ObjectList<DynamicObj *> groundobj;
 Flash *flash1;
 
 Space *space;
 
-AIObj *fplayer;
+AiObj *fplayer;
 SpaceObj *sphere;
 Sphere *objsphere;
 HighClouds *highclouds;
@@ -515,6 +514,7 @@ void setLightSource (int gamma)
   light_position0 [0] = -COS(gamma);
   light_position0 [1] = SIN(gamma);
   light_position0 [2] = 0;
+  
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
@@ -567,6 +567,8 @@ void setLightSource (int gamma)
 
 int game_levelInit ()
 {
+  unsigned i;
+
   space->removeAllObjects ();
 
   fighter.clear ();
@@ -658,7 +660,7 @@ int game_levelInit ()
   }*/
 
   // initialize object's height over the surface
-  for (unsigned i = 0; i < fighter.size (); i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->id >= AntiAircraftBeginDescriptor && fighter [i]->id <= AntiAircraftEndDescriptor)
     {
@@ -768,7 +770,7 @@ int game_levelInit ()
     chaff [i]->deactivate ();
   } */
 
-  for (unsigned i = 0; i < star.size (); i ++)
+  for (i = 0; i < star.size (); i ++)
   {
     star [i]->phi = math.random (360);
     star [i]->gamma = math.random (85);
@@ -1728,13 +1730,13 @@ void myInit ()
   } */
 
   // TODO: will be removed
-  for (unsigned i = 0; i < fighter.size (); i ++)
+/*  for (unsigned i = 0; i < fighter.size (); i ++)
   {
-    fighter.push_back (new AIObj (FalconDescriptor, space, Model3dRegistry::get (FalconDescriptor.name), 0.4));
+    fighter.add (new AiObj (FalconDescriptor, space, Model3dRegistry::get (FalconDescriptor.name), 0.4));
     fighter [i]->ref.clear ();
     for (unsigned i2 = 0; i2 < 12; i2 ++)
       fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
-  }
+  }*/
 
   highclouds = new HighClouds (25);
   highclouds->setTexture (texclouds3);
@@ -1759,7 +1761,7 @@ void myInit ()
 
   for (i = 0; i < missile.size (); i ++)
   {
-    missile.push_back (new AIObj (AamHs1Descriptor, space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1));
+    missile.push_back (new AiObj (AamHs1Descriptor, space, Model3dRegistry::get (AamHs1Descriptor.name), 0.1));
   }
 
   for (i = 0; i < flare.size (); i ++)

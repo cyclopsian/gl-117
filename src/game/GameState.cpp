@@ -21,7 +21,9 @@
 
 #ifndef IS_GAME_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include "GameState.h"
 #include "Game.h"
@@ -852,7 +854,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*Model3dRegistry::get (missionnew->selfighter [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selfighter [i].name), Transformation (tl, rot, Vector3(0.04)), 1.0, 0);
 //    getModel (missionnew->selfighter [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
 
@@ -867,7 +869,7 @@ void StateMission::display ()
     else
       rot.phi = 5;
     Model3dRealizer mr;
-    mr.draw (*Model3dRegistry::get (missionnew->selweapon [i].name), Transformation (tl, rot, Vector3(0.04)), 0.1, 0);
+    mr.draw (*Model3dRegistry::get (missionnew->selweapon [i].name), Transformation (tl, rot, Vector3(0.04)), 1.0, 0);
 //    getModel (missionnew->selweapon [i])->draw (vec, tl, rot, 0.04, 0.1, 0);
   }
   glDisable (GL_DEPTH_TEST);
@@ -1052,7 +1054,7 @@ void StateFighter::display ()
   allmenus.setVisible (false);
   fightermenu.setVisible (true);
   fightermenu.draw ();
-  AIObj ffighter (FalconDescriptor);
+  AiObj ffighter (FalconDescriptor);
 
   char buf [256];
   int i;
@@ -1797,24 +1799,24 @@ void StatePlay::display ()
   if (dynamiclighting)
   {
     memset (l->dl, 0, (MAXX + 1) * (MAXX + 1));
-    for (unsigned i = 0; i < explosion.size (); i ++)
+    for (i = 0; i < explosion.size (); i ++)
     {
       if (explosion [i]->ttl > 0)
         l->calcDynamicLight (explosion [i], 50.0F, 100.0F, 2.0F);
     }
     if (!day)
     {
-      for (unsigned i = 0; i < laser.size (); i ++)
+      for (i = 0; i < laser.size (); i ++)
       {
         if (laser [i]->draw)
           l->calcDynamicLight (laser [i], 15.0F, 75.0F, 5.0F);
       }
-      for (unsigned i = 0; i < missile.size (); i ++)
+      for (i = 0; i < missile.size (); i ++)
       {
         if (missile [i]->draw)
           l->calcDynamicLight (missile [i], 15.0F, 75.0F, 5.0F);
       }
-      for (unsigned i = 0; i < flare.size (); i ++)
+      for (i = 0; i < flare.size (); i ++)
       {
         if (flare [i]->draw)
           l->calcDynamicLight (flare [i], 15.0F, 75.0F, 5.0F);
@@ -1835,7 +1837,7 @@ void StatePlay::display ()
     if (!day) dayfac = 0.5;
     if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
     {
-      for (unsigned i = 0; i < space->o.size (); i ++)
+      for (i = 0; i < space->o.size (); i ++)
       {
         if (space->o [i]->trafo.translation.y < l->getExactRayHeight (space->o [i]->trafo.translation.x, space->o [i]->trafo.translation.z))
           space->o [i]->lum = 0.5 * dayfac;
@@ -1845,7 +1847,7 @@ void StatePlay::display ()
     }
     else
     {
-      for (unsigned i = 0; i < space->o.size (); i ++)
+      for (i = 0; i < space->o.size (); i ++)
         space->o [i]->lum = dayfac;
     }
 //    printf ("%2.1f*%2.1f ", fplayer->lum, sunlight);
@@ -1866,9 +1868,9 @@ void StatePlay::display ()
 //      space->drawGL (); // draw all objects
       glDisable (GL_LIGHTING);
       glDepthMask (GL_FALSE);
-      for (unsigned i = 0; i < space->o.size (); i ++)
+      for (i = 0; i < space->o.size (); i ++)
       {
-        AIObj *dobj = (AIObj *) space->o [i];
+        AiObj *dobj = (AiObj *) space->o [i];
         if (dobj->id >= MissileBeginDescriptor)
           if (dobj->draw && dobj->drawLight && dobj->active)
           {
@@ -2084,6 +2086,7 @@ void StatePlay::display ()
 void StatePlay::timer (Uint32 dt)
 {
 //  if (multiplayer) return;
+  unsigned i, i2;
 
   fighter.cleanUp ();
   laser.cleanUp ();
@@ -2168,36 +2171,36 @@ void StatePlay::timer (Uint32 dt)
     }
 
   // collision tests
-  for (unsigned i = 0; i < fighter.size (); i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
-    for (unsigned i2 = 0; i2 < laser.size (); i2 ++)
+    for (i2 = 0; i2 < laser.size (); i2 ++)
       if (laser [i2]->active)
         fighter [i]->collide (laser [i2], dt);
-    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
+    for (i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         fighter [i]->collide (missile [i2], dt);
-    for (unsigned i2 = 0; i2 < i; i2 ++)
+    for (i2 = 0; i2 < i; i2 ++)
       if (fighter [i2]->active)
         if (i != i2)
           fighter [i]->collide (fighter [i2], dt);
   }
 
-  for (unsigned i = 0; i < flare.size (); i ++)
+  for (i = 0; i < flare.size (); i ++)
   {
-    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
+    for (i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         flare [i]->collide (missile [i2], dt);
   }
 
-  for (unsigned i = 0; i < chaff.size (); i ++)
+  for (i = 0; i < chaff.size (); i ++)
   {
-    for (unsigned i2 = 0; i2 < missile.size (); i2 ++)
+    for (i2 = 0; i2 < missile.size (); i2 ++)
       if (missile [i2]->active)
         chaff [i]->collide (missile [i2], dt);
   }
 
   // move objects
-  for (unsigned i = 0; i < fighter.size (); i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     fighter [i]->aiAction (dt, fighter, missile, laser, flare, chaff, camrot.phi, camrot.gamma);
     float lev;

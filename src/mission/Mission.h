@@ -24,7 +24,9 @@
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
 
-#define GLUT_BUILDING_LIB 1
+#ifdef COMPILER_EXIT_WORKAROUND
+  #define GLUT_BUILDING_LIB 1
+#endif
 
 #include "model3d/Model3d.h" // ok
 #include "aiobject/AiObj.h" // ok
@@ -106,9 +108,9 @@ class Mission
   Mission ();
   virtual ~Mission () {}
   void playerInit ();
-  void selectMissiles (AIObj &aiobj);
+  void selectMissiles (AiObj &aiobj);
   void alliedInit (const UnitDescriptor &fighterid, int pilotid, int i);
-  void objectInit (AIObj *aiobj, int party, int ailevel, int n);
+  void objectInit (AiObj *aiobj, int party, int ailevel, int n);
 //  virtual void init () = 0;
   virtual void start () = 0; // custom definitions for a mission
   virtual int processtimer (Uint32 dt) = 0; // custom definitions controlled by the timer, mission success/failure

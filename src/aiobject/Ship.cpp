@@ -33,12 +33,12 @@
 
 
 Ship::Ship (const UnitDescriptor &desc)
-  : AIObj (desc)
+  : AiObj (desc)
 {
 }
 
 Ship::Ship (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
-  : AIObj (desc, space2, o2, zoom2)
+  : AiObj (desc, space2, o2, zoom2)
 {
 }
 
@@ -47,7 +47,7 @@ Ship::~Ship ()
 }
 
 // core AI method
-void Ship::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
+void Ship::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
 {
   timer += dt;
 

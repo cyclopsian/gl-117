@@ -362,7 +362,7 @@ int MissionCustom::parseObjectData ()
 {
   char attr [TOKENLEN], value [TOKENLEN], casevalue [TOKENLEN];
   int ret;
-  AIObj *aiobj = &obj [numobjects];
+  AiObj *aiobj = &obj [numobjects];
 
   if (numobjects >= maxfighter)
   {

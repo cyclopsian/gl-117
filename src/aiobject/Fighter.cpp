@@ -35,7 +35,7 @@
 
 
 Fighter::Fighter (const UnitDescriptor &desc)
-  : AIObj ()
+  : AiObj ()
 {
   id = desc;
   proto = new FighterPrototype (id);
@@ -43,7 +43,7 @@ Fighter::Fighter (const UnitDescriptor &desc)
 }
 
 /*Fighter::Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2)
-  : AIObj (desc, space2, o2, zoom2)
+  : AiObj (desc, space2, o2, zoom2)
 {
 }*/
 
@@ -53,7 +53,7 @@ Fighter::~Fighter ()
 
 void Fighter::initPrototype ()
 {
-  AIObj::initPrototype ();
+  AiObj::initPrototype ();
   
   flares = getPrototype ()->maxflares;
   chaffs = getPrototype ()->maxchaffs;
@@ -138,7 +138,7 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
   chaff->trafo.scaling.set (0.12F, 0.12F, 0.12F);
 }
 
-bool Fighter::fireFlare (std::vector<DynamicObj *> &flare, std::vector<AIObj *> &missile)
+bool Fighter::fireFlare (std::vector<DynamicObj *> &flare, std::vector<AiObj *> &missile)
 {
   unsigned i, i2;
   if (flares <= 0) return false;
@@ -181,7 +181,7 @@ bool Fighter::fireFlare (std::vector<DynamicObj *> &flare, std::vector<AIObj *> 
   return false;
 }
 
-bool Fighter::fireChaff (std::vector<DynamicObj *> &chaff, std::vector<AIObj *> &missile)
+bool Fighter::fireChaff (std::vector<DynamicObj *> &chaff, std::vector<AiObj *> &missile)
 {
   unsigned i, i2;
   if (chaffs <= 0) return false;
@@ -339,10 +339,8 @@ bool Fighter::performManoevers (float myheight)
 }
 
 // core AI method
-void Fighter::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
+void Fighter::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m, std::vector<DynamicObj *> &c, std::vector<DynamicObj *> &flare, std::vector<DynamicObj *> &chaff, float camphi, float camgamma)
 {
-  int i;
-
   timer += dt;
 
   if (!active && !draw) // not active, not drawn, then exit
@@ -757,7 +755,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *>
           {
             recrot.theta = 0;
             if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor && disttarget < 20)
-              ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
+              ((AiObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
         }
       }
@@ -821,7 +819,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *>
           {
             recrot.theta = 0;
             if (target->id >= FighterBeginDescriptor && target->id <= AirEndDescriptor && disttarget < 20)
-              ((AIObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
+              ((AiObj *) target)->manoevertheta = timestep * (50 - intelligence / 10);
           }
         }
       }
@@ -893,7 +891,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AIObj *> &f, std::vector<AIObj *>
       {
         if (fabs (recrot.theta - currot.theta) < agr / 2 && fabs (aw) < agr && disttarget < 45)
         {
-          fireMissile (m, (AIObj *) target);
+          fireMissile (m, (AiObj *) target);
           firemissilettl += aggressivity * timestep;
         }
       }
