@@ -97,7 +97,7 @@ int contrast = 10;
 
 SoundSystem *sound = NULL;
 
-GL *gl;
+GlPrimitives *gl;
 
 float getView ()
 {
@@ -846,15 +846,11 @@ int game_levelInit ()
     }
     if (sungamma < 35)
     {
-      gl->fogcolor [0] = (float) (127 + 70 - 2 * sungamma) / 256.0;
-      gl->fogcolor [1] = 0.5;
-      gl->fogcolor [2] = 0.5;
+      gl->setFogColor (127 + 70 - 2 * sungamma, 127, 127);
     }
     else
     {
-      gl->fogcolor [0] = 0.5;
-      gl->fogcolor [1] = 0.5;
-      gl->fogcolor [2] = 0.52;
+      gl->setFogColor (127, 127, 132);
     }
     skycolor.set (50, 200, 255);
     objsphere->setNorthPoleColor (skycolor, 1.8);
@@ -873,9 +869,7 @@ int game_levelInit ()
   {
     skycolor.set (64, 64, 64);
     objsphere->setColor (skycolor);
-    gl->fogcolor [0] = 0.25;
-    gl->fogcolor [1] = 0.25;
-    gl->fogcolor [2] = 0.25;
+    gl->setFogColor (64, 64, 64);
     if (l->type != LAND_MOON)
     {
       skycolor.set (0, 0, 170);
@@ -893,9 +887,7 @@ int game_levelInit ()
   {
     skycolor.set (102, 102, 102);
     objsphere->setColor (skycolor);
-    gl->fogcolor [0] = 0.4;
-    gl->fogcolor [1] = 0.4;
-    gl->fogcolor [2] = 0.4;
+    gl->setFogColor (102, 102, 102);
     skycolor.set (102, 102, 102);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
@@ -903,9 +895,7 @@ int game_levelInit ()
   {
     skycolor.set (40, 40, 40);
     objsphere->setColor (skycolor);
-    gl->fogcolor [0] = 0.16;
-    gl->fogcolor [1] = 0.16;
-    gl->fogcolor [2] = 0.16;
+    gl->setFogColor (40, 40, 40);
     skycolor.set (40, 40, 40);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
@@ -913,9 +903,7 @@ int game_levelInit ()
   {
     skycolor.set (20, 20, 20);
     objsphere->setColor (skycolor);
-    gl->fogcolor [0] = 0.08;
-    gl->fogcolor [1] = 0.08;
-    gl->fogcolor [2] = 0.08;
+    gl->setFogColor (20, 20, 20);
   }
   glDeleteLists (objsphere->list1, 1);
   glDeleteLists (objsphere->list2, 1);
@@ -1818,11 +1806,7 @@ void frame ()
 void game_view ()
 {
   frame ();
-#ifdef USE_GLUT
-  glutSwapBuffers();
-#else
-  SDL_GL_SwapBuffers ();
-#endif
+  gl->swapBuffers ();
 }
 
 int missionending = 0;
@@ -3206,7 +3190,7 @@ void game_display ()
     mylight = mylight / 5.0 + 0.8;
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
-  gl->foglum = mylight;
+  gl->fogLuminance = mylight;
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
@@ -3235,7 +3219,7 @@ void game_display ()
   {
     float cloudfog = pseudoview;
     if (cloudfog > 110) cloudfog = 110;
-    gl->enableFog (cloudfog);
+    gl->enableFog (cloudfog * GLOBALSCALE, quality <= 5);
 
     highclouds->zoom = 400;
     float ch2 = -382 - fplayer->tl->y / 10.0;
@@ -3331,7 +3315,7 @@ void game_display ()
 
   if (camera != 50)
   {
-    gl->enableFog (pseudoview);
+    gl->enableFog (pseudoview * GLOBALSCALE, quality <= 5);
   }
 
   // draw terrain
@@ -4299,7 +4283,7 @@ void myFirstInit ()
   mathtab_init ();
 
   display ("Creating advanced OpenGL methods", LOG_ALL);
-  gl = new GL ();
+  gl = new GlPrimitives ();
 
   // create textures (OpenGL)
   display ("Loading textures", LOG_ALL);
@@ -4616,7 +4600,7 @@ void myFirstInit ()
 
 void init_key (int key, int x, int y)
 {
-  gl->clearScreen (); // exit intro
+  gl->clearBuffers (); // exit intro
   myInit ();
   switch_menu ();
   fplayer->ai = true;
@@ -5558,11 +5542,7 @@ int speedTest ()
       glEnd ();
     }
 
-#ifdef USE_GLUT
-  glutSwapBuffers();
-#else
-  SDL_GL_SwapBuffers ();
-#endif
+    gl->swapBuffers ();
 
   }
   return frames;

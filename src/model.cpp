@@ -30,7 +30,6 @@
 #include <math.h>
 
 #include "model.h"
-
 #include "gl.h"
 #include "mathtab.h"
 #include "loader_tga.h"
@@ -97,7 +96,6 @@ CTexture::CTexture ()
   texred = 1.0F;
   texgreen = 1.0F;
   texblue = 1.0F;
-  quality = 0;
   alpha = false;
 }
 
@@ -107,7 +105,6 @@ CTexture::CTexture (const std::string &filename, int alphaprogram, bool mipmap, 
   texred = 1.0F;
   texgreen = 1.0F;
   texblue = 1.0F;
-  quality = 0;
 
   loadFromTGA (filename, alphaprogram, mipmap, alpha);
 }
@@ -1018,7 +1015,7 @@ void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotati
   if (list2 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
-    gl->genList (&list2);
+    list2 = gl->createList ();
   }
   if (listgen || explode > 0 || !displaylist)
   {
@@ -1298,7 +1295,7 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
   if (list3 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
-    gl->genList (&list3);
+    list3 = gl->createList ();
   }
   if (listgen || explode > 0 || !displaylist)
   {

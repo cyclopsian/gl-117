@@ -47,15 +47,15 @@
 #endif
 #endif // __APPLE__
 
-#define ZOOM 256
-#define GLOBALSCALE 1
-#define VERSIONSTRING "V1.3"
-
 // data types
 #ifdef USE_GLUT
 #define Uint32 unsigned int
 #define Uint16 unsigned short
 #endif
+
+#define ZOOM 256
+#define GLOBALSCALE 1
+#define VERSIONSTRING "V1.3"
 
 #define LINEWIDTH(x) (float) x * height / 600.0F
 
@@ -264,6 +264,8 @@ const int maxjoysticks = 10;
 
 // global normed timestep (higher values mean slower gameplay)
 const int timestep = 34;
+
+// TODO: write Vector and Map classes, as STL does not work with older compilers
 
 #include <stdio.h>
 #include <string.h>

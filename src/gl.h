@@ -24,64 +24,70 @@
 #ifndef IS_GL_H
 #define IS_GL_H
 
-#include "common.h" // ok
-#include "model.h" // ok
-
 #include <iostream>
 
-// TODO: write Vector and Map classes, as STL does not work with older compilers
-
-class GL
+class GlPrimitives
 {
-  private:
-  GLint texnum; // highest used texture number
-//  CTexture *tex [200]; // support max 200 textures
-//  std::map<std::string, int> texMap;
-//  std::vector<std::string> texMap;
-  std::string texList [200];
-  GLuint gllistnr, gllightnr; // highest used list number
-  int aktlist; // current list number
-
   public:
-  bool alphablending, zbuffer, antialiasing; // features turned on
-  int shading;
-  float fogcolor [3];
-  float foglum;
-  float frustum [6] [4]; // the six frustum (cone) planes
 
-  GL ();
-  ~GL ();
-  void clearScreen ();
-  void drawScreen ();
-  void rotate (int x, int y, int z);
-  GLuint genListSphere (GLint slices, GLint stacks, float radius);
-  void setList (GLuint listnr);
-  void genList (int *list);
-  int genTexture ();
-  void enableLinearTexture (int texnum, bool mipmap);
-  void disableLinearTexture (int texnum, bool mipmap);
-//  CTexture *getTextureTGA (char *fname);
-//  CTexture *genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha);
-  /// return OpenGL texture id
-  int registerTexture (const std::string &name, const unsigned char *data,
-                       int width, int height, bool mipmap);
-  void enableAntiAliasing ();
-  void disableAntiAliasing ();
-  void enableAlphaBlending ();
-  void disableAlphaBlending ();
-  void enableTexture (int num);
-  void enableLighting ();
-  void enableZBuffer ();
-  void disableZBuffer ();
-  void shadeFlat ();
-  void shadeSmooth ();
-  void enableFog (float view);
-  void extractFrustum ();
-  bool isPointInFrustum (float x, float y, float z);
-  bool isSphereInFrustum (float x, float y, float z, float radius);
-  bool isCubeInFrustum (float x, float y, float z, float size);
+    unsigned char fogColor [3]; ///< the fog color in RGB (each 1 byte)
+    float fogLuminance;         ///< the fog luminance in [0;1], multiplied with fogColor
+
+    GlPrimitives ();
+    ~GlPrimitives ();
+
+    /// clear all buffers
+    void clearBuffers () const;
+    /// swap buffers to display the next buffer's content
+    void swapBuffers () const;
+    /// rotate using glRotatef for the 3 axes (1,0,0),(0,1,0),(0,0,1)
+    void rotate (float x, float y, float z);
+    /// call display list => draw content immediately
+    void callList (int list) const;
+    /// create a new display list and return the list number (identifier)
+    int createList ();
+    /// bind texture and enable linear shading between texels (slow)
+    void enableLinearTexture (int texnum, bool mipmap) const;
+    /// bind texture and enable const shading between texels (fast)
+    void disableLinearTexture (int texnum, bool mipmap) const;
+    /// test if the texture already exists, in that case return the OpenGL texture id,
+    /// otherwise create an OpenGL texture and return the id
+    int registerTexture (const std::string &name, const unsigned char *data,
+                         int width, int height, bool mipmap);
+    /// enable standard antialiasing on points, lines, etc.
+    void enableAntiAliasing () const;
+    void disableAntiAliasing () const;
+    /// enable standard alpha blending
+    void enableAlphaBlending () const;
+    void disableAlphaBlending () const;
+    /// enable alpha testing, which means texels less than "intensity" are NOT rendered
+    void enableAlphaTesting (float intensity) const;
+    void disableAlphaTesting () const;
+    /// bind texture and enable texture mapping
+    void enableTexture (int num) const;
+    void enableLighting () const;
+    void disableLighting () const;
+    /// enable standard z-buffer operation
+    void enableZBuffer () const;
+    void disableZBuffer () const;
+    void shadeFlat () const;
+    void shadeSmooth () const;
+    void enableFog (float view, bool fast = true) const;
+    void setFogColor (int r, int g, int b);
+  
+    void extractFrustum ();
+    bool isPointInFrustum (float x, float y, float z);
+    bool isSphereInFrustum (float x, float y, float z, float radius);
+    bool isCubeInFrustum (float x, float y, float z, float size);
+
+  private:
+
+    std::string texList [200]; ///< texture names
+    int numTextures;           ///< texture counter
+    int numLists;              ///< list counter
+    float frustum [6] [4];     ///< the six frustum (cone) planes
 };
 
-extern GL *gl;
+extern GlPrimitives *gl;
 
 #endif

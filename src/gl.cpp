@@ -23,79 +23,91 @@
 
 #ifndef IS_GL_H
 
+#include "gl.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
 
-#include "gl.h"
+// APPLE path is different (thanks Minami)
+#ifdef __APPLE__
+  #include <GLUT/glut.h>
+  #include "SDL/SDL.h"
+  #include "SDL/SDL_thread.h"
+  #ifdef HAVE_SDL_MIXER
+    #include "SDL/SDL_mixer.h"
+  #endif
+  #ifdef HAVE_SDL_NET
+    #include "SDL/SDL_net.h"
+  #endif
+#endif
+#ifndef __APPLE__
+  #ifdef USE_GLUT
+    #include <GL/glut.h>
+  #else
+    #include <GL/glut.h>
+    #include "SDL/SDL.h"
+    #include "SDL/SDL_thread.h"
+    #ifdef HAVE_SDL_MIXER
+      #include "SDL/SDL_mixer.h"
+    #endif
+    #ifdef HAVE_SDL_NET
+      #include "SDL/SDL_net.h"
+    #endif
+  #endif
+#endif
 
 /****************************************************************************
 OpenGL
 ****************************************************************************/
 
-GL::GL ()
+GlPrimitives::GlPrimitives ()
 {
-  antialiasing = false;
-  zbuffer = false;
-  alphablending = false;
-  shading = 0;
-  gllistnr = 0;
-  gllightnr = 0;
-  texnum = -1;
-  aktlist = 0;
-  fogcolor [0] = 0.5; fogcolor [1] = 0.5; fogcolor [2] = 0.5;
-  foglum = 1.0;
+  numTextures = -1; // textures start at 0
+  numLists = 0; // display lists start at 1
+  setFogColor (127, 127, 127);
+  fogLuminance = 1.0;
 }
 
-GL::~GL ()
+GlPrimitives::~GlPrimitives ()
 {
 }
 
-void GL::clearScreen ()
+void GlPrimitives::clearBuffers () const
 {
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GL::drawScreen ()
+void GlPrimitives::swapBuffers () const
 {
-  glutSwapBuffers ();
+#ifdef USE_GLUT
+  glutSwapBuffers();
+#else
+  SDL_GL_SwapBuffers ();
+#endif
 }
 
-void GL::rotate (int x, int y, int z)
+void GlPrimitives::rotate (float x, float y, float z)
 {
   glRotatef (z, 0.0f, 0.0f, 1.0f);
   glRotatef (y, 0.0f, 1.0f, 0.0f);
   glRotatef (x, 1.0f, 0.0f, 0.0f);
 }
 
-GLuint GL::genListSphere (GLint slices, GLint stacks, float radius)
+void GlPrimitives::callList (int list) const
 {
-  GLUquadricObj *quadObj;
-  quadObj = gluNewQuadric ();
-  glNewList (++ gllistnr, GL_COMPILE);
-  gluSphere (quadObj, radius, slices, stacks);
-  glEndList ();
-  return gllistnr;
+  glCallList (list);
 }
 
-void GL::setList (GLuint listnr)
+int GlPrimitives::createList ()
 {
-  glCallList (listnr);
+  numLists ++;
+  glNewList (numLists, GL_COMPILE_AND_EXECUTE);
+  return numLists;
 }
 
-void GL::genList (int *list)
-{
-  *list = ++ aktlist;
-  glNewList (aktlist, GL_COMPILE_AND_EXECUTE);
-}
-
-int GL::genTexture ()
-{
-  return 1;
-}
-
-void GL::enableLinearTexture (int texnum, bool mipmap)
+void GlPrimitives::enableLinearTexture (int texnum, bool mipmap) const
 {
   glBindTexture (GL_TEXTURE_2D, texnum);
   if (!mipmap)
@@ -105,7 +117,7 @@ void GL::enableLinearTexture (int texnum, bool mipmap)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void GL::disableLinearTexture (int texnum, bool mipmap)
+void GlPrimitives::disableLinearTexture (int texnum, bool mipmap) const
 {
   glBindTexture (GL_TEXTURE_2D, texnum);
   if (!mipmap)
@@ -115,75 +127,30 @@ void GL::disableLinearTexture (int texnum, bool mipmap)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-int GL::registerTexture (const std::string &name, const unsigned char *data,
+int GlPrimitives::registerTexture (const std::string &name, const unsigned char *data,
                          int width, int height, bool mipmap)
 {
   int i;
 
-  texnum ++;
-  for (i = 0; i < texnum; i ++)
+  numTextures ++;
+  for (i = 0; i < numTextures; i ++)
     if (!texList [i].compare (name))
       return i;
   texList [i] = std::string (name);
 
-  glBindTexture (GL_TEXTURE_2D, texnum);
-  if (!antialiasing) disableLinearTexture (texnum, mipmap);
-  else enableLinearTexture (texnum, mipmap);
+  glBindTexture (GL_TEXTURE_2D, numTextures);
+//  if (!antialiasing) disableLinearTexture (numTextures, mipmap);
+//  else enableLinearTexture (numTextures, mipmap);
 
   if (!mipmap)
     glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
   else
     gluBuild2DMipmaps (GL_TEXTURE_2D, 4, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-  return texnum;
+  return numTextures;
 }
 
-/*CTexture *GL::getTextureTGA (char *fname)
-{
-  int i;
-  for (i = 0; i <= texnum; i ++)
-  {
-    if (!strcmp (fname, tex [i]->name.c_str ())) break;
-  }
-  if (i <= texnum) return tex [i];
-  return NULL;
-}
-
-CTexture *GL::genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha)
-{
-  char buf [STDSIZE];
-  CTexture *mytex;
-  if ((mytex = getTextureTGA (fname)) != NULL)
-  {
-    return mytex;
-  }
-  texnum ++;
-  glBindTexture (GL_TEXTURE_2D, texnum);
-  tex [texnum] = new CTexture ();
-  std::string filename = fname;
-  if (!tex [texnum]->loadFromTGA (filename, alphatype, (bool) mipmap2))
-  {
-    sprintf (buf, "Texture %s not found", fname);
-    display (buf, LOG_ERROR);
-    // If texture cannot be loaded, allocate dummy tex buffer
-    tex [texnum]->width = 8; tex [texnum]->height = 8;
-    int buflen = tex [texnum]->width * tex [texnum]->height * 4;
-    tex [texnum]->data = (unsigned char *) malloc (buflen);
-    if (tex [texnum] == NULL) error_outofmemory ();
-    memset (tex [texnum]->data, 0, buflen);
-  }
-  tex [texnum]->alpha = alpha;
-  tex [texnum]->textureID = texnum;
-  if (!antialiasing) disableLinearTexture (texnum);
-  else enableLinearTexture (texnum);
-  if (!mipmap2)
-    glTexImage2D (GL_TEXTURE_2D, 0, 4, tex [texnum]->width, tex [texnum]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex [texnum]->data);
-  else
-    gluBuild2DMipmaps (GL_TEXTURE_2D, 4, tex [texnum]->width, tex [texnum]->height, GL_RGBA, GL_UNSIGNED_BYTE, tex [texnum]->data);
-  return tex [texnum];
-}*/
-
-void GL::enableAntiAliasing ()
+void GlPrimitives::enableAntiAliasing () const
 {
   glEnable (GL_LINE_SMOOTH);
   glEnable (GL_POINT_SMOOTH);
@@ -191,31 +158,38 @@ void GL::enableAntiAliasing ()
   glHint (GL_LINE_SMOOTH_HINT, GL_FASTEST);
   glHint (GL_POINT_SMOOTH_HINT, GL_FASTEST);
   glHint (GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-  antialiasing = true;
 }
 
-void GL::disableAntiAliasing ()
+void GlPrimitives::disableAntiAliasing () const
 {
   glDisable (GL_LINE_SMOOTH);
   glDisable (GL_POINT_SMOOTH);
   glDisable (GL_POLYGON_SMOOTH);
-  antialiasing = false;
 }
 
-void GL::enableAlphaBlending ()
+void GlPrimitives::enableAlphaBlending () const
 {
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  alphablending = true;
 }
 
-void GL::disableAlphaBlending ()
+void GlPrimitives::disableAlphaBlending () const
 {
   glDisable (GL_BLEND);
-  alphablending = false;
 }
 
-void GL::enableTexture (int num)
+void GlPrimitives::enableAlphaTesting (float intensity) const
+{
+  glEnable (GL_ALPHA_TEST);
+  glAlphaFunc (GL_GEQUAL, intensity);
+}
+
+void GlPrimitives::disableAlphaTesting () const
+{
+  glDisable (GL_ALPHA_TEST);
+}
+
+void GlPrimitives::enableTexture (int num) const
 {
   glBindTexture (GL_TEXTURE_2D, num);
   glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -223,43 +197,43 @@ void GL::enableTexture (int num)
   glEnable (GL_TEXTURE_2D);
 }
 
-void GL::enableLighting ()
+void GlPrimitives::enableLighting () const
 {
   glEnable (GL_LIGHTING);
 }
 
-void GL::enableZBuffer ()
+void GlPrimitives::disableLighting () const
+{
+  glDisable (GL_LIGHTING);
+}
+
+void GlPrimitives::enableZBuffer () const
 {
   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_LEQUAL);
-  glDepthRange (10.0, -10.0);
-  zbuffer = true;
 }
 
-void GL::disableZBuffer ()
+void GlPrimitives::disableZBuffer () const
 {
   glDisable (GL_DEPTH_TEST);
-  zbuffer = false;
 }
 
-void GL::shadeFlat ()
+void GlPrimitives::shadeFlat () const
 {
   glShadeModel (GL_FLAT);
-  shading = 1;
 }
 
-void GL::shadeSmooth ()
+void GlPrimitives::shadeSmooth () const
 {
   glShadeModel (GL_SMOOTH);
-  shading = 2;
 }
 
-void GL::enableFog (float view)
+void GlPrimitives::enableFog (float view, bool fast) const
 {
   float fcol [3];
-  fcol [0] = fogcolor [0] * foglum;
-  fcol [1] = fogcolor [1] * foglum;
-  fcol [2] = fogcolor [2] * foglum;
+  fcol [0] = fogColor [0] * fogLuminance / 256.0;
+  fcol [1] = fogColor [1] * fogLuminance / 256.0;
+  fcol [2] = fogColor [2] * fogLuminance / 256.0;
   glEnable (GL_FOG);
   glFogfv (GL_FOG_COLOR, fcol);
   glFogf (GL_FOG_DENSITY, 0.1);
@@ -267,18 +241,25 @@ void GL::enableFog (float view)
 // possible alternatives:
 //  glFogf (GL_FOG_DENSITY, 0.017 * 100 / view);
 //  glFogi (GL_FOG_MODE, GL_EXP2);
-  if (quality <= 5)
+  if (fast)
     glHint (GL_FOG_HINT, GL_FASTEST);
   else
     glHint (GL_FOG_HINT, GL_NICEST);
-  glFogf (GL_FOG_START, 1.0 * GLOBALSCALE);
-  glFogf (GL_FOG_END, view * GLOBALSCALE);
+  glFogf (GL_FOG_START, 1.0);
+  glFogf (GL_FOG_END, view);
+}
+
+void GlPrimitives::setFogColor (int r, int g, int b)
+{
+  fogColor [0] = (unsigned char) r;
+  fogColor [1] = (unsigned char) g;
+  fogColor [2] = (unsigned char) b;
 }
 
 
 
 // Frustum Culling according to OpenGL Page
-void GL::extractFrustum()
+void GlPrimitives::extractFrustum()
 {
   float proj[16];
   float modl[16];
@@ -386,7 +367,7 @@ void GL::extractFrustum()
   frustum[5][3] /= t;
 }
 
-bool GL::isPointInFrustum( float x, float y, float z )
+bool GlPrimitives::isPointInFrustum( float x, float y, float z )
 {
   int i;
   for (i = 0; i < 6; i ++)
@@ -395,7 +376,7 @@ bool GL::isPointInFrustum( float x, float y, float z )
   return true;
 }
 
-bool GL::isSphereInFrustum( float x, float y, float z, float radius )
+bool GlPrimitives::isSphereInFrustum( float x, float y, float z, float radius )
 {
   int i;
   for (i = 0; i < 6; i ++)
@@ -404,7 +385,7 @@ bool GL::isSphereInFrustum( float x, float y, float z, float radius )
   return true;
 }
 
-bool GL::isCubeInFrustum( float x, float y, float z, float size )
+bool GlPrimitives::isCubeInFrustum( float x, float y, float z, float size )
 {
   int i;
   for (i = 0; i < 6; i ++)
