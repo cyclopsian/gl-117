@@ -30,6 +30,8 @@
 #include "effects.h"
 
 #define CANNON1 0
+#define FLARE1 80
+#define CHAFF1 85
 #define CANNON2 99
 #define MISSILE1 100
 #define MISSILE_AIR1 100
@@ -38,6 +40,8 @@
 #define MISSILE_GROUND1 103
 #define MISSILE_GROUND2 104
 #define MISSILE_DF1 105
+#define MISSILE_FF1 106
+#define MISSILE_FF2 107
 #define MISSILE_MINE1 180
 #define MISSILE2 199
 #define FIGHTER1 200
@@ -152,7 +156,7 @@ class DynamicObj : public CSpaceObj
   void move ();
 };
 
-const int missiletypes = 6;
+const int missiletypes = 8;
 
 class AIObj : public DynamicObj
 {
@@ -176,6 +180,11 @@ class AIObj : public DynamicObj
   int score; // final score
   float dtheta, dgamma; // theta/gamma alteration (smooth piloting)
   float disttarget; // current distance to target
+  int flares;
+  int chaffs;
+  int fireflarettl;
+  int firechaffttl;
+  int ttf; // time to fire missile, targeting mechanism
   CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
 
   void aiinit (); // initialize variables
@@ -189,18 +198,27 @@ class AIObj : public DynamicObj
   void fireCannon (DynamicObj **laser, float phi);
   void fireCannon (DynamicObj **laser);
   void fireMissile2 (int id, AIObj *missile, AIObj *target);
+  void fireFlare2 (DynamicObj *flare);
+  void fireChaff2 (DynamicObj *chaff);
   int firstMissile (); // select first missile type
   int nextMissile (int from); // select next missile type (cyclic)
   bool haveMissile (int id); // missile of type id left?
+  bool haveMissile (); // missile of type missiletype left?
   void decreaseMissile (int id); // decrease missiles by one
   void fireMissile (int id, AIObj **missile, AIObj *target);
   void fireMissile (int id, AIObj **missile);
+  void fireFlare (DynamicObj **flare, AIObj **missile);
+  void fireChaff (DynamicObj **chaff, AIObj **missile);
   void fireMissileAir (AIObj **missile, AIObj *target);
+  bool selectMissileAir (AIObj **missile);
+  void fireMissileAirFF (AIObj **missile, AIObj *target);
+  bool selectMissileAirFF (AIObj **missile);
   void fireMissileGround (AIObj **missile);
+  bool selectMissileGround (AIObj **missile);
   void targetNearestEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);
-  void aiAction (AIObj **f, AIObj **m, DynamicObj **c); // core AI method
+  void aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff); // core AI method
 };
 
 #endif

@@ -203,6 +203,7 @@ class CModel
   CMaterial *material [100]; // materials, at most 100 (these are only pointers)
   CObject *object [100]; // objects, at most 100 (these are only pointers)
   bool nolight; // do not use light?
+  bool alpha; // use alpha blending?
   CModel ();
   void setName (char *name);
   void addMaterial (CMaterial *material);

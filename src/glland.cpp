@@ -2688,7 +2688,7 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   precalculate ();
 }
 
-void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile)
+void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile, DynamicObj **flare)
 {
   int i, x, y;
   memset (dl, 0, (MAXX + 1) * (MAXX + 1));
@@ -2773,6 +2773,36 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
             if (dist < radius)
             {
               int light = (int) ((radius - dist) * intens / radius * missile [i]->zoom) + dl [xn] [yn];
+              if (light > 255) light = 255;
+              dl [xn] [yn] = light;
+            }
+          }
+      }
+    }
+  }
+  float flarezoom = 0.2F;
+  for (i = 0; i < maxflare; i ++)
+  {
+    if (flare [i]->draw && flare [i]->active)
+    {
+      int mx = MAXX / 2 + (int) flare [i]->tl->x;
+      int mz = MAXX / 2 - (int) flare [i]->tl->z;
+      float h = flare [i]->tl->y - getHeight (flare [i]->tl->x, flare [i]->tl->z);
+      if (h < 0) h = 0;
+      float radius = h / 2 + 3;
+      if (h < 50)
+      {
+        float intens = 200.0 - 2 * h;
+        for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
+          for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
+          {
+            int xn = getCoord (x);
+            int yn = getCoord (y);
+            int dx = x - mx, dy = y - mz;
+            float dist = sqrt (dx*dx + dy*dy);
+            if (dist < radius)
+            {
+              int light = (int) ((radius - dist) * intens / radius * flarezoom) + dl [xn] [yn];
               if (light > 255) light = 255;
               dl [xn] [yn] = light;
             }

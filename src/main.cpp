@@ -293,12 +293,16 @@ CModel model_figh;
 CModel model_figt;
 CModel model_cannon1;
 CModel model_cannon2;
+CModel model_flare1;
+CModel model_chaff1;
 CModel model_missile1;
 CModel model_missile2;
 CModel model_missile3;
 CModel model_missile4;
 CModel model_missile5;
 CModel model_missile6;
+CModel model_missile7;
+CModel model_missile8;
 CModel model_flak1;
 CModel model_flarak1;
 CModel model_tent1;
@@ -440,6 +444,8 @@ void drawTextScaled (float x, float y, float z, char *str, CColor *col, int time
 
 
 
+DynamicObj *flare [maxflare];
+DynamicObj *chaff [maxchaff];
 AIObj *missile [maxmissile];
 DynamicObj *laser [maxlaser];
 AIObj *fighter [maxfighter];
@@ -573,24 +579,24 @@ class Mission
     if (selweapon [wantweapon] == MISSILE_AIR1)
     {
       if (selfighter [wantfighter] == FIGHTER_FALCON)
-      { fplayer->missiles [0] = 8; fplayer->missiles [3] = 0; }
+      { fplayer->missiles [0] = 5; fplayer->missiles [3] = 0; fplayer->missiles [6] = 3; }
       if (selfighter [wantfighter] == FIGHTER_HAWK)
-      { fplayer->missiles [0] = 5; fplayer->missiles [3] = 2; }
+      { fplayer->missiles [0] = 2; fplayer->missiles [3] = 2; fplayer->missiles [6] = 2; }
       if (selfighter [wantfighter] == FIGHTER_HAWK2)
-      { fplayer->missiles [0] = 5; fplayer->missiles [3] = 2; }
+      { fplayer->missiles [0] = 2; fplayer->missiles [3] = 2; fplayer->missiles [6] = 3; }
       if (selfighter [wantfighter] == FIGHTER_PHOENIX)
-      { fplayer->missiles [2] = 4; fplayer->missiles [4] = 2; }
+      { fplayer->missiles [2] = 2; fplayer->missiles [4] = 2; fplayer->missiles [7] = 3; }
       if (selfighter [wantfighter] == FIGHTER_REDARROW)
-      { fplayer->missiles [1] = 8; fplayer->missiles [3] = 0; }
+      { fplayer->missiles [1] = 6; fplayer->missiles [3] = 0; fplayer->missiles [7] = 3; }
     }
     if (selweapon [wantweapon] == MISSILE_GROUND1)
     {
       if (selfighter [wantfighter] == FIGHTER_FALCON)
       { fplayer->missiles [0] = 2; fplayer->missiles [3] = 4; }
       if (selfighter [wantfighter] == FIGHTER_HAWK)
-      { fplayer->missiles [0] = 2; fplayer->missiles [3] = 6; }
+      { fplayer->missiles [6] = 2; fplayer->missiles [3] = 6; }
       if (selfighter [wantfighter] == FIGHTER_HAWK2)
-      { fplayer->missiles [0] = 2; fplayer->missiles [4] = 6; }
+      { fplayer->missiles [6] = 2; fplayer->missiles [4] = 6; }
       if (selfighter [wantfighter] == FIGHTER_PHOENIX)
       { fplayer->missiles [2] = 1; fplayer->missiles [4] = 8; }
       if (selfighter [wantfighter] == FIGHTER_REDARROW)
@@ -3216,17 +3222,58 @@ class Cockpit
       float ex2 = -ex1, ey2 = -ey1;
       float ez = o->zoom;
       gl->enableAlphaBlending ();
-      glBegin (GL_LINE_STRIP);
+      bool full = false;
       if (((AIObj *) fplayer->target)->party != fplayer->party)
-        glColor4ub (255, 0, 0, 255);
+      {
+        if (fplayer->ttf <= 0)
+        {
+          glColor4ub (255, 255, 0, 255); full = true;
+        }
+        else
+        {
+          glColor4ub (255, (50 - fplayer->ttf) * 255 / 60, 0, 255);
+        }
+      }
       else
+      {
         glColor4ub (0, 0, 255, 255);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex2, o->tl->y + ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex2, o->tl->y - ez, o->tl->z + ey2);
-      glVertex3f (o->tl->x + ex1, o->tl->y - ez, o->tl->z + ey1);
-      glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
-      glEnd ();
+      }
+      if (!full)
+      {
+        float dx = (ex2 - ex1) / 4;
+        float dy = (ey2 - ey1) / 4;
+        float dz = ez / 2;
+        glBegin (GL_LINE_STRIP);
+        glVertex3f (o->tl->x + ex1, o->tl->y + ez - dz, o->tl->z + ey1);
+        glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
+        glVertex3f (o->tl->x + ex1 + dx, o->tl->y + ez, o->tl->z + ey1 + dy);
+        glEnd ();
+        glBegin (GL_LINE_STRIP);
+        glVertex3f (o->tl->x + ex2 - dx, o->tl->y + ez, o->tl->z + ey2 - dy);
+        glVertex3f (o->tl->x + ex2, o->tl->y + ez, o->tl->z + ey2);
+        glVertex3f (o->tl->x + ex2, o->tl->y + ez - dz, o->tl->z + ey2);
+        glEnd ();
+        glBegin (GL_LINE_STRIP);
+        glVertex3f (o->tl->x + ex2, o->tl->y - ez + dz, o->tl->z + ey2);
+        glVertex3f (o->tl->x + ex2, o->tl->y - ez, o->tl->z + ey2);
+        glVertex3f (o->tl->x + ex2 - dx, o->tl->y - ez, o->tl->z + ey2 - dy);
+        glEnd ();
+        glBegin (GL_LINE_STRIP);
+        glVertex3f (o->tl->x + ex1 + dx, o->tl->y - ez, o->tl->z + ey1 + dy);
+        glVertex3f (o->tl->x + ex1, o->tl->y - ez, o->tl->z + ey1);
+        glVertex3f (o->tl->x + ex1, o->tl->y - ez + dz, o->tl->z + ey1);
+        glEnd ();
+      }
+      else
+      {
+        glBegin (GL_LINE_STRIP);
+        glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
+        glVertex3f (o->tl->x + ex2, o->tl->y + ez, o->tl->z + ey2);
+        glVertex3f (o->tl->x + ex2, o->tl->y - ez, o->tl->z + ey2);
+        glVertex3f (o->tl->x + ex1, o->tl->y - ez, o->tl->z + ey1);
+        glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
+        glEnd ();
+      }
       gl->disableAlphaBlending ();
     }
 
@@ -3534,6 +3581,8 @@ class Cockpit
     else if (fplayer->missiletype == 3) missile = &model_missile4;
     else if (fplayer->missiletype == 4) missile = &model_missile5;
     else if (fplayer->missiletype == 5) missile = &model_missile6;
+    else if (fplayer->missiletype == 6) missile = &model_missile7;
+    else if (fplayer->missiletype == 7) missile = &model_missile8;
     glEnable (GL_LIGHTING);
     missile->draw (&n, &tl, fplayer->rot, 0.05, 1.0, 0);
     glDisable (GL_LIGHTING);
@@ -4350,6 +4399,18 @@ void game_levelInit ()
     missile [i]->deactivate ();
   }
 
+  for (i = 0; i < maxflare; i ++)
+  {
+    flare [i]->dinit ();
+    flare [i]->deactivate ();
+  }
+
+  for (i = 0; i < maxchaff; i ++)
+  {
+    chaff [i]->dinit ();
+    chaff [i]->deactivate ();
+  }
+
   for (i = 0; i < maxstar; i ++)
   {
     star [i]->phi = myrandom (360);
@@ -4769,6 +4830,16 @@ void game_key (unsigned char key, int x, int y)
   else if (key == 13)
   {
     fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
+    sound->play (SOUND_MISSILE1);
+  }
+  else if (key == 'f')
+  {
+    fplayer->fireFlare (flare, missile);
+    sound->play (SOUND_MISSILE1);
+  }
+  else if (key == 'c')
+  {
+    fplayer->fireChaff (chaff, missile);
     sound->play (SOUND_MISSILE1);
   }
   else if (key == ' ' && fplayer->active)
@@ -6057,6 +6128,10 @@ void game_quit ()
     delete (laser [i]);
   for (i = 0; i < maxmissile; i ++)
     delete (missile [i]);
+  for (i = 0; i < maxflare; i ++)
+    delete (flare [i]);
+  for (i = 0; i < maxchaff; i ++)
+    delete (chaff [i]);
   for (i = 0; i < maxexplosion; i ++)
     delete (explosion [i]);
   for (i = 0; i < maxstar; i ++)
@@ -7456,7 +7531,7 @@ void game_display ()
 //  glEnable (GL_DITHER);
 
 // draw terrain
-  l->calcDynamicLight (explosion, laser, (DynamicObj **) missile);
+  l->calcDynamicLight (explosion, laser, (DynamicObj **) missile, flare);
   glEnable (GL_CULL_FACE);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
@@ -7846,9 +7921,23 @@ void game_timer ()
           fighter [i]->collide (fighter [i2]);
   }
 
+  for (i = 0; i < maxflare; i ++)
+  {
+    for (i2 = 0; i2 < maxmissile; i2 ++)
+      if (missile [i2]->active)
+        flare [i]->collide (missile [i2]);
+  }
+
+  for (i = 0; i < maxchaff; i ++)
+  {
+    for (i2 = 0; i2 < maxmissile; i2 ++)
+      if (missile [i2]->active)
+        chaff [i]->collide (missile [i2]);
+  }
+
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->aiAction ((AIObj **) fighter, missile, laser);
+    fighter [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
     float lev;
     if (fighter [i]->explode == 3 && (lev = fplayer->distance (fighter [i])) < 32)
     {
@@ -7862,7 +7951,15 @@ void game_timer ()
   }
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i]->aiAction ((AIObj **) fighter, missile, laser);
+    missile [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
+  }
+  for (i = 0; i < maxflare; i ++)
+  {
+    flare [i]->move ();
+  }
+  for (i = 0; i < maxchaff; i ++)
+  {
+    chaff [i]->move ();
   }
 
   for (i = 0; i < maxexplosion; i ++)
@@ -8108,12 +8205,16 @@ int net_thread_main (void *data)
 
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->aiAction ((AIObj **) fighter, missile, laser);
+    fighter [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
   }
   for (i = 0; i < maxlaser; i ++)
     laser [i]->move ();
   for (i = 0; i < maxmissile; i ++)
-    missile [i]->aiAction ((AIObj **) fighter, missile, laser);
+    missile [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
+  for (i = 0; i < maxflare; i ++)
+    flare [i]->move ();
+  for (i = 0; i < maxchaff; i ++)
+    chaff [i]->move ();
 
   for (i = 0; i < maxexplosion; i ++)
     explosion [i]->move ();
@@ -8591,6 +8692,16 @@ void myInit ()
     missile [i] = new AIObj (space, &model_missile1, 0.1);
   }
 
+  for (i = 0; i < maxflare; i ++)
+  {
+    flare [i] = new DynamicObj (space, &model_flare1, 0.1);
+  }
+
+  for (i = 0; i < maxchaff; i ++)
+  {
+    chaff [i] = new DynamicObj (space, &model_chaff1, 0.1);
+  }
+
   for (i = 0; i < maxstar; i ++)
   {
     star [i] = new Star (myrandom (360), myrandom (85), 0.4 + 0.1 * myrandom (8));
@@ -8683,18 +8794,30 @@ void myFirstInit ()
   model_cannon2.object [0]->vertex [1].color.c [0] = 50;
   model_cannon2.object [0]->vertex [1].color.c [1] = 50;
   model_cannon2.object [0]->vertex [1].color.c [2] = 50;
+  g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
+  model_flare1.setName ("FLARE");
+  model_flare1.alpha = true;
+  model_flare1.nolight = true;
+  g_Load3ds.Import3DS (&model_chaff1, dirs->getModels ("chaff1.3ds"));
+  model_chaff1.setName ("CHAFF");
+  model_chaff1.alpha = true;
+  model_chaff1.nolight = true;
   g_Load3ds.Import3DS (&model_missile1, dirs->getModels ("missile1.3ds"));
-  model_missile1.setName ("AAM MK1");
+  model_missile1.setName ("AAM HS MK1");
   g_Load3ds.Import3DS (&model_missile2, dirs->getModels ("missile2.3ds"));
-  model_missile2.setName ("AAM MK2");
+  model_missile2.setName ("AAM HS MK2");
   g_Load3ds.Import3DS (&model_missile3, dirs->getModels ("missile3.3ds"));
-  model_missile3.setName ("AAM MK3");
+  model_missile3.setName ("AAM HS MK3");
   g_Load3ds.Import3DS (&model_missile4, dirs->getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
   g_Load3ds.Import3DS (&model_missile5, dirs->getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
   g_Load3ds.Import3DS (&model_missile6, dirs->getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
+  g_Load3ds.Import3DS (&model_missile7, dirs->getModels ("missile7.3ds"));
+  model_missile7.setName ("AAM FF MK1");
+  g_Load3ds.Import3DS (&model_missile8, dirs->getModels ("missile8.3ds"));
+  model_missile8.setName ("AAM FF MK2");
   g_Load3ds.Import3DS (&model_flak1, dirs->getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
   g_Load3ds.Import3DS (&model_flarak1, dirs->getModels ("flarak1.3ds"));

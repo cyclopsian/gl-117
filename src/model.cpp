@@ -442,6 +442,7 @@ CModel::CModel ()
   list3 = -1;
   name [0] = '0';
   nolight = false;
+  alpha = false;
   light_ambient [0] = 0.2; light_ambient [1] = 0.2; light_ambient [2] = 0.2; light_ambient [3] = 1;
   light_diffuse [0] = 0.8; light_diffuse [1] = 0.8; light_diffuse [2] = 0.8; light_diffuse [3] = 1;
   light_ambient2 [0] = 0.1; light_ambient2 [1] = 0.1; light_ambient2 [2] = 0.1; light_ambient2 [3] = 1;
@@ -580,6 +581,8 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
     else
       glShadeModel (GL_SMOOTH);
 
+    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
+
 	  for (i = 0; i < numObjects; i ++)
 	  {
       if (numObjects <= 0) break;
@@ -681,6 +684,8 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 //  drawVertexNormals (cm, zoom);
     }
 
+    if (alpha) glDisable (GL_BLEND);
+
     if (listgen) glEndList ();
   }
   else glCallList (list1);
@@ -733,6 +738,8 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
       glShadeModel (GL_FLAT);
     else
       glShadeModel (GL_SMOOTH);
+
+    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
     for (i = 0; i < numObjects; i++)
     {
@@ -824,6 +831,8 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     glEnd ();*/
     }
 
+    if (alpha) glDisable (GL_BLEND);
+
     if (listgen) glEndList ();
   }
   else glCallList (list2);
@@ -849,6 +858,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glScalef (zoom, zoom, zoom);
+
+  if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
   for (i = 0; i < numObjects; i++)
   {
@@ -915,6 +926,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
 
   }
 
+  if (alpha) glDisable (GL_BLEND);
+
   glPopMatrix ();
 }
 
@@ -943,6 +956,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
       glShadeModel (GL_FLAT);
     else
       glShadeModel (GL_SMOOTH);
+
+    if (alpha) { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
     for (i = 0; i < numObjects; i++)
     {
@@ -1024,6 +1039,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
       }
     glEnd ();*/
     }
+
+    if (alpha) glDisable (GL_BLEND);
 
     if (listgen) glEndList ();
   }

@@ -407,6 +407,24 @@ void DynamicObj::move ()
     return; // and exit this function (optimization)
   }
 
+  if (id == FLARE1)
+  {
+    tl->y -= 0.04;
+    zoom = 0.12F + 0.03F * sin (ttl * 2);
+    phi = camphi;
+    theta = 0;
+    gamma = camgamma;
+  }
+
+  if (id == CHAFF1)
+  {
+    tl->y -= 0.04;
+    zoom = 0.12F + 0.005F * (80 - ttl);
+    phi = camphi;
+    theta = 0;
+    gamma = camgamma;
+  }
+
   int theta0 = (int) theta; // get a normalized theta, as our sine/cosi tables only reach from 0 to 359
   while (theta0 < 0) theta0 += 360;
   while (theta0 > 360) theta0 -= 360;
@@ -600,6 +618,9 @@ void AIObj::aiinit ()
   manoeverspeed = 0;
   idle = 0;
   firemissilettl = 0;
+  fireflarettl = 0;
+  firechaffttl = 0;
+  flares = 0;
   aw = 0;
   source = NULL;
   points = 0;
@@ -613,6 +634,7 @@ void AIObj::aiinit ()
   missiletype = 0;
   autofire = false;
   ttl = -1;
+  ttf = 30;
   score = -1;
   for (int i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
@@ -636,8 +658,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.4;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 6;
+    missiles [0] = 4;
     missiles [3] = 2;
+    missiles [6] = 2;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_SWALLOW)
   {
@@ -650,6 +675,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 80.0;
     missiles [0] = 2;
     missiles [3] = 6;
+    missiles [6] = 2;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_HAWK)
   {
@@ -663,6 +691,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     missiles [0] = 4;
     missiles [3] = 6;
     missiles [5] = 2;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_HAWK2)
   {
@@ -677,6 +707,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     missiles [3] = 0;
     missiles [4] = 6;
     missiles [5] = 2;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_TRANSPORT)
   {
@@ -688,6 +720,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 1.5;
     maxgamma = 20;
     maxtheta = 30;
+    flares = 0;
+    chaffs = 20;
   }
   else if (id == FIGHTER_BUZZARD)
   {
@@ -698,9 +732,12 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.4;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 4;
+    missiles [0] = 3;
     missiles [1] = 2;
     missiles [3] = 2;
+    missiles [6] = 2;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_CROW)
   {
@@ -713,6 +750,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 80.0;
     missiles [0] = 2;
     missiles [3] = 1;
+    missiles [6] = 1;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_PHOENIX)
   {
@@ -725,6 +765,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 80.0;
     missiles [4] = 6;
     missiles [5] = 6;
+    flares = 20;
+    chaffs = 20;
   }
   else if (id == FIGHTER_REDARROW)
   {
@@ -736,6 +778,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxtheta = 90.0;
     maxgamma = 80.0;
     missiles [1] = 8;
+    flares = 25;
+    chaffs = 25;
   }
   else if (id == FIGHTER_BLACKBIRD)
   {
@@ -746,7 +790,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.25;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 6;
+    missiles [1] = 5;
+    missiles [7] = 3;
+    flares = 25;
+    chaffs = 25;
   }
   if (id >= FIGHTER1 && id <= FIGHTER2)
   {
@@ -776,7 +823,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 6.0;
     shield = maxshield = 70;
     zoom = 0.3;
-    missiles [0] = 100;
+    missiles [6] = 100;
   }
 
   if (id == TANK_AIR1)
@@ -832,7 +879,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     manoeverability = 4.0;
     impact = 20;
     shield = maxshield = 5500;
-    missiles [1] = 200;
+    missiles [6] = 200;
   }
   else if (id == SHIP_DESTROYER1)
   {
@@ -850,28 +897,28 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     intelligence = 100;
     maxspeed = 0.4;
-    nimbility = 2.2;
+    nimbility = 3.2; // old 2.2
     manoeverability = 2.2;
     ttl = 200;
-    impact = 30;
+    impact = 40;
   }
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
     maxspeed = 0.42;
-    nimbility = 3.5;
+    nimbility = 4.5; // old 3.5
     manoeverability = 2.8;
     ttl = 220;
-    impact = 40;
+    impact = 50;
   }
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
     maxspeed = 0.44;
-    nimbility = 5.5;
+    nimbility = 6.0;
     manoeverability = 3.5;
     ttl = 250;
-    impact = 50;
+    impact = 60;
   }
   else if (id == MISSILE_GROUND1)
   {
@@ -902,6 +949,24 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     ai = true;
     ttl = 300;
     impact = 900;
+  }
+  else if (id == MISSILE_FF1)
+  {
+    intelligence = 0;
+    maxspeed = 0.4;
+    nimbility = 3.0;
+    manoeverability = 2.5;
+    ttl = 250;
+    impact = 50;
+  }
+  else if (id == MISSILE_FF2)
+  {
+    intelligence = 0;
+    maxspeed = 0.45;
+    nimbility = 4.0;
+    manoeverability = 3.0;
+    ttl = 250;
+    impact = 60;
   }
   else if (id == MISSILE_MINE1)
   {
@@ -1030,12 +1095,14 @@ AIObj::~AIObj ()
 
 void AIObj::initValues (DynamicObj *dobj, float phi)
 {
+  float fac = zoom;
+  if (dobj->id == FLARE1 || dobj->id == CHAFF1) fac = -fac;
   // Hier bitte exakte Kugelkoordinaten auf Grund von gamma und theta verwenden!
-  dobj->tl->x = tl->x + COS(gamma) * SIN(phi) * zoom;
-  dobj->tl->y = tl->y - SIN(gamma) * zoom;
+  dobj->tl->x = tl->x + COS(gamma) * SIN(phi) * fac;
+  dobj->tl->y = tl->y - SIN(gamma) * fac;
   if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
-    dobj->tl->y += zoom;
-  dobj->tl->z = tl->z + COS(gamma) * COS(phi) * zoom;
+    dobj->tl->y += fac;
+  dobj->tl->z = tl->z + COS(gamma) * COS(phi) * fac;
   dobj->phi = phi;
   dobj->theta = 0;
   dobj->rectheta = dobj->theta;
@@ -1126,6 +1193,49 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
   }
 }
 
+void AIObj::fireFlare2 (DynamicObj *flare)
+{
+  flare->dinit ();
+  flare->speed = 0;
+  flare->realspeed = 0;
+  flare->recspeed = 0;
+  flare->manoeverability = 0.0;
+  flare->maxspeed = 1.0;
+  flare->gamma = 0;
+  flare->party = party;
+  flare->ttl = 80;
+  flare->shield = 1;
+  flare->immunity = (int) (zoom * 12);
+  flare->source = this;
+  flare->phi = phi;
+  flare->id = FLARE1;
+  initValues (flare, phi);
+  flare->activate ();
+  flare->explode = 0;
+}
+
+void AIObj::fireChaff2 (DynamicObj *chaff)
+{
+  chaff->dinit ();
+  chaff->speed = 0;
+  chaff->realspeed = 0;
+  chaff->recspeed = 0;
+  chaff->manoeverability = 0.0;
+  chaff->maxspeed = 1.0;
+  chaff->gamma = 0;
+  chaff->party = party;
+  chaff->ttl = 80;
+  chaff->shield = 1;
+  chaff->immunity = (int) (zoom * 12);
+  chaff->source = this;
+  chaff->phi = phi;
+  chaff->id = CHAFF1;
+  initValues (chaff, phi);
+  chaff->activate ();
+  chaff->explode = 0;
+  chaff->zoom = 0.12F;
+}
+
 int AIObj::firstMissile ()
 {
   int i = 0;
@@ -1134,6 +1244,7 @@ int AIObj::firstMissile ()
     i ++;
     if (i >= missiletypes) return 0;
   }
+  ttf = 50;
   return i;
 }
 
@@ -1147,12 +1258,20 @@ int AIObj::nextMissile (int from)
     if (i >= missiletypes) i = 0;
     if (i == from) break;
   }
+  ttf = 50;
   return i;
 }
 
 bool AIObj::haveMissile (int id)
 {
   if (missiles [id - MISSILE1] > 0)
+    return true;
+  return false;
+}
+
+bool AIObj::haveMissile () // due to missiletype
+{
+  if (missiles [missiletype] > 0)
     return true;
   return false;
 }
@@ -1166,6 +1285,7 @@ void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
 {
   int i;
   if (!haveMissile (id)) return;
+  if (ttf > 0) return;
   for (i = 0; i < maxmissile; i ++)
   {
     if (missile [i]->ttl <= 0) break;
@@ -1180,11 +1300,89 @@ void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
 
 void AIObj::fireMissile (int id, AIObj **missile)
 {
+  if (ttf > 0) return;
   fireMissile (id, missile, (AIObj *) target);
+}
+
+void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
+{
+  int i;
+  if (flares <= 0) return;
+  if (fireflarettl > 0) return;
+  for (i = 0; i < maxflare; i ++)
+  {
+    if (flare [i]->ttl <= 0) break;
+  }
+  if (i < maxflare)
+  {
+    fireFlare2 (flare [i]);
+    flares --;
+    fireflarettl = 15;
+  }
+  for (i = 0; i < maxmissile; i ++)
+  {
+    if (missile [i]->ttl > 0)
+    {
+      if (missile [i]->id >= MISSILE_AIR1 && missile [i]->id <= MISSILE_AIR3) // only heat seeking missiles
+        if (missile [i]->target == this) // only change target if angle is good
+        {
+          bool hit = false;
+          if (easymodel)
+          {
+            if (myrandom (theta + 30) > 50) hit = true;
+          }
+          else
+          {
+            if (myrandom (fabs (aileroneffect) * 90 + 30) > 50) hit = true;
+          }
+          if (hit)
+            missile [i]->target = flare [i];
+        }
+    }
+  }
+}
+
+void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
+{
+  int i;
+  if (chaffs <= 0) return;
+  if (firechaffttl > 0) return;
+  for (i = 0; i < maxchaff; i ++)
+  {
+    if (chaff [i]->ttl <= 0) break;
+  }
+  if (i < maxchaff)
+  {
+    fireChaff2 (chaff [i]);
+    chaffs --;
+    firechaffttl = 15;
+  }
+  for (i = 0; i < maxmissile; i ++)
+  {
+    if (missile [i]->ttl > 0)
+    {
+      if (missile [i]->id > MISSILE_AIR3) // only radar seeking missiles
+        if (missile [i]->target == this) // only change target if angle is good
+        {
+          bool hit = false;
+          if (easymodel)
+          {
+            if (myrandom (theta + 30) > 50) hit = true;
+          }
+          else
+          {
+            if (myrandom (fabs (aileroneffect) * 90 + 30) > 50) hit = true;
+          }
+          if (hit)
+            missile [i]->target = chaff [i];
+        }
+    }
+  }
 }
 
 void AIObj::fireMissileAir (AIObj **missile, AIObj *target)
 {
+  if (ttf > 0) return;
   if (haveMissile (MISSILE_AIR3))
     fireMissile (MISSILE_AIR3, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_AIR2))
@@ -1193,18 +1391,54 @@ void AIObj::fireMissileAir (AIObj **missile, AIObj *target)
     fireMissile (MISSILE_AIR1, missile, (AIObj *) target);
 }
 
+bool AIObj::selectMissileAir (AIObj **missile)
+{
+  bool sel = false;
+  if (haveMissile (MISSILE_AIR3)) { missiletype = MISSILE_AIR3; sel = true; }
+  else if (haveMissile (MISSILE_AIR2)) { missiletype = MISSILE_AIR2; sel = true; }
+  else if (haveMissile (MISSILE_AIR1)) { missiletype = MISSILE_AIR1; sel = true; }
+  return sel;
+}
+
+void AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
+{
+  if (ttf > 0) return;
+  if (haveMissile (MISSILE_FF2))
+    fireMissile (MISSILE_FF2, missile, (AIObj *) target);
+  else if (haveMissile (MISSILE_FF1))
+    fireMissile (MISSILE_FF1, missile, (AIObj *) target);
+}
+
+bool AIObj::selectMissileAirFF (AIObj **missile)
+{
+  bool sel = false;
+  if (haveMissile (MISSILE_FF2)) { missiletype = MISSILE_FF2; sel = true; }
+  else if (haveMissile (MISSILE_FF1)) { missiletype = MISSILE_FF1; sel = true; }
+  return sel;
+}
+
 void AIObj::fireMissileGround (AIObj **missile)
 {
+  if (ttf > 0) return;
   if (haveMissile (MISSILE_GROUND2))
     fireMissile (MISSILE_GROUND2, missile, (AIObj *) target);
   else if (haveMissile (MISSILE_GROUND1))
     fireMissile (MISSILE_GROUND1, missile, (AIObj *) target);
 }
 
+bool AIObj::selectMissileGround (AIObj **missile)
+{
+  bool sel = false;
+  if (haveMissile (MISSILE_GROUND2)) { missiletype = MISSILE_GROUND2; sel = true; }
+  else if (haveMissile (MISSILE_GROUND1)) { missiletype = MISSILE_GROUND1; sel = true; }
+  return sel;
+}
+
 void AIObj::targetNearestEnemy (AIObj **f)
 {
   int i;
   float d = 10000;
+  ttf = 50;
   for (i = 0; i < maxfighter; i ++)
   {
     if (this != f [i] && party != f [i]->party && f [i]->active)
@@ -1223,6 +1457,7 @@ void AIObj::targetNext (AIObj **f)
 {
   int i;
 //    float d = 10000;
+  ttf = 50;
   if (target == NULL) target = f [0];
   for (i = 0; i < maxfighter; i ++)
     if (target == f [i])
@@ -1261,8 +1496,10 @@ void AIObj::targetPrevious (AIObj **f)
 }
 
 // core AI method
-void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
+void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff)
 {
+  int i;
+
   if (debug)
   { printf ("a("); fflush (stdout); }
   if (!active && !draw) // not active, not drawn, then exit
@@ -1273,6 +1510,8 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
   }
 
   if (firemissilettl > 0) firemissilettl --; // time to fire the next missile
+  if (fireflarettl > 0) fireflarettl --; // time to fire the next flare
+  if (firechaffttl > 0) firechaffttl --; // time to fire the next chaff
 
   // move object according to our physics
   move ();
@@ -1461,6 +1700,33 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
     if (!target->active)
       targetNearestEnemy (f);
 
+  disttarget = distance (target); // distance to target
+
+  // fighter's targeting mechanism for missiles
+  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  {
+    if (ai)
+      if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
+        if (!selectMissileAirFF (m))
+          selectMissileAir (m);
+    if (haveMissile ())
+    {
+      float dgamma = atan ((target->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
+      float dphi = getAngle (target);
+      if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
+      {
+        if (disttarget < 40)
+          if (ttf > 0)
+            ttf -= 2;
+      }
+      else
+      {
+        if (missiletype == MISSILE_DF1) ttf = 0;
+        else ttf = 50;
+      }
+    }
+  }
+
   if (!ai || target == NULL) // no AI (player) or no target found, then exit
   {
     if (debug)
@@ -1468,7 +1734,20 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
     return;
   }
 
-  disttarget = distance (target); // distance to target
+  // fire flares
+  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
+  {
+    if (!(l->lsticker & 7))
+      for (i = 0; i < maxmissile; i ++)
+        if (m [i]->ttl > 0)
+          if (m [i]->target == this)
+          {
+            if (theta >= 20 + myrandom (40))
+              fireFlare (flare, m);
+            if (theta >= 20 + myrandom (40))
+              fireChaff (chaff, m);
+          }
+  }
 
   float dx2, dz2, ex, ez;
   float dx = target->tl->x - tl->x, dz = target->tl->z - tl->z; // current distances

@@ -423,7 +423,7 @@ void CLoad3DS::LoadTextures (CModel *model)
         }
       }
       
-      model->object [i]->material->texture = gl->genTextureTGA (str, 0, 0, 1, false);
+      model->object [i]->material->texture = gl->genTextureTGA (str, 0, -1, 1, false);
     }
   }
 }
