@@ -824,6 +824,8 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
   last = false;
   if (water)
   {
+    float watergreen = 0.00025;
+    if (day) watergreen = 0.0004;
     for (xs = x1; xs < x2;)
     {
       x = getCoord (xs);
@@ -878,7 +880,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 */
 
             texlight = texwater->texlight;
-            float d = 0.00025 * (h1 - h [x] [y]);
+            float d = watergreen * (h1 - h [x] [y]);
             if (d > 0.75) d = 0.75;
             if (type == 0)
             {
@@ -903,7 +905,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
             glColor3f (cr, cg, cb);
             glVertex3f (hh2*xs - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
 
-            d = 0.00025 * (h1 - h [xstep] [y]);
+            d = watergreen * (h1 - h [xstep] [y]);
             if (d > 0.75) d = 0.75;
             if (type == 0)
             {
@@ -1134,11 +1136,13 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
   gl->enableTextures (texwater->textureID);
   texlight = texwater->texlight;
   texzoom = 0.5;
+  float watergreen = 0.00025;
+  if (day) watergreen = 0.0004;
   float fac2 = 0.001 * sunlight/* * texlight*/;
   for (j = 0; j < 4; j ++)
   {
     int mx = getCoord (px [j]), my = getCoord (py [j]);
-    float d = 0.00025 * (h1 - h [mx] [my]);
+    float d = watergreen * (h1 - h [mx] [my]);
     if (d > 0.75) d = 0.75;
     fac = fac2 * li [j];
     if (type == 0)
@@ -1745,7 +1749,7 @@ void GLLandscape::draw (int phi, int gamma)
       fx = (float) minx + (float) (dx * (0.5 + (float) i2));
       fy = (float) miny + (float) (dy * (0.5 + (float) i));
       float d = dist (camx + MAXX/2 - fx, MAXX/2 - camz - fy);
-      detail [i] [i2] = (int) ((d - dx/2) / 10.0);
+      detail [i] [i2] = (int) ((d - dx/2) / 12.0);
       if (detail [i] [i2] < 0) detail [i] [i2] = 0;
     }
 
@@ -2288,10 +2292,10 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     float mydep = 1000;
-    if (quality == 2) mydep = 1500;
-    else if (quality == 3) mydep = 2000;
-    else if (quality == 4) mydep = 2500;
-    else if (quality == 5) mydep = 3500;
+    if (quality == 2) mydep = 1800;
+    else if (quality == 3) mydep = 2500;
+    else if (quality == 4) mydep = 3200;
+    else if (quality == 5) mydep = 3800;
     if (mydep > view * view) mydep = view * view;
 
     int lineartree = -1;
@@ -2624,7 +2628,9 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   hh2 = 2.0*hh;
   lv [0] = 0.0; lv [1] = 1.0; lv [2] = 1.0;
   mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
-  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
+  mat [1] [0] = 0.3; mat [1] [1] = 0.55; mat [1] [2] = 0.2; mat [1] [3] = 1.0;
+/*  mat [0] [0] = 0.4; mat [0] [1] = 0.8; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
+  mat [1] [0] = 0.3; mat [1] [1] = 0.5; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
 /*  mat [0] [0] = 0.3; mat [0] [1] = 1.0; mat [0] [2] = 0.3; mat [0] [3] = 1.0;
   mat [1] [0] = 0.5; mat [1] [1] = 0.85; mat [1] [2] = 0.2; mat [1] [3] = 1.0;*/
   mat [2] [0] = 0.7; mat [2] [1] = 0.7; mat [2] [2] = 0.7; mat [2] [3] = 1.0;
