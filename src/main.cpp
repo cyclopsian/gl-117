@@ -76,6 +76,7 @@ int net_thread_main (void *data);
 int game = GAME_INIT;
 
 int debuglevel = LOG_ALL;
+int brightness = 0;
 
 SoundSystem *sound = NULL;
 
@@ -110,6 +111,9 @@ CExplosion *explosion [maxexplosion];
 CBlackSmoke *blacksmoke [maxblacksmoke];
 GLLandscape *l = NULL;
 Font *font1, *font2;
+
+
+Uint32 lasttime = 0;
 
 
 
@@ -174,7 +178,7 @@ class EditField
       return;
     char buf [256];
     memcpy (buf, text, 256);
-    if (timer & 1)
+    if ((timer / timestep) & 1)
     {
       buf [cursorpos] = 'I';
       buf [cursorpos + 1] = '\0';
@@ -1039,6 +1043,7 @@ void playRandomMusic ()
 
 void switch_menu ()
 {
+  lasttime = 0;
   setLightSource ((int) sungamma);
   game = GAME_MENU;
   menu_reshape ();
@@ -1055,6 +1060,7 @@ int statsitemselected = 0;
 
 void switch_stats ()
 {
+  lasttime = 0;
   setLightSource ((int) sungamma);
   game = GAME_STATS;
   statsitemselected = 0;
@@ -1067,7 +1073,7 @@ void switch_stats ()
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
   {
-    int missionstate = mission->processtimer ();
+    int missionstate = mission->processtimer (1);
     if (missionstate == 1)
       sound->loadMusic (MUSIC_WINNER1);
     else
@@ -1123,6 +1129,7 @@ void createMission (int missionid)
 
 void switch_mission (int missionid)
 {
+  lasttime = 0;
   setLightSource (60);
   game = GAME_MISSION;
   createMission (missionid);
@@ -1134,6 +1141,7 @@ void switch_mission (int missionid)
 
 void switch_fame ()
 {
+  lasttime = 0;
   setLightSource (60);
   game = GAME_FAME;
   menu_reshape ();
@@ -1144,6 +1152,7 @@ void switch_fame ()
 
 void switch_fighter ()
 {
+  lasttime = 0;
   setLightSource (60);
   game = GAME_FIGHTER;
   menu_reshape ();
@@ -1152,9 +1161,9 @@ void switch_fighter ()
     playRandomMusic ();
 }
 
-
 void switch_create ()
 {
+  lasttime = 0;
   setLightSource (60);
   game = GAME_CREATE;
   isserver = true;
@@ -1168,6 +1177,7 @@ void switch_create ()
 
 void switch_join ()
 {
+  lasttime = 0;
   setLightSource (60);
   game = GAME_JOIN;
   isserver = false;
@@ -1183,8 +1193,9 @@ int creditstimer, finishtimer;
 
 void switch_credits ()
 {
+  lasttime = 0;
   game = GAME_CREDITS;
-  creditstimer = 50;
+  creditstimer = 50 * timestep;
   credits_reshape ();
 /*  if (sound->musicplaying)
     sound->haltMusic ();
@@ -1194,8 +1205,9 @@ void switch_credits ()
 
 void switch_finish ()
 {
+  lasttime = 0;
   game = GAME_FINISH;
-  creditstimer = 50;
+  creditstimer = 50 * timestep;
   credits_reshape ();
   if (sound->musicplaying)
     sound->haltMusic ();
@@ -1206,11 +1218,13 @@ void switch_finish ()
 
 void switch_quit ()
 {
+  lasttime = 0;
   game = GAME_QUIT;
 }
 
 void switch_game ()
 {
+  lasttime = 0;
   setLightSource ((int) sungamma);
   game = GAME_PLAY;
   game_reshape ();
@@ -1226,6 +1240,7 @@ void switch_game ()
 void event_fireCannon ()
 {
   if (!fplayer->active) return;
+  if (fplayer->firecannonttl > 0) return;
 #ifdef USE_GLUT
   fplayer->fireCannon (laser);
   sound->play (SOUND_CANNON1);
@@ -1240,6 +1255,7 @@ void event_fireCannon ()
 void event_fireMissile ()
 {
   if (!fplayer->active) return;
+  if (fplayer->firemissilettl > 0) return;
   if (fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile))
     sound->play (SOUND_MISSILE1);
 }
@@ -1247,6 +1263,7 @@ void event_fireMissile ()
 void event_fireChaff ()
 {
   if (!fplayer->active) return;
+  if (fplayer->firechaffttl > 0) return;
   if (fplayer->fireChaff (chaff, missile))
     sound->play (SOUND_CHAFF1);
 }
@@ -1254,6 +1271,7 @@ void event_fireChaff ()
 void event_fireFlare ()
 {
   if (!fplayer->active) return;
+  if (fplayer->fireflarettl > 0) return;
   if (fplayer->fireFlare (flare, missile))
     sound->play (SOUND_CHAFF1);
 }
@@ -1350,13 +1368,14 @@ void game_key (unsigned char key, int x, int y)
       fplayer->recthrust = fplayer->maxthrust * (1.0 / 18.0 * (key - '0') + 0.5);
       sound->play (SOUND_CLICK1);
     }
-/*    else if (key == 'a')
+    else if (key == 'a')
     {
       fplayer->ai = !fplayer->ai;
-      fplayer->easymodel = fplayer->ai;
+      if (!fplayer->ai) fplayer->easymodel = 2;
+      else fplayer->easymodel = 1;
       if (controls == 100)
         fplayer->easymodel = true;
-    }*/
+    }
 /*    else if (key == 'p')
     {
       if (game == GAME_PLAY) game = GAME_PAUSE;
@@ -2140,10 +2159,10 @@ void mission_display ()
   }*/
 
   float zf1 = -2.98;
-  float yind = 200.0 * sin (0.003 * missionmenutimer) + 200.0;
-  float xind = 200.0 * cos (0.003 * missionmenutimer) + 200.0;
-  float yind2 = -200.0 * sin (0.003 * missionmenutimer) + 200.0;
-  float xind2 = -200.0 * cos (0.003 * missionmenutimer) + 200.0;
+  float yind = 200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
+  float xind = 200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
+  float yind2 = -200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
+  float xind2 = -200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
   for (i = 0; i < 21; i ++)
   {
     yf = -2.5 + 0.25 * i;
@@ -2175,13 +2194,13 @@ void mission_display ()
                  xr * (1.0 - yr) * l->h [yi + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 100] [xi];
       float h4 = xr * yr * l->h [yi + 1 + 5 + 100] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5 + 100] [xi] +
                  xr * (1.0 - yr) * l->h [yi + 5 + 100] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5 + 100] [xi];*/
-      float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer)) * 0.14 + 0.14;
-      float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer)) * 0.06 + 0.06;
+      float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
+      float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
       if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
       else glColor3f (intens, 0, intens2);
       glVertex3f (xf, yf, zf1);
-      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer)) * 0.14 + 0.14;
-      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer)) * 0.06 + 0.06;
+      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
+      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
       if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
       else glColor3f (intens, 0, intens2);
       glVertex3f (xf, yf + 0.25, zf1);
@@ -2221,7 +2240,7 @@ void mission_display ()
   CVector3 tl (-4.5, 5.5, -8.0);
   CRotation rot;
   rot.a = 270;
-  rot.b = (270 - missionmenutimer * 4) % 360;
+  rot.b = (270 - missionmenutimer * 4 / timestep) % 360;
   rot.c = 90;
   
   // Draw dummy missile
@@ -2242,7 +2261,7 @@ void mission_display ()
   {
     tl.x = -5 + (float) i * 2.3;
     if (missionnew->wantfighter == i/*missionmenufighterselected == i*/)
-      rot.c = (5 + missionmenutimer * 4) % 360;
+      rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
     getModel (missionnew->selfighter [i])->draw2 (&vec, &tl, &rot, 0.9, 0);
@@ -2255,7 +2274,7 @@ void mission_display ()
   {
     tl.x = 2.0 + (float) i * 1.5;
     if (missionnew->wantweapon == i/*missionmenufighterselected == i*/)
-      rot.c = (5 + missionmenutimer * 4) % 360;
+      rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
     else
       rot.c = 5;
     getModel (missionnew->selweapon [i])->draw2 (&vec, &tl, &rot, 0.9, 0);
@@ -2428,15 +2447,15 @@ void fighter_display ()
   float zf = -3, yf;
   for (i = 0; i < 14; i ++)
   {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer & 63) / 64.0;
+    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
     glBegin (GL_QUAD_STRIP);
     for (int i2 = 0; i2 < 14; i2 ++)
     {
-      float cola = sine [(i * 100+missionmenutimer*4) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
       glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
       if (colorstd == &colorblue) glColor3f (0, 0, cola);
       else glColor3f (cola, 0, 0);
       glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
@@ -2485,9 +2504,9 @@ void fighter_display ()
   tl.y = -0.4;
   tl.z = -3;
   CRotation rot;
-  rot.a = 240;
+  rot.a = 310;
   rot.b = 0;
-  rot.c = (5 + missionmenutimer * 4) % 360;
+  rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
   CModel *model;
   int id;
   if (aktfighter == 0) { model = &model_fig; id = FIGHTER_FALCON; }
@@ -2501,7 +2520,7 @@ void fighter_display ()
   else { model = &model_figh; id = FIGHTER_BLACKBIRD; }
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
-  model->draw2 (&vec, &tl, &rot, 1.0, 0);
+  model->draw (&vec, &tl, &rot, 1.0, 1.0, 0);
   glDisable (GL_LIGHTING);
   glDisable (GL_DEPTH_TEST);
 
@@ -2563,7 +2582,7 @@ void fame_display ()
   glLoadIdentity ();
   glPushMatrix ();
   float zf = -3, yf, xf;
-  int t = 360 - (missionmenutimer * 10) % 360;
+  int t = 360 - (missionmenutimer * 10 / timestep) % 360;
   for (i = 0; i < 20; i ++)
   {
     yf = -3 + 0.3 * i; // - (float) (missionmenutimer & 63) / 64.0;
@@ -3198,6 +3217,23 @@ void menu_mouse (int button, int state, int x, int y)
           }
         }
       }
+      else if (ry >= 0.58 && ry <= 0.63)
+      {
+        menuitemselected = 17;
+        if (state == MOUSE_DOWN)
+        {
+          if (button == MOUSE_BUTTON_LEFT)
+          {
+            brightness += 10;
+            if (brightness > 50) brightness = -50;
+          }
+          else
+          {
+            brightness -= 10;
+            if (brightness < -50) brightness = 50;
+          }
+        }
+      }
 /*      else if (ry >= 0.52 && ry <= 0.57)
       {
         menuitemselected = 16;
@@ -3249,7 +3285,7 @@ void menu_mouse (int button, int state, int x, int y)
 
   if (lastitemselected != menuitemselected)
   {
-    menutimer = 0;
+//    menutimer = 0;
   }
 
   if (lastitem != menuitem)
@@ -3290,7 +3326,7 @@ void stats_mouse (int button, int state, int x, int y)
 
 void drawMissionElement (float x, float y, float z, int thismissionid, int missionid, int selected, char *string)
 {
-  int menutimernorm = menutimer * 5;
+  int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
@@ -3435,48 +3471,49 @@ void menu_display ()
 /*  if (quality >= 2)
     gl->enableAntiAliasing ();*/
 
-  int menutimernorm = menutimer * 5;
+  int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
   CColor coloryellow (255, 255, 0, 200);
 
   int textx = -14, textx2 = 0;
+  float normtimef = -menutimer * 5;
 
   if (menuitemselected == 0)
-    font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 10, -2, "PILOTS", &color2, normtimef);
   else
     font1->drawText (textx, 10, -2, "PILOTS");
   if (menuitemselected == 1)
-    font1->drawTextScaled (textx, 8, -2, "MISSIONS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 8, -2, "MISSIONS", &color2, normtimef);
   else
     font1->drawText (textx, 8, -2, "MISSIONS");
 #ifdef HAVE_SDL_NET
   if (menuitemselected == 2)
-    font1->drawTextScaled (textx, 6, -2, "MULTIPLAYER", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 6, -2, "MULTIPLAYER", &color2, normtimef);
   else
     font1->drawText (textx, 6, -2, "MULTIPLAYER");
 #endif
   if (menuitemselected == 3)
-    font1->drawTextScaled (textx, 4, -2, "OPTIONS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 4, -2, "OPTIONS", &color2, normtimef);
   else
     font1->drawText (textx, 4, -2, "OPTIONS");
   if (menuitemselected == 4)
-    font1->drawTextScaled (textx, 2, -2, "HELP", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 2, -2, "HELP", &color2, normtimef);
   else
     font1->drawText (textx, 2, -2, "HELP");
   if (menuitemselected == 5)
-    font1->drawTextScaled (textx, 0, -2, "CREDITS", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, 0, -2, "CREDITS", &color2, normtimef);
   else
     font1->drawText (textx, 0, -2, "CREDITS");
   if (menuitemselected == 6)
-    font1->drawTextScaled (textx, -2, -2, "QUIT", &color2, -menutimer * 5);
+    font1->drawTextScaled (textx, -2, -2, "QUIT", &color2, normtimef);
   else
     font1->drawText (textx, -2, -2, "QUIT");
   if (missionactive)
   {
     if (menuitemselected == 9)
-      font1->drawTextScaled (textx, -6, -2, "RETURN", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx, -6, -2, "RETURN", &color2, normtimef);
     else
       font1->drawText (textx, -6, -2, "RETURN");
   }
@@ -3493,8 +3530,8 @@ void menu_display ()
       drawRank (textx2 - 1, 12.2 - (float) i * 3, -3, pilots->pilot [i]->ranking, 1.3);
       if (menuitemselected == 20 + i)
       {
-        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, -menutimer * 5);
-        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, -menutimer * 5);
+        font1->drawTextScaled (textx2 + 3, 12.5 - (float) i * 3, -3, pilots->pilot [i]->getRank (), &color2, normtimef);
+        font1->drawTextScaled (textx2 + 5, 11.5 - (float) i * 3, -3, pilots->pilot [i]->name, &color2, normtimef);
       }
       else
       {
@@ -3503,11 +3540,11 @@ void menu_display ()
       }
     }
     if (menuitemselected == 10)
-      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)", &color2, normtimef);
     else
       font1->drawText (textx2 - 2, -5, -2.5, "DELETE (RIGHT MB)");
     if (menuitemselected == 11)
-      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, -menutimer * 5);
+      font1->drawTextScaled (textx2 - 2, -7, -2.5, "CREATE", &color2, normtimef);
     else
       font1->drawText (textx2 - 2, -7, -2.5, "CREATE");
     pilotedit.draw (textx2, -9, -2.5, menutimer / 8);
@@ -3664,6 +3701,11 @@ void menu_display ()
       font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
+    sprintf (buf, "BRIGHTNESS: %d %%", brightness);
+    if (menuitemselected == 17)
+      font1->drawTextScaled (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
+    else
+      font1->drawText (textx2, yt -= 2, -2, buf);
 /*    sprintf (buf, "MODE: %d\x%d", width, height);
     if (menuitemselected == 16)
       font1->drawTextScaled (textx2, -2, -2, buf, &color2, -menutimer * 5);
@@ -3735,7 +3777,7 @@ void pause_display ()
 void credits_display ()
 {
   float yt = 12, zf = -2.4;
-  glTranslatef (0, -3.5 + 0.014 * (float) creditstimer, 0);
+  glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
   CColor col (255, 255, 255, 255);
   CColor col2 (255, 255, 0, 255);
   font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", &col);
@@ -3755,7 +3797,7 @@ void credits_display ()
 
 void finish_display ()
 {
-  glTranslatef (0, -3.5 + 0.01 * (float) finishtimer, 0);
+  glTranslatef (0, -3.5 + 0.01 * (float) finishtimer / timestep, 0);
   CColor col (255, 255, 255, 255);
   font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", &col);
   font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", &col);
@@ -3833,11 +3875,10 @@ void game_display ()
   {
     if (camera == 0)
     {
-      float sinvib = sin ((float) vibration);
-      mycamphi += 0.2 * vibration * sinvib;
-      mycamgamma += 0.2 * vibration * sinvib;
+      float sinvib = sin ((float) vibration / timestep);
+      mycamphi += 0.2 * vibration * sinvib / timestep;
+      mycamgamma += 0.2 * vibration * sinvib / timestep;
     }
-    vibration --;
   }
 
 //  if (fplayer->tl->y > l->getRayHeight (fplayer->tl->x, fplayer->tl->z))
@@ -3863,9 +3904,9 @@ void game_display ()
   {
     if (day) sunlight = 1.0;
     else sunlight = 0.75;
-    if (flash)
+    if (flash > 0)
     {
-      sunlight = flash;
+      sunlight = (float) flash / timestep;
     }
   }
 
@@ -4161,7 +4202,7 @@ void game_display ()
       else
         space->o [i]->lum = 1.0;
     }
-    if (flash > 7)
+    if (flash > 7 * timestep)
     {
       if (quality <= 2)
         flash1->draw ();
@@ -4405,7 +4446,9 @@ void game_display ()
     }
   }
 
-/*    glColor4ub (0, 0, 0, 40);
+  if (brightness < 0)
+  {
+    glColor4ub (0, 0, 0, -brightness);
     float xf = 2.0, yf = 1.5, zf = 1.0;
     glDisable (GL_DEPTH_TEST);
     glEnable (GL_BLEND);
@@ -4418,7 +4461,25 @@ void game_display ()
     glEnd ();
     gl->disableAlphaBlending ();
     glDisable (GL_BLEND);
-    glEnable (GL_DEPTH_TEST);*/
+    glEnable (GL_DEPTH_TEST);
+  }
+  else if (brightness > 0)
+  {
+    glColor4ub (255, 255, 255, brightness);
+    float xf = 2.0, yf = 1.5, zf = 1.0;
+    glDisable (GL_DEPTH_TEST);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBegin (GL_QUADS);
+    glVertex3f (-xf, -yf, -zf);
+    glVertex3f (-xf, yf, -zf);
+    glVertex3f (xf, yf, -zf);
+    glVertex3f (xf, -yf, -zf);
+    glEnd ();
+    gl->disableAlphaBlending ();
+    glDisable (GL_BLEND);
+    glEnable (GL_DEPTH_TEST);
+  }
 
 //  glPopMatrix ();
 //  glutStrokeCharacter (GLUT_STROKE_ROMAN, 'A');
@@ -4463,15 +4524,15 @@ void game_display ()
 
   char buf [25];
   CColor col;
-  if (fps < 28)
+//  if (fps < 28)
   {
     sprintf (buf, "FPS: %d", (int) fps);
     font1->drawText (-25, 25, -3.5, buf, &col);
   }
-  else
+/*  else
   {
     font1->drawText (-25, 25, -3.5, "FPS: PERFECT", &col);
-  }
+  }*/
   bool write = false;
   if (firststart)
   {
@@ -4529,13 +4590,19 @@ void game_display ()
 float lastthrust;
 int gametimer;
 
-void game_timer ()
+void game_timer (float dt)
 {
   if (multiplayer) return;
 
   int i, i2;
 
-  gametimer ++;
+  gametimer += dt;
+  cockpit->dt = dt;
+
+  if (vibration > 0)
+  {
+    vibration -= dt;
+  }
 
   if (fplayer->autofire && fplayer->active)
   {
@@ -4547,12 +4614,12 @@ void game_timer ()
   {
     sound->play (SOUND_HIT1);
     lastshield = fplayer->shield;
-    vibration = 25;
+    vibration = 25 * timestep;
   }
 
-  if (weather == WEATHER_THUNDERSTORM && !flash && !myrandom (50))
+  if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !myrandom (2000 / dt))
   {
-    flash = 12;
+    flash = 12 * timestep;
     int fphi = (int) camphi + myrandom (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
@@ -4568,12 +4635,12 @@ void game_timer ()
 
   if (initing) return;
 
-  if (flash)
-    flash --;
-  if (flash <= 7 && flash > 0)
-    flash --;
+  if (flash > 0)
+    flash -= dt;
+  if (flash <= 7 * timestep && flash > 0)
+    flash -= dt;
 
-  if (lastthrust != fplayer->thrust && !(gametimer & 15))
+  if (lastthrust != fplayer->thrust && !((gametimer / timestep) & 15))
     setPlaneVolume ();
   lastthrust = fplayer->thrust;
 
@@ -4607,9 +4674,9 @@ void game_timer ()
 
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
+    fighter [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff);
     float lev;
-    if (fighter [i]->explode == 3 && (lev = fplayer->distance (fighter [i])) < 32)
+    if (fighter [i]->explode == 1 && (lev = fplayer->distance (fighter [i])) < 32)
     {
       sound->setVolume (SOUND_EXPLOSION1, 128 - (int) (lev * 4.0));
       sound->play (SOUND_EXPLOSION1);
@@ -4617,42 +4684,42 @@ void game_timer ()
   }
   for (i = 0; i < maxlaser; i ++)
   {
-    laser [i]->move ();
+    laser [i]->move (dt);
   }
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i]->aiAction ((AIObj **) fighter, missile, laser, flare, chaff);
+    missile [i]->aiAction (dt, (AIObj **) fighter, missile, laser, flare, chaff);
   }
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i]->move ();
+    flare [i]->move (dt);
   }
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i]->move ();
+    chaff [i]->move (dt);
   }
 
   for (i = 0; i < maxexplosion; i ++)
-    explosion [i]->move ();
+    explosion [i]->move (dt);
   for (i = 0; i < maxblacksmoke; i ++)
-    blacksmoke [i]->move ();
+    blacksmoke [i]->move (dt);
 
-  if (blackout > 0) blackout -= 3.0F;
+  if (blackout > 0) blackout -= 3.0F * dt / timestep;
   if (blackout < 0) blackout = 0;
-  if (redout > 0) redout -= 3.0F;
+  if (redout > 0) redout -= 3.0F * dt / timestep;
   if (redout < 0) redout = 0;
   if (blackout > 400) blackout = 400;
   if (redout > 400) redout = 400;
   float testout;
   if (redout < 1)
   {
-    testout = (fplayer->realspeed * fplayer->elevatoreffect - 0.15F) * 40.0F;
-    if (testout > 0) blackout += testout;
+    testout = (fplayer->realspeed * fplayer->elevatoreffect - 0.13F) * 40.0F;
+    if (testout > 0) blackout += testout * dt / timestep;
   }
   if (blackout < 1)
   {
-    testout = (fplayer->realspeed * fplayer->elevatoreffect + 0.075F) * 80.0F;
-    if (testout < 0) redout -= testout;
+    testout = (fplayer->realspeed * fplayer->elevatoreffect + 0.065F) * 80.0F;
+    if (testout < 0) redout -= testout * dt / timestep;
   }
 
   if (fplayer->shield <= 0)
@@ -4785,7 +4852,7 @@ void game_timer ()
   fplayer->recgamma += dgamma;
 
 //  printf ("%f, %f\n", fplayer->tl->x, fplayer->tl->z);
-  missionstate = mission->processtimer ();
+  missionstate = mission->processtimer (dt);
 
   if (missionstate == 2)
   {
@@ -4837,6 +4904,7 @@ void game_timer ()
   }
 }
 
+/*
 int net_thread_main (void *data)
 {
   while (true)
@@ -4905,8 +4973,6 @@ int net_thread_main (void *data)
 
   if (fplayer->shield <= 0)
     camera = 1;
-/*  if (!fplayer->active && !fplayer->draw)
-    game_levelInit ();*/
 
   float cf = -fplayer->zoom / 2;
   camtheta = fplayer->theta;
@@ -5075,14 +5141,22 @@ int net_thread_main (void *data)
 #endif
   }
 }
+*/
 
 float lastfps = -1;
+int newcamera = 0;
 
-void menu_timer ()
+void menu_timer (Uint32 dt)
 {
-  menutimer ++;
-  if (!(menutimer & 0xFF))
+  menutimer += dt;
+  int cycle = (menutimer / timestep) % 256;
+  if (cycle == 0)
   {
+    newcamera = 0;
+  }
+  if (cycle == 200 && !newcamera)
+  {
+    newcamera = 1;
     if (camera == 5)
     {
       camera = 1;
@@ -5125,9 +5199,9 @@ void menu_timer ()
 #endif
 }
 
-void stats_timer ()
+void stats_timer (Uint32 dt)
 {
-  menutimer ++;
+  menutimer += dt;
 #ifdef USE_GLUT
   glutPostRedisplay();
 #else
@@ -5135,9 +5209,9 @@ void stats_timer ()
 #endif
 }
 
-void mission_timer ()
+void mission_timer (Uint32 dt)
 {
-  missionmenutimer ++;
+  missionmenutimer += dt;
 #ifdef USE_GLUT
   glutPostRedisplay();
 #else
@@ -5145,10 +5219,10 @@ void mission_timer ()
 #endif
 }
 
-void credits_timer ()
+void credits_timer (Uint32 dt)
 {
-  creditstimer ++;
-  if (creditstimer > 550)
+  creditstimer += dt;
+  if (creditstimer > 550 * timestep)
     creditstimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5157,10 +5231,10 @@ void credits_timer ()
 #endif
 }
 
-void finish_timer ()
+void finish_timer (Uint32 dt)
 {
-  finishtimer ++;
-  if (finishtimer > 800)
+  finishtimer += dt;
+  if (finishtimer > 800 * timestep)
     finishtimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5192,7 +5266,7 @@ void join_key (unsigned char key, int x, int y)
   }
 }
 
-void create_timer ()
+void create_timer (Uint32 dt)
 {
 #ifndef USE_GLUT
 //  server->createSocketSet ();
@@ -5201,7 +5275,7 @@ void create_timer ()
 #endif
 }
 
-void join_timer ()
+void join_timer (Uint32 dt)
 {
 #ifndef USE_GLUT
   client->getServer ("Lara", "client1");
@@ -5518,6 +5592,7 @@ void myFirstInit ()
   g_Load3ds.Import3DS (&model_gl117, dirs->getModels ("gl-117.3ds"));
   g_Load3ds.Import3DS (&model_tank1, dirs->getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
+  model_tank1.scaleTexture (0.5, 0.5);
   g_Load3ds.Import3DS (&model_container1, dirs->getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
   g_Load3ds.Import3DS (&model_ship2, dirs->getModels ("ship2.3ds"));
@@ -5530,6 +5605,7 @@ void myFirstInit ()
   model_pickup2.setName ("PICKUP");
   g_Load3ds.Import3DS (&model_tank2, dirs->getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
+  model_tank2.scaleTexture (0.5, 0.5);
   g_Load3ds.Import3DS (&model_tent4, dirs->getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
   g_Load3ds.Import3DS (&model_hall1, dirs->getModels ("hall1.3ds"));
@@ -5538,7 +5614,9 @@ void myFirstInit ()
   model_hall2.setName ("HALL");
   g_Load3ds.Import3DS (&model_oilrig, dirs->getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
+  model_oilrig.alpha = true;
   g_Load3ds.Import3DS (&model_egg, dirs->getModels ("egg.3ds"));
+  model_egg.scaleTexture (8, 8);
   model_egg.setName ("COMPLEX");
   g_Load3ds.Import3DS (&model_radar, dirs->getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
@@ -5749,8 +5827,18 @@ void proceedFire ()
   memcpy (col, col2, maxfx * maxfy * sizeof (int));
 }
 
-void init_timer ()
+int initsynchrotimer = 0;
+
+void init_timer (Uint32 dt)
 {
+  initsynchrotimer += dt;
+  if (initsynchrotimer > 30)
+  {
+    initsynchrotimer -= 30;
+    dt = 30;
+  }
+  else return;
+
   int r = myrandom (100);
   if (r == 50) r = myrandom (100); // do not optimize this
 
@@ -5788,7 +5876,7 @@ void init_timer ()
 
   if (inittimer >= 150)
   {
-    initexplode ++;
+    initexplode += dt;
   }
 
   if (inittimer >= 200)
@@ -6027,36 +6115,46 @@ static void myJoystickHatFunc (int hat)
 static void myTimerFunc (int value)
 {
 //  fplayer->aiAction (l);
+  Uint32 akttime, dt;
+#ifndef USE_GLUT
+    akttime = SDL_GetTicks ();
+#else
+    akttime = glutGet (GLUT_ELAPSED_TIME);
+#endif
+  if (lasttime == 0) dt = 1;
+  else dt = akttime - lasttime;
+  lasttime = akttime;
+
   if (game == GAME_PLAY)
-    game_timer ();
+    game_timer (dt);
   else if (game == GAME_INIT)
-    init_timer ();
+    init_timer (dt);
   else if (game == GAME_MENU)
   {
     if (!missionactive)
-      game_timer ();
-    menu_timer ();
+      game_timer (dt);
+    menu_timer (dt);
   }
   else if (game == GAME_CREDITS)
   {
-    credits_timer ();
+    credits_timer (dt);
   }
   else if (game == GAME_CREATE)
-    create_timer ();
+    create_timer (dt);
   else if (game == GAME_JOIN)
-    join_timer ();
+    join_timer (dt);
   else if (game == GAME_MISSION)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_STATS)
-    stats_timer ();
+    stats_timer (dt);
   else if (game == GAME_FAME)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_FIGHTER)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_FINISH)
-    finish_timer ();
+    finish_timer (dt);
   else if (game == GAME_QUIT)
-    mission_timer ();
+    mission_timer (dt);
 
 #ifdef USE_GLUT
   glutTimerFunc (GLUT_TIMER_INTERVAL, myTimerFunc, 0);
@@ -6065,36 +6163,46 @@ static void myTimerFunc (int value)
 
 static void sdlTimerFunc ()
 {
+  Uint32 akttime, dt;
+#ifndef USE_GLUT
+    akttime = SDL_GetTicks ();
+#else
+    akttime = glutGet (GLUT_ELAPSED_TIME);
+#endif
+  if (lasttime == 0) dt = 1;
+  else dt = akttime - lasttime;
+  lasttime = akttime;
+
   if (game == GAME_PLAY)
-    game_timer ();
+    game_timer (dt);
   else if (game == GAME_INIT)
-    init_timer ();
+    init_timer (dt);
   else if (game == GAME_MENU)
   {
     if (!missionactive)
-      game_timer ();
-    menu_timer ();
+      game_timer (dt);
+    menu_timer (dt);
   }
   else if (game == GAME_CREDITS)
   {
-    credits_timer ();
+    credits_timer (dt);
   }
   else if (game == GAME_CREATE)
-    create_timer ();
+    create_timer (dt);
   else if (game == GAME_JOIN)
-    join_timer ();
+    join_timer (dt);
   else if (game == GAME_MISSION)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_STATS)
-    stats_timer ();
+    stats_timer (dt);
   else if (game == GAME_FAME)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_FIGHTER)
-    mission_timer ();
+    mission_timer (dt);
   else if (game == GAME_FINISH)
-    finish_timer ();
+    finish_timer (dt);
   else if (game == GAME_QUIT)
-    mission_timer ();
+    mission_timer (dt);
 }
 
 #ifndef USE_GLUT
@@ -6218,7 +6326,7 @@ void sdlMainLoop ()
     if (sdlreshape) myReshapeFunc (width, height);
     sdlreshape = false;
 //    SDL_Delay (sdlTimeLeft ());
-    sdlWaitTimer ();
+//    sdlWaitTimer ();
     sdlTimerFunc ();
 /* Bernd: Please uncomment the following two lines! */
 //    if (game == GAME_PLAY)

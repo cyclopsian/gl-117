@@ -61,7 +61,7 @@ class CSmoke
   int type;
   CSmoke (int type);
   void setSmoke (float x, float y, float z, int myphi, int mytime);
-  void move ();
+  void move (Uint32 dt);
   void drawElem (int n);
   void drawElemHQ (int n);
   void draw ();
@@ -90,7 +90,7 @@ class CExplosion : public CSpaceObj
   float maxzoom;
   CExplosion (Space *space, CModel *sphere);
   void setExplosion (float x, float y, float z, float maxzoom, int len);
-  void move ();
+  void move (Uint32 dt);
 };
 
 // Dark smoke after explosions
@@ -103,7 +103,7 @@ class CBlackSmoke : public CSpaceObj
   float myphi; // player's view angle
   CBlackSmoke (Space *space);
   void setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len);
-  void move ();
+  void move (Uint32 dt);
   virtual void drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2);
 };
 

@@ -198,6 +198,8 @@ void save_config ()
   cf->write (" controls", controls);
   cf->writeText ("# Difficulty level: 0=easy, 1=medium, 2=hard");
   cf->write (" difficulty", difficulty);
+  cf->writeText ("# Brightness: -50..50 per cent (default=0)");
+  cf->write (" brightness", brightness);
   cf->writeText ("\n# This file is meant to give sensible startup settings");
   cf->writeText ("# as graphic cards and drivers may differ some 100 times in speed");
   cf->writeText ("\n# To get back to default settings, just delete this file!");
@@ -306,6 +308,14 @@ int load_config ()
   { difficulty = atoi (str); }
   if (difficulty < 0) difficulty = 0;
   else if (difficulty > 2) difficulty = 0;
+
+  str = cf->getString (ret, "brightness");
+  if (str == NULL)
+  { brightness = 0; }
+  else
+  { brightness = atoi (str); }
+  if (brightness < -50) brightness = -50;
+  else if (brightness > 50) brightness = 50;
 
   if (cf->buf [0] == 0) // no file found
   {

@@ -54,7 +54,7 @@ void CSmoke::setSmoke (float x, float y, float z, int myphi, int mytime)
   phi [last] = myphi;
 }
 
-void CSmoke::move ()
+void CSmoke::move (Uint32 dt)
 {
   for (int i = 0; i < maxsmokeelem; i ++)
     if (time [i] > 0)
@@ -248,13 +248,13 @@ void CExplosion::setExplosion (float x, float y, float z, float maxzoom, int len
   draw = true;
 }
 
-void CExplosion::move ()
+void CExplosion::move (Uint32 dt)
 {
   if (ttl > 0)
   {
     zoom = sine [ttl * 180 / maxlen] * maxzoom;
-    ttl --;
-    tl->y += 0.01;
+    ttl -= dt;
+    tl->y += 0.01 * dt / timestep;
     if (ttl <= 0)
     {
       ttl = 0;
@@ -288,13 +288,13 @@ void CBlackSmoke::setBlackSmoke (float x, float y, float z, float myphi, float m
   zoom = 0;
 }
 
-void CBlackSmoke::move ()
+void CBlackSmoke::move (Uint32 dt)
 {
   if (ttl > 0)
   {
-    zoom += maxzoom / ttl;
-    tl->y += 0.04;
-    ttl --;
+    zoom = maxzoom * (maxlen - ttl) / maxlen;
+    tl->y += 0.04 * dt / timestep;
+    ttl -= dt;
     if (ttl <= 0)
     {
       ttl = 0;
@@ -621,7 +621,7 @@ void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color,
       float yi = 0.1;
       glPushMatrix ();
       glTranslatef (xz + xi / 2, yz + yi / 2, z);
-      glRotatef (timer + i * 20, 1, 0, 0);
+      glRotatef ((float) timer / timestep + i * 20, 1, 0, 0);
       glBegin (GL_QUADS);
       glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
       glTexCoord2f (tx, ty2);
@@ -689,7 +689,7 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
   glPushMatrix ();
   glTranslatef (xz + xw / 2, yz, z);
   xz = 0;
-  glScalef (1.0 + 0.08 * sine [abs (timer * 8 % 360)], 1, 1);
+  glScalef (1.0 + 0.08 * sine [abs (timer * 8 / timestep % 360)], 1, 1);
   for (i = 0; i < len; i ++)
   {
     if (str [i] >= start && str [i] <= start + n)

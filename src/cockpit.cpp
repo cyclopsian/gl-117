@@ -91,9 +91,13 @@ void Cockpit::drawCounter ()
       }
   if (flarewarn && game == GAME_PLAY)
   {
-    if (flarewarning <= 0) flarewarning = 10;
-    flarewarning --;
-    if (flarewarning <= 6)
+    if (flarewarning <= 0)
+    {
+      flarewarning = 10 * timestep;
+      sound->play (SOUND_BEEP2);
+    }
+    flarewarning -= dt;
+    if (flarewarning <= 6 * timestep)
     {
       glColor3ub (200, 0, 0);
       glBegin (GL_QUADS);
@@ -103,14 +107,16 @@ void Cockpit::drawCounter ()
       glVertex3f (xf - 1.0F, yf - 0.25F, zf);
       glEnd ();
     }
-    if (flarewarning == 1)
-      sound->play (SOUND_BEEP2);
   }
   if (chaffwarn && game == GAME_PLAY)
   {
-    if (chaffwarning <= 0) chaffwarning = 10;
-    chaffwarning --;
-    if (chaffwarning <= 6)
+    if (chaffwarning <= 0)
+    {
+      chaffwarning = 10 * timestep;
+      sound->play (SOUND_BEEP1);
+    }
+    chaffwarning -= dt;
+    if (chaffwarning <= 6 * timestep)
     {
       glColor3ub (0, 0, 200);
       glBegin (GL_QUADS);
@@ -120,8 +126,6 @@ void Cockpit::drawCounter ()
       glVertex3f (xf - 1.0F, yf + 1.0F, zf);
       glEnd ();
     }
-    if (chaffwarning == 1)
-      sound->play (SOUND_BEEP1);
   }
   glColor3ub (255, 255, 255);
   gl->enableTextures (texcounter->textureID);
@@ -161,7 +165,7 @@ void Cockpit::drawTargeter ()
       }
       else
       {
-        glColor4ub (255, (50 - fplayer->ttf) * 255 / 60, 0, 255);
+        glColor4ub (255, (50 * timestep - fplayer->ttf) * 255 / 60 / timestep, 0, 255);
       }
     }
     else

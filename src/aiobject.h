@@ -140,7 +140,7 @@ class DynamicObj : public CSpaceObj
   void thrustDown ();
   float distance (DynamicObj *target);
   // check whether the object is exploding or sinking and deactivate if necessary
-  void checkExplosion ();
+  void checkExplosion (Uint32 dt);
   // check the objects shield value and explode/sink if necessary
   void checkShield ();
   // check whether the object collides on the ground and alter gamma and y-translation
@@ -154,7 +154,7 @@ class DynamicObj : public CSpaceObj
   int getAngle (DynamicObj *o);
   // check for a looping, this is tricky :-)
   bool checkLooping ();
-  void move ();
+  void move (Uint32 dt);
 };
 
 const int missiletypes = 8;
@@ -176,6 +176,8 @@ class AIObj : public DynamicObj
   int manoevertheta, manoeverheight, manoeverthrust;
   int idle; // counter how long AI object does the same thing (to change direction)
   int firemissilettl; // minimum time to wait between shooting missiles
+  int firecannonttl; // minimum time to wait between shooting cannon
+  int smokettl; // minimum time to wait between setting smoke elements
   int missiletype; // only relevant for the player, describes type: AAM, AGM, DF
   int missiles [missiletypes]; // number of missiles of each type
   int missilerack [missileracks]; // number of missile racks
@@ -190,6 +192,7 @@ class AIObj : public DynamicObj
   int firechaffttl;
   int ttf; // time to fire missile, targeting mechanism
   CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
+  Uint32 timer;
 
   void aiinit (); // initialize variables
   void missileCount ();
@@ -225,7 +228,7 @@ class AIObj : public DynamicObj
   void targetNearestEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);
-  void aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff); // core AI method
+  void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff); // core AI method
 };
 
 #endif

@@ -58,6 +58,7 @@ Mission::Mission ()
   textcolor.setColor (255, 255, 0, 128);
   clouds = 0;
   heading = 180;
+  state = 0;
 }
 
 void Mission::playerInit ()
@@ -161,7 +162,7 @@ void Mission::start ()
 {
 }
 
-int Mission::processtimer ()
+int Mission::processtimer (Uint32 dt)
 {
   return 0;
 }
@@ -267,12 +268,12 @@ void MissionDemo1::start ()
   }
 }
 
-int MissionDemo1::processtimer ()
+int MissionDemo1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -299,7 +300,7 @@ MissionTutorial1::MissionTutorial1 ()
   alliedfighters = 1;
   strcpy (briefing, "WELCOME TO THE EAGLE SQUADRON! BEFORE FLYING ANY MISSION YOU SHOULD PLAY THIS TUTORIAL. LEARN TO HANDLE YOUR FIGHTER AND THE BASIC CONTROLS LIKE TARGETING OR FIRING A MISSILE.");
   autoLFBriefing ();
-  maxtime = 2500;
+  maxtime = 2500 * timestep;
   heading = 210;
 }
 
@@ -319,10 +320,10 @@ void MissionTutorial1::start ()
   loop = false;
 }
 
-int MissionTutorial1::processtimer ()
+int MissionTutorial1::processtimer (Uint32 dt)
 {
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
     return 2;
   if (!fighter [1]->active && fighter [1]->explode >= 35 && !fighter [2]->active && fighter [2]->explode >= 35)
     return 1;
@@ -332,12 +333,12 @@ int MissionTutorial1::processtimer ()
 void MissionTutorial1::draw ()
 {
   char buf [250], buf2 [10];
-  int timeroff = 100, timerdelay = 300;
+  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
   if (timer >= 0 && timer <= timeroff - 20)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-  else if (timer > timeroff && timer <= timeroff + timerdelay - 20)
+  else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -361,7 +362,7 @@ void MissionTutorial1::draw ()
     else fplayer->gamma -= 2;
     if (fplayer->checkLooping ()) loop = !loop;*/
   }
-  else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - 20)
+  else if (timer > timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -393,7 +394,7 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 5, -2.5, "WILL HAVE AN EFFECT", &textcolor);
     }
   }
-  else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - 20)
+  else if (timer > timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -408,7 +409,7 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 5, -2.5, "THUS YOU CAN FLY ROLLS AND LOOPS", &textcolor);
     }
   }
-  else if (timer > timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - 20)
+  else if (timer > timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -427,7 +428,7 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 6, -2.5, "USE THE KEYS PGUP AND PGDN", &textcolor);
     }
   }
-  else if (timer > timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - 20)
+  else if (timer > timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -442,7 +443,7 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 5, -2.5, "THERE IS NO WAY TO ENTIRELY STOP", &textcolor);
     }
   }
-  else if (timer > timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - 20)
+  else if (timer > timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -461,7 +462,7 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 6, -2.5, "NOW, LETS HAVE A LOOK AT SOME IMPORTANT KEYS", &textcolor);
     }
   }
-  else if (timer > timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - 20)
+  else if (timer > timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -482,13 +483,13 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
     }
   }
-  else if (timer > timeroff + 7 * timerdelay && timer <= timeroff + 8 * timerdelay - 20)
+  else if (timer > timeroff + 7 * timerdelay && timer <= timeroff + 8 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "LOOK AT THE RADAR ON THE BOTTOM OF YOUR SCREEN", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "THERE ARE ENEMIES REPRESENTED BY A YELLOW POINT (TARGETED)", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "AND A RED POINT (NOT TARGETED)", &textcolor);
   }
-  else if (timer > timeroff + 8 * timerdelay && timer <= timeroff + 9 * timerdelay - 20)
+  else if (timer > timeroff + 8 * timerdelay && timer <= timeroff + 9 * timerdelay - timerlag)
   {
     if (controls == CONTROLS_JOYSTICK)
     {
@@ -507,13 +508,14 @@ void MissionTutorial1::draw ()
       font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", &textcolor);
     }
   }
-  else if (timer > timeroff + 9 * timerdelay && timer <= timeroff + 10 * timerdelay - 20)
+  else if (timer > timeroff + 9 * timerdelay && timer <= timeroff + 10 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "SHOOT THE TARGETS TO COMPLETE", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "THIS TUTORIAL SUCCESSFULLY", &textcolor);
   }
-  if (timer == timeroff + 7 * timerdelay - 10)
+  if (timer >= timeroff + 7 * timerdelay - timerlag / 2 && state == 0)
   {
+    state ++;
     fighter [1]->activate ();
     fighter [1]->target = fighter [0];
     fighter [1]->o = &model_figt;
@@ -538,7 +540,7 @@ MissionDogfight1::MissionDogfight1 ()
   strcpy (briefing, "HERE IS THE SECOND TASK: PRACTICE YOUR DOGFIGHT SKILLS.");
   autoLFBriefing ();
   alliedfighters = 1;
-  maxtime = 5000;
+  maxtime = 5000 * timestep;
 }
   
 void MissionDogfight1::start ()
@@ -571,12 +573,14 @@ void MissionDogfight1::start ()
   texttimer = 0;
 }
 
-int MissionDogfight1::processtimer ()
+int MissionDogfight1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -616,36 +620,33 @@ int MissionDogfight1::processtimer ()
 void MissionDogfight1::draw ()
 {
   char buf [250], buf2 [10], buf3 [10];
-  int timeroff = 100, timerdelay = 300;
+  int timeroff = 100 * timestep, timerdelay = 300 * timestep, timerlag = 20 * timestep;
 
   if (laststate != state)
   {
     texttimer = 1;
     laststate = state;
   }
-  if (texttimer >= 200) texttimer = 0;
   if (texttimer > 0)
   {
-    texttimer ++;
     if (state == 1)
     {
       font1->drawTextCentered (0, 7, -2.5, "THAT WAS EASY", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "BUT CAN YOU HANDLE TWO ENEMIES", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "BUT CAN YOU HANDLE TWO ENEMIES?", &textcolor);
       return;
     }
     if (state == 2)
     {
-      font1->drawTextCentered (0, 7, -2.5, "OK, LET'S TRY THREE ENEMIES", &textcolor);
-      font1->drawTextCentered (0, 6, -2.5, "THIS SHOULD BE ENOUGH", &textcolor);
+      font1->drawTextCentered (0, 6, -2.5, "OK, LET'S TRY THREE ENEMIES", &textcolor);
       return;
     }
   }
 
-  if (timer >= 0 && timer <= timeroff - 20)
+  if (timer >= 0 && timer <= timeroff - timerlag)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-  else if (timer >= timeroff && timer <= timeroff + timerdelay - 20)
+  else if (timer >= timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "THERE IS AN ENEMY ATTACKING", &textcolor);
     getKeyString (key_selectmissile, buf2);
@@ -653,25 +654,25 @@ void MissionDogfight1::draw ()
     font1->drawTextCentered (0, 6, -2.5, buf, &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "SELECT A MISSILE", &textcolor);
   }
-  else if (timer >= timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - 20)
+  else if (timer >= timeroff + timerdelay && timer <= timeroff + 2 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "CHOOSE A FRIEND-FOE (FF) MISSILE", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "WHICH DETECTS ENEMIES BY RADAR", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "SHOOT AS EARLY AS POSSIBLE", &textcolor);
   }
-  else if (timer >= timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - 20)
+  else if (timer >= timeroff + 2 * timerdelay && timer <= timeroff + 3 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "YOU CAN ONLY FIRE MISSILES WHEN", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "THE RECTANGULAR LOCK AROUND THE ENEMY", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "APPEARS YELLOW", &textcolor);
   }
-  else if (timer >= timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - 20)
+  else if (timer >= timeroff + 3 * timerdelay && timer <= timeroff + 4 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "CHECK THE CHAFF/FLARE DISPLAYS", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "IF THEY START BLINKING, AN ENEMY HAS", &textcolor);
     font1->drawTextCentered (0, 5, -2.5, "FIRED A MISSILE TO GET YOU DOWN", &textcolor);
   }
-  else if (timer >= timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - 20)
+  else if (timer >= timeroff + 4 * timerdelay && timer <= timeroff + 5 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "FLARES PROTECT FROM INFRARED MISSILES", &textcolor);
@@ -680,7 +681,7 @@ void MissionDogfight1::draw ()
     sprintf (buf, "KEYS: DROP CHAFF = '%s', DROP FLARE = '%s'", buf2, buf3);
     font1->drawTextCentered (0, 5, -2.5, buf, &textcolor);
   }
-  else if (timer >= timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - 20)
+  else if (timer >= timeroff + 5 * timerdelay && timer <= timeroff + 6 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "THE COUNTER MEASURE ONLY HAD AN EFFECT", &textcolor);
     font1->drawTextCentered (0, 6, -2.5, "IF THE DISPLAYS STOP BLINKING", &textcolor);
@@ -696,7 +697,7 @@ MissionTransport::MissionTransport ()
   strcpy (briefing, "EUROPE: THIS IS YOUR FIRST MISSION FOR THE EAGLE SQADRON. OUR SECRET SERVICE HAS CAUGHT TWO TRANSPORTS PROVIDING TERRORISTS WITH AMMUNITION. THEY ARE ONLY LIGHTLY GUARDED, NO PROBLEM TO TAKE THEM OUT WITH OUR SUPERIOR FIGHTERS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 5000;
+  maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
 }
 
@@ -736,12 +737,12 @@ void MissionTransport::start ()
   }
 }
 
-int MissionTransport::processtimer ()
+int MissionTransport::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -757,7 +758,7 @@ int MissionTransport::processtimer ()
 
 void MissionTransport::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -772,7 +773,7 @@ MissionConvoy::MissionConvoy ()
   strcpy (briefing, "WE HAVE SPOTTED AN ENEMY CONVOY. THIS IS YOUR NEXT TARGET. BE CAREFUL, THERE ARE WIESEL TANKS WITH SURFACE-AIR CANNONS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 5000;
+  maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
 }
   
@@ -824,12 +825,12 @@ void MissionConvoy::start ()
   }
 }
 
-int MissionConvoy::processtimer ()
+int MissionConvoy::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -845,7 +846,7 @@ int MissionConvoy::processtimer ()
 
 void MissionConvoy::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -860,7 +861,7 @@ MissionDogfight2::MissionDogfight2 ()
   strcpy (briefing, "SOME ENEMY FIGHTERS ARE ON THEIR WAY ATTACKING ONE OF OUR OUTPOSTS. STOP THEM BEFORE THEY CAN REACH IT!");
   autoLFBriefing ();
   alliedfighters = 3;
-  maxtime = 5000;
+  maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
 }
@@ -906,12 +907,12 @@ void MissionDogfight2::start ()
   }
 }
 
-int MissionDogfight2::processtimer ()
+int MissionDogfight2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -927,12 +928,13 @@ int MissionDogfight2::processtimer ()
 
 void MissionDogfight2::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-  if (timer == 1000)
+  if (timer >= 1000 * timestep && state == 0)
   {
+    state ++;
     fighter [7]->activate ();
     fighter [8]->activate ();
     fighter [7]->tl->x = fplayer->tl->x + 50;
@@ -942,7 +944,7 @@ void MissionDogfight2::draw ()
     fighter [8]->tl->z = fplayer->tl->z + 60;
     fighter [8]->tl->y = l->getHeight (fighter [8]->tl->x, fighter [8]->tl->z) + 10;
   }
-  if (timer >= 1000 && timer <= 1200)
+  if (timer >= 1000 * timestep && timer <= 1200 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", &textcolor);
 }
 
@@ -955,7 +957,7 @@ MissionAirBattle::MissionAirBattle ()
   strcpy (briefing, "WE ARE BEING ATTACKED BY A MASS OF CROWS. THE SQUADRON IS ORDERED TO DEFEND.");
   autoLFBriefing ();
   alliedfighters = 7;
-  maxtime = 5000;
+  maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_FIREBIRD;
@@ -1006,12 +1008,12 @@ void MissionAirBattle::start ()
   }
 }
 
-int MissionAirBattle::processtimer ()
+int MissionAirBattle::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1027,7 +1029,7 @@ int MissionAirBattle::processtimer ()
 
 void MissionAirBattle::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1043,7 +1045,7 @@ MissionGround1::MissionGround1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_PRIMETIME;
-  maxtime = 2500;
+  maxtime = 2500 * timestep;
 }
 
 void MissionGround1::start ()
@@ -1108,12 +1110,12 @@ void MissionGround1::start ()
   fighter [8]->newinit (STATIC_TENT1, 0, 200);
 }
 
-int MissionGround1::processtimer ()
+int MissionGround1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1129,7 +1131,7 @@ int MissionGround1::processtimer ()
 
 void MissionGround1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1144,7 +1146,7 @@ MissionScout::MissionScout ()
   strcpy (briefing, "ENEMY SCOUTS ARE APPROACHING THIS REGION. BE CARFUL, THEY ARE FLYING BUZZARDS AND SHOULD BE CONSIDERED EQUAL TO OUR FALCONS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
 }
 
@@ -1176,12 +1178,12 @@ void MissionScout::start ()
   }
 }
 
-int MissionScout::processtimer ()
+int MissionScout::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1197,7 +1199,7 @@ int MissionScout::processtimer ()
 
 void MissionScout::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1216,7 +1218,7 @@ MissionBase::MissionBase ()
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_HEPTARGON;
   alliedpilot [3] = PILOT_DRDOOM;
-  maxtime = 4000;
+  maxtime = 4000 * timestep;
 }
 
 void MissionBase::start ()
@@ -1357,12 +1359,12 @@ void MissionBase::start ()
   }
 }
 
-int MissionBase::processtimer ()
+int MissionBase::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1378,7 +1380,7 @@ int MissionBase::processtimer ()
 
 void MissionBase::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1394,7 +1396,7 @@ MissionDefend1::MissionDefend1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_SHADOW;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
 }
 
@@ -1468,12 +1470,12 @@ void MissionDefend1::start ()
   }
 }
 
-int MissionDefend1::processtimer ()
+int MissionDefend1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1491,17 +1493,18 @@ int MissionDefend1::processtimer ()
 
 void MissionDefend1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-  if (timer == 600)
+  if (timer >= 600 * timestep && state == 0)
   {
+    state ++;
     fighter [11]->activate ();
     fighter [12]->activate ();
     fighter [13]->activate ();
   }
-  if (timer >= 600 && timer <= 800)
+  if (timer >= 600 * timestep && timer <= 800 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", &textcolor);
 }
 
@@ -1514,7 +1517,7 @@ MissionDogfight3::MissionDogfight3 ()
   strcpy (briefing, "ENEMY FIGHTERS HAVE BEEN SIGHTED. YOU HAVE TO INTERCEPT THEM IMMEDIATELY. EXPECT BOMBERS WITHIN THEIR WING.");
   autoLFBriefing ();
   alliedfighters = 4;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
@@ -1565,12 +1568,12 @@ void MissionDogfight3::start ()
   }
 }
 
-int MissionDogfight3::processtimer ()
+int MissionDogfight3::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1586,12 +1589,13 @@ int MissionDogfight3::processtimer ()
 
 void MissionDogfight3::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
-  if (timer == 800)
+  if (timer >= 800 * timestep && state == 0)
   {
+    state = 1;
     fighter [9]->activate ();
     fighter [10]->activate ();
     fighter [11]->activate ();
@@ -1605,7 +1609,7 @@ void MissionDogfight3::draw ()
     fighter [11]->tl->z = fplayer->tl->z + 65;
     fighter [11]->tl->y = l->getHeight (fighter [11]->tl->x, fighter [11]->tl->z) + 10;
   }
-  if (timer >= 800 && timer <= 1000)
+  if (timer >= 800 * timestep && timer <= 1000 * timestep)
     font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", &textcolor);
 }
 
@@ -1618,7 +1622,7 @@ MissionTank1::MissionTank1 ()
   strcpy (briefing, "THE ENEMY IS GATHERING LOTS OF TANKS. FLY AN ASSAUT AND DESTROY THEM.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1671,12 +1675,12 @@ void MissionTank1::start ()
   }
 }
 
-int MissionTank1::processtimer ()
+int MissionTank1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1692,7 +1696,7 @@ int MissionTank1::processtimer ()
 
 void MissionTank1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1707,7 +1711,7 @@ MissionShip1::MissionShip1 ()
   strcpy (briefing, "OUR SQUAD HAS BEEN ORDERED INTO THE MEDITERRANEAN. YOUR FIRST GOAL ARE SOME DESTROYERS, GUARDED BY CROWS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1753,12 +1757,12 @@ void MissionShip1::start ()
   }
 }
 
-int MissionShip1::processtimer ()
+int MissionShip1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1774,7 +1778,7 @@ int MissionShip1::processtimer ()
 
 void MissionShip1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1789,7 +1793,7 @@ MissionShip2::MissionShip2 ()
   strcpy (briefing, "AN OILRIG IS BEING ATTACKED BY ENEMY FORCES. DEFEND! OUR NEW SUPERIOR FIGHTER GL-15 IS NOW AVAILABLE.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2000;
+  maxtime = 2000 * timestep;
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
@@ -1842,12 +1846,12 @@ void MissionShip2::start ()
   }
 }
 
-int MissionShip2::processtimer ()
+int MissionShip2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1865,7 +1869,7 @@ int MissionShip2::processtimer ()
 
 void MissionShip2::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1880,7 +1884,7 @@ MissionShip3::MissionShip3 ()
   strcpy (briefing, "THE CRUISER C-15 ARAKON HAS ENTERED NEUTRAL TERRITORY WATERS AND MUST BE ELIMINATED.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2000;
+  maxtime = 2000 * timestep;
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
@@ -1924,12 +1928,12 @@ void MissionShip3::start ()
   }
 }
 
-int MissionShip3::processtimer ()
+int MissionShip3::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -1945,7 +1949,7 @@ int MissionShip3::processtimer ()
 
 void MissionShip3::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -1963,7 +1967,7 @@ MissionCanyon1::MissionCanyon1 ()
   strcpy (briefing, "YOU HAVE TO FLY AN ASSAULT ON A RADAR BASE. STAY AS LOW AS POSSIBLE!");
   autoLFBriefing ();
   alliedfighters = 1;
-  maxtime = 2000;
+  maxtime = 2000 * timestep;
 }
 
 void MissionCanyon1::start ()
@@ -2024,12 +2028,12 @@ void MissionCanyon1::start ()
   }
 }
 
-int MissionCanyon1::processtimer ()
+int MissionCanyon1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2053,7 +2057,7 @@ int MissionCanyon1::processtimer ()
 
 void MissionCanyon1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2074,7 +2078,7 @@ MissionCanyon2::MissionCanyon2 ()
   strcpy (briefing, "THIS MAY BECOME A REAL AIR BATTLE...");
   autoLFBriefing ();
   alliedfighters = 5;
-  maxtime = 4000;
+  maxtime = 4000 * timestep;
 }
 
 void MissionCanyon2::start ()
@@ -2131,12 +2135,12 @@ void MissionCanyon2::start ()
   }
 }
 
-int MissionCanyon2::processtimer ()
+int MissionCanyon2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2152,7 +2156,7 @@ int MissionCanyon2::processtimer ()
 
 void MissionCanyon2::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2173,7 +2177,7 @@ MissionCanyon3::MissionCanyon3 ()
   strcpy (briefing, "THERE IS ONE MAIN BASE IN THE CANYON, CONNECTED TO A BASE ON THE MOON. WE MUST TAKE OUT THIS BASE FIRST!");
   autoLFBriefing ();
   alliedfighters = 4;
-  maxtime = 3000;
+  maxtime = 3000 * timestep;
 }
 
 void MissionCanyon3::start ()
@@ -2246,12 +2250,12 @@ void MissionCanyon3::start ()
   }
 }
 
-int MissionCanyon3::processtimer ()
+int MissionCanyon3::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2267,7 +2271,7 @@ int MissionCanyon3::processtimer ()
 
 void MissionCanyon3::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2285,7 +2289,7 @@ MissionMoonDefense1::MissionMoonDefense1 ()
   strcpy (briefing, "THE DESTINY OF OUR FUTURE IS SOMEWHERE ON THE MOON. OUR NEW BOMBER GL-117 WITH ITS SUPERIOR SHIELDS SHOULD BE EXTREMELY HELPFUL. AT FIRST, WE HAVE TO TAKE OUT THE TURRETS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 4000;
+  maxtime = 4000 * timestep;
 }
 
 void MissionMoonDefense1::start ()
@@ -2330,12 +2334,12 @@ void MissionMoonDefense1::start ()
   }
 }
 
-int MissionMoonDefense1::processtimer ()
+int MissionMoonDefense1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2351,7 +2355,7 @@ int MissionMoonDefense1::processtimer ()
 
 void MissionMoonDefense1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2369,7 +2373,7 @@ MissionMoonDogfight1::MissionMoonDogfight1 ()
   strcpy (briefing, "ENEMY FIGHTERS HAVE APPEARED IN THIS REGION.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2500;
+  maxtime = 2500 * timestep;
 }
 
 void MissionMoonDogfight1::start ()
@@ -2417,12 +2421,12 @@ void MissionMoonDogfight1::start ()
   fighter [5]->newinit (FIGHTER_BLACKBIRD, 0, 140);
 }
 
-int MissionMoonDogfight1::processtimer ()
+int MissionMoonDogfight1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2438,7 +2442,7 @@ int MissionMoonDogfight1::processtimer ()
 
 void MissionMoonDogfight1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2455,7 +2459,7 @@ MissionMoonBase1::MissionMoonBase1 ()
   strcpy (briefing, "TIME TO ATTACK. THE BASE IS HEAVILY GUARDED BY BLACKBIRDS. USE AN ASTEROID FIELD TO GET NEAR THE BASE AND DESTROY IT.");
   autoLFBriefing ();
   alliedfighters = 1;
-  maxtime = 3500;
+  maxtime = 3500 * timestep;
 }
 
 void MissionMoonBase1::start ()
@@ -2499,12 +2503,12 @@ void MissionMoonBase1::start ()
   fighter [29]->newinit (STATIC_BASE1, 0, 100);
 }
 
-int MissionMoonBase1::processtimer ()
+int MissionMoonBase1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2520,7 +2524,7 @@ int MissionMoonBase1::processtimer ()
 
 void MissionMoonBase1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2535,7 +2539,7 @@ MissionMoon1::MissionMoon1 ()
   strcpy (briefing, "THIS IS JUST A SIMPLE DEMO MISSION");
   autoLFBriefing ();
   alliedfighters = 1;
-  maxtime = 2000;
+  maxtime = 2000 * timestep;
 }
 
 void MissionMoon1::start ()
@@ -2558,12 +2562,12 @@ void MissionMoon1::start ()
   fighter [2]->newinit (FIGHTER_SWALLOW, 0, 150);
 }
 
-int MissionMoon1::processtimer ()
+int MissionMoon1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2579,7 +2583,7 @@ int MissionMoon1::processtimer ()
 
 void MissionMoon1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 4, -2, name, &textcolor);
   }
@@ -2625,12 +2629,12 @@ void MissionMultiDogfight1::start ()
     fplayer->easymodel = 2;
 }
 
-int MissionMultiDogfight1::processtimer ()
+int MissionMultiDogfight1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
-  timer ++;
-  if (!fplayer->active && fplayer->explode >= 35)
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
   {
     return 2;
   }
@@ -2646,7 +2650,7 @@ int MissionMultiDogfight1::processtimer ()
 
 void MissionMultiDogfight1::draw ()
 {
-  if (timer >= 0 && timer <= 50)
+  if (timer >= 0 && timer <= 50 * timestep)
   {
     font1->drawTextCentered (0, 0, -1, "DOGFIGHT");
   }

@@ -30,6 +30,7 @@ class Cockpit
 {
   public:
   int flarewarning, chaffwarning;
+  Uint32 dt;
 
   Cockpit ();
 

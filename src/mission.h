@@ -79,13 +79,14 @@ class Mission
   CColor textcolor; // standard text color to blend in during flight
   int difficulty; // difficulty level for THIS mission
   int heading; // define northern direction (the sun is at 0 degree)
+  int state; // different mission states (individual meaning)
 
   Mission ();
   void playerInit ();
   void alliedInit (int fighterid, int pilotid, AIObj *aiobj);
   void init ();
   virtual void start (); // custom definitions for a mission
-  virtual int processtimer (); // custom definitions controlled by the timer, mission success/failure
+  virtual int processtimer (Uint32 dt); // custom definitions controlled by the timer, mission success/failure
   virtual void draw (); // custom definitions that have to be drawn
   void checkScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
   int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points);
@@ -97,7 +98,7 @@ class MissionDemo1 : public Mission
   public:
   MissionDemo1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -109,17 +110,17 @@ class MissionTutorial1 : public Mission
   public:
   MissionTutorial1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
 class MissionDogfight1 : public Mission
 {
   public:
-  int state, laststate, texttimer;
+  int laststate, texttimer;
   MissionDogfight1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -128,7 +129,7 @@ class MissionTransport : public Mission
   public:
   MissionTransport ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -137,7 +138,7 @@ class MissionConvoy : public Mission
   public:
   MissionConvoy ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -146,7 +147,7 @@ class MissionDogfight2 : public Mission
   public:
   MissionDogfight2 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -155,7 +156,7 @@ class MissionAirBattle : public Mission
   public:
   MissionAirBattle ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -164,7 +165,7 @@ class MissionGround1 : public Mission
   public:
   MissionGround1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -173,7 +174,7 @@ class MissionScout : public Mission
   public:
   MissionScout ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -182,7 +183,7 @@ class MissionBase : public Mission
   public:
   MissionBase ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -191,7 +192,7 @@ class MissionDefend1 : public Mission
   public:
   MissionDefend1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -200,7 +201,7 @@ class MissionDogfight3 : public Mission
   public:
   MissionDogfight3 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -209,7 +210,7 @@ class MissionTank1 : public Mission
   public:
   MissionTank1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -218,7 +219,7 @@ class MissionShip1 : public Mission
   public:
   MissionShip1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -227,7 +228,7 @@ class MissionShip2 : public Mission
   public:
   MissionShip2 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -236,7 +237,7 @@ class MissionShip3 : public Mission
   public:
   MissionShip3 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -245,7 +246,7 @@ class MissionCanyon1 : public Mission
   public:
   MissionCanyon1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -254,7 +255,7 @@ class MissionCanyon2 : public Mission
   public:
   MissionCanyon2 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -263,7 +264,7 @@ class MissionCanyon3 : public Mission
   public:
   MissionCanyon3 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -272,7 +273,7 @@ class MissionMoonDefense1 : public Mission
   public:
   MissionMoonDefense1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -281,7 +282,7 @@ class MissionMoonDogfight1 : public Mission
   public:
   MissionMoonDogfight1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -290,7 +291,7 @@ class MissionMoonBase1 : public Mission
   public:
   MissionMoonBase1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -299,7 +300,7 @@ class MissionMoon1 : public Mission
   public:
   MissionMoon1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 
@@ -308,7 +309,7 @@ class MissionMultiDogfight1 : public Mission
   public:
   MissionMultiDogfight1 ();
   virtual void start ();
-  virtual int processtimer ();
+  virtual int processtimer (Uint32 dt);
   virtual void draw ();
 };
 

@@ -33,6 +33,7 @@ CSpaceObj::CSpaceObj ()
   zoom = 1; alpha = 1; draw = 1; lum = 1; drawlight = true; explode = 0;
   numRefModels = 0;
   refmodel = NULL;
+  o = NULL;
 }
 
 CSpaceObj::CSpaceObj (CModel *o, float zoom)
@@ -111,7 +112,7 @@ void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, 
       if (refmodel != NULL)
       {
         glPushMatrix ();
-        glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode, tl1.z);
+        glTranslatef (tl1.x, tl1.y - 0.001 * explode * explode / timestep / timestep, tl1.z);
         glRotatef (rot->c+90, 0, -1, 0);
         glRotatef (-rot->a+90, 0, 0, 1);
         glRotatef (rot->b+180, 1, 0, 0);
@@ -194,23 +195,46 @@ void Space::translate (CVector3 *v)
 
 void Space::drawGL ()
 {
+  int i;
   if (drawlight)
   {
-    for (int i = 0; i < no; i ++)
+    for (i = 0; i < no; i ++)
     {
-      if (&o [i] != NULL)
-        if (o [i]->draw)
-          o [i]->drawGL (z1, z2, tl, alpha, lum, true, true);
+      if (o [i] != NULL)
+        if (o [i]->o != NULL)
+          if (o [i]->draw && !o [i]->o->alpha)
+            o [i]->drawGL (z1, z2, tl, alpha, lum, true, true);
+    }
+    for (i = 0; i < no; i ++)
+    {
+      if (o [i] != NULL)
+        if (o [i]->o != NULL)
+          if (o [i]->draw && o [i]->o->alpha)
+            o [i]->drawGL (z1, z2, tl, alpha, lum, true, true);
     }
   }
   else /* not yet implemented */
   {
-    for (int i = 0; i < no; i ++)
+    for (i = 0; i < no; i ++)
+    {
+      if (o [i] != NULL)
+        if (o [i]->o != NULL)
+          if (o [i]->draw && !o [i]->o->alpha)
+            o [i]->drawGL (z1, z2, tl, alpha, lum, true, true);
+    }
+    for (i = 0; i < no; i ++)
+    {
+      if (o [i] != NULL)
+        if (o [i]->o != NULL)
+          if (o [i]->draw && o [i]->o->alpha)
+            o [i]->drawGL (z1, z2, tl, alpha, lum, true, true);
+    }
+/*    for (int i = 0; i < no; i ++)
     {
       if (&o [i] != NULL)
         if (o [i]->draw)
           o [i]->drawGL (z1, z2, tl, alpha, lum, false, false);
-    }
+    }*/
   }
 }
 

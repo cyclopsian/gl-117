@@ -108,6 +108,7 @@ extern float getView (); // return view dependant on weather
 //extern const int maxexplosion, maxfighter, maxlaser, maxmissile, maxstar, maxgroundobj;
 
 extern int difficulty; // 0=easy, 1=normal, 2=hard
+extern int brightness; // brightness correction
 
 extern bool sunblinding;
 
@@ -197,5 +198,7 @@ extern int debuglevel;
 #define EXIT_COMMAND 3
 #define EXIT_ALLOC 4
 #define EXIT_CONTEXT 5
+
+const int timestep = 33;
 
 #endif

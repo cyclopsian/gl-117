@@ -618,19 +618,19 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 
 //  gl->shadeSmooth ();
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glRotatef (rot->b+180, 1, 0, 0);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list1 == -1 && !explode && displaylist)
+  if (list1 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
     gl->genList (&list1);
   }
-  if (listgen || explode || !displaylist)
+  if (listgen || explode > 0 || !displaylist)
   {
   
     if (shading == 1)
@@ -648,13 +648,13 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 	    if (cm->hasTexture)
 	    {
 		    glEnable (GL_TEXTURE_2D);
-		    glColor3ub (255, 255, 255);
+		    glColor4ub (255, 255, 255, 255);
 		    glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
 	    }
 	    else
 	    {
 		    glDisable (GL_TEXTURE_2D);
-		    glColor3ub (255, 255, 255);
+		    glColor4ub (255, 255, 255, 255);
 	    }
 
       if (cm->material != NULL)
@@ -673,9 +673,9 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
         CVertex *v = cm->triangle [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
         {
@@ -696,10 +696,10 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
               if (color [0] > 190 && color [1] > 190 && color [2] < 20)
               {
                 rotateColor (30);
-                glColor3ub (color [0] + rotcol, color [1] + rotcol, color [2] + rotcol * 3);
+                glColor4ub (color [0] + rotcol, color [1] + rotcol, color [2] + rotcol * 3, 255);
               }
               else
-                glColor3ub (color [0], color [1], color [2]);
+                glColor4ub (color [0], color [1], color [2], color [3]);
             }
           }
     //    glColor3ub (255, 255, 0);
@@ -714,24 +714,27 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
         CVertex *v = cm->quad [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 4; whichVertex++)
         {
           v = cm->quad [j].v [whichVertex];
           glNormal3f (v->normal.x, v->normal.y, v->normal.z);
-          if (cm->hasTexture) {
-            if (cm->vertex) {
+          if (cm->hasTexture)
+          {
+            if (cm->vertex)
+            {
               glTexCoord2f (v->tex.x, v->tex.y);
             }
-          } else
+          }
+          else
           {
             if(numMaterials && cm->material->texture->textureID >= 0) 
             {
               unsigned char *pColor = material [cm->material->texture->textureID]->color.c;
-              glColor3ub (pColor [0], pColor [1], pColor [2]);
+              glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
             }
           }
           glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
@@ -742,7 +745,8 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
 //  drawVertexNormals (cm, zoom);
     }
 
-    if (alpha) glDisable (GL_BLEND);
+    if (alpha)
+    { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
     if (listgen) glEndList ();
   }
@@ -777,19 +781,19 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   }
 
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list2 == -1 && !explode && displaylist)
+  if (list2 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
     gl->genList (&list2);
   }
-  if (listgen || explode || !displaylist)
+  if (listgen || explode > 0 || !displaylist)
   {
 
     if (shading == 1)
@@ -807,13 +811,13 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
       if (cm->hasTexture)
       {
         glEnable (GL_TEXTURE_2D);
-        glColor3ub (255, 255, 255);
+        glColor4ub (255, 255, 255, 255);
         glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
       }
       else
       {
         glDisable (GL_TEXTURE_2D);
-        glColor3ub (255, 255, 255);
+        glColor4ub (255, 255, 255, 255);
       }
 
       CVector3 shift;
@@ -824,17 +828,17 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         CVertex *v = cm->triangle [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
         {
           v = cm->triangle [j].v [whichVertex];
           glNormal3f (v->normal.x, v->normal.y, v->normal.z);
-          if(cm->hasTexture)
+          if (cm->hasTexture)
           {
-            if(cm->vertex)
+            if (cm->vertex)
             {
               glTexCoord2f (v->tex.x, v->tex.y);
             }
@@ -855,9 +859,9 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         CVertex *v = cm->quad [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 4; whichVertex ++)
         {
@@ -867,7 +871,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
           {
             if (cm->vertex)
             {
-              glTexCoord2f(v->tex.x, v->tex.y);
+              glTexCoord2f (v->tex.x, v->tex.y);
             }
           }
           else
@@ -875,7 +879,7 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
             unsigned char *pColor = v->color.c;
             glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
           }
-          glVertex3f(v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
+          glVertex3f (v->vector.x + shift.x, v->vector.y + shift.y, v->vector.z + shift.z);
         }
       }
       glEnd();
@@ -890,7 +894,8 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     glEnd ();*/
     }
 
-    if (alpha) glDisable (GL_BLEND);
+    if (alpha)
+    { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
     if (listgen) glEndList ();
   }
@@ -912,7 +917,7 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
@@ -936,9 +941,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
       CVertex *v = cm->triangle [j].v [0];
       if (explode > 0)
       {
-        shift.x = v->normal.x * explode / 10;
-        shift.y = v->normal.y * explode / 10;
-        shift.z = v->normal.z * explode / 10;
+        shift.x = v->normal.x * explode / 10 / timestep;
+        shift.y = v->normal.y * explode / 10 / timestep;
+        shift.z = v->normal.z * explode / 10 / timestep;
       }
       for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
       {
@@ -963,9 +968,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
       CVertex *v = cm->quad [j].v [0];
       if (explode > 0)
       {
-        shift.x = v->normal.x * explode / 10;
-        shift.y = v->normal.y * explode / 10;
-        shift.z = v->normal.z * explode / 10;
+        shift.x = v->normal.x * explode / 10 / timestep;
+        shift.y = v->normal.y * explode / 10 / timestep;
+        shift.z = v->normal.z * explode / 10 / timestep;
       }
       for (int whichVertex = 0; whichVertex < 4; whichVertex ++)
       {
@@ -986,7 +991,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, flo
 
   }
 
-  if (alpha) glDisable (GL_BLEND);
+  if (alpha)
+  { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
   glPopMatrix ();
 }
@@ -997,19 +1003,19 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   CObject *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   glPushMatrix ();
-  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode, tl->z + tl2->z);
+  glTranslatef (tl->x + tl2->x, tl->y + tl2->y - 0.001 * explode * explode / timestep / timestep, tl->z + tl2->z);
   glRotatef (rot->c+90, 0, -1, 0);
   glRotatef (rot->b+180, 1, 0, 0);
   glRotatef (-rot->a+90, 0, 0, 1);
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list3 == -1 && !explode && displaylist)
+  if (list3 == -1 && explode <= 0 && displaylist)
   {
     listgen = true;
     gl->genList (&list3);
   }
-  if (listgen || explode || !displaylist)
+  if (listgen || explode > 0 || !displaylist)
   {
 
     if (shading == 1)
@@ -1035,9 +1041,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         CVertex *v = cm->triangle [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
         {
@@ -1066,9 +1072,9 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         CVertex *v = cm->quad [j].v [0];
         if (explode > 0)
         {
-          shift.x = v->normal.x * explode / 10;
-          shift.y = v->normal.y * explode / 10;
-          shift.z = v->normal.z * explode / 10;
+          shift.x = v->normal.x * explode / 10 / timestep;
+          shift.y = v->normal.y * explode / 10 / timestep;
+          shift.z = v->normal.z * explode / 10 / timestep;
         }
         for (int whichVertex = 0; whichVertex < 4; whichVertex ++)
         {
@@ -1101,7 +1107,8 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
     glEnd ();*/
     }
 
-    if (alpha) glDisable (GL_BLEND);
+    if (alpha)
+    { glDisable (GL_BLEND); glDisable (GL_ALPHA_TEST); }
 
     if (listgen) glEndList ();
   }
