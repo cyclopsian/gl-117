@@ -25,7 +25,7 @@
 
 #include "SoundSystem.h"
 #include "logging/Logging.h"
-#include "dirs.h"
+#include "configuration/Dirs.h"
 
 WaveFile *wave = NULL;
 

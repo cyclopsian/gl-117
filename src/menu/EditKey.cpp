@@ -88,9 +88,9 @@ void EditKey::draw ()
   float xf = (x + 0.25) / (h - 0.1);
   font1->drawText (xf, yf, menuZ, text, *col);
   if (specialActive)
-    key2string (special + 256, buf);
+    conf.key2string (special + 256, buf);
   else
-    key2string (key, buf);
+    conf.key2string (key, buf);
   font1->drawText (xf + (w - 2) / h, yf, menuZ, buf, *col);
   font1->zoom = 0.1;
 }
@@ -107,7 +107,7 @@ void EditKey::eventKey (unsigned char key)
   if (!active) return;
   if (highlight)
   {
-    key2string (key, buf);
+    conf.key2string (key, buf);
     if (buf [0] != '\0')
     { 
       this->key = (int) key;
@@ -123,7 +123,7 @@ void EditKey::eventSpecial (int key)
   if (!active) return;
   if (highlight)
   {
-    key2string (key + 256, buf);
+    conf.key2string (key + 256, buf);
     if (buf [0] != '\0')
     { 
       this->special = key;

@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file handles als input/output directories. */
-
 #ifndef IS_DIRS_H
 
 #include <stdio.h>
@@ -33,10 +31,14 @@
 #include <sys/stat.h>
 #endif
 
-#include "dirs.h"
+#include "configuration/Dirs.h"
 #include "logging/Logging.h"
 
-char *mystrtok (char *str, int len, char *tok)
+
+
+Dirs dirs;
+
+char *Dirs::strtok (char *str, int len, char *tok)
 {
   char *str0 = str;
   int z = 0;
@@ -66,7 +68,11 @@ void Dirs::append (char *target, char *str)
 #endif
 }
 
-Dirs::Dirs (char *arg)
+Dirs::Dirs ()
+{
+}
+
+void Dirs::init (char *arg)
 {
 #ifdef _MSC_VER
   char path [4096];
@@ -103,7 +109,7 @@ Dirs::Dirs (char *arg)
   strcpy (maps, path);
   append (saves, "saves");
 #else
-  char buf [STDSIZE];
+  char buf [4096];
   char *home = getenv ("HOME");
   char *env = getenv ("GL117");
   char *path = getenv ("PATH");
@@ -134,7 +140,7 @@ Dirs::Dirs (char *arg)
 
     if (arg [0] != '/')
     {
-      p = mystrtok (p, (int) (path + pathlen - p), ":");
+      p = strtok (p, (int) (path + pathlen - p), ":");
       while (p + strlen (p) - 1 < mypath + pathlen)
       {
         strcpy (myfile, p);
@@ -151,7 +157,7 @@ Dirs::Dirs (char *arg)
             goto found;
           }
         }
-        p = mystrtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
+        p = strtok (p + strlen (p) + 1, (int) (path + pathlen - p), ":");
       }
     }
     logging.display ("Binary file has no context to the data files.", LOG_FATAL);
@@ -230,7 +236,9 @@ Dirs::Dirs (char *arg)
   append (maps, "maps");
 }
 
-Dirs::~Dirs () {}
+Dirs::~Dirs ()
+{
+}
 
 char *Dirs::getSaves (char *name)
 {

@@ -26,10 +26,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "dirs.h"
+#include "configuration/Dirs.h"
 #include "pilots.h"
 #include "mission.h"
 #include "logging/Logging.h"
+
+
 
 TeamPilot::TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills)
 {
@@ -152,7 +154,7 @@ void Pilot::load ()
   }
 
   char buf [4096];
-  strcpy (buf, dirs->getSaves (name));
+  strcpy (buf, dirs.getSaves (name));
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
@@ -179,7 +181,7 @@ void Pilot::save ()
 {
   int i;
   char buf [4096];
-  strcpy (buf, dirs->getSaves (name));
+  strcpy (buf, dirs.getSaves (name));
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {
@@ -370,7 +372,7 @@ void PilotList::rm ()
   if (pilot [aktpilot] != NULL)
   {
     char buf [4096];
-    strcpy (buf, dirs->getSaves (pilot [aktpilot]->name));
+    strcpy (buf, dirs.getSaves (pilot [aktpilot]->name));
     remove (buf);
     delete pilot [aktpilot];
     pilot [aktpilot] = NULL;

@@ -366,6 +366,30 @@ SOURCE=.\logging\Logging.cpp
 SOURCE=.\logging\Logging.h
 # End Source File
 # End Group
+# Begin Group "configuration"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\configuration\ConfigFile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\Configuration.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\Configuration.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\Dirs.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\configuration\Dirs.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\aiobject.cpp
@@ -381,30 +405,6 @@ SOURCE=.\cockpit.cpp
 # Begin Source File
 
 SOURCE=.\cockpit.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\common.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\common.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\conf.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\conf.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\dirs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\dirs.h
 # End Source File
 # Begin Source File
 

@@ -24,7 +24,6 @@
 #ifndef IS_NET_H
 
 #include "net.h"
-#include "main.h"
 
 int port = 4567;
 char *message;
@@ -204,7 +203,7 @@ void Server::createSocketSet ()
 void Server::getClient()
 {
 #ifdef HAVE_SDL_NET
-  char buf [STDSIZE];
+  char buf [4096];
   TCPsocket newclient;
   IPaddress *remoteip;
   int active = SDLNet_CheckSockets (set, 0);

@@ -26,10 +26,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "mission.h"
-#include "common.h"
 #include "main.h"
 #include "math/Math.h"
-#include "conf.h"
+#include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
 void Mission::autoLFBriefing ()
@@ -512,13 +511,13 @@ void MissionTutorial1::draw ()
     }
     else
     {
-      key2string (key_firecannon, buf2);
+      conf.key2string (key_firecannon, buf2);
       sprintf (buf, "%s: FIRE CANNON", buf2);
       font1->drawTextCentered (0, 7, -2.5, buf, textcolor);
-      key2string (key_selectmissile, buf2);
+      conf.key2string (key_selectmissile, buf2);
       sprintf (buf, "%s: CHOOSE MISSILE", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
-      key2string (key_firemissile, buf2);
+      conf.key2string (key_firemissile, buf2);
       sprintf (buf, "%s: FIRE MISSILE", buf2);
       font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
     }
@@ -534,7 +533,7 @@ void MissionTutorial1::draw ()
     if (controls == CONTROLS_JOYSTICK)
     {
       font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY USING THE COOLIE HAT,", textcolor);
-      key2string (key_targetnearest, buf2);
+      conf.key2string (key_targetnearest, buf2);
       sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", textcolor);
@@ -542,7 +541,7 @@ void MissionTutorial1::draw ()
     else
     {
       font1->drawTextCentered (0, 7, -2.5, "YOU MAY TARGET AN ENEMY PRESSING", textcolor);
-      key2string (key_targetnearest, buf2);
+      conf.key2string (key_targetnearest, buf2);
       sprintf (buf, "OR PRESSING '%s' ON THE KEYBOARD.", buf2);
       font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
       font1->drawTextCentered (0, 5, -2.5, "THEN APPROACH!", textcolor);
@@ -647,7 +646,7 @@ void MissionTutorial2::draw ()
   else if (timer > timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "FIRSTLY, HAVE A LOOK AT YOUR MISSILES:", textcolor);
-    key2string (key_selectmissile, buf2);
+    conf.key2string (key_selectmissile, buf2);
     sprintf (buf, "PRESS '%s' TO SWITCH BETWEEN", buf2);
     font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
     font1->drawTextCentered (0, 5, -2.5, "AGM (AIR-GROUND-MISSILE) AND DF (DUMB FIRE)", textcolor);
@@ -922,7 +921,7 @@ void MissionDogfight1::draw ()
   else if (timer >= timeroff && timer <= timeroff + timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "THERE IS AN ENEMY ATTACKING", textcolor);
-    key2string (key_selectmissile, buf2);
+    conf.key2string (key_selectmissile, buf2);
     sprintf (buf, "PRESS '%s' ON THE KEYBOARD TO", buf2);
     font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
     font1->drawTextCentered (0, 5, -2.5, "SELECT A MISSILE", textcolor);
@@ -949,8 +948,8 @@ void MissionDogfight1::draw ()
   {
     font1->drawTextCentered (0, 7, -2.5, "CHAFF IS A DECOY FOR RADAR SEEKING MISSILES,", textcolor);
     font1->drawTextCentered (0, 6, -2.5, "FLARES PROTECT FROM INFRARED MISSILES", textcolor);
-    key2string (key_dropchaff, buf2);
-    key2string (key_dropflare, buf3);
+    conf.key2string (key_dropchaff, buf2);
+    conf.key2string (key_dropflare, buf3);
     sprintf (buf, "KEYS: DROP CHAFF = '%s', DROP FLARE = '%s'", buf2, buf3);
     font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
   }
@@ -962,10 +961,10 @@ void MissionDogfight1::draw ()
   else if (timer >= timeroff + 6 * timerdelay && timer <= timeroff + 7 * timerdelay - timerlag)
   {
     font1->drawTextCentered (0, 7, -2.5, "A LITTLE TARGETING HINT:", textcolor);
-    key2string (key_targetnearest, buf2);
+    conf.key2string (key_targetnearest, buf2);
     sprintf (buf, "'%s' WILL TARGET THE NEAREST ENEMY IN FRONT,", buf2);
     font1->drawTextCentered (0, 6, -2.5, buf, textcolor);
-    key2string (key_targetlocking, buf2);
+    conf.key2string (key_targetlocking, buf2);
     sprintf (buf, "'%s' WILL TARGET AN ENEMY WHO HAS LOCKED YOU", buf2);
     font1->drawTextCentered (0, 5, -2.5, buf, textcolor);
   }

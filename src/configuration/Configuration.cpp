@@ -19,35 +19,57 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file contains all configuration parsing code. */
-
-#ifndef IS_CONF_H
+#ifndef IS_CONFIGURATION_H
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "conf.h"
-#include "common.h"
-#include "dirs.h"
+#include "configuration/Configuration.h"
+#include "configuration/Dirs.h"
 #include "logging/Logging.h"
 
-// initialization
+
+
+// one object of the Configuration class
+Configuration conf;
+
+// definition of global variables needed by basic packages
 int quality = 3;
 float view = 50.0;
-int width = 800, height = 600, bpp = 32;
-int wantwidth = 800, wantheight = 600, wantfullscreen = 1;
-int dithering = 1;
-int volumesound = 100;
-int volumemusic = 100;
-int fullscreen = 1;
-int controls = CONTROLS_MOUSE;
-int difficulty = 1;
-int physics = 0;
 int antialiasing = 1;
 int specialeffects = 1;
+int day = 1;
+int weather = 0;
+float sungamma = 45.0;
+
+// initialization
+int width = 800;
+int height = 600;
+int bpp = 32;
+int wantwidth = 800; // requested values for next restart
+int wantheight = 600;
+int wantfullscreen = 1;
+
+int volumesound = 100;
+int volumemusic = 100;
+int dithering = 1;
 int dynamiclighting = 1;
+int fullscreen = 1;
+int lighting; // 1=on, 0=off (obsolete)
+
+int difficulty = 1; // 0=easy, 1=normal, 2=hard
+int physics = 0; // 0=action, 1=realistic
+int brightness = 0; // brightness correction
+int contrast = 0; // contrast/gamma correction (not yet configurable)
+int controls = CONTROLS_MOUSE; // see CONTROLS-constants
+int game = GAME_INIT; // see GAME-constants
+
+int clouds = 0;
+int camera = 0;
+bool isserver = false;
+int loglevel = LOG_MOST;
 
 // use 0...255 for one byte keys, 256... for special (two byte) beys
 unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
@@ -67,142 +89,17 @@ bool mouse_reverse = false;
 bool mouse_relative = false;
 int mouse_autorudder = 30;
 
-ConfigFile::ConfigFile () {}
 
-ConfigFile::ConfigFile (char *fname)
+
+Configuration::Configuration ()
 {
-  char buf2 [4096];
-  bool commentmode = false;
-  FILE *in;
-  length = 0;
-  in = fopen (fname, "rb");
-  if (in != NULL)
-  {
-    length = fread (buf, 1, 32000, in);
-    fclose (in);
-  }
-  else
-  {
-    sprintf (buf2, "Could not load %s", fname);
-    logging.display (buf2, LOG_WARN);
-    buf [0] = 0;
-  }
-  for (int i = 0; i < length; i ++)
-  {
-    if (buf [i] == '#') commentmode = true;
-    if (buf [i] == '\n') commentmode = false;
-    if (commentmode) buf [i] = ' ';
-    else buf [i] = tolower (buf [i]);
-  }
 }
 
-char *ConfigFile::skipwhite (char *str)
-{
-  while (*str == ' ' || *str == '\t')
-    str ++;
-  return str;
-}
-
-char *ConfigFile::skipnum (char *str)
-{
-  while (*str >= '0' && *str <= '9')
-    str ++;
-  return str;
-}
-
-char *ConfigFile::skipalphanum (char *str)
-{
-  while (*str >= '0' && *str <= 'z')
-    str ++;
-  return str;
-}
-
-char *ConfigFile::getString (char *dest, char *str)
-{
-  char *strf, *stre;
-  char cmpstr [256];
-  int i;
-  if (strlen (str) >= 256) { return NULL; }
-  strcpy (cmpstr, str);
-  if (buf [0] == 0) { return NULL; }
-  for (i = 0; i < (int) strlen (cmpstr); i ++)
-  {
-    cmpstr [i] = tolower (cmpstr [i]);
-  }
-  strf = strstr (buf, cmpstr);
-  if (strf == NULL) { return NULL; }
-  strf += strlen (cmpstr);
-  strf = skipwhite (strf);
-  if (*strf == 0) { return NULL; }
-  strf ++;
-  if (*strf == 0) { return NULL; }
-  strf = skipwhite (strf);
-  if (*strf == 0) { return NULL; }
-  stre = skipalphanum (strf);
-  if (stre - strf >= 256) { return NULL; }
-  if (*strf == 0) { return NULL; }
-  for (i = 0; i < (int) (stre - strf); i ++)
-    dest [i] = *(strf+i);
-  dest [i] = 0;
-  return dest;
-}
-
-int ConfigFile::getValue (char *str)
-{
-  char res [256];
-  getString (res, str);
-  if (res == NULL) return -1;
-  return atoi (res);
-}
-
-int ConfigFile::openOutput (char *fname)
-{
-  out = fopen (fname, "wb");
-  if (out == NULL) return 0;
-  return 1;
-}
-
-int ConfigFile::write (char *str1, int n)
-{
-  char str [256];
-  if (strlen (str1) + 8 > 256) return 0;
-  sprintf (str, "%s = %d\n", str1, n);
-  fwrite (str, 1, strlen (str), out);
-  return 1;
-}
-
-int ConfigFile::write (char *str1, char c)
-{
-  char str [256];
-  if (c <= 32 || c >= 97)
-  {
-    write (str1, (int) c);
-    return 1;
-  }
-  if (strlen (str1) + 8 > 256) return 0;
-  sprintf (str, "%s = %c\n", str1, c);
-  fwrite (str, 1, strlen (str), out);
-  return 1;
-}
-
-void ConfigFile::writeText (char *str)
-{
-  fwrite (str, 1, strlen (str), out);
-  fwrite ("\n", 1, 1, out);
-}
-
-void ConfigFile::close ()
-{
-  fclose (out);
-}
-
-
-
-void save_config ()
+void Configuration::saveConfig ()
 {
   char buf [4096];
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs->getSaves ("conf");
+  char *confname = dirs.getSaves ("conf");
   sprintf (buf, "Saving %s ", confname);
   logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
@@ -255,11 +152,11 @@ void save_config ()
   delete cf;
 }
 
-void save_saveconfig ()
+void Configuration::saveSaveConfig ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs->getSaves ("saveconf");
+  char *confname = dirs.getSaves ("saveconf");
   sprintf (buf, "Saving %s ", confname);
   logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
@@ -279,12 +176,12 @@ void save_saveconfig ()
   delete cf;
 }
 
-int load_config ()
+int Configuration::loadConfig ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   char ret [256];
   char *str;
-  char *confname = dirs->getSaves ("conf");
+  char *confname = dirs.getSaves ("conf");
   sprintf (buf, "Loading %s ", confname);
   logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
@@ -421,12 +318,12 @@ int load_config ()
   return 1;
 }
 
-int load_saveconfig ()
+int Configuration::loadSaveConfig ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   char ret [256];
   char *str;
-  char *confname = dirs->getSaves ("saveconf");
+  char *confname = dirs.getSaves ("saveconf");
   sprintf (buf, "Loading %s ", confname);
   logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
@@ -472,18 +369,18 @@ int load_saveconfig ()
   return 1;
 }
 
-void writeJoystick (ConfigFile *cf, char *str, int jn)
+void Configuration::writeJoystick (ConfigFile *cf, char *str, int jn)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   sprintf (buf, "%s = %c%d", str, 'A' + (jn / 1000), jn % 1000);
   cf->writeText (buf);
 }
 
-void save_configInterface ()
+void Configuration::saveConfigInterface ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs->getSaves ("conf.interface");
+  char *confname = dirs.getSaves ("conf.interface");
   sprintf (buf, "Saving %s ", confname);
   logging.display (buf, LOG_MOST);
   int ret1 = cf->openOutput (confname);
@@ -569,7 +466,7 @@ void save_configInterface ()
   delete cf;
 }
 
-int getKey (char *str, int n)
+int Configuration::getKey (char *str, int n)
 {
   int tmp;
   if (str == NULL) return n;
@@ -585,7 +482,7 @@ int getKey (char *str, int n)
   return tmp;
 }
 
-int getJoystick (char *str, int n)
+int Configuration::getJoystick (char *str, int n)
 {
   int tmp, jn = 0;
   if (str == NULL) return n;
@@ -598,12 +495,12 @@ int getJoystick (char *str, int n)
   return jn * 1000 + tmp;
 }
 
-int load_configInterface ()
+int Configuration::loadConfigInterface ()
 {
-  char buf [STDSIZE];
+  char buf [4096];
   char ret [256];
   char *str;
-  char *confname = dirs->getSaves ("conf.interface");
+  char *confname = dirs.getSaves ("conf.interface");
   sprintf (buf, "Loading %s ", confname);
   logging.display (buf, LOG_MOST);
   ConfigFile *cf = new ConfigFile (confname);
@@ -756,6 +653,62 @@ int load_configInterface ()
 
   delete cf;
   return 1;
+}
+
+void Configuration::key2string (int key, char *buf)
+{
+  buf [0] = '\0';
+
+  // try one byte keys
+  if (key > 32 && key <= 'z') sprintf (buf, "%c", key);
+  else if (key == KEY_SPACE) strcpy (buf, "SPACE");
+  else if (key == KEY_TAB) strcpy (buf, "TAB");
+  else if (key == KEY_ENTER) strcpy (buf, "ENTER");
+  else if (key == KEY_BACKSPACE) strcpy (buf, "BSPACE");
+  if (key < 256) return;
+
+  // try special keys
+  key -= 256;
+  if (key == KEY_F1) strcpy (buf, "F1");
+  else if (key == KEY_F2) strcpy (buf, "F2");
+  else if (key == KEY_F3) strcpy (buf, "F3");
+  else if (key == KEY_F4) strcpy (buf, "F4");
+  else if (key == KEY_F5) strcpy (buf, "F5");
+  else if (key == KEY_F6) strcpy (buf, "F6");
+  else if (key == KEY_F7) strcpy (buf, "F7");
+  else if (key == KEY_F8) strcpy (buf, "F8");
+  else if (key == KEY_F9) strcpy (buf, "F9");
+  else if (key == KEY_F10) strcpy (buf, "F10");
+  else if (key == KEY_F10) strcpy (buf, "F11");
+  else if (key == KEY_F10) strcpy (buf, "F12");
+  else if (key == KEY_UP) strcpy (buf, "UP");
+  else if (key == KEY_DOWN) strcpy (buf, "DOWN");
+  else if (key == KEY_LEFT) strcpy (buf, "LEFT");
+  else if (key == KEY_RIGHT) strcpy (buf, "RIGHT");
+  else if (key == KEY_PGUP) strcpy (buf, "PGUP");
+  else if (key == KEY_PGDOWN) strcpy (buf, "PGDOWN");
+  else if (key == KEY_LALT) strcpy (buf, "LALT");
+  else if (key == KEY_RALT) strcpy (buf, "RALT");
+  else if (key == KEY_LCTRL) strcpy (buf, "LCTRL");
+  else if (key == KEY_RCTRL) strcpy (buf, "RCTRL");
+  else if (key == KEY_LSHIFT) strcpy (buf, "LSHIFT");
+  else if (key == KEY_RSHIFT) strcpy (buf, "RSHIFT");
+  else if (key == KEY_CAPSLOCK) strcpy (buf, "CAPS");
+  else if (key == KEY_DELETE) strcpy (buf, "DEL");
+  else if (key == KEY_HOME) strcpy (buf, "HOME");
+  else if (key == KEY_INSERT) strcpy (buf, "INS");
+  else if (key == KEY_END) strcpy (buf, "END");
+}
+
+void Configuration::joystick2string (int button, char *buf)
+{
+  buf [0] = '\0';
+  char joystick = 'A' + button / 1000;
+  int b = button % 1000;
+
+  // try one byte keys
+  if (b >= 0 && b < 100) sprintf (buf, "%c BTN%d", joystick, b);
+  else if (b >= 100) sprintf (buf, "%c HAT%d", joystick, b - 100);
 }
 
 #endif

@@ -29,7 +29,7 @@
 #include "Effects.h"
 //#include "GlLandscape.h"
 #include "opengl/GlPrimitives.h"
-#include "common.h"
+//#include "configuration/Common.h"
 
 
 

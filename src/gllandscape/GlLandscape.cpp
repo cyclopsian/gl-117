@@ -2825,125 +2825,29 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 void GlLandscape::calcDynamicLight (SpaceObj *object, float threshold, float maxintens, float intensfac)
 {
   int x, y;
-//  if (!dynamiclighting) return;
-//  for (i = 0; i < maxexplosion; i ++)
-//  {
-//    if (object [i]->ttl > 0)
-//    {
-      int mx = (int) object->tl.x;
-      int mz = (int) object->tl.z;
-      float h = object->tl.y - getHeight (object->tl.x, object->tl.z);
-      if (h < 0) h = 0;
-      float radius = h / 2 + 3;
-      if (h < threshold)
+  int mx = (int) object->tl.x;
+  int mz = (int) object->tl.z;
+  float h = object->tl.y - getHeight (object->tl.x, object->tl.z);
+  if (h < 0) h = 0;
+  float radius = h / 2 + 3;
+  if (h < threshold)
+  {
+    float intens = maxintens - intensfac * h;
+    for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
+      for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
       {
-        float intens = maxintens - intensfac * h;
-        for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
-          for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
-          {
-            int xn = GETCOORD(x);
-            int yn = GETCOORD(y);
-            int dx = x - mx, dy = y - mz;
-            float dist = sqrt (dx*dx + dy*dy);
-            if (dist < radius)
-            {
-              int light = (int) ((radius - dist) * intens / radius * object->zoom) + dl [xn] [yn];
-              if (light > 255) light = 255;
-              dl [xn] [yn] = light;
-            }
-          }
-      }
-//    }
-//  }
-/*  if (!day)
-    for (i = 0; i < maxlaser; i ++)
-    {
-      if (cannon [i]->draw)
-      {
-        int mx = (int) cannon [i]->tl.x;
-        int mz = (int) cannon [i]->tl.z;
-        float h = cannon [i]->tl.y - getHeight (cannon [i]->tl.x, cannon [i]->tl.z);
-        if (h < 0) h = 0;
-        float radius = h / 2 + 3;
-        if (h < 15)
+        int xn = GETCOORD(x);
+        int yn = GETCOORD(y);
+        int dx = x - mx, dy = y - mz;
+        float dist = sqrt (dx*dx + dy*dy);
+        if (dist < radius)
         {
-          float intens = 75.0 - 5 * h;
-          for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
-            for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
-            {
-              int xn = GETCOORD(x);
-              int yn = GETCOORD(y);
-              int dx = x - mx, dy = y - mz;
-              float dist = sqrt (dx*dx + dy*dy);
-              if (dist < radius)
-              {
-                int light = (int) ((radius - dist) * intens / radius * cannon [i]->zoom) + dl [xn] [yn];
-                if (light > 255) light = 255;
-                dl [xn] [yn] = light;
-              }
-            }
+          int light = (int) ((radius - dist) * intens / radius * object->zoom) + dl [xn] [yn];
+          if (light > 255) light = 255;
+          dl [xn] [yn] = light;
         }
       }
-    }
-  for (i = 0; i < maxmissile; i ++)
-  {
-    if (missile [i]->draw)
-    {
-      int mx = (int) missile [i]->tl.x;
-      int mz = (int) missile [i]->tl.z;
-      float h = missile [i]->tl.y - getHeight (missile [i]->tl.x, missile [i]->tl.z);
-      if (h < 0) h = 0;
-      float radius = h / 2 + 3;
-      if (h < 15)
-      {
-        float intens = 150.0 - 10 * h;
-        for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
-          for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
-          {
-            int xn = GETCOORD(x);
-            int yn = GETCOORD(y);
-            int dx = x - mx, dy = y - mz;
-            float dist = sqrt (dx*dx + dy*dy);
-            if (dist < radius)
-            {
-              int light = (int) ((radius - dist) * intens / radius * missile [i]->zoom) + dl [xn] [yn];
-              if (light > 255) light = 255;
-              dl [xn] [yn] = light;
-            }
-          }
-      }
-    }
   }
-  float flarezoom = 0.2F;
-  for (i = 0; i < maxflare; i ++)
-  {
-    if (flare [i]->draw)
-    {
-      int mx = (int) flare [i]->tl.x;
-      int mz = (int) flare [i]->tl.z;
-      float h = flare [i]->tl.y - getHeight (flare [i]->tl.x, flare [i]->tl.z);
-      if (h < 0) h = 0;
-      float radius = h / 2 + 3;
-      if (h < 50)
-      {
-        float intens = 200.0 - 2 * h;
-        for (x = mx - (int) radius; x <= mx + (int) radius; x ++)
-          for (y = mz - (int) radius; y <= mz + (int) radius; y ++)
-          {
-            int xn = GETCOORD(x);
-            int yn = GETCOORD(y);
-            int dx = x - mx, dy = y - mz;
-            float dist = sqrt (dx*dx + dy*dy);
-            if (dist < radius)
-            {
-              int light = (int) ((radius - dist) * intens / radius * flarezoom) + dl [xn] [yn];
-              if (light > 255) light = 255;
-              dl [xn] [yn] = light;
-            }
-          }
-      }
-    }
-  }*/
 }
 
 void GlLandscape::setMaterial (int n, float r, float g, float b, Texture *tex)

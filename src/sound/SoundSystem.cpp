@@ -25,7 +25,7 @@
 
 #include "SoundSystem.h"
 #include "logging/Logging.h"
-#include "dirs.h"
+#include "configuration/Dirs.h"
 
 
 
@@ -40,7 +40,7 @@ SoundSystem::SoundSystem ()
 #ifndef USE_GLUT
   char buf [4096];
 #ifndef HAVE_SDL_MIXER
-  waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
+  waveclick1 = new WaveFile (dirs.getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
   {
     sprintf (buf, "Couldn't open audio: %s, no sound available", SDL_GetError ());
@@ -66,7 +66,7 @@ SoundSystem::SoundSystem ()
   {
     audio = true;
   }
-  music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("winner.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open winner.s3m: %s", Mix_GetError ());
@@ -74,7 +74,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("loser.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open loser.s3m: %s", Mix_GetError ());
@@ -82,7 +82,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("dark.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open dark.s3m: %s", Mix_GetError ());
@@ -90,7 +90,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("stars.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open stars.s3m: %s", Mix_GetError ());
@@ -98,7 +98,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("ambient.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open ambient.s3m: %s", Mix_GetError ());
@@ -106,7 +106,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("standby.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
@@ -114,7 +114,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("electro.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
@@ -122,7 +122,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+  music1 = Mix_LoadMUS (dirs.getMusic ("softtec.s3m"));
   if (music1 == NULL)
   {
     sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
@@ -132,21 +132,21 @@ SoundSystem::SoundSystem ()
   playtime = 0;
 #endif
   int i;
-  waveexplosion1 = new WaveFile (dirs->getSounds ("explode1.wav"));
-  waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
-  wavecannon1 = new WaveFile (dirs->getSounds ("cannon1.wav"));
-  wavemissile1 = new WaveFile (dirs->getSounds ("missile1.wav"));
-  wavethunder1 = new WaveFile (dirs->getSounds ("thunder1.wav"));
+  waveexplosion1 = new WaveFile (dirs.getSounds ("explode1.wav"));
+  waveclick1 = new WaveFile (dirs.getSounds ("click1.wav"));
+  wavecannon1 = new WaveFile (dirs.getSounds ("cannon1.wav"));
+  wavemissile1 = new WaveFile (dirs.getSounds ("missile1.wav"));
+  wavethunder1 = new WaveFile (dirs.getSounds ("thunder1.wav"));
   for (i = 0; i < 1; i ++)
   {
     sprintf (buf, "plane%d.wav", i + 1);
-    waveplane [i] = new WaveFile (dirs->getSounds (buf));
+    waveplane [i] = new WaveFile (dirs.getSounds (buf));
   }
   engine = 0;
-  wavehit1 = new WaveFile (dirs->getSounds ("hit1.wav"));
-  wavebeep1 = new WaveFile (dirs->getSounds ("beep1.wav"));
-  wavechaff1 = new WaveFile (dirs->getSounds ("chaff1.wav"));
-  wavebeep2 = new WaveFile (dirs->getSounds ("beep2.wav"));
+  wavehit1 = new WaveFile (dirs.getSounds ("hit1.wav"));
+  wavebeep1 = new WaveFile (dirs.getSounds ("beep1.wav"));
+  wavechaff1 = new WaveFile (dirs.getSounds ("chaff1.wav"));
+  wavebeep2 = new WaveFile (dirs.getSounds ("beep2.wav"));
   wavecannon1->setVolume (50);
   wavemissile1->setVolume (110);
   waveclick1->setVolume (80);
@@ -268,28 +268,28 @@ void SoundSystem::loadMusic (int sample)
   switch (sample)
   {
     case MUSIC_DARK1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("dark.s3m"));
       break;
     case MUSIC_WINNER1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("winner.s3m"));
       break;
     case MUSIC_LOSER1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("loser.s3m"));
       break;
     case MUSIC_STANDBY1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("standby.s3m"));
       break;
     case MUSIC_ELECTRO1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("electro.s3m"));
       break;
     case MUSIC_STARS1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("stars.s3m"));
       break;
     case MUSIC_SOFTTEC1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("softtec.s3m"));
       break;
     case MUSIC_AMBIENT1:
-      music1 = Mix_LoadMUS (dirs->getMusic ("ambient.s3m"));
+      music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
       break;
   }
 #endif

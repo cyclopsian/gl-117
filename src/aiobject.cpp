@@ -1502,7 +1502,7 @@ void AIObj::fireCannon (DynamicObj **laser)
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   if (logging.loglevel == LOG_ALL)
   {
     sprintf (buf, "Missile: party=%d, id=%d", party, id);
@@ -1536,7 +1536,7 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 
 void AIObj::fireFlare2 (DynamicObj *flare)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   if (logging.loglevel == LOG_ALL)
   {
     sprintf (buf, "Flare: party=%d", party);
@@ -1563,12 +1563,9 @@ void AIObj::fireFlare2 (DynamicObj *flare)
 
 void AIObj::fireChaff2 (DynamicObj *chaff)
 {
-  char buf [STDSIZE];
-  if (debug == LOG_ALL)
-  {
-    sprintf (buf, "Chaff: party=%d", party);
-    logging.display (buf, LOG_ALL);
-  }
+  char buf [4096];
+  sprintf (buf, "Chaff: party=%d", party);
+  logging.display (buf, LOG_ALL);
   chaff->dinit ();
   chaff->thrust = 0;
   chaff->realspeed = 0;
@@ -1617,7 +1614,7 @@ int AIObj::nextMissile (int from)
 
 bool AIObj::haveMissile (int id)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
   {
@@ -1638,7 +1635,7 @@ bool AIObj::haveMissile () // due to missiletype
 
 void AIObj::decreaseMissile (int id)
 {
-  char buf [STDSIZE];
+  char buf [4096];
   int i;
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)

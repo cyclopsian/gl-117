@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes a collection of functions and precalculated tabless. */
-
 #ifndef IS_MATHTAB_H
 
 #include "Math.h"

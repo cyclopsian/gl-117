@@ -39,7 +39,10 @@ const int EXIT_COMMAND = 3;
 const int EXIT_ALLOC = 4;
 const int EXIT_CONTEXT = 5;
 
-
+/**
+* This class does all logging activities to stdout/stderr and logfile.
+* A message is only logged if its loglevel is lower (has higher priority) than the overall loglevel.
+*/
 class Logging
 {
   public:

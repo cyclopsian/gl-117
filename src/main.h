@@ -43,8 +43,10 @@
 #include "loadmodel/Load3ds.h" // ok
 #include "effects/Effects.h" // ok
 #include "sound/SoundSystem.h" // ok
+#include "configuration/Dirs.h" // ok
 #include "pilots.h" // ok
 
+//extern Dirs *dirs; ///< paths to directories with game data or saves
 extern Font *font1, *font2;
 
 extern Texture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
@@ -55,7 +57,7 @@ extern PilotList *pilots; // other pilots of the Eagle Squad
 extern Explosion *explosion [maxexplosion];
 extern BlackSmoke *blacksmoke [maxblacksmoke];
 
-extern Load3ds g_Load3ds;
+//extern Load3ds g_Load3ds;
 extern Model3d model_fig; // fighter models
 extern Model3d model_figa;
 extern Model3d model_figb;
@@ -126,7 +128,7 @@ extern AIObj *fplayer; // the player itself
 extern SoundSystem *sound;
 
 // get name of a keyboard's key (ENTER, SPACE)
-extern char *getKeyString (int key, char *str);
+//extern char *getKeyString (int key, char *str);
 
 // own export: main.h may be included in the cpp files
 extern Model3d *getModel (int id);

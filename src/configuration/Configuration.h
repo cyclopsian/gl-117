@@ -19,10 +19,11 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef IS_COMMON_H
-#define IS_COMMON_H
+#ifndef IS_CONFIGURATION_H
+#define IS_CONFIGURATION_H
 
 #include "../config.h" // defines HAVE_SDL, HAVE_SDL_MIXER
+#include "opengl/includegl.h"
 
 // USE_GLUT means ONLY use GLUT
 // HAVE_SDL means that SDL is available, so USE_GLUT will not be defined
@@ -40,8 +41,6 @@
 #undef HAVE_SDL_MIXER
 #endif
 
-#include "opengl/includegl.h"
-
 // data types
 #ifdef USE_GLUT
 #define Uint32 unsigned int
@@ -52,6 +51,52 @@
 #define VERSIONSTRING "V1.3"
 
 #define LINEWIDTH(x) (float) x * height / 600.0F
+
+// controls
+#define CONTROLS_KEYBOARD 0
+#define CONTROLS_MOUSE 1
+#define CONTROLS_JOYSTICK 2
+
+// view range borders
+#define VIEW_MIN 30
+#define VIEW_MAX 150
+
+extern int width;
+extern int height;
+extern int bpp;
+extern int wantwidth; // requested values for next restart
+extern int wantheight;
+extern int wantfullscreen;
+
+extern int volumesound;
+extern int volumemusic;
+extern int dithering;
+extern int dynamiclighting;
+extern int fullscreen;
+extern int lighting; // 1=on, 0=off (obsolete)
+
+extern int difficulty; // 0=easy, 1=normal, 2=hard
+extern int physics; // 0=action, 1=realistic
+extern int brightness; // brightness correction
+extern int controls; // see CONTROLS-constants
+extern int game; // see GAME-constants
+
+extern int clouds;
+extern int camera;
+extern bool isserver;
+extern int loglevel;
+
+// TODO: these constants should go somewhere else
+// maximum constants for objects
+const int maxexplosion = 30;
+const int maxfighter = 30;
+const int maxlaser = 150;
+const int maxmissile = 30;
+const int maxstar = 70;
+const int maxgroundobj = 10;
+const int maxblacksmoke = 50;
+const int maxflare = 30;
+const int maxchaff = 30;
 
 // game states
 #define GAME_INIT 0
@@ -67,74 +112,6 @@
 #define GAME_FIGHTER 10
 #define GAME_FINISH 11
 #define GAME_QUIT 12
-
-// controls
-#define CONTROLS_KEYBOARD 0
-#define CONTROLS_MOUSE 1
-#define CONTROLS_JOYSTICK 2
-
-// view range borders
-#define VIEW_MIN 30
-#define VIEW_MAX 150
-
-// preferences
-//extern int quality;
-//extern float view;
-extern int width, height, bpp;
-extern int wantwidth, wantheight, wantfullscreen; // requested values for next restart
-extern int volumesound;
-extern int volumemusic;
-extern int dithering;
-//extern int antialiasing;
-//extern int specialeffects;
-extern int dynamiclighting;
-
-// current mouse coordinates
-extern int mousex, mousey;
-
-extern int debug; // debug mode (1=counter measures)
-extern bool multiplayer, isserver;
-extern int fullscreen;
-//extern int day;
-//extern int weather; // 0: sunny, 1: thunderstorm, 2: no atmosphere (moon)
-//extern float sungamma; // angle of sunrays dropping on horizon
-
-extern int camera; // camera type (0=cockpit, 1=chase, 2=backward, ...)
-//extern float camx, camy, camz; // camera position
-//extern float camphi, camgamma, camtheta; // phi: heading, theta: roll, gamma: elevation
-//extern float sunlight; // dynamically adjustable light (0=black...1=default...brighter)
-
-extern int lighting; // 1=on, 0=off (obsolete)
-
-//extern float getView (); // return view dependant on weather
-
-extern int difficulty; // 0=easy, 1=normal, 2=hard
-extern int physics; // 0=action, 1=realistic
-extern int brightness; // brightness correction
-extern int contrast; // contrast/gamma correction (not yet configurable)
-
-extern bool sunblinding; // viewer gazing into the sun?
-
-extern int clouds;
-
-extern int controls; // see CONTROLS-constants
-
-extern int game; // see GAME-constants
-
-extern float blackout, redout; // high force
-
-extern float view_x, view_y; // angles for joystick-controlled view
-
-// maximum constants for objects
-const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50, maxflare = 30, maxchaff = 30;
-
-// sine and cosine table (obsolete)
-//#define SIN(x) sine[(int)x]
-//#define COS(x) cosi[(int)x]
-
-// exact sine, cosine functions
-//#define SIN(x) sin(x*PI/180.0)
-//#define COS(x) cos(x*PI/180.0)
 
 // define common GLUT/SDL keys
 #ifdef USE_GLUT
@@ -210,68 +187,76 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 #define KEY_ENTER 13
 #define KEY_SPACE 32
 
-extern void key2string (int key, char *buf);
-extern void joystick2string (int key, char *buf);
+// interface definitions
+extern unsigned int key_firecannon, key_firemissile, key_dropchaff, key_dropflare;
+extern unsigned int key_selectmissile, key_thrustup, key_thrustdown;
+extern unsigned int key_targetnearest, key_targetnext, key_targetprevious, key_targetlocking;
 
-#define STDSIZE 256 // typical temporary buffer size
-#define PATHSIZE 4096 // maximum path/directory string size
+extern int joystick_firecannon, joystick_firemissile, joystick_dropchaff, joystick_dropflare;
+extern int joystick_selectmissile, joystick_thrustup, joystick_thrustdown;
+extern int joystick_targetnearest, joystick_targetnext, joystick_targetprevious, joystick_targetlocking;
+extern int joystick_aileron, joystick_elevator, joystick_rudder, joystick_throttle;
+extern int joystick_view_x, joystick_view_y;
 
-// joystick constants
-const int maxjaxis = 10;
-const int maxjoysticks = 10;
+extern unsigned char mouse_firecannon, mouse_firemissile;
+extern unsigned char mouse_selectmissile;
+extern unsigned int mouse_sensitivity;
+extern bool mouse_reverse;
+extern bool mouse_relative;
+extern int mouse_autorudder;
 
-// global normed timestep (higher values mean slower gameplay)
-//const int timestep = 34;
-
-// TODO: write Vector and Map classes, as STL does not work with older compilers
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-class String
+/**
+* This class represents an abstract config file as text file in memory.
+*/
+class ConfigFile
 {
   public:
 
-  String ()
-  {
-    len = 0;
-    max = 0;
-    str = NULL;
-  }
-  String (char *str)
-  {
-    len = strlen (str);
-    max = 0;
-    str = NULL;
-    allocate ();
-    strcpy (this->str, str);
-  }
+    char buf [32000]; // max file size
+    int length;
+    FILE *out;
 
-  const char *c_str ()
-  {
-    return (const char *) str;
-  }
+    ConfigFile ();
+    ConfigFile (char *fname);
 
-  bool equals (String &string)
-  {
-    return strcmp (str, string.c_str ()) == 0;
-  }
+    char *skipwhite (char *str);
+    char *skipnum (char *str);
+    char *skipalphanum (char *str);
+    char *getString (char *dest, char *str);
+    int getValue (char *str);
+    int openOutput (char *fname);
+    int write (char *str1, int n);
+    int write (char *str1, char c);
+    void writeText (char *str);
+    void close ();
+};
+
+/**
+* This class saves/loads special config files of GL-117: conf and conf.interface
+*/
+class Configuration
+{
+  public:
+
+    Configuration ();
+
+    void saveConfig ();
+    void saveSaveConfig ();
+    int loadConfig ();
+    int loadSaveConfig ();
+    void saveConfigInterface ();
+    int loadConfigInterface ();
+
+    void key2string (int key, char *buf);
+    void joystick2string (int key, char *buf);
 
   protected:
 
-  char *str;
-  int len;
-  int max;
-
-  void allocate ()
-  {
-    if (max == 0) max = 4;
-    while (len >= max) max *= 2;
-    str = (char *) realloc (str, max);
-    if (str == NULL)
-      exit (1); // TODO: error
-  }
+    void writeJoystick (ConfigFile *cf, char *str, int jn);
+    int getKey (char *str, int n);
+    int getJoystick (char *str, int n);
 };
+
+extern Configuration conf;
 
 #endif

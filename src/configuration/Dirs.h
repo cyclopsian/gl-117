@@ -19,11 +19,15 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file handles als input/output directories. */
-
 #ifndef IS_DIRS_H
 #define IS_DIRS_H
 
+/**
+* This class handles the game directories to save/load configurations and to load game data.
+* For Unix it requires HOME to be set and it must be compiled with #define DATADIR (as compiler option)
+* to know where the game is installed (by make install).
+* One object "dirs" is already predefined, please call init() once at startup.
+*/
 class Dirs
 {
   public:
@@ -36,8 +40,11 @@ class Dirs
     char models [4096];
     char maps [4096];
 
-    Dirs (char *arg);
+    Dirs ();
     virtual ~Dirs ();
+
+    /// this method must be called once at startup with argv [0] of main as parameter!
+    void init (char *arg);
 
     /// get dir name containing the saves...
     char *getSaves (char *name);
@@ -49,9 +56,10 @@ class Dirs
   
   protected:
 
+    char *strtok (char *str, int len, char *tok);
     void append (char *target, char *str); // append subdir/file to path using (back-)slashes
 };
 
-extern Dirs *dirs; ///< paths to directories with game data or saves
+extern Dirs dirs;
 
 #endif

@@ -24,7 +24,7 @@
 #ifndef IS_COCKPIT_H
 #define IS_COCKPIT_H
 
-#include "common.h" // ok
+#include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok
 
 class Cockpit

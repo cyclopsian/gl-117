@@ -19,8 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* This file includes a collection of functions and precalculated tables. */
-
 #ifndef IS_MATHTAB_H
 #define IS_MATHTAB_H
 
@@ -36,6 +34,9 @@
 
 #define MAXSMOKEELEM 40
 
+/**
+* This class includes a collection of functions and precalculated tables.
+*/
 class Math
 {
   public:

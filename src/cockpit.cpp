@@ -105,7 +105,7 @@ void Cockpit::setColor (Color *color, int alpha)
 void Cockpit::drawCounter ()
 {
   int i;
-  char buf [STDSIZE];
+  char buf [4096];
   float xf = 2.8F, yf = -1.0F, zf = -4.0F, yf2 = -1.3F, xfl = 0.4F, yfl = 0.1F;
 //    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   bool flarewarn = false, chaffwarn = false;
@@ -427,7 +427,7 @@ void Cockpit::drawCross ()
 
 void Cockpit::drawHeading ()
 {
-  char str [STDSIZE];
+  char str [4096];
   Color color;
   int i = 0;
   int alpha = 175;
@@ -704,7 +704,7 @@ void Cockpit::drawRadar ()
 
 void Cockpit::drawRelativeHeightBar()
 {
-  char str [STDSIZE];
+  char str [4096];
   Color color;
   int alpha = 175;
   setColor (&color, alpha);
@@ -743,7 +743,7 @@ void Cockpit::drawRelativeHeightBar()
 
 void Cockpit::drawThrustBar()
 {
-  char str [STDSIZE];
+  char str [4096];
   Color color;
   int alpha = 175;
   setColor (&color, alpha);

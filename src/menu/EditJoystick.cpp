@@ -75,7 +75,7 @@ void EditJoystick::draw ()
   float yf = (y - h - 0.01) / (h - 0.1);
   float xf = (x + 0.25) / (h - 0.1);
   font1->drawText (xf, yf, menuZ, text, *col);
-  joystick2string (button, buf);
+  conf.joystick2string (button, buf);
   font1->drawText (xf + (w - 2) / h, yf, menuZ, buf, *col);
   font1->zoom = 0.1;
 }
@@ -92,7 +92,7 @@ void EditJoystick::eventJoystick (int button)
   if (!active) return;
   if (highlight)
   {
-    joystick2string (button, buf);
+    conf.joystick2string (button, buf);
     if (buf [0] != '\0')
     { 
       this->button = (int) button;

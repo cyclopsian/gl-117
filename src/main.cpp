@@ -42,16 +42,15 @@ TODO:
 #include "main.h"
 #include "menu/Component.h"
 #include "maploader.h"
-#include "dirs.h"
+#include "configuration/Dirs.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net.h"
 #include "math/Math.h"
 #include "cockpit.h"
-#include "conf.h"
+#include "configuration/Configuration.h"
 #include "mission.h"
 #include "gllandscape/GlLandscape.h"
-#include "common.h"
 #include "logging/Logging.h"
 
 #include <ctype.h>
@@ -60,13 +59,14 @@ const int timestep = 34;
 
 int mousex, mousey;
 
-int debug = 1;
-bool multiplayer = false, isserver = false;
-int day = 1;
-int weather = WEATHER_SUNNY;
-float sungamma = 45.0;
+// joystick constants
+const int maxjaxis = 10;
+const int maxjoysticks = 10;
 
-int camera = 0;
+int debug = 1;
+bool multiplayer = false;
+//bool isserver = false;
+
 //float cam.x = 0, cam.y = 0, cam.z = 0
 float camphi = 0, camgamma = 0, camtheta = 0;
 Vector3 cam;
@@ -75,7 +75,7 @@ float sunlight = 1.0, sunlight_dest = 1.0;
 
 float blackout = 0, redout = 0;
 
-int lighting = 1;
+//int lighting = 1;
 
 // pre-defined screen resolutions (x, y, bpp, fullscreen)
 int resolution [4] [4] =
@@ -88,7 +88,7 @@ float nearclippingplane = 0.25; // do NOT lower this!
 
 bool sunblinding = false;
 
-Dirs *dirs;
+//Dirs *dirs;
 Server *server = NULL;
 Client *client = NULL;
 
@@ -96,15 +96,15 @@ Client *client = NULL;
 SDL_Thread *threadnet = NULL;
 #endif*/
 
-int game = GAME_INIT;
+//int game = GAME_INIT;
 
-int loglevel = LOG_MOST;
-int brightness = 0;
-int contrast = 10;
+//int loglevel = LOG_MOST;
+//int brightness = 0;
+//int contrast = 10;
 
 SoundSystem *sound = NULL;
 
-int clouds = 0;
+//int clouds = 0;
 
 Texture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
@@ -1267,7 +1267,7 @@ void switch_quit ()
 {
   lasttime = 0;
   game = GAME_QUIT;
-  save_saveconfig (); // this configuration seems to work => save it
+  conf.saveSaveConfig (); // this configuration seems to work => save it
 }
 
 void switch_game ()
@@ -2566,9 +2566,9 @@ void game_quit ()
   int i;
   volumesound = sound->volumesound;
   volumemusic = sound->volumemusic;
-  save_config ();
-  save_configInterface ();
-  pilots->save (dirs->getSaves ("pilots"));
+  conf.saveConfig ();
+  conf.saveConfigInterface ();
+  pilots->save (dirs.getSaves ("pilots"));
   logging.display ("Pilots saved", LOG_MOST);
   for (i = 0; i < maxlaser; i ++)
     delete (laser [i]);
@@ -2595,7 +2595,7 @@ void game_quit ()
   delete font1;
   delete font2;
   delete space;
-  delete dirs;
+//  delete dirs;
 //  delete gl;
 #ifndef USE_GLUT
 //  SDL_CloseAudio();
@@ -2908,7 +2908,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 
-  char buf [STDSIZE];
+  char buf [4096];
   sprintf (buf, "selectMouse: picks=%d, pickz=%d, shift=%d", mypicks, pickz2, shift);
   logging.display (buf, LOG_ALL);
   return pickz2;
@@ -3329,20 +3329,23 @@ void game_display ()
       if (explosion [i]->ttl > 0)
         l->calcDynamicLight (explosion [i], 50.0F, 100.0F, 2.0F);
     }
-    for (i = 0; i < maxlaser; i ++)
+    if (!day)
     {
-      if (laser [i]->draw)
-        l->calcDynamicLight (laser [i], 15.0F, 75.0F, 5.0F);
-    }
-    for (i = 0; i < maxmissile; i ++)
-    {
-      if (missile [i]->draw)
-        l->calcDynamicLight (missile [i], 15.0F, 75.0F, 5.0F);
-    }
-    for (i = 0; i < maxflare; i ++)
-    {
-      if (flare [i]->draw)
-        l->calcDynamicLight (flare [i], 15.0F, 75.0F, 5.0F);
+      for (i = 0; i < maxlaser; i ++)
+      {
+        if (laser [i]->draw)
+          l->calcDynamicLight (laser [i], 15.0F, 75.0F, 5.0F);
+      }
+      for (i = 0; i < maxmissile; i ++)
+      {
+        if (missile [i]->draw)
+          l->calcDynamicLight (missile [i], 15.0F, 75.0F, 5.0F);
+      }
+      for (i = 0; i < maxflare; i ++)
+      {
+        if (flare [i]->draw)
+          l->calcDynamicLight (flare [i], 15.0F, 75.0F, 5.0F);
+      }
     }
   }
   glEnable (GL_CULL_FACE);
@@ -4120,7 +4123,7 @@ void join_timer (Uint32 dt)
 {
 #ifdef HAVE_SDL_NET
 #ifndef USE_GLUT
-  char buf [STDSIZE];
+  char buf [4096];
   if (client->sock == NULL) client->getServer ("127.0.0.1", "client1");
   else 
   {
@@ -4305,105 +4308,105 @@ void myFirstInit ()
 
   // create textures (OpenGL)
   logging.display ("Loading textures", LOG_ALL);
-  load3ds.setTextureDir (std::string (dirs->getTextures ("")));
-  texgrass = new Texture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
-  texrocks = new Texture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
-  texwater = new Texture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
-  texsand = new Texture (std::string (dirs->getTextures ("sand1.tga")), 0, 1, false);
-  texredsand = new Texture (std::string (dirs->getTextures ("redsand1.tga")), 0, 1, false);
-  texredstone = new Texture (std::string (dirs->getTextures ("redstone2.tga")), 0, 1, false);
-  texgravel1 = new Texture (std::string (dirs->getTextures ("gravel1.tga")), 0, 1, false);
-  texglitter1 = new Texture (std::string (dirs->getTextures ("glitter.tga")), -1, 0, true);
-  textree = new Texture (std::string (dirs->getTextures ("tree1.tga")), -1, 1, true);
-  textreeu = new Texture (std::string (dirs->getTextures ("treeu1.tga")), -1, 1, true);
-  textree2 = new Texture (std::string (dirs->getTextures ("tree2.tga")), -1, 1, true);
-  textreeu2 = new Texture (std::string (dirs->getTextures ("treeu2.tga")), -1, 1, true);
-  textree3 = new Texture (std::string (dirs->getTextures ("tree3.tga")), 3, 1, true);
-  textreeu3 = new Texture (std::string (dirs->getTextures ("treeu3.tga")), 3, 1, true);
-  textree4 = new Texture (std::string (dirs->getTextures ("tree4.tga")), 3, 1, true);
-  textreeu4 = new Texture (std::string (dirs->getTextures ("treeu4.tga")), 3, 1, true);
-  textree5 = new Texture (std::string (dirs->getTextures ("tree5.tga")), -1, 1, true);
-  textreeu5 = new Texture (std::string (dirs->getTextures ("treeu5.tga")), -1, 1, true);
-  texcactus1 = new Texture (std::string (dirs->getTextures ("cactus1.tga")), 3, 1, true);
-  texcactusu1 = new Texture (std::string (dirs->getTextures ("cactusu1.tga")), 3, 1, true);
-  texsmoke = new Texture (std::string (dirs->getTextures ("smoke1.tga")), -1, 1, true);
-  texsmoke2 = new Texture (std::string (dirs->getTextures ("smoke2.tga")), -1, 1, true);
-  texsmoke3 = new Texture (std::string (dirs->getTextures ("smoke3.tga")), 5, 1, true);
-  texsun = new Texture (std::string (dirs->getTextures ("sun2.tga")), -1, 0, true);
-  texmoon = new Texture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
-  texearth = new Texture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
+  load3ds.setTextureDir (std::string (dirs.getTextures ("")));
+  texgrass = new Texture (std::string (dirs.getTextures ("grass1.tga")), 0, 1, false);
+  texrocks = new Texture (std::string (dirs.getTextures ("rocks1.tga")), 0, 1, false);
+  texwater = new Texture (std::string (dirs.getTextures ("water1.tga")), 0, 1, false);
+  texsand = new Texture (std::string (dirs.getTextures ("sand1.tga")), 0, 1, false);
+  texredsand = new Texture (std::string (dirs.getTextures ("redsand1.tga")), 0, 1, false);
+  texredstone = new Texture (std::string (dirs.getTextures ("redstone2.tga")), 0, 1, false);
+  texgravel1 = new Texture (std::string (dirs.getTextures ("gravel1.tga")), 0, 1, false);
+  texglitter1 = new Texture (std::string (dirs.getTextures ("glitter.tga")), -1, 0, true);
+  textree = new Texture (std::string (dirs.getTextures ("tree1.tga")), -1, 1, true);
+  textreeu = new Texture (std::string (dirs.getTextures ("treeu1.tga")), -1, 1, true);
+  textree2 = new Texture (std::string (dirs.getTextures ("tree2.tga")), -1, 1, true);
+  textreeu2 = new Texture (std::string (dirs.getTextures ("treeu2.tga")), -1, 1, true);
+  textree3 = new Texture (std::string (dirs.getTextures ("tree3.tga")), 3, 1, true);
+  textreeu3 = new Texture (std::string (dirs.getTextures ("treeu3.tga")), 3, 1, true);
+  textree4 = new Texture (std::string (dirs.getTextures ("tree4.tga")), 3, 1, true);
+  textreeu4 = new Texture (std::string (dirs.getTextures ("treeu4.tga")), 3, 1, true);
+  textree5 = new Texture (std::string (dirs.getTextures ("tree5.tga")), -1, 1, true);
+  textreeu5 = new Texture (std::string (dirs.getTextures ("treeu5.tga")), -1, 1, true);
+  texcactus1 = new Texture (std::string (dirs.getTextures ("cactus1.tga")), 3, 1, true);
+  texcactusu1 = new Texture (std::string (dirs.getTextures ("cactusu1.tga")), 3, 1, true);
+  texsmoke = new Texture (std::string (dirs.getTextures ("smoke1.tga")), -1, 1, true);
+  texsmoke2 = new Texture (std::string (dirs.getTextures ("smoke2.tga")), -1, 1, true);
+  texsmoke3 = new Texture (std::string (dirs.getTextures ("smoke3.tga")), 5, 1, true);
+  texsun = new Texture (std::string (dirs.getTextures ("sun2.tga")), -1, 0, true);
+  texmoon = new Texture (std::string (dirs.getTextures ("moon1.tga")), 2, 0, true);
+  texearth = new Texture (std::string (dirs.getTextures ("earth.tga")), 0, 0, true);
   // TODO: why doesn't !mipmap work for the flares???
-  texflare1 = new Texture (std::string (dirs->getTextures ("flare1.tga")), -1, 1, true);
-  texflare2 = new Texture (std::string (dirs->getTextures ("flare2.tga")), -1, 1, true);
-  texflare3 = new Texture (std::string (dirs->getTextures ("flare3.tga")), -1, 1, true);
-  texflare4 = new Texture (std::string (dirs->getTextures ("flare4.tga")), -1, 1, true);
-  texcross = new Texture (std::string (dirs->getTextures ("cross.tga")), -1, 1, true);
-  texcross2 = new Texture (std::string (dirs->getTextures ("cross2.tga")), -1, 1, true);
-  texranks = new Texture (std::string (dirs->getTextures ("ranks.tga")), 0, 0, true);
-  texmedals = new Texture (std::string (dirs->getTextures ("medals.tga")), 0, 0, true);
-  texclouds1 = new Texture (std::string (dirs->getTextures ("clouds1.tga")), -1, 1, true);
-  texclouds2 = new Texture (std::string (dirs->getTextures ("clouds2.tga")), 4, 1, true);
-  texclouds3 = new Texture (std::string (dirs->getTextures ("clouds3.tga")), 6, 1, true);
-  texradar1 = new Texture (std::string (dirs->getTextures ("radar2.tga")), -1, 0, true);
-  texradar2 = new Texture (std::string (dirs->getTextures ("radar1.tga")), -1, 0, true);
-  texarrow = new Texture (std::string (dirs->getTextures ("arrow.tga")), -1, 0, true);
+  texflare1 = new Texture (std::string (dirs.getTextures ("flare1.tga")), -1, 1, true);
+  texflare2 = new Texture (std::string (dirs.getTextures ("flare2.tga")), -1, 1, true);
+  texflare3 = new Texture (std::string (dirs.getTextures ("flare3.tga")), -1, 1, true);
+  texflare4 = new Texture (std::string (dirs.getTextures ("flare4.tga")), -1, 1, true);
+  texcross = new Texture (std::string (dirs.getTextures ("cross.tga")), -1, 1, true);
+  texcross2 = new Texture (std::string (dirs.getTextures ("cross2.tga")), -1, 1, true);
+  texranks = new Texture (std::string (dirs.getTextures ("ranks.tga")), 0, 0, true);
+  texmedals = new Texture (std::string (dirs.getTextures ("medals.tga")), 0, 0, true);
+  texclouds1 = new Texture (std::string (dirs.getTextures ("clouds1.tga")), -1, 1, true);
+  texclouds2 = new Texture (std::string (dirs.getTextures ("clouds2.tga")), 4, 1, true);
+  texclouds3 = new Texture (std::string (dirs.getTextures ("clouds3.tga")), 6, 1, true);
+  texradar1 = new Texture (std::string (dirs.getTextures ("radar2.tga")), -1, 0, true);
+  texradar2 = new Texture (std::string (dirs.getTextures ("radar1.tga")), -1, 0, true);
+  texarrow = new Texture (std::string (dirs.getTextures ("arrow.tga")), -1, 0, true);
 
   logging.display ("Loading Fonts", LOG_ALL);
-  font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
-//  font1 = new Font (dirs->getTextures ("font3.tga"), 37, '!', 100);
-  font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
+  font1 = new Font (dirs.getTextures ("font1.tga"), 32, '!', 64);
+//  font1 = new Font (dirs.getTextures ("font3.tga"), 37, '!', 100);
+  font2 = new Font (dirs.getTextures ("font2.tga"), 32, '!', 64);
 
   logging.display ("Loading 3ds models:", LOG_ALL);
   logging.display (" * gl-16.3ds", LOG_ALL);
-  load3ds.import3ds (&model_fig, dirs->getModels ("gl-16.3ds"));
+  load3ds.import3ds (&model_fig, dirs.getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
   logging.display (" * gl-15.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figa, dirs->getModels ("gl-15.3ds"));
+  load3ds.import3ds (&model_figa, dirs.getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
   logging.display (" * gl-14c.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figb, dirs->getModels ("gl-14c.3ds"));
+  load3ds.import3ds (&model_figb, dirs.getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
   logging.display (" * gl-14d.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figc, dirs->getModels ("gl-14d.3ds"));
+  load3ds.import3ds (&model_figc, dirs.getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
   logging.display (" * gl-21b.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figd, dirs->getModels ("gl-21b.3ds"));
+  load3ds.import3ds (&model_figd, dirs.getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
   logging.display (" * gl-21.3ds", LOG_ALL);
-  load3ds.import3ds (&model_fige, dirs->getModels ("gl-21.3ds"));
+  load3ds.import3ds (&model_fige, dirs.getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
   logging.display (" * gl-14b.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figf, dirs->getModels ("gl-14b.3ds"));
+  load3ds.import3ds (&model_figf, dirs.getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
   logging.display (" * gl-14.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figg, dirs->getModels ("gl-14.3ds"));
+  load3ds.import3ds (&model_figg, dirs.getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
   logging.display (" * gl-29.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figh, dirs->getModels ("gl-29.3ds"));
+  load3ds.import3ds (&model_figh, dirs.getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
   model_figh.scaleTexture (0.3, 0.3);
   logging.display (" * gl-50.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figi, dirs->getModels ("gl-50.3ds"));
+  load3ds.import3ds (&model_figi, dirs.getModels ("gl-50.3ds"));
   model_figi.setName ("STORM");
   logging.display (" * transp2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figt, dirs->getModels ("transp2.3ds"));
+  load3ds.import3ds (&model_figt, dirs.getModels ("transp2.3ds"));
   model_figt.setName ("TRANSPORT");
   logging.display (" * transp4.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figu, dirs->getModels ("transp4.3ds"));
+  load3ds.import3ds (&model_figu, dirs.getModels ("transp4.3ds"));
   model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
   float cannoncube = 0.025;
   logging.display (" * cannon1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+  load3ds.import3ds (&model_cannon1, dirs.getModels ("cannon1.3ds"));
   model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
   logging.display (" * cannon1b.3ds", LOG_ALL);
-  load3ds.import3ds (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
+  load3ds.import3ds (&model_cannon1b, dirs.getModels ("cannon1b.3ds"));
   model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
 
   // cannon at night
   logging.display (" * cannon2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_cannon2, dirs->getModels ("cannon2.3ds"));
+  load3ds.import3ds (&model_cannon2, dirs.getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
   model_cannon2.alpha = true;
   for (i = 0; i < 4; i ++)
@@ -4418,7 +4421,7 @@ void myFirstInit ()
   model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
 
   logging.display (" * cannon2b.3ds", LOG_ALL);
-  load3ds.import3ds (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
+  load3ds.import3ds (&model_cannon2b, dirs.getModels ("cannon2b.3ds"));
   model_cannon2b.nolight = true;
   model_cannon2b.alpha = true;
   for (int i2 = 0; i2 < 2; i2 ++)
@@ -4436,125 +4439,125 @@ void myFirstInit ()
   model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
 
   logging.display (" * flare1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_flare1, dirs->getModels ("flare1.3ds"));
+  load3ds.import3ds (&model_flare1, dirs.getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
   model_flare1.nolight = true;
   logging.display (" * chaff1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_chaff1, dirs->getModels ("chaff1.3ds"));
+  load3ds.import3ds (&model_chaff1, dirs.getModels ("chaff1.3ds"));
   model_chaff1.setName ("CHAFF");
   model_chaff1.alpha = true;
   model_chaff1.nolight = true;
   logging.display (" * missile1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile1, dirs->getModels ("missile1.3ds"));
+  load3ds.import3ds (&model_missile1, dirs.getModels ("missile1.3ds"));
   model_missile1.setName ("AAM HS MK1");
   logging.display (" * missile2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile2, dirs->getModels ("missile2.3ds"));
+  load3ds.import3ds (&model_missile2, dirs.getModels ("missile2.3ds"));
   model_missile2.setName ("AAM HS MK2");
   logging.display (" * missile3.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile3, dirs->getModels ("missile3.3ds"));
+  load3ds.import3ds (&model_missile3, dirs.getModels ("missile3.3ds"));
   model_missile3.setName ("AAM HS MK3");
   logging.display (" * missile4.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile4, dirs->getModels ("missile4.3ds"));
+  load3ds.import3ds (&model_missile4, dirs.getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
   logging.display (" * missile5.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile5, dirs->getModels ("missile5.3ds"));
+  load3ds.import3ds (&model_missile5, dirs.getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
   logging.display (" * missile6.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile6, dirs->getModels ("missile6.3ds"));
+  load3ds.import3ds (&model_missile6, dirs.getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
   logging.display (" * missile7.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile7, dirs->getModels ("missile7.3ds"));
+  load3ds.import3ds (&model_missile7, dirs.getModels ("missile7.3ds"));
   model_missile7.setName ("AAM FF MK1");
   logging.display (" * missile8.3ds", LOG_ALL);
-  load3ds.import3ds (&model_missile8, dirs->getModels ("missile8.3ds"));
+  load3ds.import3ds (&model_missile8, dirs.getModels ("missile8.3ds"));
   model_missile8.setName ("AAM FF MK2");
   logging.display (" * flak2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_flak1, dirs->getModels ("flak2.3ds"));
+  load3ds.import3ds (&model_flak1, dirs.getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
   logging.display (" * flarak1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_flarak1, dirs->getModels ("flarak1.3ds"));
+  load3ds.import3ds (&model_flarak1, dirs.getModels ("flarak1.3ds"));
   model_flarak1.setName ("SAM");
   logging.display (" * ship1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_ship1, dirs->getModels ("ship1.3ds"));
+  load3ds.import3ds (&model_ship1, dirs.getModels ("ship1.3ds"));
   model_ship1.setName ("CRUISER");
   logging.display (" * tent1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_tent1, dirs->getModels ("tent1.3ds"));
+  load3ds.import3ds (&model_tent1, dirs.getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
   logging.display (" * gl-117.3ds", LOG_ALL);
-  load3ds.import3ds (&model_gl117, dirs->getModels ("gl-117.3ds"));
+  load3ds.import3ds (&model_gl117, dirs.getModels ("gl-117.3ds"));
   model_gl117.displaylist = false;
   logging.display (" * tank1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_tank1, dirs->getModels ("tank1.3ds"));
+  load3ds.import3ds (&model_tank1, dirs.getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
   logging.display (" * container1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_container1, dirs->getModels ("container1.3ds"));
+  load3ds.import3ds (&model_container1, dirs.getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
   logging.display (" * ship2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_ship2, dirs->getModels ("ship2.3ds"));
+  load3ds.import3ds (&model_ship2, dirs.getModels ("ship2.3ds"));
   model_ship2.setName ("LIGHT DESTROYER");
   logging.display (" * truck1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_truck1, dirs->getModels ("truck1.3ds"));
+  load3ds.import3ds (&model_truck1, dirs.getModels ("truck1.3ds"));
   model_truck1.setName ("TRUCK");
   logging.display (" * truck2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_truck2, dirs->getModels ("truck2.3ds"));
+  load3ds.import3ds (&model_truck2, dirs.getModels ("truck2.3ds"));
   model_truck2.setName ("TRUCK");
   logging.display (" * trsam.3ds", LOG_ALL);
-  load3ds.import3ds (&model_trsam, dirs->getModels ("trsam.3ds"));
+  load3ds.import3ds (&model_trsam, dirs.getModels ("trsam.3ds"));
   model_trsam.setName ("MOBILE SAM");
   logging.display (" * pickup1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_pickup1, dirs->getModels ("pickup1.3ds"));
+  load3ds.import3ds (&model_pickup1, dirs.getModels ("pickup1.3ds"));
   model_pickup1.setName ("PICKUP");
   logging.display (" * pickup2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_pickup2, dirs->getModels ("pickup2.3ds"));
+  load3ds.import3ds (&model_pickup2, dirs.getModels ("pickup2.3ds"));
   model_pickup2.setName ("PICKUP");
   logging.display (" * tank2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_tank2, dirs->getModels ("tank2.3ds"));
+  load3ds.import3ds (&model_tank2, dirs.getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
   model_tank2.scaleTexture (0.5, 0.5);
   logging.display (" * tent4.3ds", LOG_ALL);
-  load3ds.import3ds (&model_tent4, dirs->getModels ("tent4.3ds"));
+  load3ds.import3ds (&model_tent4, dirs.getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
   logging.display (" * hall1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_hall1, dirs->getModels ("hall1.3ds"));
+  load3ds.import3ds (&model_hall1, dirs.getModels ("hall1.3ds"));
   model_hall1.setName ("HALL");
   logging.display (" * hall2.3ds", LOG_ALL);
-  load3ds.import3ds (&model_hall2, dirs->getModels ("hall2.3ds"));
+  load3ds.import3ds (&model_hall2, dirs.getModels ("hall2.3ds"));
   model_hall2.setName ("HALL");
   logging.display (" * oilrig.3ds", LOG_ALL);
-  load3ds.import3ds (&model_oilrig, dirs->getModels ("oilrig.3ds"));
+  load3ds.import3ds (&model_oilrig, dirs.getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
   model_oilrig.alpha = true;
   logging.display (" * egg.3ds", LOG_ALL);
-  load3ds.import3ds (&model_egg, dirs->getModels ("egg.3ds"));
+  load3ds.import3ds (&model_egg, dirs.getModels ("egg.3ds"));
   model_egg.scaleTexture (0.08, 0.08);
   model_egg.setName ("COMPLEX");
   logging.display (" * radar.3ds", LOG_ALL);
-  load3ds.import3ds (&model_radar, dirs->getModels ("radar.3ds"));
+  load3ds.import3ds (&model_radar, dirs.getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
   logging.display (" * mine1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_mine1, dirs->getModels ("mine1.3ds"));
+  load3ds.import3ds (&model_mine1, dirs.getModels ("mine1.3ds"));
   model_mine1.setName ("MINE");
   logging.display (" * aster1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_aster1, dirs->getModels ("aster1.3ds"));
+  load3ds.import3ds (&model_aster1, dirs.getModels ("aster1.3ds"));
   model_aster1.setName ("ASTEROID");
   logging.display (" * base1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_base1, dirs->getModels ("base1.3ds"));
+  load3ds.import3ds (&model_base1, dirs.getModels ("base1.3ds"));
   model_base1.setName ("MOON BASE");
   logging.display (" * barrier.3ds", LOG_ALL);
-  load3ds.import3ds (&model_barrier1, dirs->getModels ("barrier.3ds"));
+  load3ds.import3ds (&model_barrier1, dirs.getModels ("barrier.3ds"));
   model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
   logging.display (" * rubble.3ds", LOG_ALL);
-  load3ds.import3ds (&model_rubble1, dirs->getModels ("rubble.3ds"));
+  load3ds.import3ds (&model_rubble1, dirs.getModels ("rubble.3ds"));
   model_base1.setName ("RUBBLE");
   logging.display (" * depot1.3ds", LOG_ALL);
-  load3ds.import3ds (&model_depot1, dirs->getModels ("depot1.3ds"));
+  load3ds.import3ds (&model_depot1, dirs.getModels ("depot1.3ds"));
   model_depot1.setName ("DEPOT");
   model_depot1.scaleTexture (2, 2);
-  load3ds.import3ds (&model_house1, dirs->getModels ("house1.3ds"));
+  load3ds.import3ds (&model_house1, dirs.getModels ("house1.3ds"));
   model_house1.setName ("HOUSE");
 
   setMissiles (&model_fig);
@@ -4604,7 +4607,7 @@ void myFirstInit ()
   initexplode = 0;
   initexplode1 = 0;
 
-  textitle = new Texture (std::string (dirs->getTextures ("patents.tga")), 0, false, true);
+  textitle = new Texture (std::string (dirs.getTextures ("patents.tga")), 0, false, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -5584,7 +5587,7 @@ void config_test (int argc, char **argv)
   glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
   configinit = true;
 #else // SDL
-  char buf [STDSIZE];
+  char buf [4096];
   logging.display ("Using SDL and GLUT", LOG_MOST);
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
@@ -5644,7 +5647,7 @@ void viewParameters ()
 
 void checkargs (int argc, char **argv)
 {
-  char buf [STDSIZE]; // temp buffer
+  char buf [4096]; // temp buffer
   int i; // temp counter
 
   for (i = 1; i < argc; i ++) // for each arg (argument/parameter)
@@ -7405,13 +7408,14 @@ void createMenu ()
 
 int main (int argc, char **argv)
 {
-  char buf [STDSIZE]; // temp buffer
+  char buf [4096]; // temp buffer
 
   checkargs (argc, argv); // process command line parameters
 
-  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
+//  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
+  dirs.init (argv [0]);
 
-  logging.setFile (dirs->getSaves ("logfile.txt"));
+  logging.setFile (dirs.getSaves ("logfile.txt"));
   logging.setLevel (loglevel);
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
@@ -7423,7 +7427,7 @@ int main (int argc, char **argv)
 
   logging.display ("Getting directory locations", LOG_ALL);
   
-  if (!load_config ()) // try to load conf file (conf.cpp) and validate settings
+  if (!conf.loadConfig ()) // try to load conf file (conf.cpp) and validate settings
   {
     // no conf file found => create new one
     logging.display ("Creating new configuration", LOG_ALL);
@@ -7431,10 +7435,10 @@ int main (int argc, char **argv)
     firststart = true; // enable adjusting quality/view/graphics automatically by the game
   }
 
-  save_config (); // save conf file (validated)
+  conf.saveConfig (); // save conf file (validated)
 
-  load_configInterface (); // load interface settings from conf.interface and validate
-  save_configInterface (); // save interface settings
+  conf.loadConfigInterface (); // load interface settings from conf.interface and validate
+  conf.saveConfigInterface (); // save interface settings
 
   maploader = new MapLoader ();
 
@@ -7445,7 +7449,7 @@ int main (int argc, char **argv)
   client = NULL;
 
   logging.display ("Creating/Loading pilots list", LOG_ALL);
-  pilots = new PilotList (dirs->getSaves ("pilots")); // look at pilots.h
+  pilots = new PilotList (dirs.getSaves ("pilots")); // look at pilots.h
 
 // NO SDL FOUND => USE GLUT ONLY
 #ifdef USE_GLUT
@@ -7523,7 +7527,7 @@ int main (int argc, char **argv)
   {
     if (!setScreen (width, height, bpp, fullscreen))
     {
-      load_saveconfig ();
+      conf.loadSaveConfig ();
       if (!setScreen (width, height, bpp, fullscreen))
       {
         sprintf (buf, "No working display mode %dx%d found.", width, height);
