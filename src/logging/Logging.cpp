@@ -32,6 +32,9 @@
 
 Logging logging;
 
+/* FILE *Logging::displayOut;
+std::string Logging::filename; */
+
 Logging::Logging ()
 {
   displayOut = NULL;
@@ -52,7 +55,7 @@ void Logging::setLevel (int loglevel)
 
 void Logging::setFile (const std::string &filename)
 {
-  this->filename = filename;
+  Logging::filename = filename;
 }
 
 void Logging::displayStream (FILE *stream, const std::string &str, int level)

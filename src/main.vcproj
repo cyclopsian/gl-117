@@ -78,8 +78,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\cygwin\home\Primetime\gl-117\gl-117\src&quot;"
+				AdditionalIncludeDirectories="&quot;C:\cygwin\home\Tom\gl-117\gl-117\src&quot;;&quot;C:\cygwin\home\Primetime\gl-117\gl-117\src&quot;"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
@@ -90,6 +91,7 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
 			<Tool

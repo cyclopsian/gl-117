@@ -23,6 +23,8 @@
 
 #include "Bitmap.h"
 
+#include <assert.h>
+
 BitmapList BitmapFactory::bitmapList = BitmapList ();
 
 Bitmap *BitmapFactory::getBitmap (const std::string &name)
@@ -37,6 +39,7 @@ Bitmap *BitmapFactory::getBitmap (const std::string &name)
   }
   else
   {
+    assert(it->second->data);
     return it->second;
   }
   return 0;

@@ -557,7 +557,7 @@ void Load3ds::loadTextures (Model3d *model)
         }
       }
       
-      model->object [i]->material->texture = new Texture (std::string (str), -1, true, false);
+      model->object [i]->material->texture = new Texture (str, -1, true, false);
 //      if (model->object [i]->material->texture == NULL)
 //        model->object [i]->hasTexture = false;
     }

@@ -135,7 +135,7 @@ void AIObj::missileCount ()
 void AIObj::newinit (int id, int party, int intelligence, int precision, int aggressivity)
 {
   int i;
-  float zoom;
+  float zoom = trafo.scaling.x;
   ai = true;
   this->id = id;
   this->party = party;
@@ -155,8 +155,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     o->setName ("HAWK");
   }
   else*/
-  o = getModel (id);
-  o->cube.set (trafo.scaling);
+//  o = getModel (id);
+//  o->cube.set (trafo.scaling);
+  
+  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
 
   if (id == FIGHTER_FALCON)
   {

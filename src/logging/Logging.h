@@ -46,6 +46,8 @@ const int EXIT_CONTEXT = 5;
 class Logging
 {
   public:
+    FILE *displayOut;
+    std::string filename;
 
     int loglevel; ///< current log/debug level (set to constants LOG_*)
 
@@ -59,9 +61,6 @@ class Logging
     void errorOutOfMemory ();
 
   protected:
-
-    FILE *displayOut;
-    std::string filename;
 };
 
 extern Logging logging;

@@ -203,6 +203,14 @@ SOURCE=.\loadmodel\LoadObj.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\loadmodel\Model3dFactory.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\Model3dFactory.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\loadmodel\TextFileObj.cpp
 # End Source File
 # End Group
@@ -211,11 +219,19 @@ SOURCE=.\loadmodel\TextFileObj.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\loadbitmap\LoadTga.cpp
+SOURCE=.\loadbitmap\Bitmap.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\loadbitmap\LoadTga.h
+SOURCE=.\loadbitmap\Bitmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadbitmap\BitmapFactory.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadbitmap\LoadTga.cpp
 # End Source File
 # End Group
 # Begin Group "landscape"

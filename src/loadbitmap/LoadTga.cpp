@@ -30,11 +30,13 @@
 
 #include "Bitmap.h"
 #include "../config.h" // if WORDS_BIGENDIAN is defined or not
+#include "logging/Logging.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <assert.h>
 
 
 
@@ -118,12 +120,18 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
  
   fp = fopen(im_file, "rb"); 
   if(!fp)
+  {
+    Logging l; // TODO: implement logging
+    l.display("File not found", LOG_ERROR);
+    assert(false);
     return 0;
+  }
 
   // read the footer first 
   fseek (fp, 0L - TGA_FOOTER_LEN, SEEK_END); 
   if (fread (&footer, TGA_FOOTER_LEN, 1, fp) != 1) 
   { 
+    assert(false);
 	  fclose(fp);
 	  return 0; 
   } 
@@ -135,6 +143,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
   // now read the header 
   if (fseek (fp, 0, SEEK_SET) || fread (&header, sizeof (header), 1, fp) != 1)  
   { 
+    assert(false);
     fclose(fp);
     return 0; 
   }
@@ -142,6 +151,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
   // skip over alphanumeric ID field 
   if (header.idLength && fseek (fp, header.idLength, SEEK_CUR)) 
   { 
+    assert(false);
     fclose(fp);
     return 0; 
   } 
@@ -164,6 +174,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
       break; 
 
     default: 
+      assert(false);
       fclose(fp);
       return 0; 
   } 
@@ -173,6 +184,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 
   if( ! ((bpp == 32) || (bpp == 24) || (bpp == 8)) ) 
   { 
+    assert(false);
     fclose(fp);
     return 0;
   } 
@@ -184,6 +196,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
   if ((im_w > 32767) || (im_w < 1) || (im_h > 32767) || (im_h < 1))
   {
     im_w = 0;
+    assert(false);
     fclose(fp);
     return 0;
   }
@@ -201,6 +214,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
     if(!im_data)
     {
 	     im_w = 0;
+       assert(false);
 	     fclose(fp);
 	     return 0;
     }
@@ -219,6 +233,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 	  if(!buf) 
 	  {
       im_w = 0;
+      assert(false);
       fclose(fp);
       return 0;
 	  }
@@ -226,6 +241,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
     // read in the pixel data 
     if( fread(buf, 1, datasize, fp) != datasize) 
     {
+      assert(false);
       fclose(fp);
       return 0;
     }
@@ -417,6 +433,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
         if(!im_data)
         {
           fclose(fp);
+          assert(false);
           free(buf);
           return 0;
         }
@@ -427,7 +444,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 	  free(buf); 
   }
    
-//   fclose(fp);
+  fclose(fp);
   *w=im_w; *h=im_h;
   return (unsigned char*)im_data;
 }
