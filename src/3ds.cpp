@@ -33,7 +33,7 @@ BinaryFile::BinaryFile (char *filename)
   {
     sprintf (buf, "Cannot open file %s", filename);
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   fseek (in, 0, SEEK_END);
   size = ftell (in);
@@ -159,7 +159,7 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   {
     sprintf (message, "Unable to load PRIMARY chuck from file: %s", filename);
     display (message, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   // Load objects recursively
   ProcessNextChunk (model, currentChunk);
@@ -345,6 +345,10 @@ void CLoad3DS::ReadChunk (Chunk *pChunk)
 //  unsigned char buf [10];
   pChunk->bytesRead = file->readUInt16 (&pChunk->ID);
   pChunk->bytesRead += file->readUInt32 (&pChunk->length);
+  if (pChunk->length > 128000)
+  {
+    display ("Chunk length exceeds 128K", LOG_WARN);
+  }
 }
 
 int CLoad3DS::GetString (char *buffer)

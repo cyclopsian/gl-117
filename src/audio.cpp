@@ -113,7 +113,7 @@ void WaveFile::load (char *filename)
   {
     sprintf (buf, "Couldn't load %s: %s", filename, SDL_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   spec.callback = fillrepeat;
   wave = this;
@@ -123,7 +123,7 @@ void WaveFile::load (char *filename)
   {
     sprintf (buf, "SDL_Mixer: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
 #endif
 #endif
@@ -134,19 +134,6 @@ void WaveFile::play ()
 #ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
   SDL_PauseAudio (1);
-/*  if (SDL_GetAudioStatus () == SDL_AUDIO_PLAYING)
-  {
-    SDL_PauseAudio (0);
-  }
-  SDL_CloseAudio ();
-  if (SDL_OpenAudio (&spec, NULL) < 0)
-  {
-    fprintf (stderr, "\nCouldn't open audio: %s", SDL_GetError ());
-    SDL_FreeWAV (sound);
-    exit (2);
-  }
-//  wave = this;
-  SDL_PauseAudio (0);*/
   if (wave != NULL)
   {
     wave->soundpos = 0;
@@ -248,7 +235,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open winner.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
@@ -256,7 +243,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open loser.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
@@ -264,7 +251,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open dark.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
@@ -272,7 +259,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open electro.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
@@ -280,7 +267,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open stars.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
@@ -288,7 +275,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open softtec.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
@@ -296,7 +283,7 @@ SoundSystem::SoundSystem ()
   {
     sprintf (buf, "Cannot open standby.s3m: %s", Mix_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   playtime = 0;
 #endif

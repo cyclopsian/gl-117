@@ -33,7 +33,7 @@ CFile::CFile (char *filename)
   {
     sprintf (buf, "Cannot open file %s", filename);
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   fseek (in, 0, SEEK_END);
   size = ftell (in);

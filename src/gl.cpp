@@ -109,27 +109,6 @@ int GL::genTexture ()
   return 1;
 }
 
-/*  GLuint genTextureAlphaTGA (char *fname, GLenum minFilter, GLenum maxFilter, int alphatype)
-{
-  short x, y;
-  glBindTexture (GL_TEXTURE_2D, 1);
-//    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, maxFilter);
-  FILE *in = fopen (fname, "rb");
-  if (!in) return 0;
-  fseek (in, 12, SEEK_SET);
-  fread (&x, 2, 1, in);
-  fread (&y, 2, 1, in);
-  fseek (in, 58, SEEK_SET);
-  unsigned char *buf = (unsigned char *) malloc (x * y * 4);
-  fread (buf, x * y * 4, 1, in);
-  fclose (in);
-  glTexImage2D (GL_TEXTURE_2D, 0, 4, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-  free (buf);
-  return 1;
-}*/
-
 void GL::enableLinearTexture (int texnum)
 {
   glBindTexture (GL_TEXTURE_2D, texnum);
@@ -176,7 +155,7 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
   {
     sprintf (buf, "Texture %s not found", fname);
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_LOADFILE);
   }
   tex [texnum]->alpha = alpha;
   tex [texnum]->textureID = texnum;

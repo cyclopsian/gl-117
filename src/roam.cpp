@@ -239,7 +239,7 @@ RTriangleList::RTriangleList ()
   if (t == NULL)
   {
     printf ("Out of memory"); fflush (stdout);
-    exit (1);
+    exit (EXIT_ALLOC);
   }
 }
 void RTriangleList::reallocate ()

@@ -84,7 +84,7 @@ Dirs::Dirs (char *arg)
 //    strcpy (path, "d:\\temp\\gl-117\\gl-117\\");
     display ("Binary file has no context to the data files", LOG_FATAL);
     display ("Do not execute from console, just doubleclick", LOG_MOST);
-    exit (100);
+    exit (EXIT_CONTEXT);
   }
   strcpy (textures, path);
   strcpy (music, path);
@@ -152,7 +152,7 @@ Dirs::Dirs (char *arg)
     }
   }
   display ("Binary file has no context to the data files.", LOG_FATAL);
-  exit (100);
+  exit (EXIT_CONTEXT);
 
 found:;
   int bscount = 0;
@@ -177,7 +177,7 @@ found:;
   else
   {
     display ("Binary file has no context to the data files.", LOG_FATAL);
-    exit (100);
+    exit (EXIT_CONTEXT);
   }
 
   }
@@ -222,14 +222,10 @@ found:;
     strcpy (models, myfile);
   }
 #endif
-//    append (saves, "saves");
   append (textures, "textures");
   append (music, "music");
   append (sound, "sounds");
   append (models, "models");
-//printf ("\ntextures: %s ", textures);
-//printf ("\nsaves: %s ", saves);
-//exit (0);
 }
 
 Dirs::~Dirs () {}

@@ -194,6 +194,7 @@ unsigned char* tga_load (char* im_file,int* w,int* h)
 	  {
 	     im_w = 0;
 	     fclose(fp);
+       display ("Out of memory", LOG_FATAL);
 	     return 0;
 	  }
 	
@@ -212,6 +213,7 @@ unsigned char* tga_load (char* im_file,int* w,int* h)
 	  {
 	     im_w = 0;
 	     fclose(fp);
+       display ("Out of memory", LOG_FATAL);
 	     return 0;
 	  }
 	
@@ -431,7 +433,10 @@ flip(DATA32* in, int w, int h)
    
    out = (DATA32*)malloc(w * h * sizeof(DATA32));
    if(!out)
+   {
+      display ("Out of memory", LOG_FATAL);
       return NULL;
+   }
    
    adv = 0; adv2 = w * h;
    

@@ -191,4 +191,11 @@ extern int debuglevel;
 #define STDSIZE 256
 #define PATHSIZE 4096
 
+#define EXIT_NORMAL 0
+#define EXIT_LOADFILE 1
+#define EXIT_INIT 2
+#define EXIT_COMMAND 3
+#define EXIT_ALLOC 4
+#define EXIT_CONTEXT 5
+
 #endif

@@ -2644,7 +2644,7 @@ void game_quit ()
   delete sound;
 #endif
 //  fprintf (stdout, "\n"); fflush (stdout);
-  exit (0);
+  exit (EXIT_NORMAL);
 }
 
 void quit_key (unsigned char key, int x, int y)
@@ -5336,8 +5336,6 @@ void init_reshape ()
 
 void myFirstInit ()
 {
-  int i;
-
   display ("Creating calculation tables", LOG_ALL);
   mathtab_init ();
 
@@ -6181,7 +6179,7 @@ void config_test (int argc, char **argv)
   {
     sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
     display (buf, LOG_FATAL);
-    exit (1);
+    exit (EXIT_INIT);
   }
   configinit = true;
 #endif
@@ -6208,7 +6206,7 @@ void config_test (int argc, char **argv)
   if (valids == -1)
   {
     display ("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.", LOG_FATAL);
-    exit (2);
+    exit (EXIT_INIT);
   }
 
   quality = 0;
@@ -6225,9 +6223,64 @@ void config_test (int argc, char **argv)
 #endif
 }
 
+void viewParameters ()
+{
+  display (" ", LOG_NONE);
+  display ("Usage: gl-117 [-h -v -dLEVEL]", LOG_NONE);
+  display (" ", LOG_NONE);
+  display ("-h: Display this help screen and quit", LOG_NONE);
+  display ("-v: Display version string and quit", LOG_NONE);
+  display ("-dLEVEL: Set debug LEVEL to 0=silent...5=log all", LOG_NONE);
+  display (" ", LOG_NONE);
+}
+
+void checkargs (int argc, char **argv)
+{
+  char buf [STDSIZE];
+  int i;
+  for (i = 1; i < argc; i ++)
+  {
+    if (argv [i] [1] == 'd')
+    {
+      char *ptr = &argv [i] [2];
+      debuglevel = atoi (ptr);
+      if (debuglevel < LOG_NONE || debuglevel > LOG_ALL)
+      {
+        display ("Invalid debug level", LOG_FATAL);
+        viewParameters ();
+        exit (EXIT_COMMAND);
+      }
+      else
+      {
+        sprintf (buf, "Entering debug level %d", debuglevel);
+        display (buf, LOG_MOST);
+      }
+    }
+    else if (argv [i] [1] == 'v')
+    {
+      display (VERSIONSTRING, LOG_NONE);
+      exit (EXIT_NORMAL);
+    }
+    else if (argv [i] [1] == 'h')
+    {
+      viewParameters ();
+      exit (EXIT_NORMAL);
+    }
+    else
+    {
+      display ("Invalid command line parameter", LOG_FATAL);
+      viewParameters ();
+      exit (EXIT_COMMAND);
+    }
+  }
+}
+
 int main (int argc, char **argv)
 {
   char buf [STDSIZE];
+
+  checkargs (argc, argv);
+
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   display (buf, LOG_MOST);
 
@@ -6282,26 +6335,10 @@ int main (int argc, char **argv)
     {
       sprintf (buf, "No working display mode %dx%d found", width, height);
       display (buf, LOG_FATAL);
-      exit (10);
+      exit (EXIT_INIT);
     }
   }
-/*  char gamestr [256];
-  sprintf (gamestr, "%dx%d:%d", width, height, bpp);
-  glutGameModeString (gamestr);
-  if (fullscreen && glutGameModeGet (GLUT_GAME_MODE_POSSIBLE))
-  {
-//    width = 800; height = 600;
-    glutEnterGameMode ();
-  }
-  else
-  {
-    glutInitWindowPosition (0, 0);
-    glutInitWindowSize (width, height);
-    if (glutCreateWindow ("GL-117") == GL_FALSE)
-      exit (1);
-  }*/
 
-//  glutFullScreen ();
   display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
 
@@ -6331,7 +6368,7 @@ int main (int argc, char **argv)
     {
       sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
       display (buf, LOG_FATAL);
-      exit (1);
+      exit (EXIT_INIT);
     }
   atexit (SDL_Quit);
 #ifdef HAVE_SDL_NET
@@ -6340,7 +6377,7 @@ int main (int argc, char **argv)
   {
     sprintf (buf, "SDLNet_Init: %s", SDLNet_GetError ());
     display (buf, LOG_FATAL);
-    exit (2);
+    exit (EXIT_INIT);
   }
   display ("Using SDL_net", LOG_MOST);
 #endif
@@ -6351,7 +6388,7 @@ int main (int argc, char **argv)
     {
       sprintf (buf, "No working display mode %dx%d found", width, height);
       display (buf, LOG_FATAL);
-      exit (10);
+      exit (EXIT_INIT);
     }
   }
 
