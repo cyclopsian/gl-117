@@ -662,7 +662,7 @@ void CLoad3DS::LoadTextures (CModel *model)
         }
       }
       
-      model->object [i]->material->texture = gl->genTextureTGA (str, 0, -1, 1, false);
+      model->object [i]->material->texture = gl->genTextureTGA (str, -1, 1, false);
       if (model->object [i]->material->texture == NULL)
         model->object [i]->hasTexture = false;
     }
@@ -694,7 +694,7 @@ void CLoad3DS::ComputeColors (CModel *model)
           val = c.c [1]; val = val * 2 / 3; c.c [1] = val;
           val = c.c [2]; val = val * 2 / 3; c.c [2] = val;
         }
-        v->color.take (&c);
+        v->color = c;
       }
       else
       {
@@ -759,7 +759,7 @@ void CLoad3DS::Normalize (CModel *model)
       v->vector.z /= sc;
     }
   }
-};
+}
 
 #endif
 

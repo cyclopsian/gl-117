@@ -28,6 +28,8 @@
 
 #include "vertexarray.h" // ok
 
+#include <iostream>
+
 /* Currently models are normalized to the (-1,-1,-1)-(1,1,1) cube and static!
    The model represents the "class" description of a static model's geometry and colors.
    It is "instanciated" using a DynamicObj which has a reference to the model,
@@ -35,46 +37,67 @@
    A model consists of several objects.
    Objects consist of vertices, quads, triangles, and one material. */
 
-// CColor stores color information
+/**
+* CColor stores color information for red, green, blue, alpha, each 0-255.
+* Access is granted directly through array c with c[0]=red, c[1]=green, etc.
+*/
 class CColor
 {
   public:
-  unsigned char c [4]; // color information as vector, 32 bpp (floats would be faster for the vertex arrays)
+  /// color information as vector, 32 bpp (floats would be faster for the vertex arrays)
+  unsigned char c [4];
+  
   CColor ();
-  CColor (CColor *col);
-  CColor (short cr, short cg, short cb);
-  CColor (short cr, short cg, short cb, short ca);
-  ~CColor ();
-  void setColor (CColor *col);
-  void setColor (short cr, short cg, short cb, short ca);
-  void setColor (short cr, short cg, short cb);
-  bool isEqual (CColor *col); // compare colors
-  void take (CColor *col); // copy data from col
+  CColor (const CColor &color);
+  CColor (int red, int green, int blue, int alpha = 255);
+  virtual ~CColor ();
+  
+  void setColor (const CColor &color);
+  void setColor (int red, int green, int blue, int alpha = 255);
+  bool isEqual (const CColor &color) const; // compare colors
+  void operator = (const CColor &color);
 };
 
-// CTexture loads and stores a texture to memory
-// To use a texture, it must be loaded and added to the OpenGL texture list using
-//   gl->genTextureTGA();
-// instead of this class!
+/**
+* CTexture loads and stores a texture to memory.
+* To use a texture, it must be loaded and added to the OpenGL texture list using
+*   gl->genTextureTGA();
+* instead of this class!
+*/
 class CTexture
 {
   public:
-  unsigned char *data; // texture color data as array, 32 bpp (RGBA? => see tga loader)
-  char name [256]; // texture file name
-  bool mipmap; // mipmapping on/off depending on gluBuildMipmaps
-  int textureID; // texture ID of native GL code
-  int width, height;
-  // average values to substitute textured quads by colors for LOD:
-  float texlight; // average of texture's overall brightness
-  float texred; // average of texture's red
-  float texgreen; // average of texture's green
-  float texblue; // average of texture's blue
-  int quality; // texture quality of native GL code
-  bool alpha; // alpha blending necessary
+  /// texture color data as array, 32 bpp (RGBA? => see tga loader)
+  unsigned char *data;
+  /// texture file name
+  std::string name;
+  /// mipmapping on/off depending on gluBuildMipmaps
+  bool mipmap;
+  /// texture ID of native GL code
+  int textureID;
+  /// texture width
+  int width;
+  /// texture height
+  int height;
+  /// average values to substitute textured quads by colors for LOD
+  /// average of texture's overall brightness
+  float texlight;
+  /// average of texture's red
+  float texred;
+  /// average of texture's green
+  float texgreen;
+  /// average of texture's blue
+  float texblue;
+  /// alpha blending necessary?
+  bool alpha;
+  
   CTexture ();
-  ~CTexture ();
-  int loadFromTGA (char *fname, int quality, int alphatype, int mipmap); // called via gl->genTextureTGA()
-  void getColor (CColor *c, int x, int y); // color of a special pixel
+  virtual ~CTexture ();
+  
+  /// loadFromTGA is called via gl->genTextureTGA() to not load the same texture twice
+  bool loadFromTGA (std::string &filename, int alphatype, bool mipmap);
+  /// get color of a special pixel
+  void getColor (CColor *c, int x, int y) const;
 };
 
 // CVector3 stores the components of a 3D vector (x,y,z)

@@ -39,76 +39,79 @@
 
 CColor::CColor ()
 {
-  memset (c, 255, 4 * sizeof (unsigned char));
+  memset (c, 0xFF, 4 * sizeof (unsigned char));
 }
 
-CColor::CColor (CColor *col)
+CColor::CColor (const CColor &color)
 {
-  memcpy (c, col->c, 4 * sizeof (unsigned char));
+  setColor (color);
 }
 
-CColor::CColor (short cr, short cg, short cb)
+CColor::CColor (int red, int green, int blue, int alpha)
 {
-  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255;
+  setColor (red, green, blue, alpha);
 }
 
-CColor::CColor (short cr, short cg, short cb, short ca)
+CColor::~CColor () {}
+
+void CColor::setColor (const CColor &color)
 {
-  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca;
+  memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
 
-CColor::~CColor () {};
-
-void CColor::setColor (CColor *col)
+void CColor::setColor (int red, int green, int blue, int alpha)
 {
-  memcpy (c, col->c, 4 * sizeof (unsigned char));
+  c [0] = (unsigned char) red;
+  c [1] = (unsigned char) green;
+  c [2] = (unsigned char) blue;
+  c [3] = (unsigned char) alpha;
 }
 
-void CColor::setColor (short cr, short cg, short cb, short ca)
+bool CColor::isEqual (const CColor &color) const
 {
-  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = ca;
+  return memcmp (c, color.c, 4 * sizeof (unsigned char)) == 0;
 }
 
-void CColor::setColor (short cr, short cg, short cb)
+void CColor::operator = (const CColor &color)
 {
-  c [0] = cr; c [1] = cg; c [2] = cb; c [3] = 255;
-}
-
-bool CColor::isEqual (CColor *col)
-{
-  return memcmp (c, col->c, 4 * sizeof (unsigned char)) == 0;
-}
-
-void CColor::take (CColor *col)
-{
-  memcpy (c, col->c, 4 * sizeof (unsigned char));
+  memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
 
 
 
 CTexture::CTexture ()
 {
-  texlight = 1.0F; width = 0; height = 0; textureID = -1; data = NULL;
-  texred = 1.0F; texgreen = 1.0F; texblue = 1.0F;
-  mipmap = true; quality = 0;
+  data = NULL;
+  // TODO: name = ...
+  mipmap = true;
+  textureID = -1;
+  width = 0;
+  height = 0;
+  texlight = 1.0F;
+  texred = 1.0F;
+  texgreen = 1.0F;
+  texblue = 1.0F;
+  quality = 0;
+  alpha = false;
 }
 
 CTexture::~CTexture ()
 {
-  if (data != NULL) delete data;
+  if (data != NULL)
+    delete data;
 }
 
-int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) // only 24 bit TGA
+bool CTexture::loadFromTGA (std::string &filename, int alphaprogram, bool mipmap)
 {
   int i, i2;
 
 #ifdef LOADER_TGA_H
-  data = tga_load (fname, &width, &height); // global 32 bpp texture buffer
-  if (!data) return 0;
+  data = tga_load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
+  if (!data) return false;
 #else
   unsigned char skip;
-  FILE *in = fopen (fname, "rb");
-  if (!in) return 0;
+  FILE *in = fopen (filename.c_str (), "rb");
+  if (!in) return false;
   fread (&skip, 1, 1, in);
   fseek (in, 12, SEEK_SET);
   fread (&width, 2, 1, in);
@@ -126,48 +129,49 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
   long texg = 0;
   long texb = 0;
 
+  // analyse texture file
   for (i = 0; i < height; i ++)
     for (i2 = 0; i2 < width; i2 ++)
     {
-      int n2 = (i * width + i2)*4;
+      int n2 = (i * width + i2) * 4;
 
-      texl += (int) data [n2+2] + data [n2+1] + data [n2];
+      texl += (int) data [n2 + 2] + data [n2 + 1] + data [n2];
       texr += (int) data [n2];
       texg += (int) data [n2 + 1];
       texb += (int) data [n2 + 2];
 
-      if (alphatype == 0) // alpha=255 or 0
+      if (alphaprogram == 0) // alpha=255 or 0
       {
         if (data [n2+0] + data [n2+1] + data [n2+2] < 30)
           data [n2+3] = 0;
         else
           data [n2+3] = 255;
       }
-      else if (alphatype == 1) // alpha=maxcolor
+      else if (alphaprogram == 1) // alpha=maxcolor
       {
         int max = (data [n2+0] > data [n2+1] ? data [n2+0] : data [n2+1]);
         max = (max > data [n2+2] ? max : data [n2+2]);
         data [n2+3] = max;
       }
-      else if (alphatype == 2) // alpha=red
+      else if (alphaprogram == 2) // alpha=red
       {
         data [n2+3] = data [n2];
       }
-      else if (alphatype == 3) // alpha=midcolor*6 or 0
+      else if (alphaprogram == 3) // alpha=midcolor*6 or 0
       {
         int test = (data [n2] + data [n2 + 1] + data [n2 + 2]) * 2;
         if (test > 255) test = 255;
         else if (test < 30) test = 0;
         data [n2+3] = (unsigned char) test;
       }
-      else if (alphatype == 4) // alpha=red, color=white
+      else if (alphaprogram == 4) // alpha=red, color=white
       {
         data [n2+3] = data [n2+0];
         data [n2+0] = 255;
         data [n2+1] = 255;
         data [n2+2] = 255;
       }
-      else if (alphatype == 5) // alpha=red*2, color=black
+      else if (alphaprogram == 5) // alpha=red*2, color=black
       {
         int test = data [n2+0] * 2;
         if (test > 255) test = 255;
@@ -176,7 +180,7 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
         data [n2+1] = 0;
         data [n2+2] = 0;
       }
-      else if (alphatype == 6) // alpha=red, color=black
+      else if (alphaprogram == 6) // alpha=red, color=black
       {
         data [n2+3] = data [n2+0];
         data [n2+0] = 0;
@@ -193,24 +197,26 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
   texred = (float) texr / width / height / 256; // average red
   texgreen = (float) texg / width / height / 256; // average green
   texblue = (float) texb / width / height / 256; // average blue
-  strcpy (name, fname);
-  this->quality = quality;
-  this->mipmap = (mipmap != 0);
-  return 1;
+  name = filename;
+  this->mipmap = mipmap;
+  
+  return true;
 }
 
-void CTexture::getColor (CColor *c, int x, int y)
+void CTexture::getColor (CColor *color, int x, int y) const
 {
   if (x < 0) x = (int) -x % width;
   if (y < 0) y = (int) -y % height;
   if (x >= width) x = (int) x % width;
   if (y >= height) y = (int) y % height;
-  int offs = y * width + x;
-  offs <<= 2;
-  c->c [0] = data [offs];
-  c->c [1] = data [offs + 1];
-  c->c [2] = data [offs + 2];
-  c->c [3] = data [offs + 3];
+  
+  int offset = y * width + x;
+  offset <<= 2;
+  
+  color->c [0] = data [offset];
+  color->c [1] = data [offset + 1];
+  color->c [2] = data [offset + 2];
+  color->c [3] = data [offset + 3];
 }
 
 
@@ -348,7 +354,7 @@ void CVertex::take (CVertex *v)
 {
   vector.take (&v->vector);
   normal.take (&v->normal);
-  color.take (&v->color);
+  color = v->color;
   triangles = v->triangles;
 }
 
@@ -524,7 +530,7 @@ int CObject::addVertex (CVertex *w)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    if (w->vector.isEqual (&vertex [i].vector, 1e-3F) && w->color.isEqual (&vertex [i].color)) break;
+    if (w->vector.isEqual (&vertex [i].vector, 1e-3F) && w->color.isEqual (vertex [i].color)) break;
   if (i == numVertices)
   vertex [numVertices ++].take (w);
   return i;

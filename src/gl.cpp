@@ -120,13 +120,13 @@ CTexture *GL::getTextureTGA (char *fname)
   int i;
   for (i = 0; i <= texnum; i ++)
   {
-    if (!strcmp (fname, tex [i]->name)) break;
+    if (!strcmp (fname, tex [i]->name.c_str ())) break;
   }
   if (i <= texnum) return tex [i];
   return NULL;
 }
 
-CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap2, bool alpha)
+CTexture *GL::genTextureTGA (char *fname, int alphatype, int mipmap2, bool alpha)
 {
   char buf [STDSIZE];
   CTexture *mytex;
@@ -137,7 +137,8 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
   texnum ++;
   glBindTexture (GL_TEXTURE_2D, texnum);
   tex [texnum] = new CTexture ();
-  if (!tex [texnum]->loadFromTGA (fname, quality, alphatype, mipmap2))
+  std::string filename = fname;
+  if (!tex [texnum]->loadFromTGA (filename, alphatype, (bool) mipmap2))
   {
     sprintf (buf, "Texture %s not found", fname);
     display (buf, LOG_ERROR);
