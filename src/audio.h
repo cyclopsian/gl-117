@@ -81,6 +81,7 @@ class WaveFile
 #define MUSIC_ELECTRO1 3
 #define MUSIC_STARS1 4
 #define MUSIC_LOSER1 5
+#define MUSIC_SOFTTEC1 6
 
 class SoundSystem
 {

@@ -273,6 +273,13 @@ SoundSystem::SoundSystem ()
     exit (1);
   }
   Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
+  if (music1 == NULL)
+  {
+    fprintf (stderr, "\nCannot open softtec.s3m: %s", Mix_GetError ()); fflush (stderr);
+    exit (1);
+  }
+  Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
   if (music1 == NULL)
   {
@@ -464,6 +471,9 @@ void SoundSystem::loadMusic (int sample)
       break;
     case MUSIC_STARS1:
       music1 = Mix_LoadMUS (dirs->getMusic ("stars.s3m"));
+      break;
+    case MUSIC_SOFTTEC1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("softtec.s3m"));
       break;
   }
 #endif
