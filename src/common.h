@@ -149,6 +149,8 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
   #define KEY_RIGHT GLUT_KEY_RIGHT
   #define KEY_PGUP GLUT_KEY_PAGE_UP
   #define KEY_PGDOWN GLUT_KEY_PAGE_DOWN
+  #define KEY_LALT GLUT_KEY_PAGE_UP
+  #define KEY_LCTRL GLUT_KEY_PAGE_DOWN
 #else
   #define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
   #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
@@ -170,6 +172,8 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, m
   #define KEY_RIGHT SDLK_RIGHT
   #define KEY_PGUP SDLK_PAGEUP
   #define KEY_PGDOWN SDLK_PAGEDOWN
+  #define KEY_LALT SDLK_LALT
+  #define KEY_LCTRL SDLK_LCTRL
 #endif
 
 // debug level

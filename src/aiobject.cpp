@@ -595,7 +595,7 @@ void DynamicObj::move ()
 
 //  forcex *= braking; forcez *= braking; forcey *= braking;
   braking = (fabs(ruddereffect)+fabs(elevatoreffect))*realspeed/50;
-  if (easymodel == 2) printf ("\n%f ", 0.9915 - braking);
+//  if (easymodel == 2) printf ("\n%f ", 0.9915 - braking);
   forcex *= 0.9915 - braking; forcez *= 0.9915 - braking; forcey *= 0.9915 - braking;
 
   stop = false;

@@ -1411,9 +1411,11 @@ void game_keyspecialup (int key, int x, int y)
     break;
 #ifdef HAVE_SDL
   case KEY_PGUP:
+  case KEY_LALT:
     fplayer->ruddereffect = 0;
     break;
   case KEY_PGDOWN:
+  case KEY_LCTRL:
     fplayer->ruddereffect = 0;
     break;
 #endif
@@ -1429,25 +1431,23 @@ void game_keyspecial (int key, int x, int y)
   }
   switch (key) {
   case KEY_UP:
-//    fplayer->thrustUp ();
-//    sound->play (SOUND_CLICK1);
-    fplayer->elevatoreffect = -0.5;
+    fplayer->elevatoreffect = -1.0;
     break;
   case KEY_DOWN:
-//    fplayer->thrustDown ();
-//    sound->play (SOUND_CLICK1);
     fplayer->elevatoreffect = 1.0;
     break;
   case KEY_LEFT:
-    fplayer->rolleffect = 10;
+    fplayer->rolleffect = 5;
     break;
   case KEY_RIGHT:
-    fplayer->rolleffect = -10;
+    fplayer->rolleffect = -5;
     break;
   case KEY_PGUP:
+  case KEY_LALT:
     fplayer->ruddereffect = 1.0;
     break;
   case KEY_PGDOWN:
+  case KEY_LCTRL:
     fplayer->ruddereffect = -1.0;
     break;
   case KEY_F1:
