@@ -8417,13 +8417,14 @@ void myInit ()
   texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 5, 1, true);
   texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, -1, 1, true);
   texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
-  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 1, true);
-  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 1, true);
+  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 0, true);
+  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 0, true);
   texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, 4, 1, true);
   texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
-  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 1, true);
-  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 1, true);
+  texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
+  texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
+//  texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 1, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
 /*  for (i = 0; i < maxchars; i ++)
   {

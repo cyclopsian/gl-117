@@ -118,6 +118,7 @@ class GLLandscape : public Landscape
   void drawRotatedTree (float x, float y, float htree, float wtree, int phi);
 
   void drawTree (float x, float y, float htree, float wtree, int phi); // two in one
+//  void drawTreeGrid (float x, float y, float htree, float wtree, int phi); // 9 trees in 6 quads
 
   int detail [PARTS] [PARTS]; // LOD
 //  int done [100] [100];
