@@ -1,5 +1,5 @@
 %define name gl-117
-%define version 0.8
+%define version 0.8.2
 
 Summary: An OpenGL and SDL based action flight simulator
 Summary(de): Ein OpenGL- und SDL-basierter Flugsimulator
