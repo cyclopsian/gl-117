@@ -54,6 +54,7 @@ class CTexture
   int width, height;
   float texlight; // average of texture's overall brightness
   int quality; // texture quality of native GL code
+  bool alpha; // alpha blending necessary
   CTexture ();
   int loadFromTGA (char *fname, int quality, int alphatype, int mipmap);
   void getColor (CColor *c, int x, int y);
@@ -193,6 +194,7 @@ class CModel
   int shading;
   int numObjects;
   int numMaterials;
+  bool displaylist; // enable using a display list
   int list1, list2, list3; // display lists already generated for each type of draw() method
   CMaterial *material [100]; // materials, at most 100 (these are only pointers)
   CObject *object [100]; // objects, at most 100 (these are only pointers)
@@ -232,6 +234,21 @@ class CSphere : public CModel
   void init (float radius, int segments);
   void init (float radius, int segments, float dx, float dy, float dz, int randomized);
   void invertNormals (); // point outside/inside
+  void setNorthPoleColor (CColor *c, float w); // see setPoleColor, phi=0, theta=90
+  void setSouthPoleColor (CColor *c, float w);
+  void setPoleColor (int phi, int theta, CColor *c, float w); // shade color over any pole
+};
+
+class CSpherePart : public CModel
+{
+  public:
+  int segments; // segments on lateral angle, doubled for longitudinal angle
+  float radius;
+  CSpherePart ();
+  CSpherePart (float radius, int segments, float phi);
+  ~CSpherePart ();
+  void init (float radius, int segments);
+  void init (float radius, int segments, float phi);
   void setNorthPoleColor (CColor *c, float w); // see setPoleColor, phi=0, theta=90
   void setSouthPoleColor (CColor *c, float w);
   void setPoleColor (int phi, int theta, CColor *c, float w); // shade color over any pole

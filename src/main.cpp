@@ -97,6 +97,7 @@ float getView ()
   return view;
 }
 
+int clouds = 0;
 
 
 
@@ -107,6 +108,8 @@ float getView ()
 
 
 CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+
+CTexture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
 
@@ -447,6 +450,9 @@ Space *space;
 AIObj *fplayer;
 CSpaceObj *sphere;
 CSphere *objsphere;
+//CSpaceObj *csphere;
+//CSpherePart *cloudsphere;
+HighClouds *highclouds;
 
 //GLLandscape *l;
 CModel *obj, *objlaser, *objmissile;
@@ -540,6 +546,7 @@ class Mission
     selweapon [2] = MISSILE_DF1;
     wantweapon = 0;
     textcolor.setColor (255, 255, 0, 128);
+    clouds = 0;
   }
   void playerInit ()
   {
@@ -697,6 +704,7 @@ class MissionDemo1 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 5;
     sungamma = 45;
@@ -764,6 +772,7 @@ class MissionTutorial1 : public Mission
   virtual void start ()
   {
     day = 1;
+    clouds = 2;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -989,6 +998,7 @@ class MissionDogfight1 : public Mission
   {
     int i;
     day = 1;
+    clouds = 2;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
@@ -1109,6 +1119,7 @@ class MissionTransport : public Mission
   {
     int i;
     day = 1;
+    clouds = 1;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
@@ -1187,6 +1198,7 @@ class MissionConvoy : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
@@ -1278,6 +1290,7 @@ class MissionDogfight2 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
@@ -1378,6 +1391,7 @@ class MissionAirBattle : public Mission
   {
     int i;
     day = 1;
+    clouds = 1;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
@@ -1462,6 +1476,7 @@ class MissionGround1 : public Mission
   {
     int i;
     day = 0;
+    clouds = 3;
     weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 40;
@@ -1575,6 +1590,7 @@ class MissionScout : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
@@ -1647,6 +1663,7 @@ class MissionBase : public Mission
   {
     int i, i2;
     day = 0;
+    clouds = 3;
     weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 40;
@@ -1828,6 +1845,7 @@ class MissionDefend1 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 45;
@@ -1924,6 +1942,7 @@ class MissionDogfight3 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 20;
@@ -2027,6 +2046,7 @@ class MissionTank1 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
@@ -2049,7 +2069,7 @@ class MissionTank1 : public Mission
       fighter [i]->maxspeed = 0;
       fighter [i]->speed = 0;
     }
-    for (i = 7; i <= 8; i ++)
+    for (i = 7; i <= 9; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [myrandom (2)];
@@ -2058,7 +2078,7 @@ class MissionTank1 : public Mission
       fighter [i]->tl->z = i * 3;
       fighter [i]->newinit (TANK_AIR1, 0, 50);
     }
-    for (i = 9; i <= 10; i ++)
+    for (i = 10; i <= 12; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [0];
@@ -2117,6 +2137,7 @@ class MissionShip1 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -2202,6 +2223,7 @@ class MissionShip2 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
@@ -2294,6 +2316,7 @@ class MissionShip3 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -2376,6 +2399,7 @@ class MissionCanyon1 : public Mission
   {
     int i, px, py;
     day = 1;
+    clouds = 2;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 15;
@@ -2488,6 +2512,7 @@ class MissionCanyon2 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 40;
@@ -2589,6 +2614,7 @@ class MissionCanyon3 : public Mission
   {
     int i, px, py;
     day = 0;
+    clouds = 3;
     weather = WEATHER_THUNDERSTORM;
     camera = 0;
     sungamma = 45;
@@ -2703,6 +2729,7 @@ class MissionMoonDefense1 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -2788,6 +2815,7 @@ class MissionMoonDogfight1 : public Mission
   virtual void start ()
   {
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -2877,6 +2905,7 @@ class MissionMoonBase1 : public Mission
   {
     int i;
     day = 0;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 50;
@@ -2958,6 +2987,7 @@ class MissionMoon1 : public Mission
   virtual void start ()
   {
     day = 0;
+    clouds = 0;
     weather = WEATHER_CLOUDY;
     camera = 0;
     sungamma = 50;
@@ -3019,6 +3049,7 @@ class MissionMultiDogfight1 : public Mission
   {
     int i;
     day = 1;
+    clouds = 0;
     weather = WEATHER_SUNNY;
     camera = 0;
     sungamma = 25;
@@ -3493,7 +3524,7 @@ class Cockpit
         int aw = fplayer->getAngle (fighter [i]);
         if (aw < 0) aw += 360;
         float d = fplayer->distance (fighter [i]) / 100.0;
-        float px = - d * sine [aw];
+        float px = -d * sine [aw];
         float py = yf + d * cosi [aw];
         if (px >= -1.2 && px <= 1.2 && py >= yf - 1.0 && py <= yf + 1.0)
         {
@@ -4146,6 +4177,11 @@ void game_levelInit ()
     mission->start ();
   }
 
+  if (clouds == 0) highclouds->setTexture (NULL);
+  else if (clouds == 1) highclouds->setTexture (texclouds1);
+  else if (clouds == 2) highclouds->setTexture (texclouds2);
+  else if (clouds == 3) highclouds->setTexture (texclouds3);
+
   for (i = 0; i < maxfighter; i ++)
   {
     if (fighter [i]->id >= FLAK1 && fighter [i]->id <= FLAK2)
@@ -4751,11 +4787,11 @@ void game_key (unsigned char key, int x, int y)
       fplayer->targetNext ((AIObj **) fighter);
       sound->play (SOUND_CLICK1);
     }
-/*    else if (key == 'k')
+    else if (key == 'k')
     {
       if (fplayer->target != NULL)
         fplayer->target->shield = 0;
-    }*/
+    }
 /*    else if (key == 'g')
     {
       if (polygonMode==GL_FILL)
@@ -5014,9 +5050,42 @@ void game_mousemotion (int x, int y)
 //  fplayer->rectheta = (float) (width / 2 - rx) / f;
 //  fplayer->recgamma = 135.0 + (float) (height - ry) / height * 90.0;
 
+// mouse interface code added by Lourens Veen
+  float nx = dx / width; // normalised x-coordinate, -1 at lefthand 
+                         // side of the screen, 1 at righthand side 
+
+  if (fabs(nx) < (1.0f/3.0f)) 
+  if (nx < 0.0f) 
+    fplayer->ruddereffect = 729.0f*nx*(nx+1.0f/3.0f)*(nx+1.0f/3.0f)/4.0f; 
+  else 
+    fplayer->ruddereffect = 729.0f*nx*(nx-1.0f/3.0f)*(nx-1.0f/3.0f)/4.0f; 
+  else 
+    fplayer->ruddereffect = 0.0f; 
+
+  const float roll_deadarea = (1.0f/30.0f); 
+
+  if (fabs(nx) > roll_deadarea) 
+  { 
+    if (nx > 0.0f) nx -= roll_deadarea; 
+    else nx += roll_deadarea; 
+
+    if (nx > 0) 
+      fplayer->rolleffect = -(exp(log(nx) * 1.3f)) * 20.0f; 
+    else 
+      fplayer->rolleffect = (exp(log(-nx) * 1.3f)) * 20.0f; 
+  } 
+  else 
+    fplayer->rolleffect = 0.0f; 
+
+  fplayer->aileroneffect = dy / height * 2.5; 
+  if (fplayer->aileroneffect > 1.0f) 
+    fplayer->aileroneffect = 1.0f; 
+  else if (fplayer->aileroneffect < -0.5f) 
+    fplayer->aileroneffect = -0.5f; 
+
   // innerhalb width/15 und height/15 vom Mittelpunkt aus reagiert nur das Ruder
   // fragt sich, inwieweit height/15 sinnvoll ist... Ruder ist hier für die Feineinstellung
-  if (fabs (dx) <= width / 15 && fabs (dy) <= height / 15)
+/*  if (fabs (dx) <= width / 15 && fabs (dy) <= height / 15)
   {
     fplayer->ruddereffect = (float) dx / width * 15.0; // damit ist automatisch -1<=ruddereffect<=1
     fplayer->rolleffect = 0;
@@ -5035,7 +5104,7 @@ void game_mousemotion (int x, int y)
   if (fplayer->aileroneffect > 1.0)
     fplayer->aileroneffect = 1.0;
   else if (fplayer->aileroneffect < -0.5)
-    fplayer->aileroneffect = -0.5;
+    fplayer->aileroneffect = -0.5;*/
 
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -7044,6 +7113,23 @@ void game_display ()
   gl->foglum = mylight;
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
 
+/*  gl->enableFog (pseudoview);
+  csphere->zoom = 300;
+  float ch = -290 - fplayer->tl->y / 10.0;
+  CVector3 tlsphere (0, ch, 0);
+  csphere->drawGL (tlminf, tlinf, &tlsphere, space->alpha, mylight, true, true);
+  glDisable (GL_FOG);*/
+
+  if (quality >= 1 && clouds > 0)
+  {
+    gl->enableFog (pseudoview);
+    highclouds->zoom = 300;
+    float ch2 = -288 - fplayer->tl->y / 10.0;
+    CVector3 tlsphere2 (0, ch2, 0);
+    highclouds->drawGL (&tlsphere2, fplayer->tl);
+    glDisable (GL_FOG);
+  }
+
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
   {
   if (!day)
@@ -7087,7 +7173,7 @@ void game_display ()
     glRotatef (mycamgamma + sungamma, 1.0, 0.0, 0.0);
 //  glRotatef (-camphi, 0.0, 1.0, 0.0);
   float zf = -11;
-  if (day) zf = -12;
+  if (day) zf = -10;
   if (l->type == LAND_MOON && !day) zf = -8; // diplay bigger earth
   glTranslatef (0, 0, zf);
 /*  if (camera == 0)
@@ -7108,7 +7194,7 @@ void game_display ()
     gl->enableAlphaBlending ();
     glEnable (GL_ALPHA_TEST);
     float alphamax = 0.1;
-    if (day) alphamax = 0.9;
+    if (day) alphamax = 0.1;
     glAlphaFunc (GL_GEQUAL, alphamax);
   //  glDisable (GL_DITHER);
     glBegin (GL_QUADS);
@@ -8249,32 +8335,35 @@ void myInit ()
   if (debug)
     printf ("\n initing landscape"); fflush (stdout);
 
-  texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, 2, 0);
-  texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0);
-  texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0);
+  texsun = gl->genTextureTGA (dirs->getTextures ("sun2.tga"), 1, -1, 0, true);
+  texmoon = gl->genTextureTGA (dirs->getTextures ("moon1.tga"), 1, 2, 0, true);
+  texearth = gl->genTextureTGA (dirs->getTextures ("earth.tga"), 1, 0, 0, true);
 //  texflare = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, 2, 0);
-  texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, -1, 0);
-  texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), 1, -1, 0);
-  texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), 1, -1, 0);
-  texflare4 = gl->genTextureTGA (dirs->getTextures ("flare4.tga"), 1, -1, 0);
-  texgrass = gl->genTextureTGA (dirs->getTextures ("grass1.tga"), 0, 0, 1);
-  texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 0, 1);
-  texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 0, 1);
-  texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 0, 1);
-  texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1);
-  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, 3, 1);
-  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, 3, 1);
-  textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1);
-  textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1);
-  texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1);
-  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, 4, 1);
-  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 4, 1);
-  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 5, 1);
-  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, 2, 1);
+  texflare1 = gl->genTextureTGA (dirs->getTextures ("flare1.tga"), 1, -1, 0, true);
+  texflare2 = gl->genTextureTGA (dirs->getTextures ("flare2.tga"), 1, -1, 0, true);
+  texflare3 = gl->genTextureTGA (dirs->getTextures ("flare3.tga"), 1, -1, 0, true);
+  texflare4 = gl->genTextureTGA (dirs->getTextures ("flare4.tga"), 1, -1, 0, true);
+  texgrass = gl->genTextureTGA (dirs->getTextures ("grass1.tga"), 0, 0, 1, false);
+  texrocks = gl->genTextureTGA (dirs->getTextures ("rocks1.tga"), 0, 0, 1, false);
+  texwater = gl->genTextureTGA (dirs->getTextures ("water1.tga"), 0, 0, 1, false);
+  texsand = gl->genTextureTGA (dirs->getTextures ("sand1.tga"), 0, 0, 1, false);
+  texredstone = gl->genTextureTGA (dirs->getTextures ("redstone2.tga"), 0, 0, 1, false);
+  textree = gl->genTextureTGA (dirs->getTextures ("tree1.tga"), 0, 3, 1, true);
+  textree2 = gl->genTextureTGA (dirs->getTextures ("tree2.tga"), 0, 3, 1, true);
+  textree3 = gl->genTextureTGA (dirs->getTextures ("tree3.tga"), 0, 3, 1, true);
+  textree4 = gl->genTextureTGA (dirs->getTextures ("tree4.tga"), 0, 3, 1, true);
+  texcactus1 = gl->genTextureTGA (dirs->getTextures ("cactus1.tga"), 0, 3, 1, true);
+  texsmoke = gl->genTextureTGA (dirs->getTextures ("smoke1.tga"), 0, 4, 1, true);
+  texsmoke2 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 4, 1, true);
+  texsmoke3 = gl->genTextureTGA (dirs->getTextures ("smoke2.tga"), 0, 5, 1, true);
+  texcross = gl->genTextureTGA (dirs->getTextures ("cross.tga"), 0, 2, 1, true);
 //  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, 2, 1);
-  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1);
-  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 1);
-  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 1);
+  texcross2 = gl->genTextureTGA (dirs->getTextures ("cross2.tga"), 0, -1, 1, true);
+  texranks = gl->genTextureTGA (dirs->getTextures ("ranks.tga"), 0, 0, 1, true);
+  texmedals = gl->genTextureTGA (dirs->getTextures ("medals.tga"), 0, 0, 1, true);
+  texclouds1 = gl->genTextureTGA (dirs->getTextures ("clouds1.tga"), 0, 4, 1, true);
+  texclouds2 = gl->genTextureTGA (dirs->getTextures ("clouds2.tga"), 0, 4, 1, true);
+  texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
 /*  for (i = 0; i < maxchars; i ++)
   {
@@ -8324,6 +8413,26 @@ void myInit ()
 
   if (debug)
     printf ("\n initing sphere"); fflush (stdout);
+
+  highclouds = new HighClouds (25);
+  highclouds->setTexture (texclouds3);
+
+/*  cloudsphere = new CSpherePart (1, 9, 25);
+  CObject *co = cloudsphere->object [0];
+  co->hasTexture = true;
+  co->material = new CMaterial ();
+  co->material->texture = texclouds1;
+  for (int i2 = 0; i2 < co->numVertices; i2 ++)
+  {
+    co->vertex [i2].tex.x = co->vertex [i2].vector.x * 5;
+    co->vertex [i2].tex.y = co->vertex [i2].vector.y * 5;
+  }
+  co->hasTexture = true;
+  cloudsphere->displaylist = false;
+  csphere = new CSpaceObj (cloudsphere, 10.0);
+  csphere->rot->b = 90;
+  csphere->draw = 2;
+  csphere->drawlight = false;*/
 
   objsphere = new CSphere (1, 9, 1, 1, 1);
   sphere = new CSpaceObj (objsphere, 10.0);

@@ -213,8 +213,11 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         currentChunk->bytesRead += fread (model->material [model->numMaterials - 1]->filename, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
         {
           char* str=model->material [model->numMaterials - 1]->filename;
-          while (*str) {
-            if (*str >= 'A' && *str <= 'Z') *str = tolower (*str);
+          while (*str)
+ {
+            if (*str >= 'A' && *str <= 'Z')
+ *str = tolower (*str);
+
             str++;
           }
         }
@@ -420,7 +423,7 @@ void CLoad3DS::LoadTextures (CModel *model)
         }
       }
       
-      model->object [i]->material->texture = gl->genTextureTGA (str, 0, 0, 1);;
+      model->object [i]->material->texture = gl->genTextureTGA (str, 0, 0, 1, false);
     }
   }
 }

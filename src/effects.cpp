@@ -433,7 +433,7 @@ void Font::extractLetters (int height, char start)
 
 Font::Font (char *filename, int height, char start)
 {
-  texture = gl->genTextureTGA (filename, 0, 1, 0);
+  texture = gl->genTextureTGA (filename, 0, 1, 0, true);
   extractLetters (height, start);
 }
 

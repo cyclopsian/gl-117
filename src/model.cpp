@@ -146,6 +146,13 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
         data [n2+1] = 0;
         data [n2+2] = 0;
       }
+      else if (alphatype == 6) // alpha=red, color=black
+      {
+        data [n2+3] = data [n2+0];
+        data [n2+0] = 0;
+        data [n2+1] = 0;
+        data [n2+2] = 0;
+      }
     }
 //  free (buf);
   texlight = (float) texl / width / height / 3 / 256; // average brightness
@@ -413,6 +420,7 @@ CModel::CModel ()
   numObjects = 0;
   numMaterials = 0;
   shading = 0;
+  displaylist = true;
   list1 = -1;
   list2 = -1;
   list3 = -1;
@@ -543,12 +551,12 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list1 == -1 && !explode)
+  if (list1 == -1 && !explode && displaylist)
   {
     listgen = true;
     gl->genList (&list1);
   }
-  if (listgen || explode)
+  if (listgen || explode || !displaylist)
   {
   
     if (shading == 1)
@@ -681,6 +689,11 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
         gl->enableLinearTexture (cm->material->texture->textureID);
       else
         gl->disableLinearTexture (cm->material->texture->textureID);
+      if (cm->material->texture->alpha)
+      {
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
     }
   }
 
@@ -692,12 +705,12 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list2 == -1 && !explode)
+  if (list2 == -1 && !explode && displaylist)
   {
     listgen = true;
     gl->genList (&list2);
   }
-  if (listgen || explode)
+  if (listgen || explode || !displaylist)
   {
 
     if (shading == 1)
@@ -799,6 +812,11 @@ void CModel::draw2 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   }
   else glCallList (list2);
 
+  if (cm->hasTexture)
+    if (cm->material->texture->alpha)
+    {
+      glDisable (GL_BLEND);
+    }
 //  printf ("\n%f,%f %f,%f %f,%f",ix,mx,iy,my,iz,mz); fflush (stdout);
 //  printf ("\n%d,%d",object[0]->numVertices,object[0]->numTriangles); fflush (stdout);
   glPopMatrix ();
@@ -897,12 +915,12 @@ void CModel::draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int
   glScalef (zoom, zoom, zoom);
 
   bool listgen = false;
-  if (list3 == -1 && !explode)
+  if (list3 == -1 && !explode && displaylist)
   {
     listgen = true;
     gl->genList (&list3);
   }
-  if (listgen || explode)
+  if (listgen || explode || !displaylist)
   {
 
     if (shading == 1)
@@ -1150,6 +1168,106 @@ void CSphere::setPoleColor (int phi, int theta, CColor *c, float w)
         object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
     }
   }
+}
+
+
+
+CSpherePart::CSpherePart ()
+{ }
+
+CSpherePart::CSpherePart (float radius, int segments, float phi)
+{ init (radius, segments, phi); }
+
+CSpherePart::~CSpherePart () {}
+
+void CSpherePart::init (float radius, int segments)
+{
+  init (radius, segments, 10);
+}
+
+void CSpherePart::init (float radius, int segments, float phi)
+{
+  CObject *co = new CObject;
+  co->vertex = new CVertex [segments * 4 + 1];
+  co->triangle = new CTriangle [segments];
+  co->quad = new CQuad [segments * 3];
+  this->radius = radius;
+  this->segments = segments;
+  float dx = 1, dy = 1, dz = 1;
+  int p [4];
+//    printf ("\n%d\n", segments); fflush (stdout);
+  float step = 360.0 / segments;
+  float step2 = phi / 4;
+  CRotation *rot = new CRotation ();
+  CVertex *w = new CVertex ();
+  for (float i = 0; i < phi; i += step2)
+    for (float i2 = 0; i2 < 360; i2 += step)
+    {
+      int a = ((int) i) % 360, b = ((int) i2) % 360;
+      float si = rot->getsintab (a), ci = rot->getcostabntab (a);
+      float si2 = rot->getsintab (b), ci2 = rot->getcostabntab (b);
+      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      p [0] = co->addVertex (w);
+      a = ((int) (i + step2)) % 360;
+      si = rot->getsintab (a); ci = rot->getcostabntab (a);
+      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
+      b = ((int) (i2 + step)) % 360;
+      si = rot->getsintab (a); ci = rot->getcostabntab (a);
+      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      if (a < 179) p [2] = co->addVertex (w);
+      a = ((int) i) % 360;
+      si = rot->getsintab (a); ci = rot->getcostabntab (a);
+      si2 = rot->getsintab (b); ci2 = rot->getcostabntab (b);
+      w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
+      p [3] = co->addVertex (w);
+      if (i == 0 || i >= 180 - step2 - 0.2)
+      {
+        if (i == 0) co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]]);
+        else co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [3]]);
+      }
+      else
+      {
+        co->quad [co->numQuads ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]], &co->vertex [p [3]]);
+      }
+//    printf ("\n%d %d %d\n", nv, nr, nt); fflush (stdout);
+    }
+  delete rot;
+  delete w;
+  addObject (co);
+  setColor (new CColor (128, 128, 128, 255));
+/*  for (int i2 = 0; i2 < object [0]->numVertices; i2 ++)
+  {
+    object [0]->vertex [i2].normal.neg ();
+  }*/
+//    printf ("\nnv=%d", nv);
+}
+
+void CSpherePart::setNorthPoleColor (CColor *c, float w)
+{
+  int i, i2;
+  for (i = 0; i < 4; i ++)
+    object [0]->vertex [0].color.c [i] = c->c [i];
+  int num = (int) (w * segments * 4 / 2);
+  num /= (segments * 2);
+  num *= (segments * 2);
+  for (i = 1; i <= num; i ++)
+  {
+    float weight = 1.0F - (float) ((int) ((i - 1) / (segments * 2)) * 4 * 2) / (float) num;
+  //    printf ("i=%d: w=%f (y=%f)\n", i, weight, v[i].v->z);
+    for (i2 = 0; i2 < 4; i2 ++)
+      object [0]->vertex [i].color.c [i2] = (short) ((1.0F - weight) * object [0]->vertex [i].color.c [i2] + weight * c->c [i2]);
+  }
+}
+
+void CSpherePart::setSouthPoleColor (CColor *c, float w)
+{
+}
+
+void CSpherePart::setPoleColor (int phi, int theta, CColor *c, float w)
+{
 }
 
 #endif

@@ -67,7 +67,7 @@ class GL
   void enableLinearTexture (int texnum);
   void disableLinearTexture (int texnum);
   CTexture *getTextureTGA (char *fname);
-  CTexture *genTextureTGA (char *fname, int quality, int alphatype, int mipmap2);
+  CTexture *genTextureTGA (char *fname, int quality, int alphatype, int mipmap2, bool alpha);
   float getTexLight ();
   void enableAntiAliasing ();
   void disableAntiAliasing ();

@@ -161,7 +161,7 @@ CTexture *GL::getTextureTGA (char *fname)
   return NULL;
 }
 
-CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap2)
+CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap2, bool alpha)
 {
   CTexture *mytex;
   if ((mytex = getTextureTGA (fname)) != NULL)
@@ -177,6 +177,7 @@ CTexture *GL::genTextureTGA (char *fname, int quality, int alphatype, int mipmap
     fflush (stderr);
     exit (1);
   }
+  tex [texnum]->alpha = alpha;
   tex [texnum]->textureID = texnum;
   if (quality == 0) disableLinearTexture (texnum);
   else enableLinearTexture (texnum);

@@ -74,4 +74,10 @@ extern bool sunblinding;
 
 const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50;
 
+//#define SIN(x) sine[(int)x]
+//#define COS(x) cosi[(int)x]
+
+#define SIN(x) sin(x*PI/180.0)
+#define COS(x) cos(x*PI/180.0)
+
 #endif

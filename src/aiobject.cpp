@@ -91,7 +91,7 @@ void DynamicObj::dinit ()
 //    controls = false;
   recgamma = 180;
   id = CANNON1;
-  impact = 10;
+  impact = 9;
   source = NULL;
   points = 0;
   party = 0;
@@ -435,10 +435,10 @@ void DynamicObj::move ()
     // change heading and elevation due to ailerons and rudder
     if (maxspeed + speed <= -0.00001 || maxspeed + speed >= 0.00001)
     {
-      phi += vz * sine [(int) theta0] * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
-      gamma += cosi [(int) theta0] * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
-      phi += -vz * cosi [(int) theta0] * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
-      gamma += sine [(int) theta0] * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
+      phi += vz * SIN(theta0) * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
+      gamma += COS(theta0) * aileroneffect * manoeverability * 10.0 * maxspeed / (maxspeed + speed);
+      phi += -vz * COS(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
+      gamma += SIN(theta0) * ruddereffect * manoeverability * 2.0 * maxspeed / (maxspeed + speed);
     }
     // change roll due to roll ;-)
     if (rolleffect)
@@ -476,7 +476,7 @@ void DynamicObj::move ()
     speed -= maxspeed / 60;
 
   // axis pointing through the fighter's nose
-  CVector3 vaxis (cosi [(int) gamma] * sine [(int) phi], sine [(int) gamma], cosi [(int) gamma] * cosi [(int) phi]);
+  CVector3 vaxis (COS(gamma) * SIN(phi), SIN(gamma), COS(gamma) * COS(phi));
 
   // add throttle force
   forcez += speed * vaxis.z;
@@ -486,22 +486,22 @@ void DynamicObj::move ()
   if (id >= FIGHTER1 && id <= FIGHTER1 + 50)
   {
     // lift force
-    int ngamma = (int) gamma + 90; // get normalized gamma (0 <= ngamma < 360)
+    float ngamma = gamma + 90; // get normalized gamma (0 <= ngamma < 360)
     if (ngamma >= 360) ngamma -= 360;
     else if (ngamma < 0) ngamma += 360;
-    CVector3 vx (cosi [ngamma] * sine [(int) phi], sine [ngamma], cosi [ngamma] * cosi [(int) phi]);
+    CVector3 vx (COS(ngamma) * SIN(phi), SIN(ngamma), COS(ngamma) * COS(phi));
     CVector3 x1;
     x1.take (&vx);
-    int mytheta = (int) -theta; // get normalized theta (0 <= mytheta < 360)
+    float mytheta = -theta; // get normalized theta (0 <= mytheta < 360)
     while (mytheta < 0) mytheta += 360;
     while (mytheta >= 360) mytheta -= 360;
-    x1.x *= cosi [mytheta];
-    x1.y *= cosi [mytheta];
-    x1.z *= cosi [mytheta];
+    x1.x *= COS(mytheta);
+    x1.y *= COS(mytheta);
+    x1.z *= COS(mytheta);
     vx.crossproduct (&vaxis);
-    vx.x *= sine [mytheta];
-    vx.y *= sine [mytheta];
-    vx.z *= sine [mytheta];
+    vx.x *= SIN(mytheta);
+    vx.y *= SIN(mytheta);
+    vx.z *= SIN(mytheta);
     vx.add (&x1);
     float addy = speed * vx.x * 0.3;
     if (addy >= -100 && addy <= 100) // valid values??? addy should be < 1.0
@@ -829,7 +829,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxtheta = 3;
     manoeverability = 4.0;
     impact = 20;
-    shield = maxshield = 4500;
+    shield = maxshield = 5500;
     missiles [1] = 200;
   }
   else if (id == SHIP_DESTROYER1)
@@ -958,7 +958,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id == STATIC_COMPLEX1)
   {
-    shield = maxshield = 5800;
+    shield = maxshield = 6500;
     zoom = 2.0;
     impact = 20;
   }
@@ -970,7 +970,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   }
   if (id == ASTEROID)
   {
-    shield = maxshield = 32000;
+    shield = maxshield = 100000;
     zoom = 0.01 * myrandom (60) + 1.0;
     impact = 5;
     speed = 0.18;
@@ -1029,11 +1029,11 @@ AIObj::~AIObj ()
 void AIObj::initValues (DynamicObj *dobj, float phi)
 {
   // Hier bitte exakte Kugelkoordinaten auf Grund von gamma und theta verwenden!
-  dobj->tl->x = tl->x + cosi [(int) gamma] * sine [(int) phi] * zoom;
-  dobj->tl->y = tl->y - sine [(int) gamma] * zoom;
+  dobj->tl->x = tl->x + COS(gamma) * SIN(phi) * zoom;
+  dobj->tl->y = tl->y - SIN(gamma) * zoom;
   if ((id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
     dobj->tl->y += zoom;
-  dobj->tl->z = tl->z + cosi [(int) gamma] * cosi [(int) phi] * zoom;
+  dobj->tl->z = tl->z + COS(gamma) * COS(phi) * zoom;
   dobj->phi = phi;
   dobj->theta = 0;
   dobj->rectheta = dobj->theta;
@@ -1270,9 +1270,9 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
 //    if (ai) // at the moment no smoke for player's fighter
   if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2))
   {
-    float sz = cosi [(int) gamma] * cosi [(int) phi] * zoom * 1.1;
-    float sy = -sine [(int) gamma] * zoom * 1.1;
-    float sx = cosi [(int) gamma] * sine [(int) phi] * zoom * 1.1;
+    float sz = COS(gamma) * COS(phi) * zoom * 1.1;
+    float sy = -SIN(gamma) * zoom * 1.1;
+    float sx = COS(gamma) * SIN(phi) * zoom * 1.1;
     smoke->move ();
     smoke->setSmoke (tl->x - sx - forcex * 0.75, tl->y - sy - forcey * 0.75, tl->z - sz - forcez * 0.75, (int) phi, 16);
     smoke->setSmoke (tl->x - sx - forcex * 0.5, tl->y - sy - forcey * 0.5, tl->z - sz - forcez * 0.5, (int) phi, 17);
@@ -1315,7 +1315,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
       if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
           (tl->y - myheight > 6 && target != NULL && tl->y - myheight < 50/* && !manoeverheight*/))
       {
-        recheight2 = target->tl->y - 8 * target->speed * sine [(int) target->gamma];
+        recheight2 = target->tl->y - 8 * target->speed * SIN(target->gamma);
       }
       else
       {
@@ -1464,7 +1464,7 @@ if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || 
   if (t > 60) t = 60; // higher values will not make sense
   int tt = (int) target->theta;
   if (tt < 0) tt += 360;
-  float newphi = t * sine [tt] * 5.0 * target->manoeverability; // new angle of target after time t
+  float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
   if (newphi > 90) newphi = 90;
   else if (newphi < -90) newphi = -90;
   newphi += (float) target->phi;
@@ -1472,13 +1472,13 @@ if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || 
   if (newphi < 0) newphi += 360;
   if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
   {
-    ex = target->tl->x - sine [(int) newphi] * t * target->realspeed * 0.25; // estimated target position x
-    ez = target->tl->z - cosi [(int) newphi] * t * target->realspeed * 0.25; // estimated target position z
+    ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
+    ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
   }
   else
   {
-    ex = target->tl->x - sine [(int) newphi] * t * target->realspeed * 0.05; // estimated target position x
-    ez = target->tl->z - cosi [(int) newphi] * t * target->realspeed * 0.05; // estimated target position z
+    ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.05; // estimated target position x
+    ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.05; // estimated target position z
   }
   dx2 = ex - tl->x; dz2 = ez - tl->z; // estimated distances
 }
