@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 #include "loadmodel/Model3dRegistry.h"
@@ -62,7 +62,7 @@ void MissionDemo1::start ()
   for (i = 2; i <= 8; i ++)
   {
     objectInit (new Fighter (SwallowDescriptor), 0, 400 - i * 20, i);
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = i * 20;
     fighter [i]->trafo.translation.z = 0;

@@ -27,7 +27,7 @@
 #include "logging/Logging.h"
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 
 #include <cassert>
 

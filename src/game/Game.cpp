@@ -41,11 +41,11 @@ TODO list:
 #include "game/globals.h"
 #include "menu/Component.h"
 #include "mission/MapLoader.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net/net.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "cockpit/Cockpit.h"
 #include "configuration/Configuration.h"
 #include "mission/Mission.h"
@@ -210,7 +210,23 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.35);
 
-  // Example how to pass the glBegin()...glEnd() code using vertex lists
+  glBegin (GL_QUADS);
+  glColor4ub (255, 255, 255, 200);
+  glTexCoord2f (tx1, ty1);
+  glVertex3f (x, y, z);
+  glTexCoord2f (tx2, ty1);
+  glVertex3f (x + zoom * 2, y, z);
+  glTexCoord2f (tx2, ty2);
+  glVertex3f (x + zoom * 2, y + zoom, z);
+  glTexCoord2f (tx1, ty2);
+  glVertex3f (x, y + zoom, z);
+  glEnd ();
+
+  glDisable (GL_ALPHA_TEST);
+  gl.disableAlphaBlending ();
+  glDisable (GL_TEXTURE_2D);
+  
+// Example how to pass the glBegin()...glEnd() code using vertex lists
 /*  float vertex [sizeof (float) * 9];
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -234,22 +250,6 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   vertex [mz ++] = tx1; vertex [mz ++] = ty2;
 
   glDrawArrays (GL_QUADS, 0, 4);*/
-
-  glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, 200);
-  glTexCoord2f (tx1, ty1);
-  glVertex3f (x, y, z);
-  glTexCoord2f (tx2, ty1);
-  glVertex3f (x + zoom * 2, y, z);
-  glTexCoord2f (tx2, ty2);
-  glVertex3f (x + zoom * 2, y + zoom, z);
-  glTexCoord2f (tx1, ty2);
-  glVertex3f (x, y + zoom, z);
-  glEnd ();
-
-  glDisable (GL_ALPHA_TEST);
-  gl.disableAlphaBlending ();
-  glDisable (GL_TEXTURE_2D);
 }
 
 void drawMedal (float xp, float yp, float zp, int medal, float zoom, int missionid)
@@ -719,7 +719,7 @@ int game_levelInit ()
     }
     else if (fighter [i]->id == MineDescriptor)
     {
-      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 5 + math.random (20);
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 5 + Math::random (20);
     }
     else if (fighter [i]->id == AsteroidDescriptor)
     {
@@ -767,9 +767,9 @@ int game_levelInit ()
 
   for (i = 0; i < star.size (); i ++)
   {
-    star [i]->phi = math.random (360);
-    star [i]->gamma = math.random (85);
-    star [i]->size = 0.6 + 0.15 * math.random (8);
+    star [i]->phi = Math::random (360);
+    star [i]->gamma = Math::random (85);
+    star [i]->size = 0.6 + 0.15 * Math::random (8);
   }
 
   Color skycolor;
@@ -899,7 +899,7 @@ int game_levelInit ()
 
 void playRandomMusic ()
 {
-  int r = math.random (7);
+  int r = Math::random (7);
   if (r == 0)
     sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
@@ -1536,7 +1536,7 @@ void game_quit ()
   volumemusic = sound->volumemusic;
   conf.saveConfig ();
   conf.saveConfigInterface ();
-  pilots->save (dirs.getSaves ("pilots"));
+  pilots->save (Directory::getSaves ("pilots"));
   DISPLAY_INFO("Pilots saved");
   for (i = 0; i < laser.size (); i ++)
     delete (laser [i]);
@@ -1771,7 +1771,7 @@ void myInit ()
 
   for (unsigned i = 0; i < star.size (); i ++)
   {
-    star.push_back (new Star (math.random (360), math.random (85), 0.4 + 0.1 * math.random (8)));
+    star.push_back (new Star (Math::random (360), Math::random (85), 0.4 + 0.1 * Math::random (8)));
   }
 
   cockpit = new Cockpit ();
@@ -1802,7 +1802,7 @@ int inittimer_gl117 = 0;
 void initModel (const UnitDescriptor &desc, const std::string &filename)
 {
   DISPLAY_DEBUG(std::string (" * ").append (desc.name));
-  Model3d *model = Model3dFactory::getModel (dirs.getModels (filename.c_str ()));
+  Model3d *model = Model3dFactory::getModel (Directory::getModels (filename.c_str ()));
   Model3dRegistry::add (desc.name, model);
   UnitDescriptorRegistry::add (desc);
 }
@@ -1820,53 +1820,53 @@ void myFirstInit ()
   // create textures (OpenGL)
   DISPLAY_DEBUG("Loading textures");
   Load3ds load3ds;
-  load3ds.setTextureDir (dirs.getTextures (""));
-  texgrass = new Texture (dirs.getTextures ("grass1.tga"), 0, 1, false);
-  texrocks = new Texture (dirs.getTextures ("rocks1.tga"), 0, 1, false);
-  texwater = new Texture (dirs.getTextures ("water1.tga"), 0, 1, false);
-  texsand = new Texture (dirs.getTextures ("sand1.tga"), 0, 1, false);
-  texredsand = new Texture (dirs.getTextures ("redsand1.tga"), 0, 1, false);
-  texredstone = new Texture (dirs.getTextures ("redstone2.tga"), 0, 1, false);
-  texgravel1 = new Texture (dirs.getTextures ("gravel1.tga"), 0, 1, false);
-  texglitter1 = new Texture (dirs.getTextures ("glitter.tga"), -1, 0, true);
-  textree = new Texture (dirs.getTextures ("tree1.tga"), -1, 1, true);
-  textreeu = new Texture (dirs.getTextures ("treeu1.tga"), -1, 1, true);
-  textree2 = new Texture (dirs.getTextures ("tree2.tga"), -1, 1, true);
-  textreeu2 = new Texture (dirs.getTextures ("treeu2.tga"), -1, 1, true);
-  textree3 = new Texture (dirs.getTextures ("tree3.tga"), 3, 1, true);
-  textreeu3 = new Texture (dirs.getTextures ("treeu3.tga"), 3, 1, true);
-  textree4 = new Texture (dirs.getTextures ("tree4.tga"), 3, 1, true);
-  textreeu4 = new Texture (dirs.getTextures ("treeu4.tga"), 3, 1, true);
-  textree5 = new Texture (dirs.getTextures ("tree5.tga"), -1, 1, true);
-  textreeu5 = new Texture (dirs.getTextures ("treeu5.tga"), -1, 1, true);
-  texcactus1 = new Texture (dirs.getTextures ("cactus1.tga"), 3, 1, true);
-  texcactusu1 = new Texture (dirs.getTextures ("cactusu1.tga"), 3, 1, true);
-  texsmoke = new Texture (dirs.getTextures ("smoke1.tga"), -1, 1, true);
-  texsmoke2 = new Texture (dirs.getTextures ("smoke2.tga"), -1, 1, true);
-  texsmoke3 = new Texture (dirs.getTextures ("smoke3.tga"), 5, 1, true);
-  texsun = new Texture (dirs.getTextures ("sun2.tga"), -1, 0, true);
-  texmoon = new Texture (dirs.getTextures ("moon1.tga"), 2, 0, true);
-  texearth = new Texture (dirs.getTextures ("earth.tga"), 0, 0, true);
+  load3ds.setTextureDir (Directory::getTextures (""));
+  texgrass = new Texture (Directory::getTextures ("grass1.tga"), 0, 1, false);
+  texrocks = new Texture (Directory::getTextures ("rocks1.tga"), 0, 1, false);
+  texwater = new Texture (Directory::getTextures ("water1.tga"), 0, 1, false);
+  texsand = new Texture (Directory::getTextures ("sand1.tga"), 0, 1, false);
+  texredsand = new Texture (Directory::getTextures ("redsand1.tga"), 0, 1, false);
+  texredstone = new Texture (Directory::getTextures ("redstone2.tga"), 0, 1, false);
+  texgravel1 = new Texture (Directory::getTextures ("gravel1.tga"), 0, 1, false);
+  texglitter1 = new Texture (Directory::getTextures ("glitter.tga"), -1, 0, true);
+  textree = new Texture (Directory::getTextures ("tree1.tga"), -1, 1, true);
+  textreeu = new Texture (Directory::getTextures ("treeu1.tga"), -1, 1, true);
+  textree2 = new Texture (Directory::getTextures ("tree2.tga"), -1, 1, true);
+  textreeu2 = new Texture (Directory::getTextures ("treeu2.tga"), -1, 1, true);
+  textree3 = new Texture (Directory::getTextures ("tree3.tga"), 3, 1, true);
+  textreeu3 = new Texture (Directory::getTextures ("treeu3.tga"), 3, 1, true);
+  textree4 = new Texture (Directory::getTextures ("tree4.tga"), 3, 1, true);
+  textreeu4 = new Texture (Directory::getTextures ("treeu4.tga"), 3, 1, true);
+  textree5 = new Texture (Directory::getTextures ("tree5.tga"), -1, 1, true);
+  textreeu5 = new Texture (Directory::getTextures ("treeu5.tga"), -1, 1, true);
+  texcactus1 = new Texture (Directory::getTextures ("cactus1.tga"), 3, 1, true);
+  texcactusu1 = new Texture (Directory::getTextures ("cactusu1.tga"), 3, 1, true);
+  texsmoke = new Texture (Directory::getTextures ("smoke1.tga"), -1, 1, true);
+  texsmoke2 = new Texture (Directory::getTextures ("smoke2.tga"), -1, 1, true);
+  texsmoke3 = new Texture (Directory::getTextures ("smoke3.tga"), 5, 1, true);
+  texsun = new Texture (Directory::getTextures ("sun2.tga"), -1, 0, true);
+  texmoon = new Texture (Directory::getTextures ("moon1.tga"), 2, 0, true);
+  texearth = new Texture (Directory::getTextures ("earth.tga"), 0, 0, true);
   // TODO: why doesn't !mipmap work for the flares???
-  texflare1 = new Texture (dirs.getTextures ("flare1.tga"), -1, 1, true);
-  texflare2 = new Texture (dirs.getTextures ("flare2.tga"), -1, 1, true);
-  texflare3 = new Texture (dirs.getTextures ("flare3.tga"), -1, 1, true);
-  texflare4 = new Texture (dirs.getTextures ("flare4.tga"), -1, 1, true);
-  texcross = new Texture (dirs.getTextures ("cross.tga"), -1, 1, true);
-  texcross2 = new Texture (dirs.getTextures ("cross2.tga"), -1, 1, true);
-  texranks = new Texture (dirs.getTextures ("ranks.tga"), 0, 0, true);
-  texmedals = new Texture (dirs.getTextures ("medals.tga"), 0, 0, true);
-  texclouds1 = new Texture (dirs.getTextures ("clouds1.tga"), -1, 1, true);
-  texclouds2 = new Texture (dirs.getTextures ("clouds2.tga"), 4, 1, true);
-  texclouds3 = new Texture (dirs.getTextures ("clouds3.tga"), 6, 1, true);
-  texradar1 = new Texture (dirs.getTextures ("radar2.tga"), -1, 0, true);
-  texradar2 = new Texture (dirs.getTextures ("radar1.tga"), -1, 0, true);
-  texarrow = new Texture (dirs.getTextures ("arrow.tga"), -1, 0, true);
+  texflare1 = new Texture (Directory::getTextures ("flare1.tga"), -1, 1, true);
+  texflare2 = new Texture (Directory::getTextures ("flare2.tga"), -1, 1, true);
+  texflare3 = new Texture (Directory::getTextures ("flare3.tga"), -1, 1, true);
+  texflare4 = new Texture (Directory::getTextures ("flare4.tga"), -1, 1, true);
+  texcross = new Texture (Directory::getTextures ("cross.tga"), -1, 1, true);
+  texcross2 = new Texture (Directory::getTextures ("cross2.tga"), -1, 1, true);
+  texranks = new Texture (Directory::getTextures ("ranks.tga"), 0, 0, true);
+  texmedals = new Texture (Directory::getTextures ("medals.tga"), 0, 0, true);
+  texclouds1 = new Texture (Directory::getTextures ("clouds1.tga"), -1, 1, true);
+  texclouds2 = new Texture (Directory::getTextures ("clouds2.tga"), 4, 1, true);
+  texclouds3 = new Texture (Directory::getTextures ("clouds3.tga"), 6, 1, true);
+  texradar1 = new Texture (Directory::getTextures ("radar2.tga"), -1, 0, true);
+  texradar2 = new Texture (Directory::getTextures ("radar1.tga"), -1, 0, true);
+  texarrow = new Texture (Directory::getTextures ("arrow.tga"), -1, 0, true);
 
   DISPLAY_DEBUG("Loading Fonts");
-  font1 = new Font (dirs.getTextures ("font1.tga"), 32, '!', 64);
-//  font1 = new Font (dirs.getTextures ("font3.tga"), 37, '!', 100);
-  font2 = new Font (dirs.getTextures ("font2.tga"), 32, '!', 64);
+  font1 = new Font (Directory::getTextures ("font1.tga"), 32, '!', 64);
+//  font1 = new Font (Directory::getTextures ("font3.tga"), 37, '!', 100);
+  font2 = new Font (Directory::getTextures ("font2.tga"), 32, '!', 64);
 
   DISPLAY_DEBUG("Loading 3ds models:");
   
@@ -1888,20 +1888,20 @@ void myFirstInit ()
   // cannon at daylight
   float cannoncube = 0.025;
   DISPLAY_DEBUG(" * cannon1.3ds");
-  model = Model3dFactory::getModel (dirs.getModels ("cannon1.3ds"));
+  model = Model3dFactory::getModel (Directory::getModels ("cannon1.3ds"));
 //  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1", model);
   
   DISPLAY_DEBUG(" * cannon1b.3ds");
-  model = Model3dFactory::getModel (dirs.getModels ("cannon1b.3ds"));
+  model = Model3dFactory::getModel (Directory::getModels ("cannon1b.3ds"));
 //  model->setName ("CANNON");
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1b", model);
 
   // cannon at night
   DISPLAY_DEBUG(" * cannon2.3ds");
-  model = Model3dFactory::getModel (dirs.getModels ("cannon2.3ds"));
+  model = Model3dFactory::getModel (Directory::getModels ("cannon2.3ds"));
   model->nolight = true;
   model->alpha = true;
   for (i = 0; i < 4; i ++)
@@ -1918,7 +1918,7 @@ void myFirstInit ()
   Model3dRegistry::add ("Cannon2", model);
 
   DISPLAY_DEBUG(" * cannon2b.3ds");
-  model = Model3dFactory::getModel (dirs.getModels ("cannon2b.3ds"));
+  model = Model3dFactory::getModel (Directory::getModels ("cannon2b.3ds"));
   model->nolight = true;
   model->alpha = true;
   for (int i2 = 0; i2 < 2; i2 ++)
@@ -2003,7 +2003,7 @@ void myFirstInit ()
   explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
   {
-    explsphere->object [0]->vertex [i].color.set (math.random (100) + 155, math.random (100) + 100, 0, math.random (3) / 2 * 255);
+    explsphere->object [0]->vertex [i].color.set (Math::random (100) + 155, Math::random (100) + 100, 0, Math::random (3) / 2 * 255);
   }
   Model3dRegistry::add (ExplosionDescriptor.name, explsphere);
 
@@ -2043,7 +2043,7 @@ void myFirstInit ()
   initexplode = 0;
   initexplode1 = 0;
 
-  textitle = new Texture (dirs.getTextures ("patents.tga"), 0, false, true);
+  textitle = new Texture (Directory::getTextures ("patents.tga"), 0, false, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -2070,11 +2070,11 @@ void genFireLine ()
   int i, i2;
   for (i = 0; i < maxfx; i ++)
   {
-    heat [maxfy - 1] [i] = math.random (400);
+    heat [maxfy - 1] [i] = Math::random (400);
   }
   for (i = 0; i < 5; i ++)
   {
-    int r = math.random (maxfx - 7) + 3;
+    int r = Math::random (maxfx - 7) + 3;
     for (i2 = -3; i2 <= 3; i2 ++)
     {
       heat [maxfy - 1] [r + i2] = 1200; // insert hot spots at the bottom line
@@ -2092,12 +2092,12 @@ void proceedFire ()
     {
       heat2 [i] [i2] = 0 * heat [i + 1] [i2 - 2] + 4 * heat [i + 1] [i2 - 1] + 16 * heat [i + 1] [i2] + 4 * heat [i + 1] [i2 + 1] + 0 * heat [i + 1] [i2 + 2]; // heat diffusion
       heat2 [i] [i2] += 0 * heat [i] [i2 - 2] + 4 * heat [i] [i2 - 1] + 16 * heat [i] [i2] + 4 * heat [i] [i2 + 1] + 0 * heat [i] [i2 + 2]; // heat diffusion
-	  heat2 [i] [i2] /= 48;
+      heat2 [i] [i2] /= 48;
       heat2 [i] [i2] -= (int) (300.0F / maxfy); // heat sink
       if (heat2 [i] [i2] < 0) heat2 [i] [i2] = 0;
     }
-  memcpy (heat, heat2, maxfx * maxfy * sizeof (int)); // copy back buffer to heat array
 
+  memcpy (heat, heat2, maxfx * maxfy * sizeof (int)); // copy back buffer to heat array
   
   for (i = 0; i < maxfy; i ++)
   {
@@ -2848,8 +2848,8 @@ void checkargs (int argc, char **argv)
     if (argv [i] [1] == 'd') // change log/debug level
     {
       char *ptr = &argv [i] [2];
-      loglevel = atoi (ptr);
-      if (loglevel < LOG_NONE || loglevel > LOG_DEBUG) // look at common.h for the constants
+      Logging::setLevel (static_cast<LogLevel>(atoi (ptr)));
+      if (Logging::loglevel < LOG_NONE || Logging::loglevel > LOG_DEBUG) // look at common.h for the constants
       {
         DISPLAY_FATAL("Invalid debug level");
         viewParameters ();
@@ -2857,7 +2857,7 @@ void checkargs (int argc, char **argv)
       }
       else
       {
-        DISPLAY_INFO(FormatString ("Entering debug level %d", loglevel));
+        DISPLAY_INFO(FormatString ("Entering debug level %d", Logging::loglevel));
       }
     }
     else if (argv [i] [1] == 'v') // display version string
@@ -2991,7 +2991,7 @@ void createMenu ()
   submenu [0]->add (label);
   yf -= yfstep;
 
-  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [pilots->aktpilot]->name);
+  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [pilots->aktpilot]->name.c_str ());
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   submenu [0]->add (label);
@@ -3000,7 +3000,7 @@ void createMenu ()
   for (i = 0; i < 5; i ++)
   {
     if (i < pilots->aktpilots)
-      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1), pilots->pilot [i]->name);
+      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [i]->name.c_str ());
     else
       sprintf (buf, "N/A");
     button = new Button (buf);
@@ -3849,13 +3849,13 @@ int main (int argc, char **argv)
 {
   char buf [4096]; // temp buffer
 
+  Logging::setLevel (LOG_DEBUG);
   checkargs (argc, argv); // process command line parameters
 
 //  dirs = new Dirs (argv [0]); // get data directory (DATADIR, defined via autoconf)
-  dirs.init (argv [0]);
+  Directory::init (argv [0]);
 
-  logging.setFile (dirs.getSaves ("logfile.txt"));
-  logging.setLevel (loglevel);
+  Logging::setFile (Directory::getSaves ("logfile.txt"));
 
   sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   DISPLAY_INFO(buf);
@@ -3888,7 +3888,7 @@ int main (int argc, char **argv)
   client = NULL;
 
   DISPLAY_DEBUG("Creating/Loading pilots list");
-  pilots = new PilotList (dirs.getSaves ("pilots")); // look at pilots.h
+  pilots = new PilotList (Directory::getSaves ("pilots")); // look at pilots.h
 
   gamestate = &stateinit;
 

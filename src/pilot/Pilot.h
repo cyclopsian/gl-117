@@ -27,6 +27,7 @@
 #define SAVEVERSION "GL117_S1"
 
 #include <stdio.h>
+#include <string>
 
 const int maxpilotdata = 100;
 
@@ -49,20 +50,20 @@ class TeamPilot
   public:
 
     int ranking;         ///< 0=lowest ranking
-    char name [100];     ///< pilot nickname
-    char fullname [100]; ///< pilot full name
+    std::string name;     ///< pilot nickname
+    std::string fullname; ///< pilot full name
     int intelligence;    ///< intelligence, knowledge on piloting and manoevers
     int precision;       ///< precision, reaction
     int aggressivity;    ///< stay close behind the enemy, more firing tolerance
     int fighterkills;    ///< number of fighter kills for the pilot ranking
 
-    TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills);
+    TeamPilot (int ranking, const std::string &name, int intelligence, int precision, int aggressivity, int fighterkills);
 
     void flyMission (int averagekills);
-    char *getRank ();
-    char *getShortRank ();
-    char *getName ();
-    char *getShortName ();
+    std::string getRank ();
+    std::string getShortRank ();
+    std::string getName ();
+    std::string getShortName ();
     void load (FILE *in);
     void save (FILE *out);
 };
@@ -74,7 +75,7 @@ class Pilot
 {
   public:
 
-    char name [16];
+    std::string name;
     int mission_state [maxpilotdata];  ///< success/failure
     int mission_time [maxpilotdata];   ///< time spent on the mission
     int mission_fighterkills [maxpilotdata];
@@ -87,13 +88,13 @@ class Pilot
     int ranking;    ///< current ranking (calculated due to all scores)
     TeamPilot **tp; ///< team pilots
 
-    Pilot (char *name);
+    Pilot (const std::string &name);
     ~Pilot ();
 
     void load ();
     void save ();
-    char *getRank (int lomissionid, int himissionid);
-    char *getShortRank (int lomissionid, int himissionid);
+    std::string getRank (int lomissionid, int himissionid);
+    std::string getShortRank (int lomissionid, int himissionid);
 };
 
 const int maxpilots = 5;
@@ -109,13 +110,13 @@ class PilotList
     int aktpilot;
     Pilot *pilot [maxpilots];
 
-    PilotList (char *fname);
+    PilotList (const std::string &fname);
     ~PilotList ();
 
-    void load (char *fname);
-    void save (char *fname);
+    void load (const std::string &fname);
+    void save (const std::string &fname);
     void rm ();
-    void add (char *name);
+    void add (const std::string &name);
 };
 
 #endif

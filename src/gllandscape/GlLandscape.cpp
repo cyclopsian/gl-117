@@ -22,7 +22,7 @@
 #ifndef IS_GLLANDSCAPE_H
 
 #include "GlLandscape.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "opengl/GlPrimitives.h"
 #include "logging/Logging.h"
 #include "loadmodel/Model3dRegistry.h"
@@ -2083,7 +2083,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   for (i = 0; i < parts; i ++)
     for (i2 = 0; i2 < parts; i2 ++)
     {
-      float d = math.dist (mp - i, mp - i2);
+      float d = Math::distance (mp - i, mp - i2);
       detail [i] [i2] = (int) (d * 200.0F / view); // do not use pseudoview
     }
 
@@ -2940,7 +2940,7 @@ GlLandscape::GlLandscape (int type, int *heightmask)
       }
       if (type == 0 || type == 2)
       {
-        int lakes = math.random (20) + 20;
+        int lakes = Math::random (20) + 20;
         genLake (lakes);
         genLake (lakes / 3);
         genLake (lakes / 4);
@@ -3147,8 +3147,8 @@ GlLandscape::GlLandscape (int type, int *heightmask)
   while (i < 256)
   {
     bool again = false;
-    xtree [i] = -0.48 + 0.001 * math.random (960);
-    ytree [i] = -0.48 + 0.001 * math.random (960);
+    xtree [i] = -0.48 + 0.001 * Math::random (960);
+    ytree [i] = -0.48 + 0.001 * Math::random (960);
     for (i2 = i - 1; i2 >= 0 && i2 >= i - 6; i2 --)
     {
       if (fabs (xtree [i] - xtree [i2]) + fabs (ytree [i] - ytree [i2]) < 0.08)

@@ -338,16 +338,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="math"
-			Filter="*.*">
-			<File
-				RelativePath=".\math\Math.cpp">
-			</File>
-			<File
-				RelativePath=".\math\Math.h">
-			</File>
-		</Filter>
-		<Filter
 			Name="logging"
 			Filter="*">
 			<File
@@ -370,10 +360,10 @@
 				RelativePath=".\configuration\Configuration.h">
 			</File>
 			<File
-				RelativePath=".\configuration\Dirs.cpp">
+				RelativePath=".\configuration\Directory.cpp">
 			</File>
 			<File
-				RelativePath=".\configuration\Dirs.h">
+				RelativePath=".\configuration\Directory.h">
 			</File>
 			<File
 				RelativePath=".\configuration\OptionFile.cpp">
@@ -679,6 +669,12 @@
 		<Filter
 			Name="util"
 			Filter="">
+			<File
+				RelativePath=".\util\Math.cpp">
+			</File>
+			<File
+				RelativePath=".\util\Math.h">
+			</File>
 			<File
 				RelativePath=".\util\StringUtil.cpp">
 			</File>

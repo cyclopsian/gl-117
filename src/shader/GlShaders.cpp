@@ -33,7 +33,7 @@
 
 
 #include "configuration/Configuration.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "game/Game.h"
 extern Dirs dirs;
 
@@ -170,7 +170,7 @@ destroyShaders(GlShaders * _shader)
 
 //----------------------------------------------------------------------
 // TreeShader implementation
-#include "math/Math.h" // access to myrandom()
+#include "util/Math.h" // access to myrandom()
 #include "opengl/GlPrimitives.h"	     // Open GL
 
 static const float hh = (float) 1 / (float) MAXX;
@@ -186,7 +186,7 @@ TreeShader::TreeShader(GlLandscape& _land)
   profile  = cgGLGetLatestProfile(CG_GL_VERTEX);
   cgGLSetOptimalOptions(profile); // optimal Cg compiler options
   treeprog = cgCreateProgramFromFile(g_shaders_context, CG_SOURCE, 
-				     dirs.getShaders("tree.cg"), 
+				     Directory::getShaders("tree.cg"), 
 				     profile, "main", compiler_extra_args);
 
   
@@ -207,8 +207,8 @@ TreeShader::TreeShader(GlLandscape& _land)
   {
     bool again = false;
 
-    xytree [ i ] = 0.001 * math.random (940) ;// - 0.47;
-    xytree [i+1] = 0.001 * math.random (940) ;// - 0.47;
+    xytree [ i ] = 0.001 * Math::random (940) ;// - 0.47;
+    xytree [i+1] = 0.001 * Math::random (940) ;// - 0.47;
     for(i2 = i-2; i2>=0 && i2 >= i-12; i2-=2) {
       // reject positions to close to each other
       if( fabs(xytree[i]-xytree[i2]) + fabs(xytree[i+1]-xytree[i2+1]) < 0.08) {

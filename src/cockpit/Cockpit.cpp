@@ -26,7 +26,7 @@
 #include "game/globals.h"
 #include "cockpit/Cockpit.h"
 #include "pilot/Pilot.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "mission/Mission.h"
 #include "opengl/GlPrimitives.h"
 #include "gllandscape/GlLandscape.h"

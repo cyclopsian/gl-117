@@ -27,7 +27,7 @@
 #include "logging/Logging.h"
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "loadmodel/Model3dRegistry.h"
 #include "util/Util.h"
 
@@ -162,11 +162,11 @@ bool Fighter::fireFlare (std::vector<DynamicObj *> &flare, std::vector<AiObj *> 
             bool hit = false;
             if (easymodel == 1)
             {
-              if (math.random ((int) (currot.theta + 20)) > 50) hit = true;
+              if (Math::random ((int) (currot.theta + 20)) > 50) hit = true;
             }
             else if (easymodel == 2)
             {
-              if (math.random ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
+              if (Math::random ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
@@ -205,11 +205,11 @@ bool Fighter::fireChaff (std::vector<DynamicObj *> &chaff, std::vector<AiObj *> 
             bool hit = false;
             if (easymodel == 1)
             {
-              if (math.random ((int) (currot.theta + 20)) > 50) hit = true;
+              if (Math::random ((int) (currot.theta + 20)) > 50) hit = true;
             }
             else if (easymodel == 2)
             {
-              if (math.random ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
+              if (Math::random ((int) (fabs (elevatoreffect) * 90 + 20)) > 50) hit = true;
             }
             if (hit)
             {
@@ -725,7 +725,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *>
             recrot.theta = -90;
             if (manoevertheta <= 0)
             {
-              manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8)); // turn hard left or right
+              manoevertheta = timestep * (100 + Math::random ((400 - intelligence) / 8)); // turn hard left or right
               DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
@@ -789,7 +789,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *>
             recrot.theta = 90;
             if (manoevertheta <= 0)
             {
-              manoevertheta = timestep * (100 + math.random ((400 - intelligence) / 8));
+              manoevertheta = timestep * (100 + Math::random ((400 - intelligence) / 8));
               DISPLAY_DEBUG("Manoever: Turn");
             }
             if (manoeverthrust <= 0)
@@ -882,7 +882,7 @@ void Fighter::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *>
         {
           manoevertheta = 15 * timestep;
           firemissilettl = 10 * timestep;
-          if (math.random (2)) recrot.theta = 90;
+          if (Math::random (2)) recrot.theta = 90;
           else recrot.theta = -90;
           targetNextEnemy (f);
         }

@@ -22,7 +22,7 @@
 #ifndef IS_MODEL3DREGISTRY_H
 
 #include "Model3dRegistry.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 
 #include <cassert>
 

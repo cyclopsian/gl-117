@@ -37,7 +37,7 @@
 #include "loadmodel/Load3ds.h"
 #include "effects/Effects.h"
 #include "sound/SoundSystem.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "pilot/Pilot.h"
 
 extern Font *font1, *font2;

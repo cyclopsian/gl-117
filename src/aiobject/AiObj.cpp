@@ -27,7 +27,7 @@
 #include "logging/Logging.h"
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "loadmodel/Model3dRegistry.h"
 #include "util/Util.h"
 
@@ -258,14 +258,14 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   
 /*  if (id == 200)
   {
-    o = Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
+    o = Model3dFactory::getModel (Directory::getModels ("gl-16.3ds"));
     o->setName ("HAWK");
   }
   else*/
 //  o = getModel (id);
 //  o->cube.set (trafo.scaling);
   
-//  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
+//  o = Model3dFactory::getModel (Directory::getModels ("gl-15.3ds"));
 //  o = Model3dRegistry::get (id.name);
 
 /*  if (id == FalconDescriptor)
@@ -763,7 +763,7 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   if (id == AsteroidDescriptor)
   {
     shield = getPrototype ()->maxshield = 100000;
-    zoom = 0.01 * math.random (60) + 1.0;
+    zoom = 0.01 * Math::random (60) + 1.0;
     getPrototype ()->impact = 5;
     thrust = 0.25;
     getPrototype ()->maxthrust = 0.25;

@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -77,7 +77,7 @@ void MissionMoonBattle::start ()
   for (i = 7; i <= 25; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (7)];
+    fighter [i]->target = fighter [Math::random (7)];
 //    fighter [i]->o = &model_fige;
     fighter [i]->newinit (CrowDescriptor, 0, 450 - i * 10);
     if (i <= 16)

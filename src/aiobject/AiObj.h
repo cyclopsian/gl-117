@@ -35,7 +35,7 @@
 #include "filetokenizer/FileTokenizer.h"
 #include "util/Util.h"
 #include "logging/Logging.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 
 #include <map>
 #include <cassert>

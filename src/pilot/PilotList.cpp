@@ -22,7 +22,7 @@
 #ifndef IS_PILOTS_H
 
 #include "pilot/Pilot.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "logging/Logging.h"
 
 #include <stdio.h>
@@ -31,11 +31,11 @@
 
 
 
-void PilotList::load (char *fname)
+void PilotList::load (const std::string &fname)
 {
   char buf [16];
   int i;
-  FILE *in = fopen (fname, "rb");
+  FILE *in = fopen (fname.c_str (), "rb");
   if (in == NULL)
   {
     DISPLAY_WARN("Could not load saves/pilots");
@@ -59,12 +59,12 @@ void PilotList::load (char *fname)
   fclose (in);
 }
 
-void PilotList::save (char *fname)
+void PilotList::save (const std::string &fname)
 {
   char buf [256];
   int i;
   
-  FILE *out = fopen (fname, "wb");
+  FILE *out = fopen (fname.c_str (), "wb");
   if (out == NULL)
   {
     DISPLAY_WARN("Could not write saves/pilots");
@@ -74,7 +74,7 @@ void PilotList::save (char *fname)
   fwrite (buf, 1, strlen (buf), out);
   for (i = 0; i < aktpilots; i ++)
   {
-    sprintf (buf, "%s\n", pilot [i]->name);
+    sprintf (buf, "%s\n", pilot [i]->name.c_str ());
     fwrite (buf, 1, strlen (buf), out);
   }
   fclose (out);
@@ -85,7 +85,7 @@ void PilotList::save (char *fname)
   }
 }
 
-PilotList::PilotList (char *fname)
+PilotList::PilotList (const std::string &fname)
 {
   int i;
   for (i = 0; i < maxpilots; i ++)
@@ -114,7 +114,7 @@ void PilotList::rm ()
   if (pilot [aktpilot] != NULL)
   {
     char buf [4096];
-    strcpy (buf, dirs.getSaves (pilot [aktpilot]->name));
+    strcpy (buf, Directory::getSaves (pilot [aktpilot]->name).c_str ());
     remove (buf);
     delete pilot [aktpilot];
     pilot [aktpilot] = NULL;
@@ -127,7 +127,7 @@ void PilotList::rm ()
   aktpilot = 0;
 }
 
-void PilotList::add (char *name)
+void PilotList::add (const std::string &name)
 {
   if (aktpilots >= maxpilots) return;
   aktpilot = aktpilots;

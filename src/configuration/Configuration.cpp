@@ -27,7 +27,7 @@
 #include <ctype.h>
 
 #include "configuration/Configuration.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "logging/Logging.h"
 #include "util/Util.h"
 
@@ -71,7 +71,7 @@ int game = GAME_INIT; // see GAME-constants
 int clouds = 0;
 int camera = 0;
 bool isserver = false;
-int loglevel = LOG_DEBUG;
+//int loglevel = LOG_DEBUG;
 
 // use 0...255 for one byte keys, 256... for special (two byte) beys
 unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
@@ -100,9 +100,9 @@ Configuration::Configuration ()
 void Configuration::saveConfig ()
 {
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs.getSaves ("conf");
-  DISPLAY_INFO(FormatString ("Saving %s ", confname));
-  int ret1 = cf->openOutput (confname);
+  std::string confname = Directory::getSaves ("conf");
+  DISPLAY_INFO(FormatString ("Saving %s ", confname.c_str ()));
+  int ret1 = cf->openOutput (confname.c_str ());
   if (ret1 == 0)
   {
     DISPLAY_ERROR("Could not save configuration");
@@ -155,9 +155,9 @@ void Configuration::saveConfig ()
 void Configuration::saveSaveConfig ()
 {
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs.getSaves ("saveconf");
-  DISPLAY_INFO(FormatString ("Saving %s ", confname));
-  int ret1 = cf->openOutput (confname);
+  std::string confname = Directory::getSaves ("saveconf");
+  DISPLAY_INFO(FormatString ("Saving %s ", confname.c_str ()));
+  int ret1 = cf->openOutput (confname.c_str ());
   if (ret1 == 0)
   {
     DISPLAY_ERROR("Could not save working graphics mode configuration");
@@ -178,9 +178,9 @@ int Configuration::loadConfig ()
 {
   char ret [256];
   char *str;
-  char *confname = dirs.getSaves ("conf");
-  DISPLAY_INFO(FormatString ("Loading %s ", confname));
-  ConfigFile *cf = new ConfigFile (confname);
+  std::string confname = Directory::getSaves ("conf");
+  DISPLAY_INFO(FormatString ("Loading %s ", confname.c_str ()));
+  ConfigFile *cf = new ConfigFile (confname.c_str ());
 
   if (cf->buf [0] == 0) // no file found
   {
@@ -318,7 +318,7 @@ int Configuration::loadSaveConfig ()
 {
   char ret [256];
   char *str;
-  char *confname = dirs.getSaves ("saveconf");
+  const char *confname = Directory::getSaves ("saveconf").c_str ();
   DISPLAY_INFO(FormatString ("Loading %s ", confname));
   ConfigFile *cf = new ConfigFile (confname);
 
@@ -373,9 +373,9 @@ void Configuration::writeJoystick (ConfigFile *cf, char *str, int jn)
 void Configuration::saveConfigInterface ()
 {
   ConfigFile *cf = new ConfigFile ();
-  char *confname = dirs.getSaves ("conf.interface");
-  DISPLAY_INFO(FormatString ("Saving %s ", confname));
-  int ret1 = cf->openOutput (confname);
+  std::string confname = Directory::getSaves ("conf.interface");
+  DISPLAY_INFO(FormatString ("Saving %s ", confname.c_str ()));
+  int ret1 = cf->openOutput (confname.c_str ());
   if (ret1 == 0)
   {
     DISPLAY_ERROR("Could not save interface configuration");
@@ -491,9 +491,9 @@ int Configuration::loadConfigInterface ()
 {
   char ret [256];
   char *str;
-  char *confname = dirs.getSaves ("conf.interface");
-  DISPLAY_INFO(FormatString ("Loading %s ", confname));
-  ConfigFile *cf = new ConfigFile (confname);
+  std::string confname = Directory::getSaves ("conf.interface");
+  DISPLAY_INFO(FormatString ("Loading %s ", confname.c_str ()));
+  ConfigFile *cf = new ConfigFile (confname.c_str ());
 
   str = cf->getString (ret, "key_firecannon");
   key_firecannon = getKey (str, 32);

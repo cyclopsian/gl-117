@@ -31,7 +31,7 @@
 DynamicObjPrototype::DynamicObjPrototype (const UnitDescriptor &desc)
   : UnitPrototype (desc)
 {
-  OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+  OptionFile *file = OptionFileFactory::get (Directory::getUnits (desc.name.c_str ()));
   if (!file->getFloat ("impact", impact))
     impact = 5;
   if (!file->getFloat ("manoeverability", manoeverability))

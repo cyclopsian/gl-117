@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -73,7 +73,7 @@ void MissionMoonDefense1::start ()
     int iy = (i - 2) / 3;
     fighter [i]->trafo.translation.x = ix * 10;
     fighter [i]->trafo.translation.z = iy * 10;
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_flak1;
     fighter [i]->newinit (SacDescriptor, 0, 200);
   }
@@ -83,7 +83,7 @@ void MissionMoonDefense1::start ()
     int iy = (i - 11) / 3;
     fighter [i]->trafo.translation.x = ix * 20 + 40;
     fighter [i]->trafo.translation.z = iy * 20 + 40;
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_mine1;
     fighter [i]->newinit (MineDescriptor, 0, 220);
   }

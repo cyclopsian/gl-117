@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -110,7 +110,7 @@ int MissionCanyon1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  if (fplayer->trafo.translation.y >= fighter [1]->trafo.translation.y && math.dist (fplayer->trafo.translation.x - fighter [1]->trafo.translation.x, fplayer->trafo.translation.z - fighter [1]->trafo.translation.z) < 150)
+  if (fplayer->trafo.translation.y >= fighter [1]->trafo.translation.y && Math::distance (fplayer->trafo.translation.x - fighter [1]->trafo.translation.x, fplayer->trafo.translation.z - fighter [1]->trafo.translation.z) < 150)
   {
     for (i = 4; i <= 10; i ++)
     {

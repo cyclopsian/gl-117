@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -74,7 +74,7 @@ void MissionAirBattle::start ()
   for (i = 7; i <= 25; i ++)
   {
     objectInit (new Fighter (CrowDescriptor), 0, 440 - i * 10, i);
-    fighter [i]->target = fighter [math.random (7)];
+    fighter [i]->target = fighter [Math::random (7)];
     if (i <= 13)
     {
       fighter [i]->trafo.translation.x = -i * 5;

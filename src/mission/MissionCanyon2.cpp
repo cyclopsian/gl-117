@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 #include "loadmodel/Model3dRegistry.h"
@@ -78,27 +78,27 @@ void MissionCanyon2::start ()
   for (i = 5; i <= 22; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (5)];
+    fighter [i]->target = fighter [Math::random (5)];
     if (i <= 15)
     {
       fighter [i]->trafo.translation.x = -i * 5;
       fighter [i]->trafo.translation.z = -i * 5;
 //      fighter [i]->o = &model_fige;
-      fighter [i]->newinit (CrowDescriptor, 0, math.random (120) + 260);
+      fighter [i]->newinit (CrowDescriptor, 0, Math::random (120) + 260);
     }
     else if (i <= 19)
     {
       fighter [i]->trafo.translation.x = -i * 8 - 160;
       fighter [i]->trafo.translation.z = -i * 8 - 160;
 //      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (BuzzardDescriptor, 0, math.random (120) + 160);
+      fighter [i]->newinit (BuzzardDescriptor, 0, Math::random (120) + 160);
     }
     else
     {
       fighter [i]->trafo.translation.x = -i * 8 - 240;
       fighter [i]->trafo.translation.z = -i * 8 - 240;
 //      fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
-      fighter [i]->newinit (SwallowDescriptor, 0, math.random (120) + 200);
+      fighter [i]->newinit (SwallowDescriptor, 0, Math::random (120) + 200);
     }
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

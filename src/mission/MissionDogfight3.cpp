@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 #include "loadmodel/Model3dRegistry.h"
@@ -74,7 +74,7 @@ void MissionDogfight3::start ()
   for (i = 4; i <= 8; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (4)];
+    fighter [i]->target = fighter [Math::random (4)];
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
@@ -83,7 +83,7 @@ void MissionDogfight3::start ()
   for (i = 9; i <= 11; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (4)];
+    fighter [i]->target = fighter [Math::random (4)];
 //    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;

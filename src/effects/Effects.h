@@ -29,12 +29,14 @@
 #endif
 
 #include "model3d/Model3d.h" // ok
-#include "math/Math.h" // ok
+#include "util/Math.h" // ok
 
 extern int specialeffects;
 extern int quality;
 
 extern Texture *texsmoke, *texsmoke2, *texsmoke3;
+
+#define MAXSMOKEELEM 40
 
 /**
 * This class adds smoke elements for fighters and missiles.

@@ -34,7 +34,7 @@
 
 ConfigFile::ConfigFile () {}
 
-ConfigFile::ConfigFile (char *fname)
+ConfigFile::ConfigFile (const char *fname)
 {
   char buf2 [4096];
   bool commentmode = false;
@@ -60,30 +60,30 @@ ConfigFile::ConfigFile (char *fname)
   }
 }
 
-char *ConfigFile::skipwhite (char *str)
+const char *ConfigFile::skipwhite (const char *str)
 {
   while (*str == ' ' || *str == '\t')
     str ++;
   return str;
 }
 
-char *ConfigFile::skipnum (char *str)
+const char *ConfigFile::skipnum (const char *str)
 {
   while (*str >= '0' && *str <= '9')
     str ++;
   return str;
 }
 
-char *ConfigFile::skipalphanum (char *str)
+const char *ConfigFile::skipalphanum (const char *str)
 {
   while (*str >= '0' && *str <= 'z')
     str ++;
   return str;
 }
 
-char *ConfigFile::getString (char *dest, char *str)
+char *ConfigFile::getString (char *dest, const char *str)
 {
-  char *strf, *stre;
+  const char *strf, *stre;
   char cmpstr [256];
   int i;
   if (strlen (str) >= 256) { return NULL; }
@@ -111,7 +111,7 @@ char *ConfigFile::getString (char *dest, char *str)
   return dest;
 }
 
-int ConfigFile::getValue (char *str)
+int ConfigFile::getValue (const char *str)
 {
   char res [256];
   getString (res, str);
@@ -119,14 +119,14 @@ int ConfigFile::getValue (char *str)
   return atoi (res);
 }
 
-int ConfigFile::openOutput (char *fname)
+int ConfigFile::openOutput (const char *fname)
 {
   out = fopen (fname, "wb");
   if (out == NULL) return 0;
   return 1;
 }
 
-int ConfigFile::write (char *str1, int n)
+int ConfigFile::write (const char *str1, int n)
 {
   char str [256];
   if (strlen (str1) + 8 > 256) return 0;
@@ -135,7 +135,7 @@ int ConfigFile::write (char *str1, int n)
   return 1;
 }
 
-int ConfigFile::write (char *str1, char c)
+int ConfigFile::write (const char *str1, char c)
 {
   char str [256];
   if (c <= 32 || c >= 97)
@@ -149,7 +149,7 @@ int ConfigFile::write (char *str1, char c)
   return 1;
 }
 
-void ConfigFile::writeText (char *str)
+void ConfigFile::writeText (const char *str)
 {
   fwrite (str, 1, strlen (str), out);
   fwrite ("\n", 1, 1, out);

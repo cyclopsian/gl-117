@@ -25,7 +25,7 @@
 
 #include "SoundSystem.h"
 #include "logging/Logging.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "util/Util.h"
 
 #include <cassert>
@@ -43,7 +43,7 @@ SoundSystem::SoundSystem ()
 #ifndef USE_GLUT
   char buf [4096];
 #ifndef HAVE_SDL_MIXER
-  waveclick1 = new WaveFile (dirs.getSounds ("click1.wav"));
+  waveclick1 = new WaveFile (Directory::getSounds ("click1.wav"));
   if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
   {
     DISPLAY_ERROR(FormatString ("Couldn't open audio: %s, no sound available", SDL_GetError ()));
@@ -68,7 +68,7 @@ SoundSystem::SoundSystem ()
   {
     audio = true;
   }
-  music1 = Mix_LoadMUS (dirs.getMusic ("winner.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("winner.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -76,7 +76,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("loser.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("loser.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -84,7 +84,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("dark.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("dark.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -92,7 +92,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("stars.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("stars.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -100,7 +100,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("ambient.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -108,7 +108,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("standby.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("standby.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -116,7 +116,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("electro.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("electro.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -124,7 +124,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("computa2.xm"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("computa2.xm").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -132,7 +132,7 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   Mix_FreeMusic (music1);
-  music1 = Mix_LoadMUS (dirs.getMusic ("softtec.s3m"));
+  music1 = Mix_LoadMUS (Directory::getMusic ("softtec.s3m").c_str ());
   if (music1 == NULL)
   {
     assert (false);
@@ -142,21 +142,21 @@ SoundSystem::SoundSystem ()
   playtime = 0;
 #endif
   int i;
-  waveexplosion1 = new WaveFile (dirs.getSounds ("explode1.wav"));
-  waveclick1 = new WaveFile (dirs.getSounds ("click1.wav"));
-  wavecannon1 = new WaveFile (dirs.getSounds ("cannon1.wav"));
-  wavemissile1 = new WaveFile (dirs.getSounds ("missile1.wav"));
-  wavethunder1 = new WaveFile (dirs.getSounds ("thunder1.wav"));
+  waveexplosion1 = new WaveFile (Directory::getSounds ("explode1.wav").c_str ());
+  waveclick1 = new WaveFile (Directory::getSounds ("click1.wav").c_str ());
+  wavecannon1 = new WaveFile (Directory::getSounds ("cannon1.wav").c_str ());
+  wavemissile1 = new WaveFile (Directory::getSounds ("missile1.wav").c_str ());
+  wavethunder1 = new WaveFile (Directory::getSounds ("thunder1.wav").c_str ());
   for (i = 0; i < 1; i ++)
   {
     sprintf (buf, "plane%d.wav", i + 1);
-    waveplane [i] = new WaveFile (dirs.getSounds (buf));
+    waveplane [i] = new WaveFile (Directory::getSounds (buf).c_str ());
   }
   engine = 0;
-  wavehit1 = new WaveFile (dirs.getSounds ("hit1.wav"));
-  wavebeep1 = new WaveFile (dirs.getSounds ("beep1.wav"));
-  wavechaff1 = new WaveFile (dirs.getSounds ("chaff1.wav"));
-  wavebeep2 = new WaveFile (dirs.getSounds ("beep2.wav"));
+  wavehit1 = new WaveFile (Directory::getSounds ("hit1.wav").c_str ());
+  wavebeep1 = new WaveFile (Directory::getSounds ("beep1.wav").c_str ());
+  wavechaff1 = new WaveFile (Directory::getSounds ("chaff1.wav").c_str ());
+  wavebeep2 = new WaveFile (Directory::getSounds ("beep2.wav").c_str ());
   wavecannon1->setVolume (50);
   wavemissile1->setVolume (110);
   waveclick1->setVolume (80);
@@ -278,31 +278,31 @@ void SoundSystem::loadMusic (int sample)
   switch (sample)
   {
     case MUSIC_DARK1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("dark.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("dark.s3m").c_str ());
       break;
     case MUSIC_WINNER1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("winner.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("winner.s3m").c_str ());
       break;
     case MUSIC_LOSER1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("loser.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("loser.s3m").c_str ());
       break;
     case MUSIC_STANDBY1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("standby.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("standby.s3m").c_str ());
       break;
     case MUSIC_ELECTRO1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("electro.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("electro.s3m").c_str ());
       break;
     case MUSIC_STARS1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("stars.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("stars.s3m").c_str ());
       break;
     case MUSIC_SOFTTEC1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("softtec.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("softtec.s3m").c_str ());
       break;
     case MUSIC_AMBIENT1:
-      music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("ambient.s3m").c_str ());
       break;
     case MUSIC_COMPUTA2:
-      music1 = Mix_LoadMUS (dirs.getMusic ("computa2.xm"));
+      music1 = Mix_LoadMUS (Directory::getMusic ("computa2.xm").c_str ());
       break;
   }
 #endif

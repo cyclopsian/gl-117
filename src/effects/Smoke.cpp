@@ -33,6 +33,8 @@
 
 Texture *texsmoke, *texsmoke2, *texsmoke3;
 
+#define SMOKEZOOM(i) (2.0F - 1.8F * i / MAXSMOKEELEM) * 0.15F
+
 Smoke::Smoke (int type)
 {
   for (int i = 0; i < MAXSMOKEELEM; i ++)
@@ -72,7 +74,7 @@ void Smoke::move (Uint32 dt, int dec)
 void Smoke::drawElem (int n, float phi, float gamma)
 {
   if (n < 0 || n >= MAXSMOKEELEM) return;
-  float myzoom = math.smokezoom [time [n]];
+  float myzoom = SMOKEZOOM(time [n]);
 
   glPushMatrix ();
   glTranslatef (v [n].x, v [n].y, v [n].z);
@@ -101,7 +103,7 @@ void Smoke::drawElemHQ (int n)
 
   glBegin (GL_QUADS);
   glColor4ub (255, 255, 255, time [n] * 10 + 55);
-  float myzoom = math.smokezoom [time [n]];
+  float myzoom = SMOKEZOOM(time [n]);
   glTexCoord2f (0, 0);
   glVertex3f (v [n].x - myzoom, v [n].y + myzoom, v [n].z);
   glTexCoord2f (1, 0);

@@ -27,7 +27,7 @@
 #include "game/globals.h"
 #include "loadbitmap/Bitmap.h"
 #include "filetokenizer/FileTokenizer.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "gllandscape/GlLandscape.h"
 #include "logging/Logging.h"
 #include "util/Util.h"
@@ -60,7 +60,7 @@ void MapLoader::readMapFile ()
   char token [TOKENLEN];
   mapcount = 0;
 
-  if (!file.open (dirs.getMaps ("maps.txt")))
+  if (!file.open (Directory::getMaps ("maps.txt").c_str ()))
     return;
   
   while (file.nextToken (token, TOKENLEN))
@@ -286,10 +286,10 @@ int MissionCustom::parseMapData ()
     }
     else if (!strcmp (attr, "FILE"))
     {
-      FILE *in = fopen (dirs.getMaps (casevalue), "rb");
+      FILE *in = fopen (Directory::getMaps (casevalue).c_str (), "rb");
       if (in == NULL)
       {
-        error (FormatString ("Cannot open file %s", dirs.getMaps (casevalue)).c_str ());
+        error (FormatString ("Cannot open file %s", Directory::getMaps (casevalue)).c_str ());
       }
       else
       {
@@ -730,7 +730,7 @@ void MissionCustom::init ()
   bool readtoken = true;
 
   reterror = 0;
-  if (!maploader->file.open (dirs.getMaps (maploader->mapfile [id - MISSION_CUSTOM1])))
+  if (!maploader->file.open (Directory::getMaps (maploader->mapfile [id - MISSION_CUSTOM1]).c_str ()))
   {
     error ("Could not open map file");
     return;
@@ -857,11 +857,11 @@ void MissionCustom::start ()
 
     unsigned char *map;
     int mapx, mapy;
-    Bitmap *bitmap = BitmapFactory::getBitmap (dirs.getMaps (mapfile));
+    Bitmap *bitmap = BitmapFactory::getBitmap (Directory::getMaps (mapfile));
     map = bitmap->data;
     mapx = bitmap->width;
     mapy = bitmap->height;
-//    map = LoadTga::load (dirs.getMaps (mapfile), &mapx, &mapy);
+//    map = LoadTga::load (Directory::getMaps (mapfile), &mapx, &mapy);
     if (map == NULL)
     {
       DISPLAY_FATAL("Map has a valid bpp entry but seems to be corrupt");

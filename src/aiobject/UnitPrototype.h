@@ -32,7 +32,7 @@
 #include "model3d/Model3d.h" // ok
 #include "util/Util.h"
 #include "logging/Logging.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 
 #include <map>
 #include <cassert>

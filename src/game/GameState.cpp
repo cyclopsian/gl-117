@@ -30,16 +30,15 @@
 #include "gllandscape/GlLandscape.h"
 #include "mission/Mission.h"
 #include "loadmodel/Model3dRegistry.h"
-
 #include "render/Render.h"
 
 /*#include "menu/Component.h"
 #include "mission/MapLoader.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net/net.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "cockpit/Cockpit.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
@@ -917,9 +916,9 @@ void StateMission::display ()
   }
   
   font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", *col);
-  strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1));
+  strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str ());
   strcat (buf, " ");
-  strcat (buf, pilots->pilot [pilots->aktpilot]->name);
+  strcat (buf, pilots->pilot [pilots->aktpilot]->name.c_str ());
   font2->drawText ((textx + 1.5) / fontscale, (piloty - 0.8) / fontscale, -2, buf, *col);
   drawRank (textx, piloty - 0.8, -2, pilots->pilot [pilots->aktpilot]->ranking, 0.5);
   for (i = 1; i < missionnew->alliedfighters; i ++)
@@ -1148,7 +1147,7 @@ void StateFame::display ()
   for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
     sum += p->mission_fighterkills [i];
   p->tp [10]->fighterkills = sum;
-  strcpy (p->tp [10]->name, p->name);
+  p->tp [10]->name, p->name;
   p->tp [10]->ranking = p->ranking;
   int index [11];
   for (i = 0; i < 11; i ++)
@@ -2137,14 +2136,14 @@ void StatePlay::timer (Uint32 dt)
   }
 
   // create flash during thunderstorm
-  if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !math.random (2000 / dt))
+  if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !Math::random (2000 / dt))
   {
     flash = 18 * timestep;
-    int fphi = (int) camrot.phi + math.random (50) - 25;
+    int fphi = (int) camrot.phi + Math::random (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
     float pseudoview = l->getView ();
-    float fdist = math.random ((int) pseudoview - 20) + 10;
+    float fdist = Math::random ((int) pseudoview - 20) + 10;
     float fx = fplayer->trafo.translation.x - SIN(fphi) * fdist;
     float fz = fplayer->trafo.translation.z - COS(fphi) * fdist;
     flash1->set (fx, l->getHeight (fx, fz), fz, (int) camrot.phi);
@@ -2754,8 +2753,8 @@ void StateInit::timer (Uint32 dt)
   }
   else return;
 
-  int r = math.random (100);
-  if (r == 50) r = math.random (100); // do not optimize this: random number generator initialization
+  int r = Math::random (100);
+  if (r == 50) r = Math::random (100); // do not optimize this: random number generator initialization
 
   tl.x = 6.0 * pow ((float) 1.5, (float) -(5 + tl.z));
   tl.y = (tl.z + 3) * (tl.z + 3) * 0.02 - 0.8; //0.9 * tl.x;

@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -89,7 +89,7 @@ void MissionConvoy2::start ()
   for (i = 10; i <= 12; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = px - i * 10;
     fighter [i]->trafo.translation.z = py - i * 10;

@@ -31,7 +31,7 @@
 FighterPrototype::FighterPrototype (const UnitDescriptor &desc)
   : AiObjPrototype (desc)
 {
-  OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+  OptionFile *file = OptionFileFactory::get (Directory::getUnits (desc.name.c_str ()));
   if (!file->getInteger ("chaffs", maxchaffs))
     maxchaffs = 0;
   if (!file->getInteger ("flares", maxflares))

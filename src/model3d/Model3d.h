@@ -30,7 +30,7 @@
 
 #include "opengl/includegl.h"
 #include "opengl/GlPrimitives.h"
-#include "math/Math.h"
+#include "util/Math.h"
 
 #include <iostream>
 

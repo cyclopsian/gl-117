@@ -54,7 +54,7 @@
 #endif
 
 #define GLOBALSCALE 1
-#define VERSIONSTRING "V1.3"
+#define VERSIONSTRING "V2.0"
 
 #define LINEWIDTH(x) (float) x * height / 600.0F
 
@@ -90,7 +90,7 @@ extern int game; // see GAME-constants
 extern int clouds;
 extern int camera;
 extern bool isserver;
-extern int loglevel;
+//extern int loglevel;
 
 // TODO: these constants should go somewhere else
 // maximum constants for objects
@@ -223,17 +223,17 @@ class ConfigFile
     FILE *out;
 
     ConfigFile ();
-    ConfigFile (char *fname);
+    ConfigFile (const char *fname);
 
-    char *skipwhite (char *str);
-    char *skipnum (char *str);
-    char *skipalphanum (char *str);
-    char *getString (char *dest, char *str);
-    int getValue (char *str);
-    int openOutput (char *fname);
-    int write (char *str1, int n);
-    int write (char *str1, char c);
-    void writeText (char *str);
+    const char *skipwhite (const char *str);
+    const char *skipnum (const char *str);
+    const char *skipalphanum (const char *str);
+    char *getString (char *dest, const char *str);
+    int getValue (const char *str);
+    int openOutput (const char *fname);
+    int write (const char *str1, int n);
+    int write (const char *str1, char c);
+    void writeText (const char *str);
     void close ();
 };
 

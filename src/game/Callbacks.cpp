@@ -33,11 +33,11 @@
 
 /*#include "menu/Component.h"
 #include "mission/MapLoader.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "opengl/GlPrimitives.h"
 #include "landscape/Landscape.h"
 #include "net/net.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "cockpit/Cockpit.h"
 #include "configuration/Configuration.h"
 #include "mission/Mission.h"

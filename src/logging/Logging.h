@@ -24,27 +24,33 @@
 
 #include <iostream>
 
-#define DISPLAY(msg,loglevel) logging.display(msg,loglevel,__FILE__,__LINE__);
-#define DISPLAY_FATAL(msg) logging.display(msg,LOG_FATAL,__FILE__,__LINE__);
-#define DISPLAY_ERROR(msg) logging.display(msg,LOG_ERROR,__FILE__,__LINE__);
-#define DISPLAY_WARN(msg) logging.display(msg,LOG_WARN,__FILE__,__LINE__);
-#define DISPLAY_INFO(msg) logging.display(msg,LOG_INFO,__FILE__,__LINE__);
-#define DISPLAY_DEBUG(msg) logging.display(msg,LOG_DEBUG,__FILE__,__LINE__);
+#define DISPLAY(msg,loglevel) Logging::display(msg,loglevel,__FILE__,__LINE__);
+#define DISPLAY_FATAL(msg) Logging::display(msg,LOG_FATAL,__FILE__,__LINE__);
+#define DISPLAY_ERROR(msg) Logging::display(msg,LOG_ERROR,__FILE__,__LINE__);
+#define DISPLAY_WARN(msg) Logging::display(msg,LOG_WARN,__FILE__,__LINE__);
+#define DISPLAY_INFO(msg) Logging::display(msg,LOG_INFO,__FILE__,__LINE__);
+#define DISPLAY_DEBUG(msg) Logging::display(msg,LOG_DEBUG,__FILE__,__LINE__);
 
-const int LOG_NONE = 0;  ///< do not log anything
-const int LOG_FATAL = 1; ///< only show fatal (GL-117 will exit) errors (stderr)
-const int LOG_ERROR = 2; ///< show errors too (stderr)
-const int LOG_WARN = 3;  ///< show warnings too (stdout)
-const int LOG_INFO = 4;  ///< show important messages too (stdout)
-const int LOG_DEBUG = 5;   ///< log everything (stdout)
+enum LogLevel
+{
+  LOG_NONE,  ///< do not log anything
+  LOG_FATAL, ///< only show fatal (GL-117 will exit) errors (stderr)
+  LOG_ERROR, ///< show errors too (stderr)
+  LOG_WARN,  ///< show warnings too (stdout)
+  LOG_INFO,  ///< show important messages too (stdout)
+  LOG_DEBUG  ///< log everything (stdout)
+};
 
-// exit codes
-const int EXIT_NORMAL = 0;
-const int EXIT_LOADFILE = 1;
-const int EXIT_INIT = 2;
-const int EXIT_COMMAND = 3;
-const int EXIT_ALLOC = 4;
-const int EXIT_CONTEXT = 5;
+// exit codes: call exit() with one of these values!
+enum ExitCode
+{
+  EXIT_NORMAL,
+  EXIT_LOADFILE,
+  EXIT_INIT,
+  EXIT_COMMAND,
+  EXIT_ALLOC,
+  EXIT_CONTEXT
+};
 
 /**
 * This class does all logging activities to stdout/stderr and logfile.
@@ -54,24 +60,21 @@ const int EXIT_CONTEXT = 5;
 class Logging
 {
   public:
-    FILE *displayOut;
-    std::string filename;
-
-    int loglevel; ///< current log/debug level (set to constants LOG_*)
+    static FILE *displayOut;
+    static std::string filename;
+    static LogLevel loglevel; ///< current log/debug level (set to constants LOG_*)
 
     Logging ();
     ~Logging ();
 
-    void setLevel (int loglevel);
-    void setFile (const std::string &filename);
-    void display (const std::string &str, int level, char *file, int line);
+    static void setLevel (LogLevel loglevel);
+    static void setFile (const std::string &filename);
+    static void display (const std::string &str, LogLevel level, char *file, int line);
 
   protected:
 
-    void displayStream (FILE *stream, const std::string &str, int level,
-                        char *filename, int line);
+    static void displayStream (FILE *stream, const std::string &str, LogLevel level,
+                               char *filename, int line);
 };
-
-extern Logging logging;
 
 #endif

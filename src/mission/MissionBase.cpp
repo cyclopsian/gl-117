@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -175,11 +175,11 @@ void MissionBase::start ()
   for (i = n; i < n + 6; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (4)];
+    fighter [i]->target = fighter [Math::random (4)];
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = px + i * 5 - 60;
     fighter [i]->trafo.translation.z = py + i * 5 - 60;
-    fighter [i]->newinit (CrowDescriptor, 0, 180 + math.random (200));
+    fighter [i]->newinit (CrowDescriptor, 0, 180 + Math::random (200));
   }
 }
 

@@ -22,7 +22,7 @@
 #ifndef IS_PILOTS_H
 
 #include "pilot/Pilot.h"
-//#include "configuration/Dirs.h"
+//#include "configuration/Directory.h"
 #include "logging/Logging.h"
 
 #include <stdio.h>
@@ -31,10 +31,10 @@
 
 
 
-TeamPilot::TeamPilot (int ranking, char *name, int intelligence, int precision, int aggressivity, int fighterkills)
+TeamPilot::TeamPilot (int ranking, const std::string &name, int intelligence, int precision, int aggressivity, int fighterkills)
 {
   this->ranking = ranking;
-  strcpy (this->name, name);
+  this->name = name;
   this->intelligence = intelligence;
   this->precision = precision;
   this->aggressivity = aggressivity;
@@ -51,7 +51,7 @@ void TeamPilot::flyMission (int averagekills)
   fighterkills += (int) f;
 }
 
-char *TeamPilot::getRank ()
+std::string TeamPilot::getRank ()
 {
   if (ranking == 0) return "AIRMAN BASIC";
   else if (ranking == 1) return "AIRMAN";
@@ -64,7 +64,7 @@ char *TeamPilot::getRank ()
   else return "GENERAL";
 }
 
-char *TeamPilot::getShortRank ()
+std::string TeamPilot::getShortRank ()
 {
   if (ranking == 0) return "AB";
   else if (ranking == 1) return "ARM";
@@ -77,29 +77,31 @@ char *TeamPilot::getShortRank ()
   else return "GEN";
 }
 
-char *TeamPilot::getName ()
+std::string TeamPilot::getName ()
 {
-  strcpy (fullname, getRank ());
-  strcat (fullname, " ");
-  strcat (fullname, name);
+  fullname = getRank ();
+  fullname.append (" ");
+  fullname.append (name);
   return fullname;
 }
 
-char *TeamPilot::getShortName ()
+std::string TeamPilot::getShortName ()
 {
-  strcpy (fullname, getShortRank ());
-  strcat (fullname, " ");
-  strcat (fullname, name);
+  fullname = getShortRank ();
+  fullname.append (" ");
+  fullname.append (name);
   return fullname;
 }
 
 void TeamPilot::load (FILE *in)
 {
+  char buf [4096];
   fread (&ranking, sizeof (int), 1, in);
   int len;
   fread (&len, sizeof (int), 1, in);
   if (len > 50) return;
-  fread (name, sizeof (char), len, in);
+  fread (buf, sizeof (char), len, in);
+  name = buf;
   fread (&intelligence, sizeof (int), 1, in);
   fread (&precision, sizeof (int), 1, in);
   fread (&aggressivity, sizeof (int), 1, in);
@@ -109,9 +111,9 @@ void TeamPilot::load (FILE *in)
 void TeamPilot::save (FILE *out)
 {
   fwrite (&ranking, sizeof (int), 1, out);
-  int len = strlen (name);
+  int len = name.length ();
   fwrite (&len, sizeof (int), 1, out);
-  fwrite (name, sizeof (char), len, out);
+  fwrite (name.c_str (), sizeof (char), len, out);
   fwrite (&intelligence, sizeof (int), 1, out);
   fwrite (&precision, sizeof (int), 1, out);
   fwrite (&aggressivity, sizeof (int), 1, out);

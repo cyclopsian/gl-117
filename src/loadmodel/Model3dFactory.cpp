@@ -23,7 +23,7 @@
 
 #include "Model3dFactory.h"
 #include "Load3ds.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 
 #include <cassert>
 
@@ -37,7 +37,7 @@ Model3d *Model3dFactory::getModel (const std::string &filename)
   {
     Model3d *model = new Model3d ();
     Load3ds loader;
-    loader.setTextureDir (dirs.getTextures (""));
+    loader.setTextureDir (Directory::getTextures (""));
     loader.import3ds (model, filename.c_str ());
     model3dList.insert (std::pair<std::string, Model3d *> (filename, model));
     return model;

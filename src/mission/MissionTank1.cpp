@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -64,7 +64,7 @@ void MissionTank1::start ()
   for (i = 2; i <= 7; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_tank2;
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
@@ -75,7 +75,7 @@ void MissionTank1::start ()
   for (i = 8; i <= 10; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (2)];
+    fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = i * 3;

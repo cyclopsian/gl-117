@@ -22,7 +22,7 @@
 #ifndef IS_PILOTS_H
 
 #include "pilot/Pilot.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "logging/Logging.h"
 
 #include <stdio.h>
@@ -63,7 +63,7 @@ void Pilot::load ()
   }
 
   char buf [4096];
-  strcpy (buf, dirs.getSaves (name));
+  strcpy (buf, Directory::getSaves (name).c_str ());
   FILE *in = fopen (buf, "rb");
   if (in == NULL)
   {
@@ -90,7 +90,7 @@ void Pilot::save ()
 {
   int i;
   char buf [4096];
-  strcpy (buf, dirs.getSaves (name));
+  strncpy (buf, Directory::getSaves (name).c_str (), 4096);
   FILE *out = fopen (buf, "wb");
   if (out == NULL)
   {
@@ -112,7 +112,7 @@ void Pilot::save ()
   fclose (out);
 }
 
-char *Pilot::getRank (int lomissionid, int himissionid)
+std::string Pilot::getRank (int lomissionid, int himissionid)
 {
   int i, sum = 0;
   for (i = lomissionid; i <= himissionid; i ++)
@@ -154,7 +154,7 @@ Lieutenant General, Lt Gen
 General, Gen
 */
 
-char *Pilot::getShortRank (int lomissionid, int himissionid)
+std::string Pilot::getShortRank (int lomissionid, int himissionid)
 {
   int i, sum = 0;
   for (i = lomissionid; i < himissionid; i ++)
@@ -182,10 +182,10 @@ char *Pilot::getShortRank (int lomissionid, int himissionid)
   { ranking = 8; return "GEN"; }
 }
 
-Pilot::Pilot (char *name)
+Pilot::Pilot (const std::string &name)
 {
   tp = NULL;
-  strcpy (this->name, name);
+  this->name, name.c_str ();
   load ();
 }
 

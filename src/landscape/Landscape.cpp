@@ -22,7 +22,7 @@
 #ifndef IS_LANDSCAPE_H
 
 #include "Landscape.h"
-#include "math/Math.h"
+#include "util/Math.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -344,7 +344,7 @@ void Landscape::genSurface (int elevationpc, int *heightmap)
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + math.extremeRandom (64 * elevation / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + Math::extremeRandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
       h [MAXX] [i * step] = h [0] [i * step];
@@ -372,7 +372,7 @@ void Landscape::genSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -391,7 +391,7 @@ void Landscape::genSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -431,7 +431,7 @@ void Landscape::genErosionSurface (int elevationpc, int *heightmap)
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + math.extremeRandom (64 * elevation / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + Math::extremeRandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
       h [MAXX] [i * step] = h [0] [i * step];
@@ -459,7 +459,7 @@ void Landscape::genErosionSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -478,7 +478,7 @@ void Landscape::genErosionSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -504,7 +504,7 @@ void Landscape::genErosionSurface (int elevationpc, int *heightmap)
   for (i = 0; i < MAXX; i ++)
     for (i2 = 0; i2 < MAXX; i2 ++)
       if (h [i] [i2] < erosion)
-        h [i] [i2] = erosion - 30 + math.random (60, i, i2);
+        h [i] [i2] = erosion - 30 + Math::random (60, i, i2);
   convolveGauss (2, 0, 35000);
   convolveGauss (1, 35001, 65535);
 }
@@ -523,7 +523,7 @@ void Landscape::genArcticSurface (int elevationpc, int *heightmap)
     for (i = 0; i < 4; i ++)
       for (i2 = 0; i2 < 4; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + math.extremeRandom (64 * elevation / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + Math::extremeRandom (64 * elevation / 512);
     for (i = 0; i < 5; i ++)
     {
       h [MAXX] [i * step] = h [0] [i * step];
@@ -551,7 +551,7 @@ void Landscape::genArcticSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -570,7 +570,7 @@ void Landscape::genArcticSurface (int elevationpc, int *heightmap)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -617,14 +617,14 @@ void Landscape::genMoonSurface (int height)
   type = LAND_MOON;
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
-      h [i] [i2] = 30000 + math.random (300, i, i2);    
+      h [i] [i2] = 30000 + Math::random (300, i, i2);    
 
   int maxholes = 1;
   for (i = 0; i < maxholes; i ++)
   {
-    x = math.random (MAXX + 1);
-    y = math.random (MAXX + 1);
-    radius = math.random (50) + 200;
+    x = Math::random (MAXX + 1);
+    y = Math::random (MAXX + 1);
+    radius = Math::random (50) + 200;
     depth = radius * height / 2;
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
@@ -645,12 +645,12 @@ void Landscape::genMoonSurface (int height)
       }
   }
 
-  maxholes = math.random (4) + 8 ;
+  maxholes = Math::random (4) + 8 ;
   for (i = 0; i < maxholes; i++)
   {
-    x = math.random (MAXX + 1);
-    y = math.random (MAXX + 1);
-    radius = math.random (50) + 50;
+    x = Math::random (MAXX + 1);
+    y = Math::random (MAXX + 1);
+    radius = Math::random (50) + 50;
     depth = radius * height / 2;
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
@@ -672,12 +672,12 @@ void Landscape::genMoonSurface (int height)
   
   }
 
-  maxholes = math.random (10) + 20 ;
+  maxholes = Math::random (10) + 20 ;
   for (i = 0; i < maxholes; i++)
   {
-    x = math.random (MAXX + 1);
-    y = math.random (MAXX + 1);
-    radius = math.random (20) + 20;
+    x = Math::random (MAXX + 1);
+    y = Math::random (MAXX + 1);
+    radius = Math::random (20) + 20;
     depth = radius * height / 2;
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
@@ -698,12 +698,12 @@ void Landscape::genMoonSurface (int height)
       }  
   }
 
-  maxholes = math.random (50) + 400;
+  maxholes = Math::random (50) + 400;
   for (i = 0; i < maxholes; i++)
   {
-    x = math.random (MAXX + 1);
-    y = math.random (MAXX + 1);
-    radius = math.random (10) + 5;
+    x = Math::random (MAXX + 1);
+    y = Math::random (MAXX + 1);
+    radius = Math::random (10) + 5;
     depth = radius * height / 3;
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
@@ -735,7 +735,7 @@ void Landscape::genCanyonSurface (int elevationpc)
     for (i = 0; i < 16; i ++)
       for (i2 = 0; i2 < 16; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          if (math.random (2, i, i2))
+          if (Math::random (2, i, i2))
             h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024;
           else
             h [i * step] [i2 * step] = 127 * 256 + 64 * elevation / 1024;
@@ -753,7 +753,7 @@ void Landscape::genCanyonSurface (int elevationpc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -772,7 +772,7 @@ void Landscape::genCanyonSurface (int elevationpc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < minh) htest = minh;
         if (htest > maxh) htest = maxh;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -801,7 +801,7 @@ void Landscape::genCanyonSurface (int elevationpc)
       if (abs (h [i] [i2] - h [i + 1] [i2]) < 200 && abs (h [i] [i2] - h [i] [i2 + 1]) < 200)
       {
         f [i] [i2] = REDSAND;
-        if (h [i] [i2] > 30000 && !math.random (80) && elevationpc > 20)
+        if (h [i] [i2] > 30000 && !Math::random (80) && elevationpc > 20)
           f [i] [i2] = REDTREE0;
       }
       if (elevationpc > 20)
@@ -840,7 +840,7 @@ void Landscape::genDesertSurface (int elevationpc)
     for (i = 0; i < 16; i ++)
       for (i2 = 0; i2 < 16; i2 ++)
         if (h [i * step] [i2 * step] == 0)
-          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + math.extremeRandom (64 * elevation / 512);
+          h [i * step] [i2 * step] = 127 * 256 - 64 * elevation / 1024 + Math::extremeRandom (64 * elevation / 512);
     for (i = 0; i < 17; i ++)
     {
       h [MAXX] [i * step] = h [0] [i * step];
@@ -855,7 +855,7 @@ void Landscape::genDesertSurface (int elevationpc)
       do
       {
         h1 = h [x - step] [y]; h2 = h [x + step] [y];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -874,7 +874,7 @@ void Landscape::genDesertSurface (int elevationpc)
       do
       {
         h1 = h [x] [y - step]; h2 = h [x] [y + step];
-        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + math.random ((128 >> i) * elevation / 64, x, y);
+        htest = ((h1 + h2) >> 1) - (128 >> i) * elevation / 128 + Math::random ((128 >> i) * elevation / 64, x, y);
         if (htest < 0) htest = 0;
         if (htest > 65535) htest = 65535;
         if (h [x] [y] == 0) h [x] [y] = htest;
@@ -922,7 +922,7 @@ void Landscape::genDesertSurface (int elevationpc)
   for (i = 0; i < MAXX; i += 4)
     for (i2 = 0; i2 < MAXX; i2 += 4)
     {
-      if (!math.random (50))
+      if (!Math::random (50))
         f [i] [i2] = CACTUS0;
     }
   highestPoint = 0;
@@ -961,8 +961,8 @@ void Landscape::genTrench (int width, int height)
     }
     if (i & 1)
     {
-      left += math.random (5) - 2;
-      right += math.random (5) - 2;
+      left += Math::random (5) - 2;
+      right += Math::random (5) - 2;
       if (left < -5) left = -5;
       if (left > 5) left = 5;
       if (right < -5) right = -5;
@@ -1005,8 +1005,8 @@ void Landscape::genRocks (int diffmin, int percent)
         {
           if (rd + minrock >= 800 - 800 * (h [i] [i2] - r) / (hmax - r))
           {
-            f [i] [i2] = ROCKS + math.random (2);
-            htest = h [i] [i2] - d + math.random (d * 2);
+            f [i] [i2] = ROCKS + Math::random (2);
+            htest = h [i] [i2] - d + Math::random (d * 2);
             if (htest > 65535) htest = 65535;
             h [i] [i2] = (unsigned short) htest;
             if (h [i] [i2] < rockBorder) rockBorder = h [i] [i2];
@@ -1018,8 +1018,8 @@ void Landscape::genRocks (int diffmin, int percent)
         }
         if (abs (h [i] [i2] - h [i + 1] [i2]) >= 600 || abs (h [i] [i2] - h [i] [i2 + 1]) >= 600)
         {
-          f [i] [i2] = ROCKS + math.random (2);
-          htest = h [i] [i2] - d + math.random (d * 2);
+          f [i] [i2] = ROCKS + Math::random (2);
+          htest = h [i] [i2] - d + Math::random (d * 2);
           if (htest > 65535) htest = 65535;
           h [i] [i2] = (unsigned short) htest;
         }
@@ -1174,8 +1174,8 @@ void Landscape::genLake (int depthpc)
     a1 = MAXX / 8;
     for (i = 0; i < 20; i ++)
     {
-      xs = math.random (MAXX - 2 * a1) + a1;
-      ys = math.random (MAXX - 2 * a1) + a1;
+      xs = Math::random (MAXX - 2 * a1) + a1;
+      ys = Math::random (MAXX - 2 * a1) + a1;
       if (hw [ys] [xs] == 0) break;
     }
     if (i == 20) return;
@@ -1253,7 +1253,7 @@ void Landscape::genLake (int depthpc)
               f [i] [i2] = DEEPWATER;
             else
               f [i] [i2] = XDEEPWATER;
-            hw [i] [i2] = level; // + math.random (w);
+            hw [i] [i2] = level; // + Math::random (w);
           }
 
       int barrage = ROCKS;
@@ -1363,9 +1363,9 @@ void Landscape::calcWoods (int dy)
       if (fabs ((float) (h [i] [i2] - h [i + 1] [i2])) > dy)
         if (f [i] [i2] == 0)
         {
-          int ra = math.random (3);
-          if (h [i] [i2] >= rockBorder + 3000 + math.random (var)) f [i] [i2] = (DWARFPINES1 + ra);
-          else if (h [i] [i2] >= 15000 + math.random (var) && h [i] [i2] < rockBorder - 10000 + math.random (var)) f [i] [i2] = (MIXEDWOODS1 + ra);
+          int ra = Math::random (3);
+          if (h [i] [i2] >= rockBorder + 3000 + Math::random (var)) f [i] [i2] = (DWARFPINES1 + ra);
+          else if (h [i] [i2] >= 15000 + Math::random (var) && h [i] [i2] < rockBorder - 10000 + Math::random (var)) f [i] [i2] = (MIXEDWOODS1 + ra);
           else if (h [i] [i2] < 15000 + var) f [i] [i2] = (CONIFEROUSWOODS1 + ra);
           else f [i] [i2] = (DECIDUOUSWOODS1 + ra);
         }
@@ -1376,9 +1376,9 @@ void Landscape::calcWoods (int dy)
         if (isWoods (f [i - 1] [i2]) && isWoods (f [i + 1] [i2]) ||
             isWoods (f [i] [i2 - 1]) && isWoods (f [i] [i2 + 1]))
         {
-          int ra = math.random (3);
-          if (h [i] [i2] >= rockBorder + 3000 + math.random (var)) f [i] [i2] = (DWARFPINES1 + ra);
-          else if (h [i] [i2] >= 15000 + math.random (var) && h [i] [i2] < rockBorder - 10000 + math.random (var)) f [i] [i2] = (BUSHES1 + ra);
+          int ra = Math::random (3);
+          if (h [i] [i2] >= rockBorder + 3000 + Math::random (var)) f [i] [i2] = (DWARFPINES1 + ra);
+          else if (h [i] [i2] >= 15000 + Math::random (var) && h [i] [i2] < rockBorder - 10000 + Math::random (var)) f [i] [i2] = (BUSHES1 + ra);
           else if (h [i] [i2] < 15000 + var) f [i] [i2] = (BUSHES1 + ra);
           else f [i] [i2] = (BUSHES1 + ra);
         }
@@ -1402,10 +1402,10 @@ void Landscape::calcWoods (int dy)
     for (i2 = 1; i2 < MAXX; i2 += 3)
       if (isWater (f [i] [i2]))
       {
-        if (f [i + 1] [i2] == GRASS) f [i + 1] [i2] = BUSHES1 + math.random (3);
-        if (f [i - 1] [i2] == GRASS) f [i - 1] [i2] = BUSHES1 + math.random (3);
-        if (f [i] [i2 + 1] == GRASS) f [i] [i2 + 1] = BUSHES1 + math.random (3);
-        if (f [i] [i2 - 1] == GRASS) f [i] [i2 - 1] = BUSHES1 + math.random (3);
+        if (f [i + 1] [i2] == GRASS) f [i + 1] [i2] = BUSHES1 + Math::random (3);
+        if (f [i - 1] [i2] == GRASS) f [i - 1] [i2] = BUSHES1 + Math::random (3);
+        if (f [i] [i2 + 1] == GRASS) f [i] [i2 + 1] = BUSHES1 + Math::random (3);
+        if (f [i] [i2 - 1] == GRASS) f [i] [i2 - 1] = BUSHES1 + Math::random (3);
       }
 }
 
@@ -1445,7 +1445,7 @@ void Landscape::genRiver ()
     abbruch ++;
     do
     {
-      xf = math.random (MAXX - 19) + 10; yf = math.random (MAXX - 19) + 10;
+      xf = Math::random (MAXX - 19) + 10; yf = Math::random (MAXX - 19) + 10;
     }
     while (!isGround (yf, xf));
     fl [200] [0] = xf; fl [200] [1] = yf;

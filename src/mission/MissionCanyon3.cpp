@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -99,7 +99,7 @@ void MissionCanyon3::start ()
   for (i = 10; i <= 19; i ++)
   {
     fighter [i]->party = 0;
-    fighter [i]->target = fighter [math.random (5)];
+    fighter [i]->target = fighter [Math::random (5)];
     fighter [i]->currot.phi = 180;
     if (i <= 15)
     {

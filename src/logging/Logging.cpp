@@ -21,19 +21,17 @@
 
 #ifndef IS_LOGGING_H
 
+#include "Logging.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <cassert>
 
-#include "Logging.h"
-
-
-
-Logging logging;
-
-/* FILE *Logging::displayOut;
-std::string Logging::filename; */
+FILE *Logging::displayOut = NULL;
+std::string Logging::filename ("");
+LogLevel Logging::loglevel = LOG_INFO;
 
 Logging::Logging ()
 {
@@ -48,9 +46,9 @@ Logging::~Logging ()
   displayOut = NULL;
 }
 
-void Logging::setLevel (int loglevel)
+void Logging::setLevel (LogLevel loglevel)
 {
-  this->loglevel = loglevel;
+  Logging::loglevel = loglevel;
 }
 
 void Logging::setFile (const std::string &filename)
@@ -58,8 +56,9 @@ void Logging::setFile (const std::string &filename)
   Logging::filename = filename;
 }
 
-void Logging::displayStream (FILE *stream, const std::string &str, int level, char *file, int line)
+void Logging::displayStream (FILE *stream, const std::string &str, LogLevel level, char *file, int line)
 {
+  assert (stream);
   if (level == LOG_NONE) fprintf (stream, "%s@%d: %s\n", file, line, str.c_str ());
   else if (level == LOG_FATAL) fprintf (stream, "Fatal: %s@%d: %s\n", file, line, str.c_str ());
   else if (level == LOG_ERROR) fprintf (stream, "Error: %s@%d: %s\n", file, line, str.c_str ());
@@ -70,10 +69,10 @@ void Logging::displayStream (FILE *stream, const std::string &str, int level, ch
 }
 
 // display log/debug message
-void Logging::display (const std::string &str, int level, char *file, int line)
+void Logging::display (const std::string &str, LogLevel level, char *file, int line)
 {
-  int len = str.length ();
-  if (!len) return;
+  if (!str.length ())
+    return;
 
   if (level <= loglevel)
   {

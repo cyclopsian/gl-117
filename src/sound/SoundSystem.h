@@ -46,10 +46,10 @@ class WaveFile
     int volume;
 
     WaveFile ();
-    WaveFile (char *filename);
+    WaveFile (const char *filename);
     virtual ~WaveFile ();
 
-    void load (char *filename);
+    void load (const char *filename);
     void play (int channel, bool loop);
     void stop ();
     void setVolume (int level);

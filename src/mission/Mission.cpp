@@ -23,7 +23,7 @@
 
 #include "Mission.h"
 #include "game/globals.h"
-#include "math/Math.h"
+#include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
 
@@ -357,7 +357,7 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
         else
         {
           if (id >= MISSION_CAMPAIGN1 && id <= MISSION_CAMPAIGN2)
-            p->tp [i]->flyMission (math.random (4));
+            p->tp [i]->flyMission (Math::random (4));
         }
       }
     }

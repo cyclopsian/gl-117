@@ -31,7 +31,7 @@
 AiObjPrototype::AiObjPrototype (const UnitDescriptor &desc)
   : DynamicObjPrototype (desc)
 {
-  OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+  OptionFile *file = OptionFileFactory::get (Directory::getUnits (desc.name.c_str ()));
   if (!file->getBoolean ("dualshot", dualshot))
     dualshot = false;
   if (!file->getInteger ("ammo", maxammo))

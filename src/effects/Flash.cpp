@@ -48,8 +48,8 @@ void Flash::set (float x, float y, float z, int phi)
   for (i = 1; i < 10; i ++)
   {
     w [i].y = y + 6.0 * i;
-    w [i].x = w [i - 1].x + 0.1 * math.random (60) - 3.0;
-    w [i].z = w [i - 1].z + 0.1 * math.random (60) - 3.0;
+    w [i].x = w [i - 1].x + 0.1 * Math::random (60) - 3.0;
+    w [i].z = w [i - 1].z + 0.1 * Math::random (60) - 3.0;
   }
 }
 

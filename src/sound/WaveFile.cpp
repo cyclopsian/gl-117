@@ -26,7 +26,7 @@
 
 #include "SoundSystem.h"
 #include "logging/Logging.h"
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "util/Util.h"
 
 WaveFile *wave = NULL;
@@ -107,7 +107,7 @@ WaveFile::WaveFile ()
 #endif
 }
 
-WaveFile::WaveFile (char *filename)
+WaveFile::WaveFile (const char *filename)
 {
 #ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
@@ -122,7 +122,7 @@ WaveFile::WaveFile (char *filename)
 
 WaveFile::~WaveFile () {}
 
-void WaveFile::load (char *filename)
+void WaveFile::load (const char *filename)
 {
 #ifndef USE_GLUT
   char buf [4096];
