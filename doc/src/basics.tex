@@ -24,7 +24,7 @@ to represent north, east, south, west.}
 horizon and thus your roll angle.}
 \item{C: your current target}
 \item{D: the radar reveals the position of other targets. Enemies are marked red,
-allies blue. The screen is only 2D, so it will only reveal the necessary \textit{heading} to
+allies blue, missiles white. The screen is only 2D, so it will only reveal the necessary \textit{heading} to
 other targets.}
 \item{F: your currently selected weapon}
 \item{G: the chaff/flare countermeasure systems alarms you about enemy missiles.}
@@ -57,7 +57,9 @@ m & Change weapon/missile\\
 ENTER & Fire weapon/missile\\
 \hline
 t & Target next object\\
+p & Target previous object\\
 e & Target nearest enemy\\
+p & Target locking enemy\\
 \hline
 ESC & Main menu\\
 \hline
@@ -99,15 +101,17 @@ use this option.
 \label{subsec:joystick}
 
 The easiest interface to play \emph{GL-117} is likely the joystick.\\
-\emph{GL-117} supports up to four joystick axes:
+\emph{GL-117} supports up to 10 joysticks each having up to 10 axes,
+however the standard settings include one joystick with 4 axes:
 moving the joystick up or down will change the elevator, moving left or right
 will affect the aileron, turning the joystick along the rudder will alter
 the fighter's rudder settings, and moving the throttle will change
-the fighter's throttle. If two axes functions are swapped, please edit the file
-\texttt{conf.interface} to correct the settings.\\\\
+the fighter's throttle.\\\\
 Depending on your joystick, \emph{GL-117} supports four buttons:
-fire cannon, target nearest enemy, change weapon/missile, fire weapon/missile.\\\\
-Any properly installed joystick will be available automatically.
+fire cannon, target nearest enemy, fire countermeasure, fire weapon/missile.
+The coolie hat is used for targeting purpose.\\\\
+Feel free to edit the text file \texttt{conf.interface} to completely
+adjust all the settings as you wish.
 
 
 \section{The menu}

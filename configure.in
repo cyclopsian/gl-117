@@ -1,6 +1,11 @@
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(gl-117,0.8.8,200304280000)
+AM_INIT_AUTOMAKE(gl-117,1.0,200308190000)
 AM_CONFIG_HEADER(config.h)
+
+LIBS="$LIBS -L/usr/X11R6/lib"
+
+AC_PATH_X
+AC_PATH_XTRA
 
 AC_ARG_WITH(opengl-dir, AC_HELP_STRING([--with-opengl-dir=<path>],[Search for OpenGL files in <path>]))
 AC_ARG_WITH(sdl-dir, AC_HELP_STRING([--with-sdl-dir=<path>],[Search for SDL files in <path>]))
@@ -30,7 +35,7 @@ AH_TEMPLATE([HAVE_GL],[Use GL library])
 AH_TEMPLATE([HAVE_GLU],[Use GLU library])
 AH_TEMPLATE([HAVE_GLUT],[Use GLUT library])
 
-LDFLAGS="$LDFLAGS -lm"
+LDFLAGS="$LDFLAGS -lm -lGL -lGLU -lglut"
 AC_PROG_CXX
 AC_PROG_CC
 AC_LANG_C
@@ -48,9 +53,9 @@ AC_CHECK_HEADER(GL/glut.h,AC_DEFINE(HAVE_GLUT),AC_MSG_ERROR(glut.h not found - p
 AC_CHECK_HEADER(SDL/SDL.h,AC_DEFINE(HAVE_SDL),AC_MSG_WARN(SDL.h not found - no sounds and no joystick available))
 AC_CHECK_HEADER(SDL/SDL_mixer.h,AC_DEFINE(HAVE_SDL_MIXER),AC_MSG_WARN(SDL_mixer.h not found - no advanced sounds available))
 
-AC_CHECK_LIB(GL,glEnable,LIBS="$LIBS -lGL",AC_MSG_ERROR(GL not found - please install GL or MesaGL))
-AC_CHECK_LIB(GLU,gluPerspective,LIBS="$LIBS -lGLU",AC_MSG_ERROR(GLU not found - please install GLU or MesaGLU))
-AC_CHECK_LIB(glut,glutMainLoop,LIBS="$LIBS -lglut",AC_MSG_ERROR(GLUT not found - please install GLUT or MesaGLUT))
+AC_CHECK_LIB(GL,glEnable,LIBS="$LIBS -lGL",AC_MSG_WARN(GL not found - please install GL or MesaGL))
+AC_CHECK_LIB(GLU,gluPerspective,LIBS="$LIBS -lGLU",AC_MSG_WARN(GLU not found - please install GLU or MesaGLU))
+AC_CHECK_LIB(glut,glutMainLoop,LIBS="$LIBS -lglut",AC_MSG_WARN(GLUT not found - please install GLUT or MesaGLUT))
 AC_CHECK_LIB(SDL,SDL_Init,LIBS="$LIBS -lSDL -lSDLmain",AC_MSG_WARN(SDL not found - please install SDL),-lpthread)
 AC_CHECK_LIB(SDL_mixer,Mix_LoadMUS,LIBS="$LIBS -lSDL_mixer",AC_MSG_WARN(SDL_mixer not found - please install SDL_mixer))
 

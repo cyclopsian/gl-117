@@ -1,16 +1,27 @@
-________________________________________________________________________
-
-GL-117 FREQUENTLY ASKED QUESTIONS
-________________________________________________________________________
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  GL-117 FREQUENTLY ASKED QUESTIONS
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Section 1: Installing on Linux and Mac
+- ./configure does not find the libraries?
+- ./configure simply does not work?
+- How to compile on MacOSX?
+- Libraries are installed, but gcc (linker) does not find them?
+- internal error, core dump, submit gcc bug report?
+- texture not found, strange texture name?
+
 Section 2: Configuring the game
+- How to alter resolution, color depth?
+- How to configure the input devices?
+- The joystick rudder and throttle are swapped?
+- Cannot open GLX?
+- Graphics do not initialize?
+- Graphics too lame?
 
 
-________________________________________________________________________
-
-S E C T I O N   1
-________________________________________________________________________
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  S E C T I O N   1
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: ./configure does not find the libraries?
 
@@ -19,33 +30,34 @@ GLU-devel, and GLUT-devel.
 The exact package names may vary between Linux distributions.
 A good choice for SuSE Linux 8.1 may be Mesa, MesaGLU, MesaGLUT, and
 the -devel equivalents.
+On RedHat 9 you will have to install GLUT-devel!
+
 Make also sure that the library files are located in /lib or /usr/lib.
 For SuSE8.1 the /usr/lib directory must contain libGL.so, libGLU.so,
 and libglut.so.
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: ./configure simply does not work?
 
+You may have the wrong versions of automake and autoconf.
 Create your own configure script calling
  ./rebuild
+and execute the newly created script
+ ./configure
+ 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-If errors occur, you may have the wrong version of automake installed.
-Then, copy the automake files (missing, dep-comp...) from
- /usr/local/share/automake
-to the game directory and execute the rebuild script again.
+Q: Why is there no sound?
 
-You can also use this technique to alter the file
- configure.in
-removing e.g. library checks and modifying the LDFLAGS variable.
-________________________________________________________________________
+If the game starts up prompting "Using GLUT only", the game has been
+compiled without sound. Make sure to have SDL, SDL-devel, SDL_mixer
+installed and compile the sources again:
+ ./configure
+ make
+ make install
 
-Q: Wrong version of automake?
-
-As described for the last question, copy the automake files to the
-gl-117 directory and execute the rebuild script.
-
-Or just install a new version of automake.
-________________________________________________________________________
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: How to compile on MacOSX?
 
@@ -55,7 +67,8 @@ In the Makefile, set LIBS to
 -framework AppKit
 
 Make sure that the library and header files can be found by configure.
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: Libraries are installed, but gcc (linker) does not find them?
 
@@ -65,18 +78,25 @@ Try the command
   objload.o pilots.o common.o object.o cockpit.o \
   -lGL -lGLU -lglut -lSDL -lSDLmain -lSDL_mixer \
   -lXmu -lXext -lXi -lXxf86vm
-________________________________________________________________________
 
-Q: internal error, core dump, submit bug report?
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Q: internal error, core dump, submit gcc bug report?
 
 Sorry, the cause is unknown. Just execute make again until everything is
 compiled and linked properly.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-________________________________________________________________________
+Q: texture not found, strange texture name?
 
+This might be a compiler problem (gcc 3.2). Recompile the game using the
+flag -O0 (-O zero instead of -O2).
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 S E C T I O N   2
-________________________________________________________________________
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: How to alter resolution, color depth?
 
@@ -85,7 +105,8 @@ the (text) file
  $HOME/.gl-117/conf (Unix)
  GL-117_DIR\saves\conf (Windows)
 and set the corresponding values manually.
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: How to configure the input devices?
 
@@ -93,23 +114,27 @@ Just edit the file
  $HOME/.gl-117/conf.interface (Unix)
  GL-117_DIR\saves\conf.interface (Windows)
 and adjust the settings.
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: The joystick rudder and throttle are swapped?
 
 The joystick axes identification depends on the driver (OS).
 Just edit the file conf.interface as described above.
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: Cannot open GLX?
 
 Try another bpp setting in the file conf (described above). (32, 16, 8)
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: Graphics do not initialize?
 
 This game needs properly installed versions of OpenGL, GLU, and GLUT!
-________________________________________________________________________
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Q: Graphics too lame?
 

@@ -1,27 +1,62 @@
 #!/bin/sh
-chmod +x win2unix
-./win2unix
-rm config.h
-rm configure
-rm Makefile
-rm Makefile.in
-rm src/Makefile
-rm src/Makefile.in
-rm config.h.in
-rm aclocal.m4
-rm -rf autom4te.cache
-rm config.log
-rm config.h.in~
-rm config.status
-rm configure.in.save
-rm stamp-h
-rm stamp-h1
-rm stamp-h.in
-cp /usr/share/automake*/missing .
-cp /usr/share/automake*/depcomp .
-cp /usr/share/automake*/mkinstalldirs .
-cp /usr/share/automake*/install-sh .
+
+echo Setting execution permissions...
+chmod +x win2unix 2> /dev/null
+chmod -x ChangeLog FAQ README INSTALL readme.txt AUTHORS *.spec Makefile.am COPYING NEWS configure.in 2> /dev/null
+chmod -x ./src/* 2> /dev/null
+
+echo Windows to Unix filename corrections...
+mv news NEWS 2> /dev/null
+mv install INSTALL 2> /dev/null
+mv authors AUTHORS 2> /dev/null
+mv readme README 2> /dev/null
+mv copying COPYING 2> /dev/null
+mv faq FAQ 2> /dev/null
+
+echo Deleting Windows Debug, .obj, configuration, savegames...
+rm -rf ./src/Debug 2> /dev/null
+rm -rf ./src/*.obj 2> /dev/null
+rm ./saves/* 2> /dev/null
+rm ./src/main.ncb
+rm ./src/main.opt
+rm ./src/main.plg
+
+echo Deleting obsolete CVS and automake/autoconf files...
+rm configure 2> /dev/null
+rm Makefile 2> /dev/null
+rm Makefile.in 2> /dev/null
+rm src/Makefile 2> /dev/null
+rm src/Makefile.in 2> /dev/null
+rm config.h.in 2> /dev/null
+rm aclocal.m4 2> /dev/null
+rm -rf autom4te* 2> /dev/null
+rm config.log 2> /dev/null
+rm config.h.in~ 2> /dev/null
+rm config.status 2> /dev/null
+rm configure.in.save 2> /dev/null
+rm stamp-h 2> /dev/null
+rm stamp-h1 2> /dev/null
+rm stamp-h.in 2> /dev/null
+rm -rf auto* 2> /dev/null
+find . -name "cvs" -print > dellog
+DELLOG=`cat dellog`
+rm -rf $DELLOG 2> /dev/null
+rm dellog 2> /dev/null
+
+echo Trying to copy latest automake files...
+cp /usr/share/automake*/missing . 2> /dev/null
+cp /usr/share/automake*/depcomp . 2> /dev/null
+cp /usr/share/automake*/mkinstalldirs . 2> /dev/null
+cp /usr/share/automake*/install-sh . 2> /dev/null
+
+echo Executing aclocal...
 aclocal
+
+echo Executing autoheader...
 autoheader
+
+echo Executing autoconf...
 autoconf
+
+echo Executing automake...
 automake

@@ -1,4 +1,10 @@
-Copyright 1994, 1995, 1996, 1999, 2000, 2001, 2002 Free Software
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+This file contains the typical GNU installation descriptions.
+The gl-117 specific installation instructions are covert (briefly)
+in the file README.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002 Free Software
 Foundation, Inc.
 
    This file is free documentation; the Free Software Foundation gives
