@@ -4409,6 +4409,7 @@ int newcamera = 0;
 
 void menu_timer (Uint32 dt)
 {
+  char buf [256];
   menutimer += dt;
   int cycle = (menutimer / timestep) % 256;
   if (cycle == 0)
@@ -4451,6 +4452,10 @@ void menu_timer (Uint32 dt)
             if (quality >= 1)
             { antialiasing = 1; specialeffects = 1; dithering = 1; dynamiclighting = 0; }
           }
+          sprintf (buf, "%d", (int) quality);
+          ((Label *) optmenu [0]->components [1])->setText (buf);
+          sprintf (buf, "%d", (int) view);
+          ((Label *) optmenu [0]->components [3])->setText (buf);
         }
         else if (fps < 30)
         {
@@ -4463,6 +4468,10 @@ void menu_timer (Uint32 dt)
             if (quality < 1)
             { antialiasing = 0; specialeffects = 0; dithering = 0; dynamiclighting = 0; }
           }
+          sprintf (buf, "%d", (int) quality);
+          ((Label *) optmenu [0]->components [1])->setText (buf);
+          sprintf (buf, "%d", (int) view);
+          ((Label *) optmenu [0]->components [3])->setText (buf);
         }
         menu_reshape ();
       }
@@ -6840,7 +6849,7 @@ void callbackView (Component *comp, int key)
     menu_reshape ();
   }
   sprintf (buf, "%d", (int) view);
-  ((Label *) optmenu [0]->components [3])->setText (buf);
+  ((Label *) optmenu [0]->components [3])->setText (buf); // this is also set by autoconfig in menu_timer
 }
 
 void callbackQuality (Component *comp, int key)
@@ -6857,7 +6866,7 @@ void callbackQuality (Component *comp, int key)
     if (quality < 0) quality = 5;
   }
   sprintf (buf, "%d", quality);
-  ((Label *) optmenu [0]->components [1])->setText (buf);
+  ((Label *) optmenu [0]->components [1])->setText (buf); // this is also set by autoconfig in menu_timer
 }
 
 void callbackTraining (Component *comp, int key)
