@@ -1,0 +1,70 @@
+GL-117 Frequently Asked Questions
+
+Section 1: Installing on Linux and Mac
+Section 2: Starting the game
+
+________________________________________________________________________
+
+Q: ./configure does not find the libraries?
+
+Make sure to have installed at least OpenGL, GLU, GLUT, OpenGL-devel,
+GLU-devel, and GLUT-devel.
+The exact package names may vary between Linux distributions.
+A good choice for SuSE Linux 8.1 may be Mesa, MesaGLU, MesaGLUT, and
+the -devel equivalents.
+Make also sure that the library files are located in /lib or /usr/lib.
+For SuSE8.1 the /usr/lib directory must contain libGL.so, libGLU.so,
+and libglut.so.
+________________________________________________________________________
+
+Q: ./configure simply does not work?
+
+Create your own configure script calling
+ ./rebuild
+
+If errors occur, you may have the wrong version of automake installed.
+Then, copy the automake files (missing, dep-comp...) from
+ /usr/local/share/automake
+to the game directory and execute the rebuild script again.
+
+You can also use this technique to alter the file
+ configure.in
+removing e.g. library checks and modifying the LDFLAGS variable.
+________________________________________________________________________
+
+Q: How to compile on MacOSX?
+
+In the Makefile, set LIBS to
+-framework OpenGL -framework SDL -framework GLUT -framework Foundation 
+-lSDL_mixer -lSDLmain -framework QuickTime -framework CoreServices 
+-framework AppKit
+________________________________________________________________________
+
+Q: Libraries are installed, but gcc (linker) does not find them?
+
+Try the command
+ g++ -g -O2 -lm -o gl-117 main.o gl.o model.o 3ds.o audio.o land.o \
+  glland.o aiobject.o effects.o roam.o net.o mathtab.o dirs.o \
+  objload.o pilots.o common.o \
+  -lGL -lGLU -lglut -lSDL -lSDLmain -lSDL_mixer \
+  -lXmu -lXext -lXi -lXxf86vm
+________________________________________________________________________
+
+Q: Cannot open GLX?
+
+Try another bpp setting. (32, 16, 8)
+________________________________________________________________________
+
+Q: Graphics do not initialize?
+
+This game needs properly installed versions of OpenGL, GLU, and GLUT!
+________________________________________________________________________
+
+Q: Graphics too lame?
+
+Sorry, OpenGL is not supported by every graphics card.
+You will need at least an Nvidia TNT2 chipset to seriously play the game,
+as well as the appropriate drivers.
+The game has been tested in 800x600 mode on
+ Athlon 1400 GeForce2, quality=3, view=50: FPS>30
+ P4 2.4GHz GeForce4, quality=5, view=100: FPS>30
