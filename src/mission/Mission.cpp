@@ -302,17 +302,30 @@ void Mission::objectInit (AiObj *aiobj, int party, int ailevel)
   }
 }
 
+int Mission::processtimer (Uint32 dt)
+{
+  bool b = false;
+  timer += dt;
+  if (!fplayer->active && fplayer->explode >= 35 * timestep)
+  {
+    return 2;
+  }
+  for (unsigned i = 0; i < fighter.size (); i ++)
+  {
+    if (fighter [i]->active)
+      if (fighter [i]->party == 0)
+        b = true;
+  }
+  if (b) return 0;
+  return 1;
+}
+
 /*void Mission::init ()
 {
 }
 
 void Mission::start ()
 {
-}
-
-int Mission::processtimer (Uint32 dt)
-{
-  return 0;
 }
 
 void Mission::draw ()

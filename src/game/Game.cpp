@@ -572,6 +572,7 @@ int game_levelInit ()
   flare.clear ();
   chaff.clear ();
   groundobj.clear ();
+  star.clear ();
 
   // init all objects
 /*  for (unsigned i = 0; i < fighter.size (); i ++)
@@ -765,11 +766,9 @@ int game_levelInit ()
     chaff [i]->deactivate ();
   } */
 
-  for (i = 0; i < star.size (); i ++)
+  for (i = 0; i < maxstar; i ++)
   {
-    star [i]->phi = Math::random (360);
-    star [i]->gamma = Math::random (85);
-    star [i]->size = 0.6 + 0.15 * Math::random (8);
+    star.push_back (new Star (Math::random (360), Math::random (85), 0.6 + 0.15 * Math::random (8)));
   }
 
   Color skycolor;
@@ -973,7 +972,7 @@ void createMission (int missionid)
   if (missionid == MISSION_DEMO) missionnew = new MissionDemo1 ();
   else if (missionid == MISSION_TEST1) missionnew = new MissionTest1 ();
   else if (missionid == MISSION_TEST2) missionnew = new MissionTest2 ();
-  else if (missionid == MISSION_TRANSPORT) missionnew = new MissionTransportDescriptor ();
+  else if (missionid == MISSION_TRANSPORT) missionnew = new MissionTransport ();
   else if (missionid == MISSION_CONVOY) missionnew = new MissionConvoy ();
   else if (missionid == MISSION_DOGFIGHT2) missionnew = new MissionDogfight2 ();
   else if (missionid == MISSION_AIRBATTLE) missionnew = new MissionAirBattle ();

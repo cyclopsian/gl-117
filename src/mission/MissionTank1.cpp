@@ -93,7 +93,7 @@ void MissionTank1::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionTank1::processtimer (Uint32 dt)
+/*int MissionTank1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -110,7 +110,7 @@ int MissionTank1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionTank1::draw ()
 {

@@ -70,7 +70,7 @@ void MissionTest1::start ()
   }
 }
 
-int MissionTest1::processtimer (Uint32 dt)
+/*int MissionTest1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -87,7 +87,7 @@ int MissionTest1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionTest1::draw ()
 {

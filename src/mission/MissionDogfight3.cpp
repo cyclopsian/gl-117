@@ -93,7 +93,7 @@ void MissionDogfight3::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionDogfight3::processtimer (Uint32 dt)
+/*int MissionDogfight3::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -110,7 +110,7 @@ int MissionDogfight3::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionDogfight3::draw ()
 {

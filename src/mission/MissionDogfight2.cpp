@@ -63,27 +63,15 @@ void MissionDogfight2::start ()
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 6; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 10);
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 10);
-  }
-  for (i = 7; i <= 8; i ++)
-  {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_fige;
-    fighter [i]->trafo.translation.x = -i * 10 - 100;
-    fighter [i]->trafo.translation.z = -i * 10 - 100;
-    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 20);
-    fighter [i]->deactivate ();
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionDogfight2::processtimer (Uint32 dt)
+/*int MissionDogfight2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -92,7 +80,7 @@ int MissionDogfight2::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 7; i ++)
+  for (i = 0; i <= fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -100,7 +88,7 @@ int MissionDogfight2::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionDogfight2::draw ()
 {
@@ -111,14 +99,19 @@ void MissionDogfight2::draw ()
   if (timer >= 1000 * timestep && state == 0)
   {
     state ++;
-    fighter [7]->activate ();
-    fighter [8]->activate ();
-    fighter [7]->trafo.translation.x = fplayer->trafo.translation.x + 50;
-    fighter [7]->trafo.translation.z = fplayer->trafo.translation.z + 50;
-    fighter [7]->trafo.translation.y = l->getHeight (fighter [7]->trafo.translation.x, fighter [7]->trafo.translation.z) + 10;
-    fighter [8]->trafo.translation.x = fplayer->trafo.translation.x + 60;
-    fighter [8]->trafo.translation.z = fplayer->trafo.translation.z + 60;
-    fighter [8]->trafo.translation.y = l->getHeight (fighter [8]->trafo.translation.x, fighter [8]->trafo.translation.z) + 10;
+    Fighter *f;
+    f = new Fighter (CrowDescriptor);
+    objectInit (f, 0, 260);
+    f->target = fighter [Math::random (2)];
+    f->trafo.translation.x = fplayer->trafo.translation.x + 50;
+    f->trafo.translation.z = fplayer->trafo.translation.z + 50;
+    f->trafo.translation.y = l->getHeight (fighter [7]->trafo.translation.x, fighter [7]->trafo.translation.z) + 10;
+    f = new Fighter (CrowDescriptor);
+    objectInit (f, 0, 240);
+    f->target = fighter [Math::random (2)];
+    f->trafo.translation.x = fplayer->trafo.translation.x + 60;
+    f->trafo.translation.z = fplayer->trafo.translation.z + 60;
+    f->trafo.translation.y = l->getHeight (fighter [8]->trafo.translation.x, fighter [8]->trafo.translation.z) + 10;
   }
   if (timer >= 1000 * timestep && timer <= 1200 * timestep)
     font1->drawTextCentered (0, 7, -3, "MORE ENEMIES ENTERING THE REGION", textcolor);

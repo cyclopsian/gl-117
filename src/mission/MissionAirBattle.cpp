@@ -33,6 +33,7 @@
 
 
 MissionAirBattle::MissionAirBattle ()
+  : Mission ()
 {
   id = MISSION_AIRBATTLE;
   strcpy (name, "AIR BATTLE");
@@ -97,7 +98,7 @@ void MissionAirBattle::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionAirBattle::processtimer (Uint32 dt)
+/*int MissionAirBattle::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -114,7 +115,7 @@ int MissionAirBattle::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionAirBattle::draw ()
 {

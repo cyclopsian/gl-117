@@ -104,7 +104,7 @@ void MissionCanyon2::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionCanyon2::processtimer (Uint32 dt)
+/*int MissionCanyon2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -121,7 +121,7 @@ int MissionCanyon2::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionCanyon2::draw ()
 {

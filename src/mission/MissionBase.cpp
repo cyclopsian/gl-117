@@ -168,7 +168,7 @@ void MissionBase::start ()
   }
 }
 
-int MissionBase::processtimer (Uint32 dt)
+/*int MissionBase::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -185,7 +185,7 @@ int MissionBase::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionBase::draw ()
 {

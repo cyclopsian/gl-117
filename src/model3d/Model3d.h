@@ -330,8 +330,6 @@ class Model3d
 {
   public:
 
-    static bool showCollision; ///< show collision cube of the model
-
 //    std::string name;    ///< unique model name like "GL-117"
     int shading;         ///< shading can be set to FLAT (0) or SMOOTH/GOURAUD (1)
     Uint16 numObjects;   ///< number of objects (which have a unique material)

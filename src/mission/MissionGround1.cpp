@@ -103,7 +103,7 @@ void MissionGround1::start ()
   fighter [8]->newinit (TentDescriptor, 0, 200);
 }
 
-int MissionGround1::processtimer (Uint32 dt)
+/*int MissionGround1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -120,7 +120,7 @@ int MissionGround1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionGround1::draw ()
 {

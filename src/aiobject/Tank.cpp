@@ -156,7 +156,7 @@ void Tank::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m
   if (firecannonttl <= 0)
   {
     if (id == WieselDescriptor)
-      if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 40 && target->trafo.translation.y > trafo.translation.y + 2)
+      if (fabs (recrot.theta - currot.theta) < 2 && fabs (aw) < 20 && disttarget < 40)
       {
         fireCannon (c);
         firecannonttl += firerate * timestep;

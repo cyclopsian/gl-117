@@ -63,31 +63,26 @@ void MissionConvoy::start ()
   fighter [1]->trafo.translation.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Tank (WieselDescriptor), 0, 200);
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_tank1;
     int phi = (i - 2) * 180;
-    fighter [i]->newinit (WieselDescriptor, 0, 200);
-    fighter [i]->trafo.translation.x = px + SIN(phi) * 3.0;
-    fighter [i]->trafo.translation.z = py + COS(phi) * 3.0;
+    fighter [i]->trafo.translation.x = px + SIN(phi) * 5.0;
+    fighter [i]->trafo.translation.z = py + COS(phi) * 5.0;
     fighter [i]->currot.phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->getPrototype ()->maxthrust = 0;
   }
   for (i = 4; i <= 9; i ++)
   {
-    fighter [i]->party = 0;
+    if (i == 6 || i == 9) objectInit (new StaticPassive (PickupDescriptor), 0, 400);
+    else objectInit (new StaticPassive (TruckDescriptor), 0, 400);
     fighter [i]->target = fighter [0];
-//    if (i == 6 || i == 9) fighter [i]->o = &model_pickup1;
-//    else fighter [i]->o = &model_truck1;
     fighter [i]->trafo.translation.x = px + 7.5 - i;
     fighter [i]->trafo.translation.z = py + 7.5 - i;
-    if (i == 6 || i == 9) fighter [i]->newinit (PickupDescriptor, 0, 400);
-    else fighter [i]->newinit (TruckDescriptor, 0, 400);
   }
 }
 
-int MissionConvoy::processtimer (Uint32 dt)
+/*int MissionConvoy::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -104,7 +99,7 @@ int MissionConvoy::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionConvoy::draw ()
 {

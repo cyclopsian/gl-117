@@ -828,10 +828,10 @@ void AiObj::fireCannon (DynamicObj *l, float phi)
   laser.add (l);
 
   ammo --;
-  l->thrust = 0;
-  l->recthrust = l->thrust;
+//  l->thrust = 0;
+//  l->recthrust = l->thrust;
   l->getPrototype ()->manoeverability = 0.0;
-  l->getPrototype ()->maxthrust = 0;
+//  l->getPrototype ()->maxthrust = 0;
   if (target != NULL && ai)
   {
     if (target->active)

@@ -98,7 +98,7 @@ void MissionConvoy2::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionConvoy2::processtimer (Uint32 dt)
+/*int MissionConvoy2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -115,7 +115,7 @@ int MissionConvoy2::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionConvoy2::draw ()
 {

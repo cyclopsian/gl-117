@@ -62,7 +62,7 @@ int MissionTutorial1::processtimer (Uint32 dt)
   timer += dt;
   if (!fplayer->active && fplayer->explode >= 35 * timestep)
     return 2;
-  if (!fighter [1]->active && !fighter [2]->active && state == 1)
+  if (state == 1 && fighter.size () == 1)
     return 1;
   return 0;
 }
@@ -253,18 +253,15 @@ void MissionTutorial1::draw ()
   if (timer >= timeroff + 7 * timerdelay - timerlag / 2 && state == 0)
   {
     state ++;
-    fighter [1]->activate ();
-    fighter [1]->target = fighter [0];
-//    fighter [1]->o = &model_figt;
-    fighter [1]->newinit (TransportDescriptor, 0, 200);
-    fighter [1]->trafo.translation.x = fplayer->trafo.translation.x - 30;
-    fighter [1]->trafo.translation.z = fplayer->trafo.translation.z - 30;
-    fighter [2]->activate ();
-    fighter [2]->target = fighter [0];
-//    fighter [2]->o = &model_figt;
-    fighter [2]->newinit (TransportDescriptor, 0, 200);
-    fighter [2]->trafo.translation.x = fplayer->trafo.translation.x + 30;
-    fighter [2]->trafo.translation.z = fplayer->trafo.translation.z + 30;
+    Fighter *f;
+    f = new Fighter (TransportDescriptor);
+    objectInit (f, 0, 200);
+    f->trafo.translation.x = fplayer->trafo.translation.x - 30;
+    f->trafo.translation.z = fplayer->trafo.translation.z - 30;
+    f = new Fighter (TransportDescriptor);
+    objectInit (f, 0, 200);
+    f->trafo.translation.x = fplayer->trafo.translation.x + 30;
+    f->trafo.translation.z = fplayer->trafo.translation.z + 30;
   }
 }
 

@@ -119,6 +119,7 @@ void DynamicObj::init ()
   sink = 0;
   realism = false;
   stat = ObjectStatistics ();
+  realspeed = 0;
 }
 
 void DynamicObj::thrustUp ()
@@ -255,6 +256,8 @@ void DynamicObj::checkShield ()
 // check whether the object collides on the ground and alter gamma and y-translation
 void DynamicObj::crashGround (Uint32 dt)
 {
+  if (immunity > 0)
+    return;
   if (id >= MovingGroundBeginDescriptor)
     return;
   float height = trafo.translation.y - l->getExactHeight (trafo.translation.x, trafo.translation.z);

@@ -8,6 +8,9 @@ rot.gamma = 0
 zoom = 0.35
 ammo = 100000
 dualshot = false
+cubex = 0.26
+cubey = 0.15
+cubez = 0.26
 
 
 # ADD MORE (Search&Replace this text)

@@ -66,17 +66,14 @@ void MissionTutorial2::start ()
   fplayer->trafo.translation.z = py + 150;
   for (i = 1; i <= 2; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_tank1;
+    objectInit (new Tank (PantherDescriptor), 0, 400);
     fighter [i]->trafo.translation.x = px + 6 - i * 4;
     fighter [i]->trafo.translation.z = py + 6 - i * 4;
-    fighter [i]->newinit (PantherDescriptor, 0, 400);
     fighter [i]->getPrototype ()->maxthrust = 0;
   }
 }
 
-int MissionTutorial2::processtimer (Uint32 dt)
+/*int MissionTutorial2::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -93,7 +90,7 @@ int MissionTutorial2::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionTutorial2::draw ()
 {

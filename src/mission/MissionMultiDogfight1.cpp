@@ -69,7 +69,7 @@ void MissionMultiDogfight1::start ()
     fplayer->easymodel = 2;
 }
 
-int MissionMultiDogfight1::processtimer (Uint32 dt)
+/*int MissionMultiDogfight1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -86,7 +86,7 @@ int MissionMultiDogfight1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionMultiDogfight1::draw ()
 {

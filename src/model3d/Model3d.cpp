@@ -31,8 +31,6 @@
 
 
 
-bool Model3d::showCollision = false;
-
 Model3d::Model3d ()
 {
   numObjects = 0;

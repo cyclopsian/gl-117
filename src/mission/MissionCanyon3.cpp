@@ -116,7 +116,7 @@ void MissionCanyon3::start ()
   }
 }
 
-int MissionCanyon3::processtimer (Uint32 dt)
+/*int MissionCanyon3::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -133,7 +133,7 @@ int MissionCanyon3::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionCanyon3::draw ()
 {

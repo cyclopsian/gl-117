@@ -371,12 +371,13 @@ void Fighter::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *>
   float targetheight = trafo.translation.y;
   if (target != NULL)
     targetheight = l->getExactHeight (target->trafo.translation.x, target->trafo.translation.z);
+
+  selectTarget (f);
+
   if (target != NULL)
     disttarget = distance (target); // distance to target
   else
     disttarget = 1;
-
-  selectTarget (f);
 
   if (haveMissile () && target != NULL)
   {

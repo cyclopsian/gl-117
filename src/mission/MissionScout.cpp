@@ -72,7 +72,7 @@ void MissionScout::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionScout::processtimer (Uint32 dt)
+/*int MissionScout::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -89,7 +89,7 @@ int MissionScout::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionScout::draw ()
 {

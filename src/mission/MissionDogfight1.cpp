@@ -41,7 +41,14 @@ MissionDogfight1::MissionDogfight1 ()
   alliedfighters = 1;
   maxtime = 5000 * timestep;
 }
-  
+
+Fighter *MissionDogfight1::addFighter ()
+{
+  Fighter *f = new Fighter (CrowDescriptor);
+  objectInit (f, 0, 395);
+  return f;
+}
+
 void MissionDogfight1::start ()
 {
   int i;
@@ -56,18 +63,9 @@ void MissionDogfight1::start ()
   playerInit ();
   fplayer->trafo.translation.x = 20;
   fplayer->trafo.translation.z = 70;
-  for (i = 1; i <= 6; i ++)
-  {
-    objectInit (new Fighter (CrowDescriptor), 0, 395);
-//    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_fige;
-    fighter [i]->trafo.translation.x = -i * 10;
-    fighter [i]->trafo.translation.z = -i * 10;
-//    fighter [i]->newinit (CrowDescriptor, 0, 395);
-    fighter [i]->deactivate ();
-  }
-  fighter [1]->activate ();
+  Fighter *f = addFighter ();
+  f->trafo.translation.x = -10;
+  f->trafo.translation.z = -10;
   state = 0;
   laststate = 0;
   texttimer = 0;
@@ -84,7 +82,7 @@ int MissionDogfight1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 6; i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -96,10 +94,10 @@ int MissionDogfight1::processtimer (Uint32 dt)
   {
     for (i = 2; i <= 3; i ++)
     {
-      fighter [i]->activate ();
-      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
-      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
-      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
+      Fighter *f = addFighter ();
+      f->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
+      f->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
+      f->trafo.translation.y = l->getHeight (f->trafo.translation.x, f->trafo.translation.z) + 15;
     }
     return 0;
   }
@@ -107,10 +105,10 @@ int MissionDogfight1::processtimer (Uint32 dt)
   {
     for (i = 4; i <= 6; i ++)
     {
-      fighter [i]->activate ();
-      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
-      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
-      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
+      Fighter *f = addFighter ();
+      f->trafo.translation.x = fplayer->trafo.translation.x + 50 + 10 * i;
+      f->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
+      f->trafo.translation.y = l->getHeight (f->trafo.translation.x, f->trafo.translation.z) + 15;
     }
     return 0;
   }

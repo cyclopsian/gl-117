@@ -1325,7 +1325,7 @@ void StateStats::display ()
     yf = -6;
     font1->drawTextCentered (0, yf, zf, "PROMOTED TO", *color);
     yf -= 1.5;
-    sprintf (buf, "%s", p->getRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1));
+    sprintf (buf, "%s", p->getRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str ());
     font1->drawTextCentered (0, yf, zf, buf, *color);
     drawRank (-11, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);
     drawRank (7, yf + 0.2, zf, pilots->pilot [pilots->aktpilot]->ranking, 2);

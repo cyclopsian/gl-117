@@ -124,7 +124,7 @@ int MissionDefend1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 15; i ++)
+  for (i = 0; i <= fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)

@@ -180,7 +180,7 @@ void MissionDepot::start ()
   n ++;
 }
 
-int MissionDepot::processtimer (Uint32 dt)
+/*int MissionDepot::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -197,7 +197,7 @@ int MissionDepot::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionDepot::draw ()
 {

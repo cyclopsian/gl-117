@@ -1,7 +1,7 @@
 impact = 5
 manoeverability = 0.04
 nimbility = 0.12
-thrust = 0.16
+thrust = 0.1
 shield = 35
 rot.theta = 30
 rot.gamma = 25

@@ -1,10 +1,10 @@
-impact = 7
+impact = 5
 manoeverability = 0
 nimbility = 0
 thrust = 0
 shield = 1
 zoom = 0.35
-cube = 0.2
+cube = 0.18
 ttl = 100
 
 # ADD MORE (Search&Replace this text)

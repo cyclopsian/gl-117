@@ -71,7 +71,7 @@ void MissionDemo1::start ()
   fighter [1]->target = fighter [3];
 }
 
-int MissionDemo1::processtimer (Uint32 dt)
+/*int MissionDemo1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -88,7 +88,7 @@ int MissionDemo1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionDemo1::draw ()
 {

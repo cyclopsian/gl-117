@@ -32,7 +32,7 @@
 
 
 
-MissionTransportDescriptor::MissionTransportDescriptor ()
+MissionTransport::MissionTransport ()
 {
   id = MISSION_TRANSPORT;
   strcpy (name, "TRANSPORT");
@@ -43,7 +43,7 @@ MissionTransportDescriptor::MissionTransportDescriptor ()
   alliedpilot [0] = PILOT_PRIMETIME;
 }
 
-void MissionTransportDescriptor::start ()
+void MissionTransport::start ()
 {
   int i;
   day = 1;
@@ -55,32 +55,28 @@ void MissionTransportDescriptor::start ()
   l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
   fplayer->trafo.translation.x = 0;
-  fplayer->trafo.translation.z = 100;
+  fplayer->trafo.translation.z = 60;
   alliedInit (FalconDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 5;
-  fighter [1]->trafo.translation.z = 105;
+  fighter [1]->trafo.translation.z = 65;
   for (i = 2; i <= 4; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 340);
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_fige;
-    fighter [i]->trafo.translation.x = -i * 10;
-    fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (CrowDescriptor, 0, 340);
+    fighter [i]->trafo.translation.x = -i * 20;
+    fighter [i]->trafo.translation.z = -i * 20;
   }
   for (i = 5; i <= 6; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (TransportDescriptor), 0, 200);
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_figt;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (TransportDescriptor, 0, 200);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionTransportDescriptor::processtimer (Uint32 dt)
+/*int MissionTransportDescriptor::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -97,9 +93,9 @@ int MissionTransportDescriptor::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
-void MissionTransportDescriptor::draw ()
+void MissionTransport::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {

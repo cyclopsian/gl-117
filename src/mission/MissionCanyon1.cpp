@@ -77,17 +77,6 @@ void MissionCanyon1::start ()
     fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
-  for (i = 4; i <= 10; i ++)
-  {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_figd;
-    fighter [i]->currot.phi = 180;
-    fighter [i]->newinit (BuzzardDescriptor, 0, 50 + i * 20);
-    fighter [i]->trafo.translation.x = px - 15 - i * 3;
-    fighter [i]->trafo.translation.z = py - 15 - i * 3;
-    fighter [i]->deactivate ();
-  }
   for (i = 11; i <= 12; i ++)
   {
 //    fighter [i]->o = &model_flarak1;
@@ -110,12 +99,21 @@ int MissionCanyon1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  if (fplayer->trafo.translation.y >= fighter [1]->trafo.translation.y && Math::distance (fplayer->trafo.translation.x - fighter [1]->trafo.translation.x, fplayer->trafo.translation.z - fighter [1]->trafo.translation.z) < 150)
+  if (state == 0 && fplayer->trafo.translation.y >= fighter [1]->trafo.translation.y &&
+      Math::distance (fplayer->trafo.translation.x - fighter [1]->trafo.translation.x,
+      fplayer->trafo.translation.z - fighter [1]->trafo.translation.z) < 150)
   {
+    state = 1;
     for (i = 4; i <= 10; i ++)
     {
-      if (!fighter [i]->active && fighter [i]->shield > 10)
-        fighter [i]->activate ();
+      fighter [i]->party = 0;
+      fighter [i]->target = fighter [0];
+  //    fighter [i]->o = &model_figd;
+      fighter [i]->currot.phi = 180;
+      fighter [i]->newinit (BuzzardDescriptor, 0, 50 + i * 20);
+//      fighter [i]->trafo.translation.x = px - 15 - i * 3;
+//      fighter [i]->trafo.translation.z = py - 15 - i * 3;
+      fighter [i]->deactivate ();
     }
   }
   for (i = 0; i <= 3; i ++)

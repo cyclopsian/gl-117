@@ -86,7 +86,7 @@ void MissionShip1::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionShip1::processtimer (Uint32 dt)
+/*int MissionShip1::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -103,7 +103,7 @@ int MissionShip1::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionShip1::draw ()
 {

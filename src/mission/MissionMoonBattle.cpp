@@ -101,7 +101,7 @@ void MissionMoonBattle::start ()
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
-int MissionMoonBattle::processtimer (Uint32 dt)
+/*int MissionMoonBattle::processtimer (Uint32 dt)
 {
   bool b = false;
   int i;
@@ -118,7 +118,7 @@ int MissionMoonBattle::processtimer (Uint32 dt)
   }
   if (b) return 0;
   return 1;
-}
+}*/
 
 void MissionMoonBattle::draw ()
 {

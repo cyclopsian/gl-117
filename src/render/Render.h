@@ -126,7 +126,7 @@ class OpenGlRenderer : public Renderer
             {
               glEnable (GL_LIGHTING);
               Model3dRealizer mr;
-              mr.draw (*model, spaceobj->trafo, 1.0, 0);
+              mr.draw (*model, spaceobj->trafo, 1.0, spaceobj->explode);
               if (!spaceobj->ref.empty ())
               {
                 glPushMatrix ();
@@ -151,7 +151,7 @@ class OpenGlRenderer : public Renderer
             {
               glDisable (GL_LIGHTING);
               Model3dRealizer mr;
-              mr.drawNoLight (*model, spaceobj->trafo, 0);
+              mr.drawNoLight (*model, spaceobj->trafo, spaceobj->explode);
             }
           }
         }
