@@ -65,6 +65,8 @@ int resolution [4] [4] =
 
 int difficulty = 1;
 
+float nearclippingplane = 0.1;
+
 bool sunblinding=false;
 
 Dirs *dirs;
@@ -4083,7 +4085,7 @@ void setLightSource (int gamma)
   light_position0 [0] = -cosi [gamma];
   light_position0 [1] = sine [gamma];
   light_position0 [2] = 0;
-  glLightfv( GL_LIGHT0, GL_POSITION, light_position0 );
+  glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
 void game_levelInit ()
@@ -4322,10 +4324,16 @@ void game_levelInit ()
 /*  float light_specular [3] = {0.5, 0.5, 0.5};
   glLightfv( GL_LIGHT0, GL_SPECULAR, light_specular );*/
   setLightSource ((int) sungamma);
-  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-  glEnable(GL_LIGHT0);                // Turn on a light with defaults set
-  glEnable(GL_LIGHTING);                // Turn on lighting
-  glEnable(GL_COLOR_MATERIAL);            // Allow color
+  glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+  glEnable (GL_LIGHT0);                // Turn on a light with defaults set
+  float light_ambient [4] = {0.2, 0.2, 0.2, 1.0};
+  float light_diffuse [4] = {1.0, 1.0, 1.0, 1.0};
+  float light_specular [4] = {1.0, 1.0, 1.0, 1.0};
+  glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
+  glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+  glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
+  glEnable (GL_LIGHTING);                // Turn on lighting
+  glEnable (GL_COLOR_MATERIAL);            // Allow color
 
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   glDisable (GL_DITHER);
@@ -4357,7 +4365,7 @@ void game_reshape ()
   /* angle, aspect, near Clip, far Clip */
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, (float) width / height, 0.20, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, (float) width / height, nearclippingplane, v); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -4378,7 +4386,7 @@ void menu_reshape ()
   /* angle, aspect, near Clip, far Clip */
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, 0.20, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -4396,7 +4404,7 @@ void credits_reshape ()
   /* angle, aspect, near Clip, far Clip */
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, 0.20, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -4414,7 +4422,7 @@ void stats_reshape ()
   /* angle, aspect, near Clip, far Clip */
   float v = getView ();
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, 0.20, v); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, v); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
 #ifndef USE_GLUT
@@ -8269,7 +8277,7 @@ void init_reshape ()
   /* angle, aspect, near Clip, far Clip */
   float v = view;
   if (camera == 50) v = 100000.0;
-  gluPerspective (80.0, 1.0, 0.20, 80); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, 80); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 }
 
@@ -8435,10 +8443,10 @@ void myFirstInit ()
   sungamma = 60;
   setLightSource (60);
 
-  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_COLOR_MATERIAL);
+  glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+  glEnable (GL_LIGHT0);
+  glEnable (GL_LIGHTING);
+  glEnable (GL_COLOR_MATERIAL);
 
   glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   glDisable (GL_DITHER);
@@ -8466,13 +8474,13 @@ void init_display ()
   CVector3 vec;
   CColor color (200, 200, 200, 255);
 
-//  gluPerspective (80.0, (float) width / height, 0.20, 50.0); // should be sqrt(2) or 1.5
+//  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0); // should be sqrt(2) or 1.5
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity ();
 //  glShadeModel(GL_SMOOTH);
 //  glPushMatrix ();
-//  gluPerspective (80.0, (float) width / height, 0.20, 150.0); // should be sqrt(2) or 1.5
+//  gluPerspective (80.0, (float) width / height, nearclippingplane, 150.0); // should be sqrt(2) or 1.5
 
 /*  glBegin (GL_TRIANGLES);
   glColor3ub (255,255,0);
@@ -9001,7 +9009,7 @@ int speedTest ()
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluPerspective (80.0, 1.0, 0.20, 20.0); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, 1.0, nearclippingplane, 20.0); // should be sqrt(2) or 1.5
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -9247,7 +9255,7 @@ int main (int argc, char **argv)
   glutIdleFunc (myIdleFunc);
   glutTimerFunc (20, myTimerFunc, 0);
 
-  gluPerspective (80.0, (float) width / height, 0.20, 50.0); // should be sqrt(2) or 1.5
+  gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0); // should be sqrt(2) or 1.5
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
   glutMainLoop();

@@ -111,11 +111,17 @@ void CSmoke::drawElemHQ (int n)
 void CSmoke::draw ()
 {
   int i;
+  int smoketype;
+  if (type == 0) smoketype = texsmoke->textureID;
+  else if (type == 1) smoketype = texsmoke2->textureID;
+  if (quality >= 3)
+    gl->enableLinearTexture (smoketype);
+  else
+    gl->disableLinearTexture (smoketype);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
-  if (type == 0) gl->enableTextures (texsmoke->textureID);
-  else if (type == 1) gl->enableTextures (texsmoke2->textureID);
+  gl->enableTextures (smoketype);
   for (i = last; i >= 0; i --)
   {
     if (time [i] > 0)

@@ -510,11 +510,15 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   {
       glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
       glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+/*      float light_specular [4] = {1, 1, 1, 1};
+      glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
+      glLighti (GL_LIGHT0, GL_SHININESS, 125.0);*/
   }
   else // half light if enshadowed
   {
       glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient2);
       glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse2);
+//      glLightf (GL_LIGHT0, GL_SHININESS, 0.0);
   }
 
   for (i = 0; i < numObjects; i ++)
