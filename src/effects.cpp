@@ -27,7 +27,7 @@
 
 #include "glland.h"
 
-const float smokezoom[] = { 0.02, 0.035, 0.05, 0.065, 0.085, 0.1, 0.11, 0.12, 0.1, 0.09, 0.05 };
+const float smokezoom[] = { 0.02, 0.027, 0.035, 0.042, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.11, 0.1, 0.09, 0.08, 0.06, 0.03 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
@@ -59,7 +59,7 @@ void CSmoke::move ()
   for (int i = 0; i < maxsmokeelem; i ++)
     if (time [i] > 0)
     {
-      time [i] -= 3;
+      time [i] -= 4;
       if (time [i] < 0) time [i] = 0;
     }
 }
@@ -69,7 +69,7 @@ void CSmoke::drawElem (int n)
 //    glRotatef (phi [n], 0, 1, 0);
   if (n < 0 || n >= maxsmokeelem) return;
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, time [n] * 20 + 55);
+  glColor4ub (255, 255, 255, time [n] * 10 + 55);
   float myzoom = smokezoom [time [n]];
   glTexCoord2f (0, 0);
   glVertex3f (v [n].x - myzoom * cosi [phi [n]], v [n].y + myzoom, v [n].z + myzoom * sine [phi [n]]);
@@ -87,7 +87,7 @@ void CSmoke::drawElemHQ (int n)
 //    glRotatef (phi [n], 0, 1, 0);
   if (n < 0 || n >= maxsmokeelem) return;
   glBegin (GL_QUADS);
-  glColor4ub (255, 255, 255, time [n] * 20 + 55);
+  glColor4ub (255, 255, 255, time [n] * 10 + 55);
   float myzoom = smokezoom [time [n]];
   glTexCoord2f (0, 0);
   glVertex3f (v [n].x - myzoom, v [n].y + myzoom, v [n].z);
@@ -308,6 +308,7 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
   if (ttl <= 0 || quality == 0) return;
   if (draw == 2 || gl->isSphereInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
   {
+    glDepthMask (GL_FALSE);
     if (quality >= 3)
       gl->enableLinearTexture (texsmoke3->textureID);
     else
@@ -333,6 +334,7 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
     glDisable (GL_TEXTURE_2D);
     glDisable (GL_ALPHA_TEST);
     gl->disableAlphaBlending ();
+    glDepthMask (GL_TRUE);
   }
 }
 
