@@ -4759,6 +4759,14 @@ void createMission (int missionid)
   else if (missionid == MISSION_MOON2) missionnew = new MissionMoonDogfight1 ();
   else if (missionid == MISSION_MOON3) missionnew = new MissionMoonBase1 ();
   else if (missionid == MISSION_MULTIPLAYER_DOGFIGHT) missionnew = new MissionMultiDogfight1 ();
+  if (mission != NULL)
+  {
+    if (mission->id == missionnew->id)
+    {
+      missionnew->wantfighter = mission->wantfighter;
+      missionnew->wantweapon = mission->wantweapon;
+    }
+  }
 }
 
 void switch_mission (int missionid)
@@ -9586,7 +9594,7 @@ void sdlMainLoop ()
             sdl_mousemotion (event.motion.xrel, event.motion.yrel);
           else*/
           myPassiveMotionFunc (event.motion.x, event.motion.y);
-          if (game == GAME_PLAY)
+          if (game == GAME_PLAY && controls == CONTROLS_MOUSE_EXP)
           {
             fplayer->rolleffect = 0;
             fplayer->elevatoreffect = 0;
