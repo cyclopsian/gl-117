@@ -157,8 +157,8 @@ int CTexture::loadFromTGA (char *fname, int quality, int alphatype, int mipmap) 
 
 void CTexture::getColor (CColor *c, int x, int y)
 {
-  if (x < 0 || x >= width) x %= width;
-  if (y < 0 || y >= height) y %= height;
+  if (x < 0 || x >= width) x = (unsigned int)x % width;
+  if (y < 0 || y >= height) y = (unsigned int)y % height;
   int offs = y * width + x;
   offs <<= 2;
   c->c [0] = data [offs];

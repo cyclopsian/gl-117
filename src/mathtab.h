@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-extern float *sine, *cosi;
+extern float sine[], cosi[];
 extern float PI;
 
 extern void mathtab_init ();

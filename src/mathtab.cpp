@@ -26,27 +26,18 @@
 #include "mathtab.h"
 
 float PI;
-float *sine;
-float *cosi;
-
-void mathtab_exit ()
-{
-  delete sine;
-  delete cosi;
-}
+float sine[360];
+float cosi[360];
 
 void mathtab_init ()
 {
   int i;
-  sine = new float [360];
-  cosi = new float [360];
   PI = (float) (atan (1.0) * 4.0);
   for (i = 0; i < 360; i ++)
   {
     sine [i] = (float) sin ((float) i / 180.0 * PI);
     cosi [i] = (float) cos ((float) i / 180.0 * PI);
   }
-  atexit (mathtab_exit);
 }
 
 int myrandom (int n)

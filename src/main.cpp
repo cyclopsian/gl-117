@@ -5909,8 +5909,6 @@ void game_quit ()
   delete space;
   delete dirs;
   delete gl;
-  delete sine;
-  delete cosi;
 // free allocated memory (optional)
 #ifndef USE_GLUT
 /*  SDL_CloseAudio();
