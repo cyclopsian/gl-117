@@ -22,7 +22,9 @@
 #ifndef IS_GLPRIMITIVES_H
 #define IS_GLPRIMITIVES_H
 
-#pragma warning(disable:4786) // VC98 bug
+#ifdef _MSC_VER
+  #pragma warning(disable:4786) // VC98 bug, needs SP5
+#endif
 
 #include <iostream>
 #include <vector>

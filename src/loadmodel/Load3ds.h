@@ -48,6 +48,7 @@ class BinaryFile3ds
     int readString (char *ptr, const int n);
     int readString (char *ptr);
     int skip (const int n);
+    Uint32 getSize ();
 
 private:
 

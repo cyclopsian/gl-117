@@ -168,4 +168,9 @@ int BinaryFile3ds::skip (const int len)
   return n;
 }
 
+Uint32 BinaryFile3ds::getSize ()
+{
+  return size;
+}
+
 #endif

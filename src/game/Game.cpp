@@ -1914,15 +1914,15 @@ void myFirstInit ()
   font2 = new Font (dirs.getTextures ("font2.tga"), 32, '!', 64);
 
   logging.display ("Loading 3ds models:", LOG_ALL);
+  logging.display (" * gl-14c.3ds", LOG_ALL);
+  load3ds.import3ds (&model_figb, dirs.getModels ("gl-14c.3ds"));
+  model_figb.setName ("HAWK");
   logging.display (" * gl-16.3ds", LOG_ALL);
   load3ds.import3ds (&model_fig, dirs.getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
   logging.display (" * gl-15.3ds", LOG_ALL);
   load3ds.import3ds (&model_figa, dirs.getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
-  logging.display (" * gl-14c.3ds", LOG_ALL);
-  load3ds.import3ds (&model_figb, dirs.getModels ("gl-14c.3ds"));
-  model_figb.setName ("HAWK");
   logging.display (" * gl-14d.3ds", LOG_ALL);
   load3ds.import3ds (&model_figc, dirs.getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
@@ -2374,7 +2374,7 @@ static void myMouseFunc (int button, int state, int x, int y)
     if (state == 0)
 #endif
     missionmenu.eventMouse (x, y, button);
-//    gamestate->mouse (button, state, x, y);
+    gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statestats)
   {

@@ -162,7 +162,7 @@ class GlLandscape : public Landscape
 
     void norm (float *c);
     void normalcrossproduct (float *a, float *b, float *c);
-    int selectColor (int x, int y);
+//    int selectColor (int x, int y);
 };
 
 /// The current OpenGL landscape

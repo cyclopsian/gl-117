@@ -120,6 +120,11 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
   while (previousChunk->bytesRead < previousChunk->length)
   {
     readChunk(currentChunk);
+    if (currentChunk->length > file->getSize ())
+    {
+      if (debug3ds) { fprintf (debugstream3ds, "ERROR=>cancel "); fflush (debugstream3ds); }
+      return;
+    }
     if (currentChunk->ID == 0 && currentChunk->length == 0) exit (1000);
     if (debug3ds) { fprintf (debugstream3ds, "%X: ", currentChunk->ID); fflush (debugstream3ds); }
 
@@ -136,8 +141,11 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
 
       case OBJECTINFO:
         readChunk (tempChunk);
-        tempChunk->bytesRead += file->readString (version, 10, tempChunk->length - tempChunk->bytesRead);
-        currentChunk->bytesRead += tempChunk->bytesRead;
+        if (tempChunk->ID == 15678)
+        {
+          tempChunk->bytesRead += file->readString (version, 10, tempChunk->length - tempChunk->bytesRead);
+          currentChunk->bytesRead += tempChunk->bytesRead;
+        }
         processNextChunk (model, currentChunk);
         break;
 
@@ -473,21 +481,24 @@ void Load3ds::compile (Model3d *model)
   for (i = 0; i < model->numObjects; i ++)
   {
     Object3d *co = model->object [i];
-    float uscale = co->material->uscale;
-    float vscale = co->material->vscale;
-    float uoffset = co->material->uoffset;
-    float voffset = co->material->voffset;
-    for (int i2 = 0; i2 < co->numVertices; i2 ++)
+    if (co->material)
     {
-      float ax = co->vertex [i2].tex.x - 0.5;
-      float ay = co->vertex [i2].tex.y - 0.5;
-      float phi = -co->material->wrot;
-      co->vertex [i2].tex.x = ax * COS(phi) - ay * SIN(phi) + 0.5;
-      co->vertex [i2].tex.y = ax * SIN(phi) + ay * COS(phi) + 0.5;
-      co->vertex [i2].tex.x -= uoffset;
-      co->vertex [i2].tex.y += voffset;
-      co->vertex [i2].tex.x = (co->vertex [i2].tex.x - 0.5) * uscale + 0.5;
-      co->vertex [i2].tex.y = (co->vertex [i2].tex.y - 0.5) * vscale + 0.5;
+      float uscale = co->material->uscale;
+      float vscale = co->material->vscale;
+      float uoffset = co->material->uoffset;
+      float voffset = co->material->voffset;
+      for (int i2 = 0; i2 < co->numVertices; i2 ++)
+      {
+        float ax = co->vertex [i2].tex.x - 0.5;
+        float ay = co->vertex [i2].tex.y - 0.5;
+        float phi = -co->material->wrot;
+        co->vertex [i2].tex.x = ax * COS(phi) - ay * SIN(phi) + 0.5;
+        co->vertex [i2].tex.y = ax * SIN(phi) + ay * COS(phi) + 0.5;
+        co->vertex [i2].tex.x -= uoffset;
+        co->vertex [i2].tex.y += voffset;
+        co->vertex [i2].tex.x = (co->vertex [i2].tex.x - 0.5) * uscale + 0.5;
+        co->vertex [i2].tex.y = (co->vertex [i2].tex.y - 0.5) * vscale + 0.5;
+      }
     }
   }
 }
