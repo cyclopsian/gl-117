@@ -30,10 +30,13 @@
 #include "effects.h"
 
 // id values of objects
+// non-AI air objects
 #define CANNON1 0
+#define ASTEROID 50
 #define FLARE1 80
 #define CHAFF1 85
 #define CANNON2 99
+// missiles
 #define MISSILE1 100
 #define MISSILE_AIR1 100
 #define MISSILE_AIR2 101
@@ -45,6 +48,8 @@
 #define MISSILE_FF2 107
 #define MISSILE_MINE1 180
 #define MISSILE2 199
+// air units
+#define AIR 200
 #define FIGHTER1 200
 #define FIGHTER_FALCON 200
 #define FIGHTER_SWALLOW 201
@@ -57,21 +62,28 @@
 #define FIGHTER_BLACKBIRD 208
 #define FIGHTER_TRANSPORT 280
 #define FIGHTER2 299
+// moving ground units from here
+#define MOVING_GROUND 500
 #define TANK1 700
 #define TANK_AIR1 700
 #define TANK_GROUND1 710
 #define TANK_PICKUP1 780
 #define TANK_TRUCK1 790
 #define TANK2 799
+// moving water units from here
+#define MOVING_WATER 800
 #define SHIP1 800
 #define SHIP_CRUISER 800
 #define SHIP_DESTROYER1 810
 #define SHIP2 899
+// static ground units from here
+#define STATIC_GROUND 1000
 #define FLAK1 1000
 #define FLAK_AIR1 1000
 #define FLARAK_AIR1 1010
 #define FLAK2 1099
-#define STATIC 10000
+// passive static units from here
+#define STATIC_PASSIVE 10000
 #define STATIC_TENT1 10000
 #define STATIC_TENT4 10003
 #define STATIC_CONTAINER1 10100
@@ -81,7 +93,6 @@
 #define STATIC_COMPLEX1 10301
 #define STATIC_RADAR1 10302
 #define STATIC_BASE1 10303
-#define ASTEROID 50
 
 //extern GLLandscape *l;
 

@@ -195,7 +195,7 @@ void save_config ()
   }
   cf->writeText ("# Configuration\n");
   cf->writeText ("# Some possible width x height values for fullscreen mode:");
-  cf->writeText ("#  640x480, 800x600, 1024x768");
+  cf->writeText ("#  640x480, 800x600, 1024x768, 1152x864, 1280x768, 1280x960, 1280x1024");
   cf->write (" width", width);
   cf->write (" height", height);
   cf->writeText ("# Possible bits per pixel values (color depth):");

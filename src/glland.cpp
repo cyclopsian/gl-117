@@ -512,10 +512,31 @@ float GLLandscape::getExactHeight3 (float x, float z)
 }
 
 // Get height over landscape/water, linear interpolation (slow)
+float GLLandscape::getExactHeight4 (float x, float z)
+{
+  float mx = x+MAXX/2;
+  float mz = (float)MAXX/2-z;
+  int mx1 = (int) mx;
+  int mz1 = (int) mz;
+  mx1 -= mx1 & 3;
+  mz1 -= mz1 & 3;
+  int mx2 = mx1 + 4;
+  int mz2 = mz1 + 4;
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
+  return (ZOOM * (h2/16*zoomz - zoomz2));
+}
+
+// Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight (float x, float z)
 {
   if (gridstep == 2) return getExactHeight2 (x, z);
   else if (gridstep == 3) return getExactHeight3 (x, z);
+  else if (gridstep == 4) return getExactHeight4 (x, z);
   float mx = x+MAXX/2;
   float mz = (float)MAXX/2-z;
   int mx1 = (int) mx;
@@ -578,10 +599,33 @@ float GLLandscape::getExactLSHeight3 (float x, float z)
 // Get height over landscape/water without ZOOM scaling, linear interpolation (slow)
 // Only used to draw trees
 // Get height over landscape/water, linear interpolation (slow)
+float GLLandscape::getExactLSHeight4 (float x, float z)
+{
+  float mx = x;
+  float mz = z;
+  int mx1 = (int) mx;
+  int mz1 = (int) mz;
+  mx1 -= mx1 & 3;
+  mz1 -= mz1 & 3;
+  int mx2 = mx1 + 4;
+  int mz2 = mz1 + 4;
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
+  return (h2/16*zoomz - zoomz2);
+}
+
+// Get height over landscape/water without ZOOM scaling, linear interpolation (slow)
+// Only used to draw trees
+// Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactLSHeight (float x, float z)
 {
   if (gridstep == 2) return getExactLSHeight2 (x, z);
   else if (gridstep == 3) return getExactLSHeight3 (x, z);
+  else if (gridstep == 4) return getExactLSHeight4 (x, z);
   float mx = x;
   float mz = z;
   int mx1 = (int) mx;
@@ -2218,7 +2262,7 @@ void GLLandscape::draw (int phi, int gamma)
     for (i2 = 0; i2 < parts; i2 ++)
     {
       float d = dist (mp - i, mp - i2);
-      detail [i] [i2] = (int) (d * 200.0F / pseudoview);
+      detail [i] [i2] = (int) (d * 200.0F / view); // do not use pseudoview
     }
 
   float dx = (float) (maxx - minx + 1) / parts;

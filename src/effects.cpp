@@ -27,7 +27,7 @@
 
 #include "glland.h"
 
-const float smokezoom[] = { 0.02, 0.025, 0.03, 0.035, 0.04, 0.045, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
+const float smokezoom[] = { 0.015, 0.025, 0.03, 0.035, 0.04, 0.045, 0.05, 0.058, 0.065, 0.075, 0.085, 0.092, 0.1, 0.105, 0.11, 0.115, 0.12, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
@@ -339,14 +339,23 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
     if (myalpha > 255) myalpha = 255;
     glColor4ub (0, 0, 0, myalpha);
     float myzoom = zoom;
-    glTexCoord2f (0, 0);
+    float cosphi = COS(camphi), sinphi = SIN(camphi);
+/*    glTexCoord2f (0, 0);
     glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z + myzoom * sine [(int) myphi]);
     glTexCoord2f (1, 0);
     glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y + myzoom, this->tl->z - myzoom * sine [(int) myphi]);
     glTexCoord2f (1, 1);
     glVertex3f (this->tl->x + myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z - myzoom * sine [(int) myphi]);
     glTexCoord2f (0, 1);
-    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z + myzoom * sine [(int) myphi]);
+    glVertex3f (this->tl->x - myzoom * cosi [(int) myphi], this->tl->y - myzoom, this->tl->z + myzoom * sine [(int) myphi]);*/
+    glTexCoord2f (0, 0);
+    glVertex3f (this->tl->x - myzoom * cosphi, this->tl->y + myzoom, this->tl->z + myzoom * sinphi);
+    glTexCoord2f (1, 0);
+    glVertex3f (this->tl->x + myzoom * cosphi, this->tl->y + myzoom, this->tl->z - myzoom * sinphi);
+    glTexCoord2f (1, 1);
+    glVertex3f (this->tl->x + myzoom * cosphi, this->tl->y - myzoom, this->tl->z - myzoom * sinphi);
+    glTexCoord2f (0, 1);
+    glVertex3f (this->tl->x - myzoom * cosphi, this->tl->y - myzoom, this->tl->z + myzoom * sinphi);
     glEnd ();
     glDisable (GL_TEXTURE_2D);
     glDisable (GL_ALPHA_TEST);

@@ -56,7 +56,7 @@ class CSmoke
   CVector3 v [maxsmokeelem];
   float zoom [maxsmokeelem];
   int time [maxsmokeelem];
-  int phi [maxsmokeelem]; // player's view angle (for low quality smoke)
+  int phi [maxsmokeelem]; // player's view angle (for low quality smoke), obsolete since v0.8.5
   int last;
   int type;
   CSmoke (int type);
@@ -100,7 +100,7 @@ class CBlackSmoke : public CSpaceObj
   Space *space;
   int ttl, maxlen;
   float maxzoom;
-  float myphi; // player's view angle
+  float myphi; // player's view angle, obsolete since v0.8.5
   CBlackSmoke (Space *space);
   void setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len);
   void move (Uint32 dt);

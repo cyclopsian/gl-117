@@ -127,7 +127,28 @@ void Cockpit::drawCounter ()
       glEnd ();
     }
   }
-  glColor3ub (255, 255, 255);
+  glLineWidth (1.0F);
+  glColor3ub (255, 0, 0);
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (xf - 1.0F, yf - 1.0F, zf);
+  glVertex3f (xf + 1.0F, yf - 1.0F, zf);
+  glVertex3f (xf + 1.0F, yf - 0.25F, zf);
+  glVertex3f (xf - 1.0F, yf - 0.25F, zf);
+  glVertex3f (xf - 1.0F, yf - 1.0F, zf);
+  glEnd ();
+  glColor3ub (0, 100, 255);
+  glBegin (GL_LINE_STRIP);
+  glVertex3f (xf - 1.0F, yf + 0.25F, zf);
+  glVertex3f (xf + 1.0F, yf + 0.25F, zf);
+  glVertex3f (xf + 1.0F, yf + 1.0F, zf);
+  glVertex3f (xf - 1.0F, yf + 1.0F, zf);
+  glVertex3f (xf - 1.0F, yf + 0.25F, zf);
+  glEnd ();
+  CColor blue (0, 100, 255);
+  CColor red (255, 0, 0);
+  font1->drawText (17.0F, -7.1F, -3.0F, "CHAFF", &blue);
+  font1->drawText (17.0F, -10.45F, -3.0F, "FLARE", &red);
+/*  glColor3ub (255, 255, 255);
   gl->enableTextures (texcounter->textureID);
   glEnable (GL_BLEND);
   glBegin (GL_QUADS);
@@ -141,7 +162,7 @@ void Cockpit::drawCounter ()
   glVertex3f (xf - 1.0F, yf + 1.0F, zf);
   glEnd ();
   glDisable (GL_BLEND);
-  glDisable (GL_TEXTURE_2D);
+  glDisable (GL_TEXTURE_2D);*/
 }
 
 void Cockpit::drawTargeter ()

@@ -260,6 +260,7 @@ void MissionDemo1::start ()
   fighter [1]->tl->x = 49;
   fighter [1]->tl->z = -30;
   fighter [1]->newinit (FIGHTER_FALCON, 1, 0);
+  fighter [1]->aggressivity = 300;
   for (i = 2; i <= 8; i ++)
   {
     fighter [i]->target = fighter [myrandom (2)];
@@ -1045,7 +1046,7 @@ MissionGround1::MissionGround1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_PRIMETIME;
-  maxtime = 3000 * timestep;
+  maxtime = 3500 * timestep;
 }
 
 void MissionGround1::start ()
@@ -1218,7 +1219,7 @@ MissionBase::MissionBase ()
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_HEPTARGON;
   alliedpilot [3] = PILOT_DRDOOM;
-  maxtime = 6000 * timestep;
+  maxtime = 6500 * timestep;
 }
 
 void MissionBase::start ()
@@ -1396,7 +1397,7 @@ MissionDefend1::MissionDefend1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_SHADOW;
-  maxtime = 3000 * timestep;
+  maxtime = 3500 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
 }
 
@@ -1517,7 +1518,7 @@ MissionDogfight3::MissionDogfight3 ()
   strcpy (briefing, "ENEMY FIGHTERS HAVE BEEN SIGHTED. YOU HAVE TO INTERCEPT THEM IMMEDIATELY. EXPECT BOMBERS WITHIN THEIR WING.");
   autoLFBriefing ();
   alliedfighters = 4;
-  maxtime = 3000 * timestep;
+  maxtime = 3500 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
@@ -1622,7 +1623,7 @@ MissionTank1::MissionTank1 ()
   strcpy (briefing, "THE ENEMY IS GATHERING LOTS OF TANKS. FLY AN ASSAUT AND DESTROY THEM.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3500 * timestep;
+  maxtime = 4500 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1711,7 +1712,7 @@ MissionShip1::MissionShip1 ()
   strcpy (briefing, "OUR SQUAD HAS BEEN ORDERED INTO THE MEDITERRANEAN. YOUR FIRST GOAL ARE SOME DESTROYERS, GUARDED BY CROWS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3500 * timestep;
+  maxtime = 4000 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1884,7 +1885,7 @@ MissionShip3::MissionShip3 ()
   strcpy (briefing, "THE CRUISER C-15 ARAKON HAS ENTERED NEUTRAL TERRITORY WATERS AND MUST BE ELIMINATED. BEWARE OF HIS FRONT MISSILE LAUNCHER.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2500 * timestep;
+  maxtime = 3000 * timestep;
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
@@ -2078,7 +2079,7 @@ MissionCanyon2::MissionCanyon2 ()
   strcpy (briefing, "THIS MAY BECOME A REAL AIR BATTLE...");
   autoLFBriefing ();
   alliedfighters = 5;
-  maxtime = 6000 * timestep;
+  maxtime = 6500 * timestep;
 }
 
 void MissionCanyon2::start ()
@@ -2289,7 +2290,7 @@ MissionMoonDefense1::MissionMoonDefense1 ()
   strcpy (briefing, "THE DESTINY OF OUR FUTURE IS SOMEWHERE ON THE MOON. OUR NEW BOMBER GL-117 WITH ITS SUPERIOR SHIELDS SHOULD BE EXTREMELY HELPFUL. AT FIRST, WE HAVE TO TAKE OUT THE TURRETS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 4000 * timestep;
+  maxtime = 5000 * timestep;
 }
 
 void MissionMoonDefense1::start ()
@@ -2373,7 +2374,7 @@ MissionMoonDogfight1::MissionMoonDogfight1 ()
   strcpy (briefing, "ENEMY FIGHTERS HAVE APPEARED IN THIS REGION.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2500 * timestep;
+  maxtime = 3000 * timestep;
 }
 
 void MissionMoonDogfight1::start ()

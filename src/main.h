@@ -60,7 +60,7 @@ extern Server *server;
 extern Client *client;
 
 extern CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
-extern CTexture *texradar1, *texradar2, *texcounter;
+extern CTexture *texradar1, *texradar2; //, *texcounter;
 
 extern PilotList *pilots; // other pilots of the Eagle Squad
 

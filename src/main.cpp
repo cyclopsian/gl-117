@@ -92,7 +92,7 @@ float getView ()
 
 int clouds = 0;
 
-CTexture *texradar1, *texradar2, *texcounter;
+CTexture *texradar1, *texradar2;//, *texcounter;
 
 
 
@@ -660,7 +660,7 @@ void game_levelInit ()
   {
     groundobj [i]->dinit ();
     groundobj [i]->zoom = 1;
-    groundobj [i]->id = STATIC;
+    groundobj [i]->id = STATIC_PASSIVE;
     groundobj [i]->deactivate ();
   }
 
@@ -5392,7 +5392,7 @@ void myInit ()
   texclouds3 = gl->genTextureTGA (dirs->getTextures ("clouds3.tga"), 0, 6, 1, true);
   texradar1 = gl->genTextureTGA (dirs->getTextures ("radar2.tga"), 0, -1, 0, true);
   texradar2 = gl->genTextureTGA (dirs->getTextures ("radar1.tga"), 0, -1, 0, true);
-  texcounter = gl->genTextureTGA (dirs->getTextures ("counter.tga"), 0, 1, 0, true);
+//  texcounter = gl->genTextureTGA (dirs->getTextures ("counter.tga"), 0, 1, 0, true);
   texgravel1 = gl->genTextureTGA (dirs->getTextures ("gravel1.tga"), 0, 0, 1, false);
   texglitter1 = gl->genTextureTGA (dirs->getTextures ("glitter.tga"), 0, -1, 0, true);
 //  texfont1 = gl->genTextureTGA ("textures/font1.tga", 0, 3, 0);
