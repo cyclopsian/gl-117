@@ -70,26 +70,4 @@ quality option to 0 or 1. Further acceleration can be achieved
 negligating fullscreen mode and making the window smaller.
 
 
-FAQ:
-
-Cannot open GLX?
-Try another bpp setting. (32, 16, 8)
-
-Libraries are installed, but gcc (linker) does not find them?
-Try the command
- g++ -g -O2 -lm -o gl-117 main.o gl.o model.o 3ds.o audio.o land.o \
-  glland.o aiobject.o effects.o roam.o net.o mathtab.o dirs.o \
-  objload.o pilots.o common.o \
-  -lGL -lGLU -lglut -lSDL -lSDLmain -lSDL_mixer \
-  -lXmu -lXext -lXi -lXxf86vm
-
-Graphics do not initialize?
-This game needs properly installed versions of OpenGL, GLU, and GLUT!
-
-Graphics too lame?
-Sorry, OpenGL is not supported by every graphics card.
-You will need at least an Nvidia TNT2 chipset to seriously play the game,
-as well as the appropriate drivers.
-The game has been tested in 800x600 mode on
- Athlon 900 TNT2, quality=2, view=50: FPS=Perfect
- Athlon 1400 GeForce2, quality=3, view=50: FPS=Perfect
+Please look at the file FAQ for further questions.
