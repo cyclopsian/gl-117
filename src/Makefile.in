@@ -81,7 +81,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 AUTOMAKE_OPTIONS = gnu
 bin_PROGRAMS = gl-117
-gl_117_SOURCES = game/Game.cpp game/GameState.cpp game/Callbacks.cpp cockpit/Cockpit.cpp configuration/ConfigFile.cpp configuration/Configuration.cpp configuration/Dirs.cpp effects/BlackSmoke.cpp effects/Explosion.cpp effects/Flash.cpp effects/Font.cpp effects/HighClouds.cpp effects/Smoke.cpp effects/Star.cpp filetokenizer/FileTokenizer.cpp gllandscape/GlLandscape.cpp landscape/Landscape.cpp loadbitmap/LoadTga.cpp loadmodel/BinaryFile3ds.cpp loadmodel/Load3ds.cpp loadmodel/LoadObj.cpp loadmodel/TextFileObj.cpp logging/Logging.cpp math/Math.cpp menu/Button.cpp menu/Component.cpp menu/Component.h menu/Container.cpp menu/EditField.cpp menu/EditJoystick.cpp menu/EditKey.cpp menu/Label.cpp menu/TextField.cpp net/Client.cpp net/Server.cpp net/net.cpp opengl/Frustum.cpp opengl/GlPrimitives.cpp opengl/VertexArray.cpp pilot/Pilot.cpp pilot/PilotList.cpp pilot/TeamPilot.cpp sound/SoundSystem.cpp sound/WaveFile.cpp mission/MapLoader.cpp mission/MissionDemo1.cpp mission/MissionShip1.cpp mission/MissionAirBattle.cpp mission/MissionDepot.cpp mission/MissionShip2.cpp mission/MissionBase.cpp mission/MissionDogfight1.cpp mission/MissionShip3.cpp mission/MissionCanyon1.cpp mission/MissionDogfight2.cpp mission/MissionTank1.cpp mission/MissionCanyon2.cpp mission/MissionDogfight3.cpp mission/MissionTeamBase1.cpp mission/MissionCanyon3.cpp mission/MissionFreeFlight1.cpp mission/MissionTest1.cpp mission/MissionConvoy2.cpp mission/MissionGround1.cpp mission/MissionTest2.cpp mission/MissionConvoy.cpp mission/MissionMoonBase1.cpp mission/MissionTransport.cpp mission/Mission.cpp mission/MissionMoonBattle.cpp mission/MissionTunnel1.cpp mission/MissionDeathMatch1.cpp mission/MissionMoonDefense1.cpp mission/MissionTutorial1.cpp mission/MissionDeathMatch2.cpp mission/MissionMoonDogfight1.cpp mission/MissionTutorial2.cpp mission/MissionDeathMatch3.cpp mission/MissionMultiDogfight1.cpp mission/MissionTutorial3.cpp mission/MissionDefend1.cpp mission/MissionScout.cpp mission/MissionWaves1.cpp model3d/Color.cpp model3d/Object3d.cpp model3d/Space.cpp model3d/SpherePart.cpp model3d/Vector2.cpp model3d/Material.cpp model3d/Quad.cpp model3d/SpaceObj.cpp model3d/Texture.cpp model3d/Vector3.cpp model3d/Model3d.cpp model3d/Rotation.cpp model3d/Sphere.cpp model3d/Triangle.cpp model3d/Vertex.cpp aiobject/AiObj.cpp aiobject/DynamicObj.cpp
+gl_117_SOURCES = game/Game.cpp game/GameState.cpp game/Callbacks.cpp cockpit/Cockpit.cpp configuration/ConfigFile.cpp configuration/Configuration.cpp configuration/Dirs.cpp effects/BlackSmoke.cpp effects/Explosion.cpp effects/Flash.cpp effects/Font.cpp effects/HighClouds.cpp effects/Smoke.cpp effects/Star.cpp filetokenizer/FileTokenizer.cpp gllandscape/GlLandscape.cpp landscape/Landscape.cpp loadbitmap/LoadTga.cpp loadmodel/BinaryFile3ds.cpp loadmodel/Load3ds.cpp loadmodel/LoadObj.cpp loadmodel/TextFileObj.cpp logging/Logging.cpp math/Math.cpp menu/Button.cpp menu/Component.cpp menu/Component.h menu/Container.cpp menu/EditField.cpp menu/EditJoystick.cpp menu/EditKey.cpp menu/Label.cpp menu/TextField.cpp net/Client.cpp net/Server.cpp net/net.cpp opengl/Frustum.cpp opengl/GlPrimitives.cpp opengl/VertexArray.cpp pilot/Pilot.cpp pilot/PilotList.cpp pilot/TeamPilot.cpp sound/SoundSystem.cpp sound/WaveFile.cpp mission/MapLoader.cpp mission/MissionDemo1.cpp mission/MissionShip1.cpp mission/MissionAirBattle.cpp mission/MissionDepot.cpp mission/MissionShip2.cpp mission/MissionBase.cpp mission/MissionDogfight1.cpp mission/MissionShip3.cpp mission/MissionCanyon1.cpp mission/MissionDogfight2.cpp mission/MissionTank1.cpp mission/MissionCanyon2.cpp mission/MissionDogfight3.cpp mission/MissionTeamBase1.cpp mission/MissionCanyon3.cpp mission/MissionFreeFlight1.cpp mission/MissionTest1.cpp mission/MissionConvoy2.cpp mission/MissionGround1.cpp mission/MissionTest2.cpp mission/MissionConvoy.cpp mission/MissionMoonBase1.cpp mission/MissionTransport.cpp mission/Mission.cpp mission/MissionMoonBattle.cpp mission/MissionTunnel1.cpp mission/MissionDeathMatch1.cpp mission/MissionMoonDefense1.cpp mission/MissionTutorial1.cpp mission/MissionDeathMatch2.cpp mission/MissionMoonDogfight1.cpp mission/MissionTutorial2.cpp mission/MissionDeathMatch3.cpp mission/MissionMultiDogfight1.cpp mission/MissionTutorial3.cpp mission/MissionDefend1.cpp mission/MissionScout.cpp mission/MissionWaves1.cpp model3d/Color.cpp model3d/Object3d.cpp model3d/Space.cpp model3d/SpherePart.cpp model3d/Vector2.cpp model3d/Material.cpp model3d/Quad.cpp model3d/SpaceObj.cpp model3d/Texture.cpp model3d/Vector3.cpp model3d/Model3d.cpp model3d/Rotation.cpp model3d/Sphere.cpp model3d/Triangle.cpp model3d/Vertex.cpp aiobject/AiObj.cpp aiobject/DynamicObj.cpp render/Render.cpp
 noinst_HEADERS = 
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -129,7 +129,8 @@ am_gl_117_OBJECTS = Game.$(OBJEXT) GameState.$(OBJEXT) \
 	Material.$(OBJEXT) Quad.$(OBJEXT) SpaceObj.$(OBJEXT) \
 	Texture.$(OBJEXT) Vector3.$(OBJEXT) Model3d.$(OBJEXT) \
 	Rotation.$(OBJEXT) Sphere.$(OBJEXT) Triangle.$(OBJEXT) \
-	Vertex.$(OBJEXT) AiObj.$(OBJEXT) DynamicObj.$(OBJEXT)
+	Vertex.$(OBJEXT) AiObj.$(OBJEXT) DynamicObj.$(OBJEXT) \
+	Render.$(OBJEXT)
 gl_117_OBJECTS = $(am_gl_117_OBJECTS)
 gl_117_LDADD = $(LDADD)
 gl_117_DEPENDENCIES =
@@ -203,16 +204,17 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/MissionWaves1.Po ./$(DEPDIR)/Model3d.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Object3d.Po ./$(DEPDIR)/Pilot.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/PilotList.Po ./$(DEPDIR)/Quad.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Rotation.Po ./$(DEPDIR)/Server.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Smoke.Po ./$(DEPDIR)/SoundSystem.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Space.Po ./$(DEPDIR)/SpaceObj.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Sphere.Po ./$(DEPDIR)/SpherePart.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Star.Po ./$(DEPDIR)/TeamPilot.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/TextField.Po ./$(DEPDIR)/TextFileObj.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Texture.Po ./$(DEPDIR)/Triangle.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vector2.Po ./$(DEPDIR)/Vector3.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vertex.Po ./$(DEPDIR)/VertexArray.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/WaveFile.Po ./$(DEPDIR)/net.Po
+@AMDEP_TRUE@	./$(DEPDIR)/Render.Po ./$(DEPDIR)/Rotation.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Server.Po ./$(DEPDIR)/Smoke.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/SoundSystem.Po ./$(DEPDIR)/Space.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/SpaceObj.Po ./$(DEPDIR)/Sphere.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/SpherePart.Po ./$(DEPDIR)/Star.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/TeamPilot.Po ./$(DEPDIR)/TextField.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/TextFileObj.Po ./$(DEPDIR)/Texture.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Triangle.Po ./$(DEPDIR)/Vector2.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Vector3.Po ./$(DEPDIR)/Vertex.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/VertexArray.Po ./$(DEPDIR)/WaveFile.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/net.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -362,6 +364,7 @@ Triangle.$(OBJEXT): model3d/Triangle.cpp
 Vertex.$(OBJEXT): model3d/Vertex.cpp
 AiObj.$(OBJEXT): aiobject/AiObj.cpp
 DynamicObj.$(OBJEXT): aiobject/DynamicObj.cpp
+Render.$(OBJEXT): render/Render.cpp
 gl-117$(EXEEXT): $(gl_117_OBJECTS) $(gl_117_DEPENDENCIES) 
 	@rm -f gl-117$(EXEEXT)
 	$(CXXLINK) $(gl_117_LDFLAGS) $(gl_117_OBJECTS) $(gl_117_LDADD) $(LIBS)
@@ -451,6 +454,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pilot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PilotList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Quad.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Render.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Rotation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Smoke.Po@am__quote@
@@ -1674,6 +1678,18 @@ DynamicObj.obj: aiobject/DynamicObj.cpp
 @AMDEP_TRUE@	depfile='$(DEPDIR)/DynamicObj.Po' tmpdepfile='$(DEPDIR)/DynamicObj.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o DynamicObj.obj `cygpath -w aiobject/DynamicObj.cpp`
+
+Render.o: render/Render.cpp
+@AMDEP_TRUE@	source='render/Render.cpp' object='Render.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/Render.Po' tmpdepfile='$(DEPDIR)/Render.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Render.o `test -f 'render/Render.cpp' || echo '$(srcdir)/'`render/Render.cpp
+
+Render.obj: render/Render.cpp
+@AMDEP_TRUE@	source='render/Render.cpp' object='Render.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/Render.Po' tmpdepfile='$(DEPDIR)/Render.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Render.obj `cygpath -w render/Render.cpp`
 CXXDEPMODE = @CXXDEPMODE@
 uninstall-info-am:
 
