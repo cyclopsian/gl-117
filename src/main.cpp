@@ -4652,7 +4652,7 @@ void game_key (unsigned char key, int x, int y)
     fplayer->fireMissile (fplayer->missiletype + MISSILE1, missile);
     sound->play (SOUND_MISSILE1);
   }
-  else if (key == ' ')
+  else if (key == ' ' && fplayer->active)
   {
 #ifdef USE_GLUT
     fplayer->fireCannon (laser);
@@ -4934,7 +4934,7 @@ void game_keyspecial (int key, int x, int y)
 
 void game_mouse (int button, int state, int x, int y)
 {
-  if (state == MOUSE_DOWN)
+  if (state == MOUSE_DOWN && fplayer->active)
   {
     if (button == MOUSE_BUTTON_LEFT)
     {
@@ -5068,6 +5068,7 @@ void game_joystickaxis (int x, int y, int throttle, int rudder)
 
 void game_joystickbutton (int button)
 {
+  if (!fplayer->active) return;
   if (button == 0)
   {
     fplayer->fireCannon (laser);
@@ -7581,7 +7582,7 @@ void game_timer ()
 
   gametimer ++;
 
-  if (fplayer->autofire)
+  if (fplayer->autofire && fplayer->active)
   {
     fplayer->fireCannon (laser);
     sound->play (SOUND_CANNON1);
@@ -7711,9 +7712,9 @@ void game_timer ()
   }
   else if (camera == 4) // missile
   {
-    cf = missile [0]->zoom * 5;
+    cf = missile [0]->zoom * 10;
     camx = missile [0]->tl->x + cf * sine [(int) missile [0]->phi];// * MAXX / zoom / 2;
-    camy = missile [0]->tl->y + fplayer->zoom;
+    camy = missile [0]->tl->y + fplayer->zoom * 2;
     camz = missile [0]->tl->z + cf * cosi [(int) missile [0]->phi];// * MAXX / zoom / 2;
     camphi = missile [0]->phi;
     fplayer->draw = 1;
@@ -8626,8 +8627,7 @@ void init_display ()
   glPushMatrix ();
   gl->rotate (0 ,inittimer, 0);
   gl->rotate (0 ,0 ,inittimer);
-  int num = 50;
-  if (quality < 2) num = 10;
+  int num = 10 + quality * 8;
   for (i = 0; i < num; i++)
   {
     mykugel[i]->draw ();
