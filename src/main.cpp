@@ -671,7 +671,11 @@ class Mission
   }
   int getScore (int missionstate, int timebonus, int fighterkills, int shipkills, int tankkills, int otherkills, int shieldbonus, int points)
   {
+    if (points > 2000) points = 2000;
     int score = timebonus + shieldbonus + fighterkills * 20 + shipkills * 12 + tankkills * 10 + otherkills * 5 + points / 20;
+    if (difficulty == 0) score -= 25;
+    else if (difficulty == 1) score += 25;
+    else if (difficulty == 2) score += 75;
     if (missionstate == 2) // if failed
     {
       score /= 4;
@@ -7948,9 +7952,9 @@ void game_timer ()
     if (missionending >= 25)
     {
       missionending = 0;
-      if (mission->difficulty == 0) fplayer->points -= 25;
+/*      if (mission->difficulty == 0) fplayer->points -= 25;
       else if (mission->difficulty == 1) fplayer->points += 25;
-      else if (mission->difficulty == 2) fplayer->points += 75;
+      else if (mission->difficulty == 2) fplayer->points += 75;*/
       fplayer->score = mission->getScore (missionstate);
       if (!mission->id == MISSION_DEMO)
       {
@@ -7971,9 +7975,9 @@ void game_timer ()
     if (missionending >= 25)
     {
       missionending = 0;
-      if (mission->difficulty == 0) fplayer->points -= 25;
+/*      if (mission->difficulty == 0) fplayer->points -= 25;
       else if (mission->difficulty == 1) fplayer->points += 25;
-      else if (mission->difficulty == 2) fplayer->points += 75;
+      else if (mission->difficulty == 2) fplayer->points += 75;*/
       fplayer->score = mission->getScore (missionstate);
       if (mission->id != MISSION_DEMO)
       {

@@ -713,7 +713,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
     for (ys = y1; ys < y2;)
     {
       y = getCoord (ys);
-      if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*3*step))
+      if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*4*step))
       {
         int xstep = getCoord (x + step);
         int a = selectColor (x, y);
