@@ -1205,13 +1205,13 @@ void Landscape::genLake (int depthpc)
           if (ftry [i] [i2] == TRYLAKE)
           {
             ftry [i] [i2] = GRASS;
-            if (level - h [i] [i2] < 180)
+            if (level - h [i] [i2] < 200)
               f [i] [i2] = XSHALLOWWATER;
-            else if (level - h [i] [i2] < 360)
+            else if (level - h [i] [i2] < 400)
               f [i] [i2] = SHALLOWWATER;
-            else if (level - h [i] [i2] < 700)
+            else if (level - h [i] [i2] < 900)
               f [i] [i2] = WATER;
-            else if (level - h [i] [i2] < 1200)
+            else if (level - h [i] [i2] < 1500)
               f [i] [i2] = DEEPWATER;
             else
               f [i] [i2] = XDEEPWATER;

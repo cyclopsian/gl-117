@@ -300,7 +300,9 @@ void GLLandscape::precalculate ()
       
       int f1 = f [i] [i2], f2 = f [i + 1] [i2], f3 = f [i] [i2 + 1], f4 = f [i + 1] [i2 + 1];
       if (isType (f1, GRASS) || isWoods (f1) || isType (f1, MOONSAND) || isType (f1, REDSAND) || isType (f1, REDTREE0) || isType (f1, CACTUS0) || isType (f1, GREYSAND))
+      {
         tex1 [i] [i2] = texgrass->textureID;
+      }
       else if (isWater (f1))
       {
 /*          if (isWater (f2) && isWater (f3) && isWater (f4))
@@ -439,8 +441,8 @@ float GLLandscape::getExactHeight2 (float x, float z)
   int mz1 = (int) mz;
   mx1 -= mx1 & 1;
   mz1 -= mz1 & 1;
-  int mx2 = mx1 + 1;
-  int mz2 = mz1 + 1;
+  int mx2 = mx1 + 2;
+  int mz2 = mz1 + 2;
   mx1 = getCoord (mx1);
   mx2 = getCoord (mx2);
   mz1 = getCoord (mz1);
@@ -453,6 +455,7 @@ float GLLandscape::getExactHeight2 (float x, float z)
 // Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactHeight (float x, float z)
 {
+  if (gridstep == 2) return getExactHeight2 (x, z);
   float mx = x+MAXX/2;
   float mz = (float)MAXX/2-z;
   int mx1 = (int) mx;
@@ -495,7 +498,7 @@ float GLLandscape::getExactLSHeight2 (float x, float z)
 // Get height over landscape/water, linear interpolation (slow)
 float GLLandscape::getExactLSHeight (float x, float z)
 {
-  if (quality < 3) return getExactLSHeight2 (x, z);
+  if (gridstep == 2) return getExactLSHeight2 (x, z);
   float mx = x;
   float mz = z;
   int mx1 = (int) mx;
@@ -615,10 +618,11 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
 int visibility = 0;
 
 // Not used at the moment
-void GLLandscape::drawCloudQuadStrip (int x1, int y1, int x2, int y2, int step)
+void GLLandscape::drawCloudQuadStrip (int x1, int y1, int x2, int y2)
 {
   int x, y, xs, ys;
   float cr;
+  int step = gridstep;
 
   glDisable (GL_TEXTURE_2D);
   glPushMatrix ();
@@ -657,13 +661,14 @@ void GLLandscape::drawCloudQuadStrip (int x1, int y1, int x2, int y2, int step)
 }
 
 // Fast landscape rendering without textures
-void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
+void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 {
   int x, y, xs, ys;
   float cr, cg, cb;
   bool water = false;
   float texlight = 1.0;
   bool last = false;
+  int step = gridstep;
 
   glDisable (GL_TEXTURE_2D);
     
@@ -693,7 +698,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
           else if (a == 2 || a == 7)
             texlight = texrocks->texlight;
           else if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
-            texlight = texwater->texlight;
+            texlight = texgrass->texlight; // not texwater!
           else if (a == 11)
             texlight = texredstone->texlight;
           else if (a == 13)
@@ -840,9 +845,10 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
 }
 
 // Draw a single textured quad
-void GLLandscape::drawTexturedQuad (int xs, int ys, int step)
+void GLLandscape::drawTexturedQuad (int xs, int ys)
 {
   int j;
+  int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
   float texlight = 1.0;
@@ -937,9 +943,10 @@ void GLLandscape::drawTexturedQuad (int xs, int ys, int step)
 }
 
 // Draw a single textured water quad
-void GLLandscape::drawWaterTexturedQuad (int xs, int ys, int step)
+void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 {
   int i, j;
+  int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
   float texlight = 1.0;
@@ -1119,9 +1126,10 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys, int step)
 }
 
 // Draw two textured triangles (quad)
-void GLLandscape::drawTexturedTriangle1 (int xs, int ys, int step)
+void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
 {
   int j;
+  int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
   float texlight = 1.0;
@@ -1257,9 +1265,10 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys, int step)
 }
 
 // Draw two textured triangles (quad)
-void GLLandscape::drawTexturedTriangle2 (int xs, int ys, int step)
+void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
 {
   int j;
+  int step = gridstep;
 //    int tx, ty;
 //    float tfx, tfy, tfinc;
   float texlight = 1.0;
@@ -1440,6 +1449,9 @@ void GLLandscape::draw (int phi, int gamma)
   if (lsticker >= 36000000)
     lsticker = 0;
 
+  if (quality < 3) gridstep = 2;
+  else gridstep = 1;
+
   glPushMatrix ();
 /*  GLfloat mat_ambient[]  = { 0.7,0.7,0.7,1 };
   GLfloat mat_diffuse[]  = { 0.3,0.3,0.3,1 };
@@ -1570,16 +1582,16 @@ void GLLandscape::draw (int phi, int gamma)
   }*/
 
 //  float cr, cg, cb;
-  int step = 1;
+//  int step = 1;
   int zz1 = 0, zz2 = 0, zz = 0;
   if (quality == 0)
   {
-    step = 2;
+//    step = 2;
     minx -= (minx & 1); // modulo 2
     miny -= (miny & 1);
   }
 
-  if (camera == 50)
+/*  if (camera == 50)
   {
     if (quality == 0)
       step = 8;
@@ -1587,7 +1599,7 @@ void GLLandscape::draw (int phi, int gamma)
       step = 4;
     else
       step = 2;
-  }
+  }*/
 
   int fardetail = quality;
 //  if (quality == 2) fardetail ++;
@@ -1602,7 +1614,7 @@ void GLLandscape::draw (int phi, int gamma)
   if (quality <= 0 || camera == 50)
   {
 
-    drawQuadStrip (minx, miny, maxx, maxy, step);
+    drawQuadStrip (minx, miny, maxx, maxy);
 
 //gl->shadeFlat ();
 /*
@@ -1776,8 +1788,8 @@ void GLLandscape::draw (int phi, int gamma)
     if (mode == 0)
     {
 
-      if (quality == 1 || quality == 2) step = 2;
-      else step = 1;
+//      if (quality == 1 || quality == 2) step = 2;
+//      else step = 1;
 /*int j;
 
     for (x = minx; x < maxx; x += step)
@@ -1804,8 +1816,8 @@ void GLLandscape::draw (int phi, int gamma)
           int ax = (minx + (int) (dx * (float) i2));
           int ay = (miny + (int) (dy * (float) i));
           int zx = (minx + (int) (dx * (float) (i2 + 1)));
-          int zy = (miny + (int) (dy * (float) (i + 1)) + step);
-          if (step == 2)
+          int zy = (miny + (int) (dy * (float) (i + 1)) + gridstep);
+          if (gridstep == 2)
           {
             ax -= ax & 1; ay -= ay & 1;
           }
@@ -1816,7 +1828,7 @@ void GLLandscape::draw (int phi, int gamma)
           gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(zy)]*zoomz - zoomz2, hh2*((float)MAXX-zy) - 1.0) ||
           gl->isPointInFrustum (hh2*zx - 1.0, (float)hw[getCoord(zx)][getCoord(ay)]*zoomz - zoomz2, hh2*((float)MAXX-ay) - 1.0))*/
       if (gl->isSphereInFrustum (hh2*(ax+zx)/2 - 1.0, (float)hw[getCoord((ax+zx)/2)][getCoord((ay+zy)/2)]*zoomz - zoomz2, hh2*((float)MAXX-(ay+zy)/2) - 1.0, hh2*(zx-ax)*1.5))
-            drawQuadStrip (ax, ay, zx, zy, step);
+            drawQuadStrip (ax, ay, zx, zy);
           }
           else
           {
@@ -1847,18 +1859,18 @@ void GLLandscape::draw (int phi, int gamma)
                 {
 //                  drawTexturedQuad (x, y, step);
                   if (drawrule [x] [y] == 0)
-                    drawTexturedQuad (xs, ys, step);
+                    drawTexturedQuad (xs, ys);
                   else if (drawrule [x] [y] == 2)
-                    drawTexturedTriangle1 (xs, ys, step);
+                    drawTexturedTriangle1 (xs, ys);
                   else
-                    drawTexturedTriangle2 (xs, ys, step);
+                    drawTexturedTriangle2 (xs, ys);
                 }
 
-                ys += step;
+                ys += gridstep;
                 zz ++;
               }
 //glEnd ();
-              xs += step;
+              xs += gridstep;
             }
 //    gl->enableAlphaBlending ();
             for (xs = ax; xs < zx;)
@@ -1868,20 +1880,20 @@ void GLLandscape::draw (int phi, int gamma)
               {
                 y = getCoord (ys);
                 zz1 ++;
-                int xstep = getCoord (xs + step);
-                int ystep = getCoord (ys + step);
+                int xstep = getCoord (xs + gridstep);
+                int ystep = getCoord (ys + gridstep);
         //        int a = 0;
                 if (isWater (f [x] [y]) || isWater (f [xstep] [y]) || isWater (f [xstep] [ystep]) || isWater (f [x] [ystep]))
         //          a = selectColor (x, y);
         //        if (a == 4 || a == 5 || a == 6 || a == 8 || a == 9)
                 {
-                  drawWaterTexturedQuad (xs, ys, step);
+                  drawWaterTexturedQuad (xs, ys);
                 }
-                ys += step;
+                ys += gridstep;
                 zz ++;
               }
         //glEnd ();
-              xs += step;
+              xs += gridstep;
             }
 //  gl->disableAlphaBlending ();
           }
@@ -2036,7 +2048,9 @@ void GLLandscape::draw (int phi, int gamma)
 */
   }
 
-  if (quality == 2) step = 1;
+//  if (quality == 2) step = 1;
+  int treestep = 2;
+  if (quality >= 2) treestep = 1;
 
 // Draw trees, bushes
   if (quality >= 1)
@@ -2117,8 +2131,8 @@ void GLLandscape::draw (int phi, int gamma)
         int ax = minx + (int) (dx * (float) i2);
         int ay = miny + (int) (dy * (float) i);
         int ex = minx + (int) (dx * (float) (i2 + 1));
-        int ey = miny + (int) (dy * (float) (i + 1)) + step;
-        if (step == 2)
+        int ey = miny + (int) (dy * (float) (i + 1)) + treestep;
+        if (treestep == 2)
         {
           ax -= ax & 1; ay -= ay & 1;
         }
@@ -2262,9 +2276,9 @@ void GLLandscape::draw (int phi, int gamma)
                     drawTree (xs, ys, 0.004, 0.3, phi);
                   }
                 }
-            ys += step;
+            ys += treestep;
           } // ys for
-          xs += step;
+          xs += treestep;
         } // xs for
       }
 

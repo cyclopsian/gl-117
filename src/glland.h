@@ -77,6 +77,7 @@ class GLLandscape : public Landscape
   unsigned char tex2 [MAXX] [MAXX]; // texture for triangle2 if needed
   unsigned char dl [MAXX + 1] [MAXX + 1];
   int lsticker; // a timer increased every time draw() is called
+  int gridstep;
 
   private:
   float hh, hh2, zoomz2;
@@ -121,13 +122,13 @@ class GLLandscape : public Landscape
   int detail [PARTS] [PARTS]; // LOD
 //  int done [100] [100];
 
-  void drawCloudQuadStrip (int x1, int y1, int x2, int y2, int step); // not used
+  void drawCloudQuadStrip (int x1, int y1, int x2, int y2); // not used
 
-  void drawQuadStrip (int x1, int y1, int x2, int y2, int step);
-  void drawTexturedQuad (int x, int y, int step);
-  void drawWaterTexturedQuad (int x, int y, int step);
-  void drawTexturedTriangle1 (int x, int y, int step);
-  void drawTexturedTriangle2 (int x, int y, int step);
+  void drawQuadStrip (int x1, int y1, int x2, int y2);
+  void drawTexturedQuad (int x, int y);
+  void drawWaterTexturedQuad (int x, int y);
+  void drawTexturedTriangle1 (int x, int y);
+  void drawTexturedTriangle2 (int x, int y);
   
   void draw (int phi, int gamma); // draw ALL
 
