@@ -271,7 +271,7 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
   float z = d->zoom > zoom ? d->zoom : zoom;
   if ((id >= MISSILE1 && id <= MISSILE2) || (d->id >= MISSILE1 && d->id <= MISSILE2))
   {
-    z *= 2; // missiles need not really hit the fighter, but will explode near it
+    z *= 1.5; // missiles need not really hit the fighter, but will explode near it
   }
   if ((id >= SHIP1 && id <= SHIP2) || (d->id >= SHIP1 && d->id <= SHIP2))
     z *= 0.3;
@@ -675,7 +675,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxgamma = 80.0;
     missiles [0] = 2;
     missiles [3] = 6;
-    missiles [6] = 2;
+    missiles [6] = 1;
     flares = 20;
     chaffs = 20;
   }
@@ -736,7 +736,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     missiles [0] = 2;
     missiles [1] = 2;
     missiles [3] = 2;
-    missiles [6] = 4;
+    missiles [6] = 3;
     flares = 20;
     chaffs = 20;
   }
@@ -749,9 +749,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.39;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 1;
+    missiles [0] = 2;
     missiles [3] = 1;
-    missiles [6] = 2;
+    missiles [6] = 1;
     flares = 20;
     chaffs = 20;
   }
@@ -899,28 +899,28 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     intelligence = 100;
     maxspeed = 0.38;
-    nimbility = 3.5; // old 2.2
+    nimbility = 4.0; // old 2.2
     manoeverability = 2.5;
     ttl = 200;
-    impact = 40;
+    impact = 35;
   }
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
     maxspeed = 0.4;
-    nimbility = 4.8; // old 3.5
+    nimbility = 5.0; // old 3.5
     manoeverability = 3.0;
     ttl = 220;
-    impact = 50;
+    impact = 45;
   }
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
     maxspeed = 0.42;
-    nimbility = 6.0;
+    nimbility = 6.5;
     manoeverability = 3.5;
     ttl = 250;
-    impact = 60;
+    impact = 55;
   }
   else if (id == MISSILE_GROUND1)
   {
@@ -956,19 +956,19 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   {
     intelligence = 0;
     maxspeed = 0.45;
-    nimbility = 3.0;
-    manoeverability = 1.6;
+    nimbility = 3.5;
+    manoeverability = 2.0;
     ttl = 250;
-    impact = 50;
+    impact = 40;
   }
   else if (id == MISSILE_FF2)
   {
     intelligence = 0;
     maxspeed = 0.47;
-    nimbility = 4.0;
-    manoeverability = 2.0;
+    nimbility = 4.2;
+    manoeverability = 2.3;
     ttl = 250;
-    impact = 60;
+    impact = 50;
   }
   else if (id == MISSILE_MINE1)
   {
@@ -1745,7 +1745,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
             }
             else if (missiletype == 6 || missiletype == 7)
             {
-              ttf -= 5;
+              ttf -= 3;
             }
             else
             {
@@ -1781,11 +1781,15 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
             {
               if (theta >= 15 + myrandom (30))
                 fireFlare (flare, m);
+              if (myrandom (intelligence) < 200)
+                manoevertheta = 20;
             }
             else
             {
               if (theta >= 15 + myrandom (30))
                 fireChaff (chaff, m);
+              if (myrandom (intelligence) < 200)
+                manoevertheta = 20;
             }
           }
   }
@@ -1991,12 +1995,14 @@ m [0]->tl->y = target->tl->y;
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
         if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 40/* && target->theta < 20*/)
-          fireMissile (m, (AIObj *) target);
+          if (myrandom (intelligence) < 50)
+            fireMissile (m, (AIObj *) target);
       }
       else // ground target
       {
         if (fabs (rectheta - theta) < 3 + agr * 2 && fabs (aw) < 25 + agr * 4 && disttarget < 50)
-          fireMissile (m);
+          if (myrandom (intelligence) < 50)
+            fireMissile (m);
       }
     }
     if (!manoevertheta) // change roll angle
