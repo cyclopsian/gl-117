@@ -128,42 +128,37 @@ int BinaryFile::readUInt16 (Uint16 *i)
   return 2;
 }
 
-int BinaryFile::readString (std::string *ptr, int ptrmax, int n)
+int BinaryFile::readString (char *ptr, int ptrmax, int n)
 {
   if (n <= 0) return 0;
   if (filepointer + n > size)
     n = size - filepointer;
   if (n > ptrmax) exit (200);
-  memcpy (string, &data [filepointer], n);
-  string [strlen (string) - 1] = 0;
-  ptr->assign (string);
+  memcpy (ptr, &data [filepointer], n);
   filepointer += n;
   return n;
 }
 
-int BinaryFile::readString (std::string *ptr, int n)
+int BinaryFile::readString (char *ptr, int n)
 {
   if (n <= 0) return 0;
   if (filepointer + n > size)
     n = size - filepointer;
-  memcpy (string, &data [filepointer], n);
-  string [strlen (string) - 1] = 0;
-  ptr->assign (string);
+  memcpy (ptr, &data [filepointer], n);
   filepointer += n;
   return n;
 }
 
-int BinaryFile::readString (std::string *ptr)
+int BinaryFile::readString (char *ptr)
 {
   int i = 0;
   while (data [filepointer] != 0 && filepointer < size)
   {
-    string [i] = data [filepointer];
+    ptr [i] = data [filepointer];
     i ++;
     filepointer ++;
   }
-  string [i] = 0;
-  ptr->assign (string);
+  ptr [i] = 0;
   filepointer ++;
   i ++;
   return i;
@@ -236,7 +231,7 @@ void CLoad3DS::CleanUp ()
 
 void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 {
-  std::string version;
+  char version [10];
   char buf [STDSIZE];
   CObject newObject;
   CMaterial newTexture;
@@ -253,7 +248,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
     switch (currentChunk->ID)
     {
       case VERSION:
-        currentChunk->bytesRead += file->readString (&version, 10, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->readString (version, 10, currentChunk->length - currentChunk->bytesRead);
         if (version [0] > 0x03)
         {
           sprintf (buf, "This 3DS file is over version 3 so it may load incorrectly");
@@ -264,7 +259,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
       case OBJECTINFO:
         ReadChunk (tempChunk);
-        tempChunk->bytesRead += file->readString (&version, 10, tempChunk->length - tempChunk->bytesRead);
+        tempChunk->bytesRead += file->readString (version, 10, tempChunk->length - tempChunk->bytesRead);
         currentChunk->bytesRead += tempChunk->bytesRead;
         ProcessNextChunk (model, currentChunk);
         break;
@@ -277,7 +272,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
       case OBJECT:
         model->addObject (&newObject);
         memset (&newObject, 0, sizeof (CObject));
-        currentChunk->bytesRead += GetString (&model->object [model->numObjects - 1]->name);
+        currentChunk->bytesRead += GetString (model->object [model->numObjects - 1]->name);
         ProcessNextObjectChunk (model, (model->object [model->numObjects - 1]), currentChunk);
         break;
 
@@ -364,7 +359,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
     switch (currentChunk->ID)
     {
       case MAT_NAME:
-        currentChunk->bytesRead += file->readString (&model->material [model->numMaterials - 1]->name, 255, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->name, 255, currentChunk->length - currentChunk->bytesRead);
         break;
 
       case MAT_DIFFUSE:
@@ -376,9 +371,9 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case MAT_MAPFILE:
-        currentChunk->bytesRead += file->readString (&model->material [model->numMaterials - 1]->filename, 255, currentChunk->length - currentChunk->bytesRead);
+        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->filename, 255, currentChunk->length - currentChunk->bytesRead);
         {
-          char *str = const_cast<char *>(model->material [model->numMaterials - 1]->filename.c_str());
+          char *str = model->material [model->numMaterials - 1]->filename;
           while (*str)
           {
             if (*str >= 'A' && *str <= 'Z')
@@ -426,7 +421,7 @@ void CLoad3DS::ReadChunk (Chunk *pChunk)
   pChunk->bytesRead += file->readUInt32 (&pChunk->length);
 }
 
-int CLoad3DS::GetString (std::string *buffer)
+int CLoad3DS::GetString (char *buffer)
 {
   return file->readString (buffer);
 }
@@ -434,9 +429,7 @@ int CLoad3DS::GetString (std::string *buffer)
 void CLoad3DS::ReadColorChunk (CMaterial *material, Chunk *pChunk)
 {
   ReadChunk (tempChunk);
-  std::string retstring;
-  tempChunk->bytesRead += file->readString (&retstring, 4, tempChunk->length - tempChunk->bytesRead);
-  memcpy (material->color.c, retstring.c_str (), 4);
+  tempChunk->bytesRead += file->readString ((char *) material->color.c, 4, tempChunk->length - tempChunk->bytesRead);
   pChunk->bytesRead += tempChunk->bytesRead;
 }
 
@@ -510,7 +503,7 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
   
   for (int i = 0; i < object->numTexVertex; i ++)
     object->vertex [i].tex.take (p [i]);
-  delete p;
+  delete []p;
 }
 
 void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
@@ -539,20 +532,20 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
     object->vertex [i].vector.y = object->vertex [i].vector.z;
     object->vertex [i].vector.z = -fTempY;
   }
-  delete p;
+  delete []p;
 }
 
 void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)
 {
-  std::string materialName;
-  previousChunk->bytesRead += GetString (&materialName);
+  char materialName [255] = {0};
+  previousChunk->bytesRead += GetString (materialName);
 
   for (int i = 0; i < model->numMaterials; i ++)
   {
-    if (materialName != model->material [i]->name)
+    if (strcmp (materialName, model->material [i]->name) == 0)
     {
       object->material = model->material [i];
-      if (model->material [i]->filename.length () > 0)
+      if (strlen (model->material [i]->filename) > 0)
         if ((model->material [i]->filename [0] >= 'A' && model->material [i]->filename [0] <= 'Z') ||
             (model->material [i]->filename [0] >= 'a' && model->material [i]->filename [0] <= 'z'))
         {
@@ -656,7 +649,7 @@ void CLoad3DS::LoadTextures (CModel *model)
   {
     if (model->object [i]->hasTexture)
     {
-      strcpy (str, dirs->getTextures (const_cast<char *>(model->object [i]->material->filename.c_str ())));
+      strcpy (str, dirs->getTextures (model->object [i]->material->filename));
 			for (i2 = (int) strlen (str) - 1; i2 >= 0; i2 --)
 			{
         if (i2 > 2 && str [i2] == '.')

@@ -26,9 +26,7 @@
 
 #include "model.h" // ok
 
-#include <iostream>
-
-const int debug3ds = 0; // set to 1 to get all Chunk IDs to stdout
+const int debug3ds = 1; // set to 1 to get all Chunk IDs to stdout
 
 // abstract binary file representation in memory
 class BinaryFile
@@ -39,7 +37,6 @@ class BinaryFile
   Uint32 filepointer; // pointer to char in memory
   unsigned char *data; // file data in memory
   unsigned char ret [11]; // big endian swapping buffer
-  char string [4096];
 
   // data type conversation
   BinaryFile (char *filename);
@@ -48,9 +45,9 @@ class BinaryFile
   int readFloat (float *f, int n);
   int readUInt32 (Uint32 *i);
   int readUInt16 (Uint16 *i);
-  int readString (std::string *ptr, int ptrmax, int n);
-  int readString (std::string *ptr, int n);
-  int readString (std::string *ptr);
+  int readString (char *ptr, int ptrmax, int n);
+  int readString (char *ptr, int n);
+  int readString (char *ptr);
   int skip (int n);
 };
 
@@ -111,7 +108,7 @@ class CLoad3DS
   
   // developer specific loading routines
   private:
-  int GetString (std::string *);
+  int GetString (char *);
   void ReadChunk (Chunk *);
   void ProcessNextChunk (CModel *model, Chunk *);
   void ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *);

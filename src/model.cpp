@@ -580,12 +580,9 @@ CMaterial::CMaterial ()
   uoffset = 0;
   voffset = 0;
   wrot = 0;
-  filename = "";
-  name = "";
-}
-
-CMaterial::~CMaterial ()
-{
+  char tmp [255] = {0};
+  strcpy (filename, tmp);
+  strcpy (name, tmp);
 }
 
 
@@ -604,21 +601,21 @@ CObject::~CObject ()
 {
 }
 
-int CObject::addVertex (const CVertex &v)
+int CObject::addVertex (CVertex *w)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    if (v.vector.isEqual (vertex [i].vector, 1e-3F) && v.color.isEqual (vertex [i].color)) break;
+    if (w->vector.isEqual (vertex [i].vector, 1e-3F) && w->color.isEqual (vertex [i].color)) break;
   if (i == numVertices)
-  vertex [numVertices ++].take (v);
+  vertex [numVertices ++].take (*w);
   return i;
 }
 
-void CObject::setColor (const CColor &color)
+void CObject::setColor (CColor *col)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    vertex [i].color.take (color);
+    memcpy (vertex [i].color.c, col, 4 * sizeof (unsigned char));
 }
 
 
@@ -709,7 +706,7 @@ void CModel::setColor (CColor *col)
   int i;
   for (i = 0; i < numObjects; i++)
   {
-    object [i]->setColor (*col);
+    object [i]->setColor (col);
   }
 }
 
@@ -1452,22 +1449,22 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      p [0] = co->addVertex (*w);
+      p [0] = co->addVertex (w);
       a = ((int) (i + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      if (a < 179 || i2 == 0) p [1] = co->addVertex (*w);
+      if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      if (a < 179) p [2] = co->addVertex (*w);
+      if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      p [3] = co->addVertex (*w);
+      p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step - 1)
       {
         if (!random (randomized))
@@ -1594,22 +1591,22 @@ void CSpherePart::init (float radius, int segments, float phi)
       float si = SIN(a), ci = COS(a);
       float si2 = SIN(b), ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      p [0] = co->addVertex (*w);
+      p [0] = co->addVertex (w);
       a = ((int) (i + step2)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      if (a < 179 || i2 == 0) p [1] = co->addVertex (*w);
+      if (a < 179 || i2 == 0) p [1] = co->addVertex (w);
       b = ((int) (i2 + step)) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      if (a < 179) p [2] = co->addVertex (*w);
+      if (a < 179) p [2] = co->addVertex (w);
       a = ((int) i) % 360;
       si = SIN(a); ci = COS(a);
       si2 = SIN(b); ci2 = COS(b);
       w->vector.x = radius * si * ci2 * dx; w->vector.y = radius * si * si2 * dy; w->vector.z = radius * ci * dz;
-      p [3] = co->addVertex (*w);
+      p [3] = co->addVertex (w);
       if (i == 0 || i >= 180 - step2 - 0.2)
       {
         if (i == 0) co->triangle [co->numTriangles ++].setVertices (&co->vertex [p [0]], &co->vertex [p [1]], &co->vertex [p [2]]);
