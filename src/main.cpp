@@ -7298,19 +7298,22 @@ void game_display ()
   double fl_size[]=       {0.8,      0.6,      0.5,      0.4,      0.8,      0.4,      0.5,      0};
   double proj[16];
   double modl[16];
+  double dr[2];
   int vp[4];
   double objx,objy,objz;
 
   glGetDoublev( GL_PROJECTION_MATRIX, proj );
   glGetDoublev( GL_MODELVIEW_MATRIX, modl );
   glGetIntegerv( GL_VIEWPORT, vp );
+  glGetDoublev( GL_DEPTH_RANGE, dr );
 
   double cx=vp[2]/2+vp[0];
   double cy=vp[3]/2+vp[1];
 
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   int i=0;
-
+  double flarez_eye=4;
+  double flarez_win=(-proj[10]+proj[14]/flarez_eye)*(dr[1]-dr[0])/2+(dr[1]+dr[0])/2;
   while (CTexture *tex=fl_texture[i]) {
   double position=fl_position[i];
   double flarex,flarey,size=fl_size[i];
@@ -7320,7 +7323,7 @@ void game_display ()
   flarex=(cx-sunx)*position+sunx;
   flarey=(cy-suny)*position+suny;
 
-  if (gluUnProject (flarex, flarey, 0.5, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
+  if (gluUnProject (flarex, flarey, flarez_win, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
   {
   gl->enableTextures (tex->textureID);
   gl->enableAlphaBlending ();
@@ -7331,13 +7334,13 @@ void game_display ()
   glBegin (GL_QUADS);
   glColor4f (1.0, 1.0, 1.0, 1.0);
   glTexCoord2d (0, 1);
-  glVertex3f (-0.1*size+objx, 0.1*size+objy, objz);
+  glVertex3f (-size+objx, size+objy, objz);
   glTexCoord2d (1, 1);
-  glVertex3f (0.1*size+objx, 0.1*size+objy, objz);
+  glVertex3f (size+objx, size+objy, objz);
   glTexCoord2d (1, 0);
-  glVertex3f (0.1*size+objx, -0.1*size+objy, objz);
+  glVertex3f (size+objx, -size+objy, objz);
   glTexCoord2d (0, 0);
-  glVertex3f (-0.1*size+objx, -0.1*size+objy, objz);
+  glVertex3f (-size+objx, -size+objy, objz);
   glEnd ();
   }
   }
