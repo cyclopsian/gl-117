@@ -24,26 +24,23 @@
 #ifndef IS_GLLAND_H
 #define IS_GLLAND_H
 
+#include "common.h"
+
 #ifdef USE_GLUT
 #include <GL/glut.h>
 #else
 #include <GL/glut.h>
-/*#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>*/
 #include "SDL/SDL.h"
 #include "SDL/SDL_thread.h"
 #ifdef HAVE_SDL_MIXER
 #include "SDL/SDL_mixer.h"
 #endif
-//#include "SDL/SDL_audio.h"
 #endif
 
 #define PARTS 12
 
 #include <string.h>
 
-#include "common.h"
 #include "gl.h"
 #include "model.h"
 #include "aiobject.h"

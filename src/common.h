@@ -1,6 +1,14 @@
 #ifndef IS_COMMON_H
 #define IS_COMMON_H
 
+#include "../config.h"
+#define USE_GLUT
+#ifdef HAVE_SDL
+#undef USE_GLUT
+#else
+#undef HAVE_SDL_MIXER
+#endif
+
 #define ZOOM 256
 #define VERSIONSTRING "GL-117 V. 0.6.5 (BETA) BY THOMAS A. DREXL"
 

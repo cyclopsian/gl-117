@@ -36,30 +36,20 @@
     HAVE_SDL: SDL installed
     HAVE_SDL_MIXER: SDL_mixer installed
     HAVE_SDL_NET: SDL_net installed */
-#include "../config.h"
-#define USE_GLUT
-#ifdef HAVE_SDL
-#undef USE_GLUT
-#else
-#undef HAVE_SDL_MIXER
-#endif
+
+#include "common.h"
 
 #ifdef USE_GLUT
 #include <GL/glut.h>
 #else
 #include <GL/glut.h>
-/*#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>*/
 #include "SDL/SDL.h"
 #include "SDL/SDL_thread.h"
 #ifdef HAVE_SDL_MIXER
 #include "SDL/SDL_mixer.h"
 #endif
-//#include "SDL/SDL_audio.h"
 #endif
 
-#include "common.h"
 #include "dirs.h"
 #include "model.h"
 #include "3ds.h"

@@ -24,6 +24,8 @@
 #ifndef IS_AIOBJECT_H
 #define IS_AIOBJECT_H
 
+#include "common.h"
+
 #include "model.h"
 #include "effects.h"
 

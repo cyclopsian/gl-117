@@ -24,22 +24,18 @@
 #ifndef IS_GL_H
 #define IS_GL_H
 
-//#define USE_GLUT
+#include "common.h"
 
 #ifdef USE_GLUT
 #include <GL/glut.h>
 #else
 #include <GL/glut.h>
-/*#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glu.h>*/
 #endif
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include "common.h"
 #include "model.h"
 
 class GL

@@ -24,13 +24,21 @@
 #ifndef IS_AUDIO_H
 #define IS_AUDIO_H
 
+#include "common.h"
+
 #include <stdlib.h>
 
-#ifndef USE_GLUT
+#ifdef USE_GLUT
+#include <GL/glut.h>
+#else
+#include <GL/glut.h>
 #include "SDL/SDL.h"
+#include "SDL/SDL_thread.h"
+#ifdef HAVE_SDL_MIXER
+#include "SDL/SDL_mixer.h"
+#endif
 #endif
 
-#include "common.h"
 #include "dirs.h"
 
 class WaveFile

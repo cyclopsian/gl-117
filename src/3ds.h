@@ -24,6 +24,8 @@
 #ifndef IS_3DS_H
 #define IS_3DS_H
 
+#include "common.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
