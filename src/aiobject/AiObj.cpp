@@ -28,6 +28,7 @@
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
 #include "math/Math.h"
+#include "loadmodel/Model3dFactory.h"
 
 #include "assert.h"
 
@@ -145,9 +146,11 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   dualshot = false;
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams
+
   o = getModel (id);
+//  o = Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
   o->cube.set (trafo.scaling);
-  
+
   if (id == FIGHTER_FALCON)
   {
     maxthrust = 0.31;

@@ -78,9 +78,9 @@ void BlackSmoke::drawGL (Vector3 &tl, float alpha2, float lum2, bool drawLight2,
   {
     glDepthMask (GL_FALSE);
     if (antialiasing)
-      texsmoke3->shadeLinear ();
+      gl.enableLinearTexture (texsmoke3->textureID, texsmoke3->mipmap);
     else
-      texsmoke3->shadeConst ();
+      gl.disableLinearTexture (texsmoke3->textureID, texsmoke3->mipmap);
     gl.enableAlphaBlending ();
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.02);

@@ -97,11 +97,11 @@ class Texture
     bool loadFromTGA (const std::string &filename, int alphaprogram = -1,
                       bool mipmap = true, bool alpha = false);
     /// get color of a special pixel
-    void getColor (Color *c, int x, int y) const;
+//    void getColor (Color *c, int x, int y) const;
     /// set to linear shading between texels (expensive esp. on old graphic cards)
-    void shadeLinear () const;
+//    void shadeLinear () const;
     /// set to const shading between texels (fast)
-    void shadeConst () const;
+//    void shadeConst () const;
 };
 
 /**

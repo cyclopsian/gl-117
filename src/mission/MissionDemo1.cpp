@@ -58,7 +58,7 @@ void MissionDemo1::start ()
 //  fighter [0]->newinit (FIGHTER_FALCON, 1, 0);
   objectInit (new Fighter (), FIGHTER_FALCON, 1, 0, 1);
   fighter [1]->target = fighter [3];
-  fighter [1]->o = &model_fig;
+//  fighter [1]->o = &model_fig;
   fighter [1]->trafo.translation.x = 49;
   fighter [1]->trafo.translation.z = -30;
 //  fighter [1]->newinit (FIGHTER_FALCON, 1, 0);

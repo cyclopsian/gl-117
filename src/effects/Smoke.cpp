@@ -128,9 +128,9 @@ void Smoke::draw (float phi, float gamma)
   if (type == 0) smoketype = texsmoke;
   else if (type == 1) smoketype = texsmoke2;
   if (antialiasing)
-    smoketype->shadeLinear ();
+    gl.enableLinearTexture (smoketype->textureID, smoketype->mipmap);
   else
-    smoketype->shadeConst ();
+    gl.disableLinearTexture (smoketype->textureID, smoketype->mipmap);
   gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.02);

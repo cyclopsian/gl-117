@@ -1691,7 +1691,7 @@ void GlLandscape::drawWaterTexturedQuad (Vector3 &cam, int xs, int ys)
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.2);
     gl.enableTexture (texglitter1->textureID);
-    texglitter1->shadeLinear ();
+    gl.enableLinearTexture (texglitter1->textureID, texglitter1->mipmap);
     for (j = 0; j < 4; j ++)
     {
       if (texture)
@@ -2444,21 +2444,21 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
           {
             if (detail [i] [i2] <= lineardetail)
             {
-              texgrass->shadeLinear ();
-              texgravel1->shadeLinear ();
-              texredsand->shadeLinear ();
-              texrocks->shadeLinear ();
-              texwater->shadeLinear ();
-              texredstone->shadeLinear ();
+              gl.enableLinearTexture (texgrass->textureID, texgrass->mipmap);
+              gl.enableLinearTexture (texgravel1->textureID, texgravel1->mipmap);
+              gl.enableLinearTexture (texredsand->textureID, texredsand->mipmap);
+              gl.enableLinearTexture (texrocks->textureID, texrocks->mipmap);
+              gl.enableLinearTexture (texwater->textureID, texwater->mipmap);
+              gl.enableLinearTexture (texredstone->textureID, texredstone->mipmap);
             }
             else
             {
-              texgrass->shadeConst ();
-              texgravel1->shadeConst ();
-              texredsand->shadeConst ();
-              texrocks->shadeConst ();
-              texwater->shadeConst ();
-              texredstone->shadeConst ();
+              gl.disableLinearTexture (texgrass->textureID, texgrass->mipmap);
+              gl.disableLinearTexture (texgravel1->textureID, texgravel1->mipmap);
+              gl.disableLinearTexture (texredsand->textureID, texredsand->mipmap);
+              gl.disableLinearTexture (texrocks->textureID, texrocks->mipmap);
+              gl.disableLinearTexture (texwater->textureID, texwater->mipmap);
+              gl.disableLinearTexture (texredstone->textureID, texredstone->mipmap);
             }
 
             // draw triangles between different grid resolutions of subdivisions to avoid T-intersections
@@ -2639,7 +2639,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.2);
   gl.enableTexture (texglitter1->textureID);
-  texglitter1->shadeLinear ();
+  gl.enableLinearTexture (texglitter1->textureID, texglitter1->mipmap);
   vertexarrayglitter [0].glEnd ();
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable (GL_ALPHA_TEST);
@@ -2719,33 +2719,33 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 
         if (detail [i] [i2] <= lineartree)
         {
-          textree->shadeLinear ();
-          textree2->shadeLinear ();
-          textree3->shadeLinear ();
-          textree4->shadeLinear ();
-          textree5->shadeLinear ();
-          texcactus1->shadeLinear ();
-          textreeu->shadeLinear ();
-          textreeu2->shadeLinear ();
-          textreeu3->shadeLinear ();
-          textreeu4->shadeLinear ();
-          textreeu5->shadeLinear ();
-          texcactusu1->shadeLinear ();
+          gl.enableLinearTexture (textree->textureID, textree->mipmap);
+          gl.enableLinearTexture (textree2->textureID, textree2->mipmap);
+          gl.enableLinearTexture (textree3->textureID, textree3->mipmap);
+          gl.enableLinearTexture (textree4->textureID, textree4->mipmap);
+          gl.enableLinearTexture (textree5->textureID, textree5->mipmap);
+          gl.enableLinearTexture (texcactus1->textureID, texcactus1->mipmap);
+          gl.enableLinearTexture (textreeu->textureID, textreeu->mipmap);
+          gl.enableLinearTexture (textreeu2->textureID, textreeu2->mipmap);
+          gl.enableLinearTexture (textreeu3->textureID, textreeu3->mipmap);
+          gl.enableLinearTexture (textreeu4->textureID, textreeu4->mipmap);
+          gl.enableLinearTexture (textreeu5->textureID, textreeu5->mipmap);
+          gl.enableLinearTexture (texcactusu1->textureID, texcactusu1->mipmap);
         }
         else
         {
-          textree->shadeConst ();
-          textree2->shadeConst ();
-          textree3->shadeConst ();
-          textree4->shadeConst ();
-          textree5->shadeConst ();
-          texcactus1->shadeConst ();
-          textreeu->shadeConst ();
-          textreeu2->shadeConst ();
-          textreeu3->shadeConst ();
-          textreeu4->shadeConst ();
-          textreeu5->shadeConst ();
-          texcactusu1->shadeConst ();
+          gl.disableLinearTexture (textree->textureID, textree->mipmap);
+          gl.disableLinearTexture (textree2->textureID, textree2->mipmap);
+          gl.disableLinearTexture (textree3->textureID, textree3->mipmap);
+          gl.disableLinearTexture (textree4->textureID, textree4->mipmap);
+          gl.disableLinearTexture (textree5->textureID, textree5->mipmap);
+          gl.disableLinearTexture (texcactus1->textureID, texcactus1->mipmap);
+          gl.disableLinearTexture (textreeu->textureID, textreeu->mipmap);
+          gl.disableLinearTexture (textreeu2->textureID, textreeu2->mipmap);
+          gl.disableLinearTexture (textreeu3->textureID, textreeu3->mipmap);
+          gl.disableLinearTexture (textreeu4->textureID, textreeu4->mipmap);
+          gl.disableLinearTexture (textreeu5->textureID, textreeu5->mipmap);
+          gl.disableLinearTexture (texcactusu1->textureID, texcactusu1->mipmap);
         }
 
         // calculate upper left and lower right texture coordinates of this subdivision
@@ -2881,7 +2881,7 @@ void GlLandscape::calcDynamicLight (SpaceObj *object, float threshold, float max
         int xn = GETCOORD(x);
         int yn = GETCOORD(y);
         int dx = x - mx, dy = y - mz;
-        float dist = sqrt (dx*dx + dy*dy);
+        float dist = sqrt ((float) (dx*dx + dy*dy));
         if (dist < radius)
         {
           int light = (int) ((radius - dist) * intens / radius * object->trafo.scaling.x) + dl [xn] [yn];

@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="7.10"
 	Name="main"
 	SccProjectName=""
 	SccLocalPath="">
@@ -59,7 +59,13 @@
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
 				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
@@ -114,9 +120,17 @@
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
 				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="model3d"
@@ -186,10 +200,10 @@
 				RelativePath=".\opengl\GlPrimitives.h">
 			</File>
 			<File
-				RelativePath=".\opengl\VertexArray.cpp">
+				RelativePath=".\opengl\includegl.h">
 			</File>
 			<File
-				RelativePath=".\opengl\includegl.h">
+				RelativePath=".\opengl\VertexArray.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -211,12 +225,27 @@
 				RelativePath=".\loadmodel\LoadObj.h">
 			</File>
 			<File
+				RelativePath="loadmodel\Model3dFactory.cpp">
+			</File>
+			<File
+				RelativePath="loadmodel\Model3dFactory.h">
+			</File>
+			<File
 				RelativePath=".\loadmodel\TextFileObj.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="loadbitmap"
 			Filter="">
+			<File
+				RelativePath="loadbitmap\Bitmap.cpp">
+			</File>
+			<File
+				RelativePath="loadbitmap\Bitmap.h">
+			</File>
+			<File
+				RelativePath="loadbitmap\BitmapFactory.cpp">
+			</File>
 			<File
 				RelativePath=".\loadbitmap\LoadTga.cpp">
 			</File>
@@ -344,13 +373,13 @@
 				RelativePath=".\net\Client.cpp">
 			</File>
 			<File
-				RelativePath=".\net\Server.cpp">
-			</File>
-			<File
 				RelativePath=".\net\net.cpp">
 			</File>
 			<File
 				RelativePath=".\net\net.h">
+			</File>
+			<File
+				RelativePath=".\net\Server.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -582,6 +611,9 @@
 				RelativePath=".\effects\BlackSmoke.cpp">
 			</File>
 			<File
+				RelativePath=".\effects\effects.h">
+			</File>
+			<File
 				RelativePath=".\effects\Explosion.cpp">
 			</File>
 			<File
@@ -598,9 +630,6 @@
 			</File>
 			<File
 				RelativePath=".\effects\Star.cpp">
-			</File>
-			<File
-				RelativePath=".\effects\effects.h">
 			</File>
 		</Filter>
 	</Files>

@@ -64,13 +64,13 @@ void MissionTeamBase1::start ()
   if (fplayer->id == FIGHTER_FALCON)
   {
     fighter [1]->newinit (FIGHTER_HAWK, 0, 200);
-    fighter [1]->o = &model_figb;
+//    fighter [1]->o = &model_figb;
     fighter [1]->target = NULL;
   }
   else
   {
     fighter [1]->newinit (FIGHTER_FALCON, 0, 200);
-    fighter [1]->o = &model_fig;
+//    fighter [1]->o = &model_fig;
     fighter [1]->target = fighter [3];
   }
   fighter [1]->party = 1;

@@ -28,7 +28,7 @@
 
 #ifndef IS_LOADTGA_H
 
-#include "LoadTga.h"
+#include "Bitmap.h"
 #include "../config.h" // if WORDS_BIGENDIAN is defined or not
 
 #include <stdio.h>
@@ -39,7 +39,7 @@
 
 
 // flip an inverted image - see RLE reading below
-static DATA32* flip(DATA32* in, int w, int h);
+static Uint32* flip(Uint32* in, int w, int h);
 
 // TGA pixel formats
 #define TGA_TYPE_MAPPED      1
@@ -88,9 +88,9 @@ class TgaFooter
 
 
 
-inline void LoadTga::writeRGBA (DATA32 *p, DATA8 r, DATA8 g, DATA8 b, DATA8 a)
+inline void LoadTga::writeRGBA (Uint32 *p, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
-  DATA8 *dp = (DATA8 *)p;
+  Uint8 *dp = (Uint8 *)p;
 
 #ifndef WORDS_BIGENDIAN
   dp[0] = r;
@@ -110,7 +110,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
   FILE      *fp; 
   int       bpp, vinverted = 0;
   int       rle = 0, footer_present = 0; 
-  DATA32    *im_data;   
+  Uint32    *im_data;   
   int       im_w,im_h;
 
   TgaHeader header; 
@@ -192,12 +192,12 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
     unsigned long datasize;
     struct stat ss;
     unsigned char *buf, *bufptr;
-    DATA32 *dataptr; 
+    Uint32 *dataptr; 
 
     int   y;
 
     // allocate the destination buffer 
-    im_data = (DATA32*)malloc(im_w * im_h * sizeof(DATA32));
+    im_data = (Uint32*)malloc(im_w * im_h * sizeof(Uint32));
     if(!im_data)
     {
 	     im_w = 0;
@@ -305,7 +305,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 	  else 
 	  { 
       unsigned char curbyte, red, green, blue, alpha; 
-      DATA32 *final_pixel = dataptr + im_w * im_h; 
+      Uint32 *final_pixel = dataptr + im_w * im_h; 
 
       // loop until we've got all the pixels 
       while(dataptr < final_pixel)	
@@ -433,16 +433,16 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 }
 
 /**
-* flip a DATA32 image block vertically
+* flip a Uint32 image block vertically
 * by allocating a new block, then copying
 * the rows in reverse order
 */ 
-DATA32* LoadTga::flip(DATA32* in, int w, int h)
+Uint32* LoadTga::flip(Uint32* in, int w, int h)
 {
   int adv, adv2, i;
-  DATA32* out;
+  Uint32* out;
 
-  out = (DATA32*)malloc(w * h * sizeof(DATA32));
+  out = (Uint32*)malloc(w * h * sizeof(Uint32));
   if(!out)
   {
     return NULL;
@@ -453,7 +453,7 @@ DATA32* LoadTga::flip(DATA32* in, int w, int h)
   for(i = 0; i < h; i++)
   {
     adv2 -= w;
-    memmove(out + adv, in + adv2, w * sizeof(DATA32));
+    memmove(out + adv, in + adv2, w * sizeof(Uint32));
     adv += w;
   }
 

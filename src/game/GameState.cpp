@@ -1599,8 +1599,8 @@ void StatePlay::display ()
         if (fighter [i]->explode > 0)
           if (fighter [i] != fplayer)
           {
-            float dgamma = fabs (fplayer->getAngleH (fighter [i]));
-            float dphi = fabs (fplayer->getAngle (fighter [i]));
+            float dgamma = fabs ((float) fplayer->getAngleH (fighter [i]));
+            float dphi = fabs ((float) fplayer->getAngle (fighter [i]));
             if (dphi < 45 && dgamma < 45)
             {
               float ddist = fplayer->distance (fighter [i]);
@@ -2680,9 +2680,9 @@ void StateInit::display ()
     glTranslatef (0, 0.5F, 0);
     gl.enableTexture (textitle->textureID);
     if (antialiasing)
-      textitle->shadeLinear ();
+      gl.enableLinearTexture (textitle->textureID, textitle->mipmap);
     else
-      textitle->shadeConst ();
+      gl.disableLinearTexture (textitle->textureID, textitle->mipmap);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin (GL_QUADS);
     glTexCoord2d (0, 1);
@@ -2739,7 +2739,7 @@ void StateInit::timer (Uint32 dt)
   int r = math.random (100);
   if (r == 50) r = math.random (100); // do not optimize this: random number generator initialization
 
-  tl.x = 6.0 * pow (1.5, -(5 + tl.z));
+  tl.x = 6.0 * pow ((float) 1.5, (float) -(5 + tl.z));
   tl.y = (tl.z + 3) * (tl.z + 3) * 0.02 - 0.8; //0.9 * tl.x;
   tl.z += 0.14;
 

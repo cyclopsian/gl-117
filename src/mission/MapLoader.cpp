@@ -25,7 +25,7 @@
 
 #include "MapLoader.h"
 #include "game/globals.h"
-#include "loadbitmap/LoadTga.h"
+#include "loadbitmap/Bitmap.h"
 #include "filetokenizer/FileTokenizer.h"
 #include "configuration/Dirs.h"
 #include "gllandscape/GlLandscape.h"
@@ -869,7 +869,11 @@ void MissionCustom::start ()
 
     unsigned char *map;
     int mapx, mapy;
-    map = LoadTga::load (dirs.getMaps (mapfile), &mapx, &mapy);
+    Bitmap *bitmap = BitmapFactory::getBitmap (dirs.getMaps (mapfile));
+    map = bitmap->data;
+    mapx = bitmap->width;
+    mapy = bitmap->height;
+//    map = LoadTga::load (dirs.getMaps (mapfile), &mapx, &mapy);
     if (map == NULL)
     {
       logging.display ("Map has a valid bpp entry but seems to be corrupt", LOG_FATAL);

@@ -63,7 +63,7 @@ void MissionTest2::start ()
   fplayer->ammo = 0;
   fighter [1]->party = 0;
   fighter [1]->target = fighter [0];
-  fighter [1]->o = &model_fig;
+//  fighter [1]->o = &model_fig;
   fighter [1]->trafo.translation.x = 0;
   fighter [1]->trafo.translation.z = 0;
   fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
@@ -110,7 +110,7 @@ int MissionTest2::processtimer (Uint32 dt)
   }
   if (fabs (fighter [1]->aw) < 10 && fabs (fplayer->aw) > 130)
   {
-    if (fabs (fighter [1]->getAngleH (fplayer)) < 10 && fighter [1]->distance (fplayer) < 20)
+    if (fabs ((float) fighter [1]->getAngleH (fplayer)) < 10 && fighter [1]->distance (fplayer) < 20)
       return 2;
   }
   if (b) return 0;

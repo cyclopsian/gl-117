@@ -23,7 +23,7 @@
 #define IS_GLPRIMITIVES_H
 
 #ifdef _MSC_VER
-  #pragma warning(disable:4786) // VC98 bug, needs SP5
+  #pragma warning(disable:4786) // workaround for MSVC6 bug, needs service pack
 #endif
 
 #include <iostream>

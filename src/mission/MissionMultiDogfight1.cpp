@@ -57,7 +57,7 @@ void MissionMultiDogfight1::start ()
     fighter [i]->ai = false;
     fighter [i]->party = i;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_fig;
+//    fighter [i]->o = &model_fig;
     fighter [i]->trafo.translation.x = 50 + i * 30;
     fighter [i]->trafo.translation.z = 100;
   }

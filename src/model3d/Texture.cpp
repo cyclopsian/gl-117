@@ -28,7 +28,7 @@
 
 #include "model3d/Model3d.h"
 #include "opengl/GlPrimitives.h"
-#include "loadbitmap/LoadTga.h"
+#include "loadbitmap/Bitmap.h"
 #include "logging/Logging.h"
 
 
@@ -67,17 +67,23 @@ Texture::~Texture ()
 bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
 {
   int i, i2;
-  char buf [4096];
+//  char buf [4096];
 
-#ifdef IS_LOADTGA_H
-  data = LoadTga::load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
+//#ifdef IS_LOADTGA_H
+  Bitmap *bitmap = BitmapFactory::getBitmap (filename);
+  width = bitmap->width;
+  height = bitmap->height;
+  data = bitmap->data;
+//  BitmapFactory bf;
+//  Bitmap *bitmap = bf.getBitmap (filename);
+/*  data = LoadTga::load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
   if (!data)
   {
     sprintf (buf, "Texture %s not found", filename.c_str ());
     logging.display (buf, LOG_FATAL);
     exit (-1);
-  }
-#else
+  }*/
+/*#else
   unsigned char skip;
   FILE *in = fopen (filename.c_str (), "rb");
   if (!in)
@@ -100,7 +106,7 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
     exit (-1);
 //    error_outofmemory ();
   fread (buf, width * height * 3, 1, in);
-#endif
+#endif*/
 
   long texl = 0;
   long texr = 0;
@@ -167,9 +173,9 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
       }
     }
 
-#ifndef IS_LOADTGA_H
+/*#ifndef IS_LOADTGA_H
   free (buf);
-#endif
+#endif*/
 
   texlight = (float) texl / width / height / 3 / 256; // average brightness
   texred = (float) texr / width / height / 256; // average red
@@ -184,7 +190,7 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
   return true;
 }
 
-void Texture::getColor (Color *color, int x, int y) const
+/*void Texture::getColor (Color *color, int x, int y) const
 {
   if (x < 0) x = (int) -x % width;
   if (y < 0) y = (int) -y % height;
@@ -198,9 +204,9 @@ void Texture::getColor (Color *color, int x, int y) const
   color->c [1] = data [offset + 1];
   color->c [2] = data [offset + 2];
   color->c [3] = data [offset + 3];
-}
+}*/
 
-void Texture::shadeLinear () const
+/*void Texture::shadeLinear () const
 {
   gl.enableLinearTexture (textureID, mipmap);
 }
@@ -208,7 +214,7 @@ void Texture::shadeLinear () const
 void Texture::shadeConst () const
 {
   gl.disableLinearTexture (textureID, mipmap);
-}
+}*/
 
 #endif
 

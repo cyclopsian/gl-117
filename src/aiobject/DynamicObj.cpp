@@ -574,7 +574,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
     // add drag force
     braking = (fabs (ruddereffect) + fabs (elevatoreffect) * 4 + fabs (rolleffect)) * realspeed / 50;
-    brakepower = pow (0.93 - braking, timefac);
+    brakepower = pow ((float) (0.93 - braking), (float) timefac);
 
     acc.x *= brakepower;
     acc.y *= brakepower;
@@ -632,7 +632,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
       braking = (fabs (ruddereffect) + fabs (elevatoreffect)) * realspeed / 50;
     else
       braking = (fabs (currot.theta / 45)) * realspeed / 50;
-    brakepower = pow (0.9915 - braking, timefac);
+    brakepower = pow ((float) (0.9915 - braking), (float) timefac);
     force.x *= brakepower; force.z *= brakepower; force.y *= brakepower;
 
   }

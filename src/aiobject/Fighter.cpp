@@ -585,7 +585,7 @@ void Fighter::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, Dynamic
   // calculate the recommended height, recheight2 depends on it
   if (manoeverheight <= 0)
   {
-    if (id >= FIGHTER1 && id <= FIGHTER2 && target != NULL) // fighter, has target
+    if (target != NULL) // fighter, has target
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
         recheight = target->trafo.translation.y - targetheight;  // target is a fighter

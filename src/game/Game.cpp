@@ -55,6 +55,7 @@ TODO list:
 #include "game/Events.h"
 #include "game/Callbacks.h"
 #include "loadmodel/Load3ds.h"
+#include "loadmodel/Model3dFactory.h"
 
 #include <ctype.h>
 
@@ -260,8 +261,8 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   float ty2 = ty1 + 0.24;
   zoom /= 10;
   gl.enableTexture (texranks->textureID);
-  if (antialiasing) texranks->shadeLinear ();
-  else texranks->shadeConst ();
+  if (antialiasing) gl.enableLinearTexture (texranks->textureID, texranks->mipmap);
+  else gl.disableLinearTexture (texranks->textureID, texranks->mipmap);
   gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.35);
@@ -319,8 +320,8 @@ void drawMedal (float xp, float yp, float zp, int medal, float zoom, int mission
   float ty2 = ty1 + 0.5;
   zoom /= 10;
   gl.enableTexture (texmedals->textureID);
-  if (antialiasing) texmedals->shadeLinear ();
-  else texmedals->shadeConst ();
+  if (antialiasing) gl.enableLinearTexture (texmedals->textureID, texmedals->mipmap);
+  else gl.disableLinearTexture (texmedals->textureID, texmedals->mipmap);
   gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
@@ -570,7 +571,7 @@ void setLightSource (int gamma)
 
 Model3d *getModel (int id)
 {
-  if (id == FIGHTER_FALCON) return &model_fig;
+  if (id == FIGHTER_FALCON) return &model_fig; //Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
   else if (id == FIGHTER_SWALLOW) return &model_figa;
   else if (id == FIGHTER_HAWK) return &model_figb;
   else if (id == FIGHTER_HAWK2) return &model_figc;
@@ -1210,24 +1211,24 @@ void Events::setAntialiasing ()
 {
   if (antialiasing)
   {
-    font1->texture->shadeLinear ();
-    font2->texture->shadeLinear ();
+    gl.enableLinearTexture (font1->texture->textureID, font1->texture->mipmap);
+    gl.enableLinearTexture (font2->texture->textureID, font2->texture->mipmap);
     if (texmoon != NULL)
     {
-      texmoon->shadeLinear ();
-      texsun->shadeLinear ();
-      texearth->shadeLinear ();
+      gl.enableLinearTexture (texmoon->textureID, texmoon->mipmap);
+      gl.enableLinearTexture (texsun->textureID, texsun->mipmap);
+      gl.enableLinearTexture (texearth->textureID, texearth->mipmap);
     }
   }
   else
   {
-    font1->texture->shadeConst ();
-    font2->texture->shadeConst ();
+    gl.disableLinearTexture (font1->texture->textureID, font1->texture->mipmap);
+    gl.disableLinearTexture (font2->texture->textureID, font2->texture->mipmap);
     if (texmoon != NULL)
     {
-      texmoon->shadeConst ();
-      texsun->shadeConst ();
-      texearth->shadeConst ();
+      gl.disableLinearTexture (texmoon->textureID, texmoon->mipmap);
+      gl.disableLinearTexture (texsun->textureID, texsun->mipmap);
+      gl.disableLinearTexture (texearth->textureID, texearth->mipmap);
     }
   }
 }

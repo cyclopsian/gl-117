@@ -64,7 +64,7 @@ void Explosion::move (Uint32 dt, float camphi, float camgamma)
       ttl = 0;
       draw = false;
     }
-    float brakepower = pow (0.98, timefac);
+    float brakepower = pow ((float) 0.98, (float) timefac);
     v.mul (brakepower);
     trafo.translation.x += v.x * timefac;
     trafo.translation.y += v.y * timefac;

@@ -629,7 +629,7 @@ void Landscape::genMoonSurface (int height)
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
       {
-         rad = (int) sqrt ((x-i2)*(x-i2)+(y-i3)*(y-i3));
+         rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
            if (rad < 0.67 * radius) 
@@ -655,7 +655,7 @@ void Landscape::genMoonSurface (int height)
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
       {
-         rad = (int) sqrt ((x-i2)*(x-i2)+(y-i3)*(y-i3));
+         rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
            if (rad < 0.67 * radius) 
@@ -682,7 +682,7 @@ void Landscape::genMoonSurface (int height)
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
       {
-         rad = (int) sqrt ((x-i2)*(x-i2)+(y-i3)*(y-i3));
+         rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
            if (rad < 0.67 * radius) 
@@ -708,7 +708,7 @@ void Landscape::genMoonSurface (int height)
     for (i2 = x - radius; i2 < x+radius; i2++)
       for (i3 = y - radius; i3 < y+radius; i3++)
       {
-         rad = (int) sqrt ((x-i2)*(x-i2)+(y-i3)*(y-i3));
+         rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
            if (rad < 0.67 * radius) depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
@@ -1360,7 +1360,7 @@ void Landscape::calcWoods (int dy)
   for (i = 0; i < MAXX; i ++)
     for (i2 = 0; i2 < MAXX; i2 ++)
     {
-      if (fabs (h [i] [i2] - h [i + 1] [i2]) > dy)
+      if (fabs ((float) (h [i] [i2] - h [i + 1] [i2])) > dy)
         if (f [i] [i2] == 0)
         {
           int ra = math.random (3);

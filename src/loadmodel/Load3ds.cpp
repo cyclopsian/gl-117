@@ -577,7 +577,7 @@ void Load3ds::computeColors (Model3d *model)
     {
       if (object->hasTexture)
       {
-        Vertex *v = &object->vertex [i2];
+/*        Vertex *v = &object->vertex [i2];
         Texture *tex = object->material->texture;
         tex->getColor (&c, (int) (v->tex.x * tex->width), (int) (v->tex.y * tex->height));
         int val;
@@ -587,7 +587,7 @@ void Load3ds::computeColors (Model3d *model)
           val = c.c [1]; val = val * 2 / 3; c.c [1] = val;
           val = c.c [2]; val = val * 2 / 3; c.c [2] = val;
         }
-        v->color = c;
+        v->color = c; */
       }
       else
       {
