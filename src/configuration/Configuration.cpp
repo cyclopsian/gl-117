@@ -70,7 +70,7 @@ int game = GAME_INIT; // see GAME-constants
 int clouds = 0;
 int camera = 0;
 bool isserver = false;
-int loglevel = LOG_MOST;
+int loglevel = LOG_ALL;
 
 // use 0...255 for one byte keys, 256... for special (two byte) beys
 unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';

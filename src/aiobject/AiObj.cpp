@@ -29,6 +29,7 @@
 #include "game/globals.h"
 #include "math/Math.h"
 
+#include "assert.h"
 
 
 void AIObj::aiinit ()
@@ -1268,6 +1269,309 @@ void AIObj::targetPrevious (AIObj **f)
   if (z > 1 && !ai) target = NULL;
 }
 
+void AIObj::setSmoke (Uint32 dt)
+{
+  float sz = COS(currot.gamma) * COS(currot.phi) * zoom * 1.1; // polar (spherical) coordinates
+  float sy = -SIN(currot.gamma) * zoom * 1.1;
+  float sx = COS(currot.gamma) * SIN(currot.phi) * zoom * 1.1;
+  
+  // some smoke elements per discrete movement
+  float fg = sqrt (force.x * force.x + force.y * force.y + force.z * force.z) * 13;
+  if (fg >= MAXSMOKEELEM) fg = (float) MAXSMOKEELEM - 0.5;
+  for (int i = 0; i < (int) fg; i ++)
+  {
+    float fac = (float) i / fg;
+    smoke->setSmoke (tl.x - sx - force.x * fac, tl.y - sy - force.y * fac, tl.z - sz - force.z * fac, 39 - i);
+  }
+/*    smoke->setSmoke (tl.x - sx - force.x * 0.6, tl.y - sy - force.y * 0.6, tl.z - sz - force.z * 0.6, (int) phi, 36);
+  smoke->setSmoke (tl.x - sx - force.x * 0.4, tl.y - sy - force.y * 0.4, tl.z - sz - force.z * 0.4, (int) phi, 37);
+  smoke->setSmoke (tl.x - sx - force.x * 0.2, tl.y - sy - force.y * 0.2, tl.z - sz - force.z * 0.2, (int) phi, 38);
+  smoke->setSmoke (tl.x - sx, tl.y - sy, tl.z - sz, (int) phi, 39);
+  smoke->move (dt, 5);*/
+  smoke->move (dt, (int) fg + 1);
+  smokettl += timestep;
+}
+
+void AIObj::checkTtl (Uint32 dt)
+{
+  if (firecannonttl > 0) firecannonttl -= dt; // time to fire the next missile
+  if (firemissilettl > 0) firemissilettl -= dt; // time to fire the next missile
+  if (fireflarettl > 0) fireflarettl -= dt; // time to fire the next flare
+  if (firechaffttl > 0) firechaffttl -= dt; // time to fire the next chaff
+  if (smokettl > 0) smokettl -= dt; // time to fire the next chaff
+}
+
+void AIObj::selectNewTarget (AIObj **f)
+{
+  if (bomber)
+    targetNearestGroundEnemy (f);
+  else
+    targetNearestEnemy (f);
+}
+
+float AIObj::getMinimumHeight ()
+{
+  // precalculated height
+  int lsdist = 15;
+  float flyx = tl.x + force.x * lsdist, flyz = tl.z + force.z * lsdist;
+  float flyx2 = tl.x + force.x * lsdist * 3, flyz2 = tl.z + force.z * lsdist * 3;
+  float flyx3 = tl.x + force.x * lsdist * 8, flyz3 = tl.z + force.z * lsdist * 8;
+  float h1 = l->getMaxHeight (flyx, flyz);
+  float h2 = l->getMaxHeight (flyx2, flyz2);
+  float h3 = l->getMaxHeight (flyx3, flyz3);
+  h1 = h1 > h2 ? h1 : h2;
+  h1 = h1 > h3 ? h1 : h3;
+  return h1;
+}
+
+void AIObj::easyPiloting (Uint32 dt)
+{
+  float timefac = (float) dt / (float) timestep;
+  float deltatheta;
+  deltatheta = recrot.theta - currot.theta;
+  if (fabs (dtheta) > 30)
+  { dtheta = 0; }
+  float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
+  if (mynimbility > nimbility) mynimbility = nimbility;
+  float nimbility2 = mynimbility;
+  if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
+    nimbility2 = 0.00001;
+
+  if (deltatheta > 0 && dtheta < 0) dtheta += mynimbility * timefac;
+  else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility * timefac;
+  else if (deltatheta > 0)
+  {
+    float estimatedtheta = dtheta * (dtheta + nimbility2 * 5 / timefac) / 2 / nimbility2;
+    if (deltatheta > estimatedtheta) dtheta += mynimbility * timefac;
+    else if (deltatheta < estimatedtheta) dtheta -= mynimbility * timefac;
+  }
+  else
+  {
+    float estimatedtheta = -dtheta * (dtheta - nimbility2 * 5 / timefac) / 2 / nimbility2;
+    if (deltatheta < estimatedtheta) dtheta -= mynimbility * timefac;
+    else if (deltatheta > estimatedtheta) dtheta += mynimbility * timefac;
+  }
+  if (dtheta > (nimbility * (1.0 + realspeed)) * timefac * 5.0F)
+    dtheta = (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
+  currot.theta += dtheta;
+
+  assert (easymodel == 1);
+  // height changes
+  float nimbility1 = nimbility / 5;
+  if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
+    nimbility1 = 0.00001;
+  if (currot.theta > maxrot.theta) currot.theta = maxrot.theta; // restrict roll angle
+  else if (currot.theta < -maxrot.theta) currot.theta = -maxrot.theta;
+
+  float deltagamma = recrot.gamma - currot.gamma;
+  if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
+  else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility1 * timefac;
+  else if (deltagamma > 0)
+  {
+    float estimatedgamma = dgamma * (dgamma + nimbility1 * 2) / nimbility1;
+    if (id == 200)
+      id = id;
+    if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
+    else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
+  }
+  else if (deltagamma < 0)
+  {
+    float estimatedgamma = -dgamma * (dgamma + nimbility1 * 2) / nimbility1;
+    if (id == 200)
+      id = id;
+    if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
+    else if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
+  }
+  if (dgamma > manoeverability * (3.33 + 15.0 * realspeed) * timefac)
+    dgamma = manoeverability * (3.33 + 15.0 * realspeed) * timefac;
+  currot.gamma += dgamma;
+}
+
+bool AIObj::performManoevers (float myheight)
+{
+  if (manoeverstate && active && draw)
+  {
+    easymodel = 2;
+
+    if (manoeverstate == 1) // Immelmann
+    {
+      recelevatoreffect = 0.05;
+      if (fabs (currot.theta) > 10) recrolleffect = -1;
+      else
+      {
+        recrolleffect = 0;
+        manoeverstate = 2;
+      }
+    }
+    else if (manoeverstate == 2)
+    {
+      if (fabs (currot.theta) <= 150)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 1;
+      }
+      else
+      {
+        manoeverstate = 3;
+      }
+    }
+    else if (manoeverstate == 3)
+    {
+      if (currot.gamma < 170 || currot.gamma > 190)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 1;
+      }
+      else
+      {
+        manoeverstate = 4;
+      }
+    }
+    else if (manoeverstate == 4)
+    {
+      if (fabs (currot.theta) > 20)
+      {
+        recrolleffect = 1;
+        recelevatoreffect = 0.05;
+      }
+      else
+      {
+        manoeverstate = 0;
+      }
+    }
+
+    if (manoeverstate == 10) // climb vertical
+    {
+      recrolleffect = 0;
+      recelevatoreffect = 1;
+      if (currot.gamma > 260 || currot.gamma < 90)
+      {
+        recrolleffect = 0;
+        recelevatoreffect = 0;
+        manoeverstate = 11;
+      }
+    }
+    else if (manoeverstate == 11)
+    {
+      if (fabs (tl.y - myheight) > 3)
+      {
+        manoeverstate = 12;
+      }
+    }
+    else if (manoeverstate == 12)
+    {
+      recelevatoreffect = -0.5;
+      if (currot.gamma > 170 && currot.gamma < 190)
+      {
+        recelevatoreffect = 0;
+        manoeverstate = 0;
+      }
+    }
+
+    if (manoeverstate == 20) // Roll
+    {
+      recelevatoreffect = 0.55;
+      recrolleffect = 1;
+      if (currot.theta > 80 && currot.theta < 90)
+      {
+        manoeverstate = 21;
+      }
+    }
+    else if (manoeverstate == 21)
+    {
+      if (currot.theta > -10 && currot.theta < 10)
+      {
+        manoeverstate = 0;
+      }
+    }
+
+    float pulljoystick = 0.005;
+    float nocorrection = 0.1;
+    if (recrolleffect > rolleffect + nocorrection) rolleffect += pulljoystick * timestep;
+    else if (recrolleffect < rolleffect - nocorrection) rolleffect -= pulljoystick * timestep;
+    if (recelevatoreffect > elevatoreffect + nocorrection) elevatoreffect += pulljoystick * timestep;
+    else if (recelevatoreffect < elevatoreffect - nocorrection) elevatoreffect -= pulljoystick * timestep;
+    return 0;
+  }
+  else
+  {
+    if (ai)
+      easymodel = 1;
+  }
+  return 1;
+}
+
+void AIObj::limitRotation ()
+{
+  if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
+  else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
+}
+
+void AIObj::estimateTargetPosition (float *dx2, float *dz2)
+{
+  float ex, ez;
+  float t = 10.0 * disttarget; // generous time to new position
+  if (t > 60) t = 60; // higher values will not make sense
+  t *= (float) (400 - precision) / 400;
+  int tt = (int) target->currot.theta;
+  if (tt < 0) tt += 360;
+  float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
+  if (newphi > 90) newphi = 90;
+  else if (newphi < -90) newphi = -90;
+  newphi += (float) target->currot.phi;
+  if (newphi >= 360) newphi -= 360;
+  if (newphi < 0) newphi += 360;
+  if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+  {
+    ex = target->tl.x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
+    ez = target->tl.z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
+  }
+  else
+  {
+    ex = target->tl.x - SIN(newphi) * t * target->realspeed * 0.05; // estimated target position x
+    ez = target->tl.z - COS(newphi) * t * target->realspeed * 0.05; // estimated target position z
+  }
+  *dx2 = ex - tl.x; *dz2 = ez - tl.z; // estimated distances
+}
+
+void AIObj::estimateHeading (float dx2, float dz2)
+{
+  float a, w = currot.phi;
+  if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
+
+  // get heading to target
+  a = atan (dx2 / dz2) * 180 / PI;
+  if (dz2 > 0)
+  {
+    if (dx2 > 0) a -= 180.0F;
+    else a += 180.0F;
+  }
+//    this->aw = a;
+  aw = a - w; // aw=0: target in front, aw=+/-180: target at back
+  if (aw < -180) aw += 360;
+  if (aw > 180) aw -= 360;
+}
+
+void AIObj::estimateFighterHeading (AIObj *fi)
+{
+  disttarget = distance (fi); // distance to target
+  float ex = fi->tl.x; // estimated target position x
+  float ez = fi->tl.z; // estimated target position z
+  float dx2 = ex - tl.x;
+  float dz2 = ez - tl.z; // estimated distances
+  int w = (int) currot.phi;
+  if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
+  int a = (atan (dx2 / dz2) * 180 / PI);
+  if (dz2 > 0)
+  {
+    if (dx2 > 0) a -= 180;
+    else a += 180;
+  }
+  aw = a - w;
+  if (aw < -180) aw += 360;
+  if (aw > 180) aw -= 360;
+}
+
 // core AI method
 void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma)
 {
@@ -1280,16 +1584,10 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     return;
   }
 
-  if (firecannonttl > 0) firecannonttl -= dt; // time to fire the next missile
-  if (firemissilettl > 0) firemissilettl -= dt; // time to fire the next missile
-  if (fireflarettl > 0) fireflarettl -= dt; // time to fire the next flare
-  if (firechaffttl > 0) firechaffttl -= dt; // time to fire the next chaff
-  if (smokettl > 0) smokettl -= dt; // time to fire the next chaff
+  checkTtl (dt);
 
   // move object according to our physics
   move (dt, camphi, camgamma);
-
-  float timefac = (float) dt / (float) timestep;
 
   if (id >= STATIC_PASSIVE) // no AI for static ground objects (buildings)
     return;
@@ -1297,25 +1595,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   // set smoke
   if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2)) // missile or fighter
   {
-    float sz = COS(currot.gamma) * COS(currot.phi) * zoom * 1.1; // polar (spherical) coordinates
-    float sy = -SIN(currot.gamma) * zoom * 1.1;
-    float sx = COS(currot.gamma) * SIN(currot.phi) * zoom * 1.1;
-    
-    // some smoke elements per discrete movement
-    float fg = sqrt (force.x * force.x + force.y * force.y + force.z * force.z) * 13;
-    if (fg >= MAXSMOKEELEM) fg = (float) MAXSMOKEELEM - 0.5;
-    for (i = 0; i < (int) fg; i ++)
-    {
-      float fac = (float) i / fg;
-      smoke->setSmoke (tl.x - sx - force.x * fac, tl.y - sy - force.y * fac, tl.z - sz - force.z * fac, 39 - i);
-    }
-/*    smoke->setSmoke (tl.x - sx - force.x * 0.6, tl.y - sy - force.y * 0.6, tl.z - sz - force.z * 0.6, (int) phi, 36);
-    smoke->setSmoke (tl.x - sx - force.x * 0.4, tl.y - sy - force.y * 0.4, tl.z - sz - force.z * 0.4, (int) phi, 37);
-    smoke->setSmoke (tl.x - sx - force.x * 0.2, tl.y - sy - force.y * 0.2, tl.z - sz - force.z * 0.2, (int) phi, 38);
-    smoke->setSmoke (tl.x - sx, tl.y - sy, tl.z - sz, (int) phi, 39);
-    smoke->move (dt, 5);*/
-    smoke->move (dt, (int) fg + 1);
-    smokettl += timestep;
+    setSmoke (dt);
   }
 
   if (!active) // not active, then exit
@@ -1349,19 +1629,13 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
   if (target == NULL)
   {
-    if (bomber)
-      targetNearestGroundEnemy (f);
-    else
-      targetNearestEnemy (f);
+    selectNewTarget (f);
   }
   if (target != NULL)
+  {
     if (!target->active)
-    {
-      if (bomber)
-        targetNearestGroundEnemy (f);
-      else
-        targetNearestEnemy (f);
-    }
+      selectNewTarget (f);
+  }
 
   if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
   {
@@ -1533,33 +1807,22 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   float recheight2; // this is the height, the object wants to achieve
   int lsdist = 15;
   float flyx = tl.x + force.x * lsdist, flyz = tl.z + force.z * lsdist;
-  int flyxs = GETCOORD((int) flyx), flyzs = GETCOORD((int) flyz);
+  if (manoeverheight > 0)
   {
-    if (manoeverheight > 0)
+    // precalculated height
+    recheight2 = l->getExactHeight (flyx, flyz) + recheight;
+  }
+  else
+  {
+     // missiles and non intelligent objects will not change their height due to the surface
+    if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
+        (tl.y - myheight > 8 && target != NULL && tl.y - myheight < 50/* && !manoeverheight*/))
     {
-      // precalculated height
-      recheight2 = l->getExactHeight (flyx, flyz) + recheight;
+      recheight2 = target->tl.y - 8 * target->thrust * SIN(target->currot.gamma);
     }
     else
     {
-       // missiles and non intelligent objects will not change their height due to the surface
-      if ((id >= MISSILE1 && id <= MISSILE2 && target != NULL) ||
-          (tl.y - myheight > 8 && target != NULL && tl.y - myheight < 50/* && !manoeverheight*/))
-      {
-        recheight2 = target->tl.y - 8 * target->thrust * SIN(target->currot.gamma);
-      }
-      else
-      {
-        // precalculated height
-        float flyx2 = tl.x + force.x * lsdist * 3, flyz2 = tl.z + force.z * lsdist * 3;
-        float flyx3 = tl.x + force.x * lsdist * 8, flyz3 = tl.z + force.z * lsdist * 8;
-        float h1 = l->getMaxHeight (flyx, flyz);
-        float h2 = l->getMaxHeight (flyx2, flyz2);
-        float h3 = l->getMaxHeight (flyx3, flyz3);
-        h1 = h1 > h2 ? h1 : h2;
-        h1 = h1 > h3 ? h1 : h3;
-        recheight2 = recheight + h1;
-      }
+      recheight2 = recheight + getMinimumHeight ();
     }
   }
 
@@ -1592,119 +1855,15 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           }
   }
 
-  // manoevers (may use the height information)
-  if (manoeverstate && active && draw)
-  {
-    easymodel = 2;
-
-    if (manoeverstate == 1) // Immelmann
-    {
-      recelevatoreffect = 0.05;
-      if (fabs (currot.theta) > 10) recrolleffect = -1;
-      else
-      {
-        recrolleffect = 0;
-        manoeverstate = 2;
-      }
-    }
-    else if (manoeverstate == 2)
-    {
-      if (fabs (currot.theta) <= 150)
-      {
-        recrolleffect = 0;
-        recelevatoreffect = 1;
-      }
-      else
-      {
-        manoeverstate = 3;
-      }
-    }
-    else if (manoeverstate == 3)
-    {
-      if (currot.gamma < 170 || currot.gamma > 190)
-      {
-        recrolleffect = 0;
-        recelevatoreffect = 1;
-      }
-      else
-      {
-        manoeverstate = 4;
-      }
-    }
-    else if (manoeverstate == 4)
-    {
-      if (fabs (currot.theta) > 20)
-      {
-        recrolleffect = 1;
-        recelevatoreffect = 0.05;
-      }
-      else
-      {
-        manoeverstate = 0;
-      }
-    }
-
-    if (manoeverstate == 10) // climb vertical
-    {
-      recrolleffect = 0;
-      recelevatoreffect = 1;
-      if (currot.gamma > 260 || currot.gamma < 90)
-      {
-        recrolleffect = 0;
-        recelevatoreffect = 0;
-        manoeverstate = 11;
-      }
-    }
-    else if (manoeverstate == 11)
-    {
-      if (fabs (tl.y - myheight) > 3)
-      {
-        manoeverstate = 12;
-      }
-    }
-    else if (manoeverstate == 12)
-    {
-      recelevatoreffect = -0.5;
-      if (currot.gamma > 170 && currot.gamma < 190)
-      {
-        recelevatoreffect = 0;
-        manoeverstate = 0;
-      }
-    }
-
-    if (manoeverstate == 20) // Roll
-    {
-      recelevatoreffect = 0.55;
-      recrolleffect = 1;
-      if (currot.theta > 80 && currot.theta < 90)
-      {
-        manoeverstate = 21;
-      }
-    }
-    else if (manoeverstate == 21)
-    {
-      if (currot.theta > -10 && currot.theta < 10)
-      {
-        manoeverstate = 0;
-      }
-    }
-
-    float pulljoystick = 0.005;
-    float nocorrection = 0.1;
-    if (recrolleffect > rolleffect + nocorrection) rolleffect += pulljoystick * timestep;
-    else if (recrolleffect < rolleffect - nocorrection) rolleffect -= pulljoystick * timestep;
-    if (recelevatoreffect > elevatoreffect + nocorrection) elevatoreffect += pulljoystick * timestep;
-    else if (recelevatoreffect < elevatoreffect - nocorrection) elevatoreffect -= pulljoystick * timestep;
+  // FIGHTERs only: manoevers (may use the height information)
+  if (!performManoevers (myheight))
     return;
-  }
-  else
-  {
-    if (ai)
-      easymodel = 1;
-  }
+
+  if (manoeverheight > 0) manoeverheight -= dt;
+  if (manoevertheta > 0) manoevertheta -= dt;
+  if (manoeverthrust > 0) manoeverthrust -= dt;
 
   // calculate the recommended height, recheight2 depends on it
-  if (manoeverheight > 0) manoeverheight -= dt;
   if (manoeverheight <= 0)
   {
     if (!(id >= FIGHTER1 && id <= FIGHTER2) && target != NULL) // no fighter, has target (missile, mine)
@@ -1721,11 +1880,14 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
         recheight = target->tl.y - targetheight;  // target is a fighter
       else
         recheight = target->tl.y - targetheight + 5; // target is no fighter
+
+      int flyxs = GETCOORD((int) (tl.x + force.x * 15)), flyzs = GETCOORD((int) (tl.z + force.z * 15));
       if (!l->isWater (l->f [flyxs] [flyzs])) // not flying above water
       {
         if (recheight < 3.5 + 0.01 * aggressivity)
           recheight = 3.5 + 0.01 * aggressivity;
       }
+
       float minh = 5.5 + 0.01 * aggressivity; // minimum height
       if (l->type == LAND_CANYON) minh = 6.5 + 0.01 * aggressivity; // stay higher in canyons
       if (fabs (tl.y - myheight) < minh)
@@ -1741,6 +1903,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
           manoeverheight = 5 * timestep; // fly manoever to gain height
         }
       }
+
       if (disttarget < 50 && fabs (tl.y - myheight) > 25)
       {
         recheight = 8 + 0.025 * aggressivity;
@@ -1749,6 +1912,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     }
   }
   
+  // get recommended elevation to target
   if (ttl <= 0 && id >= MISSILE1 && id <= MISSILE2 && id != MISSILE_MINE1)
   { recheight = -100; recheight2 = -100; recrot.gamma = 90; }
   else if (ai)
@@ -1758,7 +1922,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       float dgamma = 0;
       if (disttarget <= -0.00001 || disttarget >= 0.00001) // no division by zero
         dgamma = atan ((target->tl.y - tl.y) / disttarget) * 180 / PI - (currot.gamma - 180);
-      recrot.gamma = currot.gamma + dgamma; // get recommended elevation to target
+      recrot.gamma = currot.gamma + dgamma;
     }
     else
     {
@@ -1771,73 +1935,12 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 
 
   // do a smooth roll
-  float deltatheta;
-
   if (easymodel == 1)
   {
-    deltatheta = recrot.theta - currot.theta;
-    if (fabs (dtheta) > 30)
-    { dtheta = 0; }
-    float mynimbility = fabs (deltatheta) / 5.0F * nimbility;
-    if (mynimbility > nimbility) mynimbility = nimbility;
-    float nimbility2 = mynimbility;
-    if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
-      nimbility2 = 0.00001;
-
-    if (deltatheta > 0 && dtheta < 0) dtheta += mynimbility * timefac;
-    else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility * timefac;
-    else if (deltatheta > 0)
-    {
-      float estimatedtheta = dtheta * (dtheta + nimbility2 * 5 / timefac) / 2 / nimbility2;
-      if (deltatheta > estimatedtheta) dtheta += mynimbility * timefac;
-      else if (deltatheta < estimatedtheta) dtheta -= mynimbility * timefac;
-    }
-    else
-    {
-      float estimatedtheta = -dtheta * (dtheta - nimbility2 * 5 / timefac) / 2 / nimbility2;
-      if (deltatheta < estimatedtheta) dtheta -= mynimbility * timefac;
-      else if (deltatheta > estimatedtheta) dtheta += mynimbility * timefac;
-    }
-    if (dtheta > (nimbility * (1.0 + realspeed)) * timefac * 5.0F)
-      dtheta = (nimbility * (1.0 + realspeed)) * timefac * 5.0F;
-    currot.theta += dtheta;
-
-    // height changes
-    if (easymodel == 1)
-    {
-      float nimbility1 = nimbility / 5;
-      if (nimbility1 >= -0.00001 && nimbility1 <= 0.00001)
-        nimbility1 = 0.00001;
-      if (currot.theta > maxrot.theta) currot.theta = maxrot.theta; // restrict roll angle
-      else if (currot.theta < -maxrot.theta) currot.theta = -maxrot.theta;
-
-      float deltagamma = recrot.gamma - currot.gamma;
-      if (deltagamma > 0 && dgamma < 0) dgamma += nimbility1 * timefac;
-      else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility1 * timefac;
-      else if (deltagamma > 0)
-      {
-        float estimatedgamma = dgamma * (dgamma + nimbility1 * 2) / nimbility1;
-        if (id == 200)
-          id = id;
-        if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
-        else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
-      }
-      else if (deltagamma < 0)
-      {
-        float estimatedgamma = -dgamma * (dgamma + nimbility1 * 2) / nimbility1;
-        if (id == 200)
-          id = id;
-        if (deltagamma < estimatedgamma - 2) dgamma -= nimbility1 * timefac;
-        else if (deltagamma > estimatedgamma + 2) dgamma += nimbility1 * timefac;
-      }
-      if (dgamma > manoeverability * (3.33 + 15.0 * realspeed) * timefac)
-        dgamma = manoeverability * (3.33 + 15.0 * realspeed) * timefac;
-      currot.gamma += dgamma;
-    }
+    easyPiloting (dt);
   }
 
-  if (currot.gamma > 180 + maxrot.gamma) currot.gamma = 180 + maxrot.gamma;
-  else if (currot.gamma < 180 - maxrot.gamma) currot.gamma = 180 - maxrot.gamma;
+  limitRotation ();
 
   if (id >= MISSILE1 && id <= MISSILE2)
   {
@@ -1877,61 +1980,24 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
     return;
   }
 
-  int firerate;
-  if (difficulty == 0) firerate = 12;
-  else if (difficulty == 1) firerate = 6;
-  else firerate = 3;
-
-  float dx2, dz2, ex, ez;
+  float dx2, dz2;
   float dx = target->tl.x - tl.x, dz = target->tl.z - tl.z; // current distances
   if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
   {
-    float t = 10.0 * disttarget; // generous time to new position
-    if (t > 60) t = 60; // higher values will not make sense
-    t *= (float) (400 - precision) / 400;
-    int tt = (int) target->currot.theta;
-    if (tt < 0) tt += 360;
-    float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
-    if (newphi > 90) newphi = 90;
-    else if (newphi < -90) newphi = -90;
-    newphi += (float) target->currot.phi;
-    if (newphi >= 360) newphi -= 360;
-    if (newphi < 0) newphi += 360;
-    if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
-    {
-      ex = target->tl.x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
-      ez = target->tl.z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
-    }
-    else
-    {
-      ex = target->tl.x - SIN(newphi) * t * target->realspeed * 0.05; // estimated target position x
-      ez = target->tl.z - COS(newphi) * t * target->realspeed * 0.05; // estimated target position z
-    }
-    dx2 = ex - tl.x; dz2 = ez - tl.z; // estimated distances
+    estimateTargetPosition (&dx2, &dz2);
   }
   else
   {
     dx2 = dx; dz2 = dz;
   }
-  float a, w = currot.phi;
-  if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
-  // get heading to target
-  a = atan (dx2 / dz2) * 180 / PI;
-  if (dz2 > 0)
-  {
-    if (dx2 > 0) a -= 180.0F;
-    else a += 180.0F;
-  }
-//    this->aw = a;
-  aw = a - w; // aw=0: target in front, aw=+/-180: target at back
-  if (aw < -180) aw += 360;
-  if (aw > 180) aw -= 360;
-
-  if (manoevertheta > 0) manoevertheta -= dt;
-  if (manoeverthrust > 0) manoeverthrust -= dt;
+  estimateHeading (dx2, dz2);
 
   // heading calculations  
+  int firerate;
+  if (difficulty == 0) firerate = 12;
+  else if (difficulty == 1) firerate = 6;
+  else firerate = 3;
   if (id >= FIGHTER1 && id < FIGHTER_TRANSPORT) // for fighters do the following
   {
     if (!acttype && disttarget <= 1000 && manoevertheta <= 0) // no special action, near distance, no roll manoever
@@ -1940,13 +2006,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       {
         if (aw > 140 && disttarget > 50)
         {
-          manoeverstate = 1;
-          logging.display ("Manoever: Immelmann", LOG_ALL);
+          if (!manoeverstate)
+          {
+            manoeverstate = 1;
+            logging.display ("Manoever: Immelmann", LOG_ALL);
+          }
         }
         else if (aw > 160.0F + 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
-          manoeverstate = 1;
-          logging.display ("Manoever: Immelmann", LOG_ALL);
+          if (!manoeverstate)
+          {
+            manoeverstate = 1;
+            logging.display ("Manoever: Immelmann", LOG_ALL);
+          }
         }
         else if (aw > 160 && disttarget < 25) // target is at the back
         {
@@ -1998,13 +2070,19 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       {
         if (aw < -140 && disttarget > 50)
         {
-          manoeverstate = 1;
-          logging.display ("Manoever: Immelmann", LOG_ALL);
+          if (!manoeverstate)
+          {
+            manoeverstate = 1;
+            logging.display ("Manoever: Immelmann", LOG_ALL);
+          }
         }
         else if (aw < -160.0F - 0.05 * intelligence && disttarget < 4 + 0.01 * intelligence) // target very near at the back
         {
-          manoeverstate = 1;
-          logging.display ("Manoever: Immelmann", LOG_ALL);
+          if (!manoeverstate)
+          {
+            manoeverstate = 1;
+            logging.display ("Manoever: Immelmann", LOG_ALL);
+          }
         }
         else if (aw < -160 && disttarget < 25)
         {
@@ -2209,21 +2287,8 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
       for (int i = 0; i < maxfighter; i ++)
         if (f [i]->active && party != f [i]->party)
         {
-          disttarget = distance (f [i]); // distance to target
-          ex = f [i]->tl.x; // estimated target position x
-          ez = f [i]->tl.z; // estimated target position z
-          dx2 = ex - tl.x; dz2 = ez - tl.z; // estimated distances
-          w = (int) currot.phi;
-          if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
-          a = (atan (dx2 / dz2) * 180 / PI);
-          if (dz2 > 0)
-          {
-            if (dx2 > 0) a -= 180;
-            else a += 180;
-          }
-          aw = a - w;
-          if (aw < -180) aw += 360;
-          if (aw > 180) aw -= 360;
+          estimateFighterHeading (f [i]);
+
           if (id == FLAK_AIR1)
             if (f [i]->tl.y > tl.y + 2)
             {

@@ -284,6 +284,16 @@ class AIObj : public DynamicObj
     void targetLockingEnemy (AIObj **f);
     void targetNext (AIObj **f);
     void targetPrevious (AIObj **f);
+    void setSmoke (Uint32 dt);
+    void selectNewTarget (AIObj **f);
+    void checkTtl (Uint32);
+    float getMinimumHeight ();
+    void easyPiloting (Uint32 dt);
+    bool performManoevers (float myheight);
+    void limitRotation ();
+    void estimateTargetPosition (float *dx2, float *dz2);
+    void estimateHeading (float dx2, float dz2);
+    void estimateFighterHeading (AIObj *fi);
     void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff, float camphi, float camgamma); // core AI method
 };
 
