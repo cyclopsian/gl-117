@@ -275,7 +275,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
       fighter [i]->explode = 0;
       int temp = fighter [i]->stat.fighterkills;
       int tempid = fighter [i]->id;
-      fighter [i]->aiinit ();
+      fighter [i]->init ();
       if (i == 0)
       {
         playerInit ();

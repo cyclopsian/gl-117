@@ -101,7 +101,7 @@ int MissionDeathmatch3::processtimer (Uint32 dt)
     {
       fighter [i]->explode = 0;
       int temp = fighter [i]->stat.fighterkills;
-      fighter [i]->aiinit ();
+      fighter [i]->init ();
       if (i == 0)
       {
         playerInit ();

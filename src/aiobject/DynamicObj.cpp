@@ -34,12 +34,12 @@
 
 DynamicObj::DynamicObj ()
 {
-  dinit ();
+  init ();
 }
 
 DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
 {
-  dinit ();
+  init ();
   
   space = space2;
   o = o2;
@@ -63,7 +63,7 @@ void DynamicObj::deactivate ()
   draw = false;
 }
 
-void DynamicObj::dinit ()
+void DynamicObj::init ()
 {
   trafo.rotation.gamma = 90;
   currot.phi = 0; currot.theta = 0; currot.gamma = 180;

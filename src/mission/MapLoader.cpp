@@ -748,8 +748,7 @@ void MissionCustom::init ()
 
   for (i = 0; i < maxfighter; i ++)
   {
-    obj [i].dinit ();
-    obj [i].aiinit ();
+    obj [i].init ();
   }
 
   for (i = 0; i < maxtext; i ++)

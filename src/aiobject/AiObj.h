@@ -174,7 +174,7 @@ class DynamicObj : public SpaceObj
 
     void activate ();
     void deactivate ();
-    void dinit ();
+    virtual void init ();
     void thrustUp ();
     void thrustDown ();
     float distance (DynamicObj *target);
@@ -251,7 +251,7 @@ class AIObj : public DynamicObj
     AIObj (Space *space2, Model3d *o2, float zoom2);
     virtual ~AIObj ();
 
-    void aiinit ();     ///< initialize variables
+    virtual void init ();     ///< initialize variables
     void missileCount ();
     void newinit (int id, int party, int intelligence, int precision, int aggressivity); ///< init new AI object
     void newinit (int id, int party, int intelligence); ///< init new AI object (esp. non-fighter)

@@ -127,6 +127,36 @@ void Model3d::setColor (const Color &col)
   }
 }
 
+void Model3d::calcMissiles ()
+{
+  int i;
+  Model3d *model = this;
+  Vector3 tlmissile (0, 0.3, 0.3);
+  for (i = 0; i < model->numObjects; i ++)
+  {
+    if (model->object [i]->numVertices == 4)
+    {
+      Object3d *o = model->object [i];
+      float sumx = 0, sumz = 0;
+      float maxy = 2;
+      int i2;
+      for (i2 = 0; i2 < o->numVertices; i2 ++)
+      {
+        sumx += o->vertex [i2].vector.x;
+        if (o->vertex [i2].vector.y < maxy)
+          maxy = o->vertex [i2].vector.y;
+        sumz += o->vertex [i2].vector.z;
+      }
+      tlmissile.x = sumx / 4.0F;
+      tlmissile.y = maxy;
+      tlmissile.z = sumz / 4.0F;
+
+      tlmissile.y = maxy;
+      model->addRefPoint (tlmissile);
+    }
+  }
+}
+
 void Model3d::drawVertexNormals (const Object3d &cm, float zoom)
 {
   glColor3ub (255, 0, 0);

@@ -91,6 +91,8 @@ bool Load3ds::import3ds (Model3d *model, const char *filename)
   computeColors (model);
   // Set vertices to [(-1,-1,-1);(1,1,1)]
   normalize (model);
+
+  model->calcMissiles ();
   // Clean up
   cleanUp();
 

@@ -79,7 +79,7 @@ void Fighter::fireFlare2 (DynamicObj *flare)
     sprintf (buf, "Flare: party=%d", party);
     logging.display (buf, LOG_ALL);
   }
-  flare->dinit ();
+  flare->init ();
   flare->thrust = 0;
   flare->realspeed = 0;
   flare->recthrust = 0;
@@ -103,7 +103,7 @@ void Fighter::fireChaff2 (DynamicObj *chaff)
   char buf [4096];
   sprintf (buf, "Chaff: party=%d", party);
   logging.display (buf, LOG_ALL);
-  chaff->dinit ();
+  chaff->init ();
   chaff->thrust = 0;
   chaff->realspeed = 0;
   chaff->recthrust = 0;

@@ -37,7 +37,7 @@ AIObj::AIObj ()
 {
   o = NULL;
   trafo.scaling.set (1.0, 1.0, 1.0);
-  aiinit ();
+  init ();
   smoke = new Smoke (0);
 }
 
@@ -46,7 +46,7 @@ AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
   space = space2;
   o = o2;
   trafo.scaling.set (zoom2, zoom2, zoom2);
-  aiinit ();
+  init ();
   smoke = new Smoke (0);
   space->addObject (this);
 }
@@ -56,8 +56,10 @@ AIObj::~AIObj ()
   delete smoke;
 }
 
-void AIObj::aiinit ()
+void AIObj::init ()
 {
+  DynamicObj::init ();
+  
   int i;
   acttype = 0;
   dualshot = false;
@@ -147,8 +149,13 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams
 
+/*  if (id == 200)
+  {
+    o = Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
+    o->setName ("HAWK");
+  }
+  else*/
   o = getModel (id);
-//  o = Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
   o->cube.set (trafo.scaling);
 
   if (id == FIGHTER_FALCON)
@@ -812,8 +819,7 @@ void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
     logging.display (buf, LOG_ALL);
   }
   ttf = 50 * timestep;
-  missile->dinit ();
-  missile->aiinit ();
+  missile->init ();
   missile->newinit (id, party, 0);
   initValues (missile, currot.phi);
   missile->id = id;

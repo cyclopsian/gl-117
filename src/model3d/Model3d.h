@@ -348,6 +348,7 @@ class Model3d
     Model3d ();
     ~Model3d ();
   
+    void calcMissiles ();
     void setName (const std::string name);
     void addMaterial (const Material &material);
     void addObject (const Object3d &object);

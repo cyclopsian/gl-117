@@ -153,9 +153,9 @@ class Model3dRealizer
         if (cm->hasTexture)
         {
           if (antialiasing)
-            cm->material->texture->shadeLinear ();
+            gl.enableLinearTexture (cm->material->texture->textureID, cm->material->texture->mipmap);
           else
-            cm->material->texture->shadeConst ();
+            gl.disableLinearTexture (cm->material->texture->textureID, cm->material->texture->mipmap);
         }
       }
 
@@ -346,9 +346,9 @@ class Model3dRealizer
         if (cm->hasTexture)
         {
           if (antialiasing)
-            cm->material->texture->shadeLinear ();
+            gl.enableLinearTexture (cm->material->texture->textureID, cm->material->texture->mipmap);
           else
-            cm->material->texture->shadeConst ();
+            gl.disableLinearTexture (cm->material->texture->textureID, cm->material->texture->mipmap);
         }
       }
 

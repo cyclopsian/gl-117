@@ -623,9 +623,7 @@ int game_levelInit ()
   // init all objects
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i]->dinit ();
-    fighter [i]->aiinit ();
-//    fighter [i]->fighterinit ();
+    fighter [i]->init ();
     fighter [i]->explode = 0;
     fighter [i]->trafo.translation.x = 0;
     fighter [i]->trafo.translation.z = -i * 10;
@@ -639,7 +637,7 @@ int game_levelInit ()
   }
   for (i = 0; i < maxgroundobj; i ++)
   {
-    groundobj [i]->dinit ();
+    groundobj [i]->init ();
     groundobj [i]->trafo.scaling.set (1, 1, 1);
     groundobj [i]->id = STATIC_PASSIVE;
     groundobj [i]->deactivate ();
@@ -798,19 +796,19 @@ int game_levelInit ()
 
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i]->aiinit ();
+    missile [i]->init ();
     missile [i]->deactivate ();
   }
 
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i]->dinit ();
+    flare [i]->init ();
     flare [i]->deactivate ();
   }
 
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i]->dinit ();
+    chaff [i]->init ();
     chaff [i]->deactivate ();
   }
 
@@ -1723,7 +1721,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 ****************************************************************************/
 
 // calculate missile rack positions for a fighter
-void setMissiles (Model3d *model)
+/*void setMissiles (Model3d *model)
 {
   int i;
   Vector3 tlmissile (0, 0.3, 0.3);
@@ -1750,7 +1748,7 @@ void setMissiles (Model3d *model)
       model->addRefPoint (tlmissile);
     }
   }
-}
+}*/
 
 // initialize game data
 void myInit ()
@@ -2122,7 +2120,7 @@ void myFirstInit ()
   load3ds.import3ds (&model_house1, dirs.getModels ("house1.3ds"));
   model_house1.setName ("HOUSE");
 
-  setMissiles (&model_fig);
+/*  setMissiles (&model_fig);
   setMissiles (&model_figa);
   setMissiles (&model_figb);
   setMissiles (&model_figc);
@@ -2131,7 +2129,7 @@ void myFirstInit ()
   setMissiles (&model_figf);
   setMissiles (&model_figg);
   setMissiles (&model_figh);
-  setMissiles (&model_figi);
+  setMissiles (&model_figi);*/
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);
