@@ -106,6 +106,7 @@ class Mission
   Mission ();
   virtual ~Mission () {}
   void playerInit ();
+  void selectMissiles (AIObj &aiobj);
   void alliedInit (const UnitDescriptor &fighterid, int pilotid, int i);
   void objectInit (AIObj *aiobj, int party, int ailevel, int n);
 //  virtual void init () = 0;

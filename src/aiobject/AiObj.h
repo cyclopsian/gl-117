@@ -209,15 +209,23 @@ class DynamicUnitPrototype : public UnitPrototype
       : UnitPrototype (desc)
     {
       OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
-      impact = file->getFloat ("impact");
-      manoeverability = file->getFloat ("manoeverability");
-      nimbility = file->getFloat ("nimbility");
-      maxthrust = file->getFloat ("thrust");
-      maxshield = file->getFloat ("shield");
-      maxrot.gamma = file->getFloat ("rot.gamma");
-      maxrot.theta = file->getFloat ("rot.theta");
+      if (!file->getFloat ("impact", impact))
+        impact = 5;
+      if (!file->getFloat ("manoeverability", manoeverability))
+        manoeverability = 0.5;
+      if (!file->getFloat ("nimbility", nimbility))
+        nimbility = 0.0;
+      if (!file->getFloat ("thrust", maxthrust))
+        maxthrust = 0.0;
+      if (!file->getFloat ("shield", maxshield))
+        maxshield = 100.0;
+      if (!file->getFloat ("rot.gamma", maxrot.gamma))
+        maxrot.gamma = 70.0;
+      if (!file->getFloat ("rot.theta", maxrot.theta))
+        maxrot.theta = 90.0;
       maxrot.phi = 0; // no restriction for the heading
-      maxzoom = file->getFloat ("zoom");
+      if (!file->getFloat ("zoom", maxzoom))
+        maxzoom = 0.35;
     }
     
     virtual ~DynamicUnitPrototype ()
@@ -229,20 +237,20 @@ class AiUnitPrototype : public DynamicUnitPrototype
 {
   public:
   
-    int missilerack [missileracks]; ///< number of missile racks
-    int missilerackn [missileracks]; ///< number of missile racks
     bool dualshot;      ///< one or two cannons?
+    int maxammo;
+    int weight;
     
     AiUnitPrototype (const UnitDescriptor &desc)
       : DynamicUnitPrototype (desc)
     {
       OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
-      dualshot = file->getBoolean ("dualshot");
-      for (int i = 0; i < missileracks; i ++)
-      {
-        missilerack [i] = file->getInteger (FormatString ("missilerack.%d", i));
-        missilerackn [i] = file->getInteger (FormatString ("missilerackn.%d", i));
-      }
+      if (!file->getBoolean ("dualshot", dualshot))
+        dualshot = false;
+      if (!file->getInteger ("ammo", maxammo))
+        maxammo = 0;
+      if (!file->getInteger ("weight", weight))
+        weight = 1000;
     }
 
     virtual ~AiUnitPrototype ()
@@ -254,10 +262,24 @@ class FighterPrototype : public AiUnitPrototype
 {
   public:
   
+    int maxchaffs;
+    int maxflares;
+    int racks;
+    int rackload [missileracks];
+
     FighterPrototype (const UnitDescriptor &desc)
       : AiUnitPrototype (desc)
     {
       OptionFile *file = OptionFileFactory::get (dirs.getUnits (desc.name.c_str ()));
+      if (!file->getInteger ("chaffs", maxchaffs))
+        maxchaffs = 0;
+      if (!file->getInteger ("flares", maxflares))
+        maxflares = 0;
+      if (!file->getInteger ("racks", racks))
+        racks = 0;
+      for (int i = 0; i < racks; i ++)
+        if (!file->getInteger (FormatString ("rackload.%d", i), rackload [i]))
+          rackload [i] = 0;
     }
 };
 
@@ -367,12 +389,12 @@ class AIObj : public DynamicObj
     int smokettl;       ///< minimum time to wait between setting smoke elements
     int missiletype;    ///< only relevant for the player, describes type: AAM, AGM, DF
     int missiles [missiletypes]; ///< number of missiles of each type
+    int missilerack [missileracks]; ///< type of missiles per racks
+    int missilerackn [missileracks]; ///< number of missiles per rack
     float aw;           ///< current heading difference to target
     int score;          ///< final score
     float dtheta, dgamma; ///< theta/gamma alteration (smooth piloting)
     float disttarget;   ///< current distance to target
-    int flares;
-    int chaffs;
     int fireflarettl;
     int firechaffttl;
     int ammo;
@@ -486,6 +508,9 @@ class Ship : public AIObj
 class Fighter : public AIObj
 {
   public:
+    int flares;
+    int chaffs;
+
     Fighter (const UnitDescriptor &desc);
     Fighter (const UnitDescriptor &desc, Space *space2, Model3d *o2, float zoom2);
     virtual ~Fighter ();

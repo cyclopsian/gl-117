@@ -280,10 +280,10 @@ class OptionFile
     OptionFile (const std::string &filename);
     ~OptionFile ();
     
-    std::string getString (const std::string &name);
-    bool getBoolean (const std::string &name);
-    int getInteger (const std::string &name);
-    float getFloat (const std::string &name);
+    bool getString (const std::string &name, std::string &value);
+    bool getBoolean (const std::string &name, bool &value);
+    bool getInteger (const std::string &name, int &value);
+    bool getFloat (const std::string &name, float &value);
 };
 
 typedef std::map<std::string, OptionFile *> OptionFileList;

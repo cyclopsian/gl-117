@@ -192,7 +192,7 @@ void AIObj::init ()
   firemissilettl = 0;
   fireflarettl = 0;
   firechaffttl = 0;
-  flares = 0;
+//  flares = 0;
   aw = 0;
   source = NULL;
   stat.points = 0;
@@ -226,9 +226,9 @@ void AIObj::missileCount ()
     missiles [i] = 0;
   for (i = 0; i < missileracks; i ++)
   {
-    if (getPrototype ()->missilerackn [i] > 0)
+    if (missilerackn [i] > 0)
     {
-      missiles [getPrototype ()->missilerack [i]] += getPrototype ()->missilerackn [i];
+      missiles [missilerack [i]] += missilerackn [i];
     }
   }
 }
@@ -243,7 +243,7 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   manoeverstate = 0;
   activate ();
   for (i = 0; i < missileracks; i ++)
-    getPrototype ()->missilerackn [i] = 0;
+    missilerackn [i] = 0;
   ammo = -1;
   bomber = 0;
   getPrototype ()->dualshot = false;
@@ -271,10 +271,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.35;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 2;
-    getPrototype ()->missilerack [0] = 0; getPrototype ()->missilerack [1] = 6; getPrototype ()->missilerack [2] = 6; getPrototype ()->missilerack [3] = 0;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
+    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
+//    flares = 20;
+//    chaffs = 20;
     statfirepower = 1;
     ammo = 1200;
   }
@@ -287,10 +287,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.43;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
-    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 3; getPrototype ()->missilerack [2] = 3; getPrototype ()->missilerack [3] = 6;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
+//    flares = 20;
+//    chaffs = 20;
     bomber = 1;
     statfirepower = 3;
     ammo = 1200;
@@ -304,10 +304,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.43;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 1;
-    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 3; getPrototype ()->missilerack [2] = 3; getPrototype ()->missilerack [3] = 6;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 3; missilerack [2] = 3; missilerack [3] = 6;
+//    flares = 20;
+//    chaffs = 20;
     bomber = 1;
     statfirepower = 2;
     ammo = 1200;
@@ -321,10 +321,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.45;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 1;
-    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 4; getPrototype ()->missilerack [2] = 4; getPrototype ()->missilerack [3] = 6;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 1; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 6;
+//    flares = 20;
+//    chaffs = 20;
     bomber = 1;
     statfirepower = 3;
     ammo = 1400;
@@ -341,8 +341,8 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 1.5;
     getPrototype ()->maxrot.gamma = 25;
     getPrototype ()->maxrot.theta = 30;
-    flares = 0;
-    chaffs = 0;
+//    flares = 0;
+//    chaffs = 0;
     ammo = 0;
   }
   else if (id == Transport2Descriptor)
@@ -356,8 +356,8 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 1.5;
     getPrototype ()->maxrot.gamma = 25;
     getPrototype ()->maxrot.theta = 30;
-    flares = 0;
-    chaffs = 0;
+//    flares = 0;
+//    chaffs = 0;
     ammo = 0;
   }
   else if (id == BuzzardDescriptor)
@@ -369,10 +369,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.44;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 2;
-    getPrototype ()->missilerack [0] = 0; getPrototype ()->missilerack [1] = 6; getPrototype ()->missilerack [2] = 6; getPrototype ()->missilerack [3] = 0;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 2; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 2;
+    missilerack [0] = 0; missilerack [1] = 6; missilerack [2] = 6; missilerack [3] = 0;
+//    flares = 20;
+//    chaffs = 20;
     statfirepower = 2;
     ammo = 1200;
   }
@@ -385,10 +385,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.41;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 1;
-    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 0; getPrototype ()->missilerack [2] = 0; getPrototype ()->missilerack [3] = 6;
-    flares = 20;
-    chaffs = 20;
+    missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
+//    flares = 20;
+//    chaffs = 20;
     statfirepower = 1;
     ammo = 1000;
   }
@@ -401,10 +401,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.45;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 1; getPrototype ()->missilerackn [1] = 2; getPrototype ()->missilerackn [2] = 2; getPrototype ()->missilerackn [3] = 1;
-    getPrototype ()->missilerack [0] = 6; getPrototype ()->missilerack [1] = 0; getPrototype ()->missilerack [2] = 0; getPrototype ()->missilerack [3] = 6;
-    flares = 25;
-    chaffs = 25;
+    missilerackn [0] = 1; missilerackn [1] = 2; missilerackn [2] = 2; missilerackn [3] = 1;
+    missilerack [0] = 6; missilerack [1] = 0; missilerack [2] = 0; missilerack [3] = 6;
+//    flares = 25;
+//    chaffs = 25;
     statfirepower = 4;
     ammo = 1800;
   }
@@ -417,10 +417,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.47;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 3; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 3;
-    getPrototype ()->missilerack [0] = 4; getPrototype ()->missilerack [1] = 4; getPrototype ()->missilerack [2] = 4; getPrototype ()->missilerack [3] = 4;
-    flares = 25;
-    chaffs = 25;
+    missilerackn [0] = 3; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 3;
+    missilerack [0] = 4; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 4;
+//    flares = 25;
+//    chaffs = 25;
     bomber = 1;
     statfirepower = 5;
     ammo = 2000;
@@ -435,10 +435,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.4;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
-    getPrototype ()->missilerack [0] = 7; getPrototype ()->missilerack [1] = 1; getPrototype ()->missilerack [2] = 1; getPrototype ()->missilerack [3] = 7;
-    flares = 25;
-    chaffs = 25;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
+//    flares = 25;
+//    chaffs = 25;
     statfirepower = 2;
     ammo = 1400;
     getPrototype ()->dualshot = true;
@@ -452,10 +452,10 @@ void AIObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     zoom = 0.33;
     getPrototype ()->maxrot.theta = 90.0;
     getPrototype ()->maxrot.gamma = 70.0;
-    getPrototype ()->missilerackn [0] = 2; getPrototype ()->missilerackn [1] = 3; getPrototype ()->missilerackn [2] = 3; getPrototype ()->missilerackn [3] = 2;
-    getPrototype ()->missilerack [0] = 7; getPrototype ()->missilerack [1] = 1; getPrototype ()->missilerack [2] = 1; getPrototype ()->missilerack [3] = 7;
-    flares = 25;
-    chaffs = 25;
+    missilerackn [0] = 2; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 2;
+    missilerack [0] = 7; missilerack [1] = 1; missilerack [2] = 1; missilerack [3] = 7;
+//    flares = 25;
+//    chaffs = 25;
     statfirepower = 2;
     ammo = 1400;
     getPrototype ()->dualshot = true;
@@ -998,16 +998,16 @@ void AIObj::decreaseMissile (const UnitDescriptor &id)
   missiles [value] --;
   int ptrrack = 0, maxrack = 0;
   for (i = 0; i < missileracks; i ++)
-    if (getPrototype ()->missilerack [i] == id.id)
-      if (getPrototype ()->missilerackn [i] > maxrack)
+    if (missilerack [i] == id.id)
+      if (missilerackn [i] > maxrack)
       {
         ptrrack = i;
-        maxrack = getPrototype ()->missilerackn [i];
+        maxrack = missilerackn [i];
       }
   if (maxrack > 0)
   {
-    getPrototype ()->missilerackn [ptrrack] --;
-    ref [ptrrack * 3 + 2 - getPrototype ()->missilerackn [ptrrack]].trafo.scaling.set (0, 0, 0);
+    missilerackn [ptrrack] --;
+    ref [ptrrack * 3 + 2 - missilerackn [ptrrack]].trafo.scaling.set (0, 0, 0);
   }
 }
 

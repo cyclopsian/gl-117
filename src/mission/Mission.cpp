@@ -86,69 +86,69 @@ void Mission::playerInit ()
   for (i = 0; i < missiletypes; i ++)
     fplayer->missiles [i] = 0;
   for (i = 0; i < missileracks; i ++)
-    fplayer->getPrototype ()->missilerack [i] = -1;
+    fplayer->missilerack [i] = -1;
   if (selweapon [wantweapon] == AamHs1Descriptor)
   {
     if (selfighter [wantfighter] == FalconDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 2; fplayer->getPrototype ()->missilerackn [2] = 2; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 6; fplayer->getPrototype ()->missilerack [1] = 0; fplayer->getPrototype ()->missilerack [2] = 0; fplayer->getPrototype ()->missilerack [3] = 6; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
     if (selfighter [wantfighter] == HawkDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 2; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 2;
-      fplayer->getPrototype ()->missilerack [0] = 6; fplayer->getPrototype ()->missilerack [1] = 0; fplayer->getPrototype ()->missilerack [2] = 0; fplayer->getPrototype ()->missilerack [3] = 6; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 0; fplayer->missilerack [2] = 0; fplayer->missilerack [3] = 6; }
     if (selfighter [wantfighter] == StormDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 3; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 3;
-      fplayer->getPrototype ()->missilerack [0] = 0; fplayer->getPrototype ()->missilerack [1] = 6; fplayer->getPrototype ()->missilerack [2] = 6; fplayer->getPrototype ()->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == Hawk2Descriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 2; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 2;
-      fplayer->getPrototype ()->missilerack [0] = 1; fplayer->getPrototype ()->missilerack [1] = 6; fplayer->getPrototype ()->missilerack [2] = 6; fplayer->getPrototype ()->missilerack [3] = 1; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 6; fplayer->missilerack [2] = 6; fplayer->missilerack [3] = 1; }
     if (selfighter [wantfighter] == PhoenixDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 3; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 3;
-      fplayer->getPrototype ()->missilerack [0] = 2; fplayer->getPrototype ()->missilerack [1] = 7; fplayer->getPrototype ()->missilerack [2] = 7; fplayer->getPrototype ()->missilerack [3] = 2; }
+    { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
+      fplayer->missilerack [0] = 2; fplayer->missilerack [1] = 7; fplayer->missilerack [2] = 7; fplayer->missilerack [3] = 2; }
     if (selfighter [wantfighter] == RedArrowDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 2; fplayer->getPrototype ()->missilerackn [1] = 2; fplayer->getPrototype ()->missilerackn [2] = 2; fplayer->getPrototype ()->missilerackn [3] = 2;
-      fplayer->getPrototype ()->missilerack [0] = 7; fplayer->getPrototype ()->missilerack [1] = 1; fplayer->getPrototype ()->missilerack [2] = 1; fplayer->getPrototype ()->missilerack [3] = 7; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 7; fplayer->missilerack [1] = 1; fplayer->missilerack [2] = 1; fplayer->missilerack [3] = 7; }
   }
   if (selweapon [wantweapon] == Agm1Descriptor)
   {
     if (selfighter [wantfighter] == FalconDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 2; fplayer->getPrototype ()->missilerackn [2] = 2; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 0; fplayer->getPrototype ()->missilerack [1] = 3; fplayer->getPrototype ()->missilerack [2] = 3; fplayer->getPrototype ()->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == HawkDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 6; fplayer->getPrototype ()->missilerack [1] = 3; fplayer->getPrototype ()->missilerack [2] = 3; fplayer->getPrototype ()->missilerack [3] = 6; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 6; }
     if (selfighter [wantfighter] == StormDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 2; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 2;
-      fplayer->getPrototype ()->missilerack [0] = 3; fplayer->getPrototype ()->missilerack [1] = 3; fplayer->getPrototype ()->missilerack [2] = 3; fplayer->getPrototype ()->missilerack [3] = 3; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 3; fplayer->missilerack [2] = 3; fplayer->missilerack [3] = 3; }
     if (selfighter [wantfighter] == Hawk2Descriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 6; fplayer->getPrototype ()->missilerack [1] = 4; fplayer->getPrototype ()->missilerack [2] = 4; fplayer->getPrototype ()->missilerack [3] = 6; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 6; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 6; }
     if (selfighter [wantfighter] == PhoenixDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 3; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 3;
-      fplayer->getPrototype ()->missilerack [0] = 4; fplayer->getPrototype ()->missilerack [1] = 4; fplayer->getPrototype ()->missilerack [2] = 4; fplayer->getPrototype ()->missilerack [3] = 4; }
+    { fplayer->missilerackn [0] = 3; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 3;
+      fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 4; }
     if (selfighter [wantfighter] == RedArrowDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 1; fplayer->getPrototype ()->missilerack [1] = 4; fplayer->getPrototype ()->missilerack [2] = 4; fplayer->getPrototype ()->missilerack [3] = 1; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 4; fplayer->missilerack [2] = 4; fplayer->missilerack [3] = 1; }
   }
   if (selweapon [wantweapon] == DfmDescriptor)
   {
     if (selfighter [wantfighter] == FalconDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 1; fplayer->getPrototype ()->missilerackn [2] = 1; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 0; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == HawkDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 2; fplayer->getPrototype ()->missilerackn [2] = 2; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 0; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 0; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 0; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 0; }
     if (selfighter [wantfighter] == StormDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 3; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 3; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 3; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 3; }
     if (selfighter [wantfighter] == Hawk2Descriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 2; fplayer->getPrototype ()->missilerackn [2] = 2; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 1; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 1; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 2; fplayer->missilerackn [2] = 2; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
     if (selfighter [wantfighter] == PhoenixDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 2; fplayer->getPrototype ()->missilerackn [1] = 3; fplayer->getPrototype ()->missilerackn [2] = 3; fplayer->getPrototype ()->missilerackn [3] = 2;
-      fplayer->getPrototype ()->missilerack [0] = 4; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 4; }
+    { fplayer->missilerackn [0] = 2; fplayer->missilerackn [1] = 3; fplayer->missilerackn [2] = 3; fplayer->missilerackn [3] = 2;
+      fplayer->missilerack [0] = 4; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 4; }
     if (selfighter [wantfighter] == RedArrowDescriptor)
-    { fplayer->getPrototype ()->missilerackn [0] = 1; fplayer->getPrototype ()->missilerackn [1] = 1; fplayer->getPrototype ()->missilerackn [2] = 1; fplayer->getPrototype ()->missilerackn [3] = 1;
-      fplayer->getPrototype ()->missilerack [0] = 1; fplayer->getPrototype ()->missilerack [1] = 5; fplayer->getPrototype ()->missilerack [2] = 5; fplayer->getPrototype ()->missilerack [3] = 1; }
+    { fplayer->missilerackn [0] = 1; fplayer->missilerackn [1] = 1; fplayer->missilerackn [2] = 1; fplayer->missilerackn [3] = 1;
+      fplayer->missilerack [0] = 1; fplayer->missilerack [1] = 5; fplayer->missilerack [2] = 5; fplayer->missilerack [3] = 1; }
   }
   fplayer->missileCount ();
 
@@ -156,6 +156,61 @@ void Mission::playerInit ()
   Fighter *f = dynamic_cast<Fighter *>(fplayer); // TODO: warning C4541: 'dynamic_cast' fuer polymorphen Typ 'class AIObj' mit /GR- verwendet; unvorhersehbares Verhalten moeglich
   if (f)
     f->placeMissiles ();
+}
+
+void Mission::selectMissiles (AIObj &aiobj)
+{
+  UnitDescriptor id = aiobj.id;
+  if (id == FalconDescriptor)
+  {
+    aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 2; aiobj.missilerackn [2] = 2; aiobj.missilerackn [3] = 2;
+    aiobj.missilerack [0] = 0; aiobj.missilerack [1] = 6; aiobj.missilerack [2] = 6; aiobj.missilerack [3] = 0;
+  }
+  if (id == HawkDescriptor)
+  {
+    aiobj.missilerackn [0] = 1; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 1;
+    aiobj.missilerack [0] = 6; aiobj.missilerack [1] = 3; aiobj.missilerack [2] = 3; aiobj.missilerack [3] = 6;
+  }
+  if (id == StormDescriptor)
+  {
+    aiobj.missilerackn [0] = 1; aiobj.missilerackn [1] = 2; aiobj.missilerackn [2] = 2; aiobj.missilerackn [3] = 1;
+    aiobj.missilerack [0] = 6; aiobj.missilerack [1] = 0; aiobj.missilerack [2] = 0; aiobj.missilerack [3] = 6;
+  }
+  if (id == Hawk2Descriptor)
+  {
+    aiobj.missilerackn [0] = 1; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 1;
+    aiobj.missilerack [0] = 6; aiobj.missilerack [1] = 4; aiobj.missilerack [2] = 4; aiobj.missilerack [3] = 6;
+  }
+  if (id == PhoenixDescriptor)
+  {
+    aiobj.missilerackn [0] = 3; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 3;
+    aiobj.missilerack [0] = 4; aiobj.missilerack [1] = 4; aiobj.missilerack [2] = 4; aiobj.missilerack [3] = 4;
+  }
+  if (id == RedArrowDescriptor)
+  {
+    aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 2;
+    aiobj.missilerack [0] = 7; aiobj.missilerack [1] = 1; aiobj.missilerack [2] = 1; aiobj.missilerack [3] = 7;
+  }
+  if (id == CrowDescriptor)
+  {
+    aiobj.missilerackn [0] = 1; aiobj.missilerackn [1] = 2; aiobj.missilerackn [2] = 2; aiobj.missilerackn [3] = 1;
+    aiobj.missilerack [0] = 6; aiobj.missilerack [1] = 0; aiobj.missilerack [2] = 0; aiobj.missilerack [3] = 6;
+  }
+  if (id == BuzzardDescriptor)
+  {
+    aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 2; aiobj.missilerackn [2] = 2; aiobj.missilerackn [3] = 2;
+    aiobj.missilerack [0] = 0; aiobj.missilerack [1] = 6; aiobj.missilerack [2] = 6; aiobj.missilerack [3] = 0;
+  }
+  if (id == SwallowDescriptor)
+  {
+    aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 2;
+    aiobj.missilerack [0] = 6; aiobj.missilerack [1] = 3; aiobj.missilerack [2] = 3; aiobj.missilerack [3] = 6;
+  }
+  if (id == BlackBirdDescriptor)
+  {
+    aiobj.missilerackn [0] = 2; aiobj.missilerackn [1] = 3; aiobj.missilerackn [2] = 3; aiobj.missilerackn [3] = 2;
+    aiobj.missilerack [0] = 7; aiobj.missilerack [1] = 1; aiobj.missilerack [2] = 1; aiobj.missilerack [3] = 7;
+  }
 }
 
 void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
@@ -177,6 +232,8 @@ void Mission::alliedInit (const UnitDescriptor &fighterid, int pilotid, int n)
   aiobj->newinit (fighterid, 1, intelligence, precision, aggressivity);
   aiobj->ai = true;
 
+  selectMissiles (*aiobj);
+
   // place missiles to racks
   if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)
   {
@@ -195,6 +252,8 @@ void Mission::objectInit (AIObj *aiobj, int party, int ailevel, int n)
   space->addObject (fighter [n]);
 
   fighter [n]->newinit (aiobj->id, party, ailevel);
+  
+  selectMissiles (*aiobj);
 
   // place missiles to racks
   if (aiobj->id >= FighterBeginDescriptor && aiobj->id <= AirEndDescriptor)

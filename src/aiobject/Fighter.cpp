@@ -61,14 +61,14 @@ void Fighter::placeMissiles ()
     addRefModel (SpaceObj (Model3dRegistry::get (AamHs1Descriptor.name), Transformation (tlnull, rotmissile, scale)));
   for (i2 = 0; i2 < 4; i2 ++)
   {
-    int type = getPrototype ()->missilerack [i2];
+    int type = missilerack [i2];
 /*    ref [i2 * 3].o = o;
     ref [i2 * 3 + 1].o = o;
     ref [i2 * 3 + 2].o = o; */
     ref [i2 * 3 + 1].trafo.translation.z = ref [i2 * 3].trafo.translation.z - 0.04;
     ref [i2 * 3 + 2].trafo.translation.z = ref [i2 * 3].trafo.translation.z + 0.04;
     ref [i2 * 3].trafo.translation.y = ref [i2 * 3 + 1].trafo.translation.y - 0.04;
-    int tmp = getPrototype ()->missilerackn [i2];
+    int tmp = missilerackn [i2];
     ref [i2 * 3].trafo.scaling.set (0.25, 0.25, 0.25);
     ref [i2 * 3 + 1].trafo.scaling.set (0.25, 0.25, 0.25);
     ref [i2 * 3 + 2].trafo.scaling.set (0.25, 0.25, 0.25);

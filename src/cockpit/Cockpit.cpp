@@ -181,9 +181,11 @@ void Cockpit::drawCounter ()
   glEnd ();
   Color blue (0, 100, 255);
   Color red (255, 0, 0);
-  sprintf (buf, "CHAFF: %d", fplayer->chaffs);
+  Fighter *fig = dynamic_cast<Fighter *>(fplayer);
+  assert (fig);
+  sprintf (buf, "CHAFF: %d", fig->chaffs);
   font1->drawTextCentered (xf*10, (yf-0.05)*10, zf, buf, blue);
-  sprintf (buf, "FLARE: %d", fplayer->flares);
+  sprintf (buf, "FLARE: %d", fig->flares);
   font1->drawTextCentered (xf*10, (yf2-0.05)*10, zf, buf, red);
 
   if (mission->id == MISSION_DEATHMATCH1 || mission->id == MISSION_DEATHMATCH3)

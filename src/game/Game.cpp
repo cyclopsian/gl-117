@@ -632,7 +632,7 @@ int game_levelInit ()
     if (fighter [i]->id >= FighterBeginDescriptor && fighter [i]->id <= AirEndDescriptor)
       for (i2 = 0; i2 < 4; i2 ++)
       {
-        int type = fighter [i]->getPrototype ()->missilerack [i2];
+        int type = fighter [i]->missilerack [i2];
         Model3d *rm = getModel (MissileBeginDescriptor + type);
         fighter [i]->refModel [i2 * 3] = rm;
         fighter [i]->refModel [i2 * 3 + 1] = rm;
@@ -640,7 +640,7 @@ int game_levelInit ()
         fighter [i]->refTl [i2 * 3 + 1].z = fighter [i]->refTl [i2 * 3].z - 0.04;
         fighter [i]->refTl [i2 * 3 + 2].z = fighter [i]->refTl [i2 * 3].z + 0.04;
         fighter [i]->refTl [i2 * 3].y = fighter [i]->refTl [i2 * 3 + 1].y - 0.04;
-        int tmp = fighter [i]->getPrototype ()->missilerackn [i2];
+        int tmp = fighter [i]->missilerackn [i2];
         fighter [i]->refScale [i2 * 3] = 0.25;
         fighter [i]->refScale [i2 * 3 + 1] = 0.25;
         fighter [i]->refScale [i2 * 3 + 2] = 0.25;
