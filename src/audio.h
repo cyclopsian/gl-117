@@ -82,13 +82,14 @@ class SoundSystem
 {
   public:
   bool sound, music;
-  WaveFile *waveexplosion1, *waveclick1, *wavecannon1, *wavemissile1;
-  WaveFile *wavethunder1, *waveplane1, *wavehit1;
   bool musicplaying;
   int volumesound, volumemusic;
 #ifdef HAVE_SDL_MIXER
+  int playtime;
   Mix_Music *musicstandby1, *musicwinner1, *musicdark1, *musicelectro1;
 #endif
+  WaveFile *waveexplosion1, *waveclick1, *wavecannon1, *wavemissile1;
+  WaveFile *wavethunder1, *waveplane1, *wavehit1;
   SoundSystem ();
   ~SoundSystem ();
   void play (int sample);

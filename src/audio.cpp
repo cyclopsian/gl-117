@@ -225,6 +225,12 @@ SoundSystem::SoundSystem ()
          printf("Unable to open audio!\n");
          exit(1);
        }
+  musicdark1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
+  if (musicdark1 == NULL)
+  {
+    fprintf (stderr, "\nCannot open dark.s3m: %s", Mix_GetError ()); fflush (stderr);
+    exit (1);
+  }
   musicstandby1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
   if (musicstandby1 == NULL)
   {
@@ -237,18 +243,13 @@ SoundSystem::SoundSystem ()
     fprintf (stderr, "\nCannot open winner.s3m: %s", Mix_GetError ()); fflush (stderr);
     exit (1);
   }
-  musicdark1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
-  if (musicdark1 == NULL)
-  {
-    fprintf (stderr, "\nCannot open dark.s3m: %s", Mix_GetError ()); fflush (stderr);
-    exit (1);
-  }
   musicelectro1 = Mix_LoadMUS (dirs->getMusic ("electro.s3m"));
   if (musicelectro1 == NULL)
   {
     fprintf (stderr, "\nCannot open electro.s3m: %s", Mix_GetError ()); fflush (stderr);
     exit (1);
   }
+  playtime = 0;
 #endif
   waveexplosion1 = new WaveFile (dirs->getSounds ("explode1.wav"));
   waveclick1 = new WaveFile (dirs->getSounds ("click1.wav"));
@@ -337,6 +338,16 @@ void SoundSystem::playMusic (int sample)
   if (!music) return;
   if (volumemusic == 0) return;
 #ifdef HAVE_SDL_MIXER
+/*  int akttime = SDL_GetTicks ();
+  if (playtime == 0)
+  {
+    playtime = akttime;
+  }
+  else
+  {
+    if (abs (akttime - playtime) < 1500) return;
+    playtime = akttime;
+  }*/
   musicplaying = true;
 //  haltMusic ();
   switch (sample)
@@ -362,6 +373,7 @@ void SoundSystem::haltMusic ()
 {
 #ifdef HAVE_SDL_MIXER
   musicplaying = false;
+  playtime = SDL_GetTicks ();
   Mix_HaltMusic ();
 #endif
 }

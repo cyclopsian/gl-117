@@ -10,7 +10,7 @@
 #endif
 
 #define ZOOM 256
-#define VERSIONSTRING "GL-117 V. 0.6.5 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.6.8 (BETA) BY THOMAS A. DREXL"
 
 // game states
 #define GAME_INIT 0

@@ -3417,6 +3417,7 @@ class Cockpit
     glEnable (GL_DEPTH_TEST);
     if (fplayer->target != NULL)
       if (fplayer->target->active)
+
       {
         glEnable (GL_LIGHTING);
         fplayer->target->o->draw (&n, &tl, fplayer->target->rot, 0.05, 1.0, 0);
@@ -4544,6 +4545,7 @@ void switch_fighter ()
   if (!sound->musicplaying)
     playRandomMusic ();
 }
+
 
 void switch_create ()
 {
@@ -6811,7 +6813,7 @@ void menu_display ()
       font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
-    yt -= 2;
+//    yt -= 2;
     strcpy (buf, "CONTROLS: ");
     if (controls == CONTROLS_KEYBOARD) strcat (buf, "KEYBOARD");
     else if (controls == CONTROLS_MOUSE) strcat (buf, "MOUSE");
@@ -6831,6 +6833,8 @@ void menu_display ()
       font1->drawTextRotated (textx2, yt -= 2, -2, buf, &color2, -menutimer * 5);
     else
       font1->drawText (textx2, yt -= 2, -2, buf);
+#else
+    yt -= 4;
 #endif
     strcpy (buf, "DIFFICULTY: ");
     if (difficulty == 0) strcat (buf, "EASY");

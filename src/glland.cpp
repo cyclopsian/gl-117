@@ -443,12 +443,12 @@ float GLLandscape::getExactHeight2 (float x, float z)
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
   int mz2 = mz1 + 2;
-  mx1 = getCoord (mx1);
-  mx2 = getCoord (mx2);
-  mz1 = getCoord (mz1);
-  mz2 = getCoord (mz2);
-  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
-             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2/4*zoomz - zoomz2));
 }
 
@@ -462,12 +462,12 @@ float GLLandscape::getExactHeight (float x, float z)
   int mz1 = (int) mz;
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
-  mx1 = getCoord (mx1);
-  mx2 = getCoord (mx2);
-  mz1 = getCoord (mz1);
-  mz2 = getCoord (mz2);
-  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
-             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2*zoomz - zoomz2));
 }
 
@@ -484,12 +484,12 @@ float GLLandscape::getExactLSHeight2 (float x, float z)
   mz1 -= mz1 & 1;
   int mx2 = mx1 + 2;
   int mz2 = mz1 + 2;
-  mx1 = getCoord (mx1);
-  mx2 = getCoord (mx2);
-  mz1 = getCoord (mz1);
-  mz2 = getCoord (mz2);
-  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
-             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2/4*zoomz - zoomz2);
 }
 
@@ -505,12 +505,12 @@ float GLLandscape::getExactLSHeight (float x, float z)
   int mz1 = (int) mz;
   int mx2 = mx1 + 1;
   int mz2 = mz1 + 1;
-  mx1 = getCoord (mx1);
-  mx2 = getCoord (mx2);
-  mz1 = getCoord (mz1);
-  mz2 = getCoord (mz2);
-  float h2 = (float)hw[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
-             (float)hw[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hw[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hw[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hw[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hw[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hw[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (h2*zoomz - zoomz2);
 }
 
@@ -525,14 +525,18 @@ float GLLandscape::getRayHeight (float x, float z)
 // Get height of lowest sunray, linear interpolation
 float GLLandscape::getExactRayHeight (float x, float z)
 {
-  float mx = getCoord (x+MAXX/2);
-  float mz = getCoord ((float)MAXX/2-z);
+  float mx = x+MAXX/2;
+  float mz = (float)MAXX/2-z;
   int mx1 = (int) mx;
   int mx2 = mx1 + 1;
   int mz1 = (int) mz;
   int mz2 = mz1 + 1;
-  float h2 = (float)hray[mx1][mz1]*((float)mx2-mx)*((float)mz2-mz) + (float)hray[mx2][mz1]*(mx-mx1)*((float)mz2-mz) +
-             (float)hray[mx1][mz2]*((float)mx2-mx)*(mz-mz1) + (float)hray[mx2][mz2]*(mx-mx1)*(mz-mz1);
+  int ax1 = getCoord (mx1);
+  int ax2 = getCoord (mx2);
+  int az1 = getCoord (mz1);
+  int az2 = getCoord (mz2);
+  float h2 = (float)hray[ax1][az1]*((float)mx2-mx)*((float)mz2-mz) + (float)hray[ax2][az1]*(mx-mx1)*((float)mz2-mz) +
+             (float)hray[ax1][az2]*((float)mx2-mx)*(mz-mz1) + (float)hray[ax2][az2]*(mx-mx1)*(mz-mz1);
   return (ZOOM * (h2*zoomz - zoomz2));
 }
 
