@@ -195,8 +195,8 @@ void Server::removeClient(int id_client)
   
   num_clients--;
   if(num_clients>i)
-    memmove(&clients[i], &clients[i+1], (num_clients-i)*sizeof(Client));
-  clients=(Client*)realloc(clients, num_clients*sizeof(Client));
+    memmove(&clients[i], &clients[i+1], (num_clients-i)*sizeof(MyClient));
+  clients=(MyClient*)realloc(clients, num_clients*sizeof(MyClient));
   // server side info
   printf("<-- REMOVE %s\n",name);
   if(name)
@@ -235,7 +235,7 @@ void Server::getClient()
     newclient=SDLNet_TCP_Accept(server);
     if(newclient)
     {
-      clients=(Client*)realloc(clients, (num_clients+1)*sizeof(Client));
+      clients=(MyClient*)realloc(clients, (num_clients+1)*sizeof(MyClient));
 /*      if (!getMsg(newclient,&clients[num_clients].name)) printf ("name not received");
       else printf ("Name: %s", clients[num_clients].name);*/
       clients[num_clients].sock = newclient;
@@ -294,7 +294,7 @@ int Server::getMessage(int id_client, char *buf)
   {
     if (SDLNet_SocketReady(clients[n].sock))
     {
-       if (getMsg (clients [n].sock, buf))
+       if (getMsg (clients[n].sock, buf))
       {
         printf ("clientnummer: %d",n);
 //        printf("Received: %.*s\n",len,message);
@@ -317,14 +317,58 @@ return 0;
 #endif
 }
 
+int Server::checkStart()
+{
+#ifdef HAVE_SDL_NET
+
+  for (int i = 0; i < num_clients; i++)
+  {
+    sendMessage (clients[i].id, "ready", 5);
+  }
+ printf ("Clients ready ??");
+
+ int waittime = 0;
+ char *buf;
+ bool *ok = new bool [num_clients];
+ for (i = 0; i < num_clients; i++) ok[i] = false;
+ while (waittime < 600000)
+ {
+   waittime += SDL_GetTicks ();
+   for (int i = 0; i < num_clients; i++)
+   {
+     if (getMessage (clients[i].id, buf))
+     {
+       if (strcmp (buf,"ready")) ok[i] = true;
+     }
+   }
+   for (i = 0; i < num_clients; i++)
+   {
+     if (ok[i] == false) break;
+     if (i == num_clients && ok[i] == true)
+     {
+       printf ("Clients are ready ");
+       return 1;
+     }
+   }
+ }
+ printf ("Clients not ready");
+ return 0;
+
+
+
+#endif
+}
+
 void Server::sendMessage(int id_client, char *buf, int len)
 {
 #ifdef HAVE_SDL_NET
+
  int i = getClientFromID(id_client);
  if (!putMsg(clients[i].sock, buf, len))
  {
    removeClient (id_client);
  }
+
 #endif
 }
 
@@ -347,6 +391,7 @@ Client::Client ()
 bool Client::getServer(char *hostname, char *name)
 {
 #ifdef HAVE_SDL_NET
+
   printf("try join,");
 
   if (sock != NULL) return true;
@@ -394,6 +439,7 @@ return false;
 #endif
 
 }
+
 int Client::getMessage(char *buf)
 {
 #ifdef HAVE_SDL_NET
@@ -408,15 +454,21 @@ int Client::getMessage(char *buf)
   {
     if (SDLNet_SocketReady(sock))
     {
-       if (getMsg (sock, buf))
+      if (getMsg (sock, buf))
       {
 //        printf ("clientnummer: %d",n);
 //        printf("Received: %.*s\n",len,message);
+        if (strcmp (buf,"ready"))
+        {
+          sendMessage("ready", 5);
+        }
         return 1;
       }
       else 
       {
-        printf ("FEHLER bei getMsg");  
+        printf ("Server lost, closing connection...");  
+        SDLNet_TCP_Close(sock);
+        sock = NULL;
         return 0;
       }
     }    
@@ -440,5 +492,7 @@ void Client::sendMessage(char *buf, int len)
   if (!putMsg(sock, buf, len)) printf ("FEHLER");
 #endif
 }
+
+
 
 #endif

@@ -53,7 +53,7 @@ float sungamma = 45.0;
 
 int camera = 0;
 float camx = 0, camy = 0, camz = 0, camphi = 0, camgamma = 0, camtheta = 0;
-float sunlight = 1.0;
+float sunlight = 1.0, sunlight_dest = 1.0;
 
 float blackout = 0, redout = 0;
 
@@ -1264,6 +1264,27 @@ void event_targetPrevious ()
   sound->play (SOUND_CLICK1);
 }
 
+void event_targetLocking ()
+{
+  if (!fplayer->active) return;
+  fplayer->targetLockingEnemy ((AIObj **) fighter);
+  sound->play (SOUND_CLICK1);
+}
+
+void event_thrustUp ()
+{
+  if (!fplayer->active) return;
+  fplayer->thrustUp ();
+  fplayer->thrustUp ();
+}
+
+void event_thrustDown ()
+{
+  if (!fplayer->active) return;
+  fplayer->thrustDown ();
+  fplayer->thrustDown ();
+}
+
 void game_key (unsigned char key, int x, int y)
 {
   int hikey = toupper (key);
@@ -1313,6 +1334,14 @@ void game_key (unsigned char key, int x, int y)
   else if (hikey == key_selectmissile || lokey == key_selectmissile)
   {
     event_selectMissile ();
+  }
+  else if (hikey == key_thrustup || lokey == key_thrustup)
+  {
+    event_thrustUp ();
+  }
+  else if (hikey == key_thrustdown || lokey == key_thrustdown)
+  {
+    event_thrustDown ();
   }
 /*    else if (key == 'l')
     {
@@ -1391,6 +1420,10 @@ void game_key (unsigned char key, int x, int y)
     else if (hikey == key_targetprevious || lokey == key_targetprevious)
     {
       event_targetPrevious ();
+    }
+    else if (hikey == key_targetlocking || lokey == key_targetlocking)
+    {
+      event_targetLocking ();
     }
 /*    else if (key == 'k')
     {
@@ -2011,11 +2044,15 @@ void create_key (unsigned char key, int x, int y)
 {
   if (key == 's')
   {
-    server->sendMessage (0, "s", 1);
+//    server->sendMessage (0, "s", 1);
+    if (server->checkStart()) 
+    {
+    printf ("Starting..");
     createMission (MISSION_MULTIPLAYER_DOGFIGHT);
     game_levelInit ();
     switch_game ();
     missionactive = true;
+    }
   }
   if (key == 27)
   {
@@ -3856,10 +3893,16 @@ void menu_display ()
     font1->drawText (xs, ys --, -3, text);
     sprintf (text, "%s\tDROP FLARE", getKeyString (key_dropflare, buf));
     font1->drawText (xs, ys --, -3, text);
-    font1->drawText (xs, ys --, -3, "1..9\tCHANGE SPEED");
+    font1->drawText (xs, ys --, -3, "1..9\tCHANGE THROTTLE");
+    sprintf (text, "%s\tINCREASE THROTTLE", getKeyString (key_thrustup, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tDECREASE THROTTLE", getKeyString (key_thrustdown, buf));
+    font1->drawText (xs, ys --, -3, text);
     sprintf (text, "%s\tSELECT MISSILE", getKeyString (key_selectmissile, buf));
     font1->drawText (xs, ys --, -3, text);
     sprintf (text, "%s\tTARGET NEAREST ENEMY", getKeyString (key_targetnearest, buf));
+    font1->drawText (xs, ys --, -3, text);
+    sprintf (text, "%s\tTARGET LOCKING ENEMY", getKeyString (key_targetlocking, buf));
     font1->drawText (xs, ys --, -3, text);
     sprintf (text, "%s\tTARGET NEXT", getKeyString (key_targetnext, buf));
     font1->drawText (xs, ys --, -3, text);
@@ -3871,6 +3914,11 @@ void menu_display ()
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
     font1->drawText (xs, (-- ys) --, -3, "JOYSTICK:");
     font1->drawText (xs, ys --, -3, "SEE FILE \"CONF.INTERFACE\"");
+    font1->drawTextCentered (0, -17, -3, "CONFIG FILES ARE LOCATED IN");
+    strcpy (buf, dirs->getSaves (""));
+    for (i = 0; i < strlen (buf); i ++)
+      buf [i] = toupper (buf [i]);
+    font1->drawTextCentered (0, -18.5, -3, buf);
   }
   else if (menuitem == 7)
   {
@@ -4028,17 +4076,17 @@ void game_display ()
       if (sunfactor < 1.0) sunfactor = 1.0;
     }
     else sunfactor = 1.0;
-    sunlight = sunfactor;
+    sunlight_dest = sunfactor;
     if (game == GAME_PLAY)
       pseudoview /= sunfactor;
   }
   else
   {
-    if (day) sunlight = 1.0;
-    else sunlight = 0.75;
+    if (day) sunlight_dest = 1.0;
+    else sunlight_dest = 0.75;
     if (flash > 0)
     {
-      sunlight = (float) flash / timestep;
+      sunlight_dest = (float) flash / timestep;
     }
   }
 
@@ -4065,9 +4113,9 @@ void game_display ()
                 dgamma /= 25;
                 dgamma ++;
                 if (fighter [i]->explode < 8 * timestep)
-                  sunlight = (float) fighter [i]->explode / timestep * 4 / ddist / dphi / dgamma;
+                  sunlight_dest = (float) fighter [i]->explode / timestep * 4 / ddist / dphi / dgamma;
                 else if (fighter [i]->explode < 16 * timestep)
-                  sunlight = (16.0 - fighter [i]->explode / timestep) * 4 / ddist / dphi / dgamma;
+                  sunlight_dest = (16.0 - fighter [i]->explode / timestep) * 4 / ddist / dphi / dgamma;
               }
             }
           }
@@ -4496,6 +4544,8 @@ void game_timer (int dt)
 {
 //  if (multiplayer) return;
   int i, i2;
+
+  sunlight += (sunlight_dest - sunlight) / 10 * dt / timestep;
 
   gametimer += dt;
   cockpit->dt = dt;
@@ -4939,16 +4989,20 @@ void join_timer (Uint32 dt)
 {
 #ifndef USE_GLUT
   char buf [STDSIZE];
-  client->getServer ("127.0.0.1", "client1");
+  if (client->sock == NULL) client->getServer ("127.0.0.1", "client1");
+  else 
+  {
   SDL_Delay (100);
   mission_timer (dt);
   client->getMessage (buf);
+  
   if (buf [0] == 's')
   {
     createMission (MISSION_MULTIPLAYER_DOGFIGHT);
     game_levelInit ();
     switch_game ();
     missionactive = true;
+  }
   }
 #endif
 }

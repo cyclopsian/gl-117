@@ -496,7 +496,7 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
     float xw = 0;
     for (int i = 0; i < len; i ++)
     {
-      if (str [i] >= start && str [i] <= start + n)
+      if (str [i] >= start && str [i] < start + n)
       {
         int c = (int) (str [i] - start);
         xw += zoom * letterw [c] / height;
@@ -518,7 +518,7 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
 
   for (int i = 0; i < len; i ++)
   {
-    if (str [i] >= start && str [i] <= start + n)
+    if (str [i] >= start && str [i] < start + n)
     {
       if (i != highlight)
         glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);

@@ -37,8 +37,8 @@ int controls = CONTROLS_MOUSE;
 int difficulty = 1;
 
 unsigned char key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
-unsigned char key_selectmissile = 'M';
-unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P';
+unsigned char key_selectmissile = 'M', key_thrustup = 'I', key_thrustdown = 'D';
+unsigned char key_targetnearest = 'E', key_targetnext = 'T', key_targetprevious = 'P', key_targetlocking = 'L';
 
 unsigned int joystick_firecannon = 0, joystick_firemissile = 2, joystick_dropchaff = 3, joystick_dropflare = 3;
 unsigned int joystick_selectmissile = 1;
@@ -379,9 +379,14 @@ void save_configInterface ()
   cf->write (" key_dropflare", (char) key_dropflare);
   cf->write (" key_dropchaff", (char) key_dropchaff);
   cf->write (" key_selectmissile", (char) key_selectmissile);
+  cf->writeText ("#  Target nearest enemy with priority for enemies in front of you");
   cf->write (" key_targetnearest", (char) key_targetnearest);
+  cf->writeText ("#  Target next enemy who has locked you");
+  cf->write (" key_targetlocking", (char) key_targetlocking);
   cf->write (" key_targetnext", (char) key_targetnext);
   cf->write (" key_targetprevious", (char) key_targetprevious);
+  cf->write (" key_incthrust", (char) key_thrustup);
+  cf->write (" key_decthrust", (char) key_thrustdown);
   cf->writeText ("# All other piloting keys (CURSORS, PGUP/DN) are fixed.");
   cf->writeText ("\n# ---------------------------------------------------------------------");
   cf->writeText ("# Mouse section");
@@ -489,11 +494,20 @@ int load_configInterface ()
   str = cf->getString (ret, "key_targetnearest");
   key_targetnearest = getKey (str, 'E');
 
+  str = cf->getString (ret, "key_targetlocking");
+  key_targetlocking = getKey (str, 'L');
+
   str = cf->getString (ret, "key_targetnext");
   key_targetnext = getKey (str, 'T');
 
   str = cf->getString (ret, "key_targetprevious");
   key_targetprevious = getKey (str, 'P');
+
+  str = cf->getString (ret, "key_incthrust");
+  key_thrustup = getKey (str, 'I');
+
+  str = cf->getString (ret, "key_decthrust");
+  key_thrustdown = getKey (str, 'D');
 
   int mousebutton = 1;
   str = cf->getString (ret, "mouse_firecannon");

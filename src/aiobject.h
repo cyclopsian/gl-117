@@ -243,6 +243,7 @@ class AIObj : public DynamicObj
   bool selectMissileGround (AIObj **missile);
   void targetNearestGroundEnemy (AIObj **f);
   void targetNearestEnemy (AIObj **f);
+  void targetLockingEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);
   void aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, DynamicObj **chaff); // core AI method

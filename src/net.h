@@ -25,6 +25,7 @@
 #define IS_NET_H
 
 #include "common.h"
+#include "main.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -41,12 +42,13 @@ extern char *message;
 class Client
 {
   public:
+  bool isready;
   Client();
   bool getServer(char *hostname, char *name);
   char *name;
   void sendMessage (char *buf, int len);
   int getMessage(char *buf);
-
+  void sendReady();
 //  private:
 #ifdef HAVE_SDL_NET
   IPaddress ip;
@@ -58,13 +60,14 @@ class Client
 class Server
 {
   public:
+  bool isready;
 #ifdef HAVE_SDL_NET
   typedef struct
   {
     char name [100];
     TCPsocket sock;
     int id;
-  } Client;
+  } MyClient;
 #endif
   Server();
   char *name;
@@ -75,11 +78,14 @@ class Server
   void getClient();
   void createSocketSet();
   void sendMessage (int ip_client, char *message, int len);
+
+  int checkStart(); // 1 all Clients ready, 0 Clients not ready
+
   int id;
 
 //  private:
   int num_clients;
-  Client *clients;
+  MyClient *clients;
 #ifdef HAVE_SDL_NET
   TCPsocket server;
   IPaddress ip;

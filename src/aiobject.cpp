@@ -1719,6 +1719,8 @@ void AIObj::targetNearestGroundEnemy (AIObj **f)
       }
     }
   }
+  if (distance (target) > 200)
+  { target = NULL; }
 }
 
 void AIObj::targetNearestEnemy (AIObj **f)
@@ -1740,6 +1742,28 @@ void AIObj::targetNearestEnemy (AIObj **f)
       }
     }
   }
+  if (!ai)
+    if (distance (target) > 200)
+      target = NULL;
+}
+
+void AIObj::targetLockingEnemy (AIObj **f)
+{
+  int i;
+//    float d = 10000;
+  ttf = 50 * timestep;
+  if (target == NULL) target = f [0];
+  for (i = 0; i < maxfighter; i ++)
+    if (target == f [i])
+      break;
+  int z = 0;
+  do
+  {
+    i ++;
+    if (i >= maxfighter) { i = 0; z ++; }
+  } while ((!f [i]->active || f [i]->party == party || f [i]->target != this || distance (f [i]) > 200) && z <= 1);
+  target = f [i];
+  if (z > 1 && !ai) target = NULL;
 }
 
 void AIObj::targetNext (AIObj **f)
@@ -1759,8 +1783,9 @@ void AIObj::targetNext (AIObj **f)
     if (f [i] == this)
     { i ++; z ++; }
     if (i >= maxfighter) i = 0;
-  } while (!f [i]->active && z <= 1 && distance (f [i]) < 200);
+  } while ((!f [i]->active || distance (f [i]) > 200) && z <= 1);
   target = f [i];
+  if (z > 1 && !ai) target = NULL;
 }
 
 void AIObj::targetPrevious (AIObj **f)
@@ -1797,8 +1822,9 @@ void AIObj::targetPrevious (AIObj **f)
     if (f [i] == this)
     { i --; z ++; }
     if (i < 0) i = maxfighter - 1;
-  } while (!f [i]->active && z <= 1 && distance (f [i]) < 200);
+  } while ((!f [i]->active || distance (f [i]) > 200) && z <= 1);
   target = f [i];
+  if (z > 1 && !ai) target = NULL;
 }
 
 /*float AIObj::getFunction (float value)
