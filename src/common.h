@@ -25,6 +25,7 @@
 #define GAME_FAME 9
 #define GAME_FIGHTER 10
 #define GAME_FINISH 11
+#define GAME_QUIT 12
 
 // weather
 #define WEATHER_SUNNY 0

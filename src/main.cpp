@@ -23,7 +23,6 @@
 
 /*
 TODO:
-- missile countermeasure
 - source code: MissionX => mission.cpp
 - southern seashore landscape (additional missions)
 - torpedo, water
@@ -237,45 +236,6 @@ class InitKugel
 
 
 
-/*class Fighter : public AIObj
-{
-  public:
-
-  void fighterinit ()
-  {
-    shield = 100; maxshield = 100;
-    id = FIGHTER1;
-    speed = 0.3;
-    recspeed = 0.3;
-    smoke->type = 1;
-    impact = 2;
-    missiles [0] = 10;
-    missiles [1] = 10;
-    missiles [2] = 10;
-    missiles [3] = 10;
-    missiles [4] = 10;
-    ttl = -1;
-    easymodel = true;
-    aileroneffect = 0;
-    ruddereffect = 0;
-  }
-  Fighter ()
-  {
-    o = NULL;
-    zoom = 1.0;
-    fighterinit ();
-  }
-  Fighter (Space *space2, CModel *o2, float zoom2)
-  {
-    o = o2;
-    zoom = zoom2;
-    this->space = space2;
-    fighterinit ();
-    space->addObject (this);
-  }
-};*/
-
-
 
 
 
@@ -324,125 +284,6 @@ CModel model_radar;
 CModel model_mine1;
 CModel model_aster1;
 CModel model_base1;
-
-
-
-
-/*void RenderScene() 
-{
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear The Screen And The Depth Buffer
-  glLoadIdentity();                  // Reset The matrix
-    glShadeModel (GL_SMOOTH);
-  glRotatef (-50, 1, 1, 1);
-
-//////////// *** NEW *** ////////// *** NEW *** ///////////// *** NEW *** ////////////////////
-
-  // Give OpenGL our position,  then view,    then up vector
-//  gluLookAt(    0, 1.5f, 8,    0, 0.5f, 0,      0, 1, 0);
-  
-  // We want the model to rotate around the axis so we give it a rotation
-  // value, then increase/decrease it. You can rotate right of left with the arrow keys.
-
-
-  // Since we know how many objects our model has, go through each of them.
-//model.draw ();
-
-//////////// *** NEW *** ////////// *** NEW *** ///////////// *** NEW *** ////////////////////
-
-  glutSwapBuffers ();
-}
-*/
-
-/*void drawText (float x, float y, float z, char *str, CColor *c)
-{
-  int len = strlen (str);
-  float zoom = 0.1;
-  glDisable (GL_LIGHTING);
-  glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texfont1->textureID);
-  gl->enableAlphaBlending ();
-  glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.1);
-  glBegin (GL_QUADS);
-  glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);
-  for (int i = 0; i < len; i ++)
-  if (str [i] >= '-' && str [i] <= 'Z')
-  {
-    int c = (int) (str [i] - '-');
-    if (c >= 14) c = (int) (str [i] - 'A') + 14;
-    float dx = 34.0 / 256.0;
-    float dy = 42.0 / 256.0, dy2 = dy;
-    float tx = dx * (c % 7);
-    float ty = 1.0 - dy * (c / 7);
-    glTexCoord2f (tx, ty - dy2);
-    glVertex3f ((x + i) * zoom, y * zoom, z);
-    glTexCoord2f (tx, ty);
-    glVertex3f ((x + i) * zoom, (y + 1) * zoom, z);
-    glTexCoord2f (tx + dx, ty);
-    glVertex3f ((x + i + 1) * zoom, (y + 1) * zoom, z);
-    glTexCoord2f (tx + dx, ty - dy2);
-    glVertex3f ((x + i + 1) * zoom, y * zoom, z);
-  }
-  glEnd ();
-  glDisable (GL_ALPHA_TEST);
-  gl->disableAlphaBlending ();
-  glDisable (GL_TEXTURE_2D);
-}
-
-void drawText (float x, float y, float z, char *str)
-{
-  CColor stdcol (255, 255, 255, 190);
-  drawText (x, y, z, str, &stdcol);
-}
-
-void drawTextScaled (float x, float y, float z, char *str, CColor *col, int timer)
-{
-  int len = strlen (str);
-  float zoom = 0.1;
-  glDisable (GL_LIGHTING);
-  glDisable (GL_DEPTH_TEST);
-  gl->enableTextures (texfont1->textureID);
-  gl->enableAlphaBlending ();
-  glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.1);
-  for (int i = 0; i < len; i ++)
-  if (str [i] >= '-' && str [i] <= 'Z')
-  {
-    int c = (int) (str [i] - '-');
-    if (c >= 14) c = (int) (str [i] - 'A') + 14;
-    float dx = 34.0 / 256.0;
-    float dy = 42.0 / 256.0, dy2 = dy;
-    float tx = dx * (c % 7);
-    float ty = 1.0 - dy * (c / 7);
-    glPushMatrix ();
-    glTranslatef ((0.5 + x + i) * zoom, (0.5 + y) * zoom, z);
-    gl->rotate (timer + i * 20, 0, 0);
-    glBegin (GL_QUADS);
-    glColor4ub (col->c [0], col->c [1], col->c [2], col->c [3]);
-    glTexCoord2f (tx, ty - dy2);
-    glVertex3f (-0.5 * zoom, -0.5 * zoom, 0);
-    glTexCoord2f (tx, ty);
-    glVertex3f (-0.5 * zoom, 0.5 * zoom, 0);
-    glTexCoord2f (tx + dx, ty);
-    glVertex3f (0.5 * zoom, 0.5 * zoom, 0);
-    glTexCoord2f (tx + dx, ty - dy2);
-    glVertex3f (0.5 * zoom, -0.5 * zoom, 0);
-    glEnd ();
-    glPopMatrix ();
-  }
-  gl->disableAlphaBlending ();
-  glDisable (GL_ALPHA_TEST);
-  glDisable (GL_TEXTURE_2D);
-}*/
-
-
-
-
-
-
-
-
-
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -1549,16 +1390,6 @@ class MissionGround1 : public Mission
     fighter [8]->tl->z = py - 1;
     fighter [8]->o = &model_tent1;
     fighter [8]->newinit (STATIC_TENT1, 0, 200);
-/*      fighter [2]->activate ();
-      fighter [2]->intelligence = 300;
-      fighter [2]->party = 0;
-      fighter [2]->target = fighter [0];
-      fighter [2]->o = &model_figa;
-      fighter [3]->activate ();
-      fighter [3]->intelligence = 150;
-      fighter [3]->party = 0;
-      fighter [3]->target = fighter [0];
-      fighter [3]->o = &model_figa;*/
   }
 
   virtual int processtimer ()
@@ -3276,40 +3107,6 @@ class Cockpit
     if (fplayer->target)
     if (fplayer->target->active)
     {
-/*      float gamma = getGamma (fplayer->target);
-      float phi = getPhi (fplayer->target);
-      float mx = width / 2, my = height / 2;
-      float x = mx + phi / 90.0 * width;
-      float y = my + gamma / 90.0 * height;
-      float dx = x - mx, dy = my - y;
-      int t = (int) fplayer->theta;
-      if (t < 0) t += 360;
-      float rx = dx * cosi [t] - dy * sine [t];
-      float ry = dx * sine [t] + dy * cosi [t];
-      rx += mx;
-      ry = my - ry;*/
-/*      DynamicObj *o = fplayer->target;
-      glBegin (GL_LINE_STRIP);
-      glColor4ub (255, 255, 0, 150);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y - o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y - o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y - o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y - o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y - o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y + o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y + o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y + o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y + o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y + o->zoom, o->tl->z - o->zoom);
-      glEnd ();
-      glBegin (GL_LINES);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y - o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y + o->zoom, o->tl->z - o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y - o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x + o->zoom, o->tl->y + o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y - o->zoom, o->tl->z + o->zoom);
-      glVertex3f (o->tl->x - o->zoom, o->tl->y + o->zoom, o->tl->z + o->zoom);
-      glEnd ();*/
       DynamicObj *o = fplayer->target;
       float myphi = fplayer->phi;
       if (myphi < 0) myphi += 360;
@@ -3377,27 +3174,6 @@ class Cockpit
   void drawCross ()
   {
     glDisable (GL_LIGHTING);
-/*    gl->enableAlphaBlending ();
-    glDisable (GL_DEPTH_TEST);
-    glLineWidth (2.0);
-    glDisable (GL_DEPTH_TEST);
-    glBegin (GL_LINES);
-    glColor4f (1.0, 1.0, 0.0, 0.5);
-    float zf = -18.0, g = 2.0, g2 = 0.8;
-    glVertex3f (-g, 0.0, zf);
-    glVertex3f (g, 0.0, zf);
-    glVertex3f (0.0, -g, zf);
-    glVertex3f (0.0, g, zf);
-    glVertex3f (-g2, -g, zf);
-    glVertex3f (g2, -g, zf);
-    glVertex3f (-g2, g, zf);
-    glVertex3f (g2, g, zf);
-    glVertex3f (-g, -g2, zf);
-    glVertex3f (-g, g2, zf);
-    glVertex3f (g, -g2, zf);
-    glVertex3f (g, g2, zf);
-    glEnd ();
-    gl->disableAlphaBlending ();*/
 
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
@@ -3476,37 +3252,6 @@ class Cockpit
       }
     }
 
-/*    if (fplayer->target != NULL)
-      if (fplayer->target->active)
-      {
-        int aw = fplayer->getAngle (fplayer->target);
-//        printf ("aw = %d\n", aw);
-        if (aw < -50)
-        {
-          glBegin (GL_LINE_STRIP);
-          if (((AIObj *) fplayer->target)->party != fplayer->party)
-            glColor4ub (255, 0, 0, alpha);
-          else
-            glColor4ub (0, 0, 255, alpha);
-          glVertex3f (0.6, 0.1 * (yf - 1), zf);
-          glVertex3f (0.65, 0.1 * yf, zf);
-          glVertex3f (0.6, 0.1 * (yf + 1), zf);
-          glEnd ();
-        }
-        else if (aw > 50)
-        {
-          glBegin (GL_LINE_STRIP);
-          if (((AIObj *) fplayer->target)->party != fplayer->party)
-            glColor4ub (255, 0, 0, alpha);
-          else
-            glColor4ub (0, 0, 255, alpha);
-          glVertex3f (-0.6, 0.1 * (yf - 1), zf);
-          glVertex3f (-0.65, 0.1 * yf, zf);
-          glVertex3f (-0.6, 0.1 * (yf + 1), zf);
-          glEnd ();
-        }
-      }*/
-
     if (fplayer->target != NULL)
       if (fplayer->target->active)
       {
@@ -3545,26 +3290,6 @@ class Cockpit
           glVertex3f (xs - 0.15, ys + 0.15, zf);
           glEnd ();
         }
-/*        else if (disttarget > view)
-        {
-          float xs = -sin (dphi * PI / 180.0) * 3;
-          float zf = -4;
-          float ys = sin (dgamma * PI / 180.0) * 3;
-          glBegin (GL_LINE_STRIP);
-          glColor4ub (255, 0, 0, alpha);
-          glVertex3f (xs - 0.12, ys - 0.12, zf);
-          glVertex3f (xs + 0.12, ys - 0.12, zf);
-          glVertex3f (xs + 0.12, ys + 0.12, zf);
-          glVertex3f (xs - 0.12, ys + 0.12, zf);
-          glVertex3f (xs - 0.12, ys - 0.12, zf);
-          glEnd ();
-          glBegin (GL_LINES);
-          glVertex3f (xs - 0.15, ys - 0.15, zf);
-          glVertex3f (xs + 0.15, ys + 0.15, zf);
-          glVertex3f (xs + 0.15, ys - 0.15, zf);
-          glVertex3f (xs - 0.15, ys + 0.15, zf);
-          glEnd ();
-        }*/
       }
 
     zf = -3.5;
@@ -4301,32 +4026,7 @@ int setScreen (int w, int h, int b, int f)
   return 1;
 }
 
-/*void drawTexture (float r, float p1, float t1, float p2, float t2)
-{
-  gl->enableTextures ();
-  gl->enableAlphaBlending ();
-  glDisable (GL_DITHER);
-  glBegin (GL_QUADS);
-  float f = atan(1.0)*4.0 / 180.0;
-  float sinp1 = sin (p1*f), sinp2 = sin (p2*f), sint1 = sin (t1*f), sint2 = sin (t2*f);
-  float cosp1 = cos (p1*f), cosp2 = cos (p2*f), cost1 = cos (t1*f), cost2 = cos (t2*f);
-  float x = r * cosp1 * sint2, y = r * sinp1 * sint2, z = r * cost2;
-  printf ("(%f,%f,%f)\n", x,y,z); fflush (stdout);
-  glColor4f (1.0, 1.0, 1.0, 1.0);
-  glTexCoord2d (0, 1);
-  glVertex3f (x, y, z);
-  x = r * cosp2 * sint2, y = r * sinp2 * sint2, z = r * cost2;
-  glTexCoord2d (1, 1);
-  glVertex3f (x, y, z);
-  x = r * cosp2 * sint1, y = r * sinp2 * sint1, z = r * cost1;
-  glTexCoord2d (1, 0);
-  glVertex3f (x, y, z);
-  x = r * cosp1 * sint1, y = r * sinp1 * sint1, z = r * cost1;
-  glTexCoord2d (0, 0);
-  glVertex3f (x, y, z);
-  glEnd ();
-  glDisable (GL_TEXTURE_2D);
-}*/
+
 
 bool initing = true;
 int flash = 0;
@@ -4887,6 +4587,11 @@ void switch_finish ()
   sound->stop (SOUND_PLANE1);
 }
 
+void switch_quit ()
+{
+  game = GAME_QUIT;
+}
+
 void switch_game ()
 {
   setLightSource ((int) sungamma);
@@ -5246,9 +4951,6 @@ void game_mouse (int button, int state, int x, int y)
 
 float dtheta = 0, dgamma = 0;
 
-/* Hi Bernd. To test the messy mouse interface code you will have to do two more things,
-   as the code has been disabled on the CVS server.
-   Just search on for your first (short) name! */
 int lastmousex = 0;
 
 // This function is experimental. It is called about 30 times per second.
@@ -5289,9 +4991,6 @@ void game_easymouse ()
 void game_mousemotion (int x, int y)
 {
   if (controls != CONTROLS_MOUSE && controls != CONTROLS_MOUSE_REVERSE) return;
-
-/* Bernd: Please activate the following return to disable this method! */
-//  return;
 
   float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
@@ -5339,29 +5038,6 @@ void game_mousemotion (int x, int y)
     fplayer->aileroneffect = 1.0f; 
   else if (fplayer->aileroneffect < -0.5f) 
     fplayer->aileroneffect = -0.5f; 
-
-  // innerhalb width/15 und height/15 vom Mittelpunkt aus reagiert nur das Ruder
-  // fragt sich, inwieweit height/15 sinnvoll ist... Ruder ist hier für die Feineinstellung
-/*  if (fabs (dx) <= width / 15 && fabs (dy) <= height / 15)
-  {
-    fplayer->ruddereffect = (float) dx / width * 15.0; // damit ist automatisch -1<=ruddereffect<=1
-    fplayer->rolleffect = 0;
-  }
-  else if (fabs (dx) <= width / 15)
-  {
-    fplayer->rolleffect = 0;
-  }
-  else
-  {
-    if (dx > 0) dx -= width / 15;
-    else dx += width / 15;
-    fplayer->rolleffect = (float) -dx / width * 15.0;
-  }
-  fplayer->aileroneffect = dy / height * 2.5;
-  if (fplayer->aileroneffect > 1.0)
-    fplayer->aileroneffect = 1.0;
-  else if (fplayer->aileroneffect < -0.5)
-    fplayer->aileroneffect = -0.5;*/
 
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5496,6 +5172,10 @@ void menu_key (unsigned char key, int x, int y)
     {
       switch_game ();
     }
+    else
+    {
+      switch_quit ();
+    }
   }
 }
 
@@ -5558,6 +5238,7 @@ void finish_key (unsigned char key, int x, int y)
     switch_menu ();
   }
 }
+
 void mission_key (unsigned char key, int x, int y)
 {
   if (key == 27)
@@ -6271,6 +5952,43 @@ void game_quit ()
   exit (0);
 }
 
+void quit_key (unsigned char key, int x, int y)
+{
+  if (key == 'y' || key == 'Y')
+    game_quit ();
+  else
+    switch_menu ();
+}
+
+void quit_mouse (int button, int state, int x, int y)
+{
+  float rx = (float) x / width;
+  float ry = (float) y / height;
+  int lastitemselected = missionmenuitemselected;
+  int lastitem = menuitem;
+  missionmenuitemselected = -1;
+
+  if (ry >= 0.5 && ry <= 0.55)
+  {
+    if (rx >= 0.35 && rx <= 0.45)
+    {
+      missionmenuitemselected = 0;
+      if (state == MOUSE_DOWN)
+      {
+        quit_key ('y', 0, 0);
+      }
+    }
+    if (rx >= 0.55 && rx <= 0.65)
+    {
+      missionmenuitemselected = 1;
+      if (state == MOUSE_DOWN)
+      {
+        quit_key (27, 0, 0);
+      }
+    }
+  }
+}
+
 void menu_mouse (int button, int state, int x, int y)
 {
   int i;
@@ -6329,7 +6047,7 @@ void menu_mouse (int button, int state, int x, int y)
       if (state == MOUSE_DOWN)
       {
         menuitem = 6;
-        game_quit ();
+        switch_quit ();
       }
     }
     else if (ry >= 0.64 && ry <= 0.69)
@@ -7273,19 +6991,22 @@ void pause_display ()
 
 void credits_display ()
 {
+  float yt = 12;
   glTranslatef (0, -3.5 + 0.015 * (float) creditstimer, 0);
   CColor col (255, 255, 255, 255);
   CColor col2 (255, 255, 0, 255);
-  font2->drawTextCentered (0, 10, -2, "GAME PROGRAMMING,", &col);
-  font2->drawTextCentered (0, 8, -2, "GRAPHICS, SOUND & MUSIC", &col);
-  font1->drawTextCentered (0, 6, -2, "THOMAS A. DREXL", &col2);
-  font2->drawTextCentered (0, 2, -2, "INTRO & MOON", &col);
-  font1->drawTextCentered (0, 0, -2, "NORBERT DREXL", &col2);
-// Maybe later :)
-  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
-  font1->drawTextCentered (0, -6, -2, "PIOTR PAWLOW", &col2);
-  font2->drawTextCentered (0, -10, -2, "DESIGN & INTERFACE", &col);
-  font1->drawTextCentered (0, -12, -2, "LOURENS VEEN", &col2);
+  font2->drawTextCentered (0, yt -= 2, -2, "GAME PROGRAMMING,", &col);
+  font2->drawTextCentered (0, yt -= 2, -2, "GRAPHICS, MODELS,", &col);
+  font2->drawTextCentered (0, yt -= 2, -2, "SOUND & MUSIC", &col);
+  font1->drawTextCentered (0, yt -= 2, -2, "THOMAS A. DREXL", &col2);
+  font2->drawTextCentered (0, yt -= 4, -2, "INTRO & MOON", &col);
+  font1->drawTextCentered (0, yt -= 2, -2, "NORBERT DREXL", &col2);
+  font2->drawTextCentered (0, yt -= 4, -2, "LENS FLARES & DEBUGGING", &col);
+  font1->drawTextCentered (0, yt -= 2, -2, "PIOTR PAWLOW", &col2);
+  font2->drawTextCentered (0, yt -= 4, -2, "DESIGN & INTERFACE", &col);
+  font1->drawTextCentered (0, yt -= 2, -2, "LOURENS VEEN", &col2);
+  font2->drawTextCentered (0, yt -= 4, -2, "TESTING & PUBLISHING", &col);
+  font1->drawTextCentered (0, yt -= 2, -2, "BERNHARD KAINDL", &col2);
 }
 
 void finish_display ()
@@ -7303,10 +7024,50 @@ void finish_display ()
   font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUND, MUSIC,", &col);
   font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", &col);
   font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", &col);
-  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED AND FEEDBACK ARRIVED,", &col);
-  font1->drawTextCentered (0, -14, -3, "SPECIAL THANKS TO BERNHARD KAINDL AND JOSEF DREXL,", &col);
-  font1->drawTextCentered (0, -16, -3, "AND THE UNIX AWARD GOES TO HOOPY ;-)", &col);
+  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", &col);
+  font1->drawTextCentered (0, -14, -3, "PROGRAMMERS JOINED (LISTED IN THE CREDITS SECTION).", &col);
+  font1->drawTextCentered (0, -16, -3, "SPECIAL THANKS TO JOSEF DREXL FOR THE MODELING IDEAS,", &col);
+  font1->drawTextCentered (0, -18, -3, "AND THE UNIX AWARD GOES TO WOLFGANG HOMMEL ;-)", &col);
 }
+
+void quit_display ()
+{
+  float xf = 1.0, yf = 0.5, zf = -2.5;
+  int c1 = 100, c2 = 10, c3 = 100, c4 = 180;
+  glBegin (GL_QUADS);
+  glColor4ub (c2, c2, c2, 255);
+  glVertex3f (-xf, -yf, zf);
+  glColor4ub (c1, c1, c1, 255);
+  glVertex3f (xf, -yf, zf);
+  glColor4ub (c2, c2, c2, 255);
+  glVertex3f (xf, yf, zf);
+  glColor4ub (c1, c1, c1, 255);
+  glVertex3f (-xf, yf, zf);
+  glEnd ();
+  glBegin (GL_LINE_STRIP);
+  glColor4ub (c4, c4, c4, 255);
+  glVertex3f (-xf, -yf, zf);
+  glVertex3f (xf, -yf, zf);
+  glVertex3f (xf, yf, zf);
+  glVertex3f (-xf, yf, zf);
+  glVertex3f (-xf, -yf, zf);
+  glEnd ();
+
+  CColor colorblue (150, 180, 255, 255);
+  font1->drawTextCentered (0, 0.8, -1.5, "REALLY QUIT?", &colorblue);
+  if (missionmenuitemselected == 0)
+    font1->drawTextScaled (-4, -1.5, -1.8, "YES", &colorblue, -missionmenutimer * 5, 0);
+  else
+    font1->drawText (-4, -1.5, -1.8, "YES", &colorblue, 0);
+  if (missionmenuitemselected == 1)
+    font1->drawTextScaled (2, -1.5, -1.8, "NO", &colorblue, -missionmenutimer * 5, 0);
+  else
+    font1->drawText (2, -1.5, -1.8, "NO", &colorblue, 0);
+
+  drawMouseCursor ();
+}
+
+
 
 int vibration = 0;
 int starttime;
@@ -8003,7 +7764,7 @@ void game_timer ()
       float fdist = myrandom ((int) pseudoview - 20) + 10;
       float fx = fplayer->tl->x - sine [fphi] * fdist;
       float fz = fplayer->tl->z - cosi [fphi] * fdist;
-      flash1->set (fx, l->getHeight (fx, fz), fz, camphi);
+      flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
       int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
       sound->setVolume (SOUND_THUNDER1, lev);
       sound->play (SOUND_THUNDER1);
@@ -8287,7 +8048,7 @@ int net_thread_main (void *data)
       float fdist = myrandom ((int) pseudoview - 20) + 10;
       float fx = fplayer->tl->x - sine [fphi] * fdist;
       float fz = fplayer->tl->z - cosi [fphi] * fdist;
-      flash1->set (fx, l->getHeight (fx, fz), fz, camphi);
+      flash1->set (fx, l->getHeight (fx, fz), fz, (int) camphi);
       int lev = (int) (128.0 - 80.0 * fdist / (pseudoview - 10));
       sound->setVolume (SOUND_THUNDER1, lev);
       sound->play (SOUND_THUNDER1);
@@ -8600,7 +8361,7 @@ void mission_timer ()
 void credits_timer ()
 {
   creditstimer ++;
-  if (creditstimer > 360)
+  if (creditstimer > 450)
     creditstimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -9224,6 +8985,8 @@ static void myKeyboardFunc (unsigned char key, int x, int y)
     fighter_key (key, x, y);
   else if (game == GAME_FINISH)
     finish_key (key, x, y);
+  else if (game == GAME_QUIT)
+    quit_key (key, x, y);
 }
 
 static void mySpecialFunc (int key, int x, int y)
@@ -9253,6 +9016,8 @@ static void myPassiveMotionFunc (int x, int y)
     fame_mouse (-1, -1, x, y);
   else if (game == GAME_FIGHTER)
     fighter_mouse (-1, -1, x, y);
+  else if (game == GAME_QUIT)
+    quit_mouse (-1, -1, x, y);
 }
 
 static void myMouseFunc (int button, int state, int x, int y)
@@ -9281,6 +9046,10 @@ static void myMouseFunc (int button, int state, int x, int y)
   {
     fighter_mouse (button, state, x, y);
   }
+  else if (game == GAME_QUIT)
+  {
+    quit_mouse (button, state, x, y);
+  }
 }
 
 static void myReshapeFunc (int width, int height)
@@ -9289,7 +9058,7 @@ static void myReshapeFunc (int width, int height)
   ::height = height;
   if (game == GAME_PLAY || game == GAME_PAUSE)
     game_reshape ();
-  else if (game == GAME_MENU || game == GAME_MISSION)
+  else if (game == GAME_MENU || game == GAME_MISSION || game == GAME_QUIT)
     menu_reshape ();
   else if (game == GAME_INIT)
     init_reshape ();
@@ -9362,6 +9131,12 @@ static void myDisplayFunc ()
     finish_display ();
     game_view ();
   }
+  else if (game == GAME_QUIT)
+  {
+    game_display ();
+    quit_display ();
+    game_view ();
+  }
 }
 
 static void myIdleFunc ()
@@ -9429,6 +9204,8 @@ static void myTimerFunc (int value)
     mission_timer ();
   else if (game == GAME_FINISH)
     finish_timer ();
+  else if (game == GAME_QUIT)
+    mission_timer ();
 
 #ifdef USE_GLUT
   glutTimerFunc (GLUT_TIMER_INTERVAL, myTimerFunc, 0);
@@ -9465,6 +9242,8 @@ static void sdlTimerFunc ()
     mission_timer ();
   else if (game == GAME_FINISH)
     finish_timer ();
+  else if (game == GAME_QUIT)
+    mission_timer ();
 }
 
 #ifndef USE_GLUT
@@ -9696,61 +9475,6 @@ void config_test (int argc, char **argv)
   bpp = bppi [valids];
   fullscreen = resolution [valids] [3];
 
-/*  if (modes [0] < 40 && bppi [0] > 0)
-  {
-    quality = 0;
-    view = 20;
-    width = resolution [0] [0];
-    height = resolution [0] [1];
-    bpp = bppi [0];
-    fullscreen = resolution [0] [3];
-    if (modes [0] < 20) view = 20;
-    else view = 30;
-  }
-  else
-  {
-    if (modes [1] < 70 && bppi [1] > 0)
-    {
-      width = resolution [1] [0];
-      height = resolution [1] [1];
-      bpp = bppi [1];
-      fullscreen = resolution [1] [3];
-      quality = 3;
-      if (modes [1] < 40) view = 20;
-      else if (modes [1] < 50) view = 30;
-      else if (modes [1] < 60) view = 30;
-      else view = 40;
-      if (modes [1] < 50) quality = 2;
-    }
-    else if (modes [2] < 70 && bppi [2] > 0)
-    {
-      width = resolution [2] [0];
-      height = resolution [2] [1];
-      bpp = bppi [2];
-      fullscreen = resolution [2] [3];
-      quality = 3;
-      if (modes [2] < 40) view = 20;
-      else if (modes [2] < 50) view = 30;
-      else if (modes [2] < 60) view = 30;
-      else view = 40;
-      if (modes [2] < 50) quality = 2;
-    }
-    else
-    {
-      width = resolution [3] [0];
-      height = resolution [3] [1];
-      bpp = bppi [3];
-      fullscreen = resolution [3] [3];
-      if (modes [3] < 40) quality = 2;
-      else if (modes [3] < 80) quality = 3;
-      else if (modes [3] < 120) quality = 4;
-      else quality = 5;
-      view = (int) (modes [3] / 10) * 10 - 10;
-      if (view > 100) view = 100;
-      else if (view < 30) view = 30;
-    }
-  }*/
-
 #ifdef USE_GLUT
 //  glutDestroyWindow (glutwindow);
 #else
@@ -9864,53 +9588,6 @@ int main (int argc, char **argv)
   }
   fprintf (stdout, "\nUsing SDL_net"); fflush (stdout);
 #endif
-
-/*  if (bpp == 0) {
-    if ( SDL_GetVideoInfo()->vfmt->BitsPerPixel <= 8 ) {
-      bpp = 8;
-    } else {
-      bpp = 16;
-    }
-  }
-
-  Uint32 video_flags;
-  video_flags = SDL_OPENGL;
-  if (fullscreen) video_flags |= SDL_FULLSCREEN;
-
-  int rgb_size[3];
-  switch (bpp) {
-    case 8:
-    rgb_size[0] = 2;
-    rgb_size[1] = 3;
-    rgb_size[2] = 3;
-    break;
-    case 15:
-    case 16:
-    rgb_size[0] = 5;
-    rgb_size[1] = 5;
-    rgb_size[2] = 5;
-    break;
-    default:
-    rgb_size[0] = 8;
-    rgb_size[1] = 8;
-    rgb_size[2] = 8;
-    break;
-  }
-  SDL_GL_SetAttribute (SDL_GL_RED_SIZE, rgb_size [0]);
-  SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, rgb_size [1]);
-  SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, rgb_size [2]);
-  SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16);
-  SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-printf ("\nEntering mode %dx%d:%d,%d ", width, height, bpp, video_flags); fflush (stdout);
-  if (SDL_SetVideoMode (width, height, bpp, video_flags) == NULL)
-  {
-    if (SDL_VideoModeOK (width, height, bpp, video_flags) != 0)
-    {
-      fprintf (stderr, "\nCouldn't set GL mode: %s\n", SDL_GetError ());
-      SDL_Quit ();
-      exit (1);
-    }
-  }*/
 
   if (!configinit)
   {

@@ -442,9 +442,17 @@ Font::Font (char *filename, int height, char start, int num)
   texture = gl->genTextureTGA (filename, 0, 1, 0, true);
   extractLetters (height, start, num);
   zoom = 0.1F;
+  stdcol = new CColor (255, 255, 255, 220);
+  highlightcol = new CColor (255, 255, 0, 255);
 }
 
-void Font::drawText (float x, float y, float z, char *str, CColor *c, bool centered)
+Font::~Font ()
+{
+  delete stdcol;
+  delete highlightcol;
+}
+
+void Font::drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol)
 {
   int len = strlen (str);
   glDisable (GL_LIGHTING);
@@ -486,6 +494,10 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
   {
     if (str [i] >= start && str [i] <= start + n)
     {
+      if (i != highlight)
+        glColor4ub (c->c [0], c->c [1], c->c [2], c->c [3]);
+      else
+        glColor4ub (highlightcol->c [0], highlightcol->c [1], highlightcol->c [2], highlightcol->c [3]);
       int c = (int) (str [i] - start);
       float tx = (float) letterx [c] / texture->width;
       float ty = 1.0 - (float) lettery [c] / texture->height;
@@ -526,26 +538,64 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
   glDisable (GL_TEXTURE_2D);
 }
 
+void Font::drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol)
+{
+  drawText (x, y, z, str, c, false, highlight, highlightcol);
+}
+
+void Font::drawText (float x, float y, float z, char *str, CColor *c, int highlight)
+{
+  drawText (x, y, z, str, c, false, highlight, highlightcol);
+}
+
+void Font::drawText (float x, float y, float z, char *str, int highlight, CColor *highlightcol)
+{
+  drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
+}
+
+void Font::drawText (float x, float y, float z, char *str, int highlight)
+{
+  drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
+}
+
 void Font::drawText (float x, float y, float z, char *str, CColor *c)
 {
-  drawText (x, y, z, str, c, false);
+  drawText (x, y, z, str, c, false, -1, highlightcol);
 }
 
 void Font::drawText (float x, float y, float z, char *str)
 {
-  CColor stdcol (255, 255, 255, 220);
-  drawText (x, y, z, str, &stdcol, false);
+  drawText (x, y, z, str, stdcol, false, -1, highlightcol);
+}
+
+void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol)
+{
+  drawText (x, y, z, str, c, true, highlight, highlightcol);
+}
+
+void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight)
+{
+  drawText (x, y, z, str, c, true, highlight, highlightcol);
 }
 
 void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c)
 {
-  drawText (x, y, z, str, c, true);
+  drawText (x, y, z, str, c, true, -1, highlightcol);
+}
+
+void Font::drawTextCentered (float x, float y, float z, char *str, int highlight, CColor *highlightcol)
+{
+  drawText (x, y, z, str, stdcol, true, highlight, highlightcol);
+}
+
+void Font::drawTextCentered (float x, float y, float z, char *str, int highlight)
+{
+  drawText (x, y, z, str, stdcol, true, highlight, highlightcol);
 }
 
 void Font::drawTextCentered (float x, float y, float z, char *str)
 {
-  CColor stdcol (255, 255, 255, 150);
-  drawText (x, y, z, str, &stdcol, true);
+  drawText (x, y, z, str, stdcol, true, -1, highlightcol);
 }
 
 void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color, int timer)
@@ -603,7 +653,7 @@ void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color,
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer)
+void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight, CColor *highlightcol)
 {
   int i;
   int len = strlen (str);
@@ -651,11 +701,14 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
       float ty2 = (float) ty - (float) height / texture->height;
       float xi = 0.1 * letterw [c] / height;
       float yi = 0.1;
+      if (i != highlight)
+        glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
+      else
+        glColor4ub (highlightcol->c [0], highlightcol->c [1], highlightcol->c [2], highlightcol->c [3]);
       glPushMatrix ();
       glTranslatef (xz + xi / 2 - xw / 2, yi / 2, 0);
 //      glScalef (1.0 + 0.25 * sine [abs (timer * 8 % 360)], 1, 1);
       glBegin (GL_QUADS);
-      glColor4ub (color->c [0], color->c [1], color->c [2], color->c [3]);
       glTexCoord2f (tx, ty2);
       glVertex3f (-xi / 2, -yi / 2, 0);
       glTexCoord2f (tx, ty);
@@ -684,6 +737,31 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
   glDisable (GL_ALPHA_TEST);
   gl->disableAlphaBlending ();
   glDisable (GL_TEXTURE_2D);
+}
+
+void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight)
+{
+  drawTextScaled (x, y, z, str, color, timer, highlight, highlightcol);
+}
+
+void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer)
+{
+  drawTextScaled (x, y, z, str, color, timer, -1, highlightcol);
+}
+
+void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, CColor *highlightcol)
+{
+  drawTextScaled (x, y, z, str, stdcol, timer, highlight, highlightcol);
+}
+
+void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight)
+{
+  drawTextScaled (x, y, z, str, stdcol, timer, highlight, highlightcol);
+}
+
+void Font::drawTextScaled (float x, float y, float z, char *str, int timer)
+{
+  drawTextScaled (x, y, z, str, stdcol, timer, -1, highlightcol);
 }
 
 

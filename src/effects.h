@@ -121,19 +121,35 @@ class Font
   short letterx [256]; // starting x coordinate in the texture
   short lettery [256]; // starting y coordinate in the texture
   short letterw [256]; // width in the texture
+  CColor *stdcol;
+  CColor *highlightcol;
   
   bool isPixel (int x, int y); // is pixel set in the texture?
   void extractLetters (int height, char start, int num); // extract the letters
   Font (char *filename, int height, char start, int num); // new Font
+  ~Font ();
 
   // some custom OpenGL output methods
-  void drawText (float x, float y, float z, char *str, CColor *c, bool centered);
+  void drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol);
+  void drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);
+  void drawText (float x, float y, float z, char *str, CColor *c, int highlight);
   void drawText (float x, float y, float z, char *str, CColor *c);
+  void drawText (float x, float y, float z, char *str, int highlight, CColor *highlightcol);
+  void drawText (float x, float y, float z, char *str, int highlight);
   void drawText (float x, float y, float z, char *str);
+  void drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);
+  void drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight);
   void drawTextCentered (float x, float y, float z, char *str, CColor *c);
+  void drawTextCentered (float x, float y, float z, char *str, int highlight, CColor *highlightcol);
+  void drawTextCentered (float x, float y, float z, char *str, int highlight);
   void drawTextCentered (float x, float y, float z, char *str);
   void drawTextRotated (float x, float y, float z, char *str, CColor *color, int timer);
+  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight, CColor *highlightcol);
+  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight);
   void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer);
+  void drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, CColor *highlightcol);
+  void drawTextScaled (float x, float y, float z, char *str, int timer, int highlight);
+  void drawTextScaled (float x, float y, float z, char *str, int timer);
 };
 
 class HighClouds : public CSpaceObj
