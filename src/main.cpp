@@ -482,11 +482,12 @@ int getTrainingIdFromValue (int n)
   else if (n == z ++) return MISSION_FREEFLIGHT1;
   else if (n == z ++) return MISSION_DEATHMATCH1;
   else if (n == z ++) return MISSION_DEATHMATCH2;
+  else if (n == z ++) return MISSION_DEATHMATCH3;
   else if (n == z ++) return MISSION_TEAMBASE1;
   else if (n == z ++) return MISSION_WAVES1;
   else
   {
-    return MISSION_CUSTOM1 + n - 9;
+    return MISSION_CUSTOM1 + n - 10;
   }
   return 0;
 }
@@ -1154,6 +1155,7 @@ void createMission (int missionid)
   else if (missionid == MISSION_FREEFLIGHT1) missionnew = new MissionFreeFlight1 ();
   else if (missionid == MISSION_DEATHMATCH1) missionnew = new MissionDeathmatch1 ();
   else if (missionid == MISSION_DEATHMATCH2) missionnew = new MissionDeathmatch2 ();
+  else if (missionid == MISSION_DEATHMATCH3) missionnew = new MissionDeathmatch3 ();
   else if (missionid == MISSION_TEAMBASE1) missionnew = new MissionTeamBase1 ();
   else if (missionid == MISSION_WAVES1) missionnew = new MissionWaves1 ();
   else if (missionid == MISSION_MULTIPLAYER_DOGFIGHT) missionnew = new MissionMultiDogfight1 ();
@@ -2945,6 +2947,59 @@ void credits_mouse (int button, int state, int x, int y)
 
 void credits_display ()
 {
+#ifdef SHOW_SOFTWARE_PATENTS
+  float xt = -22, yt = 12, zf = -2.4, ydist = 0.7;
+  glPushMatrix ();
+//  glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
+  glTranslatef (0, -3.4 + 0.004 * (float) creditstimer / timestep, 0);
+  CColor *col = &colorwhite;
+  CColor *col2 = &coloryellow;
+  float fontzoom = 1.0;
+  font1->zoom = 0.1;
+  font2->zoom = 0.1;
+  font1->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "MONEY VERSUS DEMOCRACY", col2);
+  font1->drawTextCentered (0, (yt -= 3 * ydist) / fontzoom, zf, "PATENTS ON SOFTWARE", col2);
+  fontzoom = 0.8;
+  font1->zoom = 0.08;
+  font2->zoom = 0.08;
+
+  font1->drawText (xt, (yt -= 5 * ydist) / fontzoom, zf, "WHAT ARE PATENTS?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "PATENTS IN EUROPE COST ABOUT 30000-50000 EURO (= US$).", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "THEY GRANT PROPERTY FOR SOMETHING, THAT NOONE CAN PUBLISH", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EXCEPT THE PATENT OWNER.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHO CAN AFFORD PATENTS?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "ONLY HUGE COMPANIES.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT CAN BE PATENTED?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "CURRENTLY EVERYTHING. AMAZON HAS A PATENT TO SELL PRODUCTS", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "WITH ONE MOUSE CLICK. THERE ARE EUROPEAN PATENTS ON THE", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PROGRESS BAR, ON THE UNDO FUNCTION, ETC.", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CURRENTLY EURO SOFTWARE PATENTS ARE STOPPED UNTIL THE END", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "OF SUMMER 2004.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "AN EXAMPLE FOR PATENTS ON COURT?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "IN 2001 MICROSOFT HAD TO PAY 500000000 US$, BECAUSE ANOTHER", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "COMPANY HAD A PATENT ON BROWSER PLUGINS (US).", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS SOFTWARE?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "SOFTWARE IS BASED ON ABSTRACT DESCRIPTIONS, WHICH EVERYONE", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "CAN FORMULATE IN PROSE LANGUAGE. CODE IS JUST A MIRROR", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "IMAGE OF THE DESCRIPTION.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY DOES MICROSOFT WANT PATENTS?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "TO PATENT CONCEPTS, AND DICTATE WHICH SYSTEMS MAY USE THEM.", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "EVENTUALLY TO ELIMINATE LINUX AND OPEN SOURCE.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHY CAN EVERYTHING BE PATENTED?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "HUGE COMPANIES ARE PUSHING FOR EXECUTIVE POWERS.", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "PATENT LAWYERS ARE TAKING THE MONEY.", col);
+
+  font1->drawText (xt, (yt -= 4 * ydist) / fontzoom, zf, "WHAT IS DEMOCRACY?", col2);
+  font2->drawText (xt, (yt -= 2 * ydist) / fontzoom, zf, "YOUR POWER TO STOP THIS ABUSE.", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "VOTE AGAINST SOFTWARE PATENTS ON HTTP://PETITION.EUROLINUX.ORG.", col);
+  font2->drawText (xt, (yt -= 1.5 * ydist) / fontzoom, zf, "TELL YOUR FRIENDS AND SEARCH THE INTERNET FOR MORE INSANITY.", col);
+#else
   float yt = 12, zf = -2.4, ydist = 0.7;
   glPushMatrix ();
   glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
@@ -2987,6 +3042,7 @@ void credits_display ()
   font1->zoom = 0.1;
   font2->zoom = 0.1;
   glPopMatrix ();
+#endif
 }
 
 void finish_display ()
@@ -4013,8 +4069,14 @@ void mission_timer (Uint32 dt)
 void credits_timer (Uint32 dt)
 {
   creditstimer += dt;
+#ifdef SHOW_SOFTWARE_PATENTS
+  if (creditstimer > 2500 * timestep)
+    creditstimer = 0;
+#else
   if (creditstimer > 700 * timestep)
     creditstimer = 0;
+#endif
+
 #ifdef USE_GLUT
   glutPostRedisplay();
 #else
@@ -4537,7 +4599,7 @@ void myFirstInit ()
   initexplode1 = 0;
 
   textitle = new CTexture ();
-  textitle = gl->genTextureTGA (dirs->getTextures ("title.tga"), 0, 0, 0, true);
+  textitle = gl->genTextureTGA (dirs->getTextures ("patents.tga"), 0, 0, 0, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -6435,7 +6497,11 @@ void createMenu ()
   strcpy (mainmenunames [1], "TRAINING");
   strcpy (mainmenunames [2], "CAMPAIGN");
   strcpy (mainmenunames [3], "OPTIONS");
+#ifdef SHOW_SOFTWARE_PATENTS
+  strcpy (mainmenunames [4], "SOFTWARE PATENTS");
+#else
   strcpy (mainmenunames [4], "CREDITS");
+#endif
   strcpy (mainmenunames [5], "QUIT");
   strcpy (mainmenunames [6], "RETURN");
 
@@ -6534,11 +6600,12 @@ void createMenu ()
   strcpy (submenu1names [z ++], "FREE FLIGHT");
   strcpy (submenu1names [z ++], "DEATHMATCH");
   strcpy (submenu1names [z ++], "TEAM DEATHMATCH");
+  strcpy (submenu1names [z ++], "CANNON DEATHMATCH");
   strcpy (submenu1names [z ++], "TEAM BASE");
   strcpy (submenu1names [z ++], "WAVES");
 
   xf = xsubmenu; yf = ysubmenu - 2; xfstep = 12; yfstep = 0.8;
-  for (i = 0; i < 9; i ++)
+  for (i = 0; i < 10; i ++)
   {
     button = new Button (submenu1names [i]);
     button->setBounds (xf, yf, xfstep, yfstep - 0.1);

@@ -180,7 +180,7 @@ void Cockpit::drawCounter ()
   sprintf (buf, "FLARE: %d", fplayer->flares);
   font1->drawTextCentered (xf*10, (yf2-0.05)*10, zf, buf, &red);
 
-  if (mission->id == MISSION_DEATHMATCH1)
+  if (mission->id == MISSION_DEATHMATCH1 || mission->id == MISSION_DEATHMATCH3)
   {
     sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->fighterkills);
     font1->drawText (-30.0F, 15.0F, -3.0F, buf, &blue);

@@ -1098,7 +1098,7 @@ MissionDeathmatch1::MissionDeathmatch1 ()
 {
   id = MISSION_DEATHMATCH1;
   strcpy (name, "DEATHMATCH");
-  strcpy (briefing, "THIS IS A SHORT TEAM DEATHMATCH - 8 OPPONENTS AND 10 KILLS TO WIN. THE DIFFICULTY STILL DETERMINES THE OPPONENTS STRENGTH.");
+  strcpy (briefing, "THE DEATHMATCH - 8 OPPONENTS AND 10 KILLS TO WIN. THE DIFFICULTY STILL DETERMINES THE OPPONENTS STRENGTH.");
   autoLFBriefing ();
   alliedfighters = 1;
   selweapons = 1;
@@ -1287,6 +1287,112 @@ int MissionDeathmatch2::processtimer (Uint32 dt)
 }
 
 void MissionDeathmatch2::draw ()
+{
+  if (timer >= 0 && timer <= 50 * timestep)
+  {
+    font1->drawTextCentered (0, 4, -2, name, &textcolor);
+  }
+}
+
+
+
+MissionDeathmatch3::MissionDeathmatch3 ()
+{
+  id = MISSION_DEATHMATCH3;
+  strcpy (name, "CANNON DEATHMATCH");
+  strcpy (briefing, "DEATHMATCH WITHOUT MISSILES - 8 OPPONENTS AND 10 KILLS TO WIN. THE DIFFICULTY STILL DETERMINES THE OPPONENTS STRENGTH.");
+  autoLFBriefing ();
+  alliedfighters = 1;
+  selweapons = 1;
+  selfighters = 1;
+  maxtime = 20000 * timestep;
+}
+  
+void MissionDeathmatch3::start ()
+{
+  int i, i2;
+  day = 1;
+  clouds = 1;
+  weather = WEATHER_SUNNY;
+  camera = 0;
+  sungamma = 25;
+  heading = 220;
+  if (l != NULL) delete l;
+  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  playerInit ();
+  fplayer->tl->x = 0;
+  fplayer->tl->z = 50;
+  fplayer->ammo = 100000;
+  for (i2 = 0; i2 < missiletypes; i2 ++)
+  {
+    fplayer->missiles [i2] = 0;
+  }
+
+  for (i = 1; i <= 7; i ++)
+  {
+    fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
+    fighter [i]->party = i + 1;
+    fighter [i]->target = fighter [i - 1];
+    fighter [i]->o = &model_fig;
+    fighter [i]->tl->x = 50 * SIN(i * 360 / 8);
+    fighter [i]->tl->z = 50 * COS(i * 360 / 8);
+    fighter [i]->ammo = 100000;
+    for (i2 = 0; i2 < missiletypes; i2 ++)
+    {
+      fighter [i]->missiles [i2] = 0;
+    }
+  }
+  state = 0;
+  laststate = 0;
+  texttimer = 0;
+}
+
+int MissionDeathmatch3::processtimer (Uint32 dt)
+{
+  int i;
+  if (texttimer >= 200 * timestep) texttimer = 0;
+  if (texttimer > 0) texttimer += dt;
+  timer += dt;
+  for (i = 0; i <= 7; i ++)
+  {
+    if (fighter [i]->fighterkills >= 10)
+    {
+//      fplayer->shield = 1;
+      if (i == 0) return 1;
+      else return 2;
+    }
+    if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
+    {
+      fighter [i]->explode = 0;
+      int temp = fighter [i]->fighterkills;
+      fighter [i]->aiinit ();
+      if (i == 0)
+      {
+        playerInit ();
+      }
+      else
+      {
+        fighter [i]->newinit (FIGHTER_FALCON, i + 1, 200);
+      }
+      fighter [i]->party = i + 1;
+      fighter [i]->shield = fighter [i]->maxshield;
+      fighter [i]->immunity = 50 * timestep;
+      fighter [i]->activate ();
+//      fighter [i]->killed = false;
+      fighter [i]->fighterkills = temp;
+      fighter [i]->killed = false;
+      fighter [i]->ammo = 100000;
+      for (i = 0; i < missiletypes; i ++)
+      {
+        fighter [i]->missiles [i] = 0;
+      }
+      camera = 0;
+    }
+  }
+  return 0;
+}
+
+void MissionDeathmatch3::draw ()
 {
   if (timer >= 0 && timer <= 50 * timestep)
   {

@@ -37,16 +37,16 @@ int quality = 3;
 float view = 50.0;
 int width = 800, height = 600, bpp = 32;
 int wantwidth = 800, wantheight = 600, wantfullscreen = 1;
-int dithering = 0;
+int dithering = 1;
 int volumesound = 100;
 int volumemusic = 100;
 int fullscreen = 1;
 int controls = CONTROLS_MOUSE;
 int difficulty = 1;
 int physics = 0;
-int antialiasing = 0;
-int specialeffects = 0;
-int dynamiclighting = 0;
+int antialiasing = 1;
+int specialeffects = 1;
+int dynamiclighting = 1;
 
 // use 0...255 for one byte keys, 256... for special (two byte) beys
 unsigned int key_firecannon = 32, key_firemissile = 13, key_dropchaff = 'C', key_dropflare = 'F';
