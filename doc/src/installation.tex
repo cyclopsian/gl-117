@@ -19,31 +19,47 @@ support and basic sound processing}
 support and music}
 \end{itemize}
 
-Installation of \texttt{SDL} is optional, however strongly recommended.
+Installation of \texttt{SDL} and \texttt{SDL\_mixer} is optional, however strongly recommended.
 
 \section{Downloading GL-117}
 \label{sec:downloading_gl117}
 
 The latest \emph{GL-117} release is currently available for download at
-\texttt{http://www.freshmeat.net/gl-117} in \texttt{.tar.gz} and \texttt{.zip} format.
-Using MSWindows you may prefer the \texttt{.zip} file that may be unpacked with
-lots of programs like \texttt{PKUnzip, Winzip, WinRAR, WinACE}.
-The \texttt{.tar.gz} version can be unpacked with GNU Tar using \\\texttt{tar xvfz
-gl-117-x.y.z.tar.gz}\\ where \texttt{x.y.z} is the \emph{GL-117} version
+\texttt{http://www.heptargon.de} in \texttt{.tar.gz} or \texttt{.zip} format.
+Try to get a suitable binary package for your system, so you needn't recompile the game.
+Some Linux distributions (Debian, PLD) already include the latest game releases and provide an update
+mechanism to download and install the game via internet.
+Using MSWindows there is already a prebuilt executable. 
+
+Now unpack the archive file with your favourite tool.
+For MSWindows I can recommend \texttt{7-zip}, if you are searching for free software that can handle multiple formats.
+
+To extract the files on command line please look at the file suffix:
+\begin{verbatim}
+unzip gl-117-x.y.z-src.zip
+tar zxvf gl-117-x.y.z-src.tar.gz
+tar jxvf gl-117-x.y.z-src.tar.bz2
+\end{verbatim}
+with \texttt{x.y.z} meaning the \emph{GL-117} version
 number. For last minute updates and release-specific building and
 install instructions, make sure to have a look at the
 \texttt{README} and \texttt{INSTALL} files.
 
+
 \section{Linux/Unix installation}
 \label{sec:linux_installation}
 
-If you got a binary \texttt{gl-117} in the \texttt{linux} directory, you will only
+If you got a binary package, you will only
 need the libraries \texttt{GL, GLU, GLUT} and \texttt{SDL, SDL\_mixer} as
-described above.
+described above and install them, e.g. for \texttt{rpm} files enter:
+\begin{verbatim}
+ rpm -i SDL-*.rpm
+ rpm -i gl-117-*.rpm
+\end{verbatim}
 
-In order to compile \emph{GL-117} you will also have to install the developement
-versions of the libraries above (except \texttt{SDL\_mixer}).
-To compile \emph{GL-117} do the following steps in the gl-117-\textit{VERSION}
+In order to \textit{compile} \emph{GL-117} you will also have to install the development
+versions \texttt{-devel} of the libraries above (except \texttt{SDL\_mixer}).
+To compile \emph{GL-117} (as \textit{root}) do the following steps in the \texttt{gl-117-x.y.z-src}
 directory:
 \begin{verbatim}
  ./configure
@@ -53,9 +69,8 @@ directory:
 The \texttt{configure} script will check for the required libraries and will output
 a \texttt{Makefile}, which can be invoked using the \texttt{make} command.
 After compiling \emph{GL-117} successfully, you will find a binary called \texttt{gl-117}
-in the \texttt{src} directory. Move it to the \texttt{linux} directory manually and
-execute.\\
-To really install \emph{GL-117} please use:
+in the \texttt{src} directory.\\
+To really \textit{install} \emph{GL-117} please use:
 \begin{verbatim}
  make install
 \end{verbatim}
@@ -64,13 +79,15 @@ and the rest of data files to your data directory (e.g. \texttt{/usr/local/share
 Any files that require output permissions will be stored in the user's home directory,
 exactly \texttt{\$HOME/.gl-117}.\\
 This step will require write permissions in the binary and data directories.
-However you may customize these directories using for example
+However, without \textit{root} permissions you may customize these directories using for example
 \begin{verbatim}
  ./configure --prefix='/home/tom/gl-117'
  make
  make install
 \end{verbatim}
 
+If you encounter any problems while building or executing the game, please read the \texttt{FAQ}
+file or write a mail to \texttt{tom.drexl@gmx.de}.
 
 \section{MSWindows installation}
 \label{sec:windows_installation}
@@ -83,29 +100,42 @@ Look into your system directory, that is generally
 \end{verbatim}
 You will need the files \texttt{opengl32.dll, glu32.dll, glut32.dll, sdl.dll, sdl\_mixer.dll}
 there.
-If one is missing, please search the internet.
-That's it. Execute the binary \texttt{gl-117.exe} in \emph{GL-117}'s \texttt{windows}
-directory.\\
+If one is missing, please search the internet and move the file there.
+That's it. Execute the binary \texttt{gl-117.exe} stored in a directory with the same name.
 
 If you had already an earlier version of \emph{GL-117} you might want to use your
-old pilots with the new version of the game. Therefore simply copy the old
+old pilots with the new version of the game. Therefore copy the old
 \texttt{saves} directory to the new version.
 
+This game is *NOT* meant to be a Windows game! Do not complain if there is no proper
+installer available! Do not complain, if you are not able to unpack and install the game!
+There are plenty other and better commercial action games.
 
 \section{Running GL-117}
 \label{sec:running_gl117}
 
-At startup, \emph{GL-117} tries to read a file \texttt{conf} from the user's home
-directory (Linux/Unix) or the \texttt{saves} directory (MSWindows).
-If there is none, the game will try out some screen settings and store the file.
+At startup, \emph{GL-117} tries to read the files \texttt{conf} and \texttt{conf.interface}
+from the user's home directory (Linux/Unix) or the \texttt{saves} directory (MSWindows).
+If there are none, the game will try out some screen settings and store the files.
 \begin{verbatim}
  Linux/Unix      $HOME/.gl-117/conf
+                 $HOME/.gl-117/conf.interface
  MSWindows       GL-117-INSTALLDIR/saves/conf
+                 GL-117-INSTALLDIR/saves/conf.interface
 \end{verbatim}
 
-Edit the file using your favourite text editor and adjust the settings
-to your system.
+You may edit these file using your favourite text editor and adjust the settings
+to your system. Since version \textit{1.1}, \emph{GL-117} provides a full menu based configuration
+of these files.
+
 If you lack a hardware accelerated video card, please turn down the
 quality to 0 or 1. Further acceleration can be achieved negligating fullscreen mode
 and choosing a lower resolution.\\
-Just delete the \texttt{conf} file if you want to reset to the initial settings.
+Just delete the files \texttt{conf} and/or \texttt{conf.interface}
+if you want to reset to the initial settings.
+
+Typical performance values:
+
+ AMD K2 500 AGP1x TNT, quality=0, view=50: FPS$>$30\\
+ Athlon 1400 GeForce2, quality=3, view=70: FPS$>$30\\
+ P4 2.4GHz GeForce4, quality=4, view=110: FPS$>$30
