@@ -2012,10 +2012,17 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
     float mydep = 1000;
     if (quality == 3) mydep = 1600;
     else if (quality == 4) mydep = 2500;
     else if (quality == 5) mydep = 3500;
+    if (mydep > view * view) mydep = view * view;
+
+    int lineartree = -1;
+    if (quality == 3 || quality == 4) lineartree = 0;
+    else if (quality == 5) lineartree = 1;
+
     float x21 = 0.3, y21 = -0.32;
     float x22 = -0.21, y22 = 0.22;
     float x31 = 0.32, y31 = -0.08;
@@ -2028,7 +2035,7 @@ void GLLandscape::draw (int phi, int gamma)
     for (i = 0; i < PARTS; i ++)
       for (i2 = 0; i2 < PARTS; i2 ++)
       {
-        if (detail [i] [i2] <= fardetail - 4)
+        if (detail [i] [i2] <= lineartree)
         {
           gl->enableLinearTexture (textree->textureID);
           gl->enableLinearTexture (textree2->textureID);
