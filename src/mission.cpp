@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -30,7 +30,7 @@
 #include "main.h"
 #include "mathtab.h"
 #include "conf.h"
-#include "glland.h"
+#include "gllandscape/GlLandscape.h"
 
 void Mission::autoLFBriefing ()
 {
@@ -289,7 +289,7 @@ void MissionDemo1::start ()
   camera = 5;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   fplayer = fighter [0];
   fighter [0]->tl->x = 220;
   fighter [0]->tl->z = -30;
@@ -354,7 +354,7 @@ void MissionTutorial1::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 220;
   fplayer->tl->z = -30;
@@ -599,7 +599,7 @@ void MissionTutorial2::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
@@ -695,7 +695,7 @@ void MissionTutorial3::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
+  l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
   fplayer->tl->x = 220;
   fplayer->tl->z = -30;
@@ -826,7 +826,7 @@ void MissionDogfight1::start ()
   sungamma = 25;
   heading = 220;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 20;
   fplayer->tl->z = 70;
@@ -994,7 +994,7 @@ void MissionFreeFlight1::start ()
   sungamma = 50;
   heading = 200;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 20;
   fplayer->tl->z = 70;
@@ -1116,7 +1116,7 @@ void MissionDeathmatch1::start ()
   sungamma = 25;
   heading = 220;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 50;
@@ -1206,7 +1206,7 @@ void MissionDeathmatch2::start ()
   sungamma = 45;
   heading = 220;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 50;
@@ -1318,7 +1318,7 @@ void MissionDeathmatch3::start ()
   sungamma = 25;
   heading = 220;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 50;
@@ -1422,7 +1422,7 @@ void MissionTeamBase1::start ()
   sungamma = 50;
   heading = 180;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (1, 1, &px, &py);
   l->flatten (px, py, 8, 8);
@@ -1707,7 +1707,7 @@ void MissionWaves1::start ()
   sungamma = 50;
   heading = 220;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 20;
   fplayer->tl->z = 70;
@@ -1838,7 +1838,7 @@ void MissionTest1::start ()
   camera = 0;
   sungamma = 55;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
@@ -1908,7 +1908,7 @@ void MissionTest2::start ()
   camera = 0;
   sungamma = 55;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 50;
@@ -2007,7 +2007,7 @@ void MissionTransport::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_LOW_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_LOW_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -2084,7 +2084,7 @@ void MissionConvoy::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
@@ -2170,7 +2170,7 @@ void MissionDogfight2::start ()
   sungamma = 40;
   heading = 200;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -2267,7 +2267,7 @@ void MissionAirBattle::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -2356,7 +2356,7 @@ void MissionGround1::start ()
   sungamma = 40;
   heading = 200;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_NOLAKE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_NOLAKE, NULL);
   int px, py;
   l->searchPlain (1, 1, &px, &py);
   l->flatten (px, py, 3, 3);
@@ -2456,7 +2456,7 @@ void MissionScout::start ()
   sungamma = 22;
   heading = 250;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -2527,7 +2527,7 @@ void MissionBase::start ()
   camera = 0;
   sungamma = 40;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   l->flatten (px, py, 8, 8);
@@ -2704,7 +2704,7 @@ void MissionDepot::start ()
   camera = 0;
   sungamma = 40;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE_EROSION, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
   l->searchPlain (-1, -1, &px, &py);
   l->flatten (px, py, 6, 6);
@@ -2883,7 +2883,7 @@ void MissionDefend1::start ()
   sungamma = 65;
   heading = 200;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
+  l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
   fplayer->tl->x = 10;
   fplayer->tl->z = 90;
@@ -3010,7 +3010,7 @@ void MissionDogfight3::start ()
   sungamma = 20;
   heading = 300;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
+  l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -3114,7 +3114,7 @@ void MissionTank1::start ()
   sungamma = 40;
   heading = 280;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
+  l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -3204,7 +3204,7 @@ void MissionConvoy2::start ()
   sungamma = 60;
   heading = 230;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_DESERT, NULL);
+  l = new GlLandscape (LANDSCAPE_DESERT, NULL);
   int px = 200, py = 200;
   playerInit ();
   fplayer->tl->x = px;
@@ -3298,7 +3298,7 @@ void MissionShip1::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
+  l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
   fplayer->tl->x = 80;
   fplayer->tl->z = 0;
@@ -3383,7 +3383,7 @@ void MissionShip2::start ()
   sungamma = 15;
   heading = 270;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
+  l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
   fplayer->tl->x = 80;
   fplayer->tl->z = 0;
@@ -3474,7 +3474,7 @@ void MissionShip3::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_SEA, NULL);
+  l = new GlLandscape (LANDSCAPE_SEA, NULL);
   playerInit ();
   fplayer->tl->x = 80;
   fplayer->tl->z = 0;
@@ -3556,7 +3556,7 @@ void MissionCanyon1::start ()
   sungamma = 15;
   heading = 270;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
+  l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
   fplayer->tl->x = px + 130;
@@ -3664,7 +3664,7 @@ void MissionCanyon2::start ()
   camera = 0;
   sungamma = 40;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
+  l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   playerInit ();
   fplayer->tl->x = 100;
   fplayer->tl->z = 100;
@@ -3764,7 +3764,7 @@ void MissionCanyon3::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_CANYON, NULL);
+  l = new GlLandscape (LANDSCAPE_CANYON, NULL);
   l->searchPlain (-1, -1, &px, &py);
   playerInit ();
   fplayer->tl->x = px + 100;
@@ -3875,7 +3875,7 @@ void MissionMoonDefense1::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+  l = new GlLandscape (LANDSCAPE_MOON, NULL);
 //  l->genTrench (12, 5000);
   playerInit ();
   fplayer->tl->x = 100;
@@ -3967,7 +3967,7 @@ void MissionMoonBattle::start ()
   camera = 0;
   sungamma = 45;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+  l = new GlLandscape (LANDSCAPE_MOON, NULL);
   playerInit ();
   fplayer->tl->x = 0;
   fplayer->tl->z = 100;
@@ -4059,7 +4059,7 @@ void MissionMoonDogfight1::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_MOON, NULL);
+  l = new GlLandscape (LANDSCAPE_MOON, NULL);
   playerInit ();
   fplayer->tl->x = -100;
   fplayer->tl->z = -100;
@@ -4147,7 +4147,7 @@ void MissionTunnel1::start ()
   camera = 0;
   sungamma = 60;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_CANYON_TRENCH, NULL);
+  l = new GlLandscape (LANDSCAPE_CANYON_TRENCH, NULL);
   playerInit ();
   fplayer->tl->x = 256;
   fplayer->tl->z = 256;
@@ -4268,7 +4268,7 @@ void MissionMoonBase1::start ()
   camera = 0;
   sungamma = 50;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_FLAT_MOON, NULL);
+  l = new GlLandscape (LANDSCAPE_FLAT_MOON, NULL);
   playerInit ();
   fplayer->tl->x = -20;
   fplayer->tl->z = -40;
@@ -4348,7 +4348,7 @@ void MissionMultiDogfight1::start ()
   camera = 0;
   sungamma = 25;
   if (l != NULL) delete l;
-  l = new GLLandscape (space, LANDSCAPE_ALPINE, NULL);
+  l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
   for (i = 0; i <= 1; i ++)
   {
     fighter [i]->activate ();

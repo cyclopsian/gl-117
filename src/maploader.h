@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -26,7 +26,7 @@
 
 #include "aiobject.h" // ok
 #include "mission.h" // ok
-#include "fileloader.h" // ok
+#include "filetokenizer/FileTokenizer.h" // ok
 
 #define MAXMAPS 100
 #define TOKENLEN 1024

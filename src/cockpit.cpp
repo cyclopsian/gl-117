@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -30,8 +30,8 @@
 #include "pilots.h"
 #include "mathtab.h"
 #include "mission.h"
-#include "gl.h"
-#include "glland.h"
+#include "opengl/GlPrimitives.h"
+#include "gllandscape/GlLandscape.h"
 
 #define TRIANGLE_BLIP 1
 #define SQUARE_BLIP   2
@@ -242,7 +242,7 @@ void Cockpit::drawCounter ()
     float b = sqrt (dist * dist - a * a);
     float descale = hud_height * 0.5f / tan (view_angle * 0.5f) / b;
 
-    gl->enableAlphaBlending ();
+    gl.enableAlphaBlending ();
     glTranslatef (pos.x * descale, pos.y * descale, 0.0f);
     glPushMatrix ();
 
@@ -306,7 +306,7 @@ void Cockpit::drawCounter ()
         glEnd ();
       }
     glPopMatrix ();
-    gl->disableAlphaBlending ();
+    gl.disableAlphaBlending ();
   }
   glMatrixMode (GL_MODELVIEW);
   glPopMatrix();
@@ -333,7 +333,7 @@ void Cockpit::drawTargeter ()
     float ex1 = cosi [(int) myphi] * o->zoom, ey1 = -sine [(int) myphi] * o->zoom;
     float ex2 = -ex1, ey2 = -ey1;
     float ez = o->zoom;
-    gl->enableAlphaBlending ();
+    gl.enableAlphaBlending ();
     bool full = false;
     if (((AIObj *) fplayer->target)->party != fplayer->party)
     {
@@ -386,7 +386,7 @@ void Cockpit::drawTargeter ()
       glVertex3f (o->tl->x + ex1, o->tl->y + ez, o->tl->z + ey1);
       glEnd ();
     }
-    gl->disableAlphaBlending ();
+    gl.disableAlphaBlending ();
   }
 }
 
@@ -394,17 +394,17 @@ void Cockpit::drawCross ()
 {
   glDisable (GL_LIGHTING);
 
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   if (fplayer->o == &model_fig || fplayer->o == &model_figg)
   {
-    gl->enableTexture (texcross->textureID);
+    gl.enableTexture (texcross->textureID);
   }
   else
   {
-    gl->enableTexture (texcross2->textureID);
+    gl.enableTexture (texcross2->textureID);
   }
 
   float xf = 0.1, yf = 0.1, zf = 1.0;
@@ -421,7 +421,7 @@ void Cockpit::drawCross ()
   glEnd ();
   glDisable (GL_ALPHA_TEST);
   glDisable (GL_TEXTURE_2D);
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
@@ -453,7 +453,7 @@ void Cockpit::drawHeading ()
       else
         g = 0.1;
       xf = p / 6.0;
-      gl->enableAlphaBlending ();
+      gl.enableAlphaBlending ();
       setColor (alpha);
       glBegin (GL_LINES);
       glVertex3f (xf * 0.1, (yf - g) * 0.1, zf);
@@ -506,7 +506,7 @@ void Cockpit::drawHeading ()
   sprintf (str, "AMMO %d", fplayer->ammo);
   font1->drawTextCentered (8.0, -8.5, -4.0, str, &color);
 
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
 
   float dgamma = fplayer->gamma - (int) fplayer->gamma;
   float innerx = 5, outerx = 10, widthx = 1;
@@ -553,7 +553,7 @@ void Cockpit::drawHeading ()
     cockpitvertex (outerx,tmp);
   }
   glEnd ();
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
 
   glLineWidth (LINEWIDTH(2.0F));
 }
@@ -567,7 +567,7 @@ void Cockpit::drawTargetedElement ()
   color.set (255, 0, 0);
   color.c [3] = 255;
   tl.x = -0.35; tl.y = -0.3; tl.z = -0.5;
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
   if (fplayer->target != NULL)
     if (fplayer->target->active)
@@ -595,7 +595,7 @@ void Cockpit::drawWeapon ()
   color.set (255, 0, 0);
   color.c [3] = 255;
   tl.x = 0.35; tl.y = -0.3; tl.z = -0.5;
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
   Model3d *missile = NULL;
   if (fplayer->missiletype == 0) missile = &model_missile1;
@@ -620,7 +620,7 @@ void Cockpit::drawRadar ()
   int i;
   float yf = -4.2, zf = -7.0;
 
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -629,13 +629,13 @@ void Cockpit::drawRadar ()
   int type;
   if (fplayer->o == &model_fig || fplayer->o == &model_figg)
   {
-    gl->enableTexture (texradar2->textureID);
+    gl.enableTexture (texradar2->textureID);
     xl = 1.4; yl = 1.3;
     type = 0;
   }
   else
   {
-    gl->enableTexture (texradar1->textureID);
+    gl.enableTexture (texradar1->textureID);
     xl = 1.3; yl = 1.2;
     type = 1;
   }
@@ -699,7 +699,7 @@ void Cockpit::drawRadar ()
       }
     }
   }
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
 }
 
 void Cockpit::drawRelativeHeightBar()
@@ -712,7 +712,7 @@ void Cockpit::drawRelativeHeightBar()
   glDisable (GL_LIGHTING);
   glLineWidth (LINEWIDTH(1.0F));
   glDisable (GL_DEPTH_TEST);
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   
   float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
   float px = fplayer->tl->x, py = fplayer->tl->y, pz = fplayer->tl->z;
@@ -738,7 +738,7 @@ void Cockpit::drawRelativeHeightBar()
   sprintf (str, "RHEIGHT");
   font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
   glEnd();
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
 }
 
 void Cockpit::drawThrustBar()
@@ -751,7 +751,7 @@ void Cockpit::drawThrustBar()
   glDisable (GL_LIGHTING);
   glLineWidth (LINEWIDTH(1.0F));
   glDisable (GL_DEPTH_TEST);
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
 
   setColor(80); // don't block visibility too much
   float xf = -1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
@@ -772,7 +772,7 @@ void Cockpit::drawThrustBar()
   font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, &color);
 
   glEnd();
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
 }
 
 #endif

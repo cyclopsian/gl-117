@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -25,7 +25,10 @@
 
 /*
 TODO:
-- options => video => resolution and fullscreen (both with restart)
+- joystick update (mail)
+- joystick in menu
+- mig29 model
+- new soundtrack
 - correct transport2 (left side corrupt in VRML) and add mission with transport2
 - southern seashore landscape (additional missions)
 - alpine snow landscape (additional missions)
@@ -36,17 +39,17 @@ TODO:
 #ifndef IS_MAIN_H
 
 #include "main.h"
-#include "menu.h"
+#include "menu/Component.h"
 #include "maploader.h"
 #include "dirs.h"
-#include "gl.h"
-#include "land.h"
+#include "opengl/GlPrimitives.h"
+#include "landscape/Landscape.h"
 #include "net.h"
 #include "mathtab.h"
 #include "cockpit.h"
 #include "conf.h"
 #include "mission.h"
-#include "glland.h"
+#include "gllandscape/GlLandscape.h"
 #include "common.h"
 
 #include <ctype.h>
@@ -91,13 +94,10 @@ SDL_Thread *threadnet = NULL;
 int game = GAME_INIT;
 
 int debuglevel = LOG_MOST;
-int showcollision = 0;
 int brightness = 0;
 int contrast = 10;
 
 SoundSystem *sound = NULL;
-
-GlPrimitives *gl;
 
 float getView ()
 {
@@ -125,9 +125,9 @@ Texture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
 
-CExplosion *explosion [maxexplosion];
-CBlackSmoke *blacksmoke [maxblacksmoke];
-GLLandscape *l = NULL;
+Explosion *explosion [maxexplosion];
+BlackSmoke *blacksmoke [maxblacksmoke];
+GlLandscape *l = NULL;
 Font *font1, *font2;
 
 Texture *textitle;
@@ -138,7 +138,7 @@ Uint32 lasttime = 0;
 
 
 
-CLoad3DS g_Load3ds;
+Load3ds g_Load3ds;
 Model3d model_fig;
 Model3d model_figa;
 Model3d model_figb;
@@ -205,7 +205,7 @@ Flash *flash1;
 Space *space;
 
 AIObj *fplayer;
-CSpaceObj *sphere;
+SpaceObj *sphere;
 Sphere *objsphere;
 HighClouds *highclouds;
 HighClouds *highclouds2;
@@ -269,10 +269,10 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   float ty1 = 0.755 - 0.25 * (rank / 2);
   float ty2 = ty1 + 0.24;
   zoom /= 10;
-  gl->enableTexture (texranks->textureID);
+  gl.enableTexture (texranks->textureID);
   if (antialiasing) texranks->shadeLinear ();
   else texranks->shadeConst ();
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.35);
 
@@ -314,7 +314,7 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   glEnd ();
 
   glDisable (GL_ALPHA_TEST);
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   glDisable (GL_TEXTURE_2D);
 }
 
@@ -328,10 +328,10 @@ void drawMedal (float xp, float yp, float zp, int medal, float zoom, int mission
   float ty1 = 0.5 * (medal / 2);
   float ty2 = ty1 + 0.5;
   zoom /= 10;
-  gl->enableTexture (texmedals->textureID);
+  gl.enableTexture (texmedals->textureID);
   if (antialiasing) texmedals->shadeLinear ();
   else texmedals->shadeConst ();
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glBegin (GL_QUADS);
@@ -346,7 +346,7 @@ void drawMedal (float xp, float yp, float zp, int medal, float zoom, int mission
   glVertex3f (x, y + zoom, z);
   glEnd ();
   glDisable (GL_ALPHA_TEST);
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   glDisable (GL_TEXTURE_2D);
 }
 
@@ -361,11 +361,11 @@ void drawMouseCursor ()
   glTranslatef (0, -height, 0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-  gl->enableAlphaBlending ();
+  gl.enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  gl->enableTexture (texcross2->textureID);
+  gl.enableTexture (texcross2->textureID);
   int crossradius = width / 35;
 
   glTranslatef (mousex, mousey, 0);
@@ -382,7 +382,7 @@ void drawMouseCursor ()
   glEnd ();
   glDisable (GL_ALPHA_TEST);
   glDisable (GL_TEXTURE_2D);
-  gl->disableAlphaBlending ();
+  gl.disableAlphaBlending ();
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
@@ -697,18 +697,18 @@ int game_levelInit ()
       {
         int type = fighter [i]->missilerack [i2];
         Model3d *rm = getModel (MISSILE1 + type);
-        fighter [i]->refmodel [i2 * 3] = rm;
-        fighter [i]->refmodel [i2 * 3 + 1] = rm;
-        fighter [i]->refmodel [i2 * 3 + 2] = rm;
-        fighter [i]->reftl [i2 * 3 + 1].z = fighter [i]->reftl [i2 * 3].z - 0.04;
-        fighter [i]->reftl [i2 * 3 + 2].z = fighter [i]->reftl [i2 * 3].z + 0.04;
-        fighter [i]->reftl [i2 * 3].y = fighter [i]->reftl [i2 * 3 + 1].y - 0.04;
+        fighter [i]->refModel [i2 * 3] = rm;
+        fighter [i]->refModel [i2 * 3 + 1] = rm;
+        fighter [i]->refModel [i2 * 3 + 2] = rm;
+        fighter [i]->refTl [i2 * 3 + 1].z = fighter [i]->refTl [i2 * 3].z - 0.04;
+        fighter [i]->refTl [i2 * 3 + 2].z = fighter [i]->refTl [i2 * 3].z + 0.04;
+        fighter [i]->refTl [i2 * 3].y = fighter [i]->refTl [i2 * 3 + 1].y - 0.04;
         int tmp = fighter [i]->missilerackn [i2];
-        fighter [i]->refscale [i2 * 3] = 0.25;
-        fighter [i]->refscale [i2 * 3 + 1] = 0.25;
-        fighter [i]->refscale [i2 * 3 + 2] = 0.25;
-        if (tmp < 3) fighter [i]->refscale [i2 * 3] = 0;
-        if (tmp < 2) fighter [i]->refscale [i2 * 3 + 1] = 0;
+        fighter [i]->refScale [i2 * 3] = 0.25;
+        fighter [i]->refScale [i2 * 3 + 1] = 0.25;
+        fighter [i]->refScale [i2 * 3 + 2] = 0.25;
+        if (tmp < 3) fighter [i]->refScale [i2 * 3] = 0;
+        if (tmp < 2) fighter [i]->refScale [i2 * 3 + 1] = 0;
       }
   }
 
@@ -796,7 +796,7 @@ int game_levelInit ()
     {
       laser [i]->o = &model_cannon1;
       laser [i]->zoom = 0.08;
-      laser [i]->drawlight = false;
+      laser [i]->drawLight = false;
     }
     else
     {
@@ -846,11 +846,11 @@ int game_levelInit ()
     }
     if (sungamma < 35)
     {
-      gl->setFogColor (127 + 70 - 2 * sungamma, 127, 127);
+      gl.setFogColor (127 + 70 - 2 * sungamma, 127, 127);
     }
     else
     {
-      gl->setFogColor (127, 127, 132);
+      gl.setFogColor (127, 127, 132);
     }
     skycolor.set (50, 200, 255);
     objsphere->setNorthPoleColor (skycolor, 1.8);
@@ -869,7 +869,7 @@ int game_levelInit ()
   {
     skycolor.set (64, 64, 64);
     objsphere->setColor (skycolor);
-    gl->setFogColor (64, 64, 64);
+    gl.setFogColor (64, 64, 64);
     if (l->type != LAND_MOON)
     {
       skycolor.set (0, 0, 170);
@@ -887,7 +887,7 @@ int game_levelInit ()
   {
     skycolor.set (102, 102, 102);
     objsphere->setColor (skycolor);
-    gl->setFogColor (102, 102, 102);
+    gl.setFogColor (102, 102, 102);
     skycolor.set (102, 102, 102);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
@@ -895,7 +895,7 @@ int game_levelInit ()
   {
     skycolor.set (40, 40, 40);
     objsphere->setColor (skycolor);
-    gl->setFogColor (40, 40, 40);
+    gl.setFogColor (40, 40, 40);
     skycolor.set (40, 40, 40);
     objsphere->setNorthPoleColor (skycolor, 1.8);
   }
@@ -903,7 +903,7 @@ int game_levelInit ()
   {
     skycolor.set (20, 20, 20);
     objsphere->setColor (skycolor);
-    gl->setFogColor (20, 20, 20);
+    gl.setFogColor (20, 20, 20);
   }
   glDeleteLists (objsphere->list1, 1);
   glDeleteLists (objsphere->list2, 1);
@@ -1297,6 +1297,7 @@ void event_setAntialiasing ()
       texsun->shadeLinear ();
       texearth->shadeLinear ();
     }
+    Model3d::antialiasing = true;
   }
   else
   {
@@ -1308,6 +1309,7 @@ void event_setAntialiasing ()
       texsun->shadeConst ();
       texearth->shadeConst ();
     }
+    Model3d::antialiasing = false;
   }
 }
 
@@ -1464,12 +1466,12 @@ void game_key (int key, int x, int y)
   {
     event_targetLocking ();
   }
-/*  else if (key == 'K')
+  else if (key == 'K')
   {
     if (fplayer->target != NULL)
       fplayer->target->shield = -1;
   }
-  else if (key == 'V')
+/*  else if (key == 'V')
   {
     visibleangle += 10.0;
     if (visibleangle > 120.0) visibleangle = 50.0;
@@ -1806,7 +1808,7 @@ void frame ()
 void game_view ()
 {
   frame ();
-  gl->swapBuffers ();
+  gl.swapBuffers ();
 }
 
 int missionending = 0;
@@ -2159,8 +2161,8 @@ void mission_mouse (int button, int state, int x, int y)
 void drawArrow (float x, float y, float w, float h)
 {
   float zf = -3;
-  gl->enableTexture (texarrow->textureID);
-  gl->enableAlphaBlending ();
+  gl.enableTexture (texarrow->textureID);
+  gl.enableAlphaBlending ();
   glBegin (GL_QUADS);
   glColor3ub (180, 180, 180);
 
@@ -2205,7 +2207,7 @@ void mission_display ()
   Color *colorstd = &colorred;
   if (p->mission_state [missionnew->id] == 1)
     colorstd = &colorblue;
-  Color *col = &menu_colwhite;
+  Color *col = &StandardTextColor;
   Font *font2 = font1;
 
   Vector3 vec;
@@ -2467,10 +2469,11 @@ void fighter_display ()
   ffighter.o = model;
   ffighter.newinit (id, 1, 0);
 
+  Color *col = &StandardTextColor;
   float fontzoom = 0.7;
   float textx = -9.5;
   font1->zoom = 0.07;
-  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), &menu_colwhite);
+  font1->drawText (textx / fontzoom, 9.7 / fontzoom, -2, getModelName (id), col);
   float yf = 9.6 - 1.35;
   strcpy (buf, "TYPE: ");
   if (ffighter.id == FIGHTER_FALCON || ffighter.id == FIGHTER_CROW || ffighter.id == FIGHTER_BUZZARD || ffighter.id == FIGHTER_REDARROW || ffighter.id == FIGHTER_BLACKBIRD)
@@ -2479,29 +2482,29 @@ void fighter_display ()
     strcat (buf, "FIGHTER-BOMBER");
   else
     strcat (buf, "BOMBER");
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
   yf -= 1;
   strcpy (buf, "SPEED: ");
   int stars = (int) ((ffighter.maxthrust - 0.2) * 40);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "NIMBILITY: ");
   stars = (int) ((ffighter.manoeverability - 0.3) * 20 + 1);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "SHIELD: ");
   stars = (int) ((ffighter.maxshield - 30) / 30);
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   yf -= 1;
   strcpy (buf, "FIREPOWER: ");
   stars = ffighter.statfirepower;
-  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, &menu_colwhite);
+  font1->drawText (textx / fontzoom, yf / fontzoom, -2, buf, col);
   for (i = 0; i < stars; i ++)
     drawMedal (4 + i * 1.1, yf + 0.7, -2, 0, 1, MISSION_CAMPAIGN1);
   font1->zoom = 0.1;
@@ -2519,6 +2522,7 @@ void fame_display ()
   int i, i2;
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
+  Color *col = &StandardTextColor;
   float textx = -10;
   int sum = 0;
   for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
@@ -2545,9 +2549,9 @@ void fame_display ()
     font1->zoom = 0.07;
     drawRank (textx + 0.2, i - 3.7, -2, p->tp [index [i]]->ranking, 0.7);
     sprintf (buf, "%s %s", p->tp [index [i]]->getRank (), p->tp [index [i]]->name);
-    font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, &menu_colwhite);
+    font1->drawText ((textx + 2) / 0.7, (i - 3.7) / 0.7, -2, buf, col);
     sprintf (buf, "%d", p->tp [index [i]]->fighterkills);
-    font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, &menu_colwhite);
+    font1->drawText ((textx + 18) / 0.7, (i - 3.7) / 0.7, -2, buf, col);
     font1->zoom = 0.1;
   }
 
@@ -2595,7 +2599,7 @@ void game_quit ()
   delete font2;
   delete space;
   delete dirs;
-  delete gl;
+//  delete gl;
 #ifndef USE_GLUT
 //  SDL_CloseAudio();
 //  SDL_FreeWAV(wave.sound);
@@ -2678,7 +2682,7 @@ void stats_display ()
   Color *color;
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
-  color = &menu_colwhite;
+  color = &StandardTextColor;
   if (missionstate == 1)
   {
     font1->drawTextCentered (0, 7, -2, "SUCCESS", &colorblue);
@@ -3056,7 +3060,7 @@ void quit_display ()
   quitmenu.setVisible (true);
   quitmenu.draw ();
 
-  font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", &menu_colwhite);
+  font1->drawTextCentered (0, 0, -2, "REALLY QUIT?", &StandardTextColor);
 
   drawMouseCursor ();
 }
@@ -3190,7 +3194,7 @@ void game_display ()
     mylight = mylight / 5.0 + 0.8;
   else if (mylight > 1.0 && !day)
     mylight = mylight / 5.0 + 0.8;
-  gl->fogLuminance = mylight;
+  gl.setFogLuminance (mylight);
   sphere->drawGL (tlminf, tlinf, tlnull, space->alpha, mylight, true, false);
 
   if (weather == WEATHER_SUNNY || weather == WEATHER_CLOUDY)
@@ -3219,7 +3223,7 @@ void game_display ()
   {
     float cloudfog = pseudoview;
     if (cloudfog > 110) cloudfog = 110;
-    gl->enableFog (cloudfog * GLOBALSCALE, quality <= 5);
+    gl.enableFog (cloudfog * GLOBALSCALE, quality <= 5);
 
     highclouds->zoom = 400;
     float ch2 = -382 - fplayer->tl->y / 10.0;
@@ -3244,17 +3248,17 @@ void game_display ()
     if (l->type == LAND_MOON && !day)
       zf = -8; // diplay bigger earth
     glTranslatef (0, 0, zf);
-    gl->extractFrustum ();
-    if (gl->isPointInFrustum (-1, 1, 0) || gl->isPointInFrustum (-1, -1, 0) ||
-        gl->isPointInFrustum (1, -1, 0) || gl->isPointInFrustum (1, 1, 0))
+    frustum.extractFrustum ();
+    if (frustum.isPointInFrustum (-1, 1, 0) || frustum.isPointInFrustum (-1, -1, 0) ||
+        frustum.isPointInFrustum (1, -1, 0) || frustum.isPointInFrustum (1, 1, 0))
     {
       glDisable (GL_DEPTH_TEST);
-      if (day) gl->enableTexture (texsun->textureID);
-      else if (l->type != LAND_MOON) gl->enableTexture (texmoon->textureID);
-      else gl->enableTexture (texearth->textureID);
+      if (day) gl.enableTexture (texsun->textureID);
+      else if (l->type != LAND_MOON) gl.enableTexture (texmoon->textureID);
+      else gl.enableTexture (texearth->textureID);
       if (day && l->type != 1)
         glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      gl->enableAlphaBlending ();
+      gl.enableAlphaBlending ();
       glEnable (GL_ALPHA_TEST);
       float alphamax = 0.1;
       if (day) alphamax = 0.1;
@@ -3293,7 +3297,7 @@ void game_display ()
       glDisable (GL_ALPHA_TEST);
       glEnable (GL_DEPTH_TEST);
       glDisable (GL_TEXTURE_2D);
-      gl->disableAlphaBlending ();
+      gl.disableAlphaBlending ();
     }
   }
 
@@ -3315,18 +3319,18 @@ void game_display ()
 
   if (camera != 50)
   {
-    gl->enableFog (pseudoview * GLOBALSCALE, quality <= 5);
+    gl.enableFog (pseudoview * GLOBALSCALE, quality <= 5);
   }
 
   // draw terrain
-  l->calcDynamicLight (explosion, laser, (DynamicObj **) missile, flare);
+  l->calcDynamicLight (explosion, (SpaceObj **) laser, (SpaceObj **) missile, (SpaceObj **) flare);
   glEnable (GL_CULL_FACE);
   glCullFace (GL_FRONT);
   l->draw ((int) mycamphi, (int) (-mycamgamma + 180.0));
   glDisable (GL_CULL_FACE);
 
   // draw objects
-  gl->extractFrustum ();
+  frustum.extractFrustum ();
   if (camera != 50)
   {
     space->lum = sunlight;
@@ -3367,7 +3371,7 @@ void game_display ()
       {
         AIObj *dobj = (AIObj *) space->o [i];
         if (dobj->id >= MISSILE1)
-          if (dobj->draw && dobj->drawlight && dobj->active)
+          if (dobj->draw && dobj->drawLight && dobj->active)
           {
             if (dobj->smoke)
               if ((dobj->id >= MISSILE1 && dobj->id <= MISSILE2) || (dobj->id >= FIGHTER1 && dobj->id <= FIGHTER2))
@@ -3438,8 +3442,8 @@ void game_display ()
 
         if (gluUnProject (flarex, flarey, flarez_win, modl, proj, vp, &objx, &objy, &objz)==GL_TRUE)
         {
-          gl->enableTexture (tex->textureID);
-          gl->enableAlphaBlending ();
+          gl.enableTexture (tex->textureID);
+          gl.enableAlphaBlending ();
           glDisable (GL_ALPHA_TEST);
           glDisable (GL_DEPTH_TEST);
           glDisable (GL_FOG);
@@ -3459,7 +3463,7 @@ void game_display ()
       }
       glEnable (GL_DEPTH_TEST);
       glDisable (GL_TEXTURE_2D);
-      gl->disableAlphaBlending ();
+      gl.disableAlphaBlending ();
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
@@ -3524,7 +3528,7 @@ void game_display ()
       glVertex3f (xf, yf, -zf);
       glVertex3f (xf, -yf, -zf);
       glEnd ();
-      gl->disableAlphaBlending ();
+      gl.disableAlphaBlending ();
       glDisable (GL_BLEND);
       glEnable (GL_DEPTH_TEST);
     }
@@ -4182,12 +4186,12 @@ void myInit ()
   }
   for (i = 0; i < maxexplosion; i ++)
   {
-    explosion [i] = new CExplosion (space, explsphere);
+    explosion [i] = new Explosion (space, explsphere);
   }
 
   for (i = 0; i < maxblacksmoke; i ++)
   {
-    blacksmoke [i] = new CBlackSmoke (space);
+    blacksmoke [i] = new BlackSmoke (space);
   }
 
   for (i = 0; i < maxfighter; i ++)
@@ -4204,12 +4208,12 @@ void myInit ()
   highclouds2->setTexture (texclouds3);
 
   objsphere = new Sphere (1, 9, 1, 1, 1);
-  sphere = new CSpaceObj (objsphere, 10.0);
+  sphere = new SpaceObj (objsphere, 10.0);
   sphere->rot->a = 90;
   sphere->rot->b = 90;
   sphere->rot->c = 270;
   sphere->draw = 2;
-  sphere->drawlight = false;
+  sphere->drawLight = false;
 
   flash1 = new Flash ();
 
@@ -4283,7 +4287,8 @@ void myFirstInit ()
   mathtab_init ();
 
   display ("Creating advanced OpenGL methods", LOG_ALL);
-  gl = new GlPrimitives ();
+//  gl = new GlPrimitives ();
+//  frustum = new Frustum ();
 
   // create textures (OpenGL)
   display ("Loading textures", LOG_ALL);
@@ -4314,10 +4319,10 @@ void myFirstInit ()
   texmoon = new Texture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
   texearth = new Texture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
   // TODO: why doesn't !mipmap work for the flares???
-  texflare1 = new Texture (std::string (dirs->getTextures ("flare1.tga")), -1, 0, true);
-  texflare2 = new Texture (std::string (dirs->getTextures ("flare2.tga")), -1, 0, true);
-  texflare3 = new Texture (std::string (dirs->getTextures ("flare3.tga")), -1, 0, true);
-  texflare4 = new Texture (std::string (dirs->getTextures ("flare4.tga")), -1, 0, true);
+  texflare1 = new Texture (std::string (dirs->getTextures ("flare1.tga")), -1, 1, true);
+  texflare2 = new Texture (std::string (dirs->getTextures ("flare2.tga")), -1, 1, true);
+  texflare3 = new Texture (std::string (dirs->getTextures ("flare3.tga")), -1, 1, true);
+  texflare4 = new Texture (std::string (dirs->getTextures ("flare4.tga")), -1, 1, true);
   texcross = new Texture (std::string (dirs->getTextures ("cross.tga")), -1, 1, true);
   texcross2 = new Texture (std::string (dirs->getTextures ("cross2.tga")), -1, 1, true);
   texranks = new Texture (std::string (dirs->getTextures ("ranks.tga")), 0, 0, true);
@@ -4336,55 +4341,55 @@ void myFirstInit ()
 
   display ("Loading 3ds models:", LOG_ALL);
   display (" * gl-16.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_fig, dirs->getModels ("gl-16.3ds"));
+  g_Load3ds.import3ds (&model_fig, dirs->getModels ("gl-16.3ds"));
   model_fig.setName ("FALCON");
   display (" * gl-15.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figa, dirs->getModels ("gl-15.3ds"));
+  g_Load3ds.import3ds (&model_figa, dirs->getModels ("gl-15.3ds"));
   model_figa.setName ("SWALLOW");
   display (" * gl-14c.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figb, dirs->getModels ("gl-14c.3ds"));
+  g_Load3ds.import3ds (&model_figb, dirs->getModels ("gl-14c.3ds"));
   model_figb.setName ("HAWK");
   display (" * gl-14d.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figc, dirs->getModels ("gl-14d.3ds"));
+  g_Load3ds.import3ds (&model_figc, dirs->getModels ("gl-14d.3ds"));
   model_figc.setName ("HAWK II");
   display (" * gl-21b.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figd, dirs->getModels ("gl-21b.3ds"));
+  g_Load3ds.import3ds (&model_figd, dirs->getModels ("gl-21b.3ds"));
   model_figd.setName ("BUZZARD");
   display (" * gl-21.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_fige, dirs->getModels ("gl-21.3ds"));
+  g_Load3ds.import3ds (&model_fige, dirs->getModels ("gl-21.3ds"));
   model_fige.setName ("CROW");
   display (" * gl-14b.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figf, dirs->getModels ("gl-14b.3ds"));
+  g_Load3ds.import3ds (&model_figf, dirs->getModels ("gl-14b.3ds"));
   model_figf.setName ("PHOENIX");
   display (" * gl-14.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figg, dirs->getModels ("gl-14.3ds"));
+  g_Load3ds.import3ds (&model_figg, dirs->getModels ("gl-14.3ds"));
   model_figg.setName ("RED ARROW");
   display (" * gl-29.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figh, dirs->getModels ("gl-29.3ds"));
+  g_Load3ds.import3ds (&model_figh, dirs->getModels ("gl-29.3ds"));
   model_figh.setName ("BLACKBIRD");
   model_figh.scaleTexture (0.3, 0.3);
   display (" * gl-50.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figi, dirs->getModels ("gl-50.3ds"));
+  g_Load3ds.import3ds (&model_figi, dirs->getModels ("gl-50.3ds"));
   model_figi.setName ("STORM");
   display (" * transp2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figt, dirs->getModels ("transp2.3ds"));
+  g_Load3ds.import3ds (&model_figt, dirs->getModels ("transp2.3ds"));
   model_figt.setName ("TRANSPORT");
   display (" * transp4.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_figu, dirs->getModels ("transp4.3ds"));
+  g_Load3ds.import3ds (&model_figu, dirs->getModels ("transp4.3ds"));
   model_figu.setName ("TRANSPORT");
 
   // cannon at daylight
   float cannoncube = 0.025;
   display (" * cannon1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_cannon1, dirs->getModels ("cannon1.3ds"));
+  g_Load3ds.import3ds (&model_cannon1, dirs->getModels ("cannon1.3ds"));
   model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
   display (" * cannon1b.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
+  g_Load3ds.import3ds (&model_cannon1b, dirs->getModels ("cannon1b.3ds"));
   model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
 
   // cannon at night
   display (" * cannon2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_cannon2, dirs->getModels ("cannon2.3ds"));
+  g_Load3ds.import3ds (&model_cannon2, dirs->getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
   model_cannon2.alpha = true;
   for (i = 0; i < 4; i ++)
@@ -4399,7 +4404,7 @@ void myFirstInit ()
   model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
 
   display (" * cannon2b.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
+  g_Load3ds.import3ds (&model_cannon2b, dirs->getModels ("cannon2b.3ds"));
   model_cannon2b.nolight = true;
   model_cannon2b.alpha = true;
   for (int i2 = 0; i2 < 2; i2 ++)
@@ -4417,125 +4422,125 @@ void myFirstInit ()
   model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
 
   display (" * flare1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
+  g_Load3ds.import3ds (&model_flare1, dirs->getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;
   model_flare1.nolight = true;
   display (" * chaff1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_chaff1, dirs->getModels ("chaff1.3ds"));
+  g_Load3ds.import3ds (&model_chaff1, dirs->getModels ("chaff1.3ds"));
   model_chaff1.setName ("CHAFF");
   model_chaff1.alpha = true;
   model_chaff1.nolight = true;
   display (" * missile1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile1, dirs->getModels ("missile1.3ds"));
+  g_Load3ds.import3ds (&model_missile1, dirs->getModels ("missile1.3ds"));
   model_missile1.setName ("AAM HS MK1");
   display (" * missile2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile2, dirs->getModels ("missile2.3ds"));
+  g_Load3ds.import3ds (&model_missile2, dirs->getModels ("missile2.3ds"));
   model_missile2.setName ("AAM HS MK2");
   display (" * missile3.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile3, dirs->getModels ("missile3.3ds"));
+  g_Load3ds.import3ds (&model_missile3, dirs->getModels ("missile3.3ds"));
   model_missile3.setName ("AAM HS MK3");
   display (" * missile4.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile4, dirs->getModels ("missile4.3ds"));
+  g_Load3ds.import3ds (&model_missile4, dirs->getModels ("missile4.3ds"));
   model_missile4.setName ("AGM MK1");
   display (" * missile5.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile5, dirs->getModels ("missile5.3ds"));
+  g_Load3ds.import3ds (&model_missile5, dirs->getModels ("missile5.3ds"));
   model_missile5.setName ("AGM MK2");
   display (" * missile6.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile6, dirs->getModels ("missile6.3ds"));
+  g_Load3ds.import3ds (&model_missile6, dirs->getModels ("missile6.3ds"));
   model_missile6.setName ("DFM");
   display (" * missile7.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile7, dirs->getModels ("missile7.3ds"));
+  g_Load3ds.import3ds (&model_missile7, dirs->getModels ("missile7.3ds"));
   model_missile7.setName ("AAM FF MK1");
   display (" * missile8.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_missile8, dirs->getModels ("missile8.3ds"));
+  g_Load3ds.import3ds (&model_missile8, dirs->getModels ("missile8.3ds"));
   model_missile8.setName ("AAM FF MK2");
   display (" * flak2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_flak1, dirs->getModels ("flak2.3ds"));
+  g_Load3ds.import3ds (&model_flak1, dirs->getModels ("flak2.3ds"));
   model_flak1.setName ("SA CANNON");
   display (" * flarak1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_flarak1, dirs->getModels ("flarak1.3ds"));
+  g_Load3ds.import3ds (&model_flarak1, dirs->getModels ("flarak1.3ds"));
   model_flarak1.setName ("SAM");
   display (" * ship1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_ship1, dirs->getModels ("ship1.3ds"));
+  g_Load3ds.import3ds (&model_ship1, dirs->getModels ("ship1.3ds"));
   model_ship1.setName ("CRUISER");
   display (" * tent1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_tent1, dirs->getModels ("tent1.3ds"));
+  g_Load3ds.import3ds (&model_tent1, dirs->getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
   display (" * gl-117.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_gl117, dirs->getModels ("gl-117.3ds"));
+  g_Load3ds.import3ds (&model_gl117, dirs->getModels ("gl-117.3ds"));
   model_gl117.displaylist = false;
   display (" * tank1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_tank1, dirs->getModels ("tank1.3ds"));
+  g_Load3ds.import3ds (&model_tank1, dirs->getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
   display (" * container1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_container1, dirs->getModels ("container1.3ds"));
+  g_Load3ds.import3ds (&model_container1, dirs->getModels ("container1.3ds"));
   model_container1.setName ("CONTAINER");
   display (" * ship2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_ship2, dirs->getModels ("ship2.3ds"));
+  g_Load3ds.import3ds (&model_ship2, dirs->getModels ("ship2.3ds"));
   model_ship2.setName ("LIGHT DESTROYER");
   display (" * truck1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_truck1, dirs->getModels ("truck1.3ds"));
+  g_Load3ds.import3ds (&model_truck1, dirs->getModels ("truck1.3ds"));
   model_truck1.setName ("TRUCK");
   display (" * truck2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_truck2, dirs->getModels ("truck2.3ds"));
+  g_Load3ds.import3ds (&model_truck2, dirs->getModels ("truck2.3ds"));
   model_truck2.setName ("TRUCK");
   display (" * trsam.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_trsam, dirs->getModels ("trsam.3ds"));
+  g_Load3ds.import3ds (&model_trsam, dirs->getModels ("trsam.3ds"));
   model_trsam.setName ("MOBILE SAM");
   display (" * pickup1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_pickup1, dirs->getModels ("pickup1.3ds"));
+  g_Load3ds.import3ds (&model_pickup1, dirs->getModels ("pickup1.3ds"));
   model_pickup1.setName ("PICKUP");
   display (" * pickup2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_pickup2, dirs->getModels ("pickup2.3ds"));
+  g_Load3ds.import3ds (&model_pickup2, dirs->getModels ("pickup2.3ds"));
   model_pickup2.setName ("PICKUP");
   display (" * tank2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_tank2, dirs->getModels ("tank2.3ds"));
+  g_Load3ds.import3ds (&model_tank2, dirs->getModels ("tank2.3ds"));
   model_tank2.setName ("PANTHER");
   model_tank2.scaleTexture (0.5, 0.5);
   display (" * tent4.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_tent4, dirs->getModels ("tent4.3ds"));
+  g_Load3ds.import3ds (&model_tent4, dirs->getModels ("tent4.3ds"));
   model_tent4.setName ("BIG TENT");
   display (" * hall1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_hall1, dirs->getModels ("hall1.3ds"));
+  g_Load3ds.import3ds (&model_hall1, dirs->getModels ("hall1.3ds"));
   model_hall1.setName ("HALL");
   display (" * hall2.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_hall2, dirs->getModels ("hall2.3ds"));
+  g_Load3ds.import3ds (&model_hall2, dirs->getModels ("hall2.3ds"));
   model_hall2.setName ("HALL");
   display (" * oilrig.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_oilrig, dirs->getModels ("oilrig.3ds"));
+  g_Load3ds.import3ds (&model_oilrig, dirs->getModels ("oilrig.3ds"));
   model_oilrig.setName ("OILRIG");
   model_oilrig.alpha = true;
   display (" * egg.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_egg, dirs->getModels ("egg.3ds"));
+  g_Load3ds.import3ds (&model_egg, dirs->getModels ("egg.3ds"));
   model_egg.scaleTexture (0.08, 0.08);
   model_egg.setName ("COMPLEX");
   display (" * radar.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_radar, dirs->getModels ("radar.3ds"));
+  g_Load3ds.import3ds (&model_radar, dirs->getModels ("radar.3ds"));
   model_radar.setName ("RADAR");
   display (" * mine1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_mine1, dirs->getModels ("mine1.3ds"));
+  g_Load3ds.import3ds (&model_mine1, dirs->getModels ("mine1.3ds"));
   model_mine1.setName ("MINE");
   display (" * aster1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_aster1, dirs->getModels ("aster1.3ds"));
+  g_Load3ds.import3ds (&model_aster1, dirs->getModels ("aster1.3ds"));
   model_aster1.setName ("ASTEROID");
   display (" * base1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_base1, dirs->getModels ("base1.3ds"));
+  g_Load3ds.import3ds (&model_base1, dirs->getModels ("base1.3ds"));
   model_base1.setName ("MOON BASE");
   display (" * barrier.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_barrier1, dirs->getModels ("barrier.3ds"));
+  g_Load3ds.import3ds (&model_barrier1, dirs->getModels ("barrier.3ds"));
   model_barrier1.setName ("MOON BASE");
   model_barrier1.scaleTexture (10, 10);
   model_barrier1.alpha = true;
   display (" * rubble.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_rubble1, dirs->getModels ("rubble.3ds"));
+  g_Load3ds.import3ds (&model_rubble1, dirs->getModels ("rubble.3ds"));
   model_base1.setName ("RUBBLE");
   display (" * depot1.3ds", LOG_ALL);
-  g_Load3ds.Import3DS (&model_depot1, dirs->getModels ("depot1.3ds"));
+  g_Load3ds.import3ds (&model_depot1, dirs->getModels ("depot1.3ds"));
   model_depot1.setName ("DEPOT");
   model_depot1.scaleTexture (2, 2);
-  g_Load3ds.Import3DS (&model_house1, dirs->getModels ("house1.3ds"));
+  g_Load3ds.import3ds (&model_house1, dirs->getModels ("house1.3ds"));
   model_house1.setName ("HOUSE");
 
   setMissiles (&model_fig);
@@ -4557,7 +4562,7 @@ void myFirstInit ()
 
   display ("Setting up world geometry", LOG_ALL);
   space = new Space ();
-  space->drawlight = true;
+  space->drawLight = true;
   clip1 = space->z1;
   clip2 = space->z2;
   clip1->x = -ZOOM;
@@ -4601,7 +4606,7 @@ void myFirstInit ()
 
 void init_key (int key, int x, int y)
 {
-  gl->clearBuffers (); // exit intro
+  gl.clearBuffers (); // exit intro
   myInit ();
   switch_menu ();
   fplayer->ai = true;
@@ -4655,7 +4660,7 @@ void init_display ()
     glColor3ub (col, col, col);
     glPushMatrix ();
     glTranslatef (0, 0.5F, 0);
-    gl->enableTexture (textitle->textureID);
+    gl.enableTexture (textitle->textureID);
     if (antialiasing)
       textitle->shadeLinear ();
     else
@@ -4684,7 +4689,7 @@ void init_display ()
 
   float xf = 1.75F, yf = 1.78F, zf = 2.0F;
   glPushMatrix ();
-  gl->enableTexture (5000);
+  gl.enableTexture (5000);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   glBegin (GL_QUADS);
   glTexCoord2d (0, 1);
@@ -5543,7 +5548,7 @@ int speedTest ()
       glEnd ();
     }
 
-    gl->swapBuffers ();
+    gl.swapBuffers ();
 
   }
   return frames;

@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -24,7 +24,7 @@
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
 
-#include "model.h" // ok
+#include "model3d/Model3d.h" // ok
 #include "aiobject.h" // ok
 
 #define MISSION_DEMO 0

@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -27,25 +27,31 @@
 class Dirs
 {
   public:
-  char dir [4096];
-  char saves [4096]; // path to saves, UNIX and Windows differ
-  char textures [4096]; // path to textures, ...
-  char music [4096];
-  char sound [4096];
-  char models [4096];
-  char maps [4096];
 
-  void append (char *target, char *str); // append subdir/file to path using (back-)slashes
-  Dirs (char *arg);
-  virtual ~Dirs ();
-  char *getSaves (char *name); // get dir name containing the saves, ...
-  char *getTextures (char *name);
-  char *getSounds (char *name);
-  char *getMusic (char *name);
-  char *getModels (char *name);
-  char *getMaps (char *name);
+    char dir [4096];
+    char saves [4096];    ///< path to saves, UNIX and Windows differ
+    char textures [4096]; ///< path to textures...
+    char music [4096];
+    char sound [4096];
+    char models [4096];
+    char maps [4096];
+
+    Dirs (char *arg);
+    virtual ~Dirs ();
+
+    /// get dir name containing the saves...
+    char *getSaves (char *name);
+    char *getTextures (char *name);
+    char *getSounds (char *name);
+    char *getMusic (char *name);
+    char *getModels (char *name);
+    char *getMaps (char *name);
+  
+  protected:
+
+    void append (char *target, char *str); // append subdir/file to path using (back-)slashes
 };
 
-extern Dirs *dirs; // paths to directories with game data or saves
+extern Dirs *dirs; ///< paths to directories with game data or saves
 
 #endif

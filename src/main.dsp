@@ -1,0 +1,434 @@
+# Microsoft Developer Studio Project File - Name="main" - Package Owner=<4>
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
+# ** NICHT BEARBEITEN **
+
+# TARGTYPE "Win32 (x86) Console Application" 0x0103
+
+CFG=main - Win32 Debug
+!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
+!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE 
+!MESSAGE NMAKE /f "main.mak".
+!MESSAGE 
+!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
+!MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
+!MESSAGE 
+!MESSAGE NMAKE /f "main.mak" CFG="main - Win32 Debug"
+!MESSAGE 
+!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE 
+!MESSAGE "main - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "main - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE 
+
+# Begin Project
+# PROP AllowPerConfigDependencies 0
+# PROP Scc_ProjName ""
+# PROP Scc_LocalPath ""
+CPP=cl.exe
+RSC=rc.exe
+
+!IF  "$(CFG)" == "main - Win32 Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "Release"
+# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "Release"
+# PROP Intermediate_Dir "Release"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD BASE RSC /l 0x407 /d "NDEBUG"
+# ADD RSC /l 0x407 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib SDL_net.lib /nologo /subsystem:console /machine:I386
+
+!ELSEIF  "$(CFG)" == "main - Win32 Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /MD /W3 /GX /ZI /Od /I "c:/cygwin/home/tom/gl-117/gl-117/src" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD BASE RSC /l 0x407 /d "_DEBUG"
+# ADD RSC /l 0x407 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib SDL_net.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+
+!ENDIF 
+
+# Begin Target
+
+# Name "main - Win32 Release"
+# Name "main - Win32 Debug"
+# Begin Group "model3d"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\model3d\Color.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Material.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Model3d.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Model3d.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Object3d.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Quad.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Rotation.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Space.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\SpaceObj.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Sphere.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\SpherePart.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Texture.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Triangle.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Vector2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Vector3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\model3d\Vertex.cpp
+# End Source File
+# End Group
+# Begin Group "opengl"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\opengl\Frustum.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\opengl\GlPrimitives.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\opengl\GlPrimitives.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\opengl\includegl.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\opengl\VertexArray.cpp
+# End Source File
+# End Group
+# Begin Group "loadmodel"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\loadmodel\BinaryFile3ds.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\Load3ds.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\Load3ds.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\LoadObj.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\LoadObj.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadmodel\TextFileObj.cpp
+# End Source File
+# End Group
+# Begin Group "loadbitmap"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\loadbitmap\LoadTga.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\loadbitmap\LoadTga.h
+# End Source File
+# End Group
+# Begin Group "landscape"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\landscape\Landscape.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\landscape\Landscape.h
+# End Source File
+# End Group
+# Begin Group "gllandscape"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\gllandscape\GlLandscape.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\gllandscape\GlLandscape.h
+# End Source File
+# End Group
+# Begin Group "filetokenizer"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\filetokenizer\FileTokenizer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\filetokenizer\FileTokenizer.h
+# End Source File
+# End Group
+# Begin Group "effects"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\effects\BlackSmoke.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\effects.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\Explosion.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\Flash.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\Font.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\HighClouds.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\Smoke.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\effects\Star.cpp
+# End Source File
+# End Group
+# Begin Group "sound"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\sound\SoundSystem.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\sound\SoundSystem.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\sound\WaveFile.cpp
+# End Source File
+# End Group
+# Begin Group "menu"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\menu\Button.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\Component.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\Component.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\Container.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\EditField.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\EditJoystick.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\EditKey.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\Label.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\menu\TextField.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\aiobject.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\aiobject.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\cockpit.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\cockpit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\common.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\common.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\conf.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\conf.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dirs.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\dirs.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\main.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\main.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\maploader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\maploader.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mathtab.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mathtab.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mission.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\net.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\net.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pilots.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\pilots.h
+# End Source File
+# End Target
+# End Project

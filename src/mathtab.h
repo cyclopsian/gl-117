@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -25,7 +25,7 @@
 #define IS_MATHTAB_H
 
 extern float sine[], cosi[]; // sine and cosine tables (only use for approximations)
-extern float PI;
+//extern float PI;
 
 extern void mathtab_init (); // calculate tables
 extern int myrandom (int n); // random integer number [0;n-1]

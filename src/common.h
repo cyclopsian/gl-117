@@ -1,3 +1,24 @@
+/*
+    GL-117
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
+
+    This file is part of GL-117.
+
+    GL-117 is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    GL-117 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GL-117; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 #ifndef IS_COMMON_H
 #define IS_COMMON_H
 
@@ -19,33 +40,7 @@
 #undef HAVE_SDL_MIXER
 #endif
 
-// APPLE path is different (thanks Minami)
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_thread.h"
-#ifdef HAVE_SDL_MIXER
-#include "SDL/SDL_mixer.h"
-#endif
-#ifdef HAVE_SDL_NET
-#include "SDL/SDL_net.h"
-#endif
-#endif
-#ifndef __APPLE__
-#ifdef USE_GLUT
-#include <GL/glut.h>
-#else
-#include <GL/glut.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_thread.h"
-#ifdef HAVE_SDL_MIXER
-#include "SDL/SDL_mixer.h"
-#endif
-#ifdef HAVE_SDL_NET
-#include "SDL/SDL_net.h"
-#endif
-#endif
-#endif // __APPLE__
+#include "opengl/includegl.h"
 
 // data types
 #ifdef USE_GLUT
@@ -145,8 +140,8 @@ const int maxexplosion = 30, maxfighter = 30, maxlaser = 150, maxmissile = 30, m
 //#define COS(x) cosi[(int)x]
 
 // exact sine, cosine functions
-#define SIN(x) sin(x*PI/180.0)
-#define COS(x) cos(x*PI/180.0)
+//#define SIN(x) sin(x*PI/180.0)
+//#define COS(x) cos(x*PI/180.0)
 
 // define common GLUT/SDL keys
 #ifdef USE_GLUT
@@ -243,9 +238,6 @@ extern void joystick2string (int key, char *buf);
 
 // current log/debug level (set to constants above)
 extern int debuglevel;
-
-// show collition detection
-extern int showcollision;
 
 #define STDSIZE 256 // typical temporary buffer size
 #define PATHSIZE 4096 // maximum path/directory string size

@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -25,7 +25,7 @@
 #define IS_COCKPIT_H
 
 #include "common.h" // ok
-#include "model.h" // ok
+#include "model3d/Model3d.h" // ok
 
 class Cockpit
 {

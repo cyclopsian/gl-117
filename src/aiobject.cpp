@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -24,7 +24,7 @@
 #ifndef IS_AIOBJECT_H
 
 #include "aiobject.h"
-#include "glland.h"
+#include "gllandscape/GlLandscape.h"
 #include "main.h"
 #include "mathtab.h"
 
@@ -1388,7 +1388,7 @@ AIObj::AIObj ()
   o = NULL;
   zoom = 1.0;
   aiinit ();
-  smoke = new CSmoke (0);
+  smoke = new Smoke (0);
 }
 
 AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
@@ -1397,7 +1397,7 @@ AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
   o = o2;
   zoom = zoom2;
   aiinit ();
-  smoke = new CSmoke (0);
+  smoke = new Smoke (0);
   space->addObject (this);
 }
 
@@ -1657,7 +1657,7 @@ void AIObj::decreaseMissile (int id)
   if (maxrack > 0)
   {
     missilerackn [ptrrack] --;
-    refscale [ptrrack * 3 + 2 - missilerackn [ptrrack]] = 0;
+    refScale [ptrrack * 3 + 2 - missilerackn [ptrrack]] = 0;
   }
 }
 
@@ -2138,7 +2138,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   Vector3 targetvec;
   if (target != NULL)
   {
-    targetvec.take (target->tl);
+    targetvec.set (target->tl);
     float disttarget = distance (&targetvec);
     if (disttarget > 30) disttarget = 30;
     targetvec.x += target->forcex * disttarget / 5;

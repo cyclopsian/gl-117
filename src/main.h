@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -39,10 +39,10 @@
     HAVE_SDL_NET: SDL_net installed */
 
 #include "aiobject.h" // ok
-#include "model.h" // ok
-#include "3ds.h" // ok
-#include "effects.h" // ok
-#include "audio.h" // ok
+#include "model3d/Model3d.h" // ok
+#include "loadmodel/Load3ds.h" // ok
+#include "effects/Effects.h" // ok
+#include "sound/SoundSystem.h" // ok
 #include "pilots.h" // ok
 
 extern Font *font1, *font2;
@@ -52,10 +52,10 @@ extern Texture *texradar1, *texradar2, *texarrow;
 
 extern PilotList *pilots; // other pilots of the Eagle Squad
 
-extern CExplosion *explosion [maxexplosion];
-extern CBlackSmoke *blacksmoke [maxblacksmoke];
+extern Explosion *explosion [maxexplosion];
+extern BlackSmoke *blacksmoke [maxblacksmoke];
 
-extern CLoad3DS g_Load3ds;
+extern Load3ds g_Load3ds;
 extern Model3d model_fig; // fighter models
 extern Model3d model_figa;
 extern Model3d model_figb;

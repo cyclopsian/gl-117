@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -29,10 +29,10 @@
 #include <math.h>
 #include "maploader.h"
 #include "main.h"
-#include "loader_tga.h"
-#include "fileloader.h"
+#include "loadbitmap/LoadTga.h"
+#include "filetokenizer/FileTokenizer.h"
 #include "dirs.h"
-#include "glland.h"
+#include "gllandscape/GlLandscape.h"
 
 int mapPilotname2Num (char *str)
 {
@@ -857,11 +857,11 @@ void MissionCustom::start ()
   if (l != NULL) delete l;
   if (strlen (mapfile) == 0)
   {
-    l = new GLLandscape (space, map_type, NULL);
+    l = new GlLandscape (map_type, NULL);
   }
   else
   {
-    l = new GLLandscape (space, map_type, NULL);
+    l = new GlLandscape (map_type, NULL);
 
     unsigned char *map;
     int mapx, mapy;

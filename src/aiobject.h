@@ -1,6 +1,6 @@
 /*
     GL-117
-    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
+    Copyright 2001-2004 Thomas A. Drexl aka heptargon
 
     This file is part of GL-117.
 
@@ -25,8 +25,8 @@
 #define IS_AIOBJECT_H
 
 #include "common.h" // ok
-#include "model.h" // ok
-#include "effects.h" // ok
+#include "model3d/Model3d.h" // ok
+#include "effects/Effects.h" // ok
 
 // id values of objects
 // non-AI air objects
@@ -100,7 +100,7 @@
 #define STATIC_DEPOT1 10304
 #define STATIC_BARRIER1 10400
 
-class DynamicObj : public CSpaceObj
+class DynamicObj : public SpaceObj
 {
   public:
   int id; // object type: FLARAK_AIR1, STATIC_TENT1, FIGHTER_SWALLOW, ...
@@ -215,7 +215,7 @@ class AIObj : public DynamicObj
   int firechaffttl;
   int ammo;
   int ttf; // time to fire missile, targeting mechanism
-  CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
+  Smoke *smoke; // bright smoke behind the object (fighter&missiles)
   Uint32 timer;
   int statfirepower; // firepower (missiles) statistics, number of stars
   bool dualshot; // one or two cannons?
