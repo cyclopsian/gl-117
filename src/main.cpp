@@ -7078,8 +7078,10 @@ void credits_display ()
   font2->drawTextCentered (0, 2, -2, "INTRO & MOON", &col);
   font1->drawTextCentered (0, 0, -2, "NORBERT DREXL", &col2);
 // Maybe later :)
-//  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
-//  font1->drawTextCentered (0, -6, -2, "PIOTR PAWLOW", &col2);
+  font2->drawTextCentered (0, -4, -2, "LENS FLARES & DEBUGGING", &col);
+  font1->drawTextCentered (0, -6, -2, "PIOTR PAWLOW", &col2);
+  font2->drawTextCentered (0, -10, -2, "DESIGN & INTERFACE", &col);
+  font1->drawTextCentered (0, -12, -2, "LOURENS VEEN", &col2);
 }
 
 void finish_display ()
@@ -7088,14 +7090,18 @@ void finish_display ()
   CColor col (255, 255, 255, 255);
   font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", &col);
   font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", &col);
-  font1->drawTextCentered (0, 6, -3, "THANK YOU FOR PLAYING GL-117.", &col);
+  font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", &col);
   font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", &col);
   font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", &col);
-  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY,", &col);
-  font1->drawTextCentered (0, -2, -3, "BY THOMAS ALEXANDER DREXL.", &col);
-  font1->drawTextCentered (0, -6, -3, "THANKS TO HOOPY, THE GREATEST UNIX FREAK OUT THERE,", &col);
-  font1->drawTextCentered (0, -8, -3, "JOSEF FOR HIS HELP TO DESIGN THE FIGHTER MODELS,", &col);
-  font1->drawTextCentered (0, -10, -3, "PIOTR FOR THE LENS FLARES AND BERND FOR HIS IDEAS.", &col);
+  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", &col);
+  font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", &col);
+  font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", &col);
+  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUND, MUSIC,", &col);
+  font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", &col);
+  font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", &col);
+  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED AND FEEDBACK ARRIVED,", &col);
+  font1->drawTextCentered (0, -14, -3, "SPECIAL THANKS TO BERNHARD KAINDL AND JOSEF DREXL,", &col);
+  font1->drawTextCentered (0, -16, -3, "AND THE UNIX AWARD GOES TO HOOPY ;-)", &col);
 }
 
 int vibration = 0;
@@ -7157,6 +7163,8 @@ void game_display ()
       sunlight = flash;
     }
   }
+
+  if (game != GAME_PLAY && sunlight > 0.9F) sunlight = 0.9F;
 
 /*  if (camera == 0 && l->glittering > 1.0F)
   {
