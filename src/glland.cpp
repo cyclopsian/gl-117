@@ -46,7 +46,7 @@ void GLLandscape::normalcrossproduct( float* a, float* b, float*c )
   norm (c);
 }
 
-float *GLLandscape::selectMaterial (int x, int y)
+/*float *GLLandscape::selectMaterial (int x, int y)
 {
   if (f [x] [y] == GRASS) return mata [0];
   else if (f [x] [y] >= CONIFEROUSWOODS1 && f [x] [y] <= MIXEDWOODS3) return mata [1];
@@ -66,7 +66,7 @@ float *GLLandscape::selectMaterial (int x, int y)
   else if (f [x] [y] == GREYSAND) return mata [14];
   else if (f [x] [y] == GRAVEL) return mata [15];
   else return mat [0];
-}
+}*/
 
 int GLLandscape::selectColor (int x, int y)
 {
@@ -100,9 +100,24 @@ void GLLandscape::precalculate ()
   float a[3];
   float c[3];
 
+  // initialize dynamic light mask
   memset (dl, 0, (MAXX + 1) * (MAXX + 1));
 
-  norm (lv);
+  norm (lv); // normalize light vector
+
+  // generate greyish material values for night if necessary
+  float matgrey [MAXMATERIAL] [4];
+  if (!day)
+  {
+    float greyfactor = 0.75; // 0 = grey, 1 = no modification
+    for (i = 0; i < MAXMATERIAL; i ++)
+    {
+      float mid = (mat [i] [0] + mat [i] [1] + mat [i] [2]) / 3.0F;
+      matgrey [i] [0] = mid + (mat [i] [0] - mid) * greyfactor;
+      matgrey [i] [1] = mid + (mat [i] [1] - mid) * greyfactor;
+      matgrey [i] [2] = mid + (mat [i] [2] - mid) * greyfactor;
+    }
+  }
 
 // Set the colors of the landscape
   float mzoom = zoomz;
@@ -115,9 +130,18 @@ void GLLandscape::precalculate ()
       {
         a = 11;
       }
-      r [x] [z] = (unsigned char) (mat [a] [0] * 255.9);
-      g [x] [z] = (unsigned char) (mat [a] [1] * 255.9);
-      b [x] [z] = (unsigned char) (mat [a] [2] * 255.9);
+      if (day)
+      {
+        r [x] [z] = (unsigned char) (mat [a] [0] * 255.9);
+        g [x] [z] = (unsigned char) (mat [a] [1] * 255.9);
+        b [x] [z] = (unsigned char) (mat [a] [2] * 255.9);
+      }
+      else
+      {
+        r [x] [z] = (unsigned char) (matgrey [a] [0] * 255.9);
+        g [x] [z] = (unsigned char) (matgrey [a] [1] * 255.9);
+        b [x] [z] = (unsigned char) (matgrey [a] [2] * 255.9);
+      }
 //        printf ("a=%d, r=%d, g=%d, b=%d\n", a, r[x][z],g[x][z],b[x][z]); fflush (stdout);
     }
 
@@ -198,7 +222,15 @@ void GLLandscape::precalculate ()
     }
   }
 
+  // precalculate water light, always the same angle
   int nlwater = 1200 - (int) (1000.0 * 2.0 * fabs ((90.0 - sungamma) * PI / 180.0) / PI);
+
+  // precalculate a height average
+  int midheight = (highestpoint + lowestpoint) / 2;
+
+  // set minimum ambient light
+  int minambient = 100;
+  if (!day) minambient = 50;
 
 // Set the luminance of the landscape
   for (x = 0; x <= MAXX; x ++)
@@ -208,7 +240,8 @@ void GLLandscape::precalculate ()
       int xp1 = getCoord (x + 1);
       int zm1 = getCoord (z - 1);
       int zp1 = getCoord (z + 1);
-// Calculate the normal vectors
+
+      // Calculate the normal vectors
       a[0] = 0;
       a[1] = (float) (hw[x][zm1] - hw[x][z]) * mzoom;
       a[2] = -hh;
@@ -240,16 +273,21 @@ void GLLandscape::precalculate ()
       float normx = (no[0] + nw[0] + so[0] + sw[0]) / 4.0;
       float normy = (no[1] + nw[1] + so[1] + sw[1]) / 4.0;
       float normz = (no[2] + nw[2] + so[2] + sw[2]) / 4.0;
-  // Calculate the light hitting the surface
-      float gamma = (float) acos (normx * lv [0] + normy * lv [1] + normz * lv [2]);
+
+      // Calculate the light hitting the surface
+      float gamma = (float) acos (normx * lv [0] + normy * lv [1] + normz * lv [2]); // angle
       if (!isWater (f [x] [z]))
       {
-        nl [x] [z] = 1200 - (int) (1000.0 * 2.0 * fabs (gamma) / PI);
+        nl [x] [z] = 1200 - (int) (900.0 * 2.0 * fabs (gamma) / PI); // calculate light
+        if (type == LAND_CANYON) // in canyons more ambient light in higher regions
+          nl [x] [z] += (h [x] [z] - midheight) / 40; // typical max height diff is 10000
       }
       else
-        nl [x] [z] = nlwater;
-      if (nl [x] [z] < 0)
-        nl [x] [z] = 0;
+      {
+        nl [x] [z] = nlwater; // precalculated light (above)
+      }
+      if (nl [x] [z] < minambient) // minimum ambient light
+        nl [x] [z] = minambient;
 /*      float vh = (float) h [x] [z];
     for (i = z + 1; i < MAXX; i ++)
     {
@@ -263,7 +301,11 @@ void GLLandscape::precalculate ()
     }*/
 // Check whether this point is in the shadow of some mountain
       if (hw [x] [z] < hray [x] [z])
+      {
         nl [x] [z] /= 2;
+        if (nl [x] [z] < minambient)
+          nl [x] [z] = minambient; // minimum ambient light
+      }
 /*      if (isWater (f [x] [z]))
     {
       if (nl [x] [z] > 0.75) nl [x] [z] = 50.0;
@@ -2599,9 +2641,9 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
   mat [13] [0] = 1.0; mat [13] [1] = 0.76; mat [13] [2] = 0.35; mat [13] [3] = 1.0;
   mat [14] [0] = 0.7; mat [14] [1] = 0.7; mat [14] [2] = 0.65; mat [14] [3] = 1.0;
   mat [15] [0] = 0.75; mat [15] [1] = 0.78; mat [15] [2] = 0.68; mat [15] [3] = 1.0;
-  for (i = 0; i < 7; i ++)
+/*  for (i = 0; i < 7; i ++)
     for (i2 = 0; i2 < 4; i2 ++)
-      mata [i] [i2] = mat [i] [i2] / 2.0;
+      mata [i] [i2] = mat [i] [i2] / 2.0;*/
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
       if (hw [i] [i2] == 0)

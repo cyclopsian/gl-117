@@ -578,6 +578,8 @@ void DynamicObj::move ()
   if (immunity > 0) immunity --; // decrease immunity
 }
 
+
+
 void AIObj::aiinit ()
 {
   acttype = 0;
@@ -1258,59 +1260,60 @@ void AIObj::targetPrevious (AIObj **f)
   target = f [i];
 }
 
+// core AI method
 void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
 {
   if (debug)
   { printf ("a("); fflush (stdout); }
-  if (!active && !draw)
+  if (!active && !draw) // not active, not drawn, then exit
   {
     if (debug)
     { printf (")"); fflush (stdout); }
     return;
   }
 
-  if (firemissilettl > 0) firemissilettl --;
+  if (firemissilettl > 0) firemissilettl --; // time to fire the next missile
 
-  // Move object according to our physics
+  // move object according to our physics
   move ();
 
-  if (id >= STATIC)
+  if (id >= STATIC) // no AI for static ground objects (buildings)
     return;
 
-  // Set smoke
-//    if (ai) // at the moment no smoke for player's fighter
-  if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2))
+  // set smoke
+  if ((id >= MISSILE1 && id < MISSILE_MINE1) || (id >= FIGHTER1 && id <= FIGHTER2)) // missile or fighter
   {
-    float sz = COS(gamma) * COS(phi) * zoom * 1.1;
+    float sz = COS(gamma) * COS(phi) * zoom * 1.1; // polar (spherical) coordinates
     float sy = -SIN(gamma) * zoom * 1.1;
     float sx = COS(gamma) * SIN(phi) * zoom * 1.1;
     smoke->move ();
+    // four smoke elements per discrete movement
     smoke->setSmoke (tl->x - sx - forcex * 0.75, tl->y - sy - forcey * 0.75, tl->z - sz - forcez * 0.75, (int) phi, 16);
     smoke->setSmoke (tl->x - sx - forcex * 0.5, tl->y - sy - forcey * 0.5, tl->z - sz - forcez * 0.5, (int) phi, 17);
     smoke->setSmoke (tl->x - sx - forcex * 0.25, tl->y - sy - forcey * 0.25, tl->z - sz - forcez * 0.25, (int) phi, 18);
     smoke->setSmoke (tl->x - sx, tl->y - sy, tl->z - sz, (int) phi, 19);
   }
 
-  if (!active)
+  if (!active) // not active, then exit
   {
     if (debug)
     { printf (")"); fflush (stdout); }
     return;
   }
-  if (explode || sink)
+  if (explode || sink) // exploding or sinking, then exit
   {
     if (debug)
     { printf (")"); fflush (stdout); }
     return;
   }
 
-  // Do expensive calculations only once
+  // do expensive calculations only once
   float myheight = l->getExactHeight (tl->x, tl->z);
   float targetheight = tl->y;
   if (target != NULL)
     targetheight = l->getExactHeight (target->tl->x, target->tl->z);
 
-  // Which height???
+  // which height???
   float recheight2; // this is the height, the object wants to achieve
   float flyx = tl->x + forcex * 6, flyz = tl->z + forcez * 6;
   if (ttl != 0)
@@ -1337,48 +1340,44 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
   }
   else recheight2 = -100;
 
+  // calculate the recommended height, recheight2 depends on it
   if (manoeverheight > 0) manoeverheight --;
   if (!manoeverheight)
   {
-    if (!(id >= FIGHTER1 && id <= FIGHTER2) && target != NULL)
+    if (!(id >= FIGHTER1 && id <= FIGHTER2) && target != NULL) // no fighter, has target (missile, mine)
     {
       recheight = target->tl->y - targetheight;
     }
-    else if (id >= FIGHTER1 && id <= FIGHTER2 && target != NULL)
+    else if (id >= FIGHTER1 && id <= FIGHTER2 && target != NULL) // fighter, has target
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
-        recheight = target->tl->y - targetheight;
+        recheight = target->tl->y - targetheight;  // target is a fighter
       else
-        recheight = target->tl->y - targetheight + 5;
-      if (!l->isWater (l->f [(int) flyx] [(int) flyz]))
+        recheight = target->tl->y - targetheight + 5; // target is no fighter
+      if (!l->isWater (l->f [(int) flyx] [(int) flyz])) // not flying above water
       {
         if (recheight < 3.5 + 0.005 * aggressivity) recheight = 3.5 + 0.005 * aggressivity;
-        if (maxgamma < 40)
+        if (maxgamma < 40) // transporters have to stay higher
           if (recheight < 20) recheight = 20;
       }
-      float minh = 2.0 + 0.005 * aggressivity;
-      if (l->type == LAND_CANYON) minh = 5.0 + 0.005 * aggressivity;
+      float minh = 2.0 + 0.005 * aggressivity; // minimum height
+      if (l->type == LAND_CANYON) minh = 5.5 + 0.005 * aggressivity; // stay higher in canyons
       if (fabs (l->getHeight (flyx, flyz) - myheight) < minh)
       {
         recheight = 8 + 0.01 * aggressivity;
-        manoeverheight = 30;
+        manoeverheight = 30; // fly manoever to gain height
       }
-/*        if (myrandom (intelligence + 50) == 0)
-      {
-        recheight = 10.0 * fabs (l->getHeight (flyx, flyz) - myheight);
-        manoeverheight = 15;
-      }*/
     }
   }
 
   if (ai)
   {
-    if (id >= MISSILE_GROUND1 && id <= MISSILE_GROUND2)
+    if (id >= MISSILE_GROUND1 && id <= MISSILE_GROUND2) // is AGM
     {
       float dgamma = 0;
-      if (disttarget <= -0.00001 || disttarget >= 0.00001)
+      if (disttarget <= -0.00001 || disttarget >= 0.00001) // no division by zero
         dgamma = atan ((target->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
-      recgamma = gamma + dgamma;
+      recgamma = gamma + dgamma; // get recommended elevation to target
     }
     else
       recgamma = (int) ((recheight2 - tl->y) * 10 - gamma + 360);
@@ -1392,111 +1391,115 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c)
   if (gamma > 250) gamma = 250;
   if (gamma < 110) gamma = 110;*/
 
-//  float nimbility;
-float nimbility2 = nimbility;
-if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
-  nimbility2 = 0.00001;
-float deltatheta = rectheta - theta;
-//  nimbility = 1.0;
-if (deltatheta > 0 && dtheta < 0) dtheta += nimbility;
-else if (deltatheta < 0 && dtheta > 0) dtheta -= nimbility;
-else if (deltatheta > 0)
-{
-  float estimatedtheta = dtheta * (dtheta + nimbility) / 2 / nimbility2;
-  if (deltatheta > estimatedtheta + 2) dtheta += nimbility;
-  else if (deltatheta < estimatedtheta - 2) dtheta -= nimbility;
-}
-else
-{
-  float estimatedtheta = -dtheta * (dtheta - nimbility) / 2 / nimbility2;
-  if (deltatheta < estimatedtheta - 2) dtheta -= nimbility;
-  else if (deltatheta > estimatedtheta + 2) dtheta += nimbility;
-}
-theta += dtheta;
+  // do a smooth roll
+  float deltatheta = rectheta - theta;
+  float mynimbility = fabs (deltatheta) / 10.0F * nimbility;
+  if (mynimbility > nimbility) mynimbility = nimbility;
+  float nimbility2 = mynimbility;
+  if (nimbility2 >= -0.00001 && nimbility2 <= 0.00001)
+    nimbility2 = 0.00001;
 
-if (easymodel)
-{
-if (theta > maxtheta) theta = maxtheta;
-else if (theta < -maxtheta) theta = -maxtheta;
+  if (deltatheta > 0 && dtheta < 0) dtheta += mynimbility;
+  else if (deltatheta < 0 && dtheta > 0) dtheta -= mynimbility;
+  else if (deltatheta > 0)
+  {
+    float estimatedtheta = dtheta * (dtheta + mynimbility) / 2 / nimbility2;
+    if (deltatheta > estimatedtheta + 1) dtheta += mynimbility;
+    else if (deltatheta < estimatedtheta - 1) dtheta -= mynimbility;
+  }
+  else
+  {
+    float estimatedtheta = -dtheta * (dtheta - mynimbility) / 2 / nimbility2;
+    if (deltatheta < estimatedtheta - 1) dtheta -= mynimbility;
+    else if (deltatheta > estimatedtheta + 1) dtheta += mynimbility;
+  }
+  theta += dtheta;
 
-float deltagamma = recgamma - gamma;
-//  nimbility = maxspeed * 2;
-if (deltagamma > 0 && dgamma < 0) dgamma += nimbility;
-else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility;
-else if (deltagamma > 0)
-{
-  float estimatedgamma = dgamma * (dgamma + nimbility) / nimbility2;
-  if (deltagamma > estimatedgamma + 2) dgamma += nimbility;
-  else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility;
-}
-else if (deltagamma < 0)
-{
-  float estimatedgamma = -dgamma * (dgamma - nimbility) / nimbility2;
-  if (deltagamma < estimatedgamma - 2) dgamma -= nimbility;
-  else if (deltagamma > estimatedgamma + 2) dgamma += nimbility;
-}
-gamma += dgamma;
+  // height changes
+  if (easymodel)
+  {
+    if (theta > maxtheta) theta = maxtheta;
+    else if (theta < -maxtheta) theta = -maxtheta;
 
-}
+    float deltagamma = recgamma - gamma;
+    //  nimbility = maxspeed * 2;
+    if (deltagamma > 0 && dgamma < 0) dgamma += nimbility;
+    else if (deltagamma < 0 && dgamma > 0) dgamma -= nimbility;
+    else if (deltagamma > 0)
+    {
+      float estimatedgamma = dgamma * (dgamma + nimbility) / nimbility2;
+      if (deltagamma > estimatedgamma + 2) dgamma += nimbility;
+      else if (deltagamma < estimatedgamma - 2) dgamma -= nimbility;
+    }
+    else if (deltagamma < 0)
+    {
+      float estimatedgamma = -dgamma * (dgamma - nimbility) / nimbility2;
+      if (deltagamma < estimatedgamma - 2) dgamma -= nimbility;
+      else if (deltagamma > estimatedgamma + 2) dgamma += nimbility;
+    }
+    gamma += dgamma;
+  }
 
-if (easymodel)
-{
-  if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
-  else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
-}
-else
-{
-  (void) checkLooping ();
-}
+  // check maximum gamma
+  if (easymodel)
+  {
+    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
+    else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;
+  }
+  else // otherwise check for value overflow due to loops
+  {
+    (void) checkLooping ();
+  }
 
-/*    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
-  else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;*/
+  /*    if (gamma > 180 + maxgamma) gamma = 180 + maxgamma;
+    else if (gamma < 180 - maxgamma) gamma = 180 - maxgamma;*/
 
+  // get a new target if necessary
   if (target == NULL)
     targetNearestEnemy (f);
   if (target != NULL)
     if (!target->active)
       targetNearestEnemy (f);
 
-  if (!ai || target == NULL)
+  if (!ai || target == NULL) // no AI (player) or no target found, then exit
   {
     if (debug)
     { printf (")"); fflush (stdout); }
     return;
   }
 
-disttarget = distance (target); // distance to target
+  disttarget = distance (target); // distance to target
 
-float dx2, dz2, ex, ez;
-float dx = target->tl->x - tl->x, dz = target->tl->z - tl->z; // actual distances
-if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
-{
-  float t = 10.0 * disttarget; // generous time to new position
-  if (t > 60) t = 60; // higher values will not make sense
-  int tt = (int) target->theta;
-  if (tt < 0) tt += 360;
-  float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
-  if (newphi > 90) newphi = 90;
-  else if (newphi < -90) newphi = -90;
-  newphi += (float) target->phi;
-  if (newphi >= 360) newphi -= 360;
-  if (newphi < 0) newphi += 360;
-  if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+  float dx2, dz2, ex, ez;
+  float dx = target->tl->x - tl->x, dz = target->tl->z - tl->z; // current distances
+  if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= MISSILE1 && id <= MISSILE2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
   {
-    ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
-    ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
+    float t = 10.0 * disttarget; // generous time to new position
+    if (t > 60) t = 60; // higher values will not make sense
+    int tt = (int) target->theta;
+    if (tt < 0) tt += 360;
+    float newphi = t * SIN(tt) * 5.0 * target->manoeverability; // new angle of target after time t
+    if (newphi > 90) newphi = 90;
+    else if (newphi < -90) newphi = -90;
+    newphi += (float) target->phi;
+    if (newphi >= 360) newphi -= 360;
+    if (newphi < 0) newphi += 360;
+    if ((id >= FIGHTER1 && id <= FIGHTER2) || (id >= FLAK1 && id <= FLAK2) || (id >= TANK1 && id <= TANK2))
+    {
+      ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.25; // estimated target position x
+      ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.25; // estimated target position z
+    }
+    else
+    {
+      ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.05; // estimated target position x
+      ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.05; // estimated target position z
+    }
+    dx2 = ex - tl->x; dz2 = ez - tl->z; // estimated distances
   }
   else
   {
-    ex = target->tl->x - SIN(newphi) * t * target->realspeed * 0.05; // estimated target position x
-    ez = target->tl->z - COS(newphi) * t * target->realspeed * 0.05; // estimated target position z
+    dx2 = dx; dz2 = dz;
   }
-  dx2 = ex - tl->x; dz2 = ez - tl->z; // estimated distances
-}
-else
-{
-  dx2 = dx; dz2 = dz;
-}
   int a, w = (int) phi;
   if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
@@ -1509,6 +1512,7 @@ m [0]->draw = true;
 m [0]->tl->y = target->tl->y;
 }*/
 
+  // get heading to target
   a = (int) (atan (dx2 / dz2) * 180 / PI);
   if (dz2 > 0)
   {
@@ -1516,74 +1520,84 @@ m [0]->tl->y = target->tl->y;
     else a += 180;
   }
 //    this->aw = a;
-  aw = a - w;
+  aw = a - w; // aw=0: target in front, aw=+/-180: target at back
   if (aw < -180) aw += 360;
   if (aw > 180) aw -= 360;
 
   if (manoevertheta > 0) manoevertheta --;
   if (manoeverspeed > 0) manoeverspeed --;
-  if (id >= FIGHTER1 && id <= FIGHTER2)
+
+  // heading calculations  
+  if (id >= FIGHTER1 && id <= FIGHTER2) // for fighters do the following
   {
-  if (!acttype && disttarget <= 1000 && !manoevertheta)
-  {
-    if (aw > 0)
+    if (!acttype && disttarget <= 1000 && !manoevertheta) // no special action, near distance, no roll manoever
     {
-      if (aw > 180 - intelligence / 20 && disttarget < 15)
+      if (aw > 0) // positive angle
       {
-        rectheta = -90;
-        manoevertheta = 10 + myrandom ((400 - intelligence) / 4);
-        if (!manoeverspeed)
-          recspeed = maxspeed - myrandom (intelligence) * 0.0003;
-        if (!manoeverheight)
-        { recheight = 5; manoeverheight = 8 - intelligence / 50; }
+        if (aw > 180 - intelligence / 20 && disttarget < 15) // target is at the back
+        {
+          rectheta = -90;
+          manoevertheta = 10 + myrandom ((400 - intelligence) / 4); // turn hard left or right
+          if (!manoeverspeed)
+            recspeed = maxspeed - myrandom (intelligence) * 0.0003; // fly faster
+          if (!manoeverheight)
+          { recheight = 5; manoeverheight = 8 - intelligence / 50; } // stay low
+        }
+        else if (aw < 40 && disttarget > 60)
+        {
+          rectheta = 0;
+        }
+        else // otherwise fly to target direction
+        {
+          int maw = aw > 90 ? 90 : aw;
+          maw = 90 - maw;
+          rectheta = 90 - maw * intelligence / 100;
+        }
       }
-      else
+      else // same for negative angle
       {
-        int maw = aw > 90 ? 90 : aw;
-        maw = 90 - maw;
-        rectheta = 90 - maw * intelligence / 100;
+        if (aw < -180 + intelligence / 20 && disttarget < 15)
+        {
+          rectheta = 90;
+          manoevertheta = 10 + myrandom ((400 - intelligence) / 4);
+          if (!manoeverspeed)
+            recspeed = maxspeed - myrandom (intelligence) * 0.0003;
+          if (!manoeverheight)
+          { recheight = 5; manoeverheight = 8 - intelligence / 50; }
+        }
+        else if (aw > -40 && disttarget > 60)
+        {
+          rectheta = 0;
+        }
+        else
+        {
+          int maw = aw < -90 ? -90 : aw;
+          maw = -90 - maw;
+          rectheta = -90 - maw * intelligence / 100;
+        }
+  //        rectheta = -90;
       }
+  //      if (rectheta > theta + 5.0) toLeft ();
+  //      else if (rectheta < theta - 5.0) toRight ();
     }
-    else
-    {
-      if (aw < -180 + intelligence / 20 && disttarget < 15)
-      {
-        rectheta = 90;
-        manoevertheta = 10 + myrandom ((400 - intelligence) / 4);
-        if (!manoeverspeed)
-          recspeed = maxspeed - myrandom (intelligence) * 0.0003;
-        if (!manoeverheight)
-        { recheight = 5; manoeverheight = 8 - intelligence / 50; }
-      }
-      else
-      {
-        int maw = aw < -90 ? -90 : aw;
-        maw = -90 - maw;
-        rectheta = -90 - maw * intelligence / 100;
-      }
-//        rectheta = -90;
-    }
-//      if (rectheta > theta + 5.0) toLeft ();
-//      else if (rectheta < theta - 5.0) toRight ();
   }
-  }
-  else if (id >= MISSILE1 && id <= MISSILE2)
+  else if (id >= MISSILE1 && id <= MISSILE2) // for missiles do the following
   {
-    if (abs (aw) < 50 && disttarget > 10)
+    if (abs (aw) < 50 && disttarget > 10) // target in front and minimum distance, then no roll
       rectheta = 0;
-    else
+    else // otherwise chase target
     {
-    if (aw > 0)
-    {
-      rectheta = aw > 90 ? 90 : aw;
-    }
-    else
-    {
-      rectheta = aw < -90 ? -90 : aw;
-    }
+      if (aw > 0)
+      {
+        rectheta = aw > 90 ? 90 : aw;
+      }
+      else
+      {
+        rectheta = aw < -90 ? -90 : aw;
+      }
     }
   }
-  else if (id >= FLAK1 && id <= FLAK2)
+  else if (id >= FLAK1 && id <= FLAK2) // ground-air-cannon
   {
     recspeed = 0; speed = 0;
     if (aw > 0)
@@ -1595,9 +1609,9 @@ m [0]->tl->y = target->tl->y;
       rectheta = aw < -90 ? -90 : aw;
     }
   }
-  else if (id >= TANK1 && id <= TANK2)
+  else if (id >= TANK1 && id <= TANK2) // tanks
   {
-    recspeed = maxspeed; speed = maxspeed;
+    recspeed = maxspeed; speed = maxspeed; // always at maximum speed
     if (aw > 0)
     {
       rectheta = maxtheta;
@@ -1615,17 +1629,19 @@ m [0]->tl->y = target->tl->y;
         if (myrandom (intelligence) < 100)
           fireCannon (c);
   }
-  if (id >= FIGHTER1 && id <= FIGHTER2)
+
+  // speed and manoever calculations
+  if (id >= FIGHTER1 && id <= FIGHTER2) // fighters
   {
     if (disttarget > 2.5 + aggressivity / 100)
     {
-      if (disttarget < 50 && abs (aw) > 30 && !manoeverspeed)
+      if (disttarget < 50 && abs (aw) > 30 && !manoeverspeed) // low speed for faster heading changes in melee combat
         recspeed = maxspeed / 2;
-      else speedUp ();
+      else speedUp (); // otherwise fly faster
     }
     else if (!manoeverspeed)
     {
-      if (recspeed > target->speed)
+      if (recspeed > target->speed) // adopt speed of target
       {
         speedDown ();
       }
@@ -1634,20 +1650,22 @@ m [0]->tl->y = target->tl->y;
         speedUp ();
       }
     }
-    if (disttarget > 60 && abs (aw) < 20)
-      rectheta = 0; // fly straight
-    if (disttarget < 10 && abs (aw) > 50 && (target->id < FIGHTER1 || target->id > FIGHTER2))
+    if (disttarget > 60 && abs (aw) < 20) // high distance and target in front, then fly straight
+      rectheta = 0;
+    if (disttarget < 10 && abs (aw) > 50 && (target->id < FIGHTER1 || target->id > FIGHTER2)) // avoid collisions
     {
       manoevertheta = 50;
       rectheta = 0;
       manoeverspeed = 50;
       recspeed = maxspeed;
     }
+    // fire cannon?
     float agr = 4.0 - aggressivity / 100;
     if (fabs (rectheta - theta) < 2 + agr && fabs (aw) < 20 + agr * 4 && disttarget < 30)
       fireCannon (c);
     else if (disttarget < 2 + agr && fabs (aw) < 20 + agr * 4)
       fireCannon (c);
+    // fire missile?
     if (!firemissilettl)
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
@@ -1661,7 +1679,7 @@ m [0]->tl->y = target->tl->y;
           fireMissileGround (m);
       }
     }
-    if (!manoevertheta)
+    if (!manoevertheta) // change roll angle
     {
       rectheta += myrandom (precision) - precision / 2;
       if (rectheta > 90 - precision / 5) rectheta = 90 - precision / 5;
@@ -1670,7 +1688,7 @@ m [0]->tl->y = target->tl->y;
 //      if (recspeed > maxspeed - 0.001 * intelligence)
 //        recspeed = maxspeed - 0.001 * intelligence;
     idle ++;
-    if (idle > 400)
+    if (idle > 400) // too long flying the same direction, then change direction
     {
       idle = 0;
       if (rectheta < 0)

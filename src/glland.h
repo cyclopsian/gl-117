@@ -60,6 +60,9 @@
 #define LANDSCAPE_CANYON 30
 #define LANDSCAPE_DESERT 40
 
+// number of materials
+#define MAXMATERIAL 16
+
 // textures are loaded in main.cpp
 extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone, *textree4, *texearth, *texsand, *texredsand, *texgravel1;
 extern CTexture *texglitter1;
@@ -83,14 +86,15 @@ class GLLandscape : public Landscape
   private:
   float hh, hh2, zoomz2;
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
-  float mat [16] [4], mata [16] [4]; // materials=colors of landscape IDs
+  float mat [MAXMATERIAL] [4]; // materials=colors of landscape IDs
+//  float mata [MAXMATERIAL] [4];
   Space *space; // space of all objects
   CColor treecolor;
 
   void norm (float *c);
   void normalcrossproduct (float *a, float *b, float *c);
 
-  float *selectMaterial (int x, int y);
+//  float *selectMaterial (int x, int y);
   int selectColor (int x, int y);
   
   unsigned short lg [MAXX + 1] [MAXX + 1]; // gaussian filter result

@@ -158,37 +158,41 @@ class AIObj : public DynamicObj
 {
   protected:
   public:
-  bool ai;
-  bool autofire;
-  DynamicObj *target;
-  int acttype;
-  int intelligence, aggressivity, precision;
+  bool ai; // AI on/off
+  bool autofire; // cannon fire on/off
+  DynamicObj *target; // targeted object
+  int acttype; // object is doing some action (Immelmann, Loop, ... not yet implemented)
+  // three intellience characteristics which make up a pilot: 0 = best, 400 = worst
+  int intelligence; // valid for every AI object: manoevers, fire rate (tanks), ...
+  int aggressivity; // valid for fighters: fly low, stay near and behind enemy
+  int precision; // valid for fighters: heading calculation
+  // manoevers disable any other AI consideration
   int manoevertheta, manoeverheight, manoeverspeed;
-  int idle;
-  int firemissilettl;
-  int missiletype; // only relevant for the player
-  int missiles [missiletypes];
-  int aw; // aktueller Winkel zum Ziel
-  int score;
-  float dtheta, dgamma;
-  float disttarget; // aktuelle Distanz zum Ziel
-  CSmoke *smoke;
+  int idle; // counter how long AI object does the same thing (to change direction)
+  int firemissilettl; // minimum time to wait between shooting missiles
+  int missiletype; // only relevant for the player, describes type: AAM, AGM, DF
+  int missiles [missiletypes]; // number of missiles of each type
+  int aw; // current heading difference to target
+  int score; // final score
+  float dtheta, dgamma; // theta/gamma alteration (smooth piloting)
+  float disttarget; // current distance to target
+  CSmoke *smoke; // bright smoke behind the object (fighter&missiles)
 
-  void aiinit ();
-  void newinit (int id, int party, int intelligence, int precision, int aggressivity);
-  void newinit (int id, int party, int intelligence);
+  void aiinit (); // initialize variables
+  void newinit (int id, int party, int intelligence, int precision, int aggressivity); // init new AI object
+  void newinit (int id, int party, int intelligence); // init new AI object (esp. non-fighter)
   AIObj ();
   AIObj (Space *space2, CModel *o2, float zoom2);
   ~AIObj ();
-  void initValues (DynamicObj *dobj, float phi);
+  void initValues (DynamicObj *dobj, float phi); // init values to shoot cannon or missile
   void fireCannon (DynamicObj *laser, float phi);
   void fireCannon (DynamicObj **laser, float phi);
   void fireCannon (DynamicObj **laser);
   void fireMissile2 (int id, AIObj *missile, AIObj *target);
-  int firstMissile ();
-  int nextMissile (int from);
-  bool haveMissile (int id);
-  void decreaseMissile (int id);
+  int firstMissile (); // select first missile type
+  int nextMissile (int from); // select next missile type (cyclic)
+  bool haveMissile (int id); // missile of type id left?
+  void decreaseMissile (int id); // decrease missiles by one
   void fireMissile (int id, AIObj **missile, AIObj *target);
   void fireMissile (int id, AIObj **missile);
   void fireMissileAir (AIObj **missile, AIObj *target);
@@ -196,7 +200,7 @@ class AIObj : public DynamicObj
   void targetNearestEnemy (AIObj **f);
   void targetNext (AIObj **f);
   void targetPrevious (AIObj **f);
-  void aiAction (AIObj **f, AIObj **m, DynamicObj **c);
+  void aiAction (AIObj **f, AIObj **m, DynamicObj **c); // core AI method
 };
 
 #endif

@@ -28,6 +28,7 @@ TODO:
 - southern seashore landscape (additional missions)
 - torpedo, water
 - faster gaussian convolution (isotropic)
+- little bigger gauss filter for light mask, 2x2 grid does not look good
 */
 
 #ifndef IS_MAIN_H
