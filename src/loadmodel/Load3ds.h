@@ -22,6 +22,8 @@
 #ifndef IS_LOAD3DS_H
 #define IS_LOAD3DS_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "model3d/Model3d.h" // ok
 
 

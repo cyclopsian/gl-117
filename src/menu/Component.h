@@ -22,6 +22,8 @@
 #ifndef IS_COMPONENT_H
 #define IS_COMPONENT_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "model3d/Model3d.h" // ok
 #include "effects/Effects.h" // ok
 

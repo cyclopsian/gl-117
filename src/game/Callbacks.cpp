@@ -21,6 +21,8 @@
 
 #ifndef IS_CALLBACKS_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "Callbacks.h"
 #include "globals.h"
 #include "Game.h"

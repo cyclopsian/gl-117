@@ -24,6 +24,8 @@
 #ifndef IS_MISSION_H
 #define IS_MISSION_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "model3d/Model3d.h" // ok
 #include "aiobject/AiObj.h" // ok
 

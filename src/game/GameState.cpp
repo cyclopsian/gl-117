@@ -21,6 +21,8 @@
 
 #ifndef IS_GAME_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "GameState.h"
 #include "Game.h"
 #include "gllandscape/GlLandscape.h"

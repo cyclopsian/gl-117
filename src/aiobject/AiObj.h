@@ -24,6 +24,8 @@
 #ifndef IS_AIOBJECT_H
 #define IS_AIOBJECT_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok
 #include "effects/Effects.h" // ok

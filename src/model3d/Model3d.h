@@ -22,6 +22,8 @@
 #ifndef IS_MODEL3D_H
 #define IS_MODEL3D_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include "opengl/includegl.h"
 #include "opengl/GlPrimitives.h"
 #include "math/Math.h"

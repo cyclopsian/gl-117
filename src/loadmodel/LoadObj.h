@@ -24,6 +24,8 @@
 
 #define int32 int
 
+#define GLUT_BUILDING_LIB 1
+
 #include "model3d/Model3d.h" // ok
 
 class TextFileObj

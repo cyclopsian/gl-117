@@ -22,6 +22,8 @@
 #ifndef IS_GLLANDSCAPE_H
 #define IS_GLLANDSCAPE_H
 
+#define GLUT_BUILDING_LIB 1
+
 #include <string.h>
 
 #include "model3d/Model3d.h" // ok
