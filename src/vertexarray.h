@@ -24,7 +24,7 @@
 #ifndef IS_VERTEXARRAY_H
 #define IS_VERTEXARRAY_H
 
-//#include "common.h" // ok
+#include "common.h" // ok
 
 #define VERTEXARRAY_V3N3C4T2 1
 #define VERTEXARRAY_V3C4T2 2
@@ -32,32 +32,37 @@
 #define VERTEXARRAY_V3N3C4 4
 #define VERTEXARRAY_V3C4 5
 
-/* VertexArray class to emulate OpenGL primitives and pass 3D data in blocks to the hardware! Much faster!
-   Use one VertexArray for each #define VERTEXARRAY prototype and each primitive's type (GL_QUADS, GL_TRIANGLES).
-   Usage:
-     VertexArray quads; 
-     quads.glBegin(GL_QUADS);
-     quads.glVertex3f(...);
-     ... ;
-     quads.glEnd();
-   quads.glEnd() passes the data block to OpenGL, so make sure to call quads.glEnd() ONLY AFTER painting ALL your quads!
-   That means, you can add vertices using quads.glVertex() at ANY time WITHOUT glBegin()/glEnd() calls!
-   For your other primitives, use different arrays:
-     VertexArray quadstrip;
-     VertexArray triangles; */
+/**
+* VertexArray class to emulate OpenGL primitives and pass 3D data in blocks to the hardware!
+* This is much faster!
+* Use one VertexArray for each #define VERTEXARRAY prototype and each primitive's type
+* (GL_QUADS, GL_TRIANGLES).
+*
+* Usage:
+*   VertexArray quads; 
+*   quads.glBegin (GL_QUADS);
+*   quads.glVertex3f (...);
+*   ... ;
+*   quads.glEnd ();
+*
+* quads.glEnd() passes the data block to OpenGL, so make sure to call quads.glEnd()
+* ONLY AFTER painting ALL your quads!
+* That means, you can add vertices using quads.glVertex() at ANY time WITHOUT
+* glBegin()/glEnd() calls!
+* For your other primitives, use different arrays:
+* - VertexArray quadstrip;
+* - VertexArray triangles;
+*/
 class VertexArray
 {
   public:
-  int type;    // primitive type in glBegin: GL_QUAD, GL_TRIANGLE...
-  int n;       // number of vertices in this array
-  int max;     // allocated number of vertices in this array
-  float *data; // data block to pass to OpenGL (always float data: position, color, texture coords)
-  int stride;  // size of data for one vertex in floats (V3N3C4T2 makes up 12 floats)
-  int pref;    // vertex array type as given by the #define VERTEXARRAY prototypes, ONE class instance can only be of ONE type 
 
+    /// construct standard vertexarray using VERTEXARRAY_V3C4T2
   VertexArray ();
+    /// construct vertexarray with a custom prototype (see VERTEXARRAY_...)
   VertexArray (int pref);
   ~VertexArray ();
+
   void setPref (int pref);
   void glBegin (int type);
   void glVertex3f (float x, float y, float z);
@@ -72,8 +77,24 @@ class VertexArray
   void glTexCoord2f (float x, float y);
   void glTexCoord2fv (float *f);
   void glTexCoord2d (float x, float y);
+    // ... add more primitives here ...
   void reallocData ();
   void glEnd ();
+
+  protected:
+
+    /// primitive type in glBegin: GL_QUAD, GL_TRIANGLE...
+    int type;
+    /// number of vertices in this array
+    int n;
+    /// allocated number of vertices in this array
+    int max;
+    /// data block to pass to OpenGL (always float data: position, color, texture coords)
+    float *data;
+    /// size of data for one vertex in floats (V3N3C4T2 makes up 12 floats)
+    int stride;
+    /// vertex array type as given by the #define VERTEXARRAY prototypes, ONE class instance can only be of ONE type
+    int pref;
 };
 
 #endif

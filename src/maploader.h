@@ -26,6 +26,7 @@
 
 #include "aiobject.h" // ok
 #include "mission.h" // ok
+#include "fileloader.h" // ok
 
 #define MAXMAPS 100
 #define TOKENLEN 1024
@@ -33,6 +34,7 @@
 class MapLoader
 {
   public:
+  FileTokenizer file;
   int mapcount;
   int mapptr;
   char mapfile [MAXMAPS] [TOKENLEN];

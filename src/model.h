@@ -24,6 +24,7 @@
 #ifndef IS_MODEL_H
 #define IS_MODEL_H
 
+#include "common.h" // ok
 #include "vertexarray.h" // ok
 
 #include <iostream>

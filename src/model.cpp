@@ -120,11 +120,11 @@ bool CTexture::loadFromTGA (const std::string &filename, int alphaprogram, bool 
   int i, i2;
 
 #ifdef LOADER_TGA_H
-  data = tga_load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
+  data = LoadTga::load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
   if (!data)
   {
     char buf [256];
-    sprintf (buf, "Texture %s not found", filename);
+    sprintf (buf, "Texture %s not found", filename.c_str ());
     display (buf, LOG_FATAL);
   }
 #else
@@ -132,7 +132,7 @@ bool CTexture::loadFromTGA (const std::string &filename, int alphaprogram, bool 
   FILE *in = fopen (filename.c_str (), "rb");
   if (!in)
   {
-    sprintf (buf, "Texture %s not found", filename);
+    sprintf (buf, "Texture %s not found", filename.c_str ());
     display (buf, LOG_FATAL);
   }
   fread (&skip, 1, 1, in);

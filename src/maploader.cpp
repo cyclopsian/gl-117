@@ -54,25 +54,25 @@ void MapLoader::readMapFile ()
   char token [TOKENLEN];
   mapcount = 0;
 
-  if (!file_open (dirs->getMaps ("maps.txt")))
+  if (!file.open (dirs->getMaps ("maps.txt")))
     return;
   
-  while (file_nextToken (token, TOKENLEN))
+  while (file.nextToken (token, TOKENLEN))
   {
     strcpy (mapfile [mapcount], token);
     mapcount ++;
     if (mapcount >= MAXMAPS) break;
   }
 
-  file_close ();
+  file.close ();
 }
 
 MapLoader::MapLoader ()
 {
   // initialize map file loader
-  file_setWhitespace (" \t\r\n");
-  file_addComment ("#", "\n");
-  file_setQuotes ("\"'´`");
+  file.setWhitespace (" \t\r\n");
+  file.addComment ("#", "\n");
+  file.setQuotes ("\"'´`");
   readMapFile ();
   mapptr = 0;
 }
@@ -117,7 +117,7 @@ void MissionCustom::error (char *msg)
 {
   char buf [TOKENLEN];
   reterror = 1;
-  sprintf (buf, "Line %d: %s", file_getLine (), msg);
+  sprintf (buf, "Line %d: %s", maploader->file.getLine (), msg);
   display (buf, LOG_ERROR);
 }
 
@@ -132,13 +132,13 @@ void MissionCustom::toUpper (char *str)
 
 int MissionCustom::readAttribute (char *attribute, char *value, char *casevalue)
 {
-  if (!file_nextToken (token, TOKENLEN))
+  if (!maploader->file.nextToken (token, TOKENLEN))
     return 0;
   toUpper (token);
   if (isGlobal (token))
     return 0;
   strcpy (attribute, token);
-  if (!file_nextToken (token, TOKENLEN))
+  if (!maploader->file.nextToken (token, TOKENLEN))
     return 0;
   if (strcmp (token, "="))
   {
@@ -147,7 +147,7 @@ int MissionCustom::readAttribute (char *attribute, char *value, char *casevalue)
       return 0;
     return -1;
   }
-  if (!file_nextToken (token, TOKENLEN))
+  if (!maploader->file.nextToken (token, TOKENLEN))
   {
     error ("Unexpected end of file");
     return 0;
@@ -160,7 +160,7 @@ int MissionCustom::readAttribute (char *attribute, char *value, char *casevalue)
 
 int MissionCustom::synchronize ()
 {
-  if (!file_find ("\n")) return 0;
+  if (!maploader->file.find ("\n")) return 0;
   return 1;
 }
 
@@ -736,7 +736,7 @@ void MissionCustom::init ()
   bool readtoken = true;
 
   reterror = 0;
-  if (!file_open (dirs->getMaps (maploader->mapfile [id - MISSION_CUSTOM1])))
+  if (!maploader->file.open (dirs->getMaps (maploader->mapfile [id - MISSION_CUSTOM1])))
   {
     error ("Could not open map file");
     return;
@@ -771,7 +771,7 @@ void MissionCustom::init ()
   {
     if (readtoken)
     {
-      if (!file_nextToken (token, TOKENLEN))
+      if (!maploader->file.nextToken (token, TOKENLEN))
         break;
     }
     readtoken = true;
@@ -817,7 +817,7 @@ void MissionCustom::init ()
     }
   }
 
-  file_close ();
+  maploader->file.close ();
 
   autoLFBriefing ();
   alliedfighters = 1;
@@ -865,7 +865,7 @@ void MissionCustom::start ()
 
     unsigned char *map;
     int mapx, mapy;
-    map = tga_load (dirs->getMaps (mapfile), &mapx, &mapy);
+    map = LoadTga::load (dirs->getMaps (mapfile), &mapx, &mapy);
     if (map == NULL)
     {
       display ("Map has a valid bpp entry but seems to be corrupt", LOG_FATAL);
