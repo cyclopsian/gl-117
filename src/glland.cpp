@@ -402,26 +402,10 @@ fertig:
   }*/
 }
 
-int GLLandscape::getCoord (int a)
+inline int GLLandscape::getCoord (int a)
 {
-/*  if (a < 0) return -a;
-  else if (a >= MAXX) return 2 * MAXX - a - 1;
-  return a;*/
-  if (a < -2000 || a > 2000) return 0;
-  while (a < 0) a += MAXX;
-  while (a >= MAXX) a -= MAXX;
-  return a;
-}
-
-float GLLandscape::getCoord (float a)
-{
-/*  if (a < 0) return -a;
-  else if (a >= MAXX) return (float) 2 * MAXX - a - 1;
-  return a;*/
-  if (a < -2000 || a > 2000) return 0;
-  while (a < 0) a += MAXX;
-  while (a >= MAXX) a -= MAXX;
-  return a;
+  return (a & MAXX_MASK);
+//  return (a>=0)? a%MAXX : MAXX-a%MAXX; // more general version
 }
 
 // Get height over landscape/water, no interpolation (fast)
