@@ -72,17 +72,25 @@ bool CColor::isEqual (const CColor &color) const
   return memcmp (c, color.c, 4 * sizeof (unsigned char)) == 0;
 }
 
-void CColor::operator = (const CColor &color)
+void CColor::take (const CColor &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
+
+/* Do NOT use overloaded operators, as we will lose the feeling
+   which operators are slow and which are fast.
+   E.g. a = b; c = d; but first is a pointer copy, second copies a huge data structure! */
+/*void CColor::operator = (const CColor &color)
+{
+  memcpy (c, color.c, 4 * sizeof (unsigned char));
+}*/
 
 
 
 CTexture::CTexture ()
 {
   data = NULL;
-  // TODO: name = ...
+  name = "";
   mipmap = true;
   textureID = -1;
   width = 0;
@@ -223,22 +231,35 @@ void CTexture::getColor (CColor *color, int x, int y) const
 
 CVector3::CVector3 ()
 {
-  x = y = z = 0;
+  set (0, 0, 0);
 }
 
 CVector3::CVector3 (float x, float y, float z)
 {
-  this->x = x; this->y = y; this->z = z;
+  set (x, y, z);
 }
 
-CVector3::CVector3 (CVector3 *v)
+CVector3::CVector3 (const CVector3 &v)
 {
-  x = v->x; y = v->y; z = v->z;
+  set (v);
+}
+
+CVector3::~CVector3 ()
+{
+}
+
+void CVector3::set (const CVector3 &v)
+{
+  x = v.x;
+  y = v.y;
+  z = v.z;
 }
 
 void CVector3::set (float x, float y, float z)
 {
-  this->x = x; this->y = y; this->z = z;
+  this->x = x;
+  this->y = y;
+  this->z = z;
 }
 
 void CVector3::neg ()
@@ -246,14 +267,14 @@ void CVector3::neg ()
   x = -x; y = -y; z = -z;
 }
 
-void CVector3::add (CVector3 *v)
+void CVector3::add (const CVector3 &v)
 {
-  x += v->x; y += v->y; z += v->z;
+  x += v.x; y += v.y; z += v.z;
 }
 
-void CVector3::sub (CVector3 *v)
+void CVector3::sub (const CVector3 &v)
 {
-  x -= v->x; y -= v->y; z -= v->z;
+  x -= v.x; y -= v.y; z -= v.z;
 }
 
 void CVector3::mul (float fac)
@@ -261,20 +282,22 @@ void CVector3::mul (float fac)
   x *= fac; y *= fac; z *= fac;
 }
 
-void CVector3::crossproduct (CVector3 *v)
+void CVector3::crossproduct (const CVector3 &v)
 {
-  float nx = y * v->z - z * v->y;
-  float ny = z * v->x - x * v->z;
-  float nz = x * v->y - y * v->x;
-  x = nx; y = ny; z = nz;
+  float nx = y * v.z - z * v.y;
+  float ny = z * v.x - x * v.z;
+  float nz = x * v.y - y * v.x;
+  x = nx;
+  y = ny;
+  z = nz;
 }
 
-float CVector3::dotproduct (CVector3 *v)   
+float CVector3::dotproduct (const CVector3 &v) const
 {
-  return x * v->x + y * v->y + z * v->z;
+  return x * v.x + y * v.y + z * v.z;
 }
 
-float CVector3::length ()
+float CVector3::length () const
 {
   return (float) sqrt (x * x + y * y + z * z);
 }
@@ -282,43 +305,80 @@ float CVector3::length ()
 void CVector3::norm ()
 {
   float d = sqrt (x * x + y * y + z * z);
-  if (d == 0) d = 1E-10;
-  x /= d; y /= d; z /= d;
+  if (d == 0)
+    d = 1E-10;
+  x /= d;
+  y /= d;
+  z /= d;
 }
 
-bool CVector3::isEqual (CVector3 *v)
+bool CVector3::isEqual (const CVector3 &v) const
 {
-  return x == v->x && y == v->y && z == v->z;
+  return x == v.x && y == v.y && z == v.z;
 }
 
-bool CVector3::isEqual (CVector3 *v, float tol)
+bool CVector3::isEqual (const CVector3 &v, float tolerance) const
 {
-  return x >= v->x - tol && x <= v->x + tol &&
-         y >= v->y - tol && y <= v->y + tol &&
-         z >= v->z - tol && z <= v->z + tol;
+  return x >= v.x - tolerance && x <= v.x + tolerance &&
+         y >= v.y - tolerance && y <= v.y + tolerance &&
+         z >= v.z - tolerance && z <= v.z + tolerance;
 }
 
-void CVector3::take (CVector3 *v)
+void CVector3::take (CVector3 &v)
 {
-  x = v->x; y = v->y; z = v->z;
+  x = v.x;
+  y = v.y;
+  z = v.z;
 }
 
 
 
-bool CVector2::isEqual (CVector2 *v)
+CVector2::CVector2 ()
 {
-  return x == v->x && y == v->y;
+  set (0, 0);
 }
 
-bool CVector2::isEqual (CVector2 *v, float tol)
+CVector2::CVector2 (float x, float y)
 {
-  return x >= v->x - tol && x <= v->x + tol &&
-         y >= v->y - tol && y <= v->y + tol;
+  set (x, y);
 }
 
-void CVector2::take (CVector2 *v)
+CVector2::CVector2 (const CVector2 &v)
 {
-  x = v->x; y = v->y;
+  set (v);
+}
+
+CVector2::~CVector2 ()
+{
+}
+
+void CVector2::set (const CVector2 &v)
+{
+  x = v.x;
+  y = v.y;
+}
+
+void CVector2::set (float x, float y)
+{
+  this->x = x;
+  this->y = y;
+}
+
+bool CVector2::isEqual (CVector2 &v) const
+{
+  return x == v.x && y == v.y;
+}
+
+bool CVector2::isEqual (CVector2 &v, float tolerance) const
+{
+  return x >= v.x - tolerance && x <= v.x + tolerance &&
+         y >= v.y - tolerance && y <= v.y + tolerance;
+}
+
+void CVector2::take (CVector2 &v)
+{
+  x = v.x;
+  y = v.y;
 }
 
 
@@ -328,51 +388,56 @@ CVertex::CVertex ()
   triangles = 0;
 }
 
-CVertex::CVertex (CVertex *v)
+CVertex::CVertex (CVertex &v)
 {
   take (v);
 }
 
-void CVertex::addNormal (CVector3 *n)
+CVertex::~CVertex ()
 {
-  triangles ++;
-  normal.x = (normal.x * (triangles - 1) + n->x) / (float) triangles;
-  normal.y = (normal.y * (triangles - 1) + n->y) / (float) triangles;
-  normal.z = (normal.z * (triangles - 1) + n->z) / (float) triangles;
 }
 
-void CVertex::addColor (CColor *c)
+void CVertex::addNormal (CVector3 &n)
+{
+  triangles ++;
+  normal.x = (normal.x * (triangles - 1) + n.x) / (float) triangles;
+  normal.y = (normal.y * (triangles - 1) + n.y) / (float) triangles;
+  normal.z = (normal.z * (triangles - 1) + n.z) / (float) triangles;
+}
+
+void CVertex::addColor (CColor &color)
 {
   triangles ++;
   for (int i = 0; i < 4; i ++)
   {
-    color.c [i] = (unsigned char) (((float) color.c [i] * (triangles - 1) + c->c [i]) / (float) triangles);
+    this->color.c [i] = (unsigned char) (((float) this->color.c [i] * (triangles - 1)
+                                         + color.c [i]) / (float) triangles);
   }
 }
 
-void CVertex::take (CVertex *v)
+void CVertex::take (CVertex &v)
 {
-  vector.take (&v->vector);
-  normal.take (&v->normal);
-  color = v->color;
-  triangles = v->triangles;
+  vector.take (v.vector);
+  normal.take (v.normal);
+  color.take (v.color);
+  triangles = v.triangles;
 }
 
 
 
-double pitab;
-float sintab [360], costab [360];
+//double pitab;
+//float sintab [360], costab [360];
 
 CRotation::CRotation ()
 {
   a = b = c = 0;
   calcRotation ();
-  pitab = 4 * atan (1);
+/*  pitab = 4 * atan (1);
   for (int i = 0; i < 360; i ++)
   {
     sintab [i] = sin (pitab / 180 * i);
     costab [i] = cos (pitab / 180 * i);
-  }
+  }*/
 }
 
 CRotation::~CRotation () {}
@@ -405,15 +470,15 @@ void CRotation::addAngles (short a, short b, short c)
 
 void CRotation::calcRotation ()
 {
-  rot [0] [0] = costab [c] * costab [b];
-  rot [0] [1] = sintab [a] * sintab [b] * costab [c] - sintab [c] * costab [a];
-  rot [0] [2] = sintab [a] * sintab [c] + costab [a] * sintab [b] * costab [c];
-  rot [1] [0] = sintab [c] * costab [b];
-  rot [1] [1] = costab [c] * costab [a] + sintab [a] * sintab [b] * sintab [c];
-  rot [1] [2] = costab [a] * sintab [b] * sintab [c] - sintab [a] * costab [c];
-  rot [2] [0] = -sintab [b];
-  rot [2] [1] = sintab [a] * costab [b];
-  rot [2] [2] = costab [a] * costab [b];
+  rot [0] [0] = COS(c) * COS(b);
+  rot [0] [1] = SIN(a) * SIN(b) * COS(c) - SIN(c) * COS(a);
+  rot [0] [2] = SIN(a) * SIN(c) + COS(a) * SIN(b) * COS(c);
+  rot [1] [0] = SIN(c) * COS(b);
+  rot [1] [1] = COS(c) * COS(a) + SIN(a) * SIN(b) * SIN(c);
+  rot [1] [2] = COS(a) * SIN(b) * SIN(c) - SIN(a) * COS(c);
+  rot [2] [0] = -SIN(b);
+  rot [2] [1] = SIN(a) * COS(b);
+  rot [2] [2] = COS(a) * COS(b);
 }
 
 float CRotation::rotateX (CVector3 *v)
@@ -433,13 +498,13 @@ float CRotation::rotateZ (CVector3 *v)
 
 float CRotation::getsintab (int a)
 {
-  if (a >= 0 && a < 360) return sintab [a];
+  if (a >= 0 && a < 360) return SIN(a);
   return 0;
 }
 
 float CRotation::getcostabntab (int a)
 {
-  if (a >= 0 && a < 360) return costab [a];
+  if (a >= 0 && a < 360) return COS(a);
   return 0;
 }
 
@@ -453,11 +518,11 @@ void CRotation::take (CRotation *r)
 void CTriangle::getNormal (CVector3 *n)
 {
   CVector3 dummy;
-  n->take (&v [1]->vector);
-  n->sub (&v [0]->vector);
-  dummy.take (&v [2]->vector);
-  dummy.sub (&v [0]->vector);
-  n->crossproduct (&dummy);
+  n->take (v [1]->vector);
+  n->sub (v [0]->vector);
+  dummy.take (v [2]->vector);
+  dummy.sub (v [0]->vector);
+  n->crossproduct (dummy);
 }
 
 void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
@@ -469,7 +534,7 @@ void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
   dummy.norm ();
   if (dummy.z > 0) dummy.neg ();
   for (i = 0; i < 3; i ++)
-  { v [i]->addNormal (&dummy); }
+  { v [i]->addNormal (dummy); }
 }
 
 
@@ -477,11 +542,11 @@ void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
 void CQuad::getNormal (CVector3 *n)
 {
   CVector3 dummy;
-  n->take (&v [1]->vector);
-  n->sub (&v [0]->vector);
-  dummy.take (&v [3]->vector);
-  dummy.sub (&v [0]->vector);
-  n->crossproduct (&dummy);
+  n->take (v [1]->vector);
+  n->sub (v [0]->vector);
+  dummy.take (v [3]->vector);
+  dummy.sub (v [0]->vector);
+  n->crossproduct (dummy);
 }
 
 void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
@@ -493,7 +558,7 @@ void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
   dummy.norm ();
   if (dummy.z > 0) dummy.neg ();
   for (i = 0; i < 4; i ++)
-  { v [i]->addNormal (&dummy); }
+  { v [i]->addNormal (dummy); }
 }
 
 
@@ -530,9 +595,9 @@ int CObject::addVertex (CVertex *w)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
-    if (w->vector.isEqual (&vertex [i].vector, 1e-3F) && w->color.isEqual (vertex [i].color)) break;
+    if (w->vector.isEqual (vertex [i].vector, 1e-3F) && w->color.isEqual (vertex [i].color)) break;
   if (i == numVertices)
-  vertex [numVertices ++].take (w);
+  vertex [numVertices ++].take (*w);
   return i;
 }
 
@@ -602,13 +667,13 @@ void CModel::addRefPoint (CVector3 *tl)
     {
       for (i2 = numRefpoints; i2 > i; i2 --)
       {
-        refpoint [i2].take (&refpoint [i2 - 1]);
+        refpoint [i2].take (refpoint [i2 - 1]);
       }
-      refpoint [i].take (tl);
+      refpoint [i].take (*tl);
       goto fertigref1;
     }
   }
-  refpoint [numRefpoints].take (tl);
+  refpoint [numRefpoints].take (*tl);
 fertigref1:;
   numRefpoints ++;
 }
@@ -773,21 +838,21 @@ void CModel::draw (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, floa
   if (alpha)
   { glEnable (GL_BLEND); glEnable (GL_ALPHA_TEST); glAlphaFunc (GL_GEQUAL, 0.2); }
 
-	for (i = 0; i < numObjects; i ++)
-	{
+  for (i = 0; i < numObjects; i ++)
+  {
     if (numObjects <= 0) break;
-	  cm = object [i];
-	  if (cm->hasTexture)
-	  {
-		  glEnable (GL_TEXTURE_2D);
-		  glColor4f (1, 1, 1, 1);
-		  glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
-	  }
-	  else
-	  {
-		  glDisable (GL_TEXTURE_2D);
-		  glColor4f (1, 1, 1, 1);
-	  }
+    cm = object [i];
+    if (cm->hasTexture)
+    {
+      glEnable (GL_TEXTURE_2D);
+      glColor4f (1, 1, 1, 1);
+      glBindTexture (GL_TEXTURE_2D, cm->material->texture->textureID);
+    }
+    else
+    {
+      glDisable (GL_TEXTURE_2D);
+      glColor4f (1, 1, 1, 1);
+    }
 
     if (cm->material != NULL)
     {

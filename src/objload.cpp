@@ -148,8 +148,8 @@ void CLoadOBJ::ComputeColors (CModel *model)
     CObject *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      n.take (&object->vertex [i2].normal);
-      int lum = (int) (255.0 - 255.0 * acos (n.dotproduct (&light)));
+      n.take (object->vertex [i2].normal);
+      int lum = (int) (255.0 - 255.0 * acos (n.dotproduct (light)));
       object->vertex [i2].color.c [0] = lum;
       object->vertex [i2].color.c [1] = lum;
       object->vertex [i2].color.c [2] = lum;
@@ -174,7 +174,7 @@ void CLoadOBJ::ComputeNormals (CModel *model)
       if (n.x == 0 && n.y == 0 && n.z == 0) n.z = 1;
       for (i3 = 0; i3 < 3; i3 ++)
       {
-        object->triangle [i2].v [i3]->addNormal (&n);
+        object->triangle [i2].v [i3]->addNormal (n);
       }
     }
     for (i2 = 0; i2 < object->numQuads; i2 ++)
@@ -182,7 +182,7 @@ void CLoadOBJ::ComputeNormals (CModel *model)
       object->quad [i2].getNormal (&n);
       for (i3 = 0; i3 < 4; i3 ++)
       {
-        object->quad [i2].v [i3]->addNormal (&n);
+        object->quad [i2].v [i3]->addNormal (n);
       }
     }
     for (i2 = 0; i2 < object->numTriangles; i2 ++)

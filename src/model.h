@@ -55,7 +55,8 @@ class CColor
   void setColor (const CColor &color);
   void setColor (int red, int green, int blue, int alpha = 255);
   bool isEqual (const CColor &color) const; // compare colors
-  void operator = (const CColor &color);
+  void take (const CColor &color);
+//  void operator = (const CColor &color);
 };
 
 /**
@@ -100,56 +101,101 @@ class CTexture
   void getColor (CColor *c, int x, int y) const;
 };
 
-// CVector3 stores the components of a 3D vector (x,y,z)
+/**
+* CVector3 stores the components of a 3D vector (x,y,z).
+* Access x,y,z directly.
+*/
 class CVector3 
 {
   public:
-  float x, y, z; // coordinates, float on most systems faster than double
+  /// x coordinate
+  float x;
+  /// y coordinate
+  float y;
+  /// z coordinate
+  float z;
+  
   CVector3 ();
   CVector3 (float x, float y, float z);
-  CVector3 (CVector3 *v);
+  CVector3 (const CVector3 &v);
+  virtual ~CVector3 ();
+  
+  void set (const CVector3 &v);
   void set (float x, float y, float z);
   void neg ();
-  void add (CVector3 *v);
-  void sub (CVector3 *v);
+  void add (const CVector3 &v);
+  void sub (const CVector3 &v);
   void mul (float fac);
-  void crossproduct (CVector3 *v);
-  float dotproduct (CVector3 *v);
-  float length ();
+  void crossproduct (const CVector3 &v);
+  float dotproduct (const CVector3 &v) const;
+  float length () const;
   void norm ();
-  bool isEqual (CVector3 *v); // exactly equal in memory (no sense for comparisons)
-  bool isEqual (CVector3 *v, float tol); // numerically equal, use a tolerance like 1E-8
-  void take (CVector3 *v); // copy data from v
+  /// exactly equal in memory? (e.g. after loading from file)
+  bool isEqual (const CVector3 &v) const;
+  /// numerically equal, use a tolerance like 1E-8
+  bool isEqual (const CVector3 &v, float tolerance) const;
+  void take (CVector3 &v); // copy data from v
 };
 
-// CVector2 stores the components of a 2D vector, for texture purpose
+/**
+* CVector2 stores the components of a 2D vector (x,y).
+* Access x,y directly.
+*/
 class CVector2 
 {
   public:
-  float x, y; // coordinates
-  void take (CVector2 *v); // copy data from v
-  bool isEqual (CVector2 *v); // exactly equal in memory (no sense for comparisons)
-  bool isEqual (CVector2 *v, float tol); // numerically equal, use a tolerance like 1E-8
+  /// x coordinate
+  float x;
+  /// y coordinate
+  float y;
+  
+  CVector2 ();
+  CVector2 (float x, float y);
+  CVector2 (const CVector2 &v);
+  virtual ~CVector2 ();
+  
+  void set (const CVector2 &v);
+  void set (float x, float y);
+  /// exactly equal in memory (no sense for comparisons)
+  bool isEqual (CVector2 &v) const;
+  /// numerically equal, use a tolerance like 1E-8
+  bool isEqual (CVector2 &v, float tolerance) const;
+  /// copy data from v
+  void take (CVector2 &v);
 };
 
-// CVertex represents a vertex which may take inforamtion about color, location, normal, texture, number of surrounding triangles
+/**
+* CVertex represents a vertex which may take information about
+* color, location, normal, texture, number of surrounding triangles.
+*/
 class CVertex
 {
   public:
-  int triangles; // number of triangles this vertex belongs to
-  CColor color; // color, used when displayed without textures
-  CVector3 vector; // coordinates
-  CVector3 normal; // normal vector interpolated of all surrounding triangles
-  CVector2 tex; // 2D texture coordinates
+  /// number of triangles to which this vertex belongs to
+  int triangles;
+  /// color, used when displayed without textures
+  CColor color;
+  /// position
+  CVector3 vector;
+  /// normal vector, interpolation of all surrounding triangles
+  CVector3 normal;
+  /// 2D texture coordinates
+  CVector2 tex;
+  
   CVertex ();
-  CVertex (CVertex *v);
-  void addNormal (CVector3 *n); // the normal vector of a vertex can be calculated as average of all adjacent plane normals
-  void addColor (CColor *c); // the color of a vertex can be calculated as average of all adjacent plane colors
-  void take (CVertex *v); // copy data from v
+  CVertex (CVertex &v);
+  virtual ~CVertex ();
+  
+  /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
+  void addNormal (CVector3 &n); 
+  /// the color of a vertex can be calculated as average of all adjacent plane colors
+  void addColor (CColor &c);
+  /// copy data from v
+  void take (CVertex &v);
 };
 
-extern double pitab; // pi=atan(1)
-extern float sintab [360], costab [360]; // table for sine, cosine functions (obsolete, use COS(), SIN() instead)
+//extern double pitab; // pi=atan(1)
+//extern float sintab [360], costab [360]; // table for sine, cosine functions (obsolete, use COS(), SIN() instead)
 
 // CRotation stores one (x,y,z)-rotation
 class CRotation

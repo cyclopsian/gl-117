@@ -502,7 +502,7 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
   
   for (int i = 0; i < object->numTexVertex; i ++)
-    object->vertex [i].tex.take (&p [i]);
+    object->vertex [i].tex.take (p [i]);
   delete p;
 }
 
@@ -522,7 +522,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
     
   for (i = 0; i < object->numVertices; i ++)
   {
-    object->vertex [i].vector.take (&p [i]);
+    object->vertex [i].vector.take (p [i]);
   }
 
   // Flip the y values with the z values as 3DMAX changed them and negate z
@@ -574,8 +574,8 @@ void CLoad3DS::Compile (CModel *model)
     {
       for (int i3 = 0; i3 < i2; i3 ++)
       {
-        if (co->vertex [i2].vector.isEqual (&co->vertex [i3].vector) &&   // same coordinates
-            co->vertex [i2].tex.isEqual (&co->vertex [i3].tex))           // same texture coordinates
+        if (co->vertex [i2].vector.isEqual (co->vertex [i3].vector) &&   // same coordinates
+            co->vertex [i2].tex.isEqual (co->vertex [i3].tex))           // same texture coordinates
         {
           for (int i4 = 0; i4 < co->numTriangles; i4 ++)
           {
@@ -627,7 +627,7 @@ void CLoad3DS::ComputeNormals (CModel *model)
       object->triangle [i2].getNormal (&n);
       for (i3 = 0; i3 < 3; i3 ++)
       {
-        object->triangle [i2].v [i3]->addNormal (&n);
+        object->triangle [i2].v [i3]->addNormal (n);
       }
     }
     for (i2 = 0; i2 < object->numTriangles; i2 ++)

@@ -73,7 +73,7 @@ void CSpaceObj::addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float 
     refscale = new float [50];
   }
   refmodel [numRefModels] = model;
-  reftl [numRefModels].take (tl);
+  reftl [numRefModels].take (*tl);
   refrot [numRefModels].take (rot);
   refscale [numRefModels] = scale;
   numRefModels ++;
@@ -153,8 +153,8 @@ Space::Space ()
 Space::Space (CVector3 *v, CVector3 *w)
 { no = 0; alpha = 1; lum = 1; drawlight = true;
   tl = new CVector3 ();
-  z1 = new CVector3 (v);
-  z2 = new CVector3 (w); }
+  z1 = new CVector3 (*v);
+  z2 = new CVector3 (*w); }
 
 Space::~Space ()
 { delete tl; delete z1; delete z2; }

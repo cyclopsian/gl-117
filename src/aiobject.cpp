@@ -588,16 +588,16 @@ void DynamicObj::move (Uint32 dt)
     phiup = phi;
     uaxis.set (COS(gammaup) * SIN(phiup), SIN(gammaup), COS(gammaup) * COS(phiup)); // upward axis (theta = 0)
     // now rotate around vaxis using theta
-    utemp.take (&uaxis);
+    utemp.take (uaxis);
     utemp.mul (COS(thetaup));
-    utemp2.take (&vaxis);
-    utemp2.mul ((1 - COS(thetaup)) * uaxis.dotproduct (&vaxis));
-    utemp3.take (&uaxis);
-    utemp3.crossproduct (&vaxis);
+    utemp2.take (vaxis);
+    utemp2.mul ((1 - COS(thetaup)) * uaxis.dotproduct (vaxis));
+    utemp3.take (uaxis);
+    utemp3.crossproduct (vaxis);
     utemp3.mul (SIN(thetaup));
-    utemp.add (&utemp2);
-    utemp.add (&utemp3);
-    uaxis.take (&utemp);
+    utemp.add (utemp2);
+    utemp.add (utemp3);
+    uaxis.take (utemp);
 
   }
 
@@ -1442,7 +1442,7 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
       if (id >= FIGHTER1 && id <= FIGHTER2)
         laser->gamma = gamma;
       else
-        laser->gamma = 180.0 + atan ((target->tl->y - tl->y) / distance (target)) * 180.0 / pitab;
+        laser->gamma = 180.0 + atan ((target->tl->y - tl->y) / distance (target)) * 180.0 / PI;
     }
   }
   else
