@@ -77,6 +77,7 @@ class WaveFile
 #define MUSIC_WINNER1 1
 #define MUSIC_STANDBY1 2
 #define MUSIC_ELECTRO1 3
+#define MUSIC_STARS1 4
 
 class SoundSystem
 {

@@ -4557,13 +4557,15 @@ void stats_reshape ()
 
 void playRandomMusic ()
 {
-  int r = myrandom (3);
+  int r = myrandom (4);
   if (r == 0)
     sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
     sound->loadMusic (MUSIC_STANDBY1);
-  else
+  else if (r == 2)
     sound->loadMusic (MUSIC_ELECTRO1);
+  else
+    sound->loadMusic (MUSIC_STARS1);
   sound->playMusic ();
 }
 
