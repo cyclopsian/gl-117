@@ -6707,9 +6707,42 @@ void game_mouse (int button, int state, int x, int y)
 
 float dtheta = 0, dgamma = 0;
 
+/* Hi Bernd. To test the messy mouse interface code you will have to do two more things,
+   as the code has been disabled on the CVS server.
+   Just search on for your first (short) name! */
+int lastmousex = 0;
+
+// This function is experimental. It is called about 30 times per second.
+void game_easymouse ()
+{
+  float mx = width / 2, my = height / 2;
+  float dx = mousex - mx, dy = my - mousey; // deltax and deltay
+
+  int t = (int) fplayer->theta; // roll angle
+  if (t < 0) t += 360;
+  float rx = dx * cosi [t] - dy * sine [t]; // rolled mouse x coordinate
+  float ry = -dx * sine [t] + dy * cosi [t]; // rolled mouse y coordinate
+
+  if (mousex != lastmousex) // only change roll angle on mouse event
+  {
+    fplayer->rectheta = -rx * 240 / width; // some scaling
+  }
+  if (fplayer->rectheta > 90) fplayer->rectheta = 90; // limits
+  else if (fplayer->rectheta < -90) fplayer->rectheta = -90;
+  lastmousex = mousex; // save last mouse x coordinate to detect an event
+
+  // calculate the aileron effect every time
+  fplayer->aileroneffect = 0.005F * ry;
+  if (fplayer->aileroneffect > 1.0) fplayer->aileroneffect = 1.0;
+  else if (fplayer->aileroneffect < -0.5) fplayer->aileroneffect = -0.5;
+}
+
 void game_mousemotion (int x, int y)
 {
   if (controls != CONTROLS_MOUSE) return;
+
+/* Bernd: Please activate the following return to disable this method! */
+//  return;
 
   float f = (float) width / 240.0;
   float mx = width / 2, my = height / 2;
@@ -10719,6 +10752,9 @@ void sdlMainLoop ()
 //    SDL_Delay (sdlTimeLeft ());
     sdlWaitTimer ();
     sdlTimerFunc ();
+/* Bernd: Please uncomment the following two lines! */
+//    if (game == GAME_PLAY)
+//      game_easymouse ();
   }
 }
 #endif
