@@ -1620,7 +1620,7 @@ bool AIObj::haveMissile (int id)
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
   {
-    sprintf (buf, "Wrong missile ID in %s, line %s", __FILE__, __LINE__);
+    sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
     display (buf, LOG_ERROR);
   }
   if (missiles [id] > 0)
@@ -1642,7 +1642,7 @@ void AIObj::decreaseMissile (int id)
   id -= MISSILE1;
   if (id < 0 || id >= missiletypes)
   {
-    sprintf (buf, "Wrong missile ID in %s, line %s", __FILE__, __LINE__);
+    sprintf (buf, "Wrong missile ID in %s, line %d", __FILE__, __LINE__);
     display (buf, LOG_ERROR);
   }
   missiles [id] --;

@@ -93,6 +93,7 @@ class Mission
   int physics; // action=0 or simulation=1
 
   Mission ();
+  virtual ~Mission () {}
   void playerInit ();
   void alliedInit (int fighterid, int pilotid, AIObj *aiobj);
   void init ();

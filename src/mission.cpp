@@ -1136,7 +1136,6 @@ void MissionDeathmatch1::start ()
 
 int MissionDeathmatch1::processtimer (Uint32 dt)
 {
-  bool b = false;
   int i;
   if (texttimer >= 200 * timestep) texttimer = 0;
   if (texttimer > 0) texttimer += dt;

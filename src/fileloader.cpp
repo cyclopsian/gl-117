@@ -152,7 +152,6 @@ void file_setSeparator (char *string)
   Add comment strings for this file
   Example language C++:
     file_addComment ("//", "\n");
-    file_addComment ("/*", "* /"); <-- without whitespace between * and /
 **************************************************************************/
 void file_addComment (char *startstring, char *endstring)
 {

@@ -48,6 +48,8 @@ TODO:
 #include "glland.h"
 #include "common.h"
 
+#include <ctype.h>
+
 int mousex, mousey;
 
 int debug = 1;
@@ -3173,7 +3175,7 @@ void game_display ()
 
   if (quality >= 1 && clouds > 0)
   {
-    int cloudfog = pseudoview;
+    float cloudfog = pseudoview;
     if (cloudfog > 110) cloudfog = 110;
     gl->enableFog (cloudfog);
 
@@ -6267,14 +6269,12 @@ void callbackQuality (Component *comp, int key)
 void callbackTraining (Component *comp, int key)
 {
   allmenus.setVisible (false);
-  Button *button = (Button *) comp;
   switch_mission (getTrainingIdFromValue (comp->id - trainingstartid));
 }
 
 void callbackCampaign (Component *comp, int key)
 {
   allmenus.setVisible (false);
-  Button *button = (Button *) comp;
   switch_mission (getCampaignIdFromValue (comp->id - campaignstartid));
 }
 
@@ -7101,7 +7101,7 @@ void createMenu ()
   yf -= yfstep + 0.25;
 
   yfstep = 1.0;
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   fightermenu.add (label);
@@ -7140,36 +7140,36 @@ void createMenu ()
 */
 
   xf = -12.5; yf = 11; xfstep = 25; yfstep = 1.3;
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   missionmenu.add (label);
   yf -= yfstep + 0.15;
 
   yfstep = 1.0;
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, 3.5);
   missionmenu.add (label);
   yf -= 3.75;
 
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep / 2 - 0.1, 5.7);
   missionmenu.add (label);
 
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, 5.7);
   missionmenu.add (label);
   yf -= 5.95;
 
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep / 2 - 0.1, 6.8);
   missionmenu.add (label);
 
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf + xfstep / 2 + 0.1, yf, xfstep / 2 - 0.1, 6.8);
   missionmenu.add (label);
@@ -7193,7 +7193,7 @@ void createMenu ()
 */
 
   xf = -6; yf = 2; xfstep = 12; yfstep = 1.2;
-  sprintf (buf, "");
+  buf [0] = 0;
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, 3);
   quitmenu.add (label);
@@ -7217,7 +7217,7 @@ void createMenu ()
 */
 
   xf = -10; yf = 9; xfstep = 20; yfstep = 1.2;
-  sprintf (buf, "");
+  buf [0] = 0;
   textfield = new TextField (buf, 1);
   textfield->setBounds (xf, yf, xfstep, 15.8);
   statsmenu.add (textfield);

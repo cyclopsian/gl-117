@@ -27,10 +27,10 @@
 #include "model.h" // ok
 #include "object.h" // ok
 
-const int maxsmokeelem = 30;
+const int maxsmokeelem = 30; // smoke quads to be rendered
 
-extern CTexture *texsmoke, *texsmoke2, *texsmoke3;
-extern const float smokezoom[];
+extern CTexture *texsmoke, *texsmoke2, *texsmoke3; // some smoke textures
+extern const float smokezoom[]; // zoom values of the smoke quads
 
 // Smoke of missiles and fighters
 class CSmoke
@@ -42,7 +42,9 @@ class CSmoke
   int phi [maxsmokeelem]; // player's view angle (for low quality smoke), obsolete since v0.8.5
   int last;
   int type;
+  
   CSmoke (int type);
+  virtual ~CSmoke ();
   void setSmoke (float x, float y, float z, int myphi, int mytime);
   void move (Uint32 dt, int dec);
   void drawElem (int n);
@@ -58,7 +60,7 @@ class Flash
   int phi; // player's view angle
   CVector3 w [10];
   Flash ();
-  ~Flash ();
+  virtual ~Flash ();
   void set (float x, float y, float z, int phi);
   void draw ();
   void drawHQ ();
@@ -72,9 +74,12 @@ class CExplosion : public CSpaceObj
   int ttl, maxlen;
   float maxzoom;
   CVector3 v;
+  
   CExplosion (Space *space, CModel *sphere);
+  virtual ~CExplosion () {}
   void setExplosion (float x, float y, float z, float vx, float vy, float vz, float maxzoom, int len);
   void move (Uint32 dt);
+  // drawGL() of CSpaceObj
 };
 
 // Dark smoke after explosions
@@ -85,7 +90,9 @@ class CBlackSmoke : public CSpaceObj
   int ttl, maxlen;
   float maxzoom;
   float myphi; // player's view angle, obsolete since v0.8.5
+  
   CBlackSmoke (Space *space);
+  virtual ~CBlackSmoke () {}
   void setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len);
   void move (Uint32 dt);
   virtual void drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2);
@@ -95,9 +102,11 @@ class CBlackSmoke : public CSpaceObj
 class Star
 {
   public:
-  int phi, gamma;
+  int phi, gamma; // polar (sphere) coords
   float size;
+  
   Star (int phi, int gamma, float size);
+  virtual ~Star () {}
   void draw ();
 };
 
@@ -116,11 +125,12 @@ class Font
   CColor *stdcol;
   CColor *highlightcol;
   
+  Font (char *filename, int height, char start, int num); // new Font
+  virtual ~Font ();
+
   bool isPixel (int x, int y); // is pixel set in the texture?
   void extractLetters (int height, char start, int num); // extract the letters
-  Font (char *filename, int height, char start, int num); // new Font
-  ~Font ();
-
+  
   // some custom OpenGL output methods
   void drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol);
   void drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);
@@ -148,8 +158,9 @@ class HighClouds : public CSpaceObj
 {
   public:
   CSpherePart *sphere;
+  
   HighClouds (int theta);
-  ~HighClouds ();
+  virtual ~HighClouds ();
   void init (int theta);
   void setTexture (CTexture *texture);
   void drawGL (CVector3 *tl, CVector3 *textl);

@@ -122,7 +122,7 @@ Dirs::Dirs (char *arg)
   if (!founddir)
   {
 
-    FILE *in;
+//    FILE *in;
     char cwd [4096];
     getcwd (cwd, 4096); // get current working directory
     char mypath [8092];

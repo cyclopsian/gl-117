@@ -23,12 +23,14 @@
 
 #ifndef IS_EFFECTS_H
 
-#include <math.h>
 #include "effects.h"
 #include "mathtab.h"
 #include "glland.h"
 #include "gl.h"
 #include "common.h"
+
+#include <math.h>
+#include <stdlib.h>
 
 const float smokezoom[] = { 0.174, 0.171, 0.168, 0.165, 0.162, 0.159, 0.156, 0.153, 0.15, 0.149, 0.146, 0.143, 0.14, 0.136, 0.132, 0.128, 0.124, 0.12, 0.115, 0.11, 0.105, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.015 };
 CTexture *texsmoke, *texsmoke2, *texsmoke3;
@@ -43,6 +45,10 @@ CSmoke::CSmoke (int type)
   }
   last = 0;
   this->type = type;
+}
+
+CSmoke::~CSmoke ()
+{
 }
 
 void CSmoke::setSmoke (float x, float y, float z, int myphi, int mytime)

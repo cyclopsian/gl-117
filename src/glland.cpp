@@ -29,6 +29,8 @@
 #include "gl.h"
 #include "common.h"
 
+#include <stdlib.h>
+
 const float zoomz = 1.0/(100.0*MAXX);
 const float hh = (float) 1 / (float) MAXX;
 const float zoomz2 = 32768.0 * zoomz;
@@ -286,9 +288,9 @@ void GLLandscape::precalculate ()
   int midheight = (highestpoint + lowestpoint) / 2;
 
   // set minimum ambient light
-  int minambient = 100.0 + sungamma * 4;
+  int minambient = (int) (100.0 + sungamma * 4);
   if (!day) minambient = 100;
-  if (minambient > 350.0) minambient = 350.0;
+  if (minambient > 350) minambient = 350;
 
   // Set the luminance of the landscape
   for (x = 0; x <= MAXX; x ++)
@@ -1096,7 +1098,7 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
     else if (h1 < minh) minh = h1;
   }
   float midh = (minh + maxh) / 2;
-  float size = (maxh - minh) * step; // exakt wäre mal 0.5
+  float size = (maxh - minh) * step; // exakt wï¿½e mal 0.5
   if (size < 1.0 / 2 * step)
     size = 1.0 / 2 * step;
   if (!gl->isSphereInFrustum ((0.5+xs), midh, (0.5+ys), size * 2))
@@ -1167,7 +1169,7 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
     else if (h1 < minh) minh = h1;
   }
   float midh = (minh + maxh) / 2;
-  float size = (maxh - minh) * step; // exakt wäre mal 0.5
+  float size = (maxh - minh) * step; // exakt wï¿½e mal 0.5
   if (size < 1.0 / 2 * step)
     size = 1.0 / 2 * step;
   if (!gl->isSphereInFrustum ((0.5+xs), midh, (0.5+ys), size * 2))
@@ -1241,7 +1243,7 @@ void GLLandscape::drawTexturedQuad (int x1, int y1, int x2, int y2, int x3, int 
     else if (h1 < minh) minh = h1;
   }
   float midh = (minh + maxh) / 2;
-  float size = (maxh - minh) * step; // exakt wäre mal 0.5
+  float size = (maxh - minh) * step; // exakt wï¿½e mal 0.5
   if (size < 1.0 / 2 * step)
     size = 1.0 / 2 * step;
   if (!gl->isSphereInFrustum ((0.5+x2), midh, (0.5+y2), size * 2))
@@ -1335,7 +1337,7 @@ void GLLandscape::drawTexturedTriangle (int x1, int y1, int x2, int y2, int x3, 
     else if (h1 < minh) minh = h1;
   }
   float midh = (minh + maxh) / 2;
-  float size = (maxh - minh) * step; // exakt wäre mal 0.5
+  float size = (maxh - minh) * step; // exakt wï¿½e mal 0.5
   if (size < 1.0 / 2 * step)
     size = 1.0 / 2 * step;
   if (!gl->isSphereInFrustum ((0.5+x2), midh, (0.5+y2), size * 2))
@@ -1436,7 +1438,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys)
     else if (h1 < minh) minh = h1;
   }
   float midh = (minh + maxh) / 2;
-  float size = (maxh - minh) * step; // exakt wäre mal 0.5
+  float size = (maxh - minh) * step; // exakt wï¿½e mal 0.5
   if (size < 1.0 / 2 * step)
     size = 1.0 / 2 * step;
   if (!gl->isSphereInFrustum ((0.5+xs), midh, (0.5+ys), size * 2))
@@ -1998,13 +2000,13 @@ void GLLandscape::draw (int phi, int gamma)
 
   if (phi < 0 || phi >= 360)
   {
-    sprintf (buf, "Phi exceeds in file %s, line %s, val %d", __FILE__, __LINE__, phi);
+    sprintf (buf, "Phi exceeds in file %s, line %d, val %d", __FILE__, __LINE__, phi);
     display (buf, LOG_ERROR);
   }
 
   if (gamma < 0 || gamma >= 360)
   {
-    sprintf (buf, "Gamma exceeds in file %s, line %s, val %d", __FILE__, __LINE__, gamma);
+    sprintf (buf, "Gamma exceeds in file %s, line %d, val %d", __FILE__, __LINE__, gamma);
     display (buf, LOG_ERROR);
   }
 
@@ -2136,7 +2138,6 @@ void GLLandscape::draw (int phi, int gamma)
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
           dh1 = vminref - (int) ch;
-          dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
           else
@@ -2197,7 +2198,6 @@ void GLLandscape::draw (int phi, int gamma)
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
           dh1 = vminref - (int) ch;
-          dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
           else
@@ -2258,7 +2258,6 @@ void GLLandscape::draw (int phi, int gamma)
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
           dh1 = vminref - (int) ch;
-          dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
           else
@@ -2319,7 +2318,6 @@ void GLLandscape::draw (int phi, int gamma)
           dist1 = sqrt ((float) deltax * deltax + deltay * deltay);
           dist2 = sqrt ((float) lastx * lastx + lasty * lasty);
           dh1 = vminref - (int) ch;
-          dhp;
           if (dist1 > 1E-4)
             dhp = (int) (dist2 * dh1 / dist1);
           else

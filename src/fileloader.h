@@ -1,27 +1,25 @@
 /*
-   ****************************************************************************
-   * COPYRIGHT  by Testing Solutions                                          *
-   * Reuter, Christian  c.reuter@testingsolutions.de                          *
-   * Von-Leoprechting-Str. 14, 86899 Landsberg / Lech Germany                 *
-   * Phone: +49 8191 305202, Fax: +49 8191 305244                             *
-   * Internet: www.testingsolutions.de                                        *
-   ****************************************************************************
-   *                                                                          *
-   * All Rights Reserved.                                                     *
-   *                                                                          *
-   * This software is the confidential and proprietary information of the     *
-   * author.                                                                  *
-   *                                                                          *
-   * All brand names and product names used in this software are trademarks,  *
-   * registered trademarks, or trade names of their respective holders.       *
-   * The authors of this software are not associated with any product or      *
-   * vendor mentioned in the code or documentation.                           *
-   *                                                                          *
-   ****************************************************************************
+    GL-117
+    Copyright 2001, 2002 Thomas A. Drexl aka heptargon
 
-   DOCUMENTATION:
-     This is a low level library to split text files into tokens.
+    This file is part of GL-117.
+
+    GL-117 is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    GL-117 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GL-117; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
+// This is a low level library to split text files into tokens.
 
 #ifndef IS_FILELOADER_H
 #define IS_FILELOADER_H
@@ -117,7 +115,6 @@ extern void file_setSeparator (char *string);
   Add comment strings for this file
   Example language C++:
     file_addComment ("//", "\n");
-    file_addComment ("/*", "* /"); <-- without whitespace between * and /
 **************************************************************************/
 extern void file_addComment (char *startstring, char *endstring);
 

@@ -37,7 +37,7 @@ class Dirs
 
   void append (char *target, char *str); // append subdir/file to path using (back-)slashes
   Dirs (char *arg);
-  ~Dirs ();
+  virtual ~Dirs ();
   char *getSaves (char *name); // get dir name containing the saves, ...
   char *getTextures (char *name);
   char *getSounds (char *name);
