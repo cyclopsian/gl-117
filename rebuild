@@ -51,6 +51,13 @@ cp /usr/share/automake*/depcomp . 2> /dev/null
 cp /usr/share/automake*/mkinstalldirs . 2> /dev/null
 cp /usr/share/automake*/install-sh . 2> /dev/null
 
+echo Cleaning up doc/src directory from obsolete pdfLaTeX files
+rm doc/src/gl-117.pdf 2> /dev/null
+rm doc/src/gl-117.aux 2> /dev/null
+rm doc/src/gl-117.toc 2> /dev/null
+rm doc/src/gl-117.out 2> /dev/null
+rm doc/src/gl-117.log 2> /dev/null
+
 echo Executing aclocal...
 aclocal
 
