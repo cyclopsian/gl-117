@@ -274,6 +274,8 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
     if (d->party != party)
       z *= 2.0; // missiles need not really hit the fighter, but will explode near it
   }
+  if (id >= STATIC)
+    z *= 0.7;
   if ((id >= SHIP1 && id <= SHIP2) || (d->id >= SHIP1 && d->id <= SHIP2))
     z *= 0.3;
   if (id == ASTEROID)
@@ -926,7 +928,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_GROUND1)
   {
     intelligence = 50;
-    maxspeed = 0.48;
+    maxspeed = 0.58;
     nimbility = 1.2;
     manoeverability = 1.0;
     ai = true;
@@ -936,7 +938,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_GROUND2)
   {
     intelligence = 0;
-    maxspeed = 0.50;
+    maxspeed = 0.60;
     nimbility = 1.5;
     manoeverability = 1.0;
     ai = true;
@@ -946,7 +948,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_DF1)
   {
     intelligence = 0;
-    maxspeed = 0.50;
+    maxspeed = 0.62;
     nimbility = 0.0;
     manoeverability = 0.0;
     ai = true;
@@ -1054,13 +1056,18 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     impact = 20;
   }
 
-  if (difficulty == 0)
+  if (difficulty == 0) // easy
   {
     intelligence = 400 - (400 - intelligence) / 2;
     precision = 400 - (400 - precision) / 2;
     aggressivity = 400 - (400 - aggressivity) / 2;
+    if (party == 0 && shield > 10)
+    {
+      shield = shield * 8 / 10;
+      maxshield = shield;
+    }
   }
-  else if (difficulty == 2)
+  else if (difficulty == 2) // hard
   {
     intelligence /= 2;
     precision /= 2;

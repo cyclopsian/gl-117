@@ -245,6 +245,13 @@ SoundSystem::SoundSystem ()
     exit (1);
   }
   Mix_FreeMusic (music1);
+  music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
+  if (music1 == NULL)
+  {
+    fprintf (stderr, "\nCannot open loser.s3m: %s", Mix_GetError ()); fflush (stderr);
+    exit (1);
+  }
+  Mix_FreeMusic (music1);
   music1 = Mix_LoadMUS (dirs->getMusic ("dark.s3m"));
   if (music1 == NULL)
   {
@@ -281,6 +288,8 @@ SoundSystem::SoundSystem ()
   wavethunder1 = new WaveFile (dirs->getSounds ("thunder1.wav"));
   waveplane1 = new WaveFile (dirs->getSounds ("plane1.wav"));
   wavehit1 = new WaveFile (dirs->getSounds ("hit1.wav"));
+  wavebeep1 = new WaveFile (dirs->getSounds ("beep1.wav"));
+  wavechaff1 = new WaveFile (dirs->getSounds ("chaff1.wav"));
   wavecannon1->setVolume (50);
   wavemissile1->setVolume (110);
   waveclick1->setVolume (80);
@@ -306,6 +315,8 @@ SoundSystem::~SoundSystem ()
   delete wavethunder1;
   delete waveplane1;
   delete wavehit1;
+  delete wavebeep1;
+  delete wavechaff1;
 }
 
 void SoundSystem::play (int sample)
@@ -334,6 +345,12 @@ void SoundSystem::play (int sample)
       break;
     case SOUND_HIT1:
       wavehit1->play ();
+      break;
+    case SOUND_BEEP1:
+      wavebeep1->play ();
+      break;
+    case SOUND_CHAFF1:
+      wavechaff1->play ();
       break;
   }
 }
@@ -364,6 +381,12 @@ void SoundSystem::playLoop (int sample)
       break;
     case SOUND_HIT1:
       wavehit1->playLoop ();
+      break;
+    case SOUND_BEEP1:
+      wavebeep1->playLoop ();
+      break;
+    case SOUND_CHAFF1:
+      wavechaff1->playLoop ();
       break;
   }
 }
@@ -430,6 +453,9 @@ void SoundSystem::loadMusic (int sample)
     case MUSIC_WINNER1:
       music1 = Mix_LoadMUS (dirs->getMusic ("winner.s3m"));
       break;
+    case MUSIC_LOSER1:
+      music1 = Mix_LoadMUS (dirs->getMusic ("loser.s3m"));
+      break;
     case MUSIC_STANDBY1:
       music1 = Mix_LoadMUS (dirs->getMusic ("standby.s3m"));
       break;
@@ -472,6 +498,12 @@ void SoundSystem::setVolume (int sample, int level)
     case SOUND_HIT1:
       wavehit1->setVolume (level);
       break;
+    case SOUND_BEEP1:
+      wavebeep1->setVolume (level);
+      break;
+    case SOUND_CHAFF1:
+      wavechaff1->setVolume (level);
+      break;
   }
 }
 
@@ -486,6 +518,8 @@ void SoundSystem::setVolume ()
   wavethunder1->setVolume (level);
   waveplane1->setVolume (level);
   wavehit1->setVolume (level);
+  wavebeep1->setVolume (level);
+  wavechaff1->setVolume (level);
 }
 
 void SoundSystem::setVolumeMusic ()
@@ -521,7 +555,13 @@ void SoundSystem::stop (int sample)
       waveplane1->stop ();
       break;
     case SOUND_HIT1:
-      waveplane1->stop ();
+      wavehit1->stop ();
+      break;
+    case SOUND_BEEP1:
+      wavebeep1->stop ();
+      break;
+    case SOUND_CHAFF1:
+      wavechaff1->stop ();
       break;
   }
 }

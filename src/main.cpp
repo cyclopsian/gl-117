@@ -1908,6 +1908,21 @@ class MissionDefend1 : public Mission
       fighter [i]->newinit (TANK_GROUND1, 0, 300);
       fighter [i]->target = fighter [i - 4];
     }
+    for (i = 11; i <= 13; i ++)
+    {
+      int off = 40;
+      if (difficulty == 0) off = 55;
+      else off = 25;
+      fighter [i]->tl->x = i * 5 - 50;
+      fighter [i]->tl->z = -i * 5 - off * 2;
+      fighter [i]->o = &model_tank2;
+      if (i == 12)
+        fighter [i]->newinit (TANK_AIR1, 0, 300);
+      else
+        fighter [i]->newinit (TANK_GROUND1, 0, 300);
+      fighter [i]->target = fighter [i - 4];
+      fighter [i]->deactivate ();
+    }
   }
 
   virtual int processtimer ()
@@ -1919,7 +1934,7 @@ class MissionDefend1 : public Mission
     {
       return 2;
     }
-    for (i = 0; i <= 10; i ++)
+    for (i = 0; i <= 13; i ++)
     {
       if (fighter [i]->active)
         if (fighter [i]->party == 0)
@@ -1937,6 +1952,14 @@ class MissionDefend1 : public Mission
     {
       font1->drawTextCentered (0, 4, -2, name, &textcolor);
     }
+    if (timer == 1000)
+    {
+      fighter [11]->activate ();
+      fighter [12]->activate ();
+      fighter [13]->activate ();
+    }
+    if (timer >= 1000 && timer <= 1200)
+      font1->drawTextCentered (0, 7, -3, "MORE TANKS ARE ATTACKING", &textcolor);
   }
 };
 
@@ -2467,7 +2490,7 @@ class MissionCanyon1 : public Mission
     {
       fighter [i]->o = &model_flarak1;
       fighter [i]->target = fighter [0];
-      fighter [i]->newinit (FLARAK_AIR1, 0, 100);
+      fighter [i]->newinit (FLARAK_AIR1, 0, 200);
       fighter [i]->tl->x = px + 4;
       fighter [i]->tl->z = py + i * 3 - 30;
       fighter [i]->maxspeed = 0;
@@ -2684,20 +2707,20 @@ class MissionCanyon3 : public Mission
     fighter [8]->tl->z = py - 3;
     fighter [9]->tl->x = px + 3;
     fighter [9]->tl->z = py - 3;
-    for (i = 10; i <= 22; i ++)
+    for (i = 10; i <= 17; i ++)
     {
       fighter [i]->party = 0;
       fighter [i]->target = fighter [myrandom (5)];
       fighter [i]->phi = 180;
-      if (i <= 16)
+      if (i <= 15)
       {
         fighter [i]->o = &model_figb;
-        fighter [i]->newinit (FIGHTER_CROW, 0, i * 10);
+        fighter [i]->newinit (FIGHTER_CROW, 0, i * 20);
       }
       else
       {
         fighter [i]->o = &model_figd;
-        fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 10);
+        fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 15);
       }
       fighter [i]->tl->x = px - i * 3;
       fighter [i]->tl->z = py - i * 3;
@@ -2713,7 +2736,7 @@ class MissionCanyon3 : public Mission
     {
       return 2;
     }
-    for (i = 0; i <= 9; i ++)
+    for (i = 0; i <= 17; i ++)
     {
       if (fighter [i]->active)
         if (fighter [i]->party == 0)
@@ -3212,6 +3235,8 @@ class Cockpit
         glVertex3f (xf - 1.0F, yf - 0.25F, zf);
         glEnd ();
       }
+      if (flarewarning == 1)
+        sound->play (SOUND_BEEP1);
     }
     if (chaffwarn)
     {
@@ -3227,6 +3252,8 @@ class Cockpit
         glVertex3f (xf - 1.0F, yf + 1.0F, zf);
         glEnd ();
       }
+      if (chaffwarning == 1)
+        sound->play (SOUND_BEEP1);
     }
     glColor3ub (255, 255, 255);
     gl->enableTextures (texcounter->textureID);
@@ -4731,7 +4758,11 @@ void switch_stats ()
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
   {
-    sound->loadMusic (MUSIC_WINNER1);
+    int missionstate = mission->processtimer ();
+    if (missionstate == 1)
+      sound->loadMusic (MUSIC_WINNER1);
+    else
+      sound->loadMusic (MUSIC_LOSER1);
     sound->playMusic ();
   }
 }
@@ -4903,12 +4934,12 @@ void game_key (unsigned char key, int x, int y)
   else if (key == 'f')
   {
     fplayer->fireFlare (flare, missile);
-    sound->play (SOUND_MISSILE1);
+    sound->play (SOUND_CHAFF1);
   }
   else if (key == 'c')
   {
     fplayer->fireChaff (chaff, missile);
-    sound->play (SOUND_MISSILE1);
+    sound->play (SOUND_CHAFF1);
   }
   else if (key == ' ' && fplayer->active)
   {
