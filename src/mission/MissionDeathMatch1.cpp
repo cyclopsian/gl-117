@@ -63,7 +63,6 @@ void MissionDeathmatch1::start ()
     fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
     fighter [i]->party = i + 1;
     fighter [i]->target = fighter [i - 1];
-//    fighter [i]->o = &model_fig;
     fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
     fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
   }

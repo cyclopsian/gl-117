@@ -75,7 +75,7 @@ void MissionCanyon3::start ()
     fighter [i]->target = fighter [5 + i];
     fighter [i]->currot.phi = 45;
   }
-  fighter [5]->o = &model_egg;
+//  fighter [5]->o = &model_egg;
   fighter [5]->newinit (STATIC_COMPLEX1, 0, 0);
   fighter [5]->trafo.translation.x = px;
   fighter [5]->trafo.translation.z = py;
@@ -83,7 +83,7 @@ void MissionCanyon3::start ()
   fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
   {
-    fighter [i]->o = &model_hall1;
+//    fighter [i]->o = &model_hall1;
     fighter [i]->newinit (STATIC_HALL1, 0, 100);
     fighter [i]->maxthrust = 0;
     fighter [i]->thrust = 0;
@@ -103,12 +103,12 @@ void MissionCanyon3::start ()
     fighter [i]->currot.phi = 180;
     if (i <= 15)
     {
-      fighter [i]->o = &model_figb;
+      fighter [i]->id = FIGHTER_HAWK;
       fighter [i]->newinit (FIGHTER_CROW, 0, i * 20);
     }
     else
     {
-      fighter [i]->o = &model_figd;
+//      fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, i * 15);
     }
     fighter [i]->trafo.translation.x = px - i * 3;

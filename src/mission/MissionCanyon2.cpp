@@ -26,6 +26,7 @@
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -82,21 +83,21 @@ void MissionCanyon2::start ()
     {
       fighter [i]->trafo.translation.x = -i * 5;
       fighter [i]->trafo.translation.z = -i * 5;
-      fighter [i]->o = &model_fige;
+//      fighter [i]->o = &model_fige;
       fighter [i]->newinit (FIGHTER_CROW, 0, math.random (120) + 260);
     }
     else if (i <= 19)
     {
       fighter [i]->trafo.translation.x = -i * 8 - 160;
       fighter [i]->trafo.translation.z = -i * 8 - 160;
-      fighter [i]->o = &model_figd;
+//      fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, math.random (120) + 160);
     }
     else
     {
       fighter [i]->trafo.translation.x = -i * 8 - 240;
       fighter [i]->trafo.translation.z = -i * 8 - 240;
-      fighter [i]->o = &model_figa;
+//      fighter [i]->o = Model3dRegistry::get ("Swallow");
       fighter [i]->newinit (FIGHTER_SWALLOW, 0, math.random (120) + 200);
     }
   }

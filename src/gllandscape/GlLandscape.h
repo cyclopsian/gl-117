@@ -183,6 +183,5 @@ class GlLandscape : public Landscape
 
 /// The current OpenGL landscape
 extern GlLandscape *l;
-extern Model3d model_house1;
 
 #endif

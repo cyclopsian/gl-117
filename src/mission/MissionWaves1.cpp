@@ -26,6 +26,7 @@
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -64,18 +65,18 @@ void MissionWaves1::start ()
     fighter [i]->trafo.translation.z = -i * 10;
     if (i <= 2)
     {
-      fighter [i]->o = &model_fige;
+//      fighter [i]->o = &model_fige;
       fighter [i]->newinit (FIGHTER_CROW, 0, 395);
     }
     else if (i <= 5)
     {
-      fighter [i]->o = &model_figa;
+//      fighter [i]->o = Model3dRegistry::get ("Swallow");
       fighter [i]->newinit (FIGHTER_SWALLOW, 0, 395);
       fighter [i]->deactivate ();
     }
     else if (i <= 9)
     {
-      fighter [i]->o = &model_figd;
+//      fighter [i]->o = &model_figd;
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, 395);
       fighter [i]->deactivate ();
     }

@@ -74,12 +74,12 @@ void MissionGround1::start ()
     fighter [i]->target = fighter [0];
     if (i == 2)
     {
-      fighter [i]->o = &model_flarak1;
+//      fighter [i]->o = &model_flarak1;
       fighter [i]->newinit (FLARAK_AIR1, 0, 220);
     }
     else
     {
-      fighter [i]->o = &model_flak1;
+//      fighter [i]->o = &model_flak1;
       fighter [i]->newinit (FLAK_AIR1, 0, 200);
     }
   }
@@ -90,16 +90,16 @@ void MissionGround1::start ()
     fighter [i]->trafo.translation.x = px - 17 + i * 3;
     fighter [i]->trafo.translation.z = py;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_flak1;
+//    fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
   fighter [7]->trafo.translation.x = px + 1;
   fighter [7]->trafo.translation.z = py - 1;
-  fighter [7]->o = &model_tent1;
+//  fighter [7]->o = &model_tent1;
   fighter [7]->newinit (STATIC_TENT1, 0, 200);
   fighter [8]->trafo.translation.x = px - 1;
   fighter [8]->trafo.translation.z = py - 1;
-  fighter [8]->o = &model_tent1;
+//  fighter [8]->o = &model_tent1;
   fighter [8]->newinit (STATIC_TENT1, 0, 200);
 }
 

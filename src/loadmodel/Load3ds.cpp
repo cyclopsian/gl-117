@@ -46,7 +46,7 @@ Load3ds::Load3ds ()
   tempChunk = new Chunk3ds;
 }
 
-void Load3ds::setTextureDir (std::string texDir)
+void Load3ds::setTextureDir (const std::string &texDir)
 {
   textureDir = texDir;
 }

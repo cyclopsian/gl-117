@@ -25,6 +25,7 @@
 #include "math/Math.h"
 #include "opengl/GlPrimitives.h"
 #include "logging/Logging.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include "render/Render.h"
 
@@ -873,7 +874,7 @@ void GlLandscape::drawTown (int x, int y)
     tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
     glPushMatrix ();
     Model3dRealizer mr;
-    mr.draw (model_house1, Transformation(Vector3 (), rot, Vector3(0.3)), 1.0, 0);
+    mr.draw (*Model3dRegistry::get ("House"), Transformation(Vector3 (), rot, Vector3(0.3)), 1.0, 0);
 //    model_house1.draw (tl, Vector3 (), rot, 0.3, 1, 0);
     glPopMatrix ();
     return;

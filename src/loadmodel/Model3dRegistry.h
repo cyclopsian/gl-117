@@ -19,8 +19,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef IS_MODEL3DFACTORY_H
-#define IS_MODEL3DFACTORY_H
+#ifndef IS_MODEL3DREGISTRY_H
+#define IS_MODEL3DREGISTRY_H
 
 #include "model3d/Model3d.h" // ok
 
@@ -31,22 +31,32 @@
 typedef std::map<std::string, Model3d *> Model3dList;
 
 /**
-* Use the factory to load models from arbitrary files.
-* The factory decides according to the filename, if the model has to be loaded from disk
-* or if the model is already in memory.
+* Use the registry to register arbitrary instances of Model3d with a string as identifier.
+* The registry serves as global access to the models, so they need not be reloaded
+* or recreated. Note that some models are not directly loaded by 3ds, but created by primitives.
 *
 * @example
-* Model3dFactory mf;
-* Model3d *model = mf.getModel3d ("myfile.3ds");
+* Model3dRegistry mr;
+* Model3d *model = ... (e.g. use factory to load)
+* mr.add ("mymodel", model);
+*
+* @example
+* Model3dRegistry mr;
+* Model3d *model = mr.get ("mymodel");
 */
-class Model3dFactory
+class Model3dRegistry
 {
   public:
 
     static Model3dList model3dList;
 
-    static Model3d *getModel (const std::string &filename);
+    Model3dRegistry ();
+    virtual ~Model3dRegistry ();
+    
+    static void add (const std::string &name, Model3d *model);
+    static Model3d *get (const std::string &name);
 };
+
 
 #endif
 

@@ -62,7 +62,7 @@ void MissionCanyon1::start ()
   fplayer->trafo.translation.z = py + 130;
   fplayer->currot.phi = 45;
   fplayer->target = fighter [1];
-  fighter [1]->o = &model_egg;
+//  fighter [1]->o = &model_egg;
   fighter [1]->newinit (STATIC_COMPLEX1, 0, 0);
   fighter [1]->trafo.translation.x = px + 1;
   fighter [1]->trafo.translation.z = py + 1;
@@ -70,7 +70,7 @@ void MissionCanyon1::start ()
   fighter [1]->thrust = 0;
   for (i = 2; i < 4; i ++)
   {
-    fighter [i]->o = &model_radar;
+//    fighter [i]->o = &model_radar;
     fighter [i]->newinit (STATIC_RADAR1, 0, 0);
     fighter [i]->trafo.translation.x = px - 2 - (i - 2) * 2;
     fighter [i]->trafo.translation.z = py - 2 - (i - 2) * 2;
@@ -81,7 +81,7 @@ void MissionCanyon1::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_figd;
+//    fighter [i]->o = &model_figd;
     fighter [i]->currot.phi = 180;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 50 + i * 20);
     fighter [i]->trafo.translation.x = px - 15 - i * 3;
@@ -90,7 +90,7 @@ void MissionCanyon1::start ()
   }
   for (i = 11; i <= 12; i ++)
   {
-    fighter [i]->o = &model_flarak1;
+//    fighter [i]->o = &model_flarak1;
     fighter [i]->target = fighter [0];
     fighter [i]->newinit (FLARAK_AIR1, 0, 200);
     fighter [i]->trafo.translation.x = px + 4;

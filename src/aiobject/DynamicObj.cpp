@@ -28,7 +28,7 @@
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
 #include "math/Math.h"
-
+#include "loadmodel/Model3dRegistry.h"
 
 
 
@@ -186,7 +186,7 @@ void DynamicObj::checkExplosion (Uint32 dt)
         draw = true;
         id = STATIC_PASSIVE;
         shield = 100000;
-        o = &model_rubble1;
+        o = Model3dRegistry::get ("Rubble");
         trafo.scaling.x *= 0.7F;
         if (trafo.scaling.x > 1) trafo.scaling.x = 1;
         trafo.translation.y = l->getExactHeight (trafo.translation.x, trafo.translation.z) + trafo.scaling.x / 4;

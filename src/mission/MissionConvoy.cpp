@@ -65,7 +65,7 @@ void MissionConvoy::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_tank1;
+//    fighter [i]->o = &model_tank1;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_AIR1, 0, 200);
     fighter [i]->trafo.translation.x = px + SIN(phi) * 3.0;
@@ -78,8 +78,8 @@ void MissionConvoy::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    if (i == 6 || i == 9) fighter [i]->o = &model_pickup1;
-    else fighter [i]->o = &model_truck1;
+//    if (i == 6 || i == 9) fighter [i]->o = &model_pickup1;
+//    else fighter [i]->o = &model_truck1;
     fighter [i]->trafo.translation.x = px + 7.5 - i;
     fighter [i]->trafo.translation.z = py + 7.5 - i;
     if (i == 6 || i == 9) fighter [i]->newinit (TANK_PICKUP1, 0, 400);

@@ -27,6 +27,7 @@
 #include "Game.h"
 #include "gllandscape/GlLandscape.h"
 #include "mission/Mission.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include "render/Render.h"
 
@@ -833,7 +834,7 @@ void StateMission::display ()
   // Draw dummy missile
   glEnable (GL_LIGHTING);
   Model3dRealizer mr;
-  mr.draw (model_missile1, Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
+  mr.draw (*Model3dRegistry::get ("AamHs1"), Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
 //  model_missile1.draw (vec, tl, rot, 0.05, 1.0, 0);
   glDisable (GL_LIGHTING);
   
@@ -1066,16 +1067,16 @@ void StateFighter::display ()
   rot.phi = (5 + missionmenutimer * 4 / timestep) % 360;
   Model3d *model = NULL;
   int id = 0;
-  if (aktfighter == 0) { model = &model_fig; id = FIGHTER_FALCON; }
-  else if (aktfighter == 1) { model = &model_fige; id = FIGHTER_CROW; }
-  else if (aktfighter == 2) { model = &model_figb; id = FIGHTER_HAWK; }
-  else if (aktfighter == 3) { model = &model_figi; id = FIGHTER_STORM; }
-  else if (aktfighter == 4) { model = &model_figa; id = FIGHTER_SWALLOW; }
-  else if (aktfighter == 5) { model = &model_figd; id = FIGHTER_BUZZARD; }
-  else if (aktfighter == 6) { model = &model_figc; id = FIGHTER_HAWK2; }
-  else if (aktfighter == 7) { model = &model_figg; id = FIGHTER_REDARROW; }
-  else if (aktfighter == 8) { model = &model_figf; id = FIGHTER_PHOENIX; }
-  else if (aktfighter == 9) { model = &model_figh; id = FIGHTER_BLACKBIRD; }
+  if (aktfighter == 0) { model = Model3dRegistry::get ("Falcon"); id = FIGHTER_FALCON; }
+  else if (aktfighter == 1) { model = Model3dRegistry::get ("Crow"); id = FIGHTER_CROW; }
+  else if (aktfighter == 2) { model = Model3dRegistry::get ("Hawk"); id = FIGHTER_HAWK; }
+  else if (aktfighter == 3) { model = Model3dRegistry::get ("Storm"); id = FIGHTER_STORM; }
+  else if (aktfighter == 4) { model = Model3dRegistry::get ("Swallow"); id = FIGHTER_SWALLOW; }
+  else if (aktfighter == 5) { model = Model3dRegistry::get ("Buzzard"); id = FIGHTER_BUZZARD; }
+  else if (aktfighter == 6) { model = Model3dRegistry::get ("Hawk2"); id = FIGHTER_HAWK2; }
+  else if (aktfighter == 7) { model = Model3dRegistry::get ("RedArrow"); id = FIGHTER_REDARROW; }
+  else if (aktfighter == 8) { model = Model3dRegistry::get ("Phoenix"); id = FIGHTER_PHOENIX; }
+  else if (aktfighter == 9) { model = Model3dRegistry::get ("BlackBird"); id = FIGHTER_BLACKBIRD; }
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
@@ -1643,7 +1644,7 @@ void StatePlay::display ()
 
   glShadeModel (GL_SMOOTH);
 
-  glPushMatrix ();
+  glPushMatrix (); // PUSH -> 1
   
   if (camera != 1 && camera != 5)
     glRotatef (-mycamrot.theta, 0.0, 0.0, 1.0);
@@ -1670,17 +1671,17 @@ void StatePlay::display ()
   {
     if (!day)
     {
-      glPointSize (LINEWIDTH(1.0F));
       int stars = maxstar;
       if (weather != WEATHER_CLOUDY) stars = maxstar / 2;
       for (i = 0; i < stars; i ++)
       {
-        glPushMatrix ();
+        glPointSize (LINEWIDTH(1.0F));
+        glPushMatrix (); // PUSH -> 2
         glRotatef (star [i]->phi, 0.0, 1.0, 0.0);
         glRotatef (star [i]->gamma, 1.0, 0.0, 0.0);
         glTranslatef (0, 0, -10);
         star [i]->draw ();
-        glPopMatrix ();
+        glPopMatrix (); // POP -> 1
       }
     }
   }
@@ -1770,9 +1771,9 @@ void StatePlay::display ()
     }
   }
 
-  glPopMatrix ();
+  glPopMatrix (); // POP -> 0
     
-  glPushMatrix ();
+  glPushMatrix (); // PUSH -> 1
 
   if (camera != 1 && camera != 5)
     glRotatef (-mycamrot.theta, 0.0, 0.0, 1.0);
@@ -1900,7 +1901,7 @@ void StatePlay::display ()
     glEnable (GL_DEPTH_TEST);
   }
 
-  glPopMatrix ();
+  glPopMatrix (); // POP -> 0
 
 // draw flares
   if (specialeffects)
@@ -1982,12 +1983,12 @@ void StatePlay::display ()
   {
     if (antialiasing)
       glEnable (GL_LINE_SMOOTH);
-    glPushMatrix ();
+    glPushMatrix (); // PUSH -> 1
     glRotatef (view_y, 1, 0, 0);
     glRotatef (-view_x, 0, 1, 0);
     cockpit->drawCross ();
     cockpit->drawHeading ();
-    glPopMatrix ();
+    glPopMatrix (); // POP -> 0
     if (antialiasing)
       glDisable (GL_LINE_SMOOTH);
     cockpit->drawRadar ();
@@ -2040,10 +2041,7 @@ void StatePlay::display ()
   // draw mission dependant informations
   mission->draw ();
 
-  glPushMatrix ();
   glDisable (GL_DEPTH_TEST);
-
-  glPopMatrix ();
   char buf [25];
   sprintf (buf, "FPS: %d", (int) fps);
   font1->drawText (-25, 25, -3.5, buf, colorwhite);
@@ -2663,8 +2661,8 @@ void StateInit::display ()
   glPushMatrix ();
   glTranslatef (0, 0, -5);
   Model3dRealizer mr;
-  mr.draw (model_fig, Transformation(tl, rot, Vector3(1.0)), 2.0, initexplode1);
-//  model_fig.draw (vec, tl, rot, 1.0, 2.0, initexplode1);
+  Model3d *model = Model3dRegistry::get ("Falcon");
+  mr.draw (*model, Transformation(tl, rot, Vector3(1.0)), 2.0, initexplode1);
   glPopMatrix ();
 
   glDisable (GL_DEPTH_TEST);

@@ -76,7 +76,6 @@ void MissionAirBattle::start ()
   {
     objectInit (new Fighter (), FIGHTER_CROW, 0, 440 - i * 10, i);
     fighter [i]->target = fighter [math.random (7)];
-//    fighter [i]->o = &model_fige;
     if (i <= 13)
     {
       fighter [i]->trafo.translation.x = -i * 5;

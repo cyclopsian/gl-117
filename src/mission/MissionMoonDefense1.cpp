@@ -74,7 +74,7 @@ void MissionMoonDefense1::start ()
     fighter [i]->trafo.translation.x = ix * 10;
     fighter [i]->trafo.translation.z = iy * 10;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_flak1;
+//    fighter [i]->o = &model_flak1;
     fighter [i]->newinit (FLAK_AIR1, 0, 200);
   }
   for (i = 11; i <= 20; i ++)
@@ -84,7 +84,7 @@ void MissionMoonDefense1::start ()
     fighter [i]->trafo.translation.x = ix * 20 + 40;
     fighter [i]->trafo.translation.z = iy * 20 + 40;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_mine1;
+//    fighter [i]->o = &model_mine1;
     fighter [i]->newinit (MISSILE_MINE1, 0, 220);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground

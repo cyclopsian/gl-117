@@ -66,7 +66,7 @@ void MissionShip3::start ()
   fighter [1]->target = fighter [6];
   fighter [2]->party = 0;
   fighter [2]->target = fighter [0];
-  fighter [2]->o = &model_ship1;
+//  fighter [2]->o = &model_ship1;
   fighter [2]->trafo.translation.x = -20;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->newinit (SHIP_CRUISER, 0, 200);
@@ -76,7 +76,7 @@ void MissionShip3::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 5;
     fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);

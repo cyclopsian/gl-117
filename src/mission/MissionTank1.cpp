@@ -65,7 +65,7 @@ void MissionTank1::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_tank2;
+//    fighter [i]->o = &model_tank2;
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400 - i * 25);
@@ -76,7 +76,7 @@ void MissionTank1::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_tank1;
+//    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = i * 3;
     fighter [i]->newinit (TANK_AIR1, 0, 80);
@@ -85,7 +85,7 @@ void MissionTank1::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_container1;
+//    fighter [i]->o = &model_container1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = 60;
     fighter [i]->newinit (STATIC_CONTAINER1, 0, 0);

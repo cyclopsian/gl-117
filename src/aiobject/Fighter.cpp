@@ -28,6 +28,7 @@
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
 #include "math/Math.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <cassert>
 
@@ -52,7 +53,7 @@ void Fighter::placeMissiles ()
   Vector3 scale (0.2F, 0.2F, 0.2F);
   ref.clear ();
   for (i2 = 0; i2 < 12; i2 ++)
-    addRefModel (SpaceObj (&model_missile1, Transformation (tlnull, rotmissile, scale)));
+    addRefModel (SpaceObj (Model3dRegistry::get ("AamHs1"), Transformation (tlnull, rotmissile, scale)));
   for (i2 = 0; i2 < 4; i2 ++)
   {
     int type = missilerack [i2];

@@ -19,34 +19,49 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef IS_MODEL3DFACTORY_H
+#ifndef IS_MODEL3DREGISTRY_H
 
-#include "Model3dFactory.h"
-#include "Load3ds.h"
+#include "Model3dRegistry.h"
 #include "configuration/Dirs.h"
 
 #include <cassert>
 
 
-Model3dList Model3dFactory::model3dList = Model3dList ();
+Model3dList Model3dRegistry::model3dList = Model3dList ();
 
-Model3d *Model3dFactory::getModel (const std::string &filename)
+Model3dRegistry::Model3dRegistry ()
 {
-  Model3dList::iterator it = model3dList.find (filename);
+}
+
+Model3dRegistry::~Model3dRegistry ()
+{
+  for (Model3dList::iterator it = model3dList.begin (); it != model3dList.end (); ++ it)
+  {
+    delete it->second;
+    it->second = NULL;
+  }
+  model3dList.clear ();
+}
+
+void Model3dRegistry::add (const std::string &name, Model3d *model)
+{
+  assert (model);
+  model3dList.insert (std::pair<std::string, Model3d *> (name, model));
+}
+
+Model3d *Model3dRegistry::get (const std::string &name)
+{
+  Model3dList::iterator it = model3dList.find (name);
   if (it == model3dList.end ())
   {
-    Model3d *model = new Model3d ();
-    Load3ds loader;
-    loader.setTextureDir (dirs.getTextures (""));
-    loader.import3ds (model, filename.c_str ());
-    model3dList.insert (std::pair<std::string, Model3d *> (filename, model));
-    return model;
+    assert (false);
+    return NULL;
   }
   else
   {
     return it->second;
   }
-  return 0;
 }
+
 
 #endif

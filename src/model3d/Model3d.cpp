@@ -55,7 +55,7 @@ Model3d::Model3d ()
 //  va = new VertexArray (VERTEXARRAY_V3N3C4T2);
 }
 
-void Model3d::setName (const std::string name)
+void Model3d::setName (const std::string &name)
 {
   this->name = name;
 }

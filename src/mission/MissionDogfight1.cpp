@@ -61,7 +61,7 @@ void MissionDogfight1::start ()
     objectInit (new Fighter (), FIGHTER_CROW, 0, 395, i);
 //    fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
 //    fighter [i]->newinit (FIGHTER_CROW, 0, 395);

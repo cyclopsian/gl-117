@@ -66,7 +66,7 @@ void MissionConvoy2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_trsam;
+//    fighter [i]->o = &model_trsam;
     int phi = (i - 2) * 180;
     fighter [i]->newinit (TANK_TRSAM1, 0, 200);
     fighter [i]->trafo.translation.x = px + SIN(phi) * 5.0;
@@ -79,8 +79,8 @@ void MissionConvoy2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
-    else fighter [i]->o = &model_truck2;
+//    if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
+//    else fighter [i]->o = &model_truck2;
     fighter [i]->trafo.translation.x = px + (i % 3) * 3 - 4;
     fighter [i]->trafo.translation.z = py + (i / 3) * 3 - 4;
     if (i == 6 || i == 7) fighter [i]->newinit (TANK_TRUCK1, 0, 400);
@@ -90,7 +90,7 @@ void MissionConvoy2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = px - i * 10;
     fighter [i]->trafo.translation.z = py - i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);

@@ -23,6 +23,7 @@
 
 #include "Load3ds.h"
 #include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <stdio.h>
 #include <cassert>
@@ -34,8 +35,7 @@ BinaryFile3ds::BinaryFile3ds (const char *filename)
   in = fopen (filename, "rb");
   if (in == NULL)
   {
-    sprintf (buf, "Cannot open file %s", filename);
-    DISPLAY_FATAL(buf, LOG_FATAL);
+    DISPLAY_FATAL(FormatString ("Cannot open file %s", filename));
     assert (false);
     exit (EXIT_LOADFILE);
     return;

@@ -26,6 +26,8 @@
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+//#include "loadmodel/Model3dFactory.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -65,7 +67,7 @@ void MissionShip2::start ()
   fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 90;
   fighter [1]->target = fighter [6];
-  fighter [2]->o = &model_oilrig;
+//  fighter [2]->o = &model_oilrig;
   fighter [2]->trafo.translation.x = 20;
   fighter [2]->trafo.translation.z = 0;
   fighter [2]->newinit (STATIC_OILRIG1, 0, 0);
@@ -76,7 +78,7 @@ void MissionShip2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -50 - i * 10;
     fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_CROW, 0, 300 - i * 10);
@@ -85,7 +87,7 @@ void MissionShip2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [2];
-    fighter [i]->o = &model_figa;
+//    fighter [i]->o = Model3dRegistry::get ("Swallow");
     fighter [i]->trafo.translation.x = -80 - i * 10;
     fighter [i]->trafo.translation.z = 0;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 160);

@@ -74,39 +74,6 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
   width = bitmap->width;
   height = bitmap->height;
   data = bitmap->data;
-//  BitmapFactory bf;
-//  Bitmap *bitmap = bf.getBitmap (filename);
-/*  data = LoadTga::load (const_cast<char *>(filename.c_str ()), &width, &height); // global 32 bpp texture buffer
-  if (!data)
-  {
-    sprintf (buf, "Texture %s not found", filename.c_str ());
-    logging.display (buf, LOG_FATAL);
-    exit (-1);
-  }*/
-/*#else
-  unsigned char skip;
-  FILE *in = fopen (filename.c_str (), "rb");
-  if (!in)
-  {
-    sprintf (buf, "Texture %s not found", filename.c_str ());
-    logging.display (buf, LOG_FATAL);
-    exit (-1);
-  }
-  fread (&skip, 1, 1, in);
-  fseek (in, 12, SEEK_SET);
-  fread (&width, 2, 1, in);
-  fread (&height, 2, 1, in);
-  fseek (in, 18 + skip, SEEK_SET);
-  unsigned char *buf = (unsigned char *) malloc (width * height * 3); // preload file buffer
-  if (buf == NULL)
-    exit (-1);
-//    error_outofmemory ();
-  data = (unsigned char *) malloc (width * height * 4); // global 32 bpp texture buffer
-  if (data == NULL)
-    exit (-1);
-//    error_outofmemory ();
-  fread (buf, width * height * 3, 1, in);
-#endif*/
 
   long texl = 0;
   long texr = 0;

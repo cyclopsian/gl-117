@@ -147,13 +147,13 @@ void MissionTutorial3::draw ()
     state ++;
     fighter [1]->activate ();
     fighter [1]->target = fighter [0];
-    fighter [1]->o = &model_figt;
+//    fighter [1]->o = &model_figt;
     fighter [1]->newinit (FIGHTER_TRANSPORT, 0, 200);
     fighter [1]->trafo.translation.x = fplayer->trafo.translation.x - 30;
     fighter [1]->trafo.translation.z = fplayer->trafo.translation.z - 30;
     fighter [2]->activate ();
     fighter [2]->target = fighter [0];
-    fighter [2]->o = &model_figt;
+//    fighter [2]->o = &model_figt;
     fighter [2]->newinit (FIGHTER_TRANSPORT, 0, 200);
     fighter [2]->trafo.translation.x = fplayer->trafo.translation.x + 30;
     fighter [2]->trafo.translation.z = fplayer->trafo.translation.z + 30;

@@ -64,7 +64,7 @@ void MissionScout::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_figd;
+//    fighter [i]->o = &model_figd;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_BUZZARD, 0, 170);

@@ -69,13 +69,13 @@ void MissionDefend1::start ()
     fighter [i]->trafo.translation.z = 10;
     if (i == 3 || i == 4 || i == 5)
     {
-      fighter [i]->o = &model_flarak1;
+//      fighter [i]->o = &model_flarak1;
       fighter [i]->newinit (FLARAK_AIR1, 0, 400);
       fighter [i]->target = fighter [0];
     }
     else
     {
-      fighter [i]->o = &model_flak1;
+//      fighter [i]->o = &model_flak1;
       fighter [i]->newinit (FLAK_AIR1, 0, 400);
       fighter [i]->target = fighter [0];
     }
@@ -88,7 +88,7 @@ void MissionDefend1::start ()
     else off = 15;
     fighter [i]->trafo.translation.x = i * 5 - 50;
     fighter [i]->trafo.translation.z = -i * 5 - off;
-    fighter [i]->o = &model_tank2;
+//    fighter [i]->o = &model_tank2;
     fighter [i]->newinit (TANK_GROUND1, 0, 300);
     fighter [i]->target = fighter [i - 4];
   }
@@ -102,12 +102,12 @@ void MissionDefend1::start ()
     if (i == 12)
     {
       fighter [i]->newinit (TANK_AIR1, 0, 300);
-      fighter [i]->o = &model_tank1;
+//      fighter [i]->o = &model_tank1;
     }
     else
     {
       fighter [i]->newinit (TANK_GROUND1, 0, 300);
-      fighter [i]->o = &model_tank2;
+//      fighter [i]->o = &model_tank2;
     }
     fighter [i]->target = fighter [i - 4];
     fighter [i]->deactivate ();

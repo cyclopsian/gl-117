@@ -65,7 +65,7 @@ void MissionDogfight2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 10);
@@ -74,7 +74,7 @@ void MissionDogfight2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10 - 100;
     fighter [i]->trafo.translation.z = -i * 10 - 100;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 20);

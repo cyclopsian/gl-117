@@ -48,13 +48,13 @@ class Dirs
     void init (char *arg);
 
     /// get dir name containing the saves...
-    char *getSaves (char *name);
-    char *getTextures (char *name);
-    char *getSounds (char *name);
-    char *getMusic (char *name);
-    char *getModels (char *name);
-    char *getMaps (char *name);
-    char *getShaders (char *name);
+    char *getSaves (const char *name);
+    char *getTextures (const char *name);
+    char *getSounds (const char *name);
+    char *getMusic (const char *name);
+    char *getModels (const char *name);
+    char *getMaps (const char *name);
+    char *getShaders (const char *name);
   
   protected:
 

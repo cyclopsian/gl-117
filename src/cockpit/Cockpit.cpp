@@ -30,6 +30,7 @@
 #include "mission/Mission.h"
 #include "opengl/GlPrimitives.h"
 #include "gllandscape/GlLandscape.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include "render/Render.h"
 
@@ -89,21 +90,21 @@ void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup proje
 
 void Cockpit::setColor (int alpha)
 {
-  if (fplayer->o == &model_fig) glColor4ub (255, 255, 0, alpha);
-  else if (fplayer->o == &model_figb) glColor4ub (255, 150, 100, alpha);
-  else if (fplayer->o == &model_figc) glColor4ub (200, 200, 100, alpha);
-  else if (fplayer->o == &model_figg) glColor4ub (255, 0, 0, alpha);
-  else if (fplayer->o == &model_figi) glColor4ub (200, 200, 100, alpha);
+  if (fplayer->id == FIGHTER_FALCON) glColor4ub (255, 255, 0, alpha);
+  else if (fplayer->id == FIGHTER_HAWK) glColor4ub (255, 150, 100, alpha);
+  else if (fplayer->id == FIGHTER_HAWK2) glColor4ub (200, 200, 100, alpha);
+  else if (fplayer->id == FIGHTER_REDARROW) glColor4ub (255, 0, 0, alpha);
+  else if (fplayer->id == FIGHTER_STORM) glColor4ub (200, 200, 100, alpha);
   else glColor4ub (100, 100, 255, alpha);
 }
 
 void Cockpit::setColor (Color *color, int alpha)
 {
-  if (fplayer->o == &model_fig) color->set (255, 255, 0, alpha);
-  else if (fplayer->o == &model_figb) color->set (255, 150, 100, alpha);
-  else if (fplayer->o == &model_figc) color->set (200, 200, 100, alpha);
-  else if (fplayer->o == &model_figg) color->set (255, 0, 0, alpha);
-  else if (fplayer->o == &model_figi) color->set (200, 200, 100, alpha);
+  if (fplayer->id == FIGHTER_FALCON) color->set (255, 255, 0, alpha);
+  else if (fplayer->id == FIGHTER_HAWK) color->set (255, 150, 100, alpha);
+  else if (fplayer->id == FIGHTER_HAWK2) color->set (200, 200, 100, alpha);
+  else if (fplayer->id == FIGHTER_REDARROW) color->set (255, 0, 0, alpha);
+  else if (fplayer->id == FIGHTER_STORM) color->set (200, 200, 100, alpha);
   else color->set (100, 100, 255, alpha);
 }
 
@@ -405,7 +406,7 @@ void Cockpit::drawCross ()
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_GEQUAL, 0.1);
   //  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_REDARROW)
   {
     gl.enableTexture (texcross->textureID);
   }
@@ -608,14 +609,14 @@ void Cockpit::drawWeapon ()
   gl.disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
   Model3d *missile = NULL;
-  if (fplayer->missiletype == 0) missile = &model_missile1;
-  else if (fplayer->missiletype == 1) missile = &model_missile2;
-  else if (fplayer->missiletype == 2) missile = &model_missile3;
-  else if (fplayer->missiletype == 3) missile = &model_missile4;
-  else if (fplayer->missiletype == 4) missile = &model_missile5;
-  else if (fplayer->missiletype == 5) missile = &model_missile6;
-  else if (fplayer->missiletype == 6) missile = &model_missile7;
-  else if (fplayer->missiletype == 7) missile = &model_missile8;
+  if (fplayer->missiletype == 0) missile = Model3dRegistry::get ("AamHs1");
+  else if (fplayer->missiletype == 1) missile = Model3dRegistry::get ("AamHs2");
+  else if (fplayer->missiletype == 2) missile = Model3dRegistry::get ("AamHs3");
+  else if (fplayer->missiletype == 3) missile = Model3dRegistry::get ("Agm1");
+  else if (fplayer->missiletype == 4) missile = Model3dRegistry::get ("Agm2");
+  else if (fplayer->missiletype == 5) missile = Model3dRegistry::get ("Dfm");
+  else if (fplayer->missiletype == 6) missile = Model3dRegistry::get ("AamFf1");
+  else if (fplayer->missiletype == 7) missile = Model3dRegistry::get ("AamFf1");
   glEnable (GL_LIGHTING);
   Model3dRealizer mr;
   mr.draw (*missile, Transformation(tl, fplayer->trafo.rotation, Vector3(0.05)), 1.0, 0);
@@ -639,7 +640,7 @@ void Cockpit::drawRadar ()
   setColor (150);
   float xl, yl;
   int type;
-  if (fplayer->o == &model_fig || fplayer->o == &model_figg)
+  if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_REDARROW)
   {
     gl.enableTexture (texradar2->textureID);
     xl = 1.4; yl = 1.3;

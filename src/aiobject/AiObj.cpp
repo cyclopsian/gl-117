@@ -28,7 +28,7 @@
 #include "gllandscape/GlLandscape.h"
 #include "game/globals.h"
 #include "math/Math.h"
-#include "loadmodel/Model3dFactory.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <cassert>
 
@@ -158,7 +158,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
 //  o = getModel (id);
 //  o->cube.set (trafo.scaling);
   
-  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
+//  o = Model3dFactory::getModel (dirs.getModels ("gl-15.3ds"));
+  o = Model3dRegistry::get ("Falcon");
 
   if (id == FIGHTER_FALCON)
   {
@@ -777,16 +778,16 @@ void AIObj::fireCannon (DynamicObj *laser, float phi)
   if (day)
   {
     if (dualshot)
-      laser->o = &model_cannon1b;
+      laser->o = Model3dRegistry::get ("Cannon1b");
     else
-      laser->o = &model_cannon1;
+      laser->o = Model3dRegistry::get ("Cannon1");
   }
   else
   {
     if (dualshot)
-      laser->o = &model_cannon2b;
+      laser->o = Model3dRegistry::get ("Cannon2b");
     else
-      laser->o = &model_cannon2;
+      laser->o = Model3dRegistry::get ("Cannon2");
   }
 }
 

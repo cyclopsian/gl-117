@@ -21,6 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="&quot;C:\cygwin\home\Tom\gl-117\gl-117\src&quot;"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -99,7 +100,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib cg.lib cggl.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_mixer.lib"
 				OutputFile=".\Debug/main.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -232,6 +233,12 @@
 			</File>
 			<File
 				RelativePath="loadmodel\Model3dFactory.h">
+			</File>
+			<File
+				RelativePath=".\loadmodel\Model3dRegistry.cpp">
+			</File>
+			<File
+				RelativePath=".\loadmodel\Model3dRegistry.h">
 			</File>
 			<File
 				RelativePath=".\loadmodel\TextFileObj.cpp">
@@ -643,6 +650,16 @@
 			</File>
 			<File
 				RelativePath=".\shader\GlShaders.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="util"
+			Filter="">
+			<File
+				RelativePath=".\util\StringUtil.cpp">
+			</File>
+			<File
+				RelativePath=".\util\Util.h">
 			</File>
 		</Filter>
 	</Files>

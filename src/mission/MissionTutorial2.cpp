@@ -68,7 +68,7 @@ void MissionTutorial2::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [0];
-    fighter [i]->o = &model_tank1;
+//    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = px + 6 - i * 4;
     fighter [i]->trafo.translation.z = py + 6 - i * 4;
     fighter [i]->newinit (TANK_GROUND1, 0, 400);

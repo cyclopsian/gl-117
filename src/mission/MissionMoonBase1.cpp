@@ -67,7 +67,7 @@ void MissionMoonBase1::start ()
     fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 200;
-    fighter [i]->o = &model_aster1;
+//    fighter [i]->o = &model_aster1;
     fighter [i]->newinit (ASTEROID, 0, 150);
     fighter [i]->party = 0;
   }
@@ -77,12 +77,12 @@ void MissionMoonBase1::start ()
     fighter [i]->trafo.translation.z = 210;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 50;
-    fighter [i]->o = &model_figh;
+//    fighter [i]->o = &model_figh;
     fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 200);
   }
   fighter [29]->trafo.translation.x = 50 + difficulty * 15;
   fighter [29]->trafo.translation.z = 180 + difficulty * 30;
-  fighter [29]->o = &model_base1;
+//  fighter [29]->o = &model_base1;
   fighter [29]->newinit (STATIC_BASE1, 0, 100);
 }
 

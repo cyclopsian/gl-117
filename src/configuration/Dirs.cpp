@@ -247,49 +247,49 @@ Dirs::~Dirs ()
 {
 }
 
-char *Dirs::getSaves (char *name)
+char *Dirs::getSaves (const char *name)
 {
   strcpy (dir, saves);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getTextures (char *name)
+char *Dirs::getTextures (const char *name)
 {
   strcpy (dir, textures);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getMusic (char *name)
+char *Dirs::getMusic (const char *name)
 {
   strcpy (dir, music);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getSounds (char *name)
+char *Dirs::getSounds (const char *name)
 {
   strcpy (dir, sound);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getModels (char *name)
+char *Dirs::getModels (const char *name)
 {
   strcpy (dir, models);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getMaps (char *name)
+char *Dirs::getMaps (const char *name)
 {
   strcpy (dir, maps);
   strcat (dir, name);
   return dir;
 }
 
-char *Dirs::getShaders (char *name)
+char *Dirs::getShaders (const char *name)
 {
   strcpy (dir, shaders);
   strcat (dir, name);

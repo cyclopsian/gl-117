@@ -26,6 +26,7 @@
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+#include "loadmodel/Model3dRegistry.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -49,28 +50,24 @@ void MissionDemo1::start ()
   sungamma = 45;
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE, NULL);
-  fplayer = fighter [0];
   objectInit (new Fighter (), FIGHTER_FALCON, 1, 0, 0);
+  fplayer = fighter [0];
   fighter [0]->trafo.translation.x = 220;
   fighter [0]->trafo.translation.z = -30;
-  fighter [0]->o = &model_fig;
+//  fighter [0]->o = Model3dRegistry::get ("Falcon");
   fighter [0]->target = fighter [2];
-//  fighter [0]->newinit (FIGHTER_FALCON, 1, 0);
   objectInit (new Fighter (), FIGHTER_FALCON, 1, 0, 1);
   fighter [1]->target = fighter [3];
-//  fighter [1]->o = &model_fig;
   fighter [1]->trafo.translation.x = 49;
   fighter [1]->trafo.translation.z = -30;
-//  fighter [1]->newinit (FIGHTER_FALCON, 1, 0);
   fighter [1]->aggressivity = 300;
   for (i = 2; i <= 8; i ++)
   {
     objectInit (new Fighter (), FIGHTER_SWALLOW, 0, 400 - i * 20, i);
     fighter [i]->target = fighter [math.random (2)];
-    fighter [i]->o = &model_figa;
+//    fighter [i]->o = Model3dRegistry::get ("Swallow");
     fighter [i]->trafo.translation.x = i * 20;
     fighter [i]->trafo.translation.z = 0;
-//    fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);
   }
 }
 

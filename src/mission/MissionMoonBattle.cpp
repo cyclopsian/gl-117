@@ -78,7 +78,7 @@ void MissionMoonBattle::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (7)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->newinit (FIGHTER_CROW, 0, 450 - i * 10);
     if (i <= 16)
     {
@@ -89,7 +89,7 @@ void MissionMoonBattle::start ()
     {
       fighter [i]->trafo.translation.x = -i * 8 - 150;
       fighter [i]->trafo.translation.z = -i * 8 - 150;
-      fighter [i]->o = &model_figh;
+//      fighter [i]->o = &model_figh;
       fighter [i]->newinit (FIGHTER_BLACKBIRD, 0, 450 - i * 10);
     }
     else

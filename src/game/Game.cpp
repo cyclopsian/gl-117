@@ -56,6 +56,9 @@ TODO list:
 #include "game/Callbacks.h"
 #include "loadmodel/Load3ds.h"
 #include "loadmodel/Model3dFactory.h"
+#include "loadmodel/Model3dRegistry.h"
+#include "logging/Logging.h"
+#include "util/Util.h"
 
 #include <ctype.h>
 #include <cassert>
@@ -138,62 +141,6 @@ Uint32 lasttime = 0;
 
 
 
-
-
-Load3ds load3ds;
-Model3d model_fig;
-Model3d model_figa;
-Model3d model_figb;
-Model3d model_figc;
-Model3d model_figd;
-Model3d model_fige;
-Model3d model_figf;
-Model3d model_figg;
-Model3d model_figh;
-Model3d model_figi;
-Model3d model_figt;
-Model3d model_figu;
-Model3d model_cannon1;
-Model3d model_cannon2;
-Model3d model_cannon1b;
-Model3d model_cannon2b;
-Model3d model_flare1;
-Model3d model_chaff1;
-Model3d model_missile1;
-Model3d model_missile2;
-Model3d model_missile3;
-Model3d model_missile4;
-Model3d model_missile5;
-Model3d model_missile6;
-Model3d model_missile7;
-Model3d model_missile8;
-Model3d model_flak1;
-Model3d model_flarak1;
-Model3d model_tent1;
-Model3d model_ship1;
-Model3d model_ship2;
-Model3d model_gl117;
-Model3d model_tank1;
-Model3d model_container1;
-Model3d model_truck1;
-Model3d model_truck2;
-Model3d model_trsam;
-Model3d model_pickup1;
-Model3d model_pickup2;
-Model3d model_tank2;
-Model3d model_tent4;
-Model3d model_hall1;
-Model3d model_hall2;
-Model3d model_oilrig;
-Model3d model_egg;
-Model3d model_radar;
-Model3d model_mine1;
-Model3d model_aster1;
-Model3d model_base1;
-Model3d model_barrier1;
-Model3d model_rubble1;
-Model3d model_depot1;
-Model3d model_house1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -572,49 +519,49 @@ void setLightSource (int gamma)
 
 Model3d *getModel (int id)
 {
-  if (id == FIGHTER_FALCON) return &model_fig; //Model3dFactory::getModel (dirs.getModels ("gl-16.3ds"));
-  else if (id == FIGHTER_SWALLOW) return &model_figa;
-  else if (id == FIGHTER_HAWK) return &model_figb;
-  else if (id == FIGHTER_HAWK2) return &model_figc;
-  else if (id == FIGHTER_BUZZARD) return &model_figd;
-  else if (id == FIGHTER_CROW) return &model_fige;
-  else if (id == FIGHTER_PHOENIX) return &model_figf;
-  else if (id == FIGHTER_REDARROW) return &model_figg;
-  else if (id == FIGHTER_BLACKBIRD) return &model_figh;
-  else if (id == FIGHTER_STORM) return &model_figi;
-  else if (id == FIGHTER_TRANSPORT) return &model_figt;
-  else if (id == FIGHTER_TRANSPORT2) return &model_figu;
-  else if (id == MISSILE_AIR1) return &model_missile1;
-  else if (id == MISSILE_AIR2) return &model_missile2;
-  else if (id == MISSILE_AIR3) return &model_missile3;
-  else if (id == MISSILE_GROUND1) return &model_missile4;
-  else if (id == MISSILE_GROUND2) return &model_missile5;
-  else if (id == MISSILE_DF1) return &model_missile6;
-  else if (id == MISSILE_FF1) return &model_missile7;
-  else if (id == MISSILE_FF2) return &model_missile8;
-  else if (id == TANK_AIR1) return &model_tank1;
-  else if (id == TANK_GROUND1) return &model_tank2;
-  else if (id == TANK_TRSAM1) return &model_trsam;
-  else if (id == TANK_PICKUP1) return &model_pickup1;
-  else if (id == TANK_TRUCK1) return &model_truck1;
-  else if (id == TANK_TRUCK2) return &model_truck2;
-  else if (id == SHIP_CRUISER) return &model_ship1;
-  else if (id == SHIP_DESTROYER1) return &model_ship2;
-  else if (id == FLAK_AIR1) return &model_flak1;
-  else if (id == FLARAK_AIR1) return &model_flarak1;
-  else if (id == STATIC_TENT1) return &model_tent1;
-  else if (id == STATIC_TENT4) return &model_tent4;
-  else if (id == STATIC_CONTAINER1) return &model_container1;
-  else if (id == STATIC_HALL1) return &model_hall1;
-  else if (id == STATIC_HALL2) return &model_hall2;
-  else if (id == STATIC_OILRIG1) return &model_oilrig;
-  else if (id == STATIC_COMPLEX1) return &model_egg;
-  else if (id == STATIC_RADAR1) return &model_radar;
-  else if (id == STATIC_BASE1) return &model_base1;
-  else if (id == STATIC_DEPOT1) return &model_depot1;
-  else if (id == STATIC_BARRIER1) return &model_barrier1;
-  else if (id == ASTEROID) return &model_aster1;
-  return &model_fig;
+  if (id == FIGHTER_FALCON) return Model3dRegistry::get ("Falcon");
+  else if (id == FIGHTER_SWALLOW) return Model3dRegistry::get ("Swallow");
+  else if (id == FIGHTER_HAWK) return Model3dRegistry::get ("Hawk");
+  else if (id == FIGHTER_HAWK2) return Model3dRegistry::get ("Hawk2");
+  else if (id == FIGHTER_BUZZARD) return Model3dRegistry::get ("Buzzard");
+  else if (id == FIGHTER_CROW) return Model3dRegistry::get ("Crow");
+  else if (id == FIGHTER_PHOENIX) return Model3dRegistry::get ("Phoenix");
+  else if (id == FIGHTER_REDARROW) return Model3dRegistry::get ("RedArrow");
+  else if (id == FIGHTER_BLACKBIRD) return Model3dRegistry::get ("BlackBird");
+  else if (id == FIGHTER_STORM) return Model3dRegistry::get ("Storm");
+  else if (id == FIGHTER_TRANSPORT) return Model3dRegistry::get ("Transport");
+  else if (id == FIGHTER_TRANSPORT2) return Model3dRegistry::get ("Transport2");
+  else if (id == MISSILE_AIR1) return Model3dRegistry::get ("AamHs1");
+  else if (id == MISSILE_AIR2) return Model3dRegistry::get ("AamHs2");
+  else if (id == MISSILE_AIR3) return Model3dRegistry::get ("AamHs3");
+  else if (id == MISSILE_GROUND1) return Model3dRegistry::get ("Agm1");
+  else if (id == MISSILE_GROUND2) return Model3dRegistry::get ("Agm2");
+  else if (id == MISSILE_DF1) return Model3dRegistry::get ("Dfm");
+  else if (id == MISSILE_FF1) return Model3dRegistry::get ("AamFf1");
+  else if (id == MISSILE_FF2) return Model3dRegistry::get ("AamFf2");
+  else if (id == TANK_AIR1) return Model3dRegistry::get ("Wiesel");
+  else if (id == TANK_GROUND1) return Model3dRegistry::get ("Panther");
+  else if (id == TANK_TRSAM1) return Model3dRegistry::get ("MobileSam");
+  else if (id == TANK_PICKUP1) return Model3dRegistry::get ("Pickup");
+  else if (id == TANK_TRUCK1) return Model3dRegistry::get ("Truck");
+  else if (id == TANK_TRUCK2) return Model3dRegistry::get ("Truck2");
+  else if (id == SHIP_CRUISER) return Model3dRegistry::get ("Cruiser");
+  else if (id == SHIP_DESTROYER1) return Model3dRegistry::get ("LightDestroyer");
+  else if (id == FLAK_AIR1) return Model3dRegistry::get ("Sac");
+  else if (id == FLARAK_AIR1) return Model3dRegistry::get ("Sam");
+  else if (id == STATIC_TENT1) return Model3dRegistry::get ("Tent");
+  else if (id == STATIC_TENT4) return Model3dRegistry::get ("BigTent");
+  else if (id == STATIC_CONTAINER1) return Model3dRegistry::get ("Container");
+  else if (id == STATIC_HALL1) return Model3dRegistry::get ("Hall");
+  else if (id == STATIC_HALL2) return Model3dRegistry::get ("Hall2");
+  else if (id == STATIC_OILRIG1) return Model3dRegistry::get ("Oilrig");
+  else if (id == STATIC_COMPLEX1) return Model3dRegistry::get ("Complex");
+  else if (id == STATIC_RADAR1) return Model3dRegistry::get ("Radar");
+  else if (id == STATIC_BASE1) return Model3dRegistry::get ("MoonBase");
+  else if (id == STATIC_DEPOT1) return Model3dRegistry::get ("Depot");
+  else if (id == STATIC_BARRIER1) return Model3dRegistry::get ("LaserBarrier");
+  else if (id == ASTEROID) return Model3dRegistry::get ("Asteroid");
+  return Model3dRegistry::get ("Falcon");
 }
 
 int game_levelInit ()
@@ -634,7 +581,7 @@ int game_levelInit ()
     fighter [i]->recheight = 15;
     fighter [i]->recthrust = 0.2;
     fighter [i]->recrot.theta = 0;
-    fighter [i]->o = &model_fig;
+    fighter [i]->o = Model3dRegistry::get ("Falcon");
   }
   for (i = 0; i < maxgroundobj; i ++)
   {
@@ -784,13 +731,13 @@ int game_levelInit ()
     laser [i]->deactivate ();
     if (day)
     {
-      laser [i]->o = &model_cannon1;
+      laser [i]->o = Model3dRegistry::get ("Cannon1");
       laser [i]->trafo.scaling.set (0.08, 0.08, 0.08);
       laser [i]->drawLight = false;
     }
     else
     {
-      laser [i]->o = &model_cannon2;
+      laser [i]->o = Model3dRegistry::get ("Cannon2");
       laser [i]->trafo.scaling.set (0.1, 0.1, 0.1);
     }
   }
@@ -1760,7 +1707,7 @@ void myInit ()
 
   for (i = 0; i < maxgroundobj; i ++)
   {
-    groundobj [i] = new DynamicObj (space, &model_tent1, 3);
+    groundobj [i] = new DynamicObj (space, Model3dRegistry::get ("Tent"), 3);
   }
 
   explsphere = new Sphere ();
@@ -1785,10 +1732,10 @@ void myInit ()
   // TODO: will be removed
   for (i = 0; i < maxfighter; i ++)
   {
-    fighter [i] = new AIObj (space, &model_fig, 0.4);
+    fighter [i] = new AIObj (space, Model3dRegistry::get ("Falcon"), 0.4);
     fighter [i]->ref.clear ();
     for (i2 = 0; i2 < 12; i2 ++)
-      fighter [i]->addRefModel (SpaceObj (&model_missile1, Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
+      fighter [i]->addRefModel (SpaceObj (Model3dRegistry::get ("AamHs1"), Transformation (tlnull, rotmissile, Vector3 (0.2, 0.2, 0.2))));
   }
 
   highclouds = new HighClouds (25);
@@ -1809,22 +1756,22 @@ void myInit ()
 
   for (i = 0; i < maxlaser; i ++)
   {
-    laser [i] = new DynamicObj (space, &model_cannon1, 0.07);
+    laser [i] = new DynamicObj (space, Model3dRegistry::get ("Cannon1"), 0.07);
   }
 
   for (i = 0; i < maxmissile; i ++)
   {
-    missile [i] = new AIObj (space, &model_missile1, 0.1);
+    missile [i] = new AIObj (space, Model3dRegistry::get ("AamHs1"), 0.1);
   }
 
   for (i = 0; i < maxflare; i ++)
   {
-    flare [i] = new DynamicObj (space, &model_flare1, 0.1);
+    flare [i] = new DynamicObj (space, Model3dRegistry::get ("Flare"), 0.1);
   }
 
   for (i = 0; i < maxchaff; i ++)
   {
-    chaff [i] = new DynamicObj (space, &model_chaff1, 0.1);
+    chaff [i] = new DynamicObj (space, Model3dRegistry::get ("Chaff"), 0.1);
   }
 
   for (i = 0; i < maxstar; i ++)
@@ -1857,6 +1804,14 @@ int i;
 int inittimer = 0;
 int inittimer_gl117 = 0;
 
+void initModel (const std::string &name, const std::string &displayedname, const std::string &filename)
+{
+  DISPLAY_DEBUG(std::string (" * ").append (name));
+  Model3d *model = Model3dFactory::getModel (dirs.getModels (filename.c_str ()));
+  model->setName (displayedname);
+  Model3dRegistry::add (name, model);
+}
+
 // load game data (this method does not really belong to the intro itself)
 void myFirstInit ()
 {
@@ -1869,48 +1824,49 @@ void myFirstInit ()
 
   // create textures (OpenGL)
   DISPLAY_DEBUG("Loading textures");
-  load3ds.setTextureDir (std::string (dirs.getTextures ("")));
-  texgrass = new Texture (std::string (dirs.getTextures ("grass1.tga")), 0, 1, false);
-  texrocks = new Texture (std::string (dirs.getTextures ("rocks1.tga")), 0, 1, false);
-  texwater = new Texture (std::string (dirs.getTextures ("water1.tga")), 0, 1, false);
-  texsand = new Texture (std::string (dirs.getTextures ("sand1.tga")), 0, 1, false);
-  texredsand = new Texture (std::string (dirs.getTextures ("redsand1.tga")), 0, 1, false);
-  texredstone = new Texture (std::string (dirs.getTextures ("redstone2.tga")), 0, 1, false);
-  texgravel1 = new Texture (std::string (dirs.getTextures ("gravel1.tga")), 0, 1, false);
-  texglitter1 = new Texture (std::string (dirs.getTextures ("glitter.tga")), -1, 0, true);
-  textree = new Texture (std::string (dirs.getTextures ("tree1.tga")), -1, 1, true);
-  textreeu = new Texture (std::string (dirs.getTextures ("treeu1.tga")), -1, 1, true);
-  textree2 = new Texture (std::string (dirs.getTextures ("tree2.tga")), -1, 1, true);
-  textreeu2 = new Texture (std::string (dirs.getTextures ("treeu2.tga")), -1, 1, true);
-  textree3 = new Texture (std::string (dirs.getTextures ("tree3.tga")), 3, 1, true);
-  textreeu3 = new Texture (std::string (dirs.getTextures ("treeu3.tga")), 3, 1, true);
-  textree4 = new Texture (std::string (dirs.getTextures ("tree4.tga")), 3, 1, true);
-  textreeu4 = new Texture (std::string (dirs.getTextures ("treeu4.tga")), 3, 1, true);
-  textree5 = new Texture (std::string (dirs.getTextures ("tree5.tga")), -1, 1, true);
-  textreeu5 = new Texture (std::string (dirs.getTextures ("treeu5.tga")), -1, 1, true);
-  texcactus1 = new Texture (std::string (dirs.getTextures ("cactus1.tga")), 3, 1, true);
-  texcactusu1 = new Texture (std::string (dirs.getTextures ("cactusu1.tga")), 3, 1, true);
-  texsmoke = new Texture (std::string (dirs.getTextures ("smoke1.tga")), -1, 1, true);
-  texsmoke2 = new Texture (std::string (dirs.getTextures ("smoke2.tga")), -1, 1, true);
-  texsmoke3 = new Texture (std::string (dirs.getTextures ("smoke3.tga")), 5, 1, true);
-  texsun = new Texture (std::string (dirs.getTextures ("sun2.tga")), -1, 0, true);
-  texmoon = new Texture (std::string (dirs.getTextures ("moon1.tga")), 2, 0, true);
-  texearth = new Texture (std::string (dirs.getTextures ("earth.tga")), 0, 0, true);
+  Load3ds load3ds;
+  load3ds.setTextureDir (dirs.getTextures (""));
+  texgrass = new Texture (dirs.getTextures ("grass1.tga"), 0, 1, false);
+  texrocks = new Texture (dirs.getTextures ("rocks1.tga"), 0, 1, false);
+  texwater = new Texture (dirs.getTextures ("water1.tga"), 0, 1, false);
+  texsand = new Texture (dirs.getTextures ("sand1.tga"), 0, 1, false);
+  texredsand = new Texture (dirs.getTextures ("redsand1.tga"), 0, 1, false);
+  texredstone = new Texture (dirs.getTextures ("redstone2.tga"), 0, 1, false);
+  texgravel1 = new Texture (dirs.getTextures ("gravel1.tga"), 0, 1, false);
+  texglitter1 = new Texture (dirs.getTextures ("glitter.tga"), -1, 0, true);
+  textree = new Texture (dirs.getTextures ("tree1.tga"), -1, 1, true);
+  textreeu = new Texture (dirs.getTextures ("treeu1.tga"), -1, 1, true);
+  textree2 = new Texture (dirs.getTextures ("tree2.tga"), -1, 1, true);
+  textreeu2 = new Texture (dirs.getTextures ("treeu2.tga"), -1, 1, true);
+  textree3 = new Texture (dirs.getTextures ("tree3.tga"), 3, 1, true);
+  textreeu3 = new Texture (dirs.getTextures ("treeu3.tga"), 3, 1, true);
+  textree4 = new Texture (dirs.getTextures ("tree4.tga"), 3, 1, true);
+  textreeu4 = new Texture (dirs.getTextures ("treeu4.tga"), 3, 1, true);
+  textree5 = new Texture (dirs.getTextures ("tree5.tga"), -1, 1, true);
+  textreeu5 = new Texture (dirs.getTextures ("treeu5.tga"), -1, 1, true);
+  texcactus1 = new Texture (dirs.getTextures ("cactus1.tga"), 3, 1, true);
+  texcactusu1 = new Texture (dirs.getTextures ("cactusu1.tga"), 3, 1, true);
+  texsmoke = new Texture (dirs.getTextures ("smoke1.tga"), -1, 1, true);
+  texsmoke2 = new Texture (dirs.getTextures ("smoke2.tga"), -1, 1, true);
+  texsmoke3 = new Texture (dirs.getTextures ("smoke3.tga"), 5, 1, true);
+  texsun = new Texture (dirs.getTextures ("sun2.tga"), -1, 0, true);
+  texmoon = new Texture (dirs.getTextures ("moon1.tga"), 2, 0, true);
+  texearth = new Texture (dirs.getTextures ("earth.tga"), 0, 0, true);
   // TODO: why doesn't !mipmap work for the flares???
-  texflare1 = new Texture (std::string (dirs.getTextures ("flare1.tga")), -1, 1, true);
-  texflare2 = new Texture (std::string (dirs.getTextures ("flare2.tga")), -1, 1, true);
-  texflare3 = new Texture (std::string (dirs.getTextures ("flare3.tga")), -1, 1, true);
-  texflare4 = new Texture (std::string (dirs.getTextures ("flare4.tga")), -1, 1, true);
-  texcross = new Texture (std::string (dirs.getTextures ("cross.tga")), -1, 1, true);
-  texcross2 = new Texture (std::string (dirs.getTextures ("cross2.tga")), -1, 1, true);
-  texranks = new Texture (std::string (dirs.getTextures ("ranks.tga")), 0, 0, true);
-  texmedals = new Texture (std::string (dirs.getTextures ("medals.tga")), 0, 0, true);
-  texclouds1 = new Texture (std::string (dirs.getTextures ("clouds1.tga")), -1, 1, true);
-  texclouds2 = new Texture (std::string (dirs.getTextures ("clouds2.tga")), 4, 1, true);
-  texclouds3 = new Texture (std::string (dirs.getTextures ("clouds3.tga")), 6, 1, true);
-  texradar1 = new Texture (std::string (dirs.getTextures ("radar2.tga")), -1, 0, true);
-  texradar2 = new Texture (std::string (dirs.getTextures ("radar1.tga")), -1, 0, true);
-  texarrow = new Texture (std::string (dirs.getTextures ("arrow.tga")), -1, 0, true);
+  texflare1 = new Texture (dirs.getTextures ("flare1.tga"), -1, 1, true);
+  texflare2 = new Texture (dirs.getTextures ("flare2.tga"), -1, 1, true);
+  texflare3 = new Texture (dirs.getTextures ("flare3.tga"), -1, 1, true);
+  texflare4 = new Texture (dirs.getTextures ("flare4.tga"), -1, 1, true);
+  texcross = new Texture (dirs.getTextures ("cross.tga"), -1, 1, true);
+  texcross2 = new Texture (dirs.getTextures ("cross2.tga"), -1, 1, true);
+  texranks = new Texture (dirs.getTextures ("ranks.tga"), 0, 0, true);
+  texmedals = new Texture (dirs.getTextures ("medals.tga"), 0, 0, true);
+  texclouds1 = new Texture (dirs.getTextures ("clouds1.tga"), -1, 1, true);
+  texclouds2 = new Texture (dirs.getTextures ("clouds2.tga"), 4, 1, true);
+  texclouds3 = new Texture (dirs.getTextures ("clouds3.tga"), 6, 1, true);
+  texradar1 = new Texture (dirs.getTextures ("radar2.tga"), -1, 0, true);
+  texradar2 = new Texture (dirs.getTextures ("radar1.tga"), -1, 0, true);
+  texarrow = new Texture (dirs.getTextures ("arrow.tga"), -1, 0, true);
 
   DISPLAY_DEBUG("Loading Fonts");
   font1 = new Font (dirs.getTextures ("font1.tga"), 32, '!', 64);
@@ -1918,219 +1874,132 @@ void myFirstInit ()
   font2 = new Font (dirs.getTextures ("font2.tga"), 32, '!', 64);
 
   DISPLAY_DEBUG("Loading 3ds models:");
-  DISPLAY_DEBUG(" * gl-14c.3ds");
-  load3ds.import3ds (&model_figb, dirs.getModels ("gl-14c.3ds"));
-  model_figb.setName ("HAWK");
-  DISPLAY_DEBUG(" * gl-16.3ds");
-  load3ds.import3ds (&model_fig, dirs.getModels ("gl-16.3ds"));
-  model_fig.setName ("FALCON");
-  DISPLAY_DEBUG(" * gl-15.3ds");
-  load3ds.import3ds (&model_figa, dirs.getModels ("gl-15.3ds"));
-  model_figa.setName ("SWALLOW");
-  DISPLAY_DEBUG(" * gl-14d.3ds");
-  load3ds.import3ds (&model_figc, dirs.getModels ("gl-14d.3ds"));
-  model_figc.setName ("HAWK II");
-  DISPLAY_DEBUG(" * gl-21b.3ds");
-  load3ds.import3ds (&model_figd, dirs.getModels ("gl-21b.3ds"));
-  model_figd.setName ("BUZZARD");
-  DISPLAY_DEBUG(" * gl-21.3ds");
-  load3ds.import3ds (&model_fige, dirs.getModels ("gl-21.3ds"));
-  model_fige.setName ("CROW");
-  DISPLAY_DEBUG(" * gl-14b.3ds");
-  load3ds.import3ds (&model_figf, dirs.getModels ("gl-14b.3ds"));
-  model_figf.setName ("PHOENIX");
-  DISPLAY_DEBUG(" * gl-14.3ds");
-  load3ds.import3ds (&model_figg, dirs.getModels ("gl-14.3ds"));
-  model_figg.setName ("RED ARROW");
-  DISPLAY_DEBUG(" * gl-29.3ds");
-  load3ds.import3ds (&model_figh, dirs.getModels ("gl-29.3ds"));
-  model_figh.setName ("BLACKBIRD");
-  model_figh.scaleTexture (0.3, 0.3);
-  DISPLAY_DEBUG(" * gl-50.3ds");
-  load3ds.import3ds (&model_figi, dirs.getModels ("gl-50.3ds"));
-  model_figi.setName ("STORM");
-  DISPLAY_DEBUG(" * transp2.3ds");
-  load3ds.import3ds (&model_figt, dirs.getModels ("transp2.3ds"));
-  model_figt.setName ("TRANSPORT");
-  DISPLAY_DEBUG(" * transp4.3ds");
-  load3ds.import3ds (&model_figu, dirs.getModels ("transp4.3ds"));
-  model_figu.setName ("TRANSPORT");
-
+  
+  initModel ("Falcon", "FALCON", "falcon.3ds");
+  initModel ("Hawk", "HAWK", "hawk.3ds");
+  initModel ("Swallow", "SWALLOW", "swallow.3ds");
+  initModel ("Hawk2", "HAWK II", "hawk2.3ds");
+  initModel ("Buzzard", "BUZZARD", "buzzard.3ds");
+  initModel ("Crow", "CROW", "crow.3ds");
+  initModel ("Phoenix", "PHOENIX", "phoenix.3ds");
+  initModel ("RedArrow", "RED ARROW", "redarrow.3ds");
+  initModel ("BlackBird", "BLACKBIRD", "blackbird.3ds");
+  Model3d *model = Model3dRegistry::get ("BlackBird");
+  model->scaleTexture (0.3, 0.3);
+  initModel ("Storm", "STORM", "storm.3ds");
+  initModel ("Transport", "TRANSPORT", "transport.3ds");
+  initModel ("Transport2", "TRANSPORT", "transport2.3ds");
+  
   // cannon at daylight
   float cannoncube = 0.025;
   DISPLAY_DEBUG(" * cannon1.3ds");
-  load3ds.import3ds (&model_cannon1, dirs.getModels ("cannon1.3ds"));
-  model_cannon1.cube.set (cannoncube, cannoncube, cannoncube);
+  model = Model3dFactory::getModel (dirs.getModels ("cannon1.3ds"));
+  model->setName ("CANNON");
+  model->cube.set (cannoncube, cannoncube, cannoncube);
+  Model3dRegistry::add ("Cannon1", model);
+  
   DISPLAY_DEBUG(" * cannon1b.3ds");
-  load3ds.import3ds (&model_cannon1b, dirs.getModels ("cannon1b.3ds"));
-  model_cannon1b.cube.set (cannoncube, cannoncube, cannoncube);
+  model = Model3dFactory::getModel (dirs.getModels ("cannon1b.3ds"));
+  model->setName ("CANNON");
+  model->cube.set (cannoncube, cannoncube, cannoncube);
+  Model3dRegistry::add ("Cannon1b", model);
 
   // cannon at night
   DISPLAY_DEBUG(" * cannon2.3ds");
-  load3ds.import3ds (&model_cannon2, dirs.getModels ("cannon2.3ds"));
-  model_cannon2.nolight = true;
-  model_cannon2.alpha = true;
+  model = Model3dFactory::getModel (dirs.getModels ("cannon2.3ds"));
+  model->nolight = true;
+  model->alpha = true;
   for (i = 0; i < 4; i ++)
   {
-    model_cannon2.object [0]->vertex [i].color.c [0] = 255;
-    model_cannon2.object [0]->vertex [i].color.c [1] = 255;
-    model_cannon2.object [0]->vertex [i].color.c [2] = 0;
-    model_cannon2.object [0]->vertex [i].color.c [3] = 255;
+    model->object [0]->vertex [i].color.c [0] = 255;
+    model->object [0]->vertex [i].color.c [1] = 255;
+    model->object [0]->vertex [i].color.c [2] = 0;
+    model->object [0]->vertex [i].color.c [3] = 255;
   }
-  model_cannon2.object [0]->vertex [1].color.c [3] = 50;
-  model_cannon2.object [0]->vertex [2].color.c [3] = 50;
-  model_cannon2.cube.set (cannoncube, cannoncube, cannoncube);
+  model->object [0]->vertex [1].color.c [3] = 50;
+  model->object [0]->vertex [2].color.c [3] = 50;
+  model->setName ("CANNON");
+  model->cube.set (cannoncube, cannoncube, cannoncube);
+  Model3dRegistry::add ("Cannon2", model);
 
   DISPLAY_DEBUG(" * cannon2b.3ds");
-  load3ds.import3ds (&model_cannon2b, dirs.getModels ("cannon2b.3ds"));
-  model_cannon2b.nolight = true;
-  model_cannon2b.alpha = true;
+  model = Model3dFactory::getModel (dirs.getModels ("cannon2b.3ds"));
+  model->nolight = true;
+  model->alpha = true;
   for (int i2 = 0; i2 < 2; i2 ++)
   {
     for (i = 0; i < 4; i ++)
     {
-      model_cannon2b.object [i2]->vertex [i].color.c [0] = 255;
-      model_cannon2b.object [i2]->vertex [i].color.c [1] = 255;
-      model_cannon2b.object [i2]->vertex [i].color.c [2] = 0;
-      model_cannon2b.object [i2]->vertex [i].color.c [3] = 255;
+      model->object [i2]->vertex [i].color.c [0] = 255;
+      model->object [i2]->vertex [i].color.c [1] = 255;
+      model->object [i2]->vertex [i].color.c [2] = 0;
+      model->object [i2]->vertex [i].color.c [3] = 255;
     }
-    model_cannon2b.object [i2]->vertex [1].color.c [3] = 50;
-    model_cannon2b.object [i2]->vertex [2].color.c [3] = 50;
+    model->object [i2]->vertex [1].color.c [3] = 50;
+    model->object [i2]->vertex [2].color.c [3] = 50;
   }
-  model_cannon2b.cube.set (cannoncube, cannoncube, cannoncube);
+  model->cube.set (cannoncube, cannoncube, cannoncube);
+  model->setName ("CANNON");
+  Model3dRegistry::add ("Cannon2b", model);
 
-  DISPLAY_DEBUG(" * flare1.3ds");
-  load3ds.import3ds (&model_flare1, dirs.getModels ("flare1.3ds"));
-  model_flare1.setName ("FLARE");
-  model_flare1.alpha = true;
-  model_flare1.nolight = true;
-  DISPLAY_DEBUG(" * chaff1.3ds");
-  load3ds.import3ds (&model_chaff1, dirs.getModels ("chaff1.3ds"));
-  model_chaff1.setName ("CHAFF");
-  model_chaff1.alpha = true;
-  model_chaff1.nolight = true;
-  DISPLAY_DEBUG(" * missile1.3ds");
-  load3ds.import3ds (&model_missile1, dirs.getModels ("missile1.3ds"));
-  model_missile1.setName ("AAM HS MK1");
-  DISPLAY_DEBUG(" * missile2.3ds");
-  load3ds.import3ds (&model_missile2, dirs.getModels ("missile2.3ds"));
-  model_missile2.setName ("AAM HS MK2");
-  DISPLAY_DEBUG(" * missile3.3ds");
-  load3ds.import3ds (&model_missile3, dirs.getModels ("missile3.3ds"));
-  model_missile3.setName ("AAM HS MK3");
-  DISPLAY_DEBUG(" * missile4.3ds");
-  load3ds.import3ds (&model_missile4, dirs.getModels ("missile4.3ds"));
-  model_missile4.setName ("AGM MK1");
-  DISPLAY_DEBUG(" * missile5.3ds");
-  load3ds.import3ds (&model_missile5, dirs.getModels ("missile5.3ds"));
-  model_missile5.setName ("AGM MK2");
-  DISPLAY_DEBUG(" * missile6.3ds");
-  load3ds.import3ds (&model_missile6, dirs.getModels ("missile6.3ds"));
-  model_missile6.setName ("DFM");
-  DISPLAY_DEBUG(" * missile7.3ds");
-  load3ds.import3ds (&model_missile7, dirs.getModels ("missile7.3ds"));
-  model_missile7.setName ("AAM FF MK1");
-  DISPLAY_DEBUG(" * missile8.3ds");
-  load3ds.import3ds (&model_missile8, dirs.getModels ("missile8.3ds"));
-  model_missile8.setName ("AAM FF MK2");
-  DISPLAY_DEBUG(" * flak2.3ds");
-  load3ds.import3ds (&model_flak1, dirs.getModels ("flak2.3ds"));
-  model_flak1.setName ("SA CANNON");
-  DISPLAY_DEBUG(" * flarak1.3ds");
-  load3ds.import3ds (&model_flarak1, dirs.getModels ("flarak1.3ds"));
-  model_flarak1.setName ("SAM");
-  DISPLAY_DEBUG(" * ship1.3ds");
-  load3ds.import3ds (&model_ship1, dirs.getModels ("ship1.3ds"));
-  model_ship1.setName ("CRUISER");
-  DISPLAY_DEBUG(" * tent1.3ds");
-  load3ds.import3ds (&model_tent1, dirs.getModels ("tent1.3ds"));
-  model_tent1.setName ("TENT");
-  DISPLAY_DEBUG(" * gl-117.3ds");
-  load3ds.import3ds (&model_gl117, dirs.getModels ("gl-117.3ds"));
-//  model_gl117.displaylist = false;
-  DISPLAY_DEBUG(" * tank1.3ds");
-  load3ds.import3ds (&model_tank1, dirs.getModels ("tank1.3ds"));
-  model_tank1.setName ("WIESEL");
-  model_tank1.scaleTexture (0.5, 0.5);
-  DISPLAY_DEBUG(" * container1.3ds");
-  load3ds.import3ds (&model_container1, dirs.getModels ("container1.3ds"));
-  model_container1.setName ("CONTAINER");
-  DISPLAY_DEBUG(" * ship2.3ds");
-  load3ds.import3ds (&model_ship2, dirs.getModels ("ship2.3ds"));
-  model_ship2.setName ("LIGHT DESTROYER");
-  DISPLAY_DEBUG(" * truck1.3ds");
-  load3ds.import3ds (&model_truck1, dirs.getModels ("truck1.3ds"));
-  model_truck1.setName ("TRUCK");
-  DISPLAY_DEBUG(" * truck2.3ds");
-  load3ds.import3ds (&model_truck2, dirs.getModels ("truck2.3ds"));
-  model_truck2.setName ("TRUCK");
-  DISPLAY_DEBUG(" * trsam.3ds");
-  load3ds.import3ds (&model_trsam, dirs.getModels ("trsam.3ds"));
-  model_trsam.setName ("MOBILE SAM");
-  DISPLAY_DEBUG(" * pickup1.3ds");
-  load3ds.import3ds (&model_pickup1, dirs.getModels ("pickup1.3ds"));
-  model_pickup1.setName ("PICKUP");
-  DISPLAY_DEBUG(" * pickup2.3ds");
-  load3ds.import3ds (&model_pickup2, dirs.getModels ("pickup2.3ds"));
-  model_pickup2.setName ("PICKUP");
-  DISPLAY_DEBUG(" * tank2.3ds");
-  load3ds.import3ds (&model_tank2, dirs.getModels ("tank2.3ds"));
-  model_tank2.setName ("PANTHER");
-  model_tank2.scaleTexture (0.5, 0.5);
-  DISPLAY_DEBUG(" * tent4.3ds");
-  load3ds.import3ds (&model_tent4, dirs.getModels ("tent4.3ds"));
-  model_tent4.setName ("BIG TENT");
-  DISPLAY_DEBUG(" * hall1.3ds");
-  load3ds.import3ds (&model_hall1, dirs.getModels ("hall1.3ds"));
-  model_hall1.setName ("HALL");
-  DISPLAY_DEBUG(" * hall2.3ds");
-  load3ds.import3ds (&model_hall2, dirs.getModels ("hall2.3ds"));
-  model_hall2.setName ("HALL");
-  DISPLAY_DEBUG(" * oilrig.3ds");
-  load3ds.import3ds (&model_oilrig, dirs.getModels ("oilrig.3ds"));
-  model_oilrig.setName ("OILRIG");
-  model_oilrig.alpha = true;
-  DISPLAY_DEBUG(" * egg.3ds");
-  load3ds.import3ds (&model_egg, dirs.getModels ("egg.3ds"));
-  model_egg.scaleTexture (0.08, 0.08);
-  model_egg.setName ("COMPLEX");
-  DISPLAY_DEBUG(" * radar.3ds");
-  load3ds.import3ds (&model_radar, dirs.getModels ("radar.3ds"));
-  model_radar.setName ("RADAR");
-  DISPLAY_DEBUG(" * mine1.3ds");
-  load3ds.import3ds (&model_mine1, dirs.getModels ("mine1.3ds"));
-  model_mine1.setName ("MINE");
-  DISPLAY_DEBUG(" * aster1.3ds");
-  load3ds.import3ds (&model_aster1, dirs.getModels ("aster1.3ds"));
-  model_aster1.setName ("ASTEROID");
-  DISPLAY_DEBUG(" * base1.3ds");
-  load3ds.import3ds (&model_base1, dirs.getModels ("base1.3ds"));
-  model_base1.setName ("MOON BASE");
-  DISPLAY_DEBUG(" * barrier.3ds");
-  load3ds.import3ds (&model_barrier1, dirs.getModels ("barrier.3ds"));
-  model_barrier1.setName ("MOON BASE");
-  model_barrier1.scaleTexture (10, 10);
-  model_barrier1.alpha = true;
-  DISPLAY_DEBUG(" * rubble.3ds");
-  load3ds.import3ds (&model_rubble1, dirs.getModels ("rubble.3ds"));
-  model_base1.setName ("RUBBLE");
-  DISPLAY_DEBUG(" * depot1.3ds");
-  load3ds.import3ds (&model_depot1, dirs.getModels ("depot1.3ds"));
-  model_depot1.setName ("DEPOT");
-  model_depot1.scaleTexture (2, 2);
-  load3ds.import3ds (&model_house1, dirs.getModels ("house1.3ds"));
-  model_house1.setName ("HOUSE");
+  initModel ("Flare", "FLARE", "flare1.3ds");
+  model = Model3dRegistry::get ("Flare");
+  model->alpha = true;
+  model->nolight = true;
+  initModel ("Chaff", "CHAFF", "chaff1.3ds");
+  model = Model3dRegistry::get ("Chaff");
+  model->alpha = true;
+  model->nolight = true;
 
-/*  setMissiles (&model_fig);
-  setMissiles (&model_figa);
-  setMissiles (&model_figb);
-  setMissiles (&model_figc);
-  setMissiles (&model_figd);
-  setMissiles (&model_fige);
-  setMissiles (&model_figf);
-  setMissiles (&model_figg);
-  setMissiles (&model_figh);
-  setMissiles (&model_figi);*/
+  initModel ("AamHs1", "AAM HS MK1", "missile1.3ds");
+  initModel ("AamHs2", "AAM HS MK2", "missile2.3ds");
+  initModel ("AamHs3", "AAM HS MK3", "missile3.3ds");
+  initModel ("Agm1", "AGM MK1", "missile4.3ds");
+  initModel ("Agm2", "AGM MK2", "missile5.3ds");
+  initModel ("Dfm", "CHAFF", "missile6.3ds");
+  initModel ("AamFf1", "AAM FF MK1", "missile7.3ds");
+  initModel ("AamFf2", "AAM FF MK2", "missile8.3ds");
+
+  initModel ("Sac", "SA CANNON", "flak2.3ds");
+  initModel ("Sam", "SAM", "flarak1.3ds");
+  initModel ("Cruiser", "CRUISER", "ship1.3ds");
+  initModel ("Tent", "TENT", "tent1.3ds");
+//  initModel ("Gl-117 Logo", "gl-117.3ds");
+  initModel ("Wiesel", "WIESEL", "tank1.3ds");
+  model = Model3dRegistry::get ("Wiesel");
+  model->scaleTexture (0.5, 0.5);
+  initModel ("Container", "CONTAINER", "container1.3ds");
+  initModel ("LightDestroyer", "LIGHT DESTROYER", "ship2.3ds");
+  initModel ("Truck", "TRUCK", "truck1.3ds");
+  initModel ("Truck2", "TRUCK", "truck2.3ds");
+  initModel ("MobileSam", "MOBILE SAM", "trsam.3ds");
+  initModel ("Pickup", "PICKUP", "pickup1.3ds");
+  initModel ("Pickup2", "PICKUP", "pickup2.3ds");
+  initModel ("Panther", "PANTHER", "tank2.3ds");
+  model = Model3dRegistry::get ("Panther");
+  model->scaleTexture (0.5, 0.5);
+  initModel ("BigTent", "BIG TENT", "tent4.3ds");
+  initModel ("Hall", "HALL", "hall1.3ds");
+  initModel ("Hall2", "HALL", "hall2.3ds");
+  initModel ("Oilrig", "OILRIG", "oilrig.3ds");
+  model = Model3dRegistry::get ("Oilrig");
+  model->alpha = true;
+  initModel ("Complex", "COMPLEX", "complex.3ds");
+  model = Model3dRegistry::get ("Complex");
+  model->scaleTexture (0.08, 0.08);
+  initModel ("Oilrig", "OILRIG", "radar.3ds");
+  initModel ("Mine", "MINE", "mine1.3ds");
+  initModel ("Asteroid", "ASTEROID", "aster1.3ds");
+  initModel ("MoonBase", "MOON BASE", "base1.3ds");
+  initModel ("LaserBarrier", "LASER BARRIER", "barrier.3ds");
+  model = Model3dRegistry::get ("LaserBarrier");
+  model->scaleTexture (10.0, 10.0);
+  model->alpha = true;
+  initModel ("Rubble", "RUBBLE", "rubble.3ds");
+  initModel ("Depot", "DEPOT", "depot1.3ds");
+  model = Model3dRegistry::get ("Depot");
+  model->scaleTexture (2.0, 2.0);
+  initModel ("House", "HOUSE", "house1.3ds");
 
   // enable Z-Buffer
   glEnable (GL_DEPTH_TEST);
@@ -2168,7 +2037,7 @@ void myFirstInit ()
   initexplode = 0;
   initexplode1 = 0;
 
-  textitle = new Texture (std::string (dirs.getTextures ("patents.tga")), 0, false, true);
+  textitle = new Texture (dirs.getTextures ("patents.tga"), 0, false, true);
 
   sungamma = 60;
   setLightSource (60);

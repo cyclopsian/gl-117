@@ -50,62 +50,7 @@ extern PilotList *pilots; // other pilots of the Eagle Squad
 extern Explosion *explosion [maxexplosion];
 extern BlackSmoke *blacksmoke [maxblacksmoke];
 
-// fighter models
-extern Model3d model_fig;
-extern Model3d model_figa;
-extern Model3d model_figb;
-extern Model3d model_figc;
-extern Model3d model_figd;
-extern Model3d model_fige;
-extern Model3d model_figf;
-extern Model3d model_figg;
-extern Model3d model_figh;
-extern Model3d model_figi;
-extern Model3d model_figt;
-
 // all other models
-extern Model3d model_cannon1;
-extern Model3d model_cannon2;
-extern Model3d model_cannon1b;
-extern Model3d model_cannon2b;
-extern Model3d model_flare1;
-extern Model3d model_chaff1;
-extern Model3d model_missile1;
-extern Model3d model_missile2;
-extern Model3d model_missile3;
-extern Model3d model_missile4;
-extern Model3d model_missile5;
-extern Model3d model_missile6;
-extern Model3d model_missile7;
-extern Model3d model_missile8;
-extern Model3d model_flak1;
-extern Model3d model_flarak1;
-extern Model3d model_tent1;
-extern Model3d model_ship1;
-extern Model3d model_ship2;
-extern Model3d model_gl117;
-extern Model3d model_tank1;
-extern Model3d model_container1;
-extern Model3d model_truck1;
-extern Model3d model_truck2;
-extern Model3d model_trsam;
-extern Model3d model_pickup1;
-extern Model3d model_pickup2;
-extern Model3d model_tank2;
-extern Model3d model_tent4;
-extern Model3d model_hall1;
-extern Model3d model_hall2;
-extern Model3d model_oilrig;
-extern Model3d model_egg;
-extern Model3d model_radar;
-extern Model3d model_mine1;
-extern Model3d model_aster1;
-extern Model3d model_base1;
-extern Model3d model_barrier1;
-extern Model3d model_rubble1;
-extern Model3d model_depot1;
-extern Model3d model_house1;
-
 extern DynamicObj *flare [maxflare];
 extern DynamicObj *chaff [maxchaff];
 extern AIObj *missile [maxmissile];

@@ -63,22 +63,18 @@ void MissionDeathmatch2::start ()
     if (i <= 1)
     {
       fighter [i]->newinit (FIGHTER_FALCON, 0, 200);
-//      fighter [i]->o = &model_fig;
     }
     else if (i <= 3)
     {
       fighter [i]->newinit (FIGHTER_CROW, 0, 200);
-//      fighter [i]->o = &model_fige;
     }
     else if (i <= 5)
     {
       fighter [i]->newinit (FIGHTER_BUZZARD, 0, 200);
-//      fighter [i]->o = &model_figd;
     }
     else
     {
       fighter [i]->newinit (FIGHTER_SWALLOW, 0, 200);
-//      fighter [i]->o = &model_figa;
     }
     fighter [i]->party = i / 2 + 1;
     fighter [i]->target = fighter [(i + 4) % 8];

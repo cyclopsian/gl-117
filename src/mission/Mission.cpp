@@ -82,13 +82,6 @@ void Mission::playerInit ()
     fplayer->easymodel = 2;
   fplayer->target = NULL;
   fplayer->newinit (selfighter [wantfighter], 1, 0);
-/*  if (selfighter [wantfighter] == FIGHTER_FALCON) fplayer->o = &model_fig;
-  else if (selfighter [wantfighter] == FIGHTER_HAWK) fplayer->o = &model_figb;
-  else if (selfighter [wantfighter] == FIGHTER_HAWK2) fplayer->o = &model_figc;
-  else if (selfighter [wantfighter] == FIGHTER_PHOENIX) fplayer->o = &model_figf;
-  else if (selfighter [wantfighter] == FIGHTER_REDARROW) fplayer->o = &model_figg;
-  else if (selfighter [wantfighter] == FIGHTER_BLACKBIRD) fplayer->o = &model_figh;
-  else if (selfighter [wantfighter] == FIGHTER_STORM) fplayer->o = &model_figi; */
   fplayer->ai = false;
   for (i = 0; i < missiletypes; i ++)
     fplayer->missiles [i] = 0;
@@ -182,12 +175,6 @@ void Mission::alliedInit (int fighterid, int pilotid, int n)
   int precision = p->tp [pilotid]->precision;
   int aggressivity = p->tp [pilotid]->aggressivity;
   aiobj->newinit (fighterid, 1, intelligence, precision, aggressivity);
-/*  if (fighterid == FIGHTER_FALCON) aiobj->o = &model_fig;
-  else if (fighterid == FIGHTER_HAWK) aiobj->o = &model_figb;
-  else if (fighterid == FIGHTER_HAWK2) aiobj->o = &model_figc;
-  else if (fighterid == FIGHTER_PHOENIX) aiobj->o = &model_figf;
-  else if (fighterid == FIGHTER_REDARROW) aiobj->o = &model_figg;
-  else if (fighterid == FIGHTER_STORM) aiobj->o = &model_figi; */
   aiobj->ai = true;
 
   // place missiles to racks

@@ -63,7 +63,7 @@ void MissionFreeFlight1::start ()
     fighter [i]->target = fighter [0];
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->o = &model_figt;
+//    fighter [i]->o = &model_figt;
     fighter [i]->newinit (FIGHTER_TRANSPORT, 0, 395);
     if (i >= 3)
     {

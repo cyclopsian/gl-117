@@ -26,6 +26,8 @@
 #include "math/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+#include "loadmodel/Model3dRegistry.h"
+//#include "loadmodel/Model3dFactory.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -73,7 +75,7 @@ void MissionDogfight3::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (4)];
-    fighter [i]->o = &model_fige;
+//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_CROW, 0, 400 - i * 25);
@@ -82,7 +84,7 @@ void MissionDogfight3::start ()
   {
     fighter [i]->party = 0;
     fighter [i]->target = fighter [math.random (4)];
-    fighter [i]->o = &model_figa;
+//    fighter [i]->o = Model3dRegistry::get ("Swallow");
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
     fighter [i]->newinit (FIGHTER_SWALLOW, 0, 400 - i * 20);

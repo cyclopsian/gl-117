@@ -63,7 +63,6 @@ void MissionTest2::start ()
   fplayer->ammo = 0;
   fighter [1]->party = 0;
   fighter [1]->target = fighter [0];
-//  fighter [1]->o = &model_fig;
   fighter [1]->trafo.translation.x = 0;
   fighter [1]->trafo.translation.z = 0;
   fighter [1]->newinit (FIGHTER_HAWK, 0, 170);
