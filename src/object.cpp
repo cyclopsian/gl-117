@@ -59,7 +59,7 @@ void CSpaceObj::rotateOn (short a, short b, short c)
 void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
   if (draw == 0) return;
-  if (draw == 2 || gl->isCubeInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
+  if (draw == 2 || gl->isSphereInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom * 1.5))
   {
     if (drawlight && drawlight2)
     {

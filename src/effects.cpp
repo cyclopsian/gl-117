@@ -120,15 +120,15 @@ void CSmoke::draw ()
     gl->disableLinearTexture (smoketype);
   gl->enableAlphaBlending ();
   glEnable (GL_ALPHA_TEST);
-  glAlphaFunc (GL_GEQUAL, 0.1);
+  glAlphaFunc (GL_GEQUAL, 0.02);
   gl->enableTextures (smoketype);
   for (i = last; i >= 0; i --)
   {
     if (time [i] > 0)
     {
-      if (quality >= 3)
+/*      if (quality >= 3)
         drawElemHQ (i);
-      else
+      else*/
         drawElem (i);
     }
   }
@@ -136,9 +136,9 @@ void CSmoke::draw ()
   {
     if (time [i] > 0)
     {
-      if (quality >= 3)
+/*      if (quality >= 3)
         drawElemHQ (i);
-      else
+      else*/
         drawElem (i);
     }
   }
@@ -306,7 +306,7 @@ void CBlackSmoke::move ()
 void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
   if (ttl <= 0 || quality == 0) return;
-  if (draw == 2 || gl->isCubeInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
+  if (draw == 2 || gl->isSphereInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
   {
     if (quality >= 3)
       gl->enableLinearTexture (texsmoke3->textureID);

@@ -622,7 +622,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
     for (ys = y1; ys < y2;)
     {
       y = getCoord (ys);
-      if (gl->isCubeInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*3*step))
+      if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)hw[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*3*step))
       {
         int xstep = getCoord (x + step);
         int a = selectColor (x, y);
@@ -710,7 +710,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2, int step)
           if (hw [x] [ystep] < h1) h1 = hw [x] [ystep];
           if (hw [x] [ymstep] < h1) h1 = hw [x] [ymstep];
           if (hw [xstep] [ymstep] < h1) h1 = hw [xstep] [ymstep];
-          if (gl->isCubeInFrustum (hh2*(xs) - 1.0, (float)h1*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
+          if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h1*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
           {
             if (!last)
             {
@@ -819,7 +819,7 @@ void GLLandscape::drawTexturedQuad (int xs, int ys, int step)
   float size = (maxh - minh) * zoomz * step; // exakt wäre mal 0.5
   if (size < hh2 / 2)
     size = hh2 / 2;
-  if (!gl->isCubeInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, midh, hh2*(MAXX-(0.5+ys)) - 1.0, size * 2))
     return;
   if (tex1 [x] [y] == 0xFF)
   {
@@ -921,7 +921,7 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys, int step)
     }
   }
 
-  if (!gl->isCubeInFrustum (hh2*(0.5+xs) - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 / 2 * step))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, h1*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2 * step))
     return;
   texture = true;
   gl->enableTextures (texwater->textureID);
@@ -1087,7 +1087,7 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys, int step)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isCubeInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
     return;
 
   if (tex1 [x] [y] == 0xFF)
@@ -1225,7 +1225,7 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys, int step)
   px [2] = xs + step; py [2] = ys + step;
   px [3] = xs; py [3] = ys + step;
 
-  if (!gl->isCubeInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
+  if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2))
     return;
 
 /*              int a = selectColor (x, y+step);
@@ -2012,6 +2012,11 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    float mydep = 250;
+    if (quality == 2) mydep = 500;
+    else if (quality == 3) mydep = 800;
+    else if (quality == 4) mydep = 1500;
+    else if (quality == 5) mydep = 2500;
     float x21 = 0.3, y21 = -0.32;
     float x22 = -0.21, y22 = 0.22;
     float x31 = 0.32, y31 = -0.08;
@@ -2057,9 +2062,13 @@ void GLLandscape::draw (int phi, int gamma)
 //        for (y = maxy; y >= miny;)
           {
             y = getCoord (ys);
-            if (detail [i] [i2] <= fardetail + 1)
+//            if (detail [i] [i2] <= fardetail + 1)
+            float tdx = camx + MAXX/2 - xs;
+            float tdy = MAXX/2 - camz - ys;
+            float dep = tdx * tdx + tdy * tdy;
+            if (dep < mydep)
               if (isWoods (f [x] [y]) || isType (f [x] [y], REDTREE0) || isType (f [x] [y], CACTUS0))
-                if (gl->isCubeInFrustum (hh2*(xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
+                if (gl->isSphereInFrustum (hh2*(xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2))
                 {
                   float cg = g [x] [y];
                   fac = 0.0007 * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;

@@ -4735,11 +4735,11 @@ void game_key (unsigned char key, int x, int y)
       fplayer->targetNext ((AIObj **) fighter);
       sound->play (SOUND_CLICK1);
     }
-/*    else if (key == 'k')
+    else if (key == 'k')
     {
       if (fplayer->target != NULL)
         fplayer->target->shield = 0;
-    }*/
+    }
 /*    else if (key == 'g')
     {
       if (polygonMode==GL_FILL)
@@ -7233,6 +7233,7 @@ void game_display ()
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       space->drawGL ();
       glDisable (GL_LIGHTING);
+      glDepthMask (GL_FALSE);
       for (i = 0; i < space->no; i ++)
       {
         AIObj *dobj = (AIObj *) space->o [i];
@@ -7247,6 +7248,7 @@ void game_display ()
                 }
           }
       }
+      glDepthMask (GL_TRUE);
     }
     else
     {
@@ -7291,6 +7293,7 @@ void game_display ()
   glEnd ();*/
 
 // draw flares
+if (quality > 0)
   if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
   {
   CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
