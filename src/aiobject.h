@@ -196,7 +196,7 @@ class AIObj : public DynamicObj
   int missiles [missiletypes]; // number of missiles of each type
   int missilerack [missileracks]; // number of missile racks
   int missilerackn [missileracks]; // number of missile racks
-  int aw; // current heading difference to target
+  float aw; // current heading difference to target
   int score; // final score
   float dtheta, dgamma; // theta/gamma alteration (smooth piloting)
   float disttarget; // current distance to target

@@ -1,4 +1,4 @@
-/*
+ /*
     GL-117
     Copyright 2001, 2002 Thomas A. Drexl aka heptargon
 
@@ -467,6 +467,7 @@ void DynamicObj::move (Uint32 dt)
 //      float div = maxthrust + thrust;
 //      if (div == 0) div = 1;
       phi += SIN(theta) * manoeverability * 6.67 * timefac; //10.0 * maxthrust / div;
+      gamma -= fabs (SIN(theta) * COS(gamma) / realspeed / 20) * timefac; // realistic modification
     }
   }
   else if (easymodel == 2) // now this is much more general, however simplified:
@@ -515,10 +516,6 @@ void DynamicObj::move (Uint32 dt)
     { rectheta -= 360; theta -= 360; }
   }
 
-/*    if (controls)
-  {
-  }*/
-
   if (recthrust > maxthrust) // check maximum throttle
     recthrust = maxthrust;
   if (recthrust > thrust) // alter throttle effect slowly
@@ -544,12 +541,6 @@ void DynamicObj::move (Uint32 dt)
     goto cannondone; // jump down to decrease ttl and test collision
   }
 
-  /*
-  printf (" %0.2f", forcez - vaxis.z * realspeed);
-  printf (" %0.2f", forcex - vaxis.x * realspeed);
-  printf (" %0.2f", forcey - vaxis.y * realspeed);
-  printf ("\n");
- */
   // and correct the speedvector
 
   forcez = vaxis.z * realspeed;
@@ -605,9 +596,7 @@ void DynamicObj::move (Uint32 dt)
   // drag force simulated by just halving the vector, this is not realistic, yet easy to play
   // braking = 0.97
 
-//  forcex *= braking; forcez *= braking; forcey *= braking;
   braking = (fabs (ruddereffect) + fabs (elevatoreffect)) * realspeed / 50;
-//  if (easymodel == 2) printf ("\n%f ", 0.9915 - braking);
   brakepower = pow (0.9915 - braking, timefac);
   forcex *= brakepower; forcez *= brakepower; forcey *= brakepower;
 
@@ -772,7 +761,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.31;
     nimbility = 0.8;
     manoeverability = 0.45;
-    maxshield = 95;
+    maxshield = 85;
     zoom = 0.35;
     maxtheta = 90.0;
     maxgamma = 80.0;
@@ -786,7 +775,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.23;
     nimbility = 0.6;
     manoeverability = 0.32;
-    maxshield = 105;
+    maxshield = 110;
     zoom = 0.43;
     maxtheta = 90.0;
     maxgamma = 80.0;
@@ -844,7 +833,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.31;
     nimbility = 0.76;
     manoeverability = 0.43;
-    maxshield = 80;
+    maxshield = 75;
     zoom = 0.44;
     maxtheta = 90.0;
     maxgamma = 80.0;
@@ -872,14 +861,14 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.3;
     nimbility = 0.5;
     manoeverability = 0.25;
-    maxshield = 170;
+    maxshield = 180;
     zoom = 0.47;
     maxtheta = 90.0;
     maxgamma = 80.0;
     missilerackn [0] = 3; missilerackn [1] = 3; missilerackn [2] = 3; missilerackn [3] = 3;
     missilerack [0] = 4; missilerack [1] = 4; missilerack [2] = 4; missilerack [3] = 4;
-    flares = 20;
-    chaffs = 20;
+    flares = 25;
+    chaffs = 25;
     bomber = 1;
   }
   else if (id == FIGHTER_REDARROW)
@@ -887,7 +876,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.33;
     nimbility = 1;
     manoeverability = 0.51;
-    maxshield = 125;
+    maxshield = 120;
     zoom = 0.4;
     maxtheta = 90.0;
     maxgamma = 80.0;
@@ -901,7 +890,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     maxthrust = 0.28;
     nimbility = 1.02;
     manoeverability = 0.5;
-    maxshield = 90;
+    maxshield = 85;
     zoom = 0.33;
     maxtheta = 90.0;
     maxgamma = 80.0;
@@ -1848,7 +1837,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   int lsdist = 20;
 //  if (fabs (theta) < 20) lsdist = 10;
   float flyx = tl->x + forcex * lsdist, flyz = tl->z + forcez * lsdist;
-  int flyxs = l->getX ((int) flyx), flyzs = l->getX ((int) flyz);
+  int flyxs = l->getCoord ((int) flyx), flyzs = l->getCoord ((int) flyz);
   {
     if (manoeverheight > 0)
     {
@@ -2188,7 +2177,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
   {
     dx2 = dx; dz2 = dz;
   }
-  int a, w = (int) phi;
+  float a, w = phi;
   if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
 
 /*  if (intelligence == 0)
@@ -2201,11 +2190,11 @@ m [0]->tl->y = target->tl->y;
 }*/
 
   // get heading to target
-  a = (int) (atan (dx2 / dz2) * 180 / PI);
+  a = atan (dx2 / dz2) * 180 / PI;
   if (dz2 > 0)
   {
-    if (dx2 > 0) a -= 180;
-    else a += 180;
+    if (dx2 > 0) a -= 180.0F;
+    else a += 180.0F;
   }
 //    this->aw = a;
   aw = a - w; // aw=0: target in front, aw=+/-180: target at back
@@ -2510,8 +2499,8 @@ m [0]->tl->y = target->tl->y;
   if (id >= FIGHTER1 && id <= FIGHTER2)
   {
 //    rectheta += (int) (timefac * (float) (myrandom (intelligence) - intelligence / 2));
-    if (rectheta > 90 - precision / 6) rectheta = 90 - precision / 6;
-    else if (rectheta < -90 + precision / 6) rectheta = -90 + precision / 6;
+    if (rectheta > 90 - precision / 5) rectheta = 90 - precision / 5;
+    else if (rectheta < -90 + precision / 5) rectheta = -90 + precision / 5;
   }
 }
 

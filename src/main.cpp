@@ -26,10 +26,16 @@
 /*
 TODO:
 - southern seashore landscape (additional missions)
-- antarctic
+- antarctic landscape
+- alpine snow landscape
+- tree colors (fall, spring), draw more tree textures
 - torpedo, water
-- faster gaussian convolution (isotropic)
-- little bigger gauss filter for light mask, 2x2 grid does not look good
+- little bigger gauss filter for light mask, 2x2 grid does not look good ???
+- cannon sound
+- clouds to fly through
+- particle systems
+- pseudo random number generator
+- tunnel
 */
 
 #ifndef IS_MAIN_H
@@ -338,6 +344,14 @@ Mission *missionnew = NULL;
 bool firststart = false;
 
 
+
+CColor colorwhite (255, 255, 255, 255);
+CColor colorblue (100, 150, 255, 255);
+CColor colorgreen (100, 255, 100, 255);
+CColor colororange (255, 150, 100, 255);
+CColor colorred (255, 0, 0, 255);
+CColor coloryellow (255, 255, 0, 200);
+CColor colorgrey (150, 150, 150, 200);
 
 
 void drawRank (float xp, float yp, float zp, int rank, float zoom)
@@ -663,7 +677,7 @@ void game_levelInit ()
     if (day)
     {
       laser [i]->o = &model_cannon1;
-      laser [i]->zoom = 0.05;
+      laser [i]->zoom = 0.04;
       laser [i]->drawlight = false;
     }
     else
@@ -1687,6 +1701,107 @@ bool missionactive = false;
 int menuitem = 0, menutimer = 0, menuitemselected = -1, missionmenutimer;
 int missionmenuitemselected = 0, missionmenufighterselected = -1, missionmenuweaponselected = -1;
 
+void drawCircles (CColor *colorstd)
+{
+  int i;
+  float zf = -3, yf, xf;
+  int t = 360 - (missionmenutimer * 10 / timestep) % 360;
+  for (i = 0; i < 20; i ++)
+  {
+    yf = -3 + 0.3 * i; // - (float) (missionmenutimer & 63) / 64.0;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 20; i2 ++)
+    {
+      xf = -3 + 0.3 * i2;
+      yf = -3 + 0.3 * i;
+      float cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (xf, yf, zf);
+      yf = -3 + 0.3 * (i + 1);
+      cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (xf, yf, zf);
+    }
+    glEnd ();
+  }
+}
+
+void drawQuads (CColor *colorstd)
+{
+  int i;
+  float zf = -3, yf;
+  for (i = 0; i < 14; i ++)
+  {
+    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 14; i2 ++)
+    {
+      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
+      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
+      if (colorstd == &colorblue) glColor3f (0, 0, cola);
+      else glColor3f (cola, 0, 0);
+      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
+    }
+    glEnd ();
+  }
+}
+
+void drawPlasma (CColor *colorstd)
+{
+  int i;
+  float zf = -3, yf;
+  float zf1 = -2.98;
+  float yind = 200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
+  float xind = 200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
+  float yind2 = -200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
+  float xind2 = -200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
+  for (i = 0; i < 21; i ++)
+  {
+    yf = -2.5 + 0.25 * i;
+    float yif = yind + i * 5;
+    int yi = (int) yif;
+    float yr = yif - yi;
+    float yif2 = yind2 + i * 5;
+    int yi2 = (int) yif2;
+    float yr2 = yif2 - yi2;
+    glBegin (GL_QUAD_STRIP);
+    for (int i2 = 0; i2 < 21; i2 ++)
+    {
+      float xf = -2.5 + 0.25 * i2;
+      float xif = xind + i2 * 5;
+      int xi = (int) xif;
+      float xr = xif - xi;
+      float xif2 = xind2 + i2 * 5;
+      int xi2 = (int) xif2;
+      float xr2 = xif2 - xi2;
+      float h1 = xr * yr * l->h [yi + 1] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi] [xi] +
+                 xr * (1.0 - yr) * l->h [yi] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1] [xi];
+      float h2 = xr * yr * l->h [yi + 1 + 5] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5] [xi] +
+                 xr * (1.0 - yr) * l->h [yi + 5] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5] [xi];
+      float h3 = xr2 * yr2 * l->h [yi2 + 1] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2] [xi2] +
+                 xr2 * (1.0 - yr2) * l->h [yi2] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1] [xi2];
+      float h4 = xr2 * yr2 * l->h [yi2 + 1 + 5] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2 + 5] [xi2] +
+                 xr2 * (1.0 - yr2) * l->h [yi2 + 5] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1 + 5] [xi2];
+      float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
+      float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
+      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
+      else glColor3f (intens, 0, intens2);
+      glVertex3f (xf, yf, zf1);
+      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
+      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
+      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
+      else glColor3f (intens, 0, intens2);
+      glVertex3f (xf, yf + 0.25, zf1);
+    }
+    glEnd ();
+  }
+}
+
 void menu_key (unsigned char key, int x, int y)
 {
   if (pilotedit.active)
@@ -1732,8 +1847,7 @@ void pleaseWait ()
   glVertex3f (-xf, -yf, zf);
   glEnd ();
 
-  CColor color (255, 255, 255, 255);
-  font1->drawTextCentered (0, -0.5, -1.5, "PLEASE WAIT...", &color);
+  font1->drawTextCentered (0, -0.5, -1.5, "PLEASE WAIT...", &colorwhite);
   game_view ();
 }
 
@@ -1957,10 +2071,7 @@ void mission_display ()
 {
   char buf [256];
   int i;
-  CColor colorblue (100, 150, 255, 255);
-  CColor colorgreen (100, 255, 100, 255);
-  CColor colororange (255, 150, 100, 255);
-  CColor colorred (255, 0, 0, 255);
+  float zf = -3;
   float xstats = 1, ystats = 6;
   float xstatstab = 10;
   float piloty = 6;
@@ -1973,52 +2084,8 @@ void mission_display ()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity ();
   glPushMatrix ();
-  float zf = -3, yf;
-  float zf1 = -2.98;
-  float yind = 200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
-  float xind = 200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
-  float yind2 = -200.0 * sin (0.003 * missionmenutimer / timestep) + 200.0;
-  float xind2 = -200.0 * cos (0.003 * missionmenutimer / timestep) + 200.0;
-  for (i = 0; i < 21; i ++)
-  {
-    yf = -2.5 + 0.25 * i;
-    float yif = yind + i * 5;
-    int yi = (int) yif;
-    float yr = yif - yi;
-    float yif2 = yind2 + i * 5;
-    int yi2 = (int) yif2;
-    float yr2 = yif2 - yi2;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 21; i2 ++)
-    {
-      float xf = -2.5 + 0.25 * i2;
-      float xif = xind + i2 * 5;
-      int xi = (int) xif;
-      float xr = xif - xi;
-      float xif2 = xind2 + i2 * 5;
-      int xi2 = (int) xif2;
-      float xr2 = xif2 - xi2;
-      float h1 = xr * yr * l->h [yi + 1] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi] [xi] +
-                 xr * (1.0 - yr) * l->h [yi] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1] [xi];
-      float h2 = xr * yr * l->h [yi + 1 + 5] [xi + 1] + (1.0 - xr) * (1.0 - yr) * l->h [yi + 5] [xi] +
-                 xr * (1.0 - yr) * l->h [yi + 5] [xi + 1] + (1.0 - xr) * yr * l->h [yi + 1 + 5] [xi];
-      float h3 = xr2 * yr2 * l->h [yi2 + 1] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2] [xi2] +
-                 xr2 * (1.0 - yr2) * l->h [yi2] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1] [xi2];
-      float h4 = xr2 * yr2 * l->h [yi2 + 1 + 5] [xi2 + 1] + (1.0 - xr2) * (1.0 - yr2) * l->h [yi2 + 5] [xi2] +
-                 xr2 * (1.0 - yr2) * l->h [yi2 + 5] [xi2 + 1] + (1.0 - xr2) * yr2 * l->h [yi2 + 1 + 5] [xi2];
-      float intens = sin (0.15 * (h1 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
-      float intens2 = sin (0.15 * (h3 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
-      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
-      else glColor3f (intens, 0, intens2);
-      glVertex3f (xf, yf, zf1);
-      intens = sin (0.15 * (h2 / 256 + 0.5 * missionmenutimer / timestep)) * 0.14 + 0.14;
-      intens2 = sin (0.15 * (h4 / 256 + 0.5 * missionmenutimer / timestep)) * 0.06 + 0.06;
-      if (colorstd == &colorblue) glColor3f (intens2, 0, intens);
-      else glColor3f (intens, 0, intens2);
-      glVertex3f (xf, yf + 0.25, zf1);
-    }
-    glEnd ();
-  }
+
+  drawPlasma (colorstd);
 
   glLineWidth (2.0);
   glColor4ub (180, 180, 180, 255);
@@ -2186,31 +2253,14 @@ void create_mouse (int button, int state, int x, int y)
 void create_display ()
 {
   int i;
-  CColor colorblue (100, 150, 255, 255);
   CColor *colorstd = &colorblue;
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
   glPushMatrix ();
-  float zf = -3, yf;
-  for (i = 0; i < 14; i ++)
-  {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 14; i2 ++)
-    {
-      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
-    }
-    glEnd ();
-  }
+
+  drawQuads (colorstd);
 
   float my = 0;
   for (i = 0; i < server->num_clients; i ++)
@@ -2252,32 +2302,14 @@ void join_mouse (int button, int state, int x, int y)
 
 void join_display ()
 {
-  int i;
-  CColor colorblue (100, 150, 255, 255);
   CColor *colorstd = &colorblue;
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
   glPushMatrix ();
-  float zf = -3, yf;
-  for (i = 0; i < 14; i ++)
-  {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 14; i2 ++)
-    {
-      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
-    }
-    glEnd ();
-  }
+
+  drawQuads (colorstd);
 
   font1->drawTextCentered (0, 9, -1.5, "JOIN GAME");
 
@@ -2344,8 +2376,6 @@ void fighter_mouse (int button, int state, int x, int y)
 void fighter_display ()
 {
   char buf [256];
-  int i;
-  CColor colorblue (100, 150, 255, 255);
 //  Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorblue;
 
@@ -2353,24 +2383,8 @@ void fighter_display ()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity ();
   glPushMatrix ();
-  float zf = -3, yf;
-  for (i = 0; i < 14; i ++)
-  {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 14; i2 ++)
-    {
-      float cola = sine [(i * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -3 + 0.5 * i, zf + sine [(i * 100) % 360] / 2);
-      cola = sine [((i+1) * 100+missionmenutimer*4 / timestep) % 360] / 10 + sine [(i2 * 100) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (-3 + 0.5 * i2, -2.5 + 0.5 * i, zf + sine [((i+1) * 100) % 360] / 2);
-    }
-    glEnd ();
-  }
+
+  drawQuads (colorstd);
 
   font1->drawTextCentered (0, 9, -1.5, "FIGHTER");
 
@@ -2442,7 +2456,7 @@ model = &model_missile7; */
   fplayer->newinit (id, 1, 0);
 
   font1->drawText (-10, 9, -2, getModelName (id));
-  yf = 9.5;
+  float yf = 9.5;
   strcpy (buf, "TYPE: ");
   if (fplayer->id == FIGHTER_FALCON || fplayer->id == FIGHTER_CROW || fplayer->id == FIGHTER_BUZZARD || fplayer->id == FIGHTER_REDARROW || fplayer->id == FIGHTER_BLACKBIRD)
     strcat (buf, "FIGHTER");
@@ -2488,7 +2502,6 @@ void fame_display ()
 {
   char buf [256];
   int i, i2;
-  CColor colorblue (100, 150, 255, 255);
   Pilot *p = pilots->pilot [pilots->aktpilot];
   CColor *colorstd = &colorblue;
 
@@ -2496,28 +2509,8 @@ void fame_display ()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity ();
   glPushMatrix ();
-  float zf = -3, yf, xf;
-  int t = 360 - (missionmenutimer * 10 / timestep) % 360;
-  for (i = 0; i < 20; i ++)
-  {
-    yf = -3 + 0.3 * i; // - (float) (missionmenutimer & 63) / 64.0;
-    glBegin (GL_QUAD_STRIP);
-    for (int i2 = 0; i2 < 20; i2 ++)
-    {
-      xf = -3 + 0.3 * i2;
-      yf = -3 + 0.3 * i;
-      float cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (xf, yf, zf);
-      yf = -3 + 0.3 * (i + 1);
-      cola = sine [(int) (sqrt (xf * xf + yf * yf) * 200 + t) % 360] / 10 + 0.2;
-      if (colorstd == &colorblue) glColor3f (0, 0, cola);
-      else glColor3f (cola, 0, 0);
-      glVertex3f (xf, yf, zf);
-    }
-    glEnd ();
-  }
+
+  drawCircles (colorstd);
 
   font1->drawTextCentered (0, 8, -1.5, "TOP PILOTS");
   int sum = 0;
@@ -3262,8 +3255,6 @@ void drawMissionElement (float x, float y, float z, int thismissionid, int missi
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
-  CColor coloryellow (255, 255, 0, 200);
-  CColor colorgrey (150, 150, 150, 200);
   Pilot *p = pilots->pilot [pilots->aktpilot];
   if (p->mission_state [missionid] == 1)
   {
@@ -3309,10 +3300,6 @@ void stats_display ()
   char buf [100];
   float xf1 = -12, xf2 = 0;
   yf = 6; zf = -2.5;
-  CColor colorwhite (255, 255, 255, 255);
-  CColor colorred (255, 180, 150, 255);
-  CColor colorblue (150, 180, 255, 255);
-  CColor coloryellow (255, 255, 0, 255);
   CColor *color;
   Pilot *p = pilots->pilot [pilots->aktpilot];
   if (missionstate == 1)
@@ -3404,7 +3391,6 @@ void menu_display ()
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
   CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
-  CColor coloryellow (255, 255, 0, 200);
 
   int textx = -14, textx2 = 0;
   int normtimef = -menutimer * 5;
@@ -3691,8 +3677,7 @@ void pause_display ()
   glLoadIdentity ();
   glPushMatrix ();
 
-  CColor color (255, 255, 255, 255);
-  font1->drawText (-3, -1, -1, "PAUSED", &color);
+  font1->drawText (-3, -1, -1, "PAUSED", &colorwhite);
 
   glPopMatrix ();
 }
@@ -3701,42 +3686,42 @@ void credits_display ()
 {
   float yt = 12, zf = -2.4;
   glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
-  CColor col (255, 255, 255, 255);
-  CColor col2 (255, 255, 0, 255);
-  font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", &col);
-  font2->drawTextCentered (0, yt -= 2, zf, "GRAPHICS, MODELS, SOUND & MUSIC", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "THOMAS A. DREXL", &col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "LENS FLARES & FURTHER DEBUGGING", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "PIOTR PAWLOW", &col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "LOURENS VEEN", &col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "PUBLISHING & FURTHER GAME IDEAS", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", &col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", &col2);
-  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL IMPROVEMENTS", &col);
-  font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", &col2);
+  CColor *col = &colorwhite;
+  CColor *col2 = &coloryellow;
+  font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", col);
+  font2->drawTextCentered (0, yt -= 2, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "THOMAS A. DREXL", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "LENS FLARES & FURTHER DEBUGGING", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "PIOTR PAWLOW", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "LOURENS VEEN", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "PUBLISHING & FURTHER GAME IDEAS", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL IMPROVEMENTS", col);
+  font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", col2);
 }
 
 void finish_display ()
 {
   glTranslatef (0, -3.5 + 0.01 * (float) finishtimer / timestep, 0);
-  CColor col (255, 255, 255, 255);
-  font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", &col);
-  font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", &col);
-  font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", &col);
-  font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", &col);
-  font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", &col);
-  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", &col);
-  font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", &col);
-  font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", &col);
-  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUNDS, MUSIC,", &col);
-  font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", &col);
-  font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", &col);
-  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", &col);
-  font1->drawTextCentered (0, -14, -3, "PROGRAMMERS JOINED (LISTED IN THE CREDITS SECTION).", &col);
-  font1->drawTextCentered (0, -16, -3, "SPECIAL THANKS TO JOSEF DREXL FOR THE MODELING IDEAS,", &col);
-  font1->drawTextCentered (0, -18, -3, "AND THE UNIX AWARD GOES TO WOLFGANG HOMMEL ;-)", &col);
+  CColor *col = &colorwhite;
+  font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", col);
+  font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", col);
+  font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", col);
+  font1->drawTextCentered (0, 4, -3, "THIS GAME HAS ORIGINALLY BEEN DEVELOPED AS PART", col);
+  font1->drawTextCentered (0, 2, -3, "OF THE COURSE \"APPLICATIONS OF COMPUTER GRAPHICS\"", col);
+  font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", col);
+  font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", col);
+  font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", col);
+  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUNDS, MUSIC,", col);
+  font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", col);
+  font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", col);
+  font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", col);
+  font1->drawTextCentered (0, -14, -3, "PROGRAMMERS JOINED (LISTED IN THE CREDITS SECTION).", col);
+  font1->drawTextCentered (0, -16, -3, "SPECIAL THANKS TO JOSEF DREXL FOR THE MODELING IDEAS,", col);
+  font1->drawTextCentered (0, -18, -3, "AND THE UNIX AWARD GOES TO WOLFGANG HOMMEL ;-)", col);
 }
 
 void quit_display ()
@@ -3762,7 +3747,6 @@ void quit_display ()
   glVertex3f (-xf, -yf, zf);
   glEnd ();
 
-  CColor colorblue (150, 180, 255, 255);
   font1->drawTextCentered (0, 0.8, -1.5, "REALLY QUIT?", &colorblue);
   if (missionmenuitemselected == 0)
     font1->drawTextScaled (-4, -1.5, -1.8, "YES", &colorblue, -missionmenutimer * 5, 0);
@@ -4275,9 +4259,8 @@ void game_display ()
 
   glPopMatrix ();
   char buf [25];
-  CColor col;
   sprintf (buf, "FPS: %d", (int) fps);
-  font1->drawText (-25, 25, -3.5, buf, &col);
+  font1->drawText (-25, 25, -3.5, buf, &colorwhite);
 
   bool write = false;
   if (firststart)
@@ -4290,7 +4273,6 @@ void game_display ()
 #endif
     if (akttime - starttime < 15000)
     {
-      CColor colorred (255, 0, 0, 255);
       font1->drawTextCentered (0, -8, -2, "PLEASE WAIT WHILE", &colorred);
       font1->drawTextCentered (0, -9, -2, "ADJUSTING QUALITY", &colorred);
       write = true;
@@ -4298,7 +4280,6 @@ void game_display ()
   }
   if (fps <= 20 && !write)
   {
-    CColor colorred (255, 0, 0, 255);
     font1->drawTextCentered (0, -8, -2, "FPS TOO LOW", &colorred);
     font1->drawTextCentered (0, -9, -2, "TURN DOWN VIEW OR QUALITY", &colorred);
   }

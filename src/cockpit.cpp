@@ -31,38 +31,6 @@ Cockpit::Cockpit ()
   chaffwarning = 0;
 }
 
-/*  float getGamma (DynamicObj *obj)
-{
-  float dy = obj->tl->y - fplayer->tl->y;
-  float dx = fplayer->distance (obj);
-  if (dx == 0) dx = 1E-5;
-  return atan (dy / dx) * 180.0 / PI;
-}
-
-float getPhi (DynamicObj *obj)
-{
-  float dx2 = obj->tl->x - fplayer->tl->x, dz2 = obj->tl->z - fplayer->tl->z; // actual distances
-  float a, aw, w = fplayer->phi;
-  if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
-  a = atan (dx2 / dz2) * 180 / PI;
-  if (dz2 > 0)
-  {
-    if (dx2 > 0) a -= 180;
-    else a += 180;
-  }
-  aw = a - w;
-  if (aw < -180) aw += 360;
-  if (aw > 180) aw -= 360;
-  return aw;
-}*/
-
-/*void Cockpit::cockpitvertex (float phi, float gamma) //cylindrical headup projetion
-{
-  float x = cos ((-fplayer->theta+180)/180*PI) * phi + sin ((-fplayer->theta+180)/180*PI)* gamma;
-  float y = sin ((-fplayer->theta+180)/180*PI) * phi - cos ((-fplayer->theta+180)/180*PI)* gamma;
-  glVertex3f (10*sin((x+180)/180*PI),10*sin((y+180)/180*PI),-10*cos((x+180)/180*PI)*cos((y+180)/180*PI));
-}*/
-
 void Cockpit::cockpitvertex (float phi, float gamma) // cylindrical headup projection
 {
   float fpt = -fplayer->theta + 180;
@@ -434,31 +402,13 @@ void Cockpit::drawHeading ()
     }
   }*/
   
-  sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 72000.0F));
+  sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 80000.0F));
   font1->drawTextCentered (-8.0, -8.5, -4.0, str, &color);
 
   sprintf (str, "AMMO %d", fplayer->ammo);
   font1->drawTextCentered (8.0, -8.5, -4.0, str, &color);
 
   gl->enableAlphaBlending ();
-/*  int t1 = (int) (fplayer->theta - 135.0);
-  int t2 = t1 + 90, t3 = t1 + 180, t4 = t1 + 270;
-  if (t1 != 0) t1 %= 360;
-  if (t2 != 0) t2 %= 360;
-  if (t3 != 0) t3 %= 360;
-  if (t4 != 0) t4 %= 360;
-  if (t1 < 0) t1 += 360;
-  if (t2 < 0) t2 += 360;
-  if (t3 < 0) t3 += 360;
-  if (t4 < 0) t4 += 360;
-  xf = 0.6; yf = 0.6;
-  setColor (130);
-  glBegin (GL_LINES);
-  glVertex3f (xf * cosi [t1], yf * sine [t1], zf);
-  glVertex3f (xf * cosi [t2], yf * sine [t2], zf);
-  glVertex3f (xf * cosi [t3], yf * sine [t3], zf);
-  glVertex3f (xf * cosi [t4], yf * sine [t4], zf);
-  glEnd ();*/
 
   float dgamma = fplayer->gamma - (int) fplayer->gamma;
   float innerx = 5, outerx = 10, widthx = 1;
@@ -489,20 +439,6 @@ void Cockpit::drawHeading ()
     cockpitvertex (outerx,tmp);
   }
 
-/*  for (i = -90; i < -1; i += 10)
-  {
-    int tmp=int(-i+fplayer->gamma+540)%360-180;
-//    float tmp = fplayer->gamma - i;
-    cockpitvertex (-5,tmp-1);
-    cockpitvertex (-5,tmp);
-    cockpitvertex (5,tmp-1);
-    cockpitvertex (5,tmp);
-    cockpitvertex (-10,tmp);
-    cockpitvertex (-5,tmp);
-    cockpitvertex (5,tmp);
-    cockpitvertex (10,tmp);
-  }*/
-
   for (i = step; i < 180; i += step)
   {
     float tmp=int(-i+fplayer->gamma+540)%360-180;
@@ -520,22 +456,6 @@ void Cockpit::drawHeading ()
     cockpitvertex (outerx-widthx,tmp);
     cockpitvertex (outerx,tmp);
   }
-/*  for (i = 90; i < 180; i += 10)
-  {
-    int tmp=int(-i+fplayer->gamma+540)%360-180;
-    cockpitvertex (-5,tmp-1);
-    cockpitvertex (-5,tmp);
-    cockpitvertex (5,tmp-1);
-    cockpitvertex (5,tmp);
-    cockpitvertex (-10,tmp);
-    cockpitvertex (-9,tmp);
-    cockpitvertex (5,tmp);
-    cockpitvertex (6,tmp);
-    cockpitvertex (-6,tmp);
-    cockpitvertex (-5,tmp);
-    cockpitvertex (9,tmp);
-    cockpitvertex (10,tmp);
-  }*/
   glEnd ();
   gl->disableAlphaBlending ();
 

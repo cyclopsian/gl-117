@@ -48,6 +48,7 @@ void GLLandscape::normalcrossproduct( float* a, float* b, float*c )
   norm (c);
 }
 
+// obsolete
 /*float *GLLandscape::selectMaterial (int x, int y)
 {
   if (f [x] [y] == GRASS) return mata [0];
@@ -121,7 +122,7 @@ void GLLandscape::precalculate ()
     }
   }
 
-// Set the colors of the landscape
+  // set the colors of the landscape
   float mzoom = zoomz;
   for (x=0; x<=MAXX; x++)
     for (z=0; z<=MAXX; z++)
@@ -147,7 +148,7 @@ void GLLandscape::precalculate ()
 //        printf ("a=%d, r=%d, g=%d, b=%d\n", a, r[x][z],g[x][z],b[x][z]); fflush (stdout);
     }
 
-// Smooth the colors
+  // smooth the colors (obsolete)
   long sum;
 /*  long g3[3][3]={{0,1,0},
         {1,4,1},
@@ -204,8 +205,8 @@ void GLLandscape::precalculate ()
       b [i] [i2] = (unsigned char) lg [i] [i2];
     }*/
 
-// Set the height mask for the lowest sunrays touching the landscape's surface
-// This is just an approximation presuming the sun is a vertical line
+  // Set the height mask for the lowest sunrays touching the landscape's surface
+  // This is just an approximation presuming the sun is a vertical line
   float m1 = mzoom / hh;
   float ih = tan ((sungamma + 5) * PI / 180) / m1; // 0 degree vertical sun radius
   for (x = 0; x <= MAXX; x ++)
@@ -234,7 +235,7 @@ void GLLandscape::precalculate ()
   int minambient = 100;
   if (!day) minambient = 50;
 
-// Set the luminance of the landscape
+  // Set the luminance of the landscape
   for (x = 0; x <= MAXX; x ++)
     for (z = 0; z <= MAXX; z ++)
     {
@@ -290,31 +291,16 @@ void GLLandscape::precalculate ()
       }
       if (nl [x] [z] < minambient) // minimum ambient light
         nl [x] [z] = minambient;
-/*      float vh = (float) h [x] [z];
-    for (i = z + 1; i < MAXX; i ++)
-    {
-      vh += ih;
-      if (h [x] [i] > vh)
-      {
-        nl [x] [z] /= 2;
-        break;
-      }
-      if (i > z + 100) break;
-    }*/
-// Check whether this point is in the shadow of some mountain
+      // Check whether this point is in the shadow of some mountain
       if (hw [x] [z] < hray [x] [z])
       {
         nl [x] [z] /= 2;
         if (nl [x] [z] < minambient)
           nl [x] [z] = minambient; // minimum ambient light
       }
-/*      if (isWater (f [x] [z]))
-    {
-      if (nl [x] [z] > 0.75) nl [x] [z] = 50.0;
-    }*/
     }
 
-// Smooth the luminance (very important)
+  // Smooth the luminance (very important)
   long g3_1[3][3]={{1,2,1},
                    {2,4,2},
                    {1,2,1}};
@@ -338,8 +324,8 @@ void GLLandscape::precalculate ()
 //  rt = new RTerrain ();
 //  rt->roam ((Landscape *) this);
 
-// Assign textures: tex1 = quad texture
-// if tex2 defined: tex1 = upper triangle texture, tex2 = lower triangle texture
+  // Assign textures: tex1 = quad texture
+  // if tex2 defined: tex1 = upper triangle texture, tex2 = lower triangle texture
   for (i = 0; i < MAXX; i ++)
     for (i2 = 0; i2 < MAXX; i2 ++)
     {
@@ -417,50 +403,6 @@ void GLLandscape::precalculate ()
       { drawrule [i] [i2] = 2; tex1 [i] [i2] = 0xFF; tex2 [i] [i2] = texrocks->textureID; }
     }
 
-}
-
-void GLLandscape::subdivide (int x1, int y1, int x2, int y2)
-{
-/*    int i, i2;
-  int w = x2-x1+1;
-  bool split = false;
-  if (w == 2)
-  { rect [y1] [x1] = 1; return; }
-    for (i = y1; i <= y2; i ++)
-      for (i2 = x1; i2 <= x2; i2 ++)
-      {
-    float reqheight = (float) h[y1][x1]*(y2-i)*(x2-i2) + h[y2][x1]*(i-y1)*(x2-i2) +
-                            h[y1][x2]*(y2-i)*(i2-x1) + h[y2][x2]*(i-y1)*(i2-x1);
-    reqheight /= (float) (y2-y1)*(x2-x1);
-    if (abs (h[i][i2]-reqheight) > 100)
-    { split = true; goto fertig; }
-    }
-fertig:
-  if (split)
-  {
-    subdivide (x1,y1,x1+w/2,y1+w/2);
-    subdivide (x1,y1+w/2,x1+w/2,y2);
-    subdivide (x1+w/2,y1,x2,y1+w/2);
-    subdivide (x1+w/2,y1+w/2,x2,y2);
-  }
-  else
-  {
-      for (i = y1; i <= y2; i ++)
-        for (i2 = x1; i2 <= x2; i2 ++)
-    {
-      rect [i] [i2] = w - 1;
-      float reqheight = (float) h[y1][x1]*(y2-i)*(x2-i2) + h[y2][x1]*(i-y1)*(x2-i2) +
-                               h[y1][x2]*(y2-i)*(i2-x1) + h[y2][x2]*(i-y1)*(i2-x1);
-      reqheight /= (float) (y2-y1)*(x2-x1);
-      h [i] [i2] = reqheight;
-    }
-  }*/
-}
-
-inline int GLLandscape::getCoord (int a)
-{
-  return (a & MAXX_MASK);
-//  return (a>=0)? a%MAXX : MAXX-a%MAXX; // more general version
 }
 
 // Get height over landscape/water, no interpolation (fast)
@@ -723,38 +665,9 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
     glVertex3f (hh2*(ex4+x) - 1.0, ht, hh2*(MAXX-(ey4+y+zy)) - 1.0);
     glEnd ();
   }
-/*    int myticker;
-    float zy = 0;
-    if (weather == 1)
-    {
-      myticker = (int) (0.05 / htree * lsticker / timestep + 1000 * wtree + (x + y) * 50);
-      if (myticker != 0)
-        myticker %= 360;
-      zy = 0.2 * (2.0 + sine [myticker]);
-    }
-    glBegin (GL_QUADS);
-    glColor3ub (treecolor.c [0], treecolor.c [1], treecolor.c [2]);
-    glTexCoord2d (0, 1);
-    glVertex3f (hh2*(-wtree+x) - 1.0, ht + htree, hh2*(MAXX-(y+zy)) - 1.0);
-    glTexCoord2d (1, 1);
-    glVertex3f (hh2*(wtree+x) - 1.0, ht + htree, hh2*(MAXX-(y+zy)) - 1.0);
-    glTexCoord2d (1, 0);
-    glVertex3f (hh2*(wtree+x) - 1.0, ht, hh2*(MAXX-(y)) - 1.0);
-    glTexCoord2d (0, 0);
-    glVertex3f (hh2*(-wtree+x) - 1.0, ht, hh2*(MAXX-(y)) - 1.0);
-    glEnd ();
-    glBegin (GL_QUADS);
-    glTexCoord2d (0, 1);
-    glVertex3f (hh2*(x) - 1.0, ht + htree, hh2*(MAXX-(-wtree+y+zy)) - 1.0);
-    glTexCoord2d (1, 1);
-    glVertex3f (hh2*(x) - 1.0, ht + htree, hh2*(MAXX-(wtree+y+zy)) - 1.0);
-    glTexCoord2d (1, 0);
-    glVertex3f (hh2*(x) - 1.0, ht, hh2*(MAXX-(wtree+y)) - 1.0);
-    glTexCoord2d (0, 0);
-    glVertex3f (hh2*(x) - 1.0, ht, hh2*(MAXX-(-wtree+y)) - 1.0);
-    glEnd ();*/
 }
 
+// currently not implemented
 /*void GLLandscape::drawTreeGrid (float x, float y, float htree, float wtree, int phi)
 {
   float ht = getExactLSHeight (x, y);
@@ -791,49 +704,6 @@ void GLLandscape::drawTree (float x, float y, float htree, float wtree, int phi)
 }*/
 
 int visibility = 0;
-
-// Not used at the moment
-void GLLandscape::drawCloudQuadStrip (int x1, int y1, int x2, int y2)
-{
-  int x, y, xs, ys;
-  float cr;
-  int step = neargridstep;
-
-  glDisable (GL_TEXTURE_2D);
-  glPushMatrix ();
-  glRotatef (-40, 1, 0, 0);
-    
-  for (xs = x1; xs < x2;)
-  {
-    glBegin (GL_QUAD_STRIP);
-    x = getCoord (xs);
-    for (ys = y2 - 1; ys >= y1;)
-    {
-      y = getCoord (ys);
-//      if (gl->isCubeInFrustum (hh2*(xs) - 1.0, (float)(60000)*zoomz - zoomz2, hh2*(MAXX-(ys)) - 1.0, hh2*2*step))
-      {
-        int xstep = getCoord (x + step);
-        cr = g [x] [y];
-        float fac = 0.5 * sunlight / 256.0;
-        cr = (float) cr * fac;
-        if (cr >= 1.0) cr = 1.0;
-        glColor3f (cr, cr, cr);
-        glVertex3f (hh2*xs - 1.0, (float)(50000)*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
-        cr = g [x+step] [y];
-        fac = 0.5 * sunlight / 256.0;
-        cr = (float) cr * fac;
-        if (cr >= 1.0) cr = 1.0;
-        glColor3f (cr, cr, cr);
-        glVertex3f (hh2*(xs+step) - 1.0, (float)(50000)*zoomz - zoomz2, hh2*(MAXX-ys) - 1.0);
-      }
-      ys -= step;
-    }
-    xs += step;
-    glEnd ();
-  }
-
-  glPopMatrix ();
-}
 
 // Fast landscape rendering without textures
 void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
@@ -1713,96 +1583,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
 //  glEnable (GL_DEPTH_TEST);
   }
 
-/*  float h2 = h1;
-  if (h [x] [y + 2*step] < h2) h2 = h [x] [y + 2*step];
-  if (h [x + step] [y + 2*step] < h2) h2 = h [x + step] [y + 2*step];
-  if (h2 < h1)
-  {
-  px [0] = x; py [0] = y+step; li [0] = nl [x] [y+step];
-  px [1] = x + step; py [1] = y+step; li [1] = nl [x + step] [y+step];
-  for (j = 0; j < 4; j ++)
-  {
-    int mx = px [j], my = py [j];
-    float d = 0.0005 * (h1 - h [px [j]] [py [j]]);
-    fac = fac2 * li [j];
-    col [j] [0] = 0.1 * fac;
-    col [j] [1] = (0.85 - d) * fac;
-    col [j] [2] = (0.6 + d) * fac;
-//    col [j] [3] = (float) abs (h1 - h [px [j]] [py [j]]) / 200 + 0.5;
-    if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
-    if (col [j] [1] <= 0.1) col [j] [1] = 0.1;
-    if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
-    if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-//    if (col [j] [3] >= 1.0) col [j] [3] = 1.0;
-//    col [j] [3] = 0.5;
-    pos [j] [0] = hh2*mx - 1.0;
-    if (j <= 1)
-      pos [j] [1] = (float)h1*zoomz - zoomz2;
-    else
-      pos [j] [1] = (float)h2*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-my) - 1.0;
-  }
-  for (j = 0; j < 4; j ++)
-  {
-    tf [j] [0] = (float) px [j] * texzoom;
-    tf [j] [1] = (float) py [j] * texzoom;
-  }
-  glBegin (GL_QUADS);
-  for (j = 0; j < 4; j ++)
-  {
-    if (texture)
-      glTexCoord2fv (tf [j]);
-    glColor4fv (col [j]);
-    glVertex3fv (pos [j]);
-  }
-  glEnd();
-  }
-
-  h2 = h1;
-  if (h [x + 2*step] [y] < h2) h2 = h [x + 2*step] [y];
-  if (h [x + 2*step] [y + step] < h2) h2 = h [x + 2*step] [y + step];
-  if (h2 < h1)
-  {
-  px [0] = x + step; py [0] = y; li [0] = nl [x + step] [y];
-  px [3] = x + step; py [3] = y + step; li [3] = nl [x + step] [y + step];
-  for (j = 0; j < 4; j ++)
-  {
-    int mx = px [j], my = py [j];
-    float d = 0.0005 * (h1 - h [px [j]] [py [j]]);
-    fac = fac2 * li [j];
-    col [j] [0] = 0.1 * fac;
-    col [j] [1] = (0.85 - d) * fac;
-    col [j] [2] = (0.6 + d) * fac;
-//    col [j] [3] = (float) abs (h1 - h [px [j]] [py [j]]) / 200 + 0.5;
-    if (col [j] [0] >= 1.0) col [j] [0] = 1.0;
-    if (col [j] [1] <= 0.1) col [j] [1] = 0.1;
-    if (col [j] [1] >= 1.0) col [j] [1] = 1.0;
-    if (col [j] [2] >= 1.0) col [j] [2] = 1.0;
-//    if (col [j] [3] >= 1.0) col [j] [3] = 1.0;
-//    col [j] [3] = 0.5;
-    pos [j] [0] = hh2*mx - 1.0;
-    if (j == 0 || j == 3)
-      pos [j] [1] = (float)h2*zoomz - zoomz2;
-    else
-      pos [j] [1] = (float)h1*zoomz - zoomz2;
-    pos [j] [2] = hh2*(MAXX-my) - 1.0;
-  }
-  for (j = 0; j < 4; j ++)
-  {
-    tf [j] [0] = (float) px [j] * texzoom;
-    tf [j] [1] = (float) py [j] * texzoom;
-  }
-  glBegin (GL_QUADS);
-  for (j = 0; j < 4; j ++)
-  {
-    if (texture)
-      glTexCoord2fv (tf [j]);
-    glColor4fv (col [j]);
-    glVertex3fv (pos [j]);
-  }
-  glEnd();
-  }*/
-
 }
 
 // Draw two textured triangles (quad)
@@ -1882,27 +1662,6 @@ void GLLandscape::drawTexturedTriangle1 (int xs, int ys)
   }
   glEnd();
 
-/*    a = selectColor (x, y);
-    texture = true;
-    if (a == 0 || a == 1)
-      gl->enableTextures (texgrass);
-    else if (a == 2 || a == 7)
-      gl->enableTextures (texrocks);
-    else if (a == 4 || a == 5 || a == 6)
-    {
-      gl->enableTextures (texwater);
-    }
-    else
-      glDisable (GL_TEXTURE_2D);
-  if (a > 1)
-  {
-    texzoom = 0.5;
-  }
-  else
-  {
-    texzoom = 0.25;
-  }*/
-
   if (tex2 [x] [y] == 0xFF)
   {
     texture = false;
@@ -1969,38 +1728,6 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   if (!gl->isSphereInFrustum (hh2*(0.5+xs) - 1.0, (float)h[x][y]*zoomz - zoomz2, hh2*(MAXX-(0.5+ys)) - 1.0, hh2*2*step))
     return;
 
-/*              int a = selectColor (x, y+step);
-                texture = true;
-                if (a == 0 || a == 1)
-                  gl->enableTextures (texgrass);
-                else if (a == 2 || a == 7)
-                  gl->enableTextures (texrocks);
-                else if (a == 4 || a == 5 || a == 6)
-                {
-//        int a2 = selectColor (x+step, y);
-//        if (a2 < 4 || a2 > 6) gl->enableTextures (texgrass);
-//        else
-                  {
-                    gl->enableTextures (texwater);
-                  }
-                }
-                else
-                  glDisable (GL_TEXTURE_2D);
-              if (a > 1)
-              {
-                texzoom = 0.5;
-//                tx = x & 1; ty = y & 1; // modulo 2
-//                tfx = 0.5 * tx; tfy = 0.5 * ty;
-//                tfinc = 0.5;
-              }
-              else
-              {
-                texzoom = 0.25;
-//                tx = x & 3; ty = y & 3; // modulo 4
-//                tfx = 0.25 * tx; tfy = 0.25 * ty;
-//                tfinc = 0.25;
-              }*/
-
   if (tex1 [x] [y] == 0xFF)
   {
     texture = false;
@@ -2057,27 +1784,6 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   glVertex3fv (pos [3]);
   glEnd();
 
-/*              a = selectColor (x, y + step);
-                texture = true;
-                if (a == 0 || a == 1)
-                  gl->enableTextures (texgrass);
-                else if (a == 2 || a == 7)
-                  gl->enableTextures (texrocks);
-                else if (a == 4 || a == 5 || a == 6)
-                {
-                  gl->enableTextures (texwater);
-                }
-                else
-                  glDisable (GL_TEXTURE_2D);
-              if (a > 1)
-              {
-                texzoom = 0.5;
-              }
-              else
-              {
-                texzoom = 0.25;
-              }*/
-
   if (tex2 [x] [y] == 0xFF)
   {
     texture = false;
@@ -2097,7 +1803,6 @@ void GLLandscape::drawTexturedTriangle2 (int xs, int ys)
   {
     texzoom = 0.25;
   }
-
 
   for (j = 0; j < 4; j ++)
   {
@@ -2190,25 +1895,6 @@ void GLLandscape::draw (int phi, int gamma)
   }
 
   glPushMatrix ();
-/*  GLfloat mat_ambient[]  = { 0.7,0.7,0.7,1 };
-  GLfloat mat_diffuse[]  = { 0.3,0.3,0.3,1 };
-  GLfloat mat_specular[] = { 0,0,0,0 };
-  GLfloat mat_emission[] = { 0,0,0,0 };
-  GLfloat mat_shininess[] = { 0 };
-
-  if (lighting >= 10)
-  {
-    glMaterialfv( GL_FRONT, GL_AMBIENT, mat_ambient );
-    glMaterialfv( GL_FRONT, GL_DIFFUSE, mat_diffuse );
-    glMaterialfv( GL_FRONT, GL_SPECULAR, mat_specular );
-    glMaterialfv( GL_FRONT, GL_EMISSION, mat_emission );
-    glMaterialfv( GL_FRONT, GL_SHININESS, mat_shininess );
-  }*/
-
-//  glEnable (GL_NORMALIZE);
-
-//  glutSolidSphere( 1.0, 30, 30);
-
 
   float z2 = ZOOM; // that's wrong if one would change MAXX
 //  float z2 = ZOOM;
@@ -2216,9 +1902,6 @@ void GLLandscape::draw (int phi, int gamma)
 
   gl->extractFrustum ();
     
-//    glTranslatef(-0.5,-0.5,-0.5);
-//  printf (">phi = %d, %d, %d: h = %f\n", (int) phi,(int)px+MAXX/2, (int)pz+MAXX/2, (float)h[(int)px+MAXX/2][(int)pz+MAXX/2]/65536.0-1.0); fflush (stdout);
-
   float pseudoview = getView ();
   float radius = pseudoview / cosi [45];
 
@@ -2258,6 +1941,7 @@ void GLLandscape::draw (int phi, int gamma)
   }
   minx -= 20; maxx += 20; miny -= 20; maxy += 20;
 */
+
   int minx = (int) (camx + MAXX/2 - radius);
   int miny = (int) (MAXX/2 - camz - radius);
   int maxx = (int) (minx + radius * 2);
@@ -2296,6 +1980,7 @@ void GLLandscape::draw (int phi, int gamma)
 
   float dx = (float) (maxx - minx + 1) / parts;
   float dy = (float) (maxy - miny + 1) / parts;
+
 /*  float fx, fy;
   for (i = 0; i < parts; i ++)
     for (i2 = 0; i2 < parts; i2 ++)
@@ -2332,7 +2017,9 @@ void GLLandscape::draw (int phi, int gamma)
 
 //  float cr, cg, cb;
 //  int step = 1;
+
   int zz1 = 0, zz2 = 0, zz = 0;
+
 /*  if (quality == 0)
   {
     minx -= (minx & 1); // modulo 2
@@ -3502,22 +3189,6 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
       }
     }
   }
-/*  float pseudoview = getView ();
-  float radius = pseudoview / cosi [45];
-  int minx = camx + MAXX/2 - radius;
-  int miny = MAXX/2 - camz - radius;
-  int maxx = minx + radius * 2;
-  int maxy = miny + radius * 2;
-  for (y = miny; y <= maxy; y ++)
-    for (x = minx; x <= maxx; x ++)
-    {
-      int mx = getCoord (x);
-      int my = getCoord (y);
-      if (hw [mx] [my] > 0)
-      {
-        dl [mx] [my] = 10.0;
-      }
-    }*/
 }
 
 #endif

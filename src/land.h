@@ -24,11 +24,10 @@
 #ifndef IS_LAND_H
 #define IS_LAND_H
 
-//---------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-//---------------------------------------------------------------------------
+#include <string.h>
 
 // surface extents
 #define MAXX 512
@@ -37,8 +36,8 @@
 #define DIVISIONS 4
 #define DIVX 128
 #define DIVX_8 16
-#define LOG2MAXX 9
-#define LOG2SPLINE 9
+#define LOG2MAXX 9 // number of iterations
+#define LOG2SPLINE 9 // number of iterations until spline interpolation
 #define HEIGHT 120
 
 // landscapes
@@ -46,6 +45,9 @@
 #define LAND_MOON 1
 #define LAND_CANYON 2
 #define LAND_DESERT 3
+
+// maximum Gaussian convolution kernel extent
+#define MAXCORE 10
 
 // static ID values for the landscape type (array "f")
 #define GRASS 0
@@ -101,6 +103,7 @@ class Landscape
 
   private:
   unsigned char ftry [MAXX + 1] [MAXX + 1]; // dummy data field
+  unsigned short hg [MAXX + 1] [MAXX + 1]; // dummy data field to apply convolution kernels
   int rockborder;
   int maxx; // same as MAXX, 512 is ideal
   int hoehe, maxn, n; // surface extents
@@ -111,13 +114,10 @@ class Landscape
   int highestpoint, lowestpoint;
 
   public:
-  int hg [MAXX + 1] [MAXX + 1]; // dummy data field to apply convolution kernels
-  int getX (int x); // x mod maxx (may be another function)
+  int getCoord (int a); // modulo MAXX
+  void convolveGauss (int radius, int hmin, int hmax); // fast convolution function (isotropic)
+  void gauss (int x, int y); // convolution for only one raster point
   void smoothGlacier (); // special erosion function
-  void gauss (); // gaussian smooth function for the entire height mask 5x5
-  void gaussAlpine (); // gaussian smooth function for the entire height mask, 5x5 low, 3x3 high
-  void gaussDesert (); // gaussian smooth function for desert, 5x5 low, no high
-  void gauss (int x, int y); // local gaussian smooth function, 5x5
   bool isType (unsigned char type, unsigned char id);
   bool isWoods (int type);
   bool isWater (int type);
@@ -129,7 +129,6 @@ class Landscape
   void genMoonSurface (int height); // moon
   void genDesertSurface (int hoehepc); // desert
   void genRocks (int diffmin, int percent);
-//  void cLakeRecursion (short x, short y, unsigned short level, unsigned char sn, int extent);
   int calcLake (int ys, int xs, unsigned short level, int num, int maxextent);
   void genLake (int depthpc);
   void calcWoods (int dy); // calculate woods on steep grass terrain

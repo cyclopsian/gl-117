@@ -98,13 +98,7 @@ class GLLandscape : public Landscape
   unsigned short lg [MAXX + 1] [MAXX + 1]; // gaussian filter result
   void precalculate (); // precalculate everything (colors, light mask)
 
-  // obsolete, I used this to test quadtrees
-  void subdivide (int x1, int y1, int x2, int y2);
-
   public:
-
-  int getCoord (int a); // modulo MAXX
-  float getCoord (float a);
 
   float getHeight (float x, float z); // height at (int) landscape point
 
@@ -127,8 +121,6 @@ class GLLandscape : public Landscape
 
   int detail [PARTS] [PARTS]; // LOD
 //  int done [100] [100];
-
-  void drawCloudQuadStrip (int x1, int y1, int x2, int y2); // not used
 
   void drawQuadStrip (int x1, int y1, int x2, int y2); // fast quad strip without textures
   void drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
