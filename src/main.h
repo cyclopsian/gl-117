@@ -128,7 +128,7 @@ extern int mode; // always off=0, 1 would mean to calculate ROAM!
 extern float getView (); // return view dependant on weather
 
 // maximum allocation values
-extern const int maxexplosion, maxfighter, maxlaser, maxmissile, maxstar, maxgroundobj;
+//extern const int maxexplosion, maxfighter, maxlaser, maxmissile, maxstar, maxgroundobj;
 
 extern int difficulty;
 
@@ -136,6 +136,15 @@ extern Server *server;
 extern Client *client;
 
 extern bool sunblinding;
+
+const int maxexplosion = 30, maxfighter = 30, maxlaser = 120, maxmissile = 30, maxstar = 70, maxgroundobj = 10, maxblacksmoke = 50;
+extern CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texfont1, *textfont2, *texmoon, *texcross, *texcross2, *texranks, *texmedals;
+
+extern PilotList *pilots;
+
+extern CExplosion *explosion [maxexplosion];
+extern CBlackSmoke *blacksmoke [maxblacksmoke];
+extern Font *font1, *font2;
 
 #endif
 

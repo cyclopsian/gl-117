@@ -71,7 +71,7 @@ install_sh = @install_sh@
 
 AUTOMAKE_OPTIONS = gnu
 bin_PROGRAMS = gl-117
-gl_117_SOURCES = main.cpp gl.cpp model.cpp 3ds.cpp audio.cpp land.cpp glland.cpp aiobject.cpp effects.cpp roam.cpp net.cpp mathtab.cpp dirs.cpp objload.cpp pilots.cpp loader_tga.cpp
+gl_117_SOURCES = main.cpp gl.cpp model.cpp 3ds.cpp audio.cpp land.cpp glland.cpp aiobject.cpp effects.cpp roam.cpp net.cpp mathtab.cpp dirs.cpp objload.cpp pilots.cpp loader_tga.cpp object.cpp
 noinst_HEADERS = 
 DEFS = -I. -I..
 subdir = src
@@ -85,7 +85,8 @@ am_gl_117_OBJECTS = main.$(OBJEXT) gl.$(OBJEXT) model.$(OBJEXT) \
 	3ds.$(OBJEXT) audio.$(OBJEXT) land.$(OBJEXT) glland.$(OBJEXT) \
 	aiobject.$(OBJEXT) effects.$(OBJEXT) roam.$(OBJEXT) \
 	net.$(OBJEXT) mathtab.$(OBJEXT) dirs.$(OBJEXT) \
-	objload.$(OBJEXT) pilots.$(OBJEXT) loader_tga.$(OBJEXT)
+	objload.$(OBJEXT) pilots.$(OBJEXT) loader_tga.$(OBJEXT) \
+	object.$(OBJEXT)
 gl_117_OBJECTS = $(am_gl_117_OBJECTS)
 gl_117_LDADD = $(LDADD)
 gl_117_DEPENDENCIES =
@@ -101,8 +102,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/glland.Po $(DEPDIR)/land.Po \
 @AMDEP_TRUE@	$(DEPDIR)/loader_tga.Po $(DEPDIR)/main.Po \
 @AMDEP_TRUE@	$(DEPDIR)/mathtab.Po $(DEPDIR)/model.Po \
-@AMDEP_TRUE@	$(DEPDIR)/net.Po $(DEPDIR)/objload.Po \
-@AMDEP_TRUE@	$(DEPDIR)/pilots.Po $(DEPDIR)/roam.Po
+@AMDEP_TRUE@	$(DEPDIR)/net.Po $(DEPDIR)/object.Po \
+@AMDEP_TRUE@	$(DEPDIR)/objload.Po $(DEPDIR)/pilots.Po \
+@AMDEP_TRUE@	$(DEPDIR)/roam.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -172,6 +174,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mathtab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/model.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/net.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/objload.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/pilots.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/roam.Po@am__quote@

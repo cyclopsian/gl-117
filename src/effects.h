@@ -26,7 +26,7 @@
 
 #include "model.h"
 #include "mathtab.h"
-#include "aiobject.h"
+#include "object.h"
 
 const int maxsmokeelem = 20;
 

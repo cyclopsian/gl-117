@@ -121,4 +121,6 @@ class GLLandscape : public Landscape
   GLLandscape (Space *space2, int type, int *heightmask);
 };
 
+extern GLLandscape *l;
+
 #endif
