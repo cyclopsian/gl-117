@@ -44,7 +44,7 @@ int dithering = 0;
 int volumesound = 100;
 int volumemusic = 100;
 
-int debug = 0;
+int debug = 1;
 bool multiplayer = false, isserver = false;
 int fullscreen = 1;
 int day = 1;
@@ -5289,14 +5289,16 @@ void game_joystickaxis (int axis1, int axis2, int axis3, int axis4)
   if (t < 0) t += 360;
   float rx = x * cosi [t] - y * sine [t];
   float ry = x * sine [t] + y * cosi [t];*/
-  fplayer->rectheta -= (float) x / 7500;
+  float xx = x / 32768.0;
+  xx *= fabs (xx);
+  fplayer->rectheta -= (float) xx * 6.0F;
 /*  fplayer->recgamma += (float) ry / 5000;
   if (fplayer->recgamma > 225) fplayer->recgamma = 225;
   if (fplayer->recgamma < 135) fplayer->recgamma = 135;*/
   fplayer->aileroneffect = (float) y / 30000;
   if (fplayer->aileroneffect > 1.0) fplayer->aileroneffect = 1.0;
   else if (fplayer->aileroneffect < -1.0) fplayer->aileroneffect = -1.0;
-  if (fplayer->aileroneffect < 0) fplayer->aileroneffect /= 2;
+  if (fplayer->aileroneffect < -0.5) fplayer->aileroneffect = -0.5;
   fplayer->ruddereffect = (float) rudder / 30000;
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
@@ -5312,33 +5314,33 @@ void game_joystickbutton (int button)
     fplayer->fireCannon (laser);
     sound->play (SOUND_CANNON1);
   }
-  else if (button == joystick_firemissile)
+  if (button == joystick_firemissile)
   {
 /*    if (fplayer->missiletype < 0 || fplayer->missiletype >= missiletypes)
     { fprintf (stderr, "Error in file %s, line %s", __FILE__, __LINE__); fflush (stderr); }*/
     event_fireMissile ();
   }
-  else if (button == joystick_dropflare)
+  if (button == joystick_dropflare)
   {
     event_fireFlare ();
   }
-  else if (button == joystick_dropchaff)
+  if (button == joystick_dropchaff)
   {
     event_fireChaff ();
   }
-  else if (button == joystick_selectmissile)
+  if (button == joystick_selectmissile)
   {
     event_selectMissile ();
   }
-  else if (button == joystick_targetnearest)
+  if (button == joystick_targetnearest)
   {
     event_targetNearest ();
   }
-  else if (button == joystick_targetnext)
+  if (button == joystick_targetnext)
   {
     event_targetNext ();
   }
-  else if (button == joystick_targetprevious)
+  if (button == joystick_targetprevious)
   {
     event_targetPrevious ();
   }
@@ -5356,15 +5358,15 @@ void game_joystickhat (int hat)
   {
     event_selectMissile ();
   }
-  else if (normhat == joystick_targetnext)
+  if (normhat == joystick_targetnext)
   {
     event_targetNext ();
   }
-  else if (normhat == joystick_targetprevious)
+  if (normhat == joystick_targetprevious)
   {
     event_targetPrevious ();
   }
-  else if (normhat == joystick_targetnearest)
+  if (normhat == joystick_targetnearest)
   {
     event_targetNearest ();
   }
