@@ -26,6 +26,7 @@
 #include "util/Math.h"
 #include "configuration/Configuration.h"
 #include "gllandscape/GlLandscape.h"
+#include "model3d/Model3d.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -60,8 +61,7 @@ void MissionDeathmatch1::start ()
   fplayer->trafo.translation.z = 50;
   for (i = 1; i <= 7; i ++)
   {
-    fighter [i]->newinit (FalconDescriptor, 0, 200);
-    fighter [i]->party = i + 1;
+    objectInit (new Fighter (FalconDescriptor), i + 1, 200);
     fighter [i]->target = fighter [i - 1];
     fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
     fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
@@ -77,35 +77,16 @@ int MissionDeathmatch1::processtimer (Uint32 dt)
   if (texttimer >= 200 * timestep) texttimer = 0;
   if (texttimer > 0) texttimer += dt;
   timer += dt;
-  for (i = 0; i <= 7; i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->stat.fighterkills >= 10)
     {
-//      fplayer->shield = 1;
       if (i == 0) return 1;
       else return 2;
     }
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
-      fighter [i]->explode = 0;
-      int temp = fighter [i]->stat.fighterkills;
-      fighter [i]->init ();
-      if (i == 0)
-      {
-        playerInit ();
-      }
-      else
-      {
-        fighter [i]->newinit (FalconDescriptor, i + 1, 200);
-      }
-      fighter [i]->party = i + 1;
-      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
-      fighter [i]->immunity = 50 * timestep;
-      fighter [i]->activate ();
-//      fighter [i]->killed = false;
-      fighter [i]->stat.fighterkills = temp;
-      fighter [i]->stat.killed = false;
-      camera = 0;
+      reincarnateFighter (i);
     }
   }
   return 0;

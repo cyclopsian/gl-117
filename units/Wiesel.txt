@@ -1,6 +1,6 @@
 impact = 4
 manoeverability = 8.0
-nimbility = 0
+nimbility = 1.0
 thrust = 0.04
 shield = 160
 rot.theta = 0.03

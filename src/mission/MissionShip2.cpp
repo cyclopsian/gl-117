@@ -61,37 +61,34 @@ void MissionShip2::start ()
   playerInit ();
   fplayer->trafo.translation.x = 80;
   fplayer->trafo.translation.z = 0;
-  fplayer->currot.phi = 90;
+  fplayer->currot.phi = 270;
   alliedInit (RedArrowDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
-  fighter [1]->currot.phi = 90;
-  fighter [1]->target = fighter [6];
-//  fighter [2]->o = &model_oilrig;
+  fighter [1]->currot.phi = 270;
+  
+  objectInit (new StaticPassive (OilrigDescriptor), 1, 0);
   fighter [2]->trafo.translation.x = 20;
   fighter [2]->trafo.translation.z = 0;
-  fighter [2]->newinit (OilrigDescriptor, 0, 0);
   fighter [2]->getPrototype ()->maxthrust = 0;
   fighter [2]->thrust = 0;
-  fighter [2]->party = 1;
   for (i = 3; i <= 5; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 300 - i * 10);
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -50 - i * 10;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (CrowDescriptor, 0, 300 - i * 10);
   }
   for (i = 6; i <= 7; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (SwallowDescriptor), 0, 160);
     fighter [i]->target = fighter [2];
-//    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = -80 - i * 10;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (SwallowDescriptor, 0, 160);
+    fighter [i]->bomber = true;
   }
+  fighter [1]->target = fighter [6];
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
@@ -104,7 +101,7 @@ int MissionShip2::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 15; i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)

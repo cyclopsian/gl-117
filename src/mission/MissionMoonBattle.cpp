@@ -72,32 +72,34 @@ void MissionMoonBattle::start ()
     else
       fighter [i]->trafo.translation.x = -((i + 1) / 2) * 5;
     fighter [i]->trafo.translation.z = 100 + i * 5;
-    fighter [i]->target = fighter [7 + i];
   }
   for (i = 7; i <= 25; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [Math::random (7)];
-//    fighter [i]->o = &model_fige;
-    fighter [i]->newinit (CrowDescriptor, 0, 450 - i * 10);
     if (i <= 16)
     {
+      objectInit (new Fighter (CrowDescriptor), 0, 450 - i * 10);
       fighter [i]->trafo.translation.x = -i * 5;
       fighter [i]->trafo.translation.z = -i * 5;
     }
     else if (i <= 24)
     {
+      objectInit (new Fighter (BlackBirdDescriptor), 0, 450 - i * 10);
       fighter [i]->trafo.translation.x = -i * 8 - 150;
       fighter [i]->trafo.translation.z = -i * 8 - 150;
-//      fighter [i]->o = &model_figh;
-      fighter [i]->newinit (BlackBirdDescriptor, 0, 450 - i * 10);
     }
     else
     {
+      objectInit (new Fighter (CrowDescriptor), 0, 450 - i * 10);
       fighter [i]->trafo.translation.x = -i * 8 - 350;
       fighter [i]->trafo.translation.z = -i * 8 - 350;
     }
+    fighter [i]->target = fighter [Math::random (7)];
   }
+  for (i = 1; i <= 6; i ++)
+  {
+    fighter [i]->target = fighter [7 + i];
+  }
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

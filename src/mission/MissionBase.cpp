@@ -72,7 +72,6 @@ void MissionBase::start ()
   playerInit ();
   fplayer->trafo.translation.x = px + 10;
   fplayer->trafo.translation.z = py + 100;
-  fplayer->target = fighter [4];
   for (i = 1; i <= 3; i ++)
   {
     alliedInit (FalconDescriptor, alliedpilot [i - 1]);
@@ -166,6 +165,7 @@ void MissionBase::start ()
     fighter [i]->trafo.translation.x = px + i * 5 - 60;
     fighter [i]->trafo.translation.z = py + i * 5 - 60;
   }
+  fplayer->target = fighter [4];
 }
 
 /*int MissionBase::processtimer (Uint32 dt)

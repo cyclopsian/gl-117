@@ -59,31 +59,27 @@ void MissionMoonBase1::start ()
   fplayer->trafo.translation.x = -20;
   fplayer->trafo.translation.z = -40;
   fplayer->currot.phi = 200;
-  fplayer->target = fighter [29];
   for (i = 1; i < 21; i ++)
   {
+    objectInit (new AiObj (AsteroidDescriptor), 0, 150);
     fighter [i]->trafo.translation.x = COS((i * 140) % 360) * 4.5;
     fighter [i]->trafo.translation.z = i * 0.6;
     fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + SIN((i * 160) % 360) * 4.0 + 25.0;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 200;
-//    fighter [i]->o = &model_aster1;
-    fighter [i]->newinit (AsteroidDescriptor, 0, 150);
-    fighter [i]->party = 0;
   }
   for (i = 21; i < 29; i ++)
   {
+    objectInit (new Fighter (BlackBirdDescriptor), 0, 200);
     fighter [i]->trafo.translation.x = (i - 20) * 4;
     fighter [i]->trafo.translation.z = 210;
     fighter [i]->target = fighter [0];
     fighter [i]->currot.phi = 50;
-//    fighter [i]->o = &model_figh;
-    fighter [i]->newinit (BlackBirdDescriptor, 0, 200);
   }
+  objectInit (new StaticPassive (MoonBaseDescriptor), 0, 100);
   fighter [29]->trafo.translation.x = 50 + difficulty * 15;
   fighter [29]->trafo.translation.z = 180 + difficulty * 30;
-//  fighter [29]->o = &model_base1;
-  fighter [29]->newinit (MoonBaseDescriptor, 0, 100);
+  fplayer->target = fighter [29];
 }
 
 int MissionMoonBase1::processtimer (Uint32 dt)

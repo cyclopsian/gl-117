@@ -58,29 +58,27 @@ void MissionShip3::start ()
   playerInit ();
   fplayer->trafo.translation.x = 80;
   fplayer->trafo.translation.z = 0;
-  fplayer->currot.phi = 90;
+  fplayer->currot.phi = 270;
   alliedInit (Hawk2Descriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
-  fighter [1]->currot.phi = 90;
-  fighter [1]->target = fighter [6];
-  fighter [2]->party = 0;
+  fighter [1]->currot.phi = 270;
+  
+  objectInit (new Ship (CruiserDescriptor), 0, 200);  
   fighter [2]->target = fighter [0];
-//  fighter [2]->o = &model_ship1;
   fighter [2]->trafo.translation.x = -20;
   fighter [2]->trafo.translation.z = 0;
-  fighter [2]->newinit (CruiserDescriptor, 0, 200);
   fighter [2]->getPrototype ()->maxthrust = 0;
   fighter [2]->thrust = 0;
-  for (i = 4; i <= 7; i ++)
+  for (i = 3; i <= 6; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 10);  
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 5;
     fighter [i]->trafo.translation.z = 0;
-    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 10);
   }
+  fighter [1]->target = fighter [6];
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

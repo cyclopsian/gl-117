@@ -59,27 +59,24 @@ void MissionWaves1::start ()
   fplayer->trafo.translation.z = 70;
   for (i = 1; i <= 9; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-    fighter [i]->trafo.translation.x = -i * 10;
-    fighter [i]->trafo.translation.z = -i * 10;
     if (i <= 2)
     {
-//      fighter [i]->o = &model_fige;
-      fighter [i]->newinit (CrowDescriptor, 0, 395);
+      objectInit (new Fighter (CrowDescriptor), 0, 395);
     }
     else if (i <= 5)
     {
-//      fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
-      fighter [i]->newinit (SwallowDescriptor, 0, 395);
+      objectInit (new Fighter (SwallowDescriptor), 0, 395);
       fighter [i]->deactivate ();
     }
     else if (i <= 9)
     {
-//      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (BuzzardDescriptor, 0, 395);
+      objectInit (new Fighter (BuzzardDescriptor), 0, 395);
       fighter [i]->deactivate ();
     }
+    fighter [i]->party = 0;
+    fighter [i]->target = fighter [0];
+    fighter [i]->trafo.translation.x = -i * 10;
+    fighter [i]->trafo.translation.z = -i * 10;
   }
   state = 0;
   laststate = 0;
@@ -114,7 +111,7 @@ int MissionWaves1::processtimer (Uint32 dt)
       fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
       fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
     }
-    playerInit ();
+    playerInit (false);
     return 0;
   }
   else if (state == 2)
@@ -126,7 +123,7 @@ int MissionWaves1::processtimer (Uint32 dt)
       fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 50 + 10 * i;
       fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
     }
-    playerInit ();
+    playerInit (false);
     return 0;
   }
 //  fplayer->shield = 1;

@@ -28,13 +28,9 @@
 
 SpaceObj::SpaceObj ()
 {
-  valid = true;
   o = 0L;
-  draw = 1;
-  lum = 1;
-  drawLight = true;
-  explode = 0;
   space = NULL;
+  init ();
 }
 
 SpaceObj::SpaceObj (const SpaceObj &that)
@@ -52,17 +48,22 @@ SpaceObj::SpaceObj (const SpaceObj &that)
 SpaceObj::SpaceObj (Model3d *o, const Transformation &trafo)
 {
   this->o = o;
-//  alpha = 1;
-  draw = 1;
-  lum = 1;
-  drawLight = true;
-  explode = 0;
   this->trafo.set (trafo);
   space = NULL;
+  init ();
 }
 
 SpaceObj::~SpaceObj ()
 {
+}
+
+void SpaceObj::init ()
+{
+  explode = 0;
+  draw = true;
+  lum = 1.0;
+  drawLight = true;
+  valid = true;
 }
 
 void SpaceObj::addRefModel (const SpaceObj &ref2)

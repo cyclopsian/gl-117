@@ -58,60 +58,54 @@ void MissionDefend1::start ()
   playerInit ();
   fplayer->trafo.translation.x = 10;
   fplayer->trafo.translation.z = 90;
-  fplayer->target = fighter [7];
   alliedInit (Hawk2Descriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 20;
   fighter [1]->trafo.translation.z = 100;
-  fighter [1]->target = fighter [8];
   for (i = 2; i <= 6; i ++)
   {
-    fighter [i]->trafo.translation.x = 20 + i * 5;
-    fighter [i]->trafo.translation.z = 10;
     if (i == 3 || i == 4 || i == 5)
     {
-//      fighter [i]->o = &model_flarak1;
-      fighter [i]->newinit (SamDescriptor, 0, 400);
-      fighter [i]->target = fighter [0];
+      objectInit (new StaticAa (SamDescriptor), 1, 400);
     }
     else
     {
-//      fighter [i]->o = &model_flak1;
-      fighter [i]->newinit (SacDescriptor, 0, 400);
-      fighter [i]->target = fighter [0];
+      objectInit (new StaticAa (SacDescriptor), 1, 400);
     }
-    fighter [i]->party = 1;
+    fighter [i]->trafo.translation.x = 20 + i * 5;
+    fighter [i]->trafo.translation.z = 10;
   }
   for (i = 7; i <= 10; i ++)
   {
+    objectInit (new Tank (PantherDescriptor), 0, 300);
     int off = 35;
     if (difficulty == 0) off = 55;
     else off = 15;
     fighter [i]->trafo.translation.x = i * 5 - 50;
     fighter [i]->trafo.translation.z = -i * 5 - off;
-//    fighter [i]->o = &model_tank2;
-    fighter [i]->newinit (PantherDescriptor, 0, 300);
-    fighter [i]->target = fighter [i - 4];
+    fighter [i]->target = fighter [i - 5];
   }
   for (i = 11; i <= 15; i ++)
   {
+    if (i == 12)
+    {
+      objectInit (new Tank (WieselDescriptor), 0, 300);
+      fighter [i]->target = fighter [0];
+    }
+    else
+    {
+      objectInit (new Tank (PantherDescriptor), 0, 300);
+      fighter [i]->target = fighter [i - 9];
+    }
     int off = 40;
     if (difficulty == 0) off = 55;
     else off = 25;
     fighter [i]->trafo.translation.x = i * 5 - 50;
     fighter [i]->trafo.translation.z = -i * 5 - off * 2;
-    if (i == 12)
-    {
-      fighter [i]->newinit (WieselDescriptor, 0, 300);
-//      fighter [i]->o = &model_tank1;
-    }
-    else
-    {
-      fighter [i]->newinit (PantherDescriptor, 0, 300);
-//      fighter [i]->o = &model_tank2;
-    }
-    fighter [i]->target = fighter [i - 4];
     fighter [i]->deactivate ();
   }
+  fplayer->target = fighter [7];
+  fighter [1]->target = fighter [8];
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 
@@ -124,7 +118,7 @@ int MissionDefend1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= fighter.size (); i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)

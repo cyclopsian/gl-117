@@ -101,6 +101,7 @@ void TeamPilot::load (FILE *in)
   fread (&len, sizeof (int), 1, in);
   if (len > 50) return;
   fread (buf, sizeof (char), len, in);
+  buf [len] = 0;
   name = buf;
   fread (&intelligence, sizeof (int), 1, in);
   fread (&precision, sizeof (int), 1, in);

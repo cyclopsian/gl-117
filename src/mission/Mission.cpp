@@ -97,13 +97,41 @@ void setIntelligence (AiObj &obj, int intelligence, int precision, int aggressiv
   obj.aggressivity = aggressivity;
 }
 
-void Mission::playerInit ()
+void Mission::reincarnateFighter (int i)
 {
-  Fighter *f = new Fighter (selfighter [wantfighter]);
-  fighter.add (f);
+  int fkills = fighter [i]->stat.fighterkills;
+  int party = fighter [i]->party;
+  int intelligence = fighter [i]->intelligence;
+  Vector3 tl (fighter [i]->trafo.translation);
+  dynamic_cast<Fighter *>(fighter [i])->init ();
+  dynamic_cast<Fighter *>(fighter [i])->initPrototype ();
+  fighter [i]->immunity = 50 * timestep;
+  fighter [i]->party = party;
+  fighter [i]->intelligence = intelligence;
+  fighter [i]->aggressivity = intelligence;
+  fighter [i]->precision = intelligence;
+  fighter [i]->stat.fighterkills = fkills;
+  fighter [i]->trafo.translation.set (tl);
+  fighter [i]->trafo.translation.y += 10;
+  if (i == 0)
+  {
+    fighter [i]->ai = false;
+    fighter [i]->easymodel = 2;
+  }
+  camera = 0;
+}
+
+void Mission::playerInit (bool newFighter)
+{
+  Fighter *f = dynamic_cast<Fighter *>(fplayer);
+  if (newFighter)
+  {
+    f = new Fighter (selfighter [wantfighter]);
+    fighter.add (f);
+    fplayer = f;
+  }
 
   int i;
-  fplayer = f;
   if (controls != 100)
     fplayer->easymodel = 2;
   fplayer->target = NULL;
@@ -242,15 +270,18 @@ void Mission::selectMissiles (AiObj &aiobj)
   }
   if (id == CruiserDescriptor)
   {
-    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+    aiobj.missiles [6] = 200;
+//    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
   }
   if (id == MobileSamDescriptor)
   {
-    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+    aiobj.missiles [6] = 200;
+//    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
   }
   if (id == SamDescriptor)
   {
-    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
+    aiobj.missiles [6] = 200;
+//    aiobj.missilerackn [0] = 200; aiobj.missilerack [0] = 6;
   }
 }
 
@@ -349,6 +380,7 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
 {
   Pilot *p = pilots->pilot [pilots->aktpilot];
   int i, i2;
+  int z = 1;
   int oldscore = p->mission_score [id]; // getScore (p->mission_state [id], p->mission_time [id], p->mission_fighterkills [id], p->mission_shipkills [id], p->mission_tankkills [id], p->mission_otherkills [id], p->mission_shield [id], p->mission_points [id]);
   int newscore = getScore (missionstate, timebonus, fighterkills, shipkills, tankkills, otherkills, shieldbonus, points);
   if (newscore > oldscore)
@@ -365,7 +397,7 @@ void Mission::checkScore (int missionstate, int timebonus, int fighterkills, int
         }
         if (b)
         {
-          p->tp [i]->fighterkills += fighter [i + 1]->stat.fighterkills;
+          p->tp [i]->fighterkills += fighter [z ++]->stat.fighterkills;
         }
         else
         {

@@ -1638,7 +1638,7 @@ void StatePlay::display ()
   l->glittering = 0;
 
   // turn down global sunlight when menu is showing
-  if (game != GAME_PLAY && sunlight > 0.9F) sunlight = 0.9F;
+  if (gamestate != &stateplay && sunlight > 0.9F) sunlight = 0.9F;
   l->sunlight = sunlight;
 
   // start rendering
@@ -1998,7 +1998,7 @@ void StatePlay::display ()
     cockpit->drawRadar ();
     cockpit->drawTargetedElement ();
     cockpit->drawWeapon ();
-    cockpit->drawCounter ();
+    cockpit->drawCounter (gamestate == &stateplay);
     cockpit->drawThrustBar ();
     cockpit->drawRelativeHeightBar ();
    }
@@ -2089,8 +2089,16 @@ void StatePlay::timer (Uint32 dt)
 //  if (multiplayer) return;
   unsigned i, i2;
 
-  fighter.cleanUp ();
+  // make sure that Mission::processTimer() is called after move() and before this cleanUp()!
+  // so, call cleanUp() first of all
+  explosion.cleanUp ();
+  blacksmoke.cleanUp ();
+  flare.cleanUp ();
+  chaff.cleanUp ();
+  missile.cleanUp ();
   laser.cleanUp ();
+//  fighter.cleanUp (); // do not cleanup fighter objects, we still need them for mission stats
+  groundobj.cleanUp ();
 
   sunlight += (sunlight_dest - sunlight) / 10 * dt / timestep;
   l->sunlight = sunlight;

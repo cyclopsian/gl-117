@@ -66,7 +66,7 @@ int physics = 0; // 0=action, 1=realistic
 int brightness = 0; // brightness correction
 int contrast = 0; // contrast/gamma correction (not yet configurable)
 int controls = CONTROLS_MOUSE; // see CONTROLS-constants
-int game = GAME_INIT; // see GAME-constants
+//int game = GAME_INIT; // see GAME-constants
 
 int clouds = 0;
 int camera = 0;

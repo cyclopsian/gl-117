@@ -42,7 +42,7 @@ class Cockpit
 
     void setColor (int alpha);
     void setColor (Color *color, int alpha);
-    void drawCounter ();
+    void drawCounter (bool beep);
     void drawTargeter ();
     void drawCross ();
     void drawHeading ();

@@ -93,7 +93,10 @@ void MissionAirBattle::start ()
     }
   }
   for (i = 1; i <= 6; i ++)
-    fighter [i]->target = fighter [7 + i];
+  {
+    AiObj *f = fighter [i];
+    fighter [i]->target = fighter [7 + i / 2];
+  }
 
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

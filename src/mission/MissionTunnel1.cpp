@@ -58,57 +58,50 @@ void MissionTunnel1::start ()
   fplayer->trafo.translation.x = 256;
   fplayer->trafo.translation.z = 256;
   fplayer->currot.phi = 90;
-  fplayer->target = fighter [6];
   for (i = 1; i <= 9; i ++)
   {
+    objectInit (new StaticAa (SacDescriptor), 0, 200);
     int ix = (i / 2) * 8 - 200 + 256;
     int iy = (i & 1) * 4 - 2 + 256;
     fighter [i]->trafo.translation.x = ix;
     fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
+  objectInit (new StaticAa (SamDescriptor), 0, 200);
   fighter [i]->trafo.translation.x = -200 + 256;
   fighter [i]->trafo.translation.z = 0 + 256;
   fighter [i]->target = fighter [0];
-//  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (SamDescriptor, 0, 200);
   for (i = 11; i <= 15; i ++)
   {
+    objectInit (new StaticAa (SacDescriptor), 0, 300);
     int ix = (i - 11) * 10 - 100 + 256;
     int iy = (i % 2) * 3 - 3 + 256;
     fighter [i]->trafo.translation.x = ix;
     fighter [i]->trafo.translation.z = iy;
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (SacDescriptor, 0, 300);
   }
+  objectInit (new StaticAa (SamDescriptor), 0, 200);
   fighter [i]->trafo.translation.x = -250 + 256;
   fighter [i]->trafo.translation.z = -2 + 256;
   fighter [i]->target = fighter [0];
-//  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (SamDescriptor, 0, 200);
   i ++;
+  objectInit (new StaticAa (SamDescriptor), 0, 200);
   fighter [i]->trafo.translation.x = -250 + 256;
   fighter [i]->trafo.translation.z = 2 + 256;
   fighter [i]->target = fighter [0];
-//  fighter [i]->o = &model_flarak1;
-  fighter [i]->newinit (SamDescriptor, 0, 200);
   i ++;
+  objectInit (new StaticPassive (LaserBarrierDescriptor), 0, 100);
   fighter [i]->trafo.translation.x = -350 + 256;
   fighter [i]->trafo.translation.z = 0 + 256;
-//  fighter [i]->o = &model_barrier1;
-  fighter [i]->newinit (LaserBarrierDescriptor, 0, 100);
   for (i = 19; i < 26; i ++)
   {
-    fighter [i]->newinit (BuzzardDescriptor, 0, i * 8);
+    objectInit (new StaticPassive (BuzzardDescriptor), 0, i * 8);
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_figd;
     fighter [i]->trafo.translation.x = 256;
     fighter [i]->trafo.translation.z = 256;
     fighter [i]->deactivate ();
   }
+  fplayer->target = fighter [6];
 }
 
 int MissionTunnel1::processtimer (Uint32 dt)

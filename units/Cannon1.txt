@@ -4,7 +4,9 @@ nimbility = 0
 thrust = 0
 shield = 1
 zoom = 0.35
-cube = 0.18
+cubex = 0.18
+cubey = 0.02
+cubez = 0.18
 ttl = 100
 
 

@@ -64,36 +64,31 @@ void MissionConvoy2::start ()
   fighter [1]->trafo.translation.z = py + 105;
   for (i = 2; i <= 3; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Tank (MobileSamDescriptor), 0, 200);
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_trsam;
     int phi = (i - 2) * 180;
-    fighter [i]->newinit (MobileSamDescriptor, 0, 200);
     fighter [i]->trafo.translation.x = px + SIN(phi) * 5.0;
     fighter [i]->trafo.translation.z = py + COS(phi) * 5.0;
-//    fighter [i]->phi = 359 - phi;
     fighter [i]->thrust = 0;
     fighter [i]->getPrototype ()->maxthrust = 0;
   }
   for (i = 4; i <= 9; i ++)
   {
-    fighter [i]->party = 0;
+    if (i == 6 || i == 7)
+      objectInit (new Tank (TruckDescriptor), 0, 400);
+    else
+      objectInit (new Tank (Truck2Descriptor), 0, 400);
     fighter [i]->target = fighter [0];
-//    if (i == 6 || i == 7) fighter [i]->o = &model_truck1;
-//    else fighter [i]->o = &model_truck2;
     fighter [i]->trafo.translation.x = px + (i % 3) * 3 - 4;
     fighter [i]->trafo.translation.z = py + (i / 3) * 3 - 4;
-    if (i == 6 || i == 7) fighter [i]->newinit (TruckDescriptor, 0, 400);
-    else fighter [i]->newinit (Truck2Descriptor, 0, 400);
   }
   for (i = 10; i <= 12; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 10);
     fighter [i]->target = fighter [Math::random (2)];
 //    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = px - i * 10;
     fighter [i]->trafo.translation.z = py - i * 10;
-    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 10);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

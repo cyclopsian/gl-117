@@ -62,45 +62,36 @@ void MissionGround1::start ()
   playerInit ();
   fplayer->trafo.translation.x = px + 10;
   fplayer->trafo.translation.z = py + 80;
-  fplayer->target = fighter [2];
   alliedInit (FalconDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = px + 20;
   fighter [1]->trafo.translation.z = py + 90;
-  fighter [1]->target = fighter [2];
   for (i = 2; i <= 4; i ++)
   {
+    if (i == 2)
+      objectInit (new StaticAa (SamDescriptor), 0, 220);
+    else
+      objectInit (new StaticAa (SacDescriptor), 0, 200);
     fighter [i]->trafo.translation.x = px - 9 + i * 3;
     fighter [i]->trafo.translation.z = py;
     fighter [i]->target = fighter [0];
-    if (i == 2)
-    {
-//      fighter [i]->o = &model_flarak1;
-      fighter [i]->newinit (SamDescriptor, 0, 220);
-    }
-    else
-    {
-//      fighter [i]->o = &model_flak1;
-      fighter [i]->newinit (SacDescriptor, 0, 200);
-    }
   }
   l->searchPlain (2, 1, &px, &py);
   l->flatten (px, py, 3, 3);
   for (i = 5; i <= 6; i ++)
   {
+    objectInit (new StaticAa (SacDescriptor), 0, 200);
     fighter [i]->trafo.translation.x = px - 17 + i * 3;
     fighter [i]->trafo.translation.z = py;
     fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
+  objectInit (new StaticPassive (TentDescriptor), 0, 200);
   fighter [7]->trafo.translation.x = px + 1;
   fighter [7]->trafo.translation.z = py - 1;
-//  fighter [7]->o = &model_tent1;
-  fighter [7]->newinit (TentDescriptor, 0, 200);
+  objectInit (new StaticPassive (TentDescriptor), 0, 200);
   fighter [8]->trafo.translation.x = px - 1;
   fighter [8]->trafo.translation.z = py - 1;
-//  fighter [8]->o = &model_tent1;
-  fighter [8]->newinit (TentDescriptor, 0, 200);
+  fplayer->target = fighter [2];
+  fighter [1]->target = fighter [2];
 }
 
 /*int MissionGround1::processtimer (Uint32 dt)

@@ -63,7 +63,6 @@ void MissionCanyon3::start ()
   fplayer->trafo.translation.x = px + 100;
   fplayer->trafo.translation.z = py + 100;
   fplayer->currot.phi = 45;
-  fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
     alliedInit (RedArrowDescriptor, alliedpilot [i - 1]);
@@ -72,19 +71,16 @@ void MissionCanyon3::start ()
     else
       fighter [i]->trafo.translation.x = px + 100 - ((i + 1) / 2) * 5;
     fighter [i]->trafo.translation.z = py + 100 + i * 5;
-    fighter [i]->target = fighter [5 + i];
     fighter [i]->currot.phi = 45;
   }
-//  fighter [5]->o = &model_egg;
-  fighter [5]->newinit (ComplexDescriptor, 0, 0);
+  objectInit (new StaticPassive (ComplexDescriptor), 0, 0);
   fighter [5]->trafo.translation.x = px;
   fighter [5]->trafo.translation.z = py;
   fighter [5]->getPrototype ()->maxthrust = 0;
   fighter [5]->thrust = 0;
   for (i = 6; i <= 9; i ++)
   {
-//    fighter [i]->o = &model_hall1;
-    fighter [i]->newinit (HallDescriptor, 0, 100);
+    objectInit (new StaticPassive (HallDescriptor), 0, 100);
     fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
@@ -98,22 +94,22 @@ void MissionCanyon3::start ()
   fighter [9]->trafo.translation.z = py - 3;
   for (i = 10; i <= 19; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [Math::random (5)];
-    fighter [i]->currot.phi = 180;
     if (i <= 15)
     {
-      fighter [i]->id = HawkDescriptor;
-      fighter [i]->newinit (CrowDescriptor, 0, i * 20);
+      objectInit (new Fighter (CrowDescriptor), 0, i * 20);
     }
     else
     {
-//      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (BuzzardDescriptor, 0, i * 15);
+      objectInit (new Fighter (BuzzardDescriptor), 0, i * 15);
     }
+    fighter [i]->target = fighter [Math::random (5)];
+    fighter [i]->currot.phi = 180;
     fighter [i]->trafo.translation.x = px - i * 3;
     fighter [i]->trafo.translation.z = py - i * 3;
   }
+  fplayer->target = fighter [5];
+  for (unsigned i = 1; i <= 4; i ++)
+    fighter [i]->target = fighter [5 + i];
 }
 
 /*int MissionCanyon3::processtimer (Uint32 dt)

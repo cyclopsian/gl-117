@@ -62,12 +62,10 @@ void MissionScout::start ()
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 4; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (BuzzardDescriptor), 0, 170);
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_figd;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (BuzzardDescriptor, 0, 170);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

@@ -73,21 +73,17 @@ void MissionDogfight3::start ()
   fighter [3]->trafo.translation.z = 115;
   for (i = 4; i <= 8; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 25);
     fighter [i]->target = fighter [Math::random (4)];
-//    fighter [i]->o = &model_fige;
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (CrowDescriptor, 0, 400 - i * 25);
   }
   for (i = 9; i <= 11; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Fighter (SwallowDescriptor), 0, 400 - i * 20);
     fighter [i]->target = fighter [Math::random (4)];
-//    fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
     fighter [i]->trafo.translation.x = -i * 10;
     fighter [i]->trafo.translation.z = -i * 10;
-    fighter [i]->newinit (SwallowDescriptor, 0, 400 - i * 20);
     fighter [i]->deactivate ();
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
@@ -135,7 +131,17 @@ void MissionDogfight3::draw ()
     fighter [11]->trafo.translation.y = l->getHeight (fighter [11]->trafo.translation.x, fighter [11]->trafo.translation.z) + 10;
   }
   if (timer >= 800 * timestep && timer <= 1000 * timestep)
+  {
     font1->drawTextCentered (0, 7, -3, "BOMBERS ARE ENTERING THE REGION", textcolor);
+    if (state == 0)
+    {
+      state ++;
+      for (unsigned i = 9; i <= 11; i ++)
+      {
+        fighter [i]->activate ();
+      }
+    }
+  }
 }
 
 #endif

@@ -108,7 +108,7 @@ void Cockpit::setColor (Color *color, int alpha)
   else color->set (100, 100, 255, alpha);
 }
 
-void Cockpit::drawCounter ()
+void Cockpit::drawCounter (bool beep)
 {
   char buf [4096];
   float xf = 2.8F, yf = -1.0F, zf = -4.0F, yf2 = -1.3F, xfl = 0.4F, yfl = 0.1F;
@@ -123,7 +123,7 @@ void Cockpit::drawCounter ()
         else
           chaffwarn = true;
       }
-  if (flarewarn && game == GAME_PLAY)
+  if (flarewarn && beep)
   {
     if (flarewarning <= 0)
     {
@@ -142,7 +142,7 @@ void Cockpit::drawCounter ()
       glEnd ();
     }
   }
-  if (chaffwarn && game == GAME_PLAY)
+  if (chaffwarn && beep)
   {
     if (chaffwarning <= 0)
     {
@@ -189,7 +189,7 @@ void Cockpit::drawCounter ()
 
   if (mission->id == MISSION_DEATHMATCH1 || mission->id == MISSION_DEATHMATCH3)
   {
-    sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name, fplayer->stat.fighterkills);
+    sprintf (buf, "%s: %d", pilots->pilot [pilots->aktpilot]->name.c_str (), fplayer->stat.fighterkills);
     font1->drawText (-30.0F, 15.0F, -3.0F, buf, blue);
     for (i = 1; i < 8; i ++)
     {

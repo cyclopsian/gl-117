@@ -97,29 +97,35 @@ void DynamicObj::initPrototype ()
 
 void DynamicObj::init ()
 {
-  trafo.rotation.set (90.0, 0.0, 0.0);
-  currot.set (180.0, 0.0, 0.0);
-  recrot.set (0.0, 0.0, 0.0);
-  trafo.translation.set (0.0, 0.0, 0.0);
-  force.set (0.0, 0.0, 0.0);
-  recrot.set (180.0, 0.0, 0.0);
+  SpaceObj::init ();
+  
   acc.set (0.0, 0.0, 0.0);
-  recthrust = thrust;
-  recheight = 5.0;
-  ttl = -1;
-  immunity = 0;
-//  id = Cannon1Descriptor.id;
-  source = NULL;
-  party = 0;
+  active = true;
+  bomber = false;
+  braking = 0.0;
+  currot.set (180.0, 0.0, 0.0);
   easymodel = 1; // easy model
   elevatoreffect = 0;
-  ruddereffect = 0;
-  rolleffect = 0;
-  explode = 0;
-  sink = 0;
+  force.set (0.0, 0.0, 0.0);
+  immunity = 0;
+  party = 0;
+  ttl = -1;
   realism = false;
-  stat = ObjectStatistics ();
   realspeed = 0;
+  recelevatoreffect = 0;
+  recheight = 5.0;
+  recrolleffect = 0;
+  recrot.set (180.0, 0.0, 0.0);
+  recruddereffect = 0;
+  recthrust = 0;
+  rolleffect = 0;
+  ruddereffect = 0;
+  sink = 0;
+  source = NULL;
+  stat = ObjectStatistics ();
+
+  trafo.rotation.set (90.0, 0.0, 0.0);
+  trafo.translation.set (0.0, 0.0, 0.0);
 }
 
 void DynamicObj::thrustUp ()
@@ -281,15 +287,15 @@ void DynamicObj::crashGround (Uint32 dt)
     if (id >= CannonBeginDescriptor && id <= CannonEndDescriptor)
       deactivate ();
     float decfac = 3.0F;
-    if (this == (DynamicObj *) fplayer && game == GAME_PLAY)
+    if (this == (DynamicObj *) fplayer /*&& gamestate == &stateplay*/)
     {
       if (difficulty == 1) decfac = 6.0F;
       else if (difficulty == 2) decfac = 15.0F;
     }
-    if (realism && this == (DynamicObj *) fplayer && game == GAME_PLAY)
-	  shield = -1;
-	else
-	  shield -= decfac * dt / timestep;
+    if (realism && this == (DynamicObj *) fplayer /*&& gamestate == &stateplay*/)
+	    shield = -1;
+    else
+      shield -= decfac * dt / timestep;
   }
   // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 80
   if (height > 80) trafo.translation.y = l->getHeight (trafo.translation.x, trafo.translation.z) + 80;
@@ -312,7 +318,7 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 
   if (collide)
   {
-    if (this == (DynamicObj *) fplayer && game == GAME_PLAY && realism && d->id >= AirBeginDescriptor && d->id < MovingGroundBeginDescriptor)
+    if (this == (DynamicObj *) fplayer /*&& gamestate == &stateplay*/ && realism && d->id >= AirBeginDescriptor && d->id < MovingGroundBeginDescriptor)
 	  {
       shield = -1.0F; // player collision vs another plane in SIM mode, boom
 	    d->shield = -1.0F;

@@ -179,18 +179,17 @@ void AiObj::initPrototype ()
 
 void AiObj::init ()
 {
+  DynamicObj::init ();
+
   int i;
   acttype = 0;
   intelligence = 100;
   aggressivity = 100;
   precision = 100;
   ai = true;
-  active = true;
-  draw = true;
   target = NULL;
   dtheta = 0;
   dgamma = 0;
-//  id = MissileBeginDescriptor;
   manoevertheta = 0;
   manoeverheight = 0;
   manoeverthrust = 0;
@@ -201,17 +200,9 @@ void AiObj::init ()
   firemissilettl = 0;
   fireflarettl = 0;
   firechaffttl = 0;
-//  flares = 0;
   aw = 0;
-  source = NULL;
   stat.points = 0;
   easymodel = 1;
-  elevatoreffect = 0;
-  ruddereffect = 0;
-  currot.gamma = 180;
-  recrot.gamma = 180;
-  dgamma = 0;
-  currot.theta = 0;
   missiletype = 0;
   autofire = false;
   ttl = -1;
@@ -219,7 +210,6 @@ void AiObj::init ()
   score = -1;
   for (i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
-  bomber = 0;
   timer = 0;
 }
 

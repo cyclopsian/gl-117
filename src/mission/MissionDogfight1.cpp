@@ -51,7 +51,6 @@ Fighter *MissionDogfight1::addFighter ()
 
 void MissionDogfight1::start ()
 {
-  int i;
   day = 1;
   clouds = 2;
   weather = WEATHER_SUNNY;

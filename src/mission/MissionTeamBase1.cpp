@@ -56,7 +56,10 @@ void MissionTeamBase1::start ()
   if (l != NULL) delete l;
   l = new GlLandscape (LANDSCAPE_ALPINE_EROSION, NULL);
   int px, py;
-  l->searchPlain (1, 1, &px, &py);
+  int px1, py1;
+  int px2, py2;
+  l->searchPlain (1, 1, &px1, &py1);
+  px = px1; py = py1;
   l->flatten (px, py, 8, 8);
   team1x = px; team1y = py + 50;
   playerInit ();
@@ -65,171 +68,140 @@ void MissionTeamBase1::start ()
   fplayer->currot.phi = 180;
   if (fplayer->id == FalconDescriptor)
   {
-    fighter [1]->newinit (HawkDescriptor, 0, 200);
-    fighter [1]->target = NULL;
+    objectInit (new Fighter (HawkDescriptor), 1, 200);
   }
   else
   {
-    fighter [1]->newinit (FalconDescriptor, 0, 200);
-    fighter [1]->target = fighter [3];
+    objectInit (new Fighter (FalconDescriptor), 1, 200);
   }
-  fighter [1]->party = 1;
   fighter [1]->trafo.translation.x = px + 5;
   fighter [1]->trafo.translation.z = py + 5;
 
-  int n = 4;
-  fighter [n]->trafo.translation.x = px + 2;
-  fighter [n]->trafo.translation.z = py + 5;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (Hall2Descriptor, 0, 400);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px;
-  fighter [n]->trafo.translation.z = py - 1;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (HallDescriptor, 0, 400);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px + 2;
-  fighter [n]->trafo.translation.z = py - 1;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (HallDescriptor, 0, 400);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px - 1.5;
-  fighter [n]->trafo.translation.z = py - 4.5;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (BigTentDescriptor, 0, 400);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px - 6;
-  fighter [n]->trafo.translation.z = py + 6;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
-  fighter [n]->currot.phi = 90;
-  fighter [n]->getPrototype ()->maxrot.theta = 0;
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px - 6;
-  fighter [n]->trafo.translation.z = py - 6;
-  fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
-  fighter [n]->currot.phi = 0;
-  fighter [n]->getPrototype ()->maxrot.theta = 0;
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px - 15;
-  fighter [n]->trafo.translation.z = py - 20;
-  fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px + 0;
-  fighter [n]->trafo.translation.z = py - 20;
-  fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 1;
-  n ++;
-  fighter [n]->trafo.translation.x = px + 15;
-  fighter [n]->trafo.translation.z = py - 20;
-  fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 1;
-
-  l->searchPlain (1, 2, &px, &py);
+  l->searchPlain (1, 2, &px2, &py2);
+  px = px2; py = py2;
   l->flatten (px, py, 8, 8);
   team2x = px; team2y = py - 50;
-  fighter [2]->newinit (BuzzardDescriptor, 0, 200);
-//  fighter [2]->o = &model_figd;
+  objectInit (new Fighter (BuzzardDescriptor), 2, 200);
   fighter [2]->trafo.translation.x = px;
   fighter [2]->trafo.translation.z = py;
   if (fplayer->id == FalconDescriptor)
     fighter [2]->target = fighter [1];
   else
     fighter [2]->target = fighter [0];
-  fighter [2]->party = 2;
-  fighter [3]->newinit (SwallowDescriptor, 0, 200);
-//  fighter [3]->o = Model3dRegistry::get ("SwallowDescriptor");
+  objectInit (new Fighter (SwallowDescriptor), 2, 200);
   fighter [3]->trafo.translation.x = px + 5;
   fighter [3]->trafo.translation.z = py + 5;
   fighter [3]->target = NULL;
-  fighter [3]->party = 2;
 
+  px = px1; py = py1;
+  int n = 4;
+  objectInit (new StaticPassive (Hall2Descriptor), 1, 200);
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py + 5;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall2;
-  fighter [n]->newinit (Hall2Descriptor, 0, 400);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticPassive (HallDescriptor), 1, 200);
   fighter [n]->trafo.translation.x = px;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (HallDescriptor, 0, 400);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticPassive (HallDescriptor), 1, 200);
   fighter [n]->trafo.translation.x = px + 2;
   fighter [n]->trafo.translation.z = py - 1;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_hall1;
-  fighter [n]->newinit (HallDescriptor, 0, 400);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticPassive (BigTentDescriptor), 1, 200);
   fighter [n]->trafo.translation.x = px - 1.5;
   fighter [n]->trafo.translation.z = py - 4.5;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_tent4;
-  fighter [n]->newinit (BigTentDescriptor, 0, 400);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticAa (SacDescriptor), 1, 200);
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py + 6;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 90;
   fighter [n]->getPrototype ()->maxrot.theta = 0;
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticAa (SacDescriptor), 1, 200);
   fighter [n]->trafo.translation.x = px - 6;
   fighter [n]->trafo.translation.z = py - 6;
   fighter [n]->target = fighter [0];
-//  fighter [n]->o = &model_flak1;
-  fighter [n]->newinit (AntiAircraftBeginDescriptor, 0, 200);
   fighter [n]->currot.phi = 0;
   fighter [n]->getPrototype ()->maxrot.theta = 0;
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticAa (SamDescriptor), 1, 300);
+  fighter [n]->trafo.translation.x = px - 15;
+  fighter [n]->trafo.translation.z = py - 20;
+  fighter [n]->target = NULL;
+  n ++;
+  objectInit (new StaticAa (SamDescriptor), 1, 300);
+  fighter [n]->trafo.translation.x = px + 0;
+  fighter [n]->trafo.translation.z = py - 20;
+  fighter [n]->target = NULL;
+  n ++;
+  objectInit (new StaticAa (SamDescriptor), 1, 300);
+  fighter [n]->trafo.translation.x = px + 15;
+  fighter [n]->trafo.translation.z = py - 20;
+  fighter [n]->target = NULL;
+
+  px = px2; py = py2;
+  objectInit (new StaticPassive (Hall2Descriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px + 2;
+  fighter [n]->trafo.translation.z = py + 5;
+  fighter [n]->target = fighter [0];
+  n ++;
+  objectInit (new StaticPassive (HallDescriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px;
+  fighter [n]->trafo.translation.z = py - 1;
+  fighter [n]->target = fighter [0];
+  n ++;
+  objectInit (new StaticPassive (Hall2Descriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px + 2;
+  fighter [n]->trafo.translation.z = py - 1;
+  fighter [n]->target = fighter [0];
+  n ++;
+  objectInit (new StaticPassive (BigTentDescriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px - 1.5;
+  fighter [n]->trafo.translation.z = py - 4.5;
+  fighter [n]->target = fighter [0];
+  n ++;
+  objectInit (new StaticAa (SacDescriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px - 6;
+  fighter [n]->trafo.translation.z = py + 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->currot.phi = 90;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
+  n ++;
+  objectInit (new StaticAa (SacDescriptor), 2, 200);
+  fighter [n]->trafo.translation.x = px - 6;
+  fighter [n]->trafo.translation.z = py - 6;
+  fighter [n]->target = fighter [0];
+  fighter [n]->currot.phi = 0;
+  fighter [n]->getPrototype ()->maxrot.theta = 0;
+  n ++;
+  objectInit (new StaticAa (SamDescriptor), 2, 200);
   fighter [n]->trafo.translation.x = px - 15;
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticAa (SamDescriptor), 2, 200);
   fighter [n]->trafo.translation.x = px + 0;
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 2;
   n ++;
+  objectInit (new StaticAa (SamDescriptor), 2, 200);
   fighter [n]->trafo.translation.x = px + 15;
   fighter [n]->trafo.translation.z = py + 20;
   fighter [n]->target = NULL;
-//  fighter [n]->o = &model_flarak1;
-  fighter [n]->newinit (SamDescriptor, 0, 300);
-  fighter [n]->party = 2;
+
+  if (fplayer->id == FalconDescriptor)
+  {
+    fighter [1]->target = NULL;
+  }
+  else
+  {
+    fighter [1]->target = fighter [3];
+  }
 
   state = 0;
   laststate = 0;
@@ -255,7 +227,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
   }
 
   bool testb1 = false, testb2 = false;
-  for (i = 4; i <= 29; i ++)
+  for (i = 4; i < fighter.size (); i ++)
   {
     if (fighter [i]->active)
     {
@@ -272,25 +244,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
   {
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
-      fighter [i]->explode = 0;
-      int temp = fighter [i]->stat.fighterkills;
-      UnitDescriptor tempid = fighter [i]->id;
-      fighter [i]->init ();
-      if (i == 0)
-      {
-        playerInit ();
-      }
-      else
-      {
-        fighter [i]->newinit (tempid, 0, 200);
-      }
-      fighter [i]->party = i / 2 + 1;
-      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
-      fighter [i]->immunity = 50 * timestep;
-      fighter [i]->activate ();
-//      fighter [i]->killed = false;
-      fighter [i]->stat.fighterkills = temp;
-      fighter [i]->stat.killed = false;
+      reincarnateFighter (i);
       if (i <= 1)
       {
         fighter [i]->trafo.translation.x = team1x;
@@ -301,6 +255,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
         fighter [i]->trafo.translation.x = team2x;
         fighter [i]->trafo.translation.z = team2y;
       }
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 15;
       camera = 0;
     }
   }

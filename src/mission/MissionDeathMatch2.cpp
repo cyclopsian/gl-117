@@ -62,24 +62,26 @@ void MissionDeathmatch2::start ()
   {
     if (i <= 1)
     {
-      fighter [i]->newinit (FalconDescriptor, 0, 200);
+      objectInit (new Fighter (FalconDescriptor), i / 2 + 1, 200);
     }
     else if (i <= 3)
     {
-      fighter [i]->newinit (CrowDescriptor, 0, 200);
+      objectInit (new Fighter (CrowDescriptor), i / 2 + 1, 200);
     }
     else if (i <= 5)
     {
-      fighter [i]->newinit (BuzzardDescriptor, 0, 200);
+      objectInit (new Fighter (BuzzardDescriptor), i / 2 + 1, 200);
     }
     else
     {
-      fighter [i]->newinit (SwallowDescriptor, 0, 200);
+      objectInit (new Fighter (SwallowDescriptor), i / 2 + 1, 200);
     }
-    fighter [i]->party = i / 2 + 1;
-    fighter [i]->target = fighter [(i + 4) % 8];
     fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
     fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
+  }
+  for (i = 1; i <= 7; i ++)
+  {
+    fighter [i]->target = fighter [(i + 4) % 8];
   }
   state = 0;
   laststate = 0;
@@ -102,29 +104,11 @@ int MissionDeathmatch2::processtimer (Uint32 dt)
       else return 2;
     }
   }
-  for (i = 0; i <= 7; i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
-      fighter [i]->explode = 0;
-      int temp = fighter [i]->stat.fighterkills;
-      fighter [i]->init ();
-      if (i == 0)
-      {
-        playerInit ();
-      }
-      else
-      {
-        fighter [i]->newinit (FalconDescriptor, i + 1, 200);
-      }
-      fighter [i]->party = i / 2 + 1;
-      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
-      fighter [i]->immunity = 50 * timestep;
-      fighter [i]->activate ();
-//      fighter [i]->killed = false;
-      fighter [i]->stat.fighterkills = temp;
-      fighter [i]->stat.killed = false;
-      camera = 0;
+      reincarnateFighter (i);
     }
   }
   return 0;

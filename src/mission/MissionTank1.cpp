@@ -63,32 +63,25 @@ void MissionTank1::start ()
   fighter [1]->trafo.translation.z = 105;
   for (i = 2; i <= 7; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Tank (PantherDescriptor), 0, 400 - i * 25);
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_tank2;
     fighter [i]->trafo.translation.x = -i * 4;
     fighter [i]->trafo.translation.z = -i * 4;
-    fighter [i]->newinit (PantherDescriptor, 0, 400 - i * 25);
     fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
   for (i = 8; i <= 10; i ++)
   {
-    fighter [i]->party = 0;
+    objectInit (new Tank (WieselDescriptor), 0, 80);
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_tank1;
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = i * 3;
-    fighter [i]->newinit (WieselDescriptor, 0, 80);
   }
   for (i = 11; i <= 13; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-//    fighter [i]->o = &model_container1;
+    objectInit (new StaticPassive (ContainerDescriptor), 0, 0);
     fighter [i]->trafo.translation.x = i * 3;
     fighter [i]->trafo.translation.z = 60;
-    fighter [i]->newinit (ContainerDescriptor, 0, 0);
   }
   invertZ (); // only invert if NO objects are mapped to flat ground
 }

@@ -63,7 +63,6 @@ void MissionCanyon2::start ()
   fplayer->trafo.translation.x = 100;
   fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
-  fplayer->target = fighter [5];
   for (i = 1; i <= 4; i ++)
   {
     alliedInit (RedArrowDescriptor, alliedpilot [i - 1]);
@@ -72,35 +71,36 @@ void MissionCanyon2::start ()
     else
       fighter [i]->trafo.translation.x = 100 - ((i + 1) / 2) * 5;
     fighter [i]->trafo.translation.z = 100 + i * 5;
-    fighter [i]->target = fighter [5 + i];
     fighter [i]->currot.phi = 45;
   }
   for (i = 5; i <= 22; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [Math::random (5)];
     if (i <= 15)
     {
+      objectInit (new Fighter (CrowDescriptor), 0, Math::random (120) + 260);
       fighter [i]->trafo.translation.x = -i * 5;
       fighter [i]->trafo.translation.z = -i * 5;
-//      fighter [i]->o = &model_fige;
-      fighter [i]->newinit (CrowDescriptor, 0, Math::random (120) + 260);
     }
     else if (i <= 19)
     {
+      objectInit (new Fighter (BuzzardDescriptor), 0, Math::random (120) + 160);
       fighter [i]->trafo.translation.x = -i * 8 - 160;
       fighter [i]->trafo.translation.z = -i * 8 - 160;
-//      fighter [i]->o = &model_figd;
-      fighter [i]->newinit (BuzzardDescriptor, 0, Math::random (120) + 160);
     }
     else
     {
+      objectInit (new Fighter (SwallowDescriptor), 0, Math::random (120) + 200);
       fighter [i]->trafo.translation.x = -i * 8 - 240;
       fighter [i]->trafo.translation.z = -i * 8 - 240;
-//      fighter [i]->o = Model3dRegistry::get ("SwallowDescriptor");
-      fighter [i]->newinit (SwallowDescriptor, 0, Math::random (120) + 200);
     }
+    fighter [i]->target = fighter [Math::random (5)];
   }
+  fplayer->target = fighter [5];
+  for (i = 1; i <= 4; i ++)
+  {
+    fighter [i]->target = fighter [5 + i];
+  }
+  
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

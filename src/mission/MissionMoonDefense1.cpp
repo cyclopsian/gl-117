@@ -61,32 +61,31 @@ void MissionMoonDefense1::start ()
   fplayer->trafo.translation.x = 100;
   fplayer->trafo.translation.z = 100;
   fplayer->currot.phi = 45;
-  fplayer->target = fighter [6];
   alliedInit (PhoenixDescriptor, alliedpilot [0]);
   fighter [1]->trafo.translation.x = 105;
   fighter [1]->trafo.translation.z = 105;
-  fighter [1]->target = fighter [6];
   fighter [1]->currot.phi = 45;
   for (i = 2; i <= 10; i ++)
   {
+    objectInit (new StaticAa (SacDescriptor), 0, 200);
     int ix = (i - 2) % 3;
     int iy = (i - 2) / 3;
     fighter [i]->trafo.translation.x = ix * 10;
     fighter [i]->trafo.translation.z = iy * 10;
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_flak1;
-    fighter [i]->newinit (SacDescriptor, 0, 200);
   }
   for (i = 11; i <= 20; i ++)
   {
+    objectInit (new AiObj (MineDescriptor), 0, 220);
     int ix = (i - 11) % 3;
     int iy = (i - 11) / 3;
     fighter [i]->trafo.translation.x = ix * 20 + 40;
     fighter [i]->trafo.translation.z = iy * 20 + 40;
     fighter [i]->target = fighter [Math::random (2)];
-//    fighter [i]->o = &model_mine1;
-    fighter [i]->newinit (MineDescriptor, 0, 220);
   }
+  fplayer->target = fighter [6];
+  fighter [1]->target = fighter [6];
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

@@ -22,48 +22,49 @@
 #ifndef IS_DIRS_H
 #define IS_DIRS_H
 
+#include <string>
+
 /**
 * This class handles the game directories to save/load configurations and to load game data.
 * For Unix it requires HOME to be set and it must be compiled with #define DATADIR (as compiler option)
 * to know where the game is installed (by make install).
 * One object "dirs" is already predefined, please call init() once at startup.
 */
-class Dirs
+class Directory
 {
   public:
 
-    char dir [4096];
-    char saves [4096];    ///< path to saves, UNIX and Windows differ
-    char textures [4096]; ///< path to textures...
-    char music [4096];
-    char sound [4096];
-    char models [4096];
-    char maps [4096];
-    char shaders [4096];
-    char units [4096];
+    static std::string saves;    ///< path to saves, UNIX and Windows differ
+    static std::string textures; ///< path to textures...
+    static std::string music;
+    static std::string sounds;
+    static std::string models;
+    static std::string maps;
+    static std::string shaders;
+    static std::string units;
 
-    Dirs ();
-    virtual ~Dirs ();
+    Directory ();
+//    virtual ~Directory ();
 
     /// this method must be called once at startup with argv [0] of main as parameter!
-    void init (char *arg);
+    static void init (char *arg);
 
     /// get dir name containing the saves...
-    char *getSaves (const char *name);
-    char *getTextures (const char *name);
-    char *getSounds (const char *name);
-    char *getMusic (const char *name);
-    char *getModels (const char *name);
-    char *getMaps (const char *name);
-    char *getShaders (const char *name);
-    char *getUnits (const char *name);
+    static const std::string getSaves (const std::string &name);
+    static const std::string getTextures (const std::string &name);
+    static const std::string getSounds (const std::string &name);
+    static const std::string getMusic (const std::string &name);
+    static const std::string getModels (const std::string &name);
+    static const std::string getMaps (const std::string &name);
+    static const std::string getShaders (const std::string &name);
+    static const std::string getUnits (const std::string &name);
   
   protected:
 
-    char *strtok (char *str, int len, char *tok);
-    void append (char *target, char *str); // append subdir/file to path using (back-)slashes
+    static char *strtok (char *str, int len, char *tok);
+    static void append (std::string &target, const std::string &str); // append subdir/file to path using (back-)slashes
 };
 
-extern Dirs dirs;
+//extern Dirs dirs;
 
 #endif

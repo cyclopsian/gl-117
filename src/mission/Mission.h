@@ -105,7 +105,8 @@ class Mission
     Mission ();
     virtual ~Mission () {}
 
-    void playerInit ();
+    void reincarnateFighter (int i);
+    void playerInit (bool newFighter = true);
     void selectMissiles (AiObj &aiobj);
     void alliedInit (const UnitDescriptor &id, int pilotid);
     void objectInit (AiObj *aiobj, int party, int ailevel);

@@ -66,8 +66,7 @@ void MissionDeathmatch3::start ()
 
   for (i = 1; i <= 7; i ++)
   {
-    fighter [i]->newinit (FalconDescriptor, 0, 200);
-    fighter [i]->party = i + 1;
+    objectInit (new Fighter (FalconDescriptor), i + 1, 200);
     fighter [i]->target = fighter [i - 1];
     fighter [i]->trafo.translation.x = 50 * SIN(i * 360 / 8);
     fighter [i]->trafo.translation.z = 50 * COS(i * 360 / 8);
@@ -98,24 +97,7 @@ int MissionDeathmatch3::processtimer (Uint32 dt)
     }
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)
     {
-      fighter [i]->explode = 0;
-      int temp = fighter [i]->stat.fighterkills;
-      fighter [i]->init ();
-      if (i == 0)
-      {
-        playerInit ();
-      }
-      else
-      {
-        fighter [i]->newinit (FalconDescriptor, i + 1, 200);
-      }
-      fighter [i]->party = i + 1;
-      fighter [i]->shield = fighter [i]->getPrototype ()->maxshield;
-      fighter [i]->immunity = 50 * timestep;
-      fighter [i]->activate ();
-//      fighter [i]->killed = false;
-      fighter [i]->stat.fighterkills = temp;
-      fighter [i]->stat.killed = false;
+      reincarnateFighter (i);
       fighter [i]->ammo = 100000;
       for (i = 0; i < missiletypes; i ++)
       {

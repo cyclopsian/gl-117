@@ -31,16 +31,21 @@
 #include <sys/stat.h>
 #endif
 
-#include "configuration/Dirs.h"
+#include "configuration/Directory.h"
 #include "logging/Logging.h"
 
 #include <cassert>
 
+std::string Directory::saves ("");
+std::string Directory::textures ("");
+std::string Directory::sounds ("");
+std::string Directory::music ("");
+std::string Directory::models ("");
+std::string Directory::maps ("");
+std::string Directory::shaders ("");
+std::string Directory::units ("");
 
-
-Dirs dirs;
-
-char *Dirs::strtok (char *str, int len, char *tok)
+char *Directory::strtok (char *str, int len, char *tok)
 {
   char *str0 = str;
   int z = 0;
@@ -55,9 +60,20 @@ char *Dirs::strtok (char *str, int len, char *tok)
   return str0;
 }
 
-void Dirs::append (char *target, char *str)
+void Directory::append (std::string &target, const std::string &str)
 {
 #ifdef _MSC_VER
+  if (target [target.length () - 1] != '\\')
+    target.append ("\\");
+  target.append (str);
+  target.append ("\\");
+#else
+  if (target [target.length () - 1] != '/')
+    target.append (target, "/");
+  target.append (str);
+  target.append ("/");
+#endif
+/*#ifdef _MSC_VER
   if (target [strlen (target) - 1] != '\\')
     strcat (target, "\\");
   strcat (target, str);
@@ -67,14 +83,14 @@ void Dirs::append (char *target, char *str)
     strcat (target, "/");
   strcat (target, str);
   strcat (target, "/");
-#endif
+#endif */
 }
 
-Dirs::Dirs ()
+Directory::Directory ()
 {
 }
 
-void Dirs::init (char *arg)
+void Directory::init (char *arg)
 {
 #ifdef _MSC_VER
   char path [4096];
@@ -90,7 +106,7 @@ void Dirs::init (char *arg)
     while (*p != '\\') p --;
     p --;
     while (*p != '\\') p --;
-    if (p [1] == 'D' && p [2] == 'e' && p [3] == 'b')
+    if (toupper (p [1]) == 'D' && toupper (p [2]) == 'E' && toupper (p [3]) == 'B')
     {
       p --;
       while (*p != '\\') p --;
@@ -104,14 +120,14 @@ void Dirs::init (char *arg)
     assert (false);
     exit (EXIT_CONTEXT);
   }
-  strcpy (textures, path);
-  strcpy (music, path);
-  strcpy (sound, path);
-  strcpy (models, path);
-  strcpy (saves, path);
-  strcpy (maps, path);
-  strcpy (shaders, path);
-  strcpy (units, path);
+  textures = path;
+  music = path;
+  sounds = path;
+  models = path;
+  saves = path;
+  maps = path;
+  shaders = path;
+  units = path;
   append (saves, "saves");
 #else
   char buf [4096];
@@ -119,7 +135,7 @@ void Dirs::init (char *arg)
   char *env = getenv ("GL117");
   char *path = getenv ("PATH");
   char myfile [4096];
-  sprintf (myfile, "%s/gl-117", DATADIR);
+  snprintf (myfile, 4096, "%s/gl-117", DATADIR);
   bool founddir = false;
   struct stat mystat;
 
@@ -137,9 +153,9 @@ void Dirs::init (char *arg)
     char cwd [4096];
     getcwd (cwd, 4096); // get current working directory
     char mypath [8092];
-    strcpy (mypath, cwd);
-    strcat (mypath, ":");
-    strcat (mypath, path);
+    strncpy (mypath, 8092, cwd);
+    strncat (mypath, 8092, ":");
+    strncat (mypath, 8092, path);
     char *p = mypath;
     int pathlen = strlen (mypath);
 
@@ -148,13 +164,13 @@ void Dirs::init (char *arg)
       p = strtok (p, (int) (path + pathlen - p), ":");
       while (p + strlen (p) - 1 < mypath + pathlen)
       {
-        strcpy (myfile, p);
+        strncpy (myfile, 4096, p);
         if (myfile [strlen (myfile) - 1] != '/')
-          strcat (myfile, "/");
+          strncat (myfile, 4096, "/");
         if (*arg == '.' && *(arg+1) == '/')
-          strcat (myfile, arg + 2);
+          strncat (myfile, 4096, arg + 2);
         else
-          strcat (myfile, arg);
+          strncat (myfile, 4096, arg);
         if (!stat (myfile, &mystat))
         {
 	        if (S_ISREG (mystat.st_mode))
@@ -197,112 +213,112 @@ void Dirs::init (char *arg)
 
   if (home != NULL)
   {
-    strcpy (saves, home);
+    saves = home;
     append (saves, ".gl-117");
-    if (stat (saves, &mystat))
+    if (stat (saves.c_str (), &mystat))
     {
-      mkdir (saves, S_IRWXU);
+      mkdir (saves.c_str (), S_IRWXU);
     }
   }
   else
   {
     if (env != NULL)
     {
-      strcpy (saves, env);
+      saves = env;
     }
     else
     {
-      strcpy (saves, "..");
+      saves = "..";
     }
   }
   if (env != NULL)
   {
-    strcpy (textures, env);
-    strcpy (music, env);
-    strcpy (sound, env);
-    strcpy (models, env);
-    strcpy (maps, env);
-    strcpy (shaders, path);
-    strcpy (units, env);
+    textures = env;
+    music = env;
+    sounds = env;
+    models = env;
+    maps = env;
+    shaders = path;
+    units = env;
   }
   else
   {
     DISPLAY_INFO(FormatString("Found gl-117 data directory %s ", myfile));
-    strcpy (textures, myfile);
-    strcpy (music, myfile);
-    strcpy (sound, myfile);
-    strcpy (models, myfile);
-    strcpy (maps, myfile);
-    strcpy (shaders, myfile);
-    strcpy (units, myfile);
+    textures = myfile;
+    music = myfile;
+    sounds = myfile;
+    models = myfile;
+    maps = myfile;
+    shaders = myfile;
+    units = myfile;
   }
 #endif
   append (textures, "textures");
   append (music, "music");
-  append (sound, "sounds");
+  append (sounds, "sounds");
   append (models, "models");
   append (maps, "maps");
   append (shaders, "shaders");
   append (units, "units");
 }
 
-Dirs::~Dirs ()
+/*Directory::~Directory ()
 {
-}
+}*/
 
-char *Dirs::getSaves (const char *name)
+const std::string Directory::getSaves (const std::string &name)
 {
-  strcpy (dir, saves);
-  strcat (dir, name);
+  std::string dir = saves;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getTextures (const char *name)
+const std::string Directory::getTextures (const std::string &name)
 {
-  strcpy (dir, textures);
-  strcat (dir, name);
+  std::string dir = textures;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getMusic (const char *name)
+const std::string Directory::getMusic (const std::string &name)
 {
-  strcpy (dir, music);
-  strcat (dir, name);
+  std::string dir = music;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getSounds (const char *name)
+const std::string Directory::getSounds (const std::string &name)
 {
-  strcpy (dir, sound);
-  strcat (dir, name);
+  std::string dir = sounds;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getModels (const char *name)
+const std::string Directory::getModels (const std::string &name)
 {
-  strcpy (dir, models);
-  strcat (dir, name);
+  std::string dir = models;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getMaps (const char *name)
+const std::string Directory::getMaps (const std::string &name)
 {
-  strcpy (dir, maps);
-  strcat (dir, name);
+  std::string dir = maps;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getShaders (const char *name)
+const std::string Directory::getShaders (const std::string &name)
 {
-  strcpy (dir, shaders);
-  strcat (dir, name);
+  std::string dir = shaders;
+  dir.append (name);
   return dir;
 }
 
-char *Dirs::getUnits (const char *name)
+const std::string Directory::getUnits (const std::string &name)
 {
-  strcpy (dir, units);
-  strcat (dir, name);
+  std::string dir = units;
+  dir.append (name);
   return dir;
 }
 

@@ -105,7 +105,7 @@ const int maxstar = 70;
 //const int maxchaff = 30;
 
 // game states
-#define GAME_INIT 0
+/*#define GAME_INIT 0
 #define GAME_PLAY 1
 #define GAME_PAUSE 2
 #define GAME_MENU 3
@@ -117,7 +117,7 @@ const int maxstar = 70;
 #define GAME_FAME 9
 #define GAME_FIGHTER 10
 #define GAME_FINISH 11
-#define GAME_QUIT 12
+#define GAME_QUIT 12*/
 
 // define common GLUT/SDL keys
 #ifdef USE_GLUT

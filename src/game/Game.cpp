@@ -1970,7 +1970,7 @@ void myFirstInit ()
   initModel (ComplexDescriptor, "complex.3ds");
   model = Model3dRegistry::get (ComplexDescriptor.name);
   model->scaleTexture (0.08, 0.08);
-  initModel (OilrigDescriptor, "radar.3ds");
+  initModel (RadarDescriptor, "radar.3ds");
   initModel (MineDescriptor, "mine1.3ds");
   initModel (AsteroidDescriptor, "aster1.3ds");
   initModel (MoonBaseDescriptor, "base1.3ds");

@@ -451,6 +451,7 @@ class SpaceObj
     SpaceObj (Model3d *o, const Transformation &trafo);
     virtual ~SpaceObj ();
 
+    void init ();
     void addRefModel (const SpaceObj &ref2);
     void translate (Vector3 &v);
     void translate (float x, float y, float z);

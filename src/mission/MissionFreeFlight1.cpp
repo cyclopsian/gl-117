@@ -57,18 +57,13 @@ void MissionFreeFlight1::start ()
   playerInit ();
   fplayer->trafo.translation.x = 20;
   fplayer->trafo.translation.z = 70;
-  for (i = 1; i <= 9; i ++)
+  for (i = 1; i <= 2; i ++)
   {
-    fighter [i]->party = 0;
-    fighter [i]->target = fighter [0];
-    fighter [i]->trafo.translation.x = -i * 10;
-    fighter [i]->trafo.translation.z = -i * 10;
-//    fighter [i]->o = &model_figt;
-    fighter [i]->newinit (TransportDescriptor, 0, 395);
-    if (i >= 3)
-    {
-      fighter [i]->deactivate ();
-    }
+    Fighter *f;
+    f = new Fighter (TransportDescriptor);
+    objectInit (f, 0, 395);
+    f->trafo.translation.x = -i * 10;
+    f->trafo.translation.z = -i * 10;
   }
   state = 0;
   laststate = 0;
@@ -86,7 +81,7 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
   {
     return 2;
   }
-  for (i = 0; i <= 9; i ++)
+  for (i = 0; i < fighter.size (); i ++)
   {
     if (fighter [i]->active)
       if (fighter [i]->party == 0)
@@ -98,11 +93,13 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
   {
     for (i = 3; i <= 5; i ++)
     {
-      fighter [i]->activate ();
+      Fighter *f;
+      f = new Fighter (TransportDescriptor);
+      objectInit (f, 0, 395);
       int phi = 120 * i;
-      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
-      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
-      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 25;
+      f->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
+      f->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
+      f->trafo.translation.y = l->getHeight (f->trafo.translation.x, f->trafo.translation.z) + 25;
     }
     return 0;
   }
@@ -110,11 +107,13 @@ int MissionFreeFlight1::processtimer (Uint32 dt)
   {
     for (i = 6; i <= 9; i ++)
     {
-      fighter [i]->activate ();
+      Fighter *f;
+      f = new Fighter (TransportDescriptor);
+      objectInit (f, 0, 395);
       int phi = 90 * i;
-      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
-      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
-      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 25;
+      f->trafo.translation.x = fplayer->trafo.translation.x + 40 * COS(phi);
+      f->trafo.translation.z = fplayer->trafo.translation.z + 40 * SIN(phi);
+      f->trafo.translation.y = l->getHeight (f->trafo.translation.x, f->trafo.translation.z) + 25;
     }
     return 0;
   }

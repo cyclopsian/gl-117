@@ -61,33 +61,37 @@ void MissionCanyon1::start ()
   fplayer->trafo.translation.x = px + 130;
   fplayer->trafo.translation.z = py + 130;
   fplayer->currot.phi = 45;
-  fplayer->target = fighter [1];
-//  fighter [1]->o = &model_egg;
-  fighter [1]->newinit (ComplexDescriptor, 0, 0);
+  objectInit (new StaticPassive (ComplexDescriptor), 0, 0);
   fighter [1]->trafo.translation.x = px + 1;
   fighter [1]->trafo.translation.z = py + 1;
   fighter [1]->getPrototype ()->maxthrust = 0;
   fighter [1]->thrust = 0;
   for (i = 2; i < 4; i ++)
   {
-//    fighter [i]->o = &model_radar;
-    fighter [i]->newinit (RadarDescriptor, 0, 0);
+    objectInit (new StaticPassive (RadarDescriptor), 0, 0);
     fighter [i]->trafo.translation.x = px - 2 - (i - 2) * 2;
     fighter [i]->trafo.translation.z = py - 2 - (i - 2) * 2;
     fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
   }
+  for (i = 4; i <= 10; i ++)
+  {
+    objectInit (new Fighter (BuzzardDescriptor), 0, 50 + i * 20);
+    fighter [i]->target = fighter [0];
+    fighter [i]->currot.phi = 180;
+    fighter [i]->deactivate ();
+  }
   for (i = 11; i <= 12; i ++)
   {
-//    fighter [i]->o = &model_flarak1;
+    objectInit (new StaticAa (SamDescriptor), 0, 200);
     fighter [i]->target = fighter [0];
-    fighter [i]->newinit (SamDescriptor, 0, 200);
     fighter [i]->trafo.translation.x = px + 4;
     fighter [i]->trafo.translation.z = py + i * 3 - 30;
     fighter [i]->getPrototype ()->maxthrust = 0;
     fighter [i]->thrust = 0;
     fighter [i]->currot.phi = 220;
   }
+  fplayer->target = fighter [1];
 }
 
 int MissionCanyon1::processtimer (Uint32 dt)
@@ -106,14 +110,10 @@ int MissionCanyon1::processtimer (Uint32 dt)
     state = 1;
     for (i = 4; i <= 10; i ++)
     {
-      fighter [i]->party = 0;
-      fighter [i]->target = fighter [0];
-  //    fighter [i]->o = &model_figd;
-      fighter [i]->currot.phi = 180;
-      fighter [i]->newinit (BuzzardDescriptor, 0, 50 + i * 20);
-//      fighter [i]->trafo.translation.x = px - 15 - i * 3;
-//      fighter [i]->trafo.translation.z = py - 15 - i * 3;
-      fighter [i]->deactivate ();
+      fighter [i]->activate ();
+      fighter [i]->trafo.translation.x = fplayer->trafo.translation.x - 50;
+      fighter [i]->trafo.translation.z = fplayer->trafo.translation.z - 50 - i * 10;
+      fighter [i]->trafo.translation.y = l->getHeight (fighter [i]->trafo.translation.x, fighter [i]->trafo.translation.z) + 10;
     }
   }
   for (i = 0; i <= 3; i ++)
