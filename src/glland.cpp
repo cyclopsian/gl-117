@@ -2012,11 +2012,10 @@ void GLLandscape::draw (int phi, int gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl->enableTextures (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    float mydep = 250;
-    if (quality == 2) mydep = 500;
-    else if (quality == 3) mydep = 800;
-    else if (quality == 4) mydep = 1500;
-    else if (quality == 5) mydep = 2500;
+    float mydep = 1000;
+    if (quality == 3) mydep = 1600;
+    else if (quality == 4) mydep = 2500;
+    else if (quality == 5) mydep = 3500;
     float x21 = 0.3, y21 = -0.32;
     float x22 = -0.21, y22 = 0.22;
     float x31 = 0.32, y31 = -0.08;
