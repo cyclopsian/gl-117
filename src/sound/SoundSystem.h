@@ -23,6 +23,7 @@
 #define IS_SOUNDSYSTEM_H
 
 #include "opengl/includegl.h"
+#include "configuration/Configuration.h"
 
 /**
 * This class loads and plays a Wavefile with SDL or SDL_mixer if available.
@@ -72,6 +73,7 @@ class WaveFile
 #define MUSIC_LOSER1 5
 #define MUSIC_SOFTTEC1 6
 #define MUSIC_AMBIENT1 7
+#define MUSIC_COMPUTA2 8
 
 /**
 * This class manages all wave and tracker files for GL-117.

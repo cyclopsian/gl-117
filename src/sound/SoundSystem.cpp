@@ -291,6 +291,9 @@ void SoundSystem::loadMusic (int sample)
     case MUSIC_AMBIENT1:
       music1 = Mix_LoadMUS (dirs.getMusic ("ambient.s3m"));
       break;
+    case MUSIC_COMPUTA2:
+      music1 = Mix_LoadMUS (dirs.getMusic ("computa2.xm"));
+      break;
   }
 #endif
 }

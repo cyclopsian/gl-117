@@ -27,7 +27,6 @@ TODO:
 - joystick update (mail)
 - joystick in menu
 - mig29 model
-- new soundtrack
 - correct transport2 (left side corrupt in VRML) and add mission with transport2
 - southern seashore landscape (additional missions)
 - alpine snow landscape (additional missions)
@@ -1029,7 +1028,7 @@ void stats_reshape ()
 
 void playRandomMusic ()
 {
-  int r = math.random (6);
+  int r = math.random (7);
   if (r == 0)
     sound->loadMusic (MUSIC_DARK1);
   else if (r == 1)
@@ -1040,8 +1039,10 @@ void playRandomMusic ()
     sound->loadMusic (MUSIC_STARS1);
   else if (r == 4)
     sound->loadMusic (MUSIC_SOFTTEC1);
-  else
+  else if (r == 5)
     sound->loadMusic (MUSIC_AMBIENT1);
+  else
+    sound->loadMusic (MUSIC_COMPUTA2);
   sound->playMusic (1);
 #ifdef HAVE_SDL_MIXER
   Mix_HookMusicFinished (playRandomMusic);
