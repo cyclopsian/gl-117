@@ -2246,6 +2246,24 @@ GLLandscape::GLLandscape (Space *space2, int type, int *heightmask)
       genRocks (30, 25);
       calcWoods (150);
     }
+    else if (type == LANDSCAPE_ALPINE_SEA)
+    {
+      genSurface (60, heightmask);
+      genRocks (30, 80);
+      int diff = lowestpoint + (highestpoint - lowestpoint) * 3 / 4;
+      for (i = 0; i <= MAXX; i ++)
+        for (i2 = 0; i2 <= MAXX; i2 ++)
+        {
+          if (h [i] [i2] < diff)
+          {
+            hw [i] [i2] = diff;
+            if (diff - h [i] [i2] < 1000)
+              f [i] [i2] = SHALLOWWATER;
+            else
+              f [i] [i2] = DEEPWATER;
+          }
+        }
+    }
     else if (type == LANDSCAPE_SEA)
     {
       for (i = 0; i <= MAXX; i ++)

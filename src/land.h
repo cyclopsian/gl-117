@@ -99,12 +99,15 @@ class Landscape
 
   private:
   unsigned char ftry [MAXX + 1] [MAXX + 1]; // dummy data field
-  int highestpoint, lowestpoint, rockborder;
+  int rockborder;
   int maxx; // same as MAXX, 512 is ideal
   int hoehe, maxn, n; // surface extents
   int random (int n); // get random numbers between 0 and n-1
   int extremerandom (int n); // same but numbers are often near 0 or n-1
   int getX (int x); // x mod maxx (may be another function)
+
+  protected:
+  int highestpoint, lowestpoint;
 
   public:
   int hg [MAXX + 1] [MAXX + 1]; // dummy data field to apply convolution kernels
