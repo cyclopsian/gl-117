@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Use nVidia C for Graphics (shaders) */
+#undef HAVE_CGGL
+
 /* Use GL library */
 #undef HAVE_GL
 

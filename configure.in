@@ -34,8 +34,9 @@ AH_TEMPLATE([HAVE_SDL_MIXER],[Use SDL mixer library])
 AH_TEMPLATE([HAVE_GL],[Use GL library])
 AH_TEMPLATE([HAVE_GLU],[Use GLU library])
 AH_TEMPLATE([HAVE_GLUT],[Use GLUT library])
+AH_TEMPLATE([HAVE_CGGL],[Use nVidia C for Graphics (shaders)])
 
-LDFLAGS="$LDFLAGS -lm -lGL -lGLU -lglut"
+LDFLAGS="$LDFLAGS -lm"
 AC_PROG_CXX
 AC_PROG_CC
 AC_LANG_CPLUSPLUS
@@ -52,12 +53,16 @@ AC_CHECK_HEADER(GL/glu.h,AC_DEFINE(HAVE_GLU),AC_MSG_ERROR(glu.h not found - plea
 AC_CHECK_HEADER(GL/glut.h,AC_DEFINE(HAVE_GLUT),AC_MSG_ERROR(glut.h not found - please install GLUT- or MesaGLUT-devel))
 AC_CHECK_HEADER(SDL/SDL.h,AC_DEFINE(HAVE_SDL),AC_MSG_WARN(SDL.h not found - no sounds and no joystick available))
 AC_CHECK_HEADER(SDL/SDL_mixer.h,AC_DEFINE(HAVE_SDL_MIXER),AC_MSG_WARN(SDL_mixer.h not found - no advanced sounds available))
+AC_CHECK_HEADER(Cg/cgGL.h,AC_DEFINE(HAVE_CGGL,1),AC_MSG_WARN(Cg/cgGL.h not found - no shaders for rendering))
 
 AC_CHECK_LIB(GL,glEnable,LIBS="$LIBS -lGL",AC_MSG_WARN(GL not found - please install GL or MesaGL))
 AC_CHECK_LIB(GLU,gluPerspective,LIBS="$LIBS -lGLU",AC_MSG_WARN(GLU not found - please install GLU or MesaGLU))
 AC_CHECK_LIB(glut,glutMainLoop,LIBS="$LIBS -lglut",AC_MSG_WARN(GLUT not found - please install GLUT or MesaGLUT))
 AC_CHECK_LIB(SDL,SDL_Init,LIBS="$LIBS -lSDL -lSDLmain",AC_MSG_WARN(SDL not found - please install SDL),-lpthread)
 AC_CHECK_LIB(SDL_mixer,Mix_LoadMUS,LIBS="$LIBS -lSDL_mixer",AC_MSG_WARN(SDL_mixer not found - please install SDL_mixer))
+AC_CHECK_LIB(pthread,pthread_attr_destroy,LIBS="$LIBS -lpthread",AC_MSG_WARN(pthread not found - please install pthread))
+AC_CHECK_LIB(Cg,cgCompileProgram,LIBS="-lCg $LIBS",AC_MSG_WARN(Cg not found - please install Cg))
+AC_CHECK_LIB(CgGL,cgGLBindProgram,LIBS="-lCgGL $LIBS",AC_MSG_WARN(CgGL not found - please install CgGL))
 
 CFLAGS="$CFLAGS"
 CPPFLAGS="-DDATADIR='\"$datadir\"' -Wall -pedantic"

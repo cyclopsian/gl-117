@@ -31,13 +31,9 @@
 
 
 Object3d::Object3d ()
+  : name("")
 {
-  numVertices = 0;
-  numTriangles = 0;
-  numQuads = 0;
-  numTexVertex = 0;
-  material = NULL;
-  hasTexture = false;
+  clear();
 }
 
 int Object3d::addVertex (const Vertex &w)
@@ -57,6 +53,24 @@ void Object3d::setColor (const Color &col)
   int i;
   for (i = 0; i < numVertices; i ++)
     memcpy (vertex [i].color.c, (const void *) &col, 4 * sizeof (unsigned char));
+}
+
+void Object3d::clear(void)
+{
+  // This is weird design. This is even a design BUG. After using the
+  // copy constructor to make a shallow copy, ownership of the data
+  // pointed to by material/vertex/... is definitively transferred to
+  // the copy by a call to this method, which clears the pointers
+  // without freeing the memory.
+  numVertices = 0;
+  numTriangles = 0;
+  numQuads = 0;
+  numTexVertex = 0;
+  material = 0;
+  hasTexture = false;
+  vertex = 0;
+  triangle = 0;
+  quad = 0;
 }
 
 #endif

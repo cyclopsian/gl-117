@@ -156,7 +156,7 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
 
       case OBJECT:
         model->addObject (newObject);
-        memset (&newObject, 0, sizeof (Object3d));
+        newObject.clear();
         currentChunk->bytesRead += getString (buf);
         model->object [model->numObjects - 1]->name = buf;
         processNextObjectChunk (model, (model->object [model->numObjects - 1]), currentChunk);

@@ -288,6 +288,7 @@ class Object3d
     ///< vertex list must be allocated, add vertex only if not near another vertex
     int addVertex (const Vertex &w);
     void setColor (const Color &col);
+    void clear(void);
 };
 
 /**
