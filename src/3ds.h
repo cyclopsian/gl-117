@@ -34,6 +34,28 @@
 #include "gl.h"
 #include "dirs.h"
 
+#define uint32 unsigned int
+#define uint16 unsigned short
+
+class BinaryFile
+{
+  public:
+  FILE *in;
+  uint32 size;
+  uint32 filepointer;
+  unsigned char *data;
+  unsigned char ret [11];
+
+  BinaryFile (char *filename);
+  ~BinaryFile ();
+  int readFloat (float *f);
+  int readFloat (float *f, int n);
+  int readUInt32 (uint32 *i);
+  int readUInt16 (uint16 *i);
+  int readString (char *ptr, int n);
+  int readString (char *ptr);
+};
+
 // Primary Chunk
 #define PRIMARY       0x4D4D
 
@@ -78,6 +100,7 @@ struct Chunk
 class CLoad3DS
 {
   public:
+  BinaryFile *file;
   CLoad3DS ();
   bool Import3DS (CModel *model, char *filename);
   

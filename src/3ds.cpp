@@ -25,6 +25,114 @@
 
 #include "3ds.h"
 
+BinaryFile::BinaryFile (char *filename)
+{
+  in = fopen (filename, "rb");
+  if (in == NULL)
+  {
+    fprintf (stderr, "\nCannot open file %s!", filename);
+    fflush (stderr);
+    return;
+  }
+  fseek (in, 0, SEEK_END);
+  size = ftell (in);
+  fseek (in, 0, SEEK_SET);
+  data = new unsigned char [size];
+  uint32 z = 0;
+  while (!feof (in))
+  {
+    fread (&data [z], 1, 4096, in);
+    z += 4096;
+  }
+  fclose (in);
+  filepointer = 0;
+}
+
+BinaryFile::~BinaryFile ()
+{
+  delete data;
+}
+
+int BinaryFile::readFloat (float *f)
+{
+#ifdef WORDS_BIGENDIAN
+  ret [0] = data [filepointer + 3];
+  ret [1] = data [filepointer + 2];
+  ret [2] = data [filepointer + 1];
+  ret [3] = data [filepointer];
+  ret [4] = 0;
+  *f = *((float *) ret);
+#else
+  *f = *((float *) &data [filepointer]);
+#endif
+  filepointer += 4;
+  return 4;
+}
+
+int BinaryFile::readFloat (float *f, int n)
+{
+  int i;
+  for (i = 0; i < n; i ++)
+  {
+    readFloat (&f [i]);
+  }
+  return n * 4;
+}
+
+int BinaryFile::readUInt32 (uint32 *i)
+{
+#ifdef WORDS_BIGENDIAN
+  ret [0] = data [filepointer + 3];
+  ret [1] = data [filepointer + 2];
+  ret [2] = data [filepointer + 1];
+  ret [3] = data [filepointer];
+  ret [4] = 0;
+  *i = *((uint32 *) ret);
+#else
+  *i = *((uint32 *) &data [filepointer]);
+#endif
+  filepointer += 4;
+  return 4;
+}
+
+int BinaryFile::readUInt16 (uint16 *i)
+{
+#ifdef WORDS_BIGENDIAN
+  ret [0] = data [filepointer + 1];
+  ret [1] = data [filepointer + 0];
+  ret [2] = 0;
+  *i = *((uint16 *) ret);
+#else
+  *i = *((uint16 *) &data [filepointer]);
+#endif
+  filepointer += 2;
+  return 2;
+}
+
+int BinaryFile::readString (char *ptr, int n)
+{
+  if (filepointer + n > size)
+    n = size - filepointer;
+  memcpy (ptr, &data [filepointer], n);
+  filepointer += n;
+  return n;
+}
+
+int BinaryFile::readString (char *ptr)
+{
+  int i = 0;
+  while (data [filepointer] != 0 && filepointer < size)
+  {
+    ptr [i] = data [filepointer];
+    i ++;
+    filepointer ++;
+  }
+  ptr [i] = 0;
+  filepointer ++;
+  i ++;
+  return i;
+}
+
 /****************************************************************************
 3DS LOADER
 ****************************************************************************/
@@ -40,14 +148,9 @@ CLoad3DS::CLoad3DS ()
 bool CLoad3DS::Import3DS (CModel *model, char *filename)
 {
   char message [255] = {0};
-  filepointer = fopen (filename, "rb");
-  if (!filepointer) 
-  {
-    sprintf (message, "\nUnable to find the file: %s!", filename);
-    fprintf (stderr, "%s", message);
-    fflush (stdout);
-    return false;
-  }
+
+  file = new BinaryFile (filename);
+
   // Read the first chuck
   ReadChunk(currentChunk);
   // Make sure this is a 3DS file
@@ -72,12 +175,14 @@ bool CLoad3DS::Import3DS (CModel *model, char *filename)
   Normalize (model);
   // Clean up
   CleanUp();
+
   return true;
 }
 
 void CLoad3DS::CleanUp ()
 {
-  fclose (filepointer);            // Close the current file pointer
+  delete file;
+//  fclose (filepointer);            // Close the current file pointer
 /* Vorsicht: Speicherleck !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
   //delete currentChunk;            // Free the current chunk
   //delete tempChunk;              // Free our temporary chunk
@@ -85,9 +190,9 @@ void CLoad3DS::CleanUp ()
 
 void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 {
+  char version [10];
   CObject newObject;
   CMaterial newTexture;
-  unsigned int version = 0;
   int buffer [50000] = {0};
 
   currentChunk = new Chunk;
@@ -99,8 +204,8 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
     switch (currentChunk->ID)
     {
       case VERSION:
-        currentChunk->bytesRead += fread (&version, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
-        if (version > 0x03)
+        currentChunk->bytesRead += file->readString (version, currentChunk->length - currentChunk->bytesRead);
+        if (version [0] > 0x03)
         {
           fprintf (stderr, "\nWarning: This 3DS file is over version 3 so it may load incorrectly");
           fflush (stdout);
@@ -109,7 +214,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
       case OBJECTINFO:
         ReadChunk (tempChunk);
-        tempChunk->bytesRead += fread (&version, 1, tempChunk->length - tempChunk->bytesRead, filepointer);
+        tempChunk->bytesRead += file->readString (version, tempChunk->length - tempChunk->bytesRead);
         currentChunk->bytesRead += tempChunk->bytesRead;
         ProcessNextChunk (model, currentChunk);
         break;
@@ -127,11 +232,11 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case EDITKEYFRAME:
-        currentChunk->bytesRead += fread (buffer, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString ((char *) buffer, currentChunk->length - currentChunk->bytesRead);
         break;
 
       default: 
-        currentChunk->bytesRead += fread (buffer, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString ((char *) buffer, currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -174,7 +279,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
         break;
 
       default:  
-        currentChunk->bytesRead += fread (buffer, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString ((char *) buffer, currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -198,7 +303,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
     switch (currentChunk->ID)
     {
       case MATNAME:
-        currentChunk->bytesRead += fread (model->material [model->numMaterials - 1]->name, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->name, currentChunk->length - currentChunk->bytesRead);
         break;
 
       case MATDIFFUSE:
@@ -210,7 +315,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         break;
 
       case MATMAPFILE:
-        currentChunk->bytesRead += fread (model->material [model->numMaterials - 1]->filename, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString (model->material [model->numMaterials - 1]->filename, currentChunk->length - currentChunk->bytesRead);
         {
           char* str=model->material [model->numMaterials - 1]->filename;
           while (*str)
@@ -224,7 +329,7 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
         break;
     
       default:  
-        currentChunk->bytesRead += fread (buffer, 1, currentChunk->length - currentChunk->bytesRead, filepointer);
+        currentChunk->bytesRead += file->readString ((char *) buffer, currentChunk->length - currentChunk->bytesRead);
         break;
     }
 
@@ -237,32 +342,27 @@ void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
 
 void CLoad3DS::ReadChunk (Chunk *pChunk)
 {
-  pChunk->bytesRead = fread (&pChunk->ID, 1, 2, filepointer);
-  pChunk->bytesRead += fread (&pChunk->length, 1, 4, filepointer);
+//  unsigned char buf [10];
+  pChunk->bytesRead = file->readUInt16 (&pChunk->ID);
+  pChunk->bytesRead += file->readUInt32 (&pChunk->length);
 }
 
 int CLoad3DS::GetString (char *buffer)
 {
-  int index = 0;
-  fread (buffer, 1, 1, filepointer);
-  while (*(buffer + index++) != 0)
-  {
-    fread (buffer + index, 1, 1, filepointer);
-  }
-  return strlen (buffer) + 1;
+  return file->readString (buffer);
 }
 
 void CLoad3DS::ReadColorChunk (CMaterial *material, Chunk *pChunk)
 {
   ReadChunk (tempChunk);
-  tempChunk->bytesRead += fread (material->color.c, 1, tempChunk->length - tempChunk->bytesRead, filepointer);
+  tempChunk->bytesRead += file->readString ((char *) material->color.c, tempChunk->length - tempChunk->bytesRead);
   pChunk->bytesRead += tempChunk->bytesRead;
 }
 
 void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
 {
   unsigned short index = 0;
-  previousChunk->bytesRead += fread (&object->numTriangles, 1, 2, filepointer);
+  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numTriangles);
 
   object->triangle = new CTriangle [object->numTriangles];
   memset (object->triangle, 0, sizeof (CTriangle) * object->numTriangles);
@@ -271,8 +371,8 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
   {
     for (int j = 0; j < 4; j++)
     {
-      previousChunk->bytesRead += fread (&index, 1, sizeof (index), filepointer);
-      if(j < 3)
+      previousChunk->bytesRead += file->readUInt16 (&index);
+      if (j < 3)
       {
         object->triangle [i].v [j] = &object->vertex [index];
       }
@@ -283,11 +383,11 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
 
 void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
 {
-  previousChunk->bytesRead += fread (&object->numTexVertex, 1, 2, filepointer);
+  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numTexVertex);
 
   CVector2 *p = new CVector2 [object->numTexVertex];
 
-  previousChunk->bytesRead += fread (p, 1, previousChunk->length - previousChunk->bytesRead, filepointer);
+  previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
   
   for (int i = 0; i < object->numTexVertex; i ++)
     object->vertex [i].tex.take (&p [i]);
@@ -297,14 +397,14 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
 void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
 {
   int i;
-  previousChunk->bytesRead += fread (&(object->numVertices), 1, 2, filepointer);
+  previousChunk->bytesRead += file->readUInt16 ((unsigned short *) &object->numVertices);
 
   object->vertex = new CVertex [object->numVertices];
   memset (object->vertex, 0, sizeof (CVertex) * object->numVertices);
 
   CVector3 *p = new CVector3 [object->numVertices];
 
-  previousChunk->bytesRead += fread (p, 1, previousChunk->length - previousChunk->bytesRead, filepointer);
+  previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
     
   for (i = 0; i < object->numVertices; i ++)
   {
@@ -345,7 +445,7 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
     }
   }
 
-  previousChunk->bytesRead += fread (buffer, 1, previousChunk->length - previousChunk->bytesRead, filepointer);
+  previousChunk->bytesRead += file->readString ((char *) buffer, previousChunk->length - previousChunk->bytesRead);
 }      
 
 void CLoad3DS::Compile (CModel *model)
