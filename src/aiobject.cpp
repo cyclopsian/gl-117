@@ -956,7 +956,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   if (id == MISSILE_AIR1)
   {
     intelligence = 100;
-    maxthrust = 0.38;
+    maxthrust = 0.44;
     nimbility = 4.0; // old 2.2
     manoeverability = 2.5;
     ttl = 200;
@@ -965,7 +965,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_AIR2)
   {
     intelligence = 50;
-    maxthrust = 0.4;
+    maxthrust = 0.45;
     nimbility = 5.0; // old 3.5
     manoeverability = 3.0;
     ttl = 220;
@@ -974,7 +974,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_AIR3)
   {
     intelligence = 0;
-    maxthrust = 0.42;
+    maxthrust = 0.45;
     nimbility = 6.5;
     manoeverability = 3.5;
     ttl = 250;
@@ -1013,7 +1013,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_FF1)
   {
     intelligence = 0;
-    maxthrust = 0.45;
+    maxthrust = 0.48;
     nimbility = 3.5;
     manoeverability = 2.0;
     ttl = 250;
@@ -1022,7 +1022,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_FF2)
   {
     intelligence = 0;
-    maxthrust = 0.47;
+    maxthrust = 0.5;
     nimbility = 4.2;
     manoeverability = 2.3;
     ttl = 250;

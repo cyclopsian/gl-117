@@ -15,8 +15,12 @@
 #include <GLUT/glut.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_thread.h"
+#ifdef HAVE_SDL_MIXER
 #include "SDL/SDL_mixer.h"
+#endif
+#ifdef HAVE_SDL_NET
 #include "SDL/SDL_net.h"
+#endif
 #endif
 // 2002/12/18 Minami <<<<<<
 #ifndef __APPLE__
@@ -37,7 +41,7 @@
 // 2002/12/18 Minami <<<<<<
 
 #define ZOOM 256
-#define VERSIONSTRING "GL-117 V. 0.8.1 (BETA) BY THOMAS A. DREXL"
+#define VERSIONSTRING "GL-117 V. 0.8.2 (BETA) BY THOMAS A. DREXL"
 
 // data types
 #ifdef USE_GLUT

@@ -3699,22 +3699,23 @@ void pause_display ()
 
 void credits_display ()
 {
-  float yt = 12;
-  glTranslatef (0, -3.5 + 0.015 * (float) creditstimer, 0);
+  float yt = 12, zf = -2.4;
+  glTranslatef (0, -3.5 + 0.014 * (float) creditstimer, 0);
   CColor col (255, 255, 255, 255);
   CColor col2 (255, 255, 0, 255);
-  font2->drawTextCentered (0, yt -= 2, -2, "GAME PROGRAMMING,", &col);
-  font2->drawTextCentered (0, yt -= 2, -2, "GRAPHICS, MODELS,", &col);
-  font2->drawTextCentered (0, yt -= 2, -2, "SOUND & MUSIC", &col);
-  font1->drawTextCentered (0, yt -= 2, -2, "THOMAS A. DREXL", &col2);
-  font2->drawTextCentered (0, yt -= 4, -2, "INTRO & MOON", &col);
-  font1->drawTextCentered (0, yt -= 2, -2, "NORBERT DREXL", &col2);
-  font2->drawTextCentered (0, yt -= 4, -2, "LENS FLARES & DEBUGGING", &col);
-  font1->drawTextCentered (0, yt -= 2, -2, "PIOTR PAWLOW", &col2);
-  font2->drawTextCentered (0, yt -= 4, -2, "DESIGN & INTERFACE", &col);
-  font1->drawTextCentered (0, yt -= 2, -2, "LOURENS VEEN", &col2);
-  font2->drawTextCentered (0, yt -= 4, -2, "TESTING & PUBLISHING", &col);
-  font1->drawTextCentered (0, yt -= 2, -2, "BERNHARD KAINDL", &col2);
+  font2->drawTextCentered (0, yt -= 2, zf, "GAME PROGRAMMING,", &col);
+  font2->drawTextCentered (0, yt -= 2, zf, "GRAPHICS, MODELS, SOUND & MUSIC", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "THOMAS A. DREXL", &col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "LENS FLARES & FURTHER DEBUGGING", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "PIOTR PAWLOW", &col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "MOUSE INTERFACE & LANDSCAPE IMPROVEMENTS", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "LOURENS VEEN", &col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "PUBLISHING & FURTHER GAME IDEAS", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "BERNHARD KAINDL", &col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "MOON TERRAIN", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "NORBERT DREXL", &col2);
+  font2->drawTextCentered (0, yt -= 4, zf, "PHYSICAL MODEL IMPROVEMENTS", &col);
+  font1->drawTextCentered (0, yt -= 2, zf, "ARNE REINERS", &col2);
 }
 
 void finish_display ()
@@ -3729,7 +3730,7 @@ void finish_display ()
   font1->drawTextCentered (0, 0, -3, "AT THE TECHNICAL UNIVERSITY OF MUNICH, GERMANY.", &col);
   font1->drawTextCentered (0, -2, -3, "IN FEBRUARY 2002 THE WORK WAS DONE AND I", &col);
   font1->drawTextCentered (0, -4, -3, "PRESENTED THE PROTOTYPE OF A FLIGHT SIM,", &col);
-  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUND, MUSIC,", &col);
+  font1->drawTextCentered (0, -6, -3, "YET WITHOUT TEXTURES, JOYSTICK, SOUNDS, MUSIC,", &col);
   font1->drawTextCentered (0, -8, -3, "NO CAMPAIGN!", &col);
   font1->drawTextCentered (0, -10, -3, "TWO MONTHS LATER THE FIRST RELEASE OF GL-117 WAS READY.", &col);
   font1->drawTextCentered (0, -12, -3, "FURTHER RELEASES FOLLOWED, FEEDBACK ARRIVED, AND", &col);
@@ -5097,7 +5098,7 @@ void mission_timer ()
 void credits_timer ()
 {
   creditstimer ++;
-  if (creditstimer > 450)
+  if (creditstimer > 550)
     creditstimer = 0;
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -5337,12 +5338,16 @@ void myFirstInit ()
 {
   int i;
 
+  display ("Creating calculation tables", LOG_ALL);
   mathtab_init ();
 
+  display ("Creating advanced OpenGL methods", LOG_ALL);
   gl = new GL (); //(1.0, 1000.0);
+  display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
   font2 = new Font (dirs->getTextures ("font2.tga"), 32, '!', 64);
 //  texfont1 = gl->genTextureTGA ("../textures/font2.tga", 0, 1, 0);
+  display ("Loading 3ds models", LOG_ALL);
   g_Load3ds.Import3DS (&model_fig, dirs->getModels ("fig7.3ds"));
   model_fig.setName ("FALCON");
   g_Load3ds.Import3DS (&model_figa, dirs->getModels ("fig4.3ds"));
@@ -5454,6 +5459,7 @@ void myFirstInit ()
   // fill polygons (GL_LINE for wireframe models)
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 
+  display ("Setting up world geometry", LOG_ALL);
   space = new Space ();
   space->drawlight = true;
   clip1 = space->z1;
@@ -5506,6 +5512,7 @@ void init_key (int key, int x, int y)
 //  game_quit ();
 //  gl->clearScreen ();
 //  glutSwapBuffers ();
+  gl->clearScreen ();
   myInit ();
   switch_menu ();
   fplayer->ai = true;
@@ -6228,12 +6235,14 @@ int main (int argc, char **argv)
   display ("Windows detected ", LOG_MOST);
 #endif
 
+  display ("Getting directory locations", LOG_ALL);
   dirs = new Dirs (argv [0]);
   
 //  dirs->getSaves ("filename");
 
   if (!load_config ())
   {
+    display ("Creating new configuration", LOG_ALL);
     config_test (argc, argv);
     firststart = true;
   }
@@ -6260,6 +6269,7 @@ int main (int argc, char **argv)
   server = NULL;
   client = NULL;
 
+  display ("Creating/Loading pilots list", LOG_ALL);
   pilots = new PilotList (dirs->getSaves ("pilots"));
 
 #ifdef USE_GLUT
@@ -6292,10 +6302,13 @@ int main (int argc, char **argv)
   }*/
 
 //  glutFullScreen ();
+  display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
 
+  display ("Creating sound system", LOG_ALL);
   sound = new SoundSystem ();
 
+  display ("Registering GLUT callbacks", LOG_ALL);
   glutReshapeFunc (myReshapeFunc);
   glutDisplayFunc (myDisplayFunc);
   glutKeyboardFunc (myKeyboardFunc);
@@ -6308,6 +6321,8 @@ int main (int argc, char **argv)
   gluPerspective (80.0, (float) width / height, nearclippingplane, 50.0); // should be sqrt(2) or 1.5
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
+
+  display ("Entering GLUT main loop", LOG_ALL);
   glutMainLoop();
 #else
   display ("Using SDL and GLUT", LOG_MOST);
@@ -6340,21 +6355,26 @@ int main (int argc, char **argv)
     }
   }
 
+  display ("Setting SDL caption", LOG_ALL);
   SDL_WM_SetCaption ("GL-117", "GL-117");
 
   SDL_ShowCursor (0);
 
+  display ("Creating sound system", LOG_ALL);
   sound = new SoundSystem ();
   sound->volumesound = volumesound;
   sound->volumemusic = volumemusic;
   sound->setVolume ();
   sound->setVolumeMusic ();
 
+  display ("Playing startup music", LOG_ALL);
   sound->playMusic ();
 
+  display ("Calling main initialization method", LOG_ALL);
   myFirstInit ();
   myReshapeFunc (width, height);
 
+  display ("Querying joystick", LOG_ALL);
   joystick = SDL_NumJoysticks ();
   if (joystick > 0)
   {
@@ -6378,6 +6398,7 @@ int main (int argc, char **argv)
 
 //  SDL_WM_GrabInput (SDL_GRAB_ON);
 
+  display ("Entering SDL main loop (GLUT emulation)", LOG_ALL);
   sdlMainLoop ();
 #endif
   return 0;
