@@ -155,7 +155,7 @@ class DynamicObj : public CSpaceObj
   void deactivate ();
   void dinit ();
   DynamicObj ();
-  DynamicObj (Space *space2, CModel *o2, float zoom2);
+  DynamicObj (Space *space2, Model3d *o2, float zoom2);
   void thrustUp ();
   void thrustDown ();
   float distance (DynamicObj *target);
@@ -226,7 +226,7 @@ class AIObj : public DynamicObj
   void newinit (int id, int party, int intelligence, int precision, int aggressivity); // init new AI object
   void newinit (int id, int party, int intelligence); // init new AI object (esp. non-fighter)
   AIObj ();
-  AIObj (Space *space2, CModel *o2, float zoom2);
+  AIObj (Space *space2, Model3d *o2, float zoom2);
   ~AIObj ();
   void initValues (DynamicObj *dobj, float phi); // init values to shoot cannon or missile
   void fireCannon (DynamicObj *laser, float phi);

@@ -87,7 +87,7 @@ class Mission
   int selweapon [3]; // weapon pack to choose
   int selweapons, wantweapon; // selected weapon pack
   int alliedpilot [10]; // id of allied pilots
-  CColor textcolor; // standard text color to blend in during flight
+  Color textcolor; // standard text color to blend in during flight
   int difficulty; // difficulty level for THIS mission
   int heading; // define northern direction (the sun is at 0 degree)
   int state; // different mission states (individual meaning)

@@ -42,33 +42,33 @@
      thus never make a destructor virtual as the virtptr is also somewhere in memory */
 
 /**
-* CColor stores color information for red, green, blue, alpha, each 0-255.
+* Color stores color information for red, green, blue, alpha, each 0-255.
 * Access is granted directly through array c with c[0]=red, c[1]=green, etc.
 */
-class CColor
+class Color
 {
   public:
 
     /// color information as vector, 32 bpp (floats would be faster for the vertex arrays)
     unsigned char c [4];
   
-    CColor ();
-    CColor (const CColor &color);
-    CColor (int red, int green, int blue, int alpha = 255);
+    Color ();
+    Color (const Color &color);
+    Color (int red, int green, int blue, int alpha = 255);
   
-    void set (const CColor &color);
+    void set (const Color &color);
     void set (int red, int green, int blue, int alpha = 255);
-    bool isEqual (const CColor &color) const; // compare colors
-    void take (const CColor &color);
+    bool isEqual (const Color &color) const; // compare colors
+    void take (const Color &color);
 };
 
 /**
-* CTexture loads and stores a texture to memory.
+* Texture loads and stores a texture to memory.
 * To use a texture, it must be loaded and added to the OpenGL texture list using
 *   gl->genTextureTGA ();
 * instead of this class!
 */
-class CTexture
+class Texture
 {
   public:
 
@@ -85,16 +85,16 @@ class CTexture
     float texblue;       ///< average of texture's blue
     bool alpha;          ///< alpha blending on/off
   
-    CTexture ();
-    CTexture (const std::string &filename, int alphaprogram = -1,
+    Texture ();
+    Texture (const std::string &filename, int alphaprogram = -1,
               bool mipmap = true, bool alpha = false); // TODO: alpha really necessary?
-    ~CTexture (); // necessary
+    ~Texture (); // necessary
   
     /// loadFromTGA is called via gl->genTextureTGA() to not load the same texture twice
     bool loadFromTGA (const std::string &filename, int alphaprogram = -1,
                       bool mipmap = true, bool alpha = false);
     /// get color of a special pixel
-    void getColor (CColor *c, int x, int y) const;
+    void getColor (Color *c, int x, int y) const;
     /// set to linear shading between texels (expensive esp. on old graphic cards)
     void shadeLinear () const;
     /// set to const shading between texels (fast)
@@ -102,10 +102,10 @@ class CTexture
 };
 
 /**
-* CVector3 stores the components of a 3D vector (x,y,z).
+* Vector3 stores the components of a 3D vector (x,y,z).
 * Access x,y,z directly.
 */
-class CVector3 
+class Vector3 
 {
   public:
   
@@ -113,78 +113,78 @@ class CVector3
     float y; ///< y coordinate
     float z; ///< z coordinate
   
-    CVector3 ();
-    CVector3 (float x, float y, float z);
-    CVector3 (const CVector3 &v);
+    Vector3 ();
+    Vector3 (float x, float y, float z);
+    Vector3 (const Vector3 &v);
   
-    void set (const CVector3 &v);
+    void set (const Vector3 &v);
     void set (float x, float y, float z);
     void neg ();
-    void add (const CVector3 &v);
-    void sub (const CVector3 &v);
+    void add (const Vector3 &v);
+    void sub (const Vector3 &v);
     void mul (float fac);
-    void crossproduct (const CVector3 &v);
-    float dotproduct (const CVector3 &v) const;
+    void crossproduct (const Vector3 &v);
+    float dotproduct (const Vector3 &v) const;
     float length () const;
     void norm ();
     /// exactly equal in memory? (e.g. after loading from file)
-    bool isEqual (const CVector3 &v) const;
+    bool isEqual (const Vector3 &v) const;
     /// numerically equal, use a tolerance like 1E-8
-    bool isEqual (const CVector3 &v, float tolerance) const;
+    bool isEqual (const Vector3 &v, float tolerance) const;
 };
 
 /**
-* CVector2 stores the components of a 2D vector (x,y).
+* Vector2 stores the components of a 2D vector (x,y).
 * Access x,y directly.
 */
-class CVector2 
+class Vector2 
 {
   public:
     
     float x; ///< x coordinate
     float y; ///< y coordinate
   
-    CVector2 ();
-    CVector2 (float x, float y);
-    CVector2 (const CVector2 &v);
+    Vector2 ();
+    Vector2 (float x, float y);
+    Vector2 (const Vector2 &v);
   
-    void set (const CVector2 &v);
+    void set (const Vector2 &v);
     void set (float x, float y);
     /// exactly equal in memory (no sense for comparisons)
-    bool isEqual (const CVector2 &v) const;
+    bool isEqual (const Vector2 &v) const;
     /// numerically equal, use a tolerance like 1E-8
-    bool isEqual (const CVector2 &v, float tolerance) const;
+    bool isEqual (const Vector2 &v, float tolerance) const;
 };
 
 /**
-* CVertex represents a vertex which may take information about
+* Vertex represents a vertex which may take information about
 * color, location, normal, texture, number of surrounding triangles.
 */
-class CVertex
+class Vertex
 {
   public:
 
     int triangles;   ///< number of triangles to which this vertex belongs to
-    CColor color;    ///< color, used when displayed without textures
-    CVector3 vector; ///< position
-    CVector3 normal; ///< normal vector, interpolation of all surrounding triangles
-    CVector2 tex;    ///< 2D texture coordinates
+    Color color;     ///< color, used when displayed without textures
+    Vector3 vector;  ///< position
+    Vector3 normal;  ///< normal vector, interpolation of all surrounding triangles
+    Vector2 tex;     ///< 2D texture coordinates
   
-    CVertex ();
-    CVertex (const CVertex &v);
+    Vertex ();
+    Vertex (const Vertex &v);
   
     /// copy data from v
-    void set (const CVertex &v);
+    void set (const Vertex &v);
     /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
-    void addNormal (const CVector3 &n); 
+    void addNormal (const Vector3 &n); 
     /// the color of a vertex can be calculated as average of all adjacent plane colors
-    void addColor (const CColor &c);
+    void addColor (const Color &c);
 };
 
 /**
-* CRotation stores one (x,y,z)-rotation.
+* Rotation stores one (x,y,z)-rotation.
 */
-class CRotation
+class Rotation
 {
   public:
   
@@ -192,16 +192,16 @@ class CRotation
     float b; ///< rotation angle for a plane of the coordinate system
     float c; ///< rotation angle for a plane of the coordinate system
   
-    CRotation ();
+    Rotation ();
   
-    void set (const CRotation &r);
+    void set (const Rotation &r);
     void set (float a, float b, float c);
-    void add (const CRotation &r);
+    void add (const Rotation &r);
     void add (float a, float b, float c);
 /*    void calculate (); // calculate the rotation matrix
-    float rotateX (const CVector3 &v) const;
-    float rotateY (const CVector3 &v) const;
-    float rotateZ (const CVector3 &v) const;*/
+    float rotateX (const Vector3 &v) const;
+    float rotateY (const Vector3 &v) const;
+    float rotateZ (const Vector3 &v) const;*/
 
   protected:
 
@@ -210,46 +210,46 @@ class CRotation
 };
 
 /**
-* CTriangle stores references to the vertices of the triangle/face.
+* Triangle stores references to the vertices of the triangle/face.
 */
-class CTriangle
+class Triangle
 {
   public:
     
-    CVertex *v [3]; ///< references to the three vertices
+    Vertex *v [3]; ///< references to the three vertices
   
-    CTriangle ();
+    Triangle ();
   
-    void calcNormal (CVector3 *n); ///< return normal n
-    void setVertices (CVertex *a, CVertex *b, CVertex *c); // not const as a,b,c may be altered
+    void calcNormal (Vector3 *n); ///< return normal n
+    void setVertices (Vertex *a, Vertex *b, Vertex *c); // not const as a,b,c may be altered
 };
 
 /**
-* CQuad stores references to the vertices of the quad/square/face.
+* Quad stores references to the vertices of the quad/square/face.
 */
-class CQuad
+class Quad
 {
   public:
 
-    CVertex *v [4]; ///< references to the four vertices
+    Vertex *v [4]; ///< references to the four vertices
   
-    CQuad ();
+    Quad ();
 
-    void calcNormal (CVector3 *n); ///< return normal n
-    void setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d); // not const as a,b,c,d may be altered
+    void calcNormal (Vector3 *n); ///< return normal n
+    void setVertices (Vertex *a, Vertex *b, Vertex *c, Vertex *d); // not const as a,b,c,d may be altered
 };
 
 /**
-* CMaterial stores the name, filename, color, and texture of a material.
+* Material stores the name, filename, color, and texture of a material.
 */
-class CMaterial
+class Material
 {
   public:
 
     std::string name;     ///< unique name
     std::string filename; ///< unique file name
-    CColor color;         ///< uniform color
-    CTexture *texture;    ///< reference to a texture (or NULL if there is no texture)
+    Color color;          ///< uniform color
+    Texture *texture;     ///< reference to a texture (or NULL if there is no texture)
     float utile;          ///< tiling coordinates
     float vtile;          ///< tiling coordinates
     float uoffset;        ///< texture offsets (the importer must calculate u/v due to offsets)
@@ -258,13 +258,13 @@ class CMaterial
     float vscale;         ///< texture scaling (the importer must calculate u/v due to scaling)
     float wrot;           ///< rotation in degree (the importer must calculate u/v due to wrot)
   
-    CMaterial ();
+    Material ();
 };
 
 /**
-* CObject stores the material, vertices, and faces (triangles, quads) of an object.
+* Object3d stores the material, vertices, and faces (triangles, quads) of an object.
 */
-class CObject
+class Object3d
 {
   public:
 
@@ -273,20 +273,20 @@ class CObject
     Uint16 numQuads;
     Uint16 numTexVertex;
     std::string name;    ///< unique object name
-    CMaterial *material; ///< an object has one unique material
+    Material *material;  ///< an object has one unique material
     bool hasTexture;     ///< an object can have one unique texture
-    CVertex *vertex;     ///< vertex list
-    CTriangle *triangle; ///< triangle list
-    CQuad *quad;         ///< quad list
+    Vertex *vertex;      ///< vertex list
+    Triangle *triangle;  ///< triangle list
+    Quad *quad;          ///< quad list
 
-    CObject ();
+    Object3d ();
 
-    int addVertex (const CVertex &w); ///< used to construct objects
-    void setColor (const CColor &col);
+    int addVertex (const Vertex &w); ///< used to construct objects
+    void setColor (const Color &col);
 };
 
 /**
-* CModel stores the materials and objects of a model.
+* Model3d stores the materials and objects of a model.
 * Its data structure is optimized esp. for 3DS files.
 * The drawing methods take the following parameters:
 *   tl+tl2=translation,
@@ -294,7 +294,7 @@ class CObject
 *   lum=luminance (default 1.0),
 *   explode=radial translation (default 0)
 */
-class CModel 
+class Model3d 
 {
   public:
 
@@ -303,37 +303,37 @@ class CModel
     Uint16 numObjects;   ///< number of objects (which have a unique material)
     Uint16 numMaterials; ///< number of materials (should be the same as the number of objects)
     bool displaylist;    ///< enable using a display list
-    CMaterial *material [100]; ///< materials, at most 100 (these are only pointers)
-    CObject *object [100];     ///< objects, at most 100 (these are only pointers)
+    Material *material [100];  ///< materials, at most 100 (these are only pointers)
+    Object3d *object [100];    ///< objects, at most 100 (these are only pointers)
     bool nolight;        ///< do not use light?
     bool alpha;          ///< use alpha blending?
     int numRefpoints;    ///< number of reference points for missiles
-    CVector3 *refpoint;  ///< multiple references to missile rack positions
+    Vector3 *refpoint;   ///< multiple references to missile rack positions
     float scale;         ///< overall scaling of original 3DS coords
-    CVector3 vscale;     ///< scaling of the original 3DS coords in x,y,z
+    Vector3 vscale;      ///< scaling of the original 3DS coords in x,y,z
     // Note: the model is stored to (-1,-1,-1)-(1,1,1) in RAM, the SpaceObj tells about the scaling of a model
-    CVector3 cube;       ///< surrounding cube (or radius of sphere) for simplified collision detection
+    Vector3 cube;        ///< surrounding cube (or radius of sphere) for simplified collision detection
     int list1, list2, list3;   ///< display lists already generated for each type of draw() method
 
-    CModel ();
-    ~CModel ();
+    Model3d ();
+    ~Model3d ();
   
     void setName (const std::string name);
-    void addMaterial (const CMaterial &material);
-    void addObject (const CObject &object);
-    void addRefPoint (const CVector3 &tl);
-    void setColor (const CColor &col);
-    void drawVertexNormals (const CObject &cm, float zoom);
+    void addMaterial (const Material &material);
+    void addObject (const Object3d &object);
+    void addRefPoint (const Vector3 &tl);
+    void setColor (const Color &col);
+    void drawVertexNormals (const Object3d &cm, float zoom);
     int rotateColor (int n);
     void scaleTexture (float fx, float fy);
     /// draw everything
-    void draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+    void draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 		       float zoom = 1.0F, float lum = 1.0F, int explode = 0);
     /// draw without GL lighting, no luminance => VERY FAST (uses display list)
-    void drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+    void drawNoLight (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 		              float zoom = 1.0F, int explode = 0);
     /// draw without textures, different luminance
-    void drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+    void drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 		                float zoom = 1.0F, float lum = 1.0F, int explode = 0);
 
   private:
@@ -344,9 +344,9 @@ class CModel
 };
 
 /**
-* CSphere represents an ellipsoid according to the CModel data structure.
+* Sphere represents an ellipsoid according to the Model3d data structure.
 */
-class CSphere : public CModel
+class Sphere : public Model3d
 {
   public:
 
@@ -354,15 +354,15 @@ class CSphere : public CModel
     float radius;
     float dx, dy, dz; ///< ellipsoid measures in the carthesian cosy
 
-    CSphere ();
-    CSphere (float radius, int segments, float dx, float dy, float dz);
-    ~CSphere ();
+    Sphere ();
+    Sphere (float radius, int segments, float dx, float dy, float dz);
+    ~Sphere ();
 
     void init (float radius, int segments, float dx = 1.0F, float dy = 1.0F, float dz = 1.0F, int randomized = 0);
     void invertNormals (); ///< point outside/inside
-    void setNorthPoleColor (const CColor &c, float w); ///< see setPoleColor, phi=0, theta=90
-    void setSouthPoleColor (const CColor &c, float w);
-    void setPoleColor (int phi, int theta, const CColor &c, float w); ///< shade color over any pole
+    void setNorthPoleColor (const Color &c, float w); ///< see setPoleColor, phi=0, theta=90
+    void setSouthPoleColor (const Color &c, float w);
+    void setPoleColor (int phi, int theta, const Color &c, float w); ///< shade color over any pole
 
   private:
 
@@ -372,21 +372,21 @@ class CSphere : public CModel
 /**
 * Part of an ellipsoid.
 */
-class CSpherePart : public CModel
+class SpherePart : public Model3d
 {
   public:
 
     int segments; ///< segments on lateral angle, doubled for longitudinal angle
     float radius;
 
-    CSpherePart ();
-    CSpherePart (float radius, int segments, float phi);
-    ~CSpherePart ();
+    SpherePart ();
+    SpherePart (float radius, int segments, float phi);
+    ~SpherePart ();
 
     void init (float radius, int segments, float phi = 10.0F);
-    void setNorthPoleColor (const CColor &c, float w); ///< see setPoleColor, phi=0, theta=90
-    void setSouthPoleColor (const CColor &c, float w);
-    void setPoleColor (int phi, int theta, const CColor &c, float w); ///< shade color over any pole
+    void setNorthPoleColor (const Color &c, float w); ///< see setPoleColor, phi=0, theta=90
+    void setSouthPoleColor (const Color &c, float w);
+    void setPoleColor (int phi, int theta, const Color &c, float w); ///< shade color over any pole
 };
 
 // More models could be added here, esp. for importing complex non-polygonal formats (obj, wrl)

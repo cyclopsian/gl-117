@@ -36,27 +36,27 @@
 
 
 
-CColor::CColor ()
+Color::Color ()
 {
   memset (c, 0xFF, 4 * sizeof (unsigned char));
 }
 
-CColor::CColor (const CColor &color)
+Color::Color (const Color &color)
 {
   set (color);
 }
 
-CColor::CColor (int red, int green, int blue, int alpha)
+Color::Color (int red, int green, int blue, int alpha)
 {
   set (red, green, blue, alpha);
 }
 
-void CColor::set (const CColor &color)
+void Color::set (const Color &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
 
-void CColor::set (int red, int green, int blue, int alpha)
+void Color::set (int red, int green, int blue, int alpha)
 {
   c [0] = (unsigned char) red;
   c [1] = (unsigned char) green;
@@ -64,12 +64,12 @@ void CColor::set (int red, int green, int blue, int alpha)
   c [3] = (unsigned char) alpha;
 }
 
-bool CColor::isEqual (const CColor &color) const
+bool Color::isEqual (const Color &color) const
 {
   return memcmp (c, color.c, 4 * sizeof (unsigned char)) == 0;
 }
 
-void CColor::take (const CColor &color)
+void Color::take (const Color &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
 }
@@ -77,14 +77,14 @@ void CColor::take (const CColor &color)
 /* Do NOT use overloaded operators, as we will lose the feeling
    which operators are slow and which are fast.
    E.g. a = b; c = d; but first is a pointer copy, second copies a huge data structure! */
-/*void CColor::operator = (const CColor &color)
+/*void Color::operator = (const Color &color)
 {
   memcpy (c, color.c, 4 * sizeof (unsigned char));
 }*/
 
 
 
-CTexture::CTexture ()
+Texture::Texture ()
 {
   data = NULL;
   name = "";
@@ -99,7 +99,7 @@ CTexture::CTexture ()
   alpha = false;
 }
 
-CTexture::CTexture (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
+Texture::Texture (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
 {
   texlight = 1.0F;
   texred = 1.0F;
@@ -109,13 +109,13 @@ CTexture::CTexture (const std::string &filename, int alphaprogram, bool mipmap, 
   loadFromTGA (filename, alphaprogram, mipmap, alpha);
 }
 
-CTexture::~CTexture ()
+Texture::~Texture ()
 {
   if (data != NULL)
     delete data;
 }
 
-bool CTexture::loadFromTGA (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
+bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool mipmap, bool alpha)
 {
   int i, i2;
 
@@ -229,7 +229,7 @@ bool CTexture::loadFromTGA (const std::string &filename, int alphaprogram, bool 
   return true;
 }
 
-void CTexture::getColor (CColor *color, int x, int y) const
+void Texture::getColor (Color *color, int x, int y) const
 {
   if (x < 0) x = (int) -x % width;
   if (y < 0) y = (int) -y % height;
@@ -245,68 +245,68 @@ void CTexture::getColor (CColor *color, int x, int y) const
   color->c [3] = data [offset + 3];
 }
 
-void CTexture::shadeLinear () const
+void Texture::shadeLinear () const
 {
   gl->enableLinearTexture (textureID, mipmap);
 }
 
-void CTexture::shadeConst () const
+void Texture::shadeConst () const
 {
   gl->disableLinearTexture (textureID, mipmap);
 }
 
 
 
-CVector3::CVector3 ()
+Vector3::Vector3 ()
 {
   set (0, 0, 0);
 }
 
-CVector3::CVector3 (float x, float y, float z)
+Vector3::Vector3 (float x, float y, float z)
 {
   set (x, y, z);
 }
 
-CVector3::CVector3 (const CVector3 &v)
+Vector3::Vector3 (const Vector3 &v)
 {
   set (v);
 }
 
-void CVector3::set (const CVector3 &v)
+void Vector3::set (const Vector3 &v)
 {
   x = v.x;
   y = v.y;
   z = v.z;
 }
 
-void CVector3::set (float x, float y, float z)
+void Vector3::set (float x, float y, float z)
 {
   this->x = x;
   this->y = y;
   this->z = z;
 }
 
-void CVector3::neg ()
+void Vector3::neg ()
 {
   x = -x; y = -y; z = -z;
 }
 
-void CVector3::add (const CVector3 &v)
+void Vector3::add (const Vector3 &v)
 {
   x += v.x; y += v.y; z += v.z;
 }
 
-void CVector3::sub (const CVector3 &v)
+void Vector3::sub (const Vector3 &v)
 {
   x -= v.x; y -= v.y; z -= v.z;
 }
 
-void CVector3::mul (float fac)
+void Vector3::mul (float fac)
 {
   x *= fac; y *= fac; z *= fac;
 }
 
-void CVector3::crossproduct (const CVector3 &v)
+void Vector3::crossproduct (const Vector3 &v)
 {
   float nx = y * v.z - z * v.y;
   float ny = z * v.x - x * v.z;
@@ -316,17 +316,17 @@ void CVector3::crossproduct (const CVector3 &v)
   z = nz;
 }
 
-float CVector3::dotproduct (const CVector3 &v) const
+float Vector3::dotproduct (const Vector3 &v) const
 {
   return x * v.x + y * v.y + z * v.z;
 }
 
-float CVector3::length () const
+float Vector3::length () const
 {
   return (float) sqrt (x * x + y * y + z * z);
 }
 
-void CVector3::norm ()
+void Vector3::norm ()
 {
   float d = sqrt (x * x + y * y + z * z);
   if (d == 0)
@@ -336,12 +336,12 @@ void CVector3::norm ()
   z /= d;
 }
 
-bool CVector3::isEqual (const CVector3 &v) const
+bool Vector3::isEqual (const Vector3 &v) const
 {
   return x == v.x && y == v.y && z == v.z;
 }
 
-bool CVector3::isEqual (const CVector3 &v, float tolerance) const
+bool Vector3::isEqual (const Vector3 &v, float tolerance) const
 {
   return x >= v.x - tolerance && x <= v.x + tolerance &&
          y >= v.y - tolerance && y <= v.y + tolerance &&
@@ -350,39 +350,39 @@ bool CVector3::isEqual (const CVector3 &v, float tolerance) const
 
 
 
-CVector2::CVector2 ()
+Vector2::Vector2 ()
 {
   set (0, 0);
 }
 
-CVector2::CVector2 (float x, float y)
+Vector2::Vector2 (float x, float y)
 {
   set (x, y);
 }
 
-CVector2::CVector2 (const CVector2 &v)
+Vector2::Vector2 (const Vector2 &v)
 {
   set (v);
 }
 
-void CVector2::set (const CVector2 &v)
+void Vector2::set (const Vector2 &v)
 {
   x = v.x;
   y = v.y;
 }
 
-void CVector2::set (float x, float y)
+void Vector2::set (float x, float y)
 {
   this->x = x;
   this->y = y;
 }
 
-bool CVector2::isEqual (const CVector2 &v) const
+bool Vector2::isEqual (const Vector2 &v) const
 {
   return x == v.x && y == v.y;
 }
 
-bool CVector2::isEqual (const CVector2 &v, float tolerance) const
+bool Vector2::isEqual (const Vector2 &v, float tolerance) const
 {
   return x >= v.x - tolerance && x <= v.x + tolerance &&
          y >= v.y - tolerance && y <= v.y + tolerance;
@@ -390,17 +390,17 @@ bool CVector2::isEqual (const CVector2 &v, float tolerance) const
 
 
 
-CVertex::CVertex ()
+Vertex::Vertex ()
 {
   triangles = 0;
 }
 
-CVertex::CVertex (const CVertex &v)
+Vertex::Vertex (const Vertex &v)
 {
   set (v);
 }
 
-void CVertex::set (const CVertex &v)
+void Vertex::set (const Vertex &v)
 {
   vector.set (v.vector);
   normal.set (v.normal);
@@ -408,7 +408,7 @@ void CVertex::set (const CVertex &v)
   triangles = v.triangles;
 }
 
-void CVertex::addNormal (const CVector3 &n)
+void Vertex::addNormal (const Vector3 &n)
 {
   triangles ++;
   normal.x = (normal.x * (triangles - 1) + n.x) / (float) triangles;
@@ -416,7 +416,7 @@ void CVertex::addNormal (const CVector3 &n)
   normal.z = (normal.z * (triangles - 1) + n.z) / (float) triangles;
 }
 
-void CVertex::addColor (const CColor &color)
+void Vertex::addColor (const Color &color)
 {
   triangles ++;
   for (int i = 0; i < 4; i ++)
@@ -431,7 +431,7 @@ void CVertex::addColor (const CColor &color)
 //double pitab;
 //float sintab [360], costab [360];
 
-CRotation::CRotation ()
+Rotation::Rotation ()
 {
   a = 0;
   b = 0;
@@ -439,35 +439,35 @@ CRotation::CRotation ()
 //  calculate ();
 }
 
-void CRotation::set (const CRotation &r)
+void Rotation::set (const Rotation &r)
 {
   a = r.a;
   b = r.b;
   c = r.c;
 }
 
-void CRotation::set (float a, float b, float c)
+void Rotation::set (float a, float b, float c)
 {
   this->a = a;
   this->b = b;
   this->c = c;
 }
 
-void CRotation::add (const CRotation &r)
+void Rotation::add (const Rotation &r)
 {
   a += r.a;
   b += r.b;
   c += r.c;
 }
 
-void CRotation::add (float a, float b, float c)
+void Rotation::add (float a, float b, float c)
 {
   this->a += a;
   this->b += b;
   this->c += c;
 }
 
-/*void CRotation::calculate ()
+/*void Rotation::calculate ()
 {
   rot [0] [0] = COS(c) * COS(b);
   rot [0] [1] = SIN(a) * SIN(b) * COS(c) - SIN(c) * COS(a);
@@ -480,33 +480,33 @@ void CRotation::add (float a, float b, float c)
   rot [2] [2] = COS(a) * COS(b);
 }
 
-float CRotation::rotateX (const CVector3 &v) const
+float Rotation::rotateX (const Vector3 &v) const
 {
   return v.x * rot [0] [0] + v.y * rot [0] [1] + v.z * rot [0] [2];
 }
 
-float CRotation::rotateY (const CVector3 &v) const
+float Rotation::rotateY (const Vector3 &v) const
 {
   return v.x * rot [1] [0] + v.y * rot [1] [1] + v.z * rot [1] [2];
 }
 
-float CRotation::rotateZ (const CVector3 &v) const
+float Rotation::rotateZ (const Vector3 &v) const
 {
   return v.x * rot [2] [0] + v.y * rot [2] [1] + v.z * rot [2] [2];
 }*/
 
 
 
-CTriangle::CTriangle ()
+Triangle::Triangle ()
 {
   v [0] = NULL;
   v [1] = NULL;
   v [2] = NULL;
 }
 
-void CTriangle::calcNormal (CVector3 *n)
+void Triangle::calcNormal (Vector3 *n)
 {
-  CVector3 dummy;
+  Vector3 dummy;
   n->set (v [1]->vector);
   n->sub (v [0]->vector);
   dummy.set (v [2]->vector);
@@ -514,10 +514,10 @@ void CTriangle::calcNormal (CVector3 *n)
   n->crossproduct (dummy);
 }
 
-void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
+void Triangle::setVertices (Vertex *a, Vertex *b, Vertex *c)
 {
   int i;
-  CVector3 dummy;
+  Vector3 dummy;
   v [0] = a;
   v [1] = b;
   v [2] = c;
@@ -533,7 +533,7 @@ void CTriangle::setVertices (CVertex *a, CVertex *b, CVertex *c)
 
 
 
-CQuad::CQuad ()
+Quad::Quad ()
 {
   v [0] = NULL;
   v [1] = NULL;
@@ -541,9 +541,9 @@ CQuad::CQuad ()
   v [3] = NULL;
 }
 
-void CQuad::calcNormal (CVector3 *n)
+void Quad::calcNormal (Vector3 *n)
 {
-  CVector3 dummy;
+  Vector3 dummy;
   n->set (v [1]->vector);
   n->sub (v [0]->vector);
   dummy.set (v [3]->vector);
@@ -551,10 +551,10 @@ void CQuad::calcNormal (CVector3 *n)
   n->crossproduct (dummy);
 }
 
-void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
+void Quad::setVertices (Vertex *a, Vertex *b, Vertex *c, Vertex *d)
 {
   int i;
-  CVector3 dummy;
+  Vector3 dummy;
   v [0] = a;
   v [1] = b;
   v [2] = c;
@@ -571,7 +571,7 @@ void CQuad::setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d)
 
 
 
-CMaterial::CMaterial ()
+Material::Material ()
 {
   uscale = 1;
   vscale = 1;
@@ -584,7 +584,7 @@ CMaterial::CMaterial ()
 
 
 
-CObject::CObject ()
+Object3d::Object3d ()
 {
   numVertices = 0;
   numTriangles = 0;
@@ -594,7 +594,7 @@ CObject::CObject ()
   hasTexture = false;
 }
 
-int CObject::addVertex (const CVertex &w)
+int Object3d::addVertex (const Vertex &w)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
@@ -604,7 +604,7 @@ int CObject::addVertex (const CVertex &w)
   return i;
 }
 
-void CObject::setColor (const CColor &col)
+void Object3d::setColor (const Color &col)
 {
   int i;
   for (i = 0; i < numVertices; i ++)
@@ -613,7 +613,7 @@ void CObject::setColor (const CColor &col)
 
 
 
-CModel::CModel ()
+Model3d::Model3d ()
 {
   numObjects = 0;
   numMaterials = 0;
@@ -635,34 +635,34 @@ CModel::CModel ()
   va = new VertexArray (VERTEXARRAY_V3N3C4T2);
 }
 
-void CModel::setName (const std::string name)
+void Model3d::setName (const std::string name)
 {
   this->name = name;
 }
 
-void CModel::addMaterial (const CMaterial &material)
+void Model3d::addMaterial (const Material &material)
 {
-  this->material [numMaterials] = new CMaterial;
+  this->material [numMaterials] = new Material;
   if (this->material [numMaterials] == NULL) exit (100);
-  memcpy (this->material [numMaterials], &material, sizeof (CMaterial));
+  memcpy (this->material [numMaterials], &material, sizeof (Material));
   numMaterials ++;
 }
 
-void CModel::addObject (const CObject &object)
+void Model3d::addObject (const Object3d &object)
 {
-  this->object [numObjects] = new CObject;
+  this->object [numObjects] = new Object3d;
   if (this->object [numObjects] == NULL) exit (101);
-  memcpy (this->object [numObjects], &object, sizeof (CObject));
+  memcpy (this->object [numObjects], &object, sizeof (Object3d));
   numObjects ++;
   rotcol = 0;
 }
 
-void CModel::addRefPoint (const CVector3 &tl)
+void Model3d::addRefPoint (const Vector3 &tl)
 {
   int i, i2;
   if (refpoint == NULL)
   {
-    refpoint = new CVector3 [10];
+    refpoint = new Vector3 [10];
   }
   for (i = 0; i < numRefpoints; i ++)
   {
@@ -681,7 +681,7 @@ fertigref1:;
   numRefpoints ++;
 }
 
-CModel::~CModel ()
+Model3d::~Model3d ()
 {
   int i;
   for (i = 0; i < numMaterials; i ++)
@@ -694,7 +694,7 @@ CModel::~CModel ()
   }
 }
 
-void CModel::setColor (const CColor &col)
+void Model3d::setColor (const Color &col)
 {
   int i;
   for (i = 0; i < numObjects; i++)
@@ -703,7 +703,7 @@ void CModel::setColor (const CColor &col)
   }
 }
 
-void CModel::drawVertexNormals (const CObject &cm, float zoom)
+void Model3d::drawVertexNormals (const Object3d &cm, float zoom)
 {
   glColor3ub (255, 0, 0);
   glBegin (GL_LINES);
@@ -716,7 +716,7 @@ void CModel::drawVertexNormals (const CObject &cm, float zoom)
   glEnd ();
 }
 
-int CModel::rotateColor (int n)
+int Model3d::rotateColor (int n)
 {
   if (n == 0) return 0;
   rotcol ++;
@@ -724,12 +724,12 @@ int CModel::rotateColor (int n)
   return rotcol;
 }
 
-void CModel::scaleTexture (float fx, float fy)
+void Model3d::scaleTexture (float fx, float fy)
 {
   int i;
   for (i = 0; i < numObjects; i ++)
   {
-    CObject *o = object [i];
+    Object3d *o = object [i];
     int i2;
     for (i2 = 0; i2 < o->numVertices; i2 ++)
     {
@@ -739,7 +739,7 @@ void CModel::scaleTexture (float fx, float fy)
   }
 }
 
-void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+void Model3d::draw (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
                    float zoom, float lum, int explode)
 {
   if (nolight) // if model wants to be rendered without light, call draw2
@@ -751,7 +751,7 @@ void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot
   }
 
   int i, j;
-  CObject *cm;
+  Object3d *cm;
   float la [4] = { 0.2, 0.2, 0.2, 1.0};
   if (lum >= 1)
   {
@@ -862,12 +862,12 @@ void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot
         glEnable (GL_LIGHTING);
     }
 
-    CVector3 shift;
+    Vector3 shift;
 
     va->glBegin (GL_TRIANGLES);
     for (j = 0; j < cm->numTriangles; j++)
     {
-      CVertex *v = cm->triangle [j].v [0];
+      Vertex *v = cm->triangle [j].v [0];
       if (explode > 0)
       {
         shift.x = v->normal.x * explodefac;
@@ -911,7 +911,7 @@ void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot
     va->glBegin (GL_QUADS);
     for (j = 0; j < cm->numQuads; j++)
     {
-      CVertex *v = cm->quad [j].v [0];
+      Vertex *v = cm->quad [j].v [0];
       if (explode > 0)
       {
         shift.x = v->normal.x * explodefac;
@@ -950,11 +950,11 @@ void CModel::draw (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot
   glPopMatrix ();
 }
 
-void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+void Model3d::drawNoLight (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
                           float zoom, int explode)
 {
   int i, j;
-  CObject *cm;
+  Object3d *cm;
 
   for (i = 0; i < numObjects; i ++)
   {
@@ -1044,12 +1044,12 @@ void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotati
         glColor4ub (255, 255, 255, 255);
       }
 
-      CVector3 shift;
+      Vector3 shift;
 
       va->glBegin (GL_TRIANGLES);
       for (j = 0; j < cm->numTriangles; j++)
       {
-        CVertex *v = cm->triangle [j].v [0];
+        Vertex *v = cm->triangle [j].v [0];
         if (explode > 0)
         {
           shift.x = v->normal.x * explodefac;
@@ -1081,7 +1081,7 @@ void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotati
       va->glBegin (GL_QUADS);
       for (j = 0; j < cm->numQuads; j++)
       {
-        CVertex *v = cm->quad [j].v [0];
+        Vertex *v = cm->quad [j].v [0];
         if (explode > 0)
         {
           shift.x = v->normal.x * explodefac;
@@ -1121,11 +1121,11 @@ void CModel::drawNoLight (const CVector3 &tl, const CVector3 &tl2, const CRotati
   glPopMatrix ();
 }
 
-void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+void Model3d::drawNoTexture (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
                             float zoom, float lum, int explode)
 {
   int i, j;
-  CObject *cm;
+  Object3d *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   zoom *= scale;
   glPushMatrix ();
@@ -1179,12 +1179,12 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
     glDisable (GL_TEXTURE_2D);
     glColor3ub (255, 255, 255);
 
-    CVector3 shift;
+    Vector3 shift;
 
     va->glBegin (GL_TRIANGLES);
     for (j = 0; j < cm->numTriangles; j++)
     {
-      CVertex *v = cm->triangle [j].v [0];
+      Vertex *v = cm->triangle [j].v [0];
       if (explode > 0)
       {
         shift.x = v->normal.x * explodefac;
@@ -1211,7 +1211,7 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
     va->glBegin (GL_QUADS);
     for (j = 0; j < cm->numQuads; j++)
     {
-      CVertex *v = cm->quad [j].v [0];
+      Vertex *v = cm->quad [j].v [0];
       if (explode > 0)
       {
         shift.x = v->normal.x * explodefac;
@@ -1243,11 +1243,11 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
   glPopMatrix ();
 }
 
-/*void CModel::draw3 (const CVector3 &tl, const CVector3 &tl2, const CRotation &rot,
+/*void Model3d::draw3 (const Vector3 &tl, const Vector3 &tl2, const Rotation &rot,
 					float zoom, int explode)
 {
   int i, j;
-  CObject *cm;
+  Object3d *cm;
 //  float mx=0, my=0, mz=0, ix=0, iy=0, iz=0;
   zoom *= scale;
   glPushMatrix ();
@@ -1315,12 +1315,12 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
       glDisable (GL_TEXTURE_2D);
       glColor3ub (255, 255, 255);
 
-      CVector3 shift;
+      Vector3 shift;
 
       va->glBegin (GL_TRIANGLES);
       for (j = 0; j < cm->numTriangles; j++)
       {
-        CVertex *v = cm->triangle [j].v [0];
+        Vertex *v = cm->triangle [j].v [0];
         if (explode > 0)
         {
           shift.x = v->normal.x * explodefac;
@@ -1352,7 +1352,7 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
       va->glBegin (GL_QUADS);
       for (j = 0; j < cm->numQuads; j++)
       {
-        CVertex *v = cm->quad [j].v [0];
+        Vertex *v = cm->quad [j].v [0];
         if (explode > 0)
         {
           shift.x = v->normal.x * explodefac;
@@ -1394,29 +1394,29 @@ void CModel::drawNoTexture (const CVector3 &tl, const CVector3 &tl2, const CRota
 
 
 
-CSphere::CSphere () {}
+Sphere::Sphere () {}
 
-CSphere::CSphere (float radius, int segments, float dx, float dy, float dz)
+Sphere::Sphere (float radius, int segments, float dx, float dy, float dz)
 {
   init (radius, segments, dx, dy, dz, 0);
 }
 
-CSphere::~CSphere () {}
+Sphere::~Sphere () {}
 
-int CSphere::random (int n)
+int Sphere::random (int n)
 {
   if (n == 0) return 0;
   return rand () % n;
 }
 
-void CSphere::init (float radius, int segments, float dx, float dy, float dz, int randomized)
+void Sphere::init (float radius, int segments, float dx, float dy, float dz, int randomized)
 {
-  CObject co;
-  co.vertex = new CVertex [segments * segments * 2 + 2];
+  Object3d co;
+  co.vertex = new Vertex [segments * segments * 2 + 2];
   if (co.vertex == NULL) exit (100);
-  co.triangle = new CTriangle [segments * 4];
+  co.triangle = new Triangle [segments * 4];
   if (co.triangle == NULL) exit (100);
-  co.quad = new CQuad [segments * segments * 2];
+  co.quad = new Quad [segments * segments * 2];
   if (co.quad == NULL) exit (100);
 
   this->radius = radius;
@@ -1427,7 +1427,7 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
   
   int p [4];
   float step = 180.0 / segments;
-  CVertex w;
+  Vertex w;
 
   for (float i = 0; i < 180; i += step)
     for (float i2 = 0; i2 < 360; i2 += step)
@@ -1468,14 +1468,14 @@ void CSphere::init (float radius, int segments, float dx, float dy, float dz, in
     }
 
   addObject (co);
-  setColor (CColor (128, 128, 128, 255));
+  setColor (Color (128, 128, 128, 255));
   for (int i2 = 0; i2 < object [0]->numVertices / 2; i2 ++)
   {
     object [0]->vertex [i2].normal.neg ();
   }
 }
 
-void CSphere::invertNormals ()
+void Sphere::invertNormals ()
 {
   for (int i = 0; i < object [0]->numVertices; i ++)
   {
@@ -1483,7 +1483,7 @@ void CSphere::invertNormals ()
   }
 }
 
-void CSphere::setNorthPoleColor (const CColor &c, float w)
+void Sphere::setNorthPoleColor (const Color &c, float w)
 {
   int i, i2;
   for (i = 0; i < 4; i ++)
@@ -1499,7 +1499,7 @@ void CSphere::setNorthPoleColor (const CColor &c, float w)
   }
 }
 
-void CSphere::setSouthPoleColor (const CColor &c, float w)
+void Sphere::setSouthPoleColor (const Color &c, float w)
 {
   int i, i2;
   int max = (segments - 1) * segments * 2 + 1;
@@ -1516,7 +1516,7 @@ void CSphere::setSouthPoleColor (const CColor &c, float w)
   }
 }
 
-void CSphere::setPoleColor (int phi, int theta, const CColor &c, float w)
+void Sphere::setPoleColor (int phi, int theta, const Color &c, float w)
 {
   int i, i2;
   for (i = 0; i < object [0]->numVertices; i ++)
@@ -1542,28 +1542,28 @@ void CSphere::setPoleColor (int phi, int theta, const CColor &c, float w)
 
 
 
-CSpherePart::CSpherePart () {}
+SpherePart::SpherePart () {}
 
-CSpherePart::CSpherePart (float radius, int segments, float phi)
+SpherePart::SpherePart (float radius, int segments, float phi)
 {
   init (radius, segments, phi);
 }
 
-CSpherePart::~CSpherePart () {}
+SpherePart::~SpherePart () {}
 
-void CSpherePart::init (float radius, int segments, float phi)
+void SpherePart::init (float radius, int segments, float phi)
 {
-  CObject co;
-  co.vertex = new CVertex [segments * 4 + 1];
-  co.triangle = new CTriangle [segments];
-  co.quad = new CQuad [segments * 3];
+  Object3d co;
+  co.vertex = new Vertex [segments * 4 + 1];
+  co.triangle = new Triangle [segments];
+  co.quad = new Quad [segments * 3];
   this->radius = radius;
   this->segments = segments;
   float dx = 1, dy = 1, dz = 1;
   int p [4];
   float step = 360.0 / segments;
   float step2 = phi / 4;
-  CVertex w;
+  Vertex w;
 
   for (float i = 0; i < phi; i += step2)
     for (float i2 = 0; i2 < 360; i2 += step)
@@ -1600,10 +1600,10 @@ void CSpherePart::init (float radius, int segments, float phi)
     }
   
   addObject (co);
-  setColor (CColor (128, 128, 128, 255));
+  setColor (Color (128, 128, 128, 255));
 }
 
-void CSpherePart::setNorthPoleColor (const CColor &c, float w)
+void SpherePart::setNorthPoleColor (const Color &c, float w)
 {
   int i, i2;
   for (i = 0; i < 4; i ++)
@@ -1619,11 +1619,11 @@ void CSpherePart::setNorthPoleColor (const CColor &c, float w)
   }
 }
 
-void CSpherePart::setSouthPoleColor (const CColor &c, float w)
+void SpherePart::setSouthPoleColor (const Color &c, float w)
 {
 }
 
-void CSpherePart::setPoleColor (int phi, int theta, const CColor &c, float w)
+void SpherePart::setPoleColor (int phi, int theta, const Color &c, float w)
 {
 }
 

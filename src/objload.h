@@ -54,14 +54,14 @@ class CLoadOBJ
 {
   public:
   CLoadOBJ ();
-  bool ImportOBJ (CModel *model, char *filename);
+  bool ImportOBJ (Model3d *model, char *filename);
   
   private:
   CFile *file;
-  void ComputeNormals (CModel *model);
-  void ComputeColors (CModel *model);
-  void Normalize (CModel *model);
-  void LoadObject (CModel *model);
+  void ComputeNormals (Model3d *model);
+  void ComputeColors (Model3d *model);
+  void Normalize (Model3d *model);
+  void LoadObject (Model3d *model);
 };
 
 #endif

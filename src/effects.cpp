@@ -31,7 +31,7 @@
 #include "gl.h"
 #include "common.h"
 
-CTexture *texsmoke, *texsmoke2, *texsmoke3;
+Texture *texsmoke, *texsmoke2, *texsmoke3;
 
 CSmoke::CSmoke (int type)
 {
@@ -126,7 +126,7 @@ void CSmoke::drawElemHQ (int n)
 void CSmoke::draw ()
 {
   int i;
-  CTexture *smoketype;
+  Texture *smoketype;
   if (type == 0) smoketype = texsmoke;
   else if (type == 1) smoketype = texsmoke2;
   if (antialiasing)
@@ -236,7 +236,7 @@ void Flash::drawHQ ()
 
 
 
-CExplosion::CExplosion (Space *space, CModel *sphere)
+CExplosion::CExplosion (Space *space, Model3d *sphere)
 {
   this->space = space;
   o = sphere;
@@ -321,7 +321,7 @@ void CBlackSmoke::move (Uint32 dt)
   }
 }
 
-void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
+void CBlackSmoke::drawGL (Vector3 *z1, Vector3 *z2, Vector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
   if (ttl <= 0 || !specialeffects) return;
   if (draw == 2 || gl->isSphereInFrustum (tl->x + this->tl->x, tl->y + this->tl->y, tl->z + this->tl->z, this->zoom))
@@ -458,11 +458,11 @@ void Font::extractLetters (int height, char start, int num)
 
 Font::Font (char *filename, int height, char start, int num)
 {
-  texture = new CTexture (std::string (filename), 0, false, true);
+  texture = new Texture (std::string (filename), 0, false, true);
   extractLetters (height, start, num);
   zoom = 0.1F;
-  stdcol = new CColor (255, 255, 255, 220);
-  highlightcol = new CColor (255, 255, 0, 255);
+  stdcol = new Color (255, 255, 255, 220);
+  highlightcol = new Color (255, 255, 0, 255);
 }
 
 Font::~Font ()
@@ -471,7 +471,7 @@ Font::~Font ()
   delete highlightcol;
 }
 
-void Font::drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol)
+void Font::drawText (float x, float y, float z, char *str, Color *c, bool centered, int highlight, Color *highlightcol)
 {
   int len = strlen (str);
   glDisable (GL_LIGHTING);
@@ -557,17 +557,17 @@ void Font::drawText (float x, float y, float z, char *str, CColor *c, bool cente
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol)
+void Font::drawText (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol)
 {
   drawText (x, y, z, str, c, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, CColor *c, int highlight)
+void Font::drawText (float x, float y, float z, char *str, Color *c, int highlight)
 {
   drawText (x, y, z, str, c, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, int highlight, CColor *highlightcol)
+void Font::drawText (float x, float y, float z, char *str, int highlight, Color *highlightcol)
 {
   drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
 }
@@ -577,7 +577,7 @@ void Font::drawText (float x, float y, float z, char *str, int highlight)
   drawText (x, y, z, str, stdcol, false, highlight, highlightcol);
 }
 
-void Font::drawText (float x, float y, float z, char *str, CColor *c)
+void Font::drawText (float x, float y, float z, char *str, Color *c)
 {
   drawText (x, y, z, str, c, false, -1, highlightcol);
 }
@@ -587,22 +587,22 @@ void Font::drawText (float x, float y, float z, char *str)
   drawText (x, y, z, str, stdcol, false, -1, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol)
+void Font::drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol)
 {
   drawText (x, y, z, str, c, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight)
+void Font::drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight)
 {
   drawText (x, y, z, str, c, true, highlight, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, CColor *c)
+void Font::drawTextCentered (float x, float y, float z, char *str, Color *c)
 {
   drawText (x, y, z, str, c, true, -1, highlightcol);
 }
 
-void Font::drawTextCentered (float x, float y, float z, char *str, int highlight, CColor *highlightcol)
+void Font::drawTextCentered (float x, float y, float z, char *str, int highlight, Color *highlightcol)
 {
   drawText (x, y, z, str, stdcol, true, highlight, highlightcol);
 }
@@ -617,7 +617,7 @@ void Font::drawTextCentered (float x, float y, float z, char *str)
   drawText (x, y, z, str, stdcol, true, -1, highlightcol);
 }
 
-void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color, int timer)
+void Font::drawTextRotated (float x, float y, float z, char *str, Color *color, int timer)
 {
   int len = strlen (str);
   glDisable (GL_LIGHTING);
@@ -672,7 +672,7 @@ void Font::drawTextRotated (float x, float y, float z, char *str, CColor *color,
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight, CColor *highlightcol)
+void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight, Color *highlightcol)
 {
   int i;
   int len = strlen (str);
@@ -759,17 +759,17 @@ void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, 
   glDisable (GL_TEXTURE_2D);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight)
+void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight)
 {
   drawTextScaled (x, y, z, str, color, timer, highlight, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer)
+void Font::drawTextScaled (float x, float y, float z, char *str, Color *color, int timer)
 {
   drawTextScaled (x, y, z, str, color, timer, -1, highlightcol);
 }
 
-void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, CColor *highlightcol)
+void Font::drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, Color *highlightcol)
 {
   drawTextScaled (x, y, z, str, stdcol, timer, highlight, highlightcol);
 }
@@ -798,10 +798,10 @@ HighClouds::~HighClouds ()
 
 void HighClouds::init (int theta)
 {
-  sphere = new CSpherePart (1, 9, theta);
-  CObject *co = sphere->object [0];
+  sphere = new SpherePart (1, 9, theta);
+  Object3d *co = sphere->object [0];
   co->hasTexture = true;
-  co->material = new CMaterial ();
+  co->material = new Material ();
   for (int i2 = 0; i2 < co->numVertices; i2 ++)
   {
     co->vertex [i2].tex.x = co->vertex [i2].vector.x * 5;
@@ -816,15 +816,15 @@ void HighClouds::init (int theta)
   zoom = 300;
 }
 
-void HighClouds::setTexture (CTexture *texture)
+void HighClouds::setTexture (Texture *texture)
 {
   sphere->object [0]->material->texture = texture;
 }
 
-void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
+void HighClouds::drawGL (Vector3 *tl, Vector3 *textl)
 {
   int j;
-  CObject *cm = o->object [0];
+  Object3d *cm = o->object [0];
   for (int i2 = 0; i2 < cm->numVertices; i2 ++)
   {
     cm->vertex [i2].tex.x = cm->vertex [i2].vector.x * 4 + textl->x / zoom;
@@ -855,7 +855,7 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
   glBegin (GL_TRIANGLES);
   for (j = 0; j < cm->numTriangles; j++)
   {
-    CVertex *v = cm->triangle [j].v [0];
+    Vertex *v = cm->triangle [j].v [0];
     for (int whichVertex = 0; whichVertex < 3; whichVertex ++)
     {
       v = cm->triangle [j].v [whichVertex];
@@ -875,7 +875,7 @@ void HighClouds::drawGL (CVector3 *tl, CVector3 *textl)
   glBegin(GL_QUADS);
   for (j = 0; j < cm->numQuads; j++)
   {
-    CVertex *v = cm->quad [j].v [0];
+    Vertex *v = cm->quad [j].v [0];
     for (int whichVertex = 0; whichVertex < 4; whichVertex ++)
     {
       v = cm->quad [j].v [whichVertex];

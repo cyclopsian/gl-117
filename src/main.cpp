@@ -108,7 +108,7 @@ float getView ()
 
 int clouds = 0;
 
-CTexture *texradar1, *texradar2, *texarrow;//, *texcounter;
+Texture *texradar1, *texradar2, *texarrow;//, *texcounter;
 
 MapLoader *maploader;
 
@@ -120,8 +120,8 @@ float visibleangle = 80.0F;
 
 
 
-CTexture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon = NULL, *texcross, *texcross2, *texranks, *texmedals;
-CTexture *texclouds1, *texclouds2, *texclouds3;
+Texture *texsun, *texflare1, *texflare2, *texflare3, *texflare4, *texmoon = NULL, *texcross, *texcross2, *texranks, *texmedals;
+Texture *texclouds1, *texclouds2, *texclouds3;
 
 PilotList *pilots;
 
@@ -130,7 +130,7 @@ CBlackSmoke *blacksmoke [maxblacksmoke];
 GLLandscape *l = NULL;
 Font *font1, *font2;
 
-CTexture *textitle;
+Texture *textitle;
 
 Uint32 lasttime = 0;
 
@@ -139,59 +139,59 @@ Uint32 lasttime = 0;
 
 
 CLoad3DS g_Load3ds;
-CModel model_fig;
-CModel model_figa;
-CModel model_figb;
-CModel model_figc;
-CModel model_figd;
-CModel model_fige;
-CModel model_figf;
-CModel model_figg;
-CModel model_figh;
-CModel model_figi;
-CModel model_figt;
-CModel model_figu;
-CModel model_cannon1;
-CModel model_cannon2;
-CModel model_cannon1b;
-CModel model_cannon2b;
-CModel model_flare1;
-CModel model_chaff1;
-CModel model_missile1;
-CModel model_missile2;
-CModel model_missile3;
-CModel model_missile4;
-CModel model_missile5;
-CModel model_missile6;
-CModel model_missile7;
-CModel model_missile8;
-CModel model_flak1;
-CModel model_flarak1;
-CModel model_tent1;
-CModel model_ship1;
-CModel model_ship2;
-CModel model_gl117;
-CModel model_tank1;
-CModel model_container1;
-CModel model_truck1;
-CModel model_truck2;
-CModel model_trsam;
-CModel model_pickup1;
-CModel model_pickup2;
-CModel model_tank2;
-CModel model_tent4;
-CModel model_hall1;
-CModel model_hall2;
-CModel model_oilrig;
-CModel model_egg;
-CModel model_radar;
-CModel model_mine1;
-CModel model_aster1;
-CModel model_base1;
-CModel model_barrier1;
-CModel model_rubble1;
-CModel model_depot1;
-CModel model_house1;
+Model3d model_fig;
+Model3d model_figa;
+Model3d model_figb;
+Model3d model_figc;
+Model3d model_figd;
+Model3d model_fige;
+Model3d model_figf;
+Model3d model_figg;
+Model3d model_figh;
+Model3d model_figi;
+Model3d model_figt;
+Model3d model_figu;
+Model3d model_cannon1;
+Model3d model_cannon2;
+Model3d model_cannon1b;
+Model3d model_cannon2b;
+Model3d model_flare1;
+Model3d model_chaff1;
+Model3d model_missile1;
+Model3d model_missile2;
+Model3d model_missile3;
+Model3d model_missile4;
+Model3d model_missile5;
+Model3d model_missile6;
+Model3d model_missile7;
+Model3d model_missile8;
+Model3d model_flak1;
+Model3d model_flarak1;
+Model3d model_tent1;
+Model3d model_ship1;
+Model3d model_ship2;
+Model3d model_gl117;
+Model3d model_tank1;
+Model3d model_container1;
+Model3d model_truck1;
+Model3d model_truck2;
+Model3d model_trsam;
+Model3d model_pickup1;
+Model3d model_pickup2;
+Model3d model_tank2;
+Model3d model_tent4;
+Model3d model_hall1;
+Model3d model_hall2;
+Model3d model_oilrig;
+Model3d model_egg;
+Model3d model_radar;
+Model3d model_mine1;
+Model3d model_aster1;
+Model3d model_base1;
+Model3d model_barrier1;
+Model3d model_rubble1;
+Model3d model_depot1;
+Model3d model_house1;
 
 DynamicObj *flare [maxflare];
 DynamicObj *chaff [maxchaff];
@@ -206,13 +206,13 @@ Space *space;
 
 AIObj *fplayer;
 CSpaceObj *sphere;
-CSphere *objsphere;
+Sphere *objsphere;
 HighClouds *highclouds;
 HighClouds *highclouds2;
 
-CModel *obj, *objlaser, *objmissile;
-CVector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
-CRotation *rotnull, *rotmissile;
+Model3d *obj, *objlaser, *objmissile;
+Vector3 *clip1, *clip2, *tlnull, *tlinf, *tlminf;
+Rotation *rotnull, *rotmissile;
 
 GLenum polygonMode = GL_FILL;
 
@@ -249,14 +249,14 @@ bool firststart = false;
 
 bool missionactive = false;
 
-CColor colorwhite (255, 255, 255, 255);
-CColor colorblue (50, 50, 255, 255);
-CColor colorgreen (100, 255, 100, 255);
-CColor colororange (255, 150, 100, 255);
-CColor colorred (255, 0, 0, 255);
-CColor coloryellow (255, 255, 0, 200);
-CColor colorgrey (150, 150, 150, 200);
-CColor colorlightgrey (210, 210, 210, 255);
+Color colorwhite (255, 255, 255, 255);
+Color colorblue (50, 50, 255, 255);
+Color colorgreen (100, 255, 100, 255);
+Color colororange (255, 150, 100, 255);
+Color colorred (255, 0, 0, 255);
+Color coloryellow (255, 255, 0, 200);
+Color colorgrey (150, 150, 150, 200);
+Color colorlightgrey (210, 210, 210, 255);
 
 
 void drawRank (float xp, float yp, float zp, int rank, float zoom)
@@ -578,7 +578,7 @@ void setLightSource (int gamma)
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
-CModel *getModel (int id)
+Model3d *getModel (int id)
 {
   if (id == FIGHTER_FALCON) return &model_fig;
   else if (id == FIGHTER_SWALLOW) return &model_figa;
@@ -696,7 +696,7 @@ int game_levelInit ()
       for (i2 = 0; i2 < 4; i2 ++)
       {
         int type = fighter [i]->missilerack [i2];
-        CModel *rm = getModel (MISSILE1 + type);
+        Model3d *rm = getModel (MISSILE1 + type);
         fighter [i]->refmodel [i2 * 3] = rm;
         fighter [i]->refmodel [i2 * 3 + 1] = rm;
         fighter [i]->refmodel [i2 * 3 + 2] = rm;
@@ -830,7 +830,7 @@ int game_levelInit ()
     star [i]->size = 0.6 + 0.15 * myrandom (8);
   }
 
-  CColor skycolor;
+  Color skycolor;
 
   if (day && weather == WEATHER_SUNNY)
   {
@@ -1815,7 +1815,7 @@ int missionstate = 0;
 int menuitem = 0, menutimer = 0, menuitemselected = -1, missionmenutimer;
 int missionmenuitemselected = 0, missionmenufighterselected = -1, missionmenuweaponselected = -1;
 
-void drawCircles (CColor *colorstd)
+void drawCircles (Color *colorstd)
 {
   int i;
   float zf = -3, yf, xf;
@@ -1842,7 +1842,7 @@ void drawCircles (CColor *colorstd)
   }
 }
 
-void drawQuads (CColor *colorstd)
+void drawQuads (Color *colorstd)
 {
   int i;
   float zf = -3, yf;
@@ -1865,7 +1865,7 @@ void drawQuads (CColor *colorstd)
   }
 }
 
-void drawPlasma (CColor *colorstd)
+void drawPlasma (Color *colorstd)
 {
   int i;
   float yf;
@@ -2202,15 +2202,15 @@ void mission_display ()
   int i;
   float piloty = 5;
   Pilot *p = pilots->pilot [pilots->aktpilot];
-  CColor *colorstd = &colorred;
+  Color *colorstd = &colorred;
   if (p->mission_state [missionnew->id] == 1)
     colorstd = &colorblue;
-  CColor *col = &menu_colwhite;
+  Color *col = &menu_colwhite;
   Font *font2 = font1;
 
-  CVector3 vec;
-  CVector3 tl (-4.5, 5.5, -8.0);
-  CRotation rot;
+  Vector3 vec;
+  Vector3 tl (-4.5, 5.5, -8.0);
+  Rotation rot;
   rot.a = 270;
   rot.b = (270 - missionmenutimer * 4 / timestep) % 360;
   rot.c = 90;
@@ -2344,7 +2344,7 @@ void create_mouse (int button, int state, int x, int y)
 
 void create_display ()
 {
-  CColor *colorstd = &colorblue;
+  Color *colorstd = &colorblue;
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
@@ -2398,7 +2398,7 @@ void join_mouse (int button, int state, int x, int y)
 
 void join_display ()
 {
-  CColor *colorstd = &colorblue;
+  Color *colorstd = &colorblue;
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);
@@ -2437,15 +2437,15 @@ void fighter_display ()
   char buf [256];
   int i;
 
-  CVector3 vec;
-  CVector3 tl;
+  Vector3 vec;
+  Vector3 tl;
   tl.y = -0.04;
   tl.z = -0.4;
-  CRotation rot;
+  Rotation rot;
   rot.a = 300;
   rot.b = 0;
   rot.c = (5 + missionmenutimer * 4 / timestep) % 360;
-  CModel *model = NULL;
+  Model3d *model = NULL;
   int id = 0;
   if (aktfighter == 0) { model = &model_fig; id = FIGHTER_FALCON; }
   else if (aktfighter == 1) { model = &model_fige; id = FIGHTER_CROW; }
@@ -2554,8 +2554,8 @@ void fame_display ()
   drawMouseCursor ();
 }
 
-CModel *explsphere;
-CSphere *mysphere;
+Model3d *explsphere;
+Sphere *mysphere;
 
 void game_quit ()
 {
@@ -2675,7 +2675,7 @@ void stats_display ()
   float xf1 = -12, xf2 = 0, xf3 = 8;
   float linedist = 1.3, linedist2 = 1.1;
   yf = 6.5; zf = -2.5;
-  CColor *color;
+  Color *color;
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
   color = &menu_colwhite;
@@ -2794,7 +2794,7 @@ void menu_display ()
   int menutimernorm = menutimer * 5 / timestep;
   if (menutimernorm != 0) menutimernorm %= 360;
   if (menutimernorm < 0) menutimernorm *= -1;
-  CColor color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
+  Color color2 (255, 255, (int) (255.0 * cosi [menutimernorm]), 255);
 
   Pilot *p = pilots->pilot [pilots->aktpilot];
 
@@ -2936,8 +2936,8 @@ void credits_display ()
   glPushMatrix ();
 //  glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
   glTranslatef (0, -3.4 + 0.004 * (float) creditstimer / timestep, 0);
-  CColor *col = &colorwhite;
-  CColor *col2 = &coloryellow;
+  Color *col = &colorwhite;
+  Color *col2 = &coloryellow;
   float fontzoom = 1.0;
   font1->zoom = 0.1;
   font2->zoom = 0.1;
@@ -2987,8 +2987,8 @@ void credits_display ()
   float yt = 12, zf = -2.4, ydist = 0.7;
   glPushMatrix ();
   glTranslatef (0, -3.5 + 0.014 * (float) creditstimer / timestep, 0);
-  CColor *col = &colorwhite;
-  CColor *col2 = &coloryellow;
+  Color *col = &colorwhite;
+  Color *col2 = &coloryellow;
   float fontzoom = 1;
   font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GAME PROGRAMMING,", col);
   font2->drawTextCentered (0, (yt -= 2 * ydist) / fontzoom, zf, "GRAPHICS, MODELS, SOUND & MUSIC", col);
@@ -3032,7 +3032,7 @@ void credits_display ()
 void finish_display ()
 {
   glTranslatef (0, -3.5 + 0.01 * (float) finishtimer / timestep, 0);
-  CColor *col = &colorwhite;
+  Color *col = &colorwhite;
   font1->drawTextCentered (0, 12, -3, "CONGRATULATIONS!", col);
   font1->drawTextCentered (0, 10, -3, "THE WORLD HAS BEEN SAVED YET AGAIN.", col);
   font1->drawTextCentered (0, 6, -3, "HOPE YOU HAD FUN PLAYING GL-117!", col);
@@ -3223,7 +3223,7 @@ void game_display ()
 
     highclouds->zoom = 400;
     float ch2 = -382 - fplayer->tl->y / 10.0;
-    CVector3 tlsphere2 (0, ch2, 0);
+    Vector3 tlsphere2 (0, ch2, 0);
     highclouds->drawGL (&tlsphere2, fplayer->tl);
 
     glDisable (GL_FOG);
@@ -3405,7 +3405,7 @@ void game_display ()
   if (specialeffects)
     if (sunvisible && /*camera == 0 &&*/ sunblinding && day)
     {
-      CTexture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
+      Texture* fl_texture[]= {texflare1,texflare3,texflare2,texflare4,texflare2,texflare4,texflare3,0};
       double fl_position[]=   {0.2,      1.6,      3.2,      8.1,      -1.4,     -2.2,     -3.5,     0};
       double fl_size[]=       {0.8,      0.6,      0.5,      0.4,      0.8,      0.4,      0.5,      0};
       double proj[16];
@@ -3426,7 +3426,7 @@ void game_display ()
       int i=0;
       double flarez_eye=4;
       double flarez_win=(-proj[10]+proj[14]/flarez_eye)*(dr[1]-dr[0])/2+(dr[1]+dr[0])/2;
-      while (CTexture *tex=fl_texture[i])
+      while (Texture *tex=fl_texture[i])
       {
         double position=fl_position[i];
         double flarex,flarey,size=fl_size[i]/GLOBALSCALE;
@@ -4121,15 +4121,15 @@ void join_timer (Uint32 dt)
 ****************************************************************************/
 
 // calculate missile rack positions for a fighter
-void setMissiles (CModel *model)
+void setMissiles (Model3d *model)
 {
   int i;
-  CVector3 tlmissile (0, 0.3, 0.3);
+  Vector3 tlmissile (0, 0.3, 0.3);
   for (i = 0; i < model->numObjects; i ++)
   {
     if (model->object [i]->numVertices == 4)
     {
-      CObject *o = model->object [i];
+      Object3d *o = model->object [i];
       float sumx = 0, sumz = 0;
       float maxy = 2;
       int i2;
@@ -4156,11 +4156,11 @@ void myInit ()
   int i, i2;
 
   // useful global variables/constants
-  tlinf = new CVector3 (1E10, 1E10, 1E10);
-  tlminf = new CVector3 (-1E10, -1E10, -1E10);
-  tlnull = new CVector3 (0, 0, 0);
-  rotnull = new CRotation ();
-  rotmissile = new CRotation ();
+  tlinf = new Vector3 (1E10, 1E10, 1E10);
+  tlminf = new Vector3 (-1E10, -1E10, -1E10);
+  tlnull = new Vector3 (0, 0, 0);
+  rotnull = new Rotation ();
+  rotmissile = new Rotation ();
   rotmissile->a = 90;
   rotmissile->c = 270;
 
@@ -4171,9 +4171,9 @@ void myInit ()
     groundobj [i] = new DynamicObj (space, &model_tent1, 3);
   }
 
-  explsphere = new CSphere ();
-  ((CSphere *) explsphere)->init (1, 9);
-  CColor explcolor (255, 255, 1);
+  explsphere = new Sphere ();
+  ((Sphere *) explsphere)->init (1, 9);
+  Color explcolor (255, 255, 1);
   explsphere->setColor (explcolor);
   explsphere->alpha = true;
   for (i = 0; i < explsphere->object [0]->numVertices; i ++)
@@ -4203,7 +4203,7 @@ void myInit ()
   highclouds2 = new HighClouds (25);
   highclouds2->setTexture (texclouds3);
 
-  objsphere = new CSphere (1, 9, 1, 1, 1);
+  objsphere = new Sphere (1, 9, 1, 1, 1);
   sphere = new CSpaceObj (objsphere, 10.0);
   sphere->rot->a = 90;
   sphere->rot->b = 90;
@@ -4253,10 +4253,10 @@ void myInit ()
   INTRO
 ****************************************************************************/
 
-CRotation rot;
-CRotation rot2;
-CVector3 tl;
-CVector3 tl2;
+Rotation rot;
+Rotation rot2;
+Vector3 tl;
+Vector3 tl2;
 int initexplode = 0;
 int initexplode1 = 0;
 int i;
@@ -4287,47 +4287,47 @@ void myFirstInit ()
 
   // create textures (OpenGL)
   display ("Loading textures", LOG_ALL);
-  texgrass = new CTexture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
-  texrocks = new CTexture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
-  texwater = new CTexture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
-  texsand = new CTexture (std::string (dirs->getTextures ("sand1.tga")), 0, 1, false);
-  texredsand = new CTexture (std::string (dirs->getTextures ("redsand1.tga")), 0, 1, false);
-  texredstone = new CTexture (std::string (dirs->getTextures ("redstone2.tga")), 0, 1, false);
-  texgravel1 = new CTexture (std::string (dirs->getTextures ("gravel1.tga")), 0, 1, false);
-  texglitter1 = new CTexture (std::string (dirs->getTextures ("glitter.tga")), -1, 0, true);
-  textree = new CTexture (std::string (dirs->getTextures ("tree1.tga")), -1, 1, true);
-  textreeu = new CTexture (std::string (dirs->getTextures ("treeu1.tga")), -1, 1, true);
-  textree2 = new CTexture (std::string (dirs->getTextures ("tree2.tga")), -1, 1, true);
-  textreeu2 = new CTexture (std::string (dirs->getTextures ("treeu2.tga")), -1, 1, true);
-  textree3 = new CTexture (std::string (dirs->getTextures ("tree3.tga")), 3, 1, true);
-  textreeu3 = new CTexture (std::string (dirs->getTextures ("treeu3.tga")), 3, 1, true);
-  textree4 = new CTexture (std::string (dirs->getTextures ("tree4.tga")), 3, 1, true);
-  textreeu4 = new CTexture (std::string (dirs->getTextures ("treeu4.tga")), 3, 1, true);
-  textree5 = new CTexture (std::string (dirs->getTextures ("tree5.tga")), -1, 1, true);
-  textreeu5 = new CTexture (std::string (dirs->getTextures ("treeu5.tga")), -1, 1, true);
-  texcactus1 = new CTexture (std::string (dirs->getTextures ("cactus1.tga")), 3, 1, true);
-  texcactusu1 = new CTexture (std::string (dirs->getTextures ("cactusu1.tga")), 3, 1, true);
-  texsmoke = new CTexture (std::string (dirs->getTextures ("smoke1.tga")), -1, 1, true);
-  texsmoke2 = new CTexture (std::string (dirs->getTextures ("smoke2.tga")), -1, 1, true);
-  texsmoke3 = new CTexture (std::string (dirs->getTextures ("smoke3.tga")), 5, 1, true);
-  texsun = new CTexture (std::string (dirs->getTextures ("sun2.tga")), -1, 0, true);
-  texmoon = new CTexture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
-  texearth = new CTexture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
+  texgrass = new Texture (std::string (dirs->getTextures ("grass1.tga")), 0, 1, false);
+  texrocks = new Texture (std::string (dirs->getTextures ("rocks1.tga")), 0, 1, false);
+  texwater = new Texture (std::string (dirs->getTextures ("water1.tga")), 0, 1, false);
+  texsand = new Texture (std::string (dirs->getTextures ("sand1.tga")), 0, 1, false);
+  texredsand = new Texture (std::string (dirs->getTextures ("redsand1.tga")), 0, 1, false);
+  texredstone = new Texture (std::string (dirs->getTextures ("redstone2.tga")), 0, 1, false);
+  texgravel1 = new Texture (std::string (dirs->getTextures ("gravel1.tga")), 0, 1, false);
+  texglitter1 = new Texture (std::string (dirs->getTextures ("glitter.tga")), -1, 0, true);
+  textree = new Texture (std::string (dirs->getTextures ("tree1.tga")), -1, 1, true);
+  textreeu = new Texture (std::string (dirs->getTextures ("treeu1.tga")), -1, 1, true);
+  textree2 = new Texture (std::string (dirs->getTextures ("tree2.tga")), -1, 1, true);
+  textreeu2 = new Texture (std::string (dirs->getTextures ("treeu2.tga")), -1, 1, true);
+  textree3 = new Texture (std::string (dirs->getTextures ("tree3.tga")), 3, 1, true);
+  textreeu3 = new Texture (std::string (dirs->getTextures ("treeu3.tga")), 3, 1, true);
+  textree4 = new Texture (std::string (dirs->getTextures ("tree4.tga")), 3, 1, true);
+  textreeu4 = new Texture (std::string (dirs->getTextures ("treeu4.tga")), 3, 1, true);
+  textree5 = new Texture (std::string (dirs->getTextures ("tree5.tga")), -1, 1, true);
+  textreeu5 = new Texture (std::string (dirs->getTextures ("treeu5.tga")), -1, 1, true);
+  texcactus1 = new Texture (std::string (dirs->getTextures ("cactus1.tga")), 3, 1, true);
+  texcactusu1 = new Texture (std::string (dirs->getTextures ("cactusu1.tga")), 3, 1, true);
+  texsmoke = new Texture (std::string (dirs->getTextures ("smoke1.tga")), -1, 1, true);
+  texsmoke2 = new Texture (std::string (dirs->getTextures ("smoke2.tga")), -1, 1, true);
+  texsmoke3 = new Texture (std::string (dirs->getTextures ("smoke3.tga")), 5, 1, true);
+  texsun = new Texture (std::string (dirs->getTextures ("sun2.tga")), -1, 0, true);
+  texmoon = new Texture (std::string (dirs->getTextures ("moon1.tga")), 2, 0, true);
+  texearth = new Texture (std::string (dirs->getTextures ("earth.tga")), 0, 0, true);
   // TODO: why doesn't !mipmap work for the flares???
-  texflare1 = new CTexture (std::string (dirs->getTextures ("flare1.tga")), -1, 0, true);
-  texflare2 = new CTexture (std::string (dirs->getTextures ("flare2.tga")), -1, 0, true);
-  texflare3 = new CTexture (std::string (dirs->getTextures ("flare3.tga")), -1, 0, true);
-  texflare4 = new CTexture (std::string (dirs->getTextures ("flare4.tga")), -1, 0, true);
-  texcross = new CTexture (std::string (dirs->getTextures ("cross.tga")), -1, 1, true);
-  texcross2 = new CTexture (std::string (dirs->getTextures ("cross2.tga")), -1, 1, true);
-  texranks = new CTexture (std::string (dirs->getTextures ("ranks.tga")), 0, 0, true);
-  texmedals = new CTexture (std::string (dirs->getTextures ("medals.tga")), 0, 0, true);
-  texclouds1 = new CTexture (std::string (dirs->getTextures ("clouds1.tga")), -1, 1, true);
-  texclouds2 = new CTexture (std::string (dirs->getTextures ("clouds2.tga")), 4, 1, true);
-  texclouds3 = new CTexture (std::string (dirs->getTextures ("clouds3.tga")), 6, 1, true);
-  texradar1 = new CTexture (std::string (dirs->getTextures ("radar2.tga")), -1, 0, true);
-  texradar2 = new CTexture (std::string (dirs->getTextures ("radar1.tga")), -1, 0, true);
-  texarrow = new CTexture (std::string (dirs->getTextures ("arrow.tga")), -1, 0, true);
+  texflare1 = new Texture (std::string (dirs->getTextures ("flare1.tga")), -1, 0, true);
+  texflare2 = new Texture (std::string (dirs->getTextures ("flare2.tga")), -1, 0, true);
+  texflare3 = new Texture (std::string (dirs->getTextures ("flare3.tga")), -1, 0, true);
+  texflare4 = new Texture (std::string (dirs->getTextures ("flare4.tga")), -1, 0, true);
+  texcross = new Texture (std::string (dirs->getTextures ("cross.tga")), -1, 1, true);
+  texcross2 = new Texture (std::string (dirs->getTextures ("cross2.tga")), -1, 1, true);
+  texranks = new Texture (std::string (dirs->getTextures ("ranks.tga")), 0, 0, true);
+  texmedals = new Texture (std::string (dirs->getTextures ("medals.tga")), 0, 0, true);
+  texclouds1 = new Texture (std::string (dirs->getTextures ("clouds1.tga")), -1, 1, true);
+  texclouds2 = new Texture (std::string (dirs->getTextures ("clouds2.tga")), 4, 1, true);
+  texclouds3 = new Texture (std::string (dirs->getTextures ("clouds3.tga")), 6, 1, true);
+  texradar1 = new Texture (std::string (dirs->getTextures ("radar2.tga")), -1, 0, true);
+  texradar2 = new Texture (std::string (dirs->getTextures ("radar1.tga")), -1, 0, true);
+  texarrow = new Texture (std::string (dirs->getTextures ("arrow.tga")), -1, 0, true);
 
   display ("Loading Fonts", LOG_ALL);
   font1 = new Font (dirs->getTextures ("font1.tga"), 32, '!', 64);
@@ -4583,7 +4583,7 @@ void myFirstInit ()
   initexplode = 0;
   initexplode1 = 0;
 
-  textitle = new CTexture (std::string (dirs->getTextures ("patents.tga")), 0, false, true);
+  textitle = new Texture (std::string (dirs->getTextures ("patents.tga")), 0, false, true);
 
   sungamma = 60;
   setLightSource (60);
@@ -4626,8 +4626,8 @@ int heat2 [maxfy] [maxfx];
 
 void init_display ()
 {
-  CVector3 vec;
-  CColor color (200, 200, 200, 255);
+  Vector3 vec;
+  Color color (200, 200, 200, 255);
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode (GL_MODELVIEW);

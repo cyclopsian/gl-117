@@ -41,7 +41,7 @@ class Cockpit
   void drawBlip (int shape, float x, float y, float z, unsigned char r, unsigned char g, unsigned char b);
 
   void setColor (int alpha);
-  void setColor (CColor *color, int alpha);
+  void setColor (Color *color, int alpha);
   void drawCounter ();
   void drawTargeter ();
   void drawCross ();

@@ -28,20 +28,20 @@
 
 CSpaceObj::CSpaceObj ()
 {
-  tl = new CVector3 ();
-  rot = new CRotation ();
+  tl = new Vector3 ();
+  rot = new Rotation ();
   zoom = 1; alpha = 1; draw = 1; lum = 1; drawlight = true; explode = 0;
   numRefModels = 0;
   refmodel = NULL;
   o = NULL;
 }
 
-CSpaceObj::CSpaceObj (CModel *o, float zoom)
+CSpaceObj::CSpaceObj (Model3d *o, float zoom)
 {
   this->o = o;
   this->zoom = zoom;
-  tl = new CVector3 ();
-  rot = new CRotation ();
+  tl = new Vector3 ();
+  rot = new Rotation ();
   alpha = 1; draw = 1; lum = 1; drawlight = true; explode = 0;
   numRefModels = 0;
   refmodel = NULL;
@@ -63,13 +63,13 @@ CSpaceObj::~CSpaceObj ()
   delete rot;
 }
 
-void CSpaceObj::addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float scale)
+void CSpaceObj::addRefModel (Model3d *model, Vector3 *tl, Rotation *rot, float scale)
 {
   if (refmodel == NULL)
   {
-    refmodel = new CModel *[50];
-    reftl = new CVector3 [50];
-    refrot = new CRotation [50];
+    refmodel = new Model3d *[50];
+    reftl = new Vector3 [50];
+    refrot = new Rotation [50];
     refscale = new float [50];
   }
   refmodel [numRefModels] = model;
@@ -79,7 +79,7 @@ void CSpaceObj::addRefModel (CModel *model, CVector3 *tl, CRotation *rot, float 
   numRefModels ++;
 }
 
-void CSpaceObj::translate (CVector3 *v)
+void CSpaceObj::translate (Vector3 *v)
 { tl->x = v->x;
   tl->y = v->y;
   tl->z = v->z; }
@@ -95,10 +95,10 @@ void CSpaceObj::rotate (short a, short b, short c)
 void CSpaceObj::rotateOn (short a, short b, short c)
 { rot->add (a, b, c); }
 
-void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
+void CSpaceObj::drawGL (Vector3 *z1, Vector3 *z2, Vector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2)
 {
   int i;
-  CVector3 tl1;
+  Vector3 tl1;
   tl1.x = tl->x + this->tl->x;
   tl1.y = tl->y + this->tl->y;
   tl1.z = tl->z + this->tl->z;
@@ -146,15 +146,15 @@ void CSpaceObj::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, 
 
 Space::Space ()
 { no = 0; alpha = 1; lum = 1; drawlight = true;
-  tl = new CVector3 ();
-  z1 = new CVector3 ();
-  z2 = new CVector3 (); }
+  tl = new Vector3 ();
+  z1 = new Vector3 ();
+  z2 = new Vector3 (); }
 
-Space::Space (CVector3 *v, CVector3 *w)
+Space::Space (Vector3 *v, Vector3 *w)
 { no = 0; alpha = 1; lum = 1; drawlight = true;
-  tl = new CVector3 ();
-  z1 = new CVector3 (*v);
-  z2 = new CVector3 (*w); }
+  tl = new Vector3 ();
+  z1 = new Vector3 (*v);
+  z2 = new Vector3 (*w); }
 
 Space::~Space ()
 { delete tl; delete z1; delete z2; }
@@ -188,7 +188,7 @@ bool Space::removeObject (CSpaceObj *o2)
   return false;
 }
 
-void Space::translate (CVector3 *v)
+void Space::translate (Vector3 *v)
 { tl->x = v->x;
   tl->y = v->y;
   tl->z = v->z; }

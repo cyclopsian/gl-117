@@ -28,9 +28,9 @@
 
 extern int menu_id;
 
-extern CColor menu_colwhite;
-extern CColor menu_colgrey;
-extern CColor menu_colyellow;
+extern Color menu_colwhite;
+extern Color menu_colgrey;
+extern Color menu_colyellow;
 
 class Component
 {

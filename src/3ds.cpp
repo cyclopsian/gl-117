@@ -188,7 +188,7 @@ CLoad3DS::CLoad3DS ()
 }
 
 // Load the whole 3DS file using the private functions below
-bool CLoad3DS::Import3DS (CModel *model, char *filename)
+bool CLoad3DS::Import3DS (Model3d *model, char *filename)
 {
   char message [255] = {0};
 
@@ -231,12 +231,12 @@ void CLoad3DS::CleanUp ()
   //delete tempChunk;              // Free our temporary chunk
 }
 
-void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
+void CLoad3DS::ProcessNextChunk (Model3d *model, Chunk *previousChunk)
 {
   char version [10];
   char buf [STDSIZE];
-  CObject newObject;
-  CMaterial newTexture;
+  Object3d newObject;
+  Material newTexture;
 
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -273,7 +273,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
 
       case OBJECT:
         model->addObject (newObject);
-        memset (&newObject, 0, sizeof (CObject));
+        memset (&newObject, 0, sizeof (Object3d));
         currentChunk->bytesRead += GetString (buf);
         model->object [model->numObjects - 1]->name = buf;
         ProcessNextObjectChunk (model, (model->object [model->numObjects - 1]), currentChunk);
@@ -301,7 +301,7 @@ void CLoad3DS::ProcessNextChunk (CModel *model, Chunk *previousChunk)
   currentChunk = previousChunk;
 }
 
-void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *previousChunk)
+void CLoad3DS::ProcessNextObjectChunk (Model3d *model, Object3d *object, Chunk *previousChunk)
 {
   currentChunk = new Chunk;
   if (currentChunk == NULL) error_outofmemory ();
@@ -349,7 +349,7 @@ void CLoad3DS::ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *pr
   currentChunk = previousChunk;
 }
 
-void CLoad3DS::ProcessNextMaterialChunk (CModel *model, Chunk *previousChunk)
+void CLoad3DS::ProcessNextMaterialChunk (Model3d *model, Chunk *previousChunk)
 {
   char buf [256];
   currentChunk = new Chunk;
@@ -432,21 +432,21 @@ int CLoad3DS::GetString (char *buffer)
   return file->readString (buffer);
 }
 
-void CLoad3DS::ReadColorChunk (CMaterial *material, Chunk *pChunk)
+void CLoad3DS::ReadColorChunk (Material *material, Chunk *pChunk)
 {
   ReadChunk (tempChunk);
   tempChunk->bytesRead += file->readString ((char *) material->color.c, 4, tempChunk->length - tempChunk->bytesRead);
   pChunk->bytesRead += tempChunk->bytesRead;
 }
 
-void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
+void CLoad3DS::ReadVertexIndices (Object3d *object, Chunk *previousChunk)
 {
   Uint16 index = 0;
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTriangles);
 
-  object->triangle = new CTriangle [object->numTriangles];
+  object->triangle = new Triangle [object->numTriangles];
   if (object->triangle == NULL) error_outofmemory ();
-  memset (object->triangle, 0, sizeof (CTriangle) * object->numTriangles);
+  memset (object->triangle, 0, sizeof (Triangle) * object->numTriangles);
 
   for (int i = 0; i < object->numTriangles; i ++)
   {
@@ -461,48 +461,48 @@ void CLoad3DS::ReadVertexIndices (CObject *object, Chunk *previousChunk)
   }
 }
 
-void CLoad3DS::ReadMeshMatrix (CObject *object, Chunk *previousChunk)
+void CLoad3DS::ReadMeshMatrix (Object3d *object, Chunk *previousChunk)
 {
   float matrix [12];
   previousChunk->bytesRead += file->readFloat ((float *) matrix, (previousChunk->length - previousChunk->bytesRead) / 4);
   // Where to put theses coords???
 }
 
-void CLoad3DS::ReadUScale (CMaterial *material, Chunk *previousChunk)
+void CLoad3DS::ReadUScale (Material *material, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readFloat (&material->uscale, 1);
   previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
-void CLoad3DS::ReadVScale (CMaterial *material, Chunk *previousChunk)
+void CLoad3DS::ReadVScale (Material *material, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readFloat (&material->vscale, 1);
   previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
-void CLoad3DS::ReadUOffset (CMaterial *material, Chunk *previousChunk)
+void CLoad3DS::ReadUOffset (Material *material, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readFloat (&material->uoffset, 1);
   previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
-void CLoad3DS::ReadVOffset (CMaterial *material, Chunk *previousChunk)
+void CLoad3DS::ReadVOffset (Material *material, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readFloat (&material->voffset, 1);
   previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
-void CLoad3DS::ReadUVRotation (CMaterial *material, Chunk *previousChunk)
+void CLoad3DS::ReadUVRotation (Material *material, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readFloat (&material->wrot, 1);
   previousChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }
 
-void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
+void CLoad3DS::ReadUVCoordinates (Object3d *object, Chunk *previousChunk)
 {
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numTexVertex);
 
-  CVector2 *p = new CVector2 [object->numTexVertex];
+  Vector2 *p = new Vector2 [object->numTexVertex];
   if (p == NULL) error_outofmemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
@@ -512,16 +512,16 @@ void CLoad3DS::ReadUVCoordinates (CObject *object, Chunk *previousChunk)
   delete []p;
 }
 
-void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
+void CLoad3DS::ReadVertices (Object3d *object, Chunk *previousChunk)
 {
   int i;
   previousChunk->bytesRead += file->readUInt16 ((Uint16 *) &object->numVertices);
 
-  object->vertex = new CVertex [object->numVertices];
+  object->vertex = new Vertex [object->numVertices];
   if (object->vertex == NULL) error_outofmemory ();
-  memset (object->vertex, 0, sizeof (CVertex) * object->numVertices);
+  memset (object->vertex, 0, sizeof (Vertex) * object->numVertices);
 
-  CVector3 *p = new CVector3 [object->numVertices];
+  Vector3 *p = new Vector3 [object->numVertices];
   if (p == NULL) error_outofmemory ();
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
@@ -541,7 +541,7 @@ void CLoad3DS::ReadVertices (CObject *object, Chunk *previousChunk)
   delete []p;
 }
 
-void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk)
+void CLoad3DS::ReadObjectMaterial (Model3d *model, Object3d *object, Chunk *previousChunk)
 {
   char materialName [255] = {0};
   previousChunk->bytesRead += GetString (materialName);
@@ -568,14 +568,14 @@ void CLoad3DS::ReadObjectMaterial (CModel *model, CObject *object, Chunk *previo
   currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
 }      
 
-void CLoad3DS::Compile (CModel *model)
+void CLoad3DS::Compile (Model3d *model)
 {
   // Merge numerically equal vertices
   // This is necessary to get a smooth shaded object
   int i;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *co = model->object [i];
+    Object3d *co = model->object [i];
     for (int i2 = 1; i2 < co->numVertices; i2 ++)
     {
       for (int i3 = 0; i3 < i2; i3 ++)
@@ -597,7 +597,7 @@ void CLoad3DS::Compile (CModel *model)
   // Scale texture coordinated by uscale, vscale
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *co = model->object [i];
+    Object3d *co = model->object [i];
     float uscale = co->material->uscale;
     float vscale = co->material->vscale;
     float uoffset = co->material->uoffset;
@@ -617,17 +617,17 @@ void CLoad3DS::Compile (CModel *model)
   }
 }
 
-void CLoad3DS::ComputeNormals (CModel *model)
+void CLoad3DS::ComputeNormals (Model3d *model)
 {
   int i, i2, i3;
 
   if (model->numObjects <= 0)
     return;
 
-  CVector3 n;
+  Vector3 n;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numTriangles; i2 ++)
     {
       object->triangle [i2].calcNormal (&n);
@@ -647,7 +647,7 @@ void CLoad3DS::ComputeNormals (CModel *model)
 
 }
 
-void CLoad3DS::LoadTextures (CModel *model)
+void CLoad3DS::LoadTextures (Model3d *model)
 {
   int i, i2;
   char str [256];
@@ -668,30 +668,30 @@ void CLoad3DS::LoadTextures (CModel *model)
         }
       }
       
-      model->object [i]->material->texture = new CTexture (std::string (str), -1, true, false);
+      model->object [i]->material->texture = new Texture (std::string (str), -1, true, false);
 //      if (model->object [i]->material->texture == NULL)
 //        model->object [i]->hasTexture = false;
     }
   }
 }
 
-void CLoad3DS::ComputeColors (CModel *model)
+void CLoad3DS::ComputeColors (Model3d *model)
 {
   int i, i2;
 
   if (model->numObjects <= 0)
     return;
 
-  CColor c;
+  Color c;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
       if (object->hasTexture)
       {
-        CVertex *v = &object->vertex [i2];
-        CTexture *tex = object->material->texture;
+        Vertex *v = &object->vertex [i2];
+        Texture *tex = object->material->texture;
         tex->getColor (&c, (int) (v->tex.x * tex->width), (int) (v->tex.y * tex->height));
         int val;
         if (c.c [0] < 200 || c.c [1] < 200)
@@ -722,17 +722,17 @@ void CLoad3DS::ComputeColors (CModel *model)
 
 }
 
-void CLoad3DS::Normalize (CModel *model)
+void CLoad3DS::Normalize (Model3d *model)
 {
   int i, i2;
   float minx = 1E10, miny = 1E10, minz = 1E10;
   float maxx = -1E10, maxy = -1E10, maxz = -1E10;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      CVertex *v = &object->vertex [i2];
+      Vertex *v = &object->vertex [i2];
       if (v->vector.x > maxx) maxx = v->vector.x;
       if (v->vector.y > maxy) maxy = v->vector.y;
       if (v->vector.z > maxz) maxz = v->vector.z;
@@ -753,10 +753,10 @@ void CLoad3DS::Normalize (CModel *model)
 
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      CVertex *v = &object->vertex [i2];
+      Vertex *v = &object->vertex [i2];
       v->vector.x -= tlx;
       v->vector.x /= sc;
       v->vector.y -= tly;

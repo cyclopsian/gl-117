@@ -29,9 +29,9 @@
 int menu_id = 0;
 int menu_z = -2;
 
-CColor menu_colwhite (255, 255, 255, 200);
-CColor menu_colgrey (220, 220, 220, 200);
-CColor menu_colyellow (255, 255, 0, 200);
+Color menu_colwhite (255, 255, 255, 200);
+Color menu_colgrey (220, 220, 220, 200);
+Color menu_colyellow (255, 255, 0, 200);
 
 Component::Component ()
 {
@@ -342,7 +342,7 @@ void Label::setTransparent (bool transparent)
 void Label::draw ()
 {
   if (!visible) return;
-  CColor *col = &menu_colwhite;
+  Color *col = &menu_colwhite;
   if (!transparent)
   {
     glLoadName (id);
@@ -382,9 +382,9 @@ Button::Button (char *text)
 void Button::draw ()
 {
   if (!visible) return;
-  CColor *col_active = &menu_colwhite;
-  CColor *col_deactive = &menu_colgrey;
-  CColor *col_highlight = &menu_colyellow;
+  Color *col_active = &menu_colwhite;
+  Color *col_deactive = &menu_colgrey;
+  Color *col_highlight = &menu_colyellow;
   glLoadName (id);
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -441,7 +441,7 @@ void TextField::setText (char *text)
 void TextField::draw ()
 {
   if (!visible) return;
-  CColor *col = &menu_colwhite;
+  Color *col = &menu_colwhite;
   glLoadName (id);
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -509,7 +509,7 @@ void EditKey::draw ()
 {
   if (!visible) return;
   char buf [64];
-  CColor *col = &menu_colwhite;
+  Color *col = &menu_colwhite;
   glLoadName (id);
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -607,7 +607,7 @@ void EditJoystick::draw ()
 {
   if (!visible) return;
   char buf [64];
-  CColor *col = &menu_colwhite;
+  Color *col = &menu_colwhite;
   glLoadName (id);
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -696,7 +696,7 @@ void EditField::draw ()
   int akttime;
 
   if (!visible) return;
-  CColor *col = &menu_colgrey;
+  Color *col = &menu_colgrey;
 
   strcpy (str, text);
   if (highlight)

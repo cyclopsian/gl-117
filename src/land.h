@@ -102,7 +102,7 @@ class Landscape
     Landscape ();
     ~Landscape ();
 
-    /// fast convolution function (isotropic), currently only radius in {1,2,3}
+    /// fast convolution function (isotropic), currently only Gauss, radius in {1,2,3}
     void convolveGauss (int radius, int hmin, int hmax);
     /// 5x5 convolution (radius=3) for a single raster point
     void gauss (int x, int y);
@@ -110,16 +110,21 @@ class Landscape
     void flatten (int x, int y, int dx, int dy);
     /// special erosion function
     void smoothGlacier ();
+
     /// check if type=f[][] is of a specific id
-    bool isType (unsigned char type, unsigned char id);
+    bool isType (unsigned char type, unsigned char id) const;
     /// check if type=f[][] is woods
-    bool isWoods (int type);
+    bool isWoods (int type) const;
     /// check if type=f[][] is water
-    bool isWater (int type);
+    bool isWater (int type) const;
     /// check if type=f[][] is glacier
-    bool isGlacier (int type);
+    bool isGlacier (int type) const;
+    /// check if type=f[][] is solid ground
+    bool isGround (int x, int y) const;
+
     /// reset data fields
     void init ();
+
     /// create alpine surface
     void genSurface (int elevationpc, int *heightmap);
     /// create alpine erosion surface
@@ -132,6 +137,7 @@ class Landscape
     void genMoonSurface (int height);
     /// create desert surface
     void genDesertSurface (int elevationpc);
+
     /// create a trench
     void genTrench (int width, int height);
     /// create percent rocks if landscape diff > diffmin
@@ -140,12 +146,8 @@ class Landscape
     void genLake (int depthpc);
     /// calculate woods on steep grass terrain
     void calcWoods (int dy);
-    /// check if type=f[][] is solid ground
-    bool isGround (int x, int y);
     /// search a plain
     void searchPlain (int divx, int divy, int *x, int *y);
-//    bool riverCheck (int x, int y, int *fl, int z, int z2);
-//    void genRiver ();
 
   protected:
 

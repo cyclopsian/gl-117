@@ -35,10 +35,10 @@ const float zoomz = 1.0/(100.0*MAXX);
 const float hh = (float) 1 / (float) MAXX;
 const float zoomz2 = 32768.0 * zoomz;
 const float hh2 = 2.0*hh;
-CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
-CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
-CTexture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
-CTexture *texglitter1;
+Texture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
+Texture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
+Texture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
+Texture *texglitter1;
 
 VertexArray *va;
 VertexArray vertexarrayquadstrip;
@@ -847,13 +847,13 @@ void GLLandscape::drawTown (int x, int y)
   int ys = GETCOORD(y);
   if (f [xs] [ys] == TOWN)
   {
-    CVector3 tl;
-    CRotation rot;
+    Vector3 tl;
+    Rotation rot;
     rot.a = 270;
     rot.c = 90 * ((xs + ys / 3) & 3);
     tl.set (x + 0.5, getExactHeight ((float) xs + 0.5, (float) ys + 0.5) + 0.2, y + 0.5);
     glPushMatrix ();
-    model_house1.draw (tl, CVector3 (), rot, 0.3, 1, 0);
+    model_house1.draw (tl, Vector3 (), rot, 0.3, 1, 0);
     glPopMatrix ();
     return;
   }
@@ -875,7 +875,7 @@ void GLLandscape::drawQuadStrip (int x1, int y1, int x2, int y2)
 
   glDisable (GL_TEXTURE_2D);
 
-  CTexture *tex;
+  Texture *tex;
 
   x1 -= x1 % step;
   y1 -= y1 % step;
@@ -1077,7 +1077,7 @@ void GLLandscape::drawQuad (int x1, int y1, int x2, int y2, int x3, int y3, int 
   int j;
   int step = fargridstep;
   float texred, texgreen, texblue;
-  CTexture *tex = NULL;
+  Texture *tex = NULL;
   float col [4] [3];
   float pos [4] [3];
   float fac;
@@ -1149,7 +1149,7 @@ void GLLandscape::drawTriangle (int x1, int y1, int x2, int y2, int x3, int y3)
   int j;
   int step = fargridstep;
   float texred, texgreen, texblue;
-  CTexture *tex = NULL;
+  Texture *tex = NULL;
   float col [3] [3];
   float pos [3] [3];
   float fac;
@@ -2939,7 +2939,7 @@ void GLLandscape::calcDynamicLight (CExplosion **explo, DynamicObj **cannon, Dyn
   }
 }
 
-void GLLandscape::setMaterial (int n, float r, float g, float b, CTexture *tex)
+void GLLandscape::setMaterial (int n, float r, float g, float b, Texture *tex)
 {
   mat [n] [0] = r;
   mat [n] [1] = g;

@@ -121,7 +121,7 @@ DynamicObj::DynamicObj ()
   dinit ();
 }
 
-DynamicObj::DynamicObj (Space *space2, CModel *o2, float zoom2)
+DynamicObj::DynamicObj (Space *space2, Model3d *o2, float zoom2)
 {
   this->space = space2;
   o = o2;
@@ -562,7 +562,7 @@ void DynamicObj::move (Uint32 dt)
 
   // PHYSICS (simplified model)
 
-  CVector3 vaxis, uaxis, utemp, utemp2, utemp3;
+  Vector3 vaxis, uaxis, utemp, utemp2, utemp3;
   float gammaup, phiup, thetaup;
 
   bool stop;
@@ -1391,7 +1391,7 @@ AIObj::AIObj ()
   smoke = new CSmoke (0);
 }
 
-AIObj::AIObj (Space *space2, CModel *o2, float zoom2)
+AIObj::AIObj (Space *space2, Model3d *o2, float zoom2)
 {
   this->space = space2;
   o = o2;
@@ -2135,7 +2135,7 @@ void AIObj::aiAction (Uint32 dt, AIObj **f, AIObj **m, DynamicObj **c, DynamicOb
 // The following model would be the REAL AI behaviour!
 // However enemies are too weak!
 
-  CVector3 targetvec;
+  Vector3 targetvec;
   if (target != NULL)
   {
     targetvec.take (target->tl);

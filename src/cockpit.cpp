@@ -47,7 +47,7 @@ void Cockpit::drawBlip(int shape, float x, float y, float z, unsigned char r, un
 {
   float blipsize = 0.02;
   int alpha = 200;
-  CColor color;
+  Color color;
 
 //  setColor (&color, alpha); // no need here
   glColor4ub (r, g, b, alpha);
@@ -92,7 +92,7 @@ void Cockpit::setColor (int alpha)
   else glColor4ub (100, 100, 255, alpha);
 }
 
-void Cockpit::setColor (CColor *color, int alpha)
+void Cockpit::setColor (Color *color, int alpha)
 {
   if (fplayer->o == &model_fig) color->set (255, 255, 0, alpha);
   else if (fplayer->o == &model_figb) color->set (255, 150, 100, alpha);
@@ -173,8 +173,8 @@ void Cockpit::drawCounter ()
   glVertex3f (xf - xfl, yf + yfl, zf);
   glVertex3f (xf - xfl, yf - yfl, zf);
   glEnd ();
-  CColor blue (0, 100, 255);
-  CColor red (255, 0, 0);
+  Color blue (0, 100, 255);
+  Color red (255, 0, 0);
   sprintf (buf, "CHAFF: %d", fplayer->chaffs);
   font1->drawTextCentered (xf*10, (yf-0.05)*10, zf, buf, &blue);
   sprintf (buf, "FLARE: %d", fplayer->flares);
@@ -224,8 +224,8 @@ void Cockpit::drawCounter ()
     gluOrtho2D (-hud_width * 0.5f,  hud_width * 0.5f,
                 -hud_height * 0.5f, hud_height * 0.5f);
 
-    CVector3 pos = *target->tl;
-    CVector3 delta = *fplayer->tl;
+    Vector3 pos = *target->tl;
+    Vector3 delta = *fplayer->tl;
     delta.sub (&pos);
 
     // multiply Vector by Matrix
@@ -428,7 +428,7 @@ void Cockpit::drawCross ()
 void Cockpit::drawHeading ()
 {
   char str [STDSIZE];
-  CColor color;
+  Color color;
   int i = 0;
   int alpha = 175;
   setColor (&color, alpha);
@@ -561,9 +561,9 @@ void Cockpit::drawHeading ()
 void Cockpit::drawTargetedElement ()
 {
   char str [20];
-  CColor color;
-  CVector3 tl, n;
-  CRotation r;
+  Color color;
+  Vector3 tl, n;
+  Rotation r;
   color.set (255, 0, 0);
   color.c [3] = 255;
   tl.x = -0.35; tl.y = -0.3; tl.z = -0.5;
@@ -587,9 +587,9 @@ void Cockpit::drawTargetedElement ()
 void Cockpit::drawWeapon ()
 {
   char str [20];
-  CColor color;
-  CVector3 tl, n;
-  CRotation r;
+  Color color;
+  Vector3 tl, n;
+  Rotation r;
   if (fplayer->missiles [fplayer->missiletype] <= 0)
     return;
   color.set (255, 0, 0);
@@ -597,7 +597,7 @@ void Cockpit::drawWeapon ()
   tl.x = 0.35; tl.y = -0.3; tl.z = -0.5;
   gl->disableAlphaBlending ();
   glEnable (GL_DEPTH_TEST);
-  CModel *missile = NULL;
+  Model3d *missile = NULL;
   if (fplayer->missiletype == 0) missile = &model_missile1;
   else if (fplayer->missiletype == 1) missile = &model_missile2;
   else if (fplayer->missiletype == 2) missile = &model_missile3;
@@ -705,7 +705,7 @@ void Cockpit::drawRadar ()
 void Cockpit::drawRelativeHeightBar()
 {
   char str [STDSIZE];
-  CColor color;
+  Color color;
   int alpha = 175;
   setColor (&color, alpha);
   setColor (alpha);
@@ -744,7 +744,7 @@ void Cockpit::drawRelativeHeightBar()
 void Cockpit::drawThrustBar()
 {
   char str [STDSIZE];
-  CColor color;
+  Color color;
   int alpha = 175;
   setColor (&color, alpha);
   setColor (alpha);

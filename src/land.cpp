@@ -185,12 +185,12 @@ void Landscape::flatten (int x, int y, int dx, int dy)
   LANDSCAPE TYPE QUERIES
 ****************************************************************************/
 
-bool Landscape::isType (unsigned char type, unsigned char id)
+bool Landscape::isType (unsigned char type, unsigned char id) const
 {
   return ((type & 0xFF) == (id << 0));
 }
 
-bool Landscape::isWoods (int type)
+bool Landscape::isWoods (int type) const
 {
   type &= 0xFF;
   if (type >= CONIFEROUSWOODS0 && type <= BUSHES3)
@@ -198,7 +198,7 @@ bool Landscape::isWoods (int type)
   return false;
 }
 
-bool Landscape::isWater (int type)
+bool Landscape::isWater (int type) const
 {
   type &= 0xFF;
   if (type >= WATER && type <= XDEEPWATER)
@@ -206,7 +206,7 @@ bool Landscape::isWater (int type)
   return false;
 }
 
-bool Landscape::isGlacier (int type)
+bool Landscape::isGlacier (int type) const
 {
   type &= 0xFF;
   if (type == GLACIER)
@@ -214,7 +214,7 @@ bool Landscape::isGlacier (int type)
   return false;
 }
 
-bool Landscape::isGround (int x, int y)
+bool Landscape::isGround (int x, int y) const
 {
   if (x < 0 || x > MAXX || y < 0 || y > MAXX) return false;
   int type = f [y] [x];

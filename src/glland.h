@@ -52,10 +52,10 @@
 #define MAXMATERIAL 101
 
 // textures are loaded in main.cpp
-extern CTexture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
-extern CTexture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
-extern CTexture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
-extern CTexture *texglitter1;
+extern Texture *texgrass, *texrocks, *texwater, *textree, *textree2, *textree3, *texcactus1, *texredstone;
+extern Texture *textreeu, *textreeu2, *textreeu3, *textreeu4, *textreeu5, *texcactusu1;
+extern Texture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
+extern Texture *texglitter1;
 
 class GLLandscape : public Landscape
 {
@@ -84,9 +84,9 @@ class GLLandscape : public Landscape
   private:
   unsigned short hray [MAXX + 1] [MAXX + 1]; // height of lowest sunray
   float mat [MAXMATERIAL] [4]; // materials=colors of landscape IDs
-  CTexture *texmap [MAXMATERIAL]; // texture for material
+  Texture *texmap [MAXMATERIAL]; // texture for material
   Space *space; // space of all objects
-  CColor treecolor;
+  Color treecolor;
   int vmin [PARTS] [PARTS]; // LOD
   int vmax [PARTS] [PARTS]; // LOD
   float vh [PARTS] [PARTS]; // LOD
@@ -144,7 +144,7 @@ class GLLandscape : public Landscape
 
   void calcDynamicLight (CExplosion **explo, DynamicObj **cannon, DynamicObj **missile, DynamicObj **flare); // explosions light up the surface
 
-  void setMaterial (int n, float r, float g, float b, CTexture *tex);
+  void setMaterial (int n, float r, float g, float b, Texture *tex);
 
   GLLandscape (Space *space2, int type, int *heightmask);
 };

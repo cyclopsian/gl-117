@@ -104,31 +104,31 @@ class CLoad3DS
   public:
   BinaryFile *file;
   CLoad3DS ();
-  bool Import3DS (CModel *model, char *filename);
+  bool Import3DS (Model3d *model, char *filename);
   
   // developer specific loading routines
   private:
   int GetString (char *);
   void ReadChunk (Chunk *);
-  void ProcessNextChunk (CModel *model, Chunk *);
-  void ProcessNextObjectChunk (CModel *model, CObject *object, Chunk *);
-  void ProcessNextMaterialChunk (CModel *model, Chunk *);
-  void ReadColorChunk (CMaterial *material, Chunk *pChunk);
-  void ReadVertices (CObject *object, Chunk *);
-  void ReadVertexIndices (CObject *object, Chunk *);
-  void ReadUVCoordinates (CObject *object, Chunk *);
-  void ReadMeshMatrix (CObject *object, Chunk *);
-  void ReadUScale (CMaterial *material, Chunk *);
-  void ReadVScale (CMaterial *material, Chunk *);
-  void ReadUOffset (CMaterial *material, Chunk *);
-  void ReadVOffset (CMaterial *material, Chunk *);
-  void ReadUVRotation (CMaterial *material, Chunk *);
-  void ReadObjectMaterial (CModel *model, CObject *object, Chunk *previousChunk);
-  void Compile (CModel *model);
-  void ComputeNormals (CModel *model);
-  void ComputeColors (CModel *model);
-  void LoadTextures (CModel *model);
-  void Normalize (CModel *model);
+  void ProcessNextChunk (Model3d *model, Chunk *);
+  void ProcessNextObjectChunk (Model3d *model, Object3d *object, Chunk *);
+  void ProcessNextMaterialChunk (Model3d *model, Chunk *);
+  void ReadColorChunk (Material *material, Chunk *pChunk);
+  void ReadVertices (Object3d *object, Chunk *);
+  void ReadVertexIndices (Object3d *object, Chunk *);
+  void ReadUVCoordinates (Object3d *object, Chunk *);
+  void ReadMeshMatrix (Object3d *object, Chunk *);
+  void ReadUScale (Material *material, Chunk *);
+  void ReadVScale (Material *material, Chunk *);
+  void ReadUOffset (Material *material, Chunk *);
+  void ReadVOffset (Material *material, Chunk *);
+  void ReadUVRotation (Material *material, Chunk *);
+  void ReadObjectMaterial (Model3d *model, Object3d *object, Chunk *previousChunk);
+  void Compile (Model3d *model);
+  void ComputeNormals (Model3d *model);
+  void ComputeColors (Model3d *model);
+  void LoadTextures (Model3d *model);
+  void Normalize (Model3d *model);
   void CleanUp ();
   FILE *filepointer;
   Chunk *currentChunk;

@@ -133,19 +133,19 @@ CLoadOBJ::CLoadOBJ ()
 {
 }
 
-void CLoadOBJ::ComputeColors (CModel *model)
+void CLoadOBJ::ComputeColors (Model3d *model)
 {
   int i, i2;
 
   if (model->numObjects <= 0)
     return;
 
-  CVector3 n;
-  CVector3 light (1.0, 1.0, 1.0);
+  Vector3 n;
+  Vector3 light (1.0, 1.0, 1.0);
   light.norm ();
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
       n.set (object->vertex [i2].normal);
@@ -157,17 +157,17 @@ void CLoadOBJ::ComputeColors (CModel *model)
   }
 }
 
-void CLoadOBJ::ComputeNormals (CModel *model)
+void CLoadOBJ::ComputeNormals (Model3d *model)
 {
   int i, i2, i3;
 
   if (model->numObjects <= 0)
     return;
 
-  CVector3 n;
+  Vector3 n;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numTriangles; i2 ++)
     {
       object->triangle [i2].calcNormal (&n);
@@ -202,17 +202,17 @@ void CLoadOBJ::ComputeNormals (CModel *model)
   }
 }
 
-void CLoadOBJ::Normalize (CModel *model)
+void CLoadOBJ::Normalize (Model3d *model)
 {
   int i, i2;
   float minx = 1E10, miny = 1E10, minz = 1E10;
   float maxx = -1E10, maxy = -1E10, maxz = -1E10;
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      CVertex *v = &object->vertex [i2];
+      Vertex *v = &object->vertex [i2];
       if (v->vector.x > maxx) maxx = v->vector.x;
       if (v->vector.y > maxy) maxy = v->vector.y;
       if (v->vector.z > maxz) maxz = v->vector.z;
@@ -233,10 +233,10 @@ void CLoadOBJ::Normalize (CModel *model)
 
   for (i = 0; i < model->numObjects; i ++)
   {
-    CObject *object = (model->object [i]);
+    Object3d *object = (model->object [i]);
     for (i2 = 0; i2 < object->numVertices; i2 ++)
     {
-      CVertex *v = &object->vertex [i2];
+      Vertex *v = &object->vertex [i2];
       v->vector.x -= tlx;
       v->vector.x /= sc;
       v->vector.y -= tly;
@@ -249,7 +249,7 @@ void CLoadOBJ::Normalize (CModel *model)
 //  model->scale = sc;
 }
 
-bool CLoadOBJ::ImportOBJ (CModel *model, char *filename)
+bool CLoadOBJ::ImportOBJ (Model3d *model, char *filename)
 {
   file = new CFile (filename);
   int32 i = 0;
@@ -283,17 +283,17 @@ bool CLoadOBJ::ImportOBJ (CModel *model, char *filename)
   }
 
   // create new object
-  model->object [model->numObjects] = new CObject;
-  CObject *object = model->object [model->numObjects];
+  model->object [model->numObjects] = new Object3d;
+  Object3d *object = model->object [model->numObjects];
   model->numObjects ++;
   object->numVertices = vertices;
   object->numTriangles = faces;
   object->numQuads = 0;
 
   // create array of vertices and faces (triangles, quads)
-  object->vertex = new CVertex [object->numVertices];
-  object->triangle = new CTriangle [object->numTriangles];
-  object->quad = new CQuad [object->numQuads];
+  object->vertex = new Vertex [object->numVertices];
+  object->triangle = new Triangle [object->numTriangles];
+  object->quad = new Quad [object->numQuads];
 
   int vn = 0, tn = 0;
   i = 0;

@@ -28,13 +28,13 @@
 #include "object.h" // ok
 #include "mathtab.h" // ok
 
-extern CTexture *texsmoke, *texsmoke2, *texsmoke3;
+extern Texture *texsmoke, *texsmoke2, *texsmoke3;
 
 // Smoke of missiles and fighters
 class CSmoke
 {
   public:
-  CVector3 v [MAXSMOKEELEM];
+  Vector3 v [MAXSMOKEELEM];
   float zoom [MAXSMOKEELEM];
   int time [MAXSMOKEELEM];
   int phi [MAXSMOKEELEM]; // player's view angle (for low quality smoke), obsolete since v0.8.5
@@ -56,7 +56,7 @@ class Flash
   public:
   int time;
   int phi; // player's view angle
-  CVector3 w [10];
+  Vector3 w [10];
   Flash ();
   virtual ~Flash ();
   void set (float x, float y, float z, int phi);
@@ -71,9 +71,9 @@ class CExplosion : public CSpaceObj
   Space *space;
   int ttl, maxlen;
   float maxzoom;
-  CVector3 v;
+  Vector3 v;
   
-  CExplosion (Space *space, CModel *sphere);
+  CExplosion (Space *space, Model3d *sphere);
   virtual ~CExplosion () {}
   void setExplosion (float x, float y, float z, float vx, float vy, float vz, float maxzoom, int len);
   void move (Uint32 dt);
@@ -93,7 +93,7 @@ class CBlackSmoke : public CSpaceObj
   virtual ~CBlackSmoke () {}
   void setBlackSmoke (float x, float y, float z, float myphi, float maxzoom, int len);
   void move (Uint32 dt);
-  virtual void drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2);
+  virtual void drawGL (Vector3 *z1, Vector3 *z2, Vector3 *tl, float alpha2, float lum2, bool drawlight2, bool istextured2);
 };
 
 // Stars at night
@@ -112,7 +112,7 @@ class Star
 class Font
 {
   public:
-  CTexture *texture; // the font texture
+  Texture *texture; // the font texture
   char start; // starting character
   int height; // fixed line height in the texture (should be maximum letter height)
   int n; // number of letters
@@ -120,8 +120,8 @@ class Font
   short letterx [256]; // starting x coordinate in the texture
   short lettery [256]; // starting y coordinate in the texture
   short letterw [256]; // width in the texture
-  CColor *stdcol;
-  CColor *highlightcol;
+  Color *stdcol;
+  Color *highlightcol;
   
   Font (char *filename, int height, char start, int num); // new Font
   virtual ~Font ();
@@ -130,24 +130,24 @@ class Font
   void extractLetters (int height, char start, int num); // extract the letters
 
   // some custom OpenGL output methods
-  void drawText (float x, float y, float z, char *str, CColor *c, bool centered, int highlight, CColor *highlightcol);
-  void drawText (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);
-  void drawText (float x, float y, float z, char *str, CColor *c, int highlight);
-  void drawText (float x, float y, float z, char *str, CColor *c);
-  void drawText (float x, float y, float z, char *str, int highlight, CColor *highlightcol);
+  void drawText (float x, float y, float z, char *str, Color *c, bool centered, int highlight, Color *highlightcol);
+  void drawText (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol);
+  void drawText (float x, float y, float z, char *str, Color *c, int highlight);
+  void drawText (float x, float y, float z, char *str, Color *c);
+  void drawText (float x, float y, float z, char *str, int highlight, Color *highlightcol);
   void drawText (float x, float y, float z, char *str, int highlight);
   void drawText (float x, float y, float z, char *str);
-  void drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight, CColor *highlightcol);
-  void drawTextCentered (float x, float y, float z, char *str, CColor *c, int highlight);
-  void drawTextCentered (float x, float y, float z, char *str, CColor *c);
-  void drawTextCentered (float x, float y, float z, char *str, int highlight, CColor *highlightcol);
+  void drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight, Color *highlightcol);
+  void drawTextCentered (float x, float y, float z, char *str, Color *c, int highlight);
+  void drawTextCentered (float x, float y, float z, char *str, Color *c);
+  void drawTextCentered (float x, float y, float z, char *str, int highlight, Color *highlightcol);
   void drawTextCentered (float x, float y, float z, char *str, int highlight);
   void drawTextCentered (float x, float y, float z, char *str);
-  void drawTextRotated (float x, float y, float z, char *str, CColor *color, int timer);
-  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight, CColor *highlightcol);
-  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer, int highlight);
-  void drawTextScaled (float x, float y, float z, char *str, CColor *color, int timer);
-  void drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, CColor *highlightcol);
+  void drawTextRotated (float x, float y, float z, char *str, Color *color, int timer);
+  void drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight, Color *highlightcol);
+  void drawTextScaled (float x, float y, float z, char *str, Color *color, int timer, int highlight);
+  void drawTextScaled (float x, float y, float z, char *str, Color *color, int timer);
+  void drawTextScaled (float x, float y, float z, char *str, int timer, int highlight, Color *highlightcol);
   void drawTextScaled (float x, float y, float z, char *str, int timer, int highlight);
   void drawTextScaled (float x, float y, float z, char *str, int timer);
 };
@@ -155,13 +155,13 @@ class Font
 class HighClouds : public CSpaceObj
 {
   public:
-  CSpherePart *sphere;
+  SpherePart *sphere;
   
   HighClouds (int theta);
   virtual ~HighClouds ();
   void init (int theta);
-  void setTexture (CTexture *texture);
-  void drawGL (CVector3 *tl, CVector3 *textl);
+  void setTexture (Texture *texture);
+  void drawGL (Vector3 *tl, Vector3 *textl);
 };
 
 #endif

@@ -50,7 +50,7 @@ class LoadTga
 
   protected:
 
-    static DATA32* flip(DATA32* in, int w, int h);
+    static DATA32* flip (DATA32* in, int w, int h);
     static inline void writeRGBA (DATA32 *p, DATA8 r, DATA8 g, DATA8 b, DATA8 a);
 };
 
