@@ -3,7 +3,8 @@
 echo Setting execution permissions...
 chmod +x win2unix 2> /dev/null
 chmod -x ChangeLog FAQ README INSTALL readme.txt AUTHORS *.spec Makefile.am COPYING NEWS configure.in 2> /dev/null
-chmod -x ./src/* 2> /dev/null
+chmod -x ./src/*.cpp 2> /dev/null
+chmod -x ./src/*.h 2> /dev/null
 
 echo Windows to Unix filename corrections...
 mv news NEWS 2> /dev/null
@@ -21,7 +22,7 @@ rm ./src/main.ncb
 rm ./src/main.opt
 rm ./src/main.plg
 
-echo Deleting obsolete CVS and automake/autoconf files...
+echo Deleting automake/autoconf files...
 rm config.h 2> /dev/null
 rm configure 2> /dev/null
 rm Makefile 2> /dev/null
