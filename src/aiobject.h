@@ -206,7 +206,9 @@ class AIObj : public DynamicObj
   bool haveMissile (); // missile of type missiletype left?
   void decreaseMissile (int id); // decrease missiles by one
   void fireMissile (int id, AIObj **missile, AIObj *target);
+  void fireMissile (AIObj **missile, AIObj *target);
   void fireMissile (int id, AIObj **missile);
+  void fireMissile (AIObj **missile);
   void fireFlare (DynamicObj **flare, AIObj **missile);
   void fireChaff (DynamicObj **chaff, AIObj **missile);
   void fireMissileAir (AIObj **missile, AIObj *target);

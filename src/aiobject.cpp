@@ -688,9 +688,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.43;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 4;
+    missiles [0] = 2;
     missiles [3] = 6;
     missiles [5] = 2;
+    missiles [6] = 2;
     flares = 20;
     chaffs = 20;
   }
@@ -732,10 +733,10 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.4;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 3;
+    missiles [0] = 2;
     missiles [1] = 2;
     missiles [3] = 2;
-    missiles [6] = 2;
+    missiles [6] = 4;
     flares = 20;
     chaffs = 20;
   }
@@ -748,9 +749,9 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.39;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [0] = 2;
+    missiles [0] = 1;
     missiles [3] = 1;
-    missiles [6] = 1;
+    missiles [6] = 2;
     flares = 20;
     chaffs = 20;
   }
@@ -777,7 +778,8 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
     zoom = 0.41;
     maxtheta = 90.0;
     maxgamma = 80.0;
-    missiles [1] = 8;
+    missiles [1] = 5;
+    missiles [7] = 3;
     flares = 25;
     chaffs = 25;
   }
@@ -1166,6 +1168,7 @@ void AIObj::fireCannon (DynamicObj **laser)
 
 void AIObj::fireMissile2 (int id, AIObj *missile, AIObj *target)
 {
+//printf ("%d:m=%d\n", party, id); fflush (stdout);
   missile->dinit ();
   missile->aiinit ();
   missile->newinit (id, party, 0);
@@ -1298,10 +1301,22 @@ void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
   }
 }
 
+void AIObj::fireMissile (AIObj **missile, AIObj *target)
+{
+  if (ttf > 0) return;
+  fireMissile (missiletype + MISSILE1, missile, (AIObj *) target);
+}
+
 void AIObj::fireMissile (int id, AIObj **missile)
 {
   if (ttf > 0) return;
   fireMissile (id, missile, (AIObj *) target);
+}
+
+void AIObj::fireMissile (AIObj **missile)
+{
+  if (ttf > 0) return;
+  fireMissile (missiletype + MISSILE1, missile);
 }
 
 void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
@@ -1394,9 +1409,9 @@ void AIObj::fireMissileAir (AIObj **missile, AIObj *target)
 bool AIObj::selectMissileAir (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_AIR3)) { missiletype = MISSILE_AIR3; sel = true; }
-  else if (haveMissile (MISSILE_AIR2)) { missiletype = MISSILE_AIR2; sel = true; }
-  else if (haveMissile (MISSILE_AIR1)) { missiletype = MISSILE_AIR1; sel = true; }
+  if (haveMissile (MISSILE_AIR3)) { missiletype = MISSILE_AIR3 - MISSILE1; sel = true; }
+  else if (haveMissile (MISSILE_AIR2)) { missiletype = MISSILE_AIR2 - MISSILE1; sel = true; }
+  else if (haveMissile (MISSILE_AIR1)) { missiletype = MISSILE_AIR1 - MISSILE1; sel = true; }
   return sel;
 }
 
@@ -1412,8 +1427,8 @@ void AIObj::fireMissileAirFF (AIObj **missile, AIObj *target)
 bool AIObj::selectMissileAirFF (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_FF2)) { missiletype = MISSILE_FF2; sel = true; }
-  else if (haveMissile (MISSILE_FF1)) { missiletype = MISSILE_FF1; sel = true; }
+  if (haveMissile (MISSILE_FF2)) { missiletype = MISSILE_FF2 - MISSILE1; sel = true; }
+  else if (haveMissile (MISSILE_FF1)) { missiletype = MISSILE_FF1 - MISSILE1; sel = true; }
   return sel;
 }
 
@@ -1429,8 +1444,8 @@ void AIObj::fireMissileGround (AIObj **missile)
 bool AIObj::selectMissileGround (AIObj **missile)
 {
   bool sel = false;
-  if (haveMissile (MISSILE_GROUND2)) { missiletype = MISSILE_GROUND2; sel = true; }
-  else if (haveMissile (MISSILE_GROUND1)) { missiletype = MISSILE_GROUND1; sel = true; }
+  if (haveMissile (MISSILE_GROUND2)) { missiletype = MISSILE_GROUND2 - MISSILE1; sel = true; }
+  else if (haveMissile (MISSILE_GROUND1)) { missiletype = MISSILE_GROUND1 - MISSILE1; sel = true; }
   return sel;
 }
 
@@ -1716,12 +1731,32 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
       if (fabs (dphi) < 50 && fabs (dgamma) < 50 && party != target->party)
       {
         if (disttarget < 40)
+        {
           if (ttf > 0)
-            ttf -= 2;
+          {
+            if (missiletype >= 0 && missiletype <= 2)
+            {
+              float dphi = fabs (phi - target->phi);
+              if (dphi > 270) dphi = 360 - dphi;
+              if (dphi < 45)
+                ttf -= 2;
+              else
+                ttf = 50;
+            }
+            else if (missiletype == 6 || missiletype == 7)
+            {
+              ttf -= 5;
+            }
+            else
+            {
+              ttf -= 3;
+            }
+          }
+        }
       }
       else
       {
-        if (missiletype == MISSILE_DF1) ttf = 0;
+        if (missiletype == MISSILE_DF1 - MISSILE1) ttf = 0;
         else ttf = 50;
       }
     }
@@ -1742,10 +1777,16 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
         if (m [i]->ttl > 0)
           if (m [i]->target == this)
           {
-            if (theta >= 20 + myrandom (40))
-              fireFlare (flare, m);
-            if (theta >= 20 + myrandom (40))
-              fireChaff (chaff, m);
+            if (m [i]->id >= 0 && m [i]->id <= MISSILE_AIR3)
+            {
+              if (theta >= 15 + myrandom (30))
+                fireFlare (flare, m);
+            }
+            else
+            {
+              if (theta >= 15 + myrandom (30))
+                fireChaff (chaff, m);
+            }
           }
   }
 
@@ -1949,13 +1990,13 @@ m [0]->tl->y = target->tl->y;
     {
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
-        if (fabs (rectheta - theta) < 2 + agr && fabs (aw) < 20 + agr * 4 && disttarget < 30 && target->theta < 20)
-          fireMissileAir (m, (AIObj *) target);
+        if (fabs (rectheta - theta) < 25 + agr * 5 && fabs (aw) < 40 + agr * 4 && disttarget < 40/* && target->theta < 20*/)
+          fireMissile (m, (AIObj *) target);
       }
       else // ground target
       {
-        if (fabs (rectheta - theta) < 2 + agr && fabs (aw) < 20 + agr * 4 && disttarget < 50)
-          fireMissileGround (m);
+        if (fabs (rectheta - theta) < 5 + agr && fabs (aw) < 25 + agr * 4 && disttarget < 50)
+          fireMissile (m);
       }
     }
     if (!manoevertheta) // change roll angle
