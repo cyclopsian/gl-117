@@ -189,7 +189,7 @@ class CVertex
   /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
   void addNormal (const CVector3 &n); 
   /// the color of a vertex can be calculated as average of all adjacent plane colors
-  void addColor (const CColor &c);
+  void addColor (const CColor &color);
   /// copy data from v
   void take (const CVertex &v);
 };
@@ -240,7 +240,9 @@ class CTriangle
   void setVertices (CVertex *a, CVertex *b, CVertex *c); // not const as a,b,c may be altered
 };
 
-// CQuad stores references to the vertices of the quad/square/face
+/**
+* CQuad stores references to the vertices of the quad/square/face.
+*/
 class CQuad
 {
   public:
@@ -253,25 +255,43 @@ class CQuad
   void setVertices (CVertex *a, CVertex *b, CVertex *c, CVertex *d); // not const as a,b,c,d may be altered
 };
 
-// CMaterial stores the name, filename, color, and texture of a material
+/**
+* Material stores the name, filename, color, and texture of a material
+*/
 class CMaterial
 {
   public:
-  char name [255]; // unique name
-  char filename [255]; // unique file name
-  CColor color; // uniform color
-  CTexture *texture; // reference to a texture (or NULL if there is no texture)
-  float utile; // tiling coordinates
+  /// unique name
+  std::string name;
+  /// unique file name
+  std::string filename;
+  /// uniform color
+  CColor color;
+  /// pointer to a texture (or NULL if there is no texture)
+  CTexture *texture;
+  /// tiling coordinates
+  float utile;
+  /// tiling coordinates
   float vtile;
-  float uoffset; // texture offsets (the importer must calculate u/v due to offsets)
+  /// texture offset (the importer must calculate u due to offsets)
+  float uoffset;
+  /// texture offset (the importer must calculate v due to offsets)
   float voffset;
-  float uscale; // texture scaling (the importer must calculate u/v due to scaling)
+  /// texture scaling (the importer must calculate u due to scaling)
+  float uscale;
+  /// texture scaling (the importer must calculate v due to scaling)
   float vscale;
-  float wrot; // rotation in degree (the importer must calculate u/v due to wrot)
+  /// rotation in degree (the importer must calculate u/v due to wrot)
+  float wrot;
+  
   CMaterial ();
+  virtual ~CMaterial ();
 };
 
-// CObject stores the material, vertices, and faces (triangles, quads) of an object
+/**
+* CObject stores the material, vertices, and faces (triangles, quads) of an object
+* which is a part of the whole model.
+*/
 class CObject
 {
   public:
@@ -279,34 +299,36 @@ class CObject
   Uint16 numTriangles;
   Uint16 numQuads;
   Uint16 numTexVertex;
-  CMaterial *material; // an object has one unique material
-  bool hasTexture; // an object can have one unique texture
-  char name [255]; // unique object name
-  CVertex *vertex; // vertex list
-  CTriangle *triangle; // triangle list
-  CQuad *quad; // quad list
+  /// an object has one unique material
+  CMaterial *material;
+  /// an object can have one unique texture
+  bool hasTexture;
+  /// unique object name
+  std::string name;
+  /// vertex list
+  CVertex *vertex;
+  /// triangle list
+  CTriangle *triangle;
+  /// quad list
+  CQuad *quad;
+  
   CObject ();
-  ~CObject ();
-  int addVertex (CVertex *w); // used to construct objects
-  void setColor (CColor *col);
+  virtual ~CObject ();
+  
+  //// used to construct objects
+  int addVertex (const CVertex &v);
+  void setColor (const CColor &color);
 };
 
-// CModel stores the materials and objects of a model, the data structure is optimized for 3DS files
+/**
+* CModel stores the materials and objects of a model, the data structure is optimized for 3DS files.
+* TODO: make a general "Model" and a derived "Model3ds". Split draw() methods into a "Realizer".
+*/
 class CModel 
 {
-  private:
-  // all private members are only used "temporarily" at runtime!
-  int rotcol; // very special for flickering light sources, e.g. the engine's bright yellow color is rotated
-  float light_ambient [4]; // special light source attributes
-  float light_diffuse [4];
-  float light_ambient2 [4];
-  float light_diffuse2 [4];
-  CVector3 tlnull;
-  CRotation rotnull;
-  VertexArray *va; // using a vertex array means more memory, but better performance
-
   public:
-  char name [20]; // unique model name like "GL-117"
+  /// unique model name like "GL-117"
+  char name [20];
   int shading; // shading can be set to FLAT (0) or SMOOTH/GOURAUD (1)
   Uint16 numObjects; // number of objects (which have a unique material)
   Uint16 numMaterials; // number of materials (should be the same as the number of objects)
@@ -342,6 +364,17 @@ class CModel
   void draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, int explode);
   // draw without textures, different luminance
   void draw3 (CVector3 *tl, CVector3 *tl2, CRotation *rot, float zoom, float lum, int explode);
+
+  protected:
+  /// all private members are only used "temporarily" at runtime!
+  int rotcol; // very special for flickering light sources, e.g. the engine's bright yellow color is rotated
+  float light_ambient [4]; // special light source attributes
+  float light_diffuse [4];
+  float light_ambient2 [4];
+  float light_diffuse2 [4];
+  CVector3 tlnull;
+  CRotation rotnull;
+  VertexArray *va; // using a vertex array means more memory, but better performance
 };
 
 // CSphere represents an ellipsoid according to the CModel data structure
