@@ -836,7 +836,7 @@ int game_levelInit ()
     }
     if (sungamma < 35)
     {
-      gl.setFogColor (127 + 70 - 2 * sungamma, 127, 127);
+      gl.setFogColor (static_cast<int>(127 + 70 - 2 * sungamma), 127, 127);
     }
     else
     {
