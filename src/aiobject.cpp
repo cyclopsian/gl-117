@@ -231,7 +231,7 @@ void DynamicObj::checkShield ()
 }
 
 // check whether the object collides on the ground and alter gamma and y-translation
-void DynamicObj::crashGround ()
+void DynamicObj::crashGround (Uint32 dt)
 {
   if ((id >= SHIP1 && id <= SHIP2) || (id >= FLAK1 && id <= FLAK2) || id >= STATIC || (id >= TANK1 && id <= TANK2))
     return;
@@ -255,7 +255,7 @@ void DynamicObj::crashGround ()
     }
     if (id >= CANNON1 && id <= CANNON2)
       deactivate ();
-    shield -= 1;
+    shield -= 1; // time independant
 //      shield += (int) height - 2;
   }
   // restrict to a maximum height, we want an action game!!! a little bit more now 50 -> 80
@@ -264,7 +264,7 @@ void DynamicObj::crashGround ()
 
 // check for collision, simplified model, each model is surrounded by a cube
 // this works pretty well, but we must use more than one model for complex models or scenes
-void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile)
+void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (laser, missile)
 {
   if (immunity > 0 || d->immunity > 0) return;
   if (explode > 0 || sink > 0) return;
@@ -289,10 +289,10 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
       tl->z >= d->tl->z - z && tl->z <= d->tl->z + z)
   {
     if (id < STATIC || (id >= STATIC && d->id >= MISSILE1 && d->id <= MISSILE2))
-      shield -= d->impact;
+      shield -= (float) d->impact * dt / timestep;
     else
-      shield -= 2;
-    d->shield -= impact;
+      shield -= 2.0F * dt / timestep;
+    d->shield -= (float) impact * dt / timestep;
 //      printf (" c(%d,%d)=>s(%d,%d)\n", id, d->id, shield, d->shield);
     if (d->source != NULL && active) // only for missiles/cannons
     {
@@ -363,6 +363,13 @@ int DynamicObj::getAngle (DynamicObj *o)
   if (aw < -180) aw += 360;
   if (aw > 180) aw -= 360;
   return aw;
+}
+
+// return elevation difference towards enemy
+int DynamicObj::getAngleH (DynamicObj *o)
+{
+  float disttarget = distance (o);
+  return atan ((o->tl->y - tl->y) / disttarget) * 180 / PI - (gamma - 180);
 }
 
 // check for a looping, this is tricky :-)
@@ -668,7 +675,7 @@ cannondone:;
     }
   }
   checkShield (); // check shield issues
-  crashGround (); // check ground collision
+  crashGround (dt); // check ground collision
   if (immunity > 0) immunity -= dt; // decrease immunity
 }
 
@@ -1022,7 +1029,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_GROUND1)
   {
     intelligence = 50;
-    maxthrust = 0.58;
+    maxthrust = 0.64;
     nimbility = 1.2;
     manoeverability = 1.0;
     ai = true;
@@ -1032,7 +1039,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_GROUND2)
   {
     intelligence = 0;
-    maxthrust = 0.60;
+    maxthrust = 0.68;
     nimbility = 1.5;
     manoeverability = 1.0;
     ai = true;
@@ -1042,7 +1049,7 @@ void AIObj::newinit (int id, int party, int intelligence, int precision, int agg
   else if (id == MISSILE_DF1)
   {
     intelligence = 0;
-    maxthrust = 0.62;
+    maxthrust = 0.65;
     nimbility = 0.0;
     manoeverability = 0.0;
     ai = true;

@@ -1725,8 +1725,8 @@ void GLLandscape::draw (int phi, int gamma)
 
   float fac;
 
-  if (quality >= 0 && quality <= 2) gridstep = 3;
-  else if (quality >= 3 && quality <= 4) gridstep = 2;
+  if (quality >= 0 && quality <= 1) gridstep = 3;
+  else if (quality >= 2 && quality <= 4) gridstep = 2;
   else gridstep = 1;
 
   if (phi < 0) phi += 360;

@@ -957,7 +957,7 @@ MissionAirBattle::MissionAirBattle ()
   strcpy (briefing, "WE ARE BEING ATTACKED BY A MASS OF CROWS. THE SQUADRON IS ORDERED TO DEFEND.");
   autoLFBriefing ();
   alliedfighters = 7;
-  maxtime = 5000 * timestep;
+  maxtime = 6000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_FIREBIRD;
@@ -1045,7 +1045,7 @@ MissionGround1::MissionGround1 ()
   autoLFBriefing ();
   alliedfighters = 2;
   alliedpilot [0] = PILOT_PRIMETIME;
-  maxtime = 2500 * timestep;
+  maxtime = 3000 * timestep;
 }
 
 void MissionGround1::start ()
@@ -1218,7 +1218,7 @@ MissionBase::MissionBase ()
   alliedpilot [1] = PILOT_SHADOW;
   alliedpilot [2] = PILOT_HEPTARGON;
   alliedpilot [3] = PILOT_DRDOOM;
-  maxtime = 4000 * timestep;
+  maxtime = 6000 * timestep;
 }
 
 void MissionBase::start ()
@@ -1622,7 +1622,7 @@ MissionTank1::MissionTank1 ()
   strcpy (briefing, "THE ENEMY IS GATHERING LOTS OF TANKS. FLY AN ASSAUT AND DESTROY THEM.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3000 * timestep;
+  maxtime = 3500 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1711,7 +1711,7 @@ MissionShip1::MissionShip1 ()
   strcpy (briefing, "OUR SQUAD HAS BEEN ORDERED INTO THE MEDITERRANEAN. YOUR FIRST GOAL ARE SOME DESTROYERS, GUARDED BY CROWS.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 3000 * timestep;
+  maxtime = 3500 * timestep;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
 }
@@ -1793,7 +1793,7 @@ MissionShip2::MissionShip2 ()
   strcpy (briefing, "AN OILRIG IS BEING ATTACKED BY ENEMY FORCES. DEFEND! OUR NEW SUPERIOR FIGHTER GL-15 IS NOW AVAILABLE.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2000 * timestep;
+  maxtime = 2500 * timestep;
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
@@ -1884,7 +1884,7 @@ MissionShip3::MissionShip3 ()
   strcpy (briefing, "THE CRUISER C-15 ARAKON HAS ENTERED NEUTRAL TERRITORY WATERS AND MUST BE ELIMINATED.");
   autoLFBriefing ();
   alliedfighters = 2;
-  maxtime = 2000 * timestep;
+  maxtime = 2500 * timestep;
   selfighter [0] = FIGHTER_REDARROW;
   selfighter [1] = FIGHTER_HAWK2;
   alliedpilot [0] = PILOT_SHADOW;
@@ -1967,7 +1967,7 @@ MissionCanyon1::MissionCanyon1 ()
   strcpy (briefing, "YOU HAVE TO FLY AN ASSAULT ON A RADAR BASE. STAY AS LOW AS POSSIBLE!");
   autoLFBriefing ();
   alliedfighters = 1;
-  maxtime = 2000 * timestep;
+  maxtime = 2500 * timestep;
 }
 
 void MissionCanyon1::start ()
@@ -2078,7 +2078,7 @@ MissionCanyon2::MissionCanyon2 ()
   strcpy (briefing, "THIS MAY BECOME A REAL AIR BATTLE...");
   autoLFBriefing ();
   alliedfighters = 5;
-  maxtime = 4000 * timestep;
+  maxtime = 6000 * timestep;
 }
 
 void MissionCanyon2::start ()

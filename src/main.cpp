@@ -2321,6 +2321,7 @@ void mission_display ()
   font1->drawText (xstats, ystats - 3, -3, "KILLS:");
   sprintf (buf, "%d AIRCRAFTS", p->mission_fighterkills [missionnew->id]);
   font1->drawText (xstatstab, ystats - 3, -3, buf, colorstd);
+  drawMedal (xstatstab + 2, ystats - 5.5, -3, getMedal (p->mission_score [missionnew->id]), 3.5);
   
   font1->drawText (-22, piloty, -3, "PILOTS:");
   strcpy (buf, pilots->pilot [pilots->aktpilot]->getRank ());
@@ -3416,7 +3417,7 @@ void stats_display ()
   font1->drawText (xf1, yf, zf, "TIME BONUS:", color);
   sprintf (buf, "%d%%", timebonus);
   font1->drawText (xf2, yf, zf, buf, color);
-  int shieldbonus = fplayer->shield * 100 / fplayer->maxshield;
+  int shieldbonus = (int) (fplayer->shield * 100 / fplayer->maxshield);
   yf -= 1.5;
   font1->drawText (xf1, yf, zf, "SHIELD BONUS:", color);
   sprintf (buf, "%d%%", shieldbonus);
@@ -3913,6 +3914,38 @@ void game_display ()
     if (flash > 0)
     {
       sunlight = (float) flash / timestep;
+    }
+  }
+
+  // show a short flash when an object explodes
+  if (quality > 0)
+  {
+    for (i = 0; i < maxfighter; i ++)
+    {
+      if (fighter [i]->draw)
+        if (fighter [i]->explode > 0)
+          if (fighter [i] != fplayer)
+          {
+            float dgamma = fabs (fplayer->getAngleH (fighter [i]));
+            float dphi = fabs (fplayer->getAngle (fighter [i]));
+            if (dphi < 45 && dgamma < 45)
+            {
+              float ddist = fplayer->distance (fighter [i]);
+              if (ddist < 40)
+              {
+                ddist /= 15;
+                ddist ++;
+                dphi /= 25;
+                dphi ++;
+                dgamma /= 25;
+                dgamma ++;
+                if (fighter [i]->explode < 8 * timestep)
+                  sunlight = (float) fighter [i]->explode / timestep * 4 / ddist / dphi / dgamma;
+                else if (fighter [i]->explode < 16 * timestep)
+                  sunlight = (16.0 - fighter [i]->explode / timestep) * 4 / ddist / dphi / dgamma;
+              }
+            }
+          }
     }
   }
 
@@ -4658,28 +4691,28 @@ void game_timer (float dt)
   {
     for (i2 = 0; i2 < maxlaser; i2 ++)
       if (laser [i2]->active)
-        fighter [i]->collide (laser [i2]);
+        fighter [i]->collide (laser [i2], dt);
     for (i2 = 0; i2 < maxmissile; i2 ++)
       if (missile [i2]->active)
-        fighter [i]->collide (missile [i2]);
+        fighter [i]->collide (missile [i2], dt);
     for (i2 = 0; i2 < maxfighter; i2 ++)
       if (fighter [i2]->active)
         if (i != i2)
-          fighter [i]->collide (fighter [i2]);
+          fighter [i]->collide (fighter [i2], dt);
   }
 
   for (i = 0; i < maxflare; i ++)
   {
     for (i2 = 0; i2 < maxmissile; i2 ++)
       if (missile [i2]->active)
-        flare [i]->collide (missile [i2]);
+        flare [i]->collide (missile [i2], dt);
   }
 
   for (i = 0; i < maxchaff; i ++)
   {
     for (i2 = 0; i2 < maxmissile; i2 ++)
       if (missile [i2]->active)
-        chaff [i]->collide (missile [i2]);
+        chaff [i]->collide (missile [i2], dt);
   }
 
   for (i = 0; i < maxfighter; i ++)
@@ -5566,12 +5599,24 @@ void myFirstInit ()
   // cannon at night
   g_Load3ds.Import3DS (&model_cannon2, dirs->getModels ("cannon2.3ds"));
   model_cannon2.nolight = true;
-  model_cannon2.object [0]->vertex [2].color.c [0] = 50;
-  model_cannon2.object [0]->vertex [2].color.c [1] = 50;
-  model_cannon2.object [0]->vertex [2].color.c [2] = 50;
-  model_cannon2.object [0]->vertex [1].color.c [0] = 50;
-  model_cannon2.object [0]->vertex [1].color.c [1] = 50;
-  model_cannon2.object [0]->vertex [1].color.c [2] = 50;
+  model_cannon2.alpha = true;
+  for (i = 0; i < 4; i ++)
+  {
+    model_cannon2.object [0]->vertex [i].color.c [0] = 255;
+    model_cannon2.object [0]->vertex [i].color.c [1] = 255;
+    model_cannon2.object [0]->vertex [i].color.c [2] = 0;
+    model_cannon2.object [0]->vertex [i].color.c [3] = 255;
+  }
+  model_cannon2.object [0]->vertex [1].color.c [3] = 50;
+  model_cannon2.object [0]->vertex [2].color.c [3] = 50;
+/*  model_cannon2.object [0]->vertex [2].color.c [0] = 255;
+  model_cannon2.object [0]->vertex [2].color.c [1] = 255;
+  model_cannon2.object [0]->vertex [2].color.c [2] = 0;
+  model_cannon2.object [0]->vertex [2].color.c [3] = 100;
+  model_cannon2.object [0]->vertex [1].color.c [0] = 255;
+  model_cannon2.object [0]->vertex [1].color.c [1] = 255;
+  model_cannon2.object [0]->vertex [1].color.c [2] = 0;
+  model_cannon2.object [0]->vertex [1].color.c [3] = 100;*/
   g_Load3ds.Import3DS (&model_flare1, dirs->getModels ("flare1.3ds"));
   model_flare1.setName ("FLARE");
   model_flare1.alpha = true;

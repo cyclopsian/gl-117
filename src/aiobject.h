@@ -97,7 +97,7 @@ class DynamicObj : public CSpaceObj
   int easymodel;
   int ttl; // time to live: cannon and missiles will only live a short time, missiles will sink when ttl<=0
   int immunity; // immunity means the object cannot collide with others, needed for shooting missiles/cannon
-  int impact; // this value will be subtracted from the other objects shield when colliding
+  float impact; // this value will be subtracted from the other objects shield when colliding
   // Imagine a carthesian coordinate system in the landscape, the y-axis pointing up
   float phi; // angle in x-z plane (polar coordinates)
   float gamma; // orthogonal angle (polar coordinates)
@@ -127,7 +127,7 @@ class DynamicObj : public CSpaceObj
   char net [100];
 //  GLLandscape *l;
   
-  int shield, maxshield; // current and initial/maximum shield
+  float shield, maxshield; // current and initial/maximum shield
 
   int net_write ();
   void net_read ();
@@ -144,14 +144,16 @@ class DynamicObj : public CSpaceObj
   // check the objects shield value and explode/sink if necessary
   void checkShield ();
   // check whether the object collides on the ground and alter gamma and y-translation
-  void crashGround ();
+  void crashGround (Uint32 dt);
   // check for collision, simplified model, each model is surrounded by a cube
   // this works pretty well, but we must use more than one model for complex models or scenes
-  void collide (DynamicObj *d); // d must be the medium (laser, missile)
+  void collide (DynamicObj *d, Uint32 dt); // d must be the medium (laser, missile)
   void setExplosion (float maxzoom, int len);
   void setBlackSmoke (float maxzoom, int len);
   // return heading difference towards enemy
   int getAngle (DynamicObj *o);
+  // return elevation difference towards enemy
+  int getAngleH (DynamicObj *o);
   // check for a looping, this is tricky :-)
   bool checkLooping ();
   void move (Uint32 dt);

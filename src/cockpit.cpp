@@ -298,8 +298,7 @@ void Cockpit::drawHeading ()
   if (fplayer->target != NULL)
     if (fplayer->target->active)
     {
-      float disttarget = fplayer->distance (fplayer->target);
-      float dgamma = atan ((fplayer->target->tl->y - fplayer->tl->y) / disttarget) * 180 / PI - (fplayer->gamma - 180);
+      float dgamma = fplayer->getAngleH (fplayer->target);
       float dphi = fplayer->getAngle (fplayer->target);
       if (fabs (dphi) > 50 || fabs (dgamma) > 50)
       {
