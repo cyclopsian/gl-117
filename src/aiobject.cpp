@@ -271,7 +271,8 @@ void DynamicObj::collide (DynamicObj *d) // d must be the medium (laser, missile
   float z = d->zoom > zoom ? d->zoom : zoom;
   if ((id >= MISSILE1 && id <= MISSILE2) || (d->id >= MISSILE1 && d->id <= MISSILE2))
   {
-    z *= 1.5; // missiles need not really hit the fighter, but will explode near it
+    if (d->party != party)
+      z *= 2.0; // missiles need not really hit the fighter, but will explode near it
   }
   if ((id >= SHIP1 && id <= SHIP2) || (d->id >= SHIP1 && d->id <= SHIP2))
     z *= 0.3;
@@ -427,7 +428,7 @@ void DynamicObj::move ()
 
   int theta0 = (int) theta; // get a normalized theta, as our sine/cosi tables only reach from 0 to 359
   while (theta0 < 0) theta0 += 360;
-  while (theta0 > 360) theta0 -= 360;
+  while (theta0 >= 360) theta0 -= 360;
   // the core of directional alterations and force calculations:
   // easymodels change heading due to roll angle
   // this may seem complete nonsense for fighters, but it is just a simplification!!!
@@ -1267,7 +1268,10 @@ int AIObj::nextMissile (int from)
 
 bool AIObj::haveMissile (int id)
 {
-  if (missiles [id - MISSILE1] > 0)
+  id -= MISSILE1;
+  if (id < 0 || id >= missiletypes)
+  { fprintf (stderr, "\nError in %s, line %s!", __FILE__, __LINE__); return false; }
+  if (missiles [id] > 0)
     return true;
   return false;
 }
@@ -1281,7 +1285,10 @@ bool AIObj::haveMissile () // due to missiletype
 
 void AIObj::decreaseMissile (int id)
 {
-  missiles [id - MISSILE1] --;
+  id -= MISSILE1;
+  if (id < 0 || id >= missiletypes)
+  { fprintf (stderr, "\nError in %s, line %s!", __FILE__, __LINE__); return; }
+  missiles [id] --;
 }
 
 void AIObj::fireMissile (int id, AIObj **missile, AIObj *target)
@@ -1321,7 +1328,7 @@ void AIObj::fireMissile (AIObj **missile)
 
 void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
 {
-  int i;
+  int i, i2;
   if (flares <= 0) return;
   if (fireflarettl > 0) return;
   for (i = 0; i < maxflare; i ++)
@@ -1333,33 +1340,33 @@ void AIObj::fireFlare (DynamicObj **flare, AIObj **missile)
     fireFlare2 (flare [i]);
     flares --;
     fireflarettl = 15;
-  }
-  for (i = 0; i < maxmissile; i ++)
-  {
-    if (missile [i]->ttl > 0)
+    for (i2 = 0; i2 < maxmissile; i2 ++)
     {
-      if (missile [i]->id >= MISSILE_AIR1 && missile [i]->id <= MISSILE_AIR3) // only heat seeking missiles
-        if (missile [i]->target == this) // only change target if angle is good
-        {
-          bool hit = false;
-          if (easymodel)
+      if (missile [i2]->ttl > 0)
+      {
+        if (missile [i2]->id >= MISSILE_AIR1 && missile [i2]->id <= MISSILE_AIR3) // only heat seeking missiles
+          if (missile [i2]->target == this) // only change target if angle is good
           {
-            if (myrandom (theta + 10) > 35) hit = true;
+            bool hit = false;
+            if (easymodel)
+            {
+              if (myrandom (theta + 20) > 50) hit = true;
+            }
+            else
+            {
+              if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
+            }
+            if (hit)
+              missile [i2]->target = flare [i];
           }
-          else
-          {
-            if (myrandom (fabs (aileroneffect) * 90 + 10) > 35) hit = true;
-          }
-          if (hit)
-            missile [i]->target = flare [i];
-        }
+      }
     }
   }
 }
 
 void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
 {
-  int i;
+  int i, i2;
   if (chaffs <= 0) return;
   if (firechaffttl > 0) return;
   for (i = 0; i < maxchaff; i ++)
@@ -1371,26 +1378,26 @@ void AIObj::fireChaff (DynamicObj **chaff, AIObj **missile)
     fireChaff2 (chaff [i]);
     chaffs --;
     firechaffttl = 15;
-  }
-  for (i = 0; i < maxmissile; i ++)
-  {
-    if (missile [i]->ttl > 0)
+    for (i2 = 0; i2 < maxmissile; i2 ++)
     {
-      if (missile [i]->id > MISSILE_AIR3) // only radar seeking missiles
-        if (missile [i]->target == this) // only change target if angle is good
-        {
-          bool hit = false;
-          if (easymodel)
+      if (missile [i2]->ttl > 0)
+      {
+        if (missile [i2]->id > MISSILE_AIR3) // only radar seeking missiles
+          if (missile [i2]->target == this) // only change target if angle is good
           {
-            if (myrandom (theta + 15) > 35) hit = true;
+            bool hit = false;
+            if (easymodel)
+            {
+              if (myrandom (theta + 20) > 50) hit = true;
+            }
+            else
+            {
+              if (myrandom (fabs (aileroneffect) * 90 + 20) > 50) hit = true;
+            }
+            if (hit)
+              missile [i2]->target = chaff [i];
           }
-          else
-          {
-            if (myrandom (fabs (aileroneffect) * 90 + 15) > 35) hit = true;
-          }
-          if (hit)
-            missile [i]->target = chaff [i];
-        }
+      }
     }
   }
 }
@@ -1570,6 +1577,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
   // which height???
   float recheight2; // this is the height, the object wants to achieve
   float flyx = tl->x + forcex * 6, flyz = tl->z + forcez * 6;
+  int flyxs = l->getX (flyx), flyzs = l->getX (flyz);
   if (ttl != 0)
   {
     if (manoeverheight)
@@ -1608,7 +1616,7 @@ void AIObj::aiAction (AIObj **f, AIObj **m, DynamicObj **c, DynamicObj **flare, 
         recheight = target->tl->y - targetheight;  // target is a fighter
       else
         recheight = target->tl->y - targetheight + 5; // target is no fighter
-      if (!l->isWater (l->f [(int) flyx] [(int) flyz])) // not flying above water
+      if (!l->isWater (l->f [flyxs] [flyzs])) // not flying above water
       {
         if (recheight < 3.5 + 0.005 * aggressivity) recheight = 3.5 + 0.005 * aggressivity;
         if (maxgamma < 40) // transporters have to stay higher
@@ -1995,13 +2003,13 @@ m [0]->tl->y = target->tl->y;
       if (target->id >= FIGHTER1 && target->id <= FIGHTER2)
       {
         if (fabs (rectheta - theta) < agr * 12 && fabs (aw) < agr * 15 && disttarget < 40/* && target->theta < 20*/)
-          if (myrandom (intelligence) < 50)
+          if (myrandom (intelligence) < 5)
             fireMissile (m, (AIObj *) target);
       }
       else // ground target
       {
         if (fabs (rectheta - theta) < 3 + agr * 2 && fabs (aw) < 25 + agr * 4 && disttarget < 50)
-          if (myrandom (intelligence) < 50)
+          if (myrandom (intelligence) < 5)
             fireMissile (m);
       }
     }
