@@ -1557,7 +1557,6 @@ void GLLandscape::drawWaterTexturedQuad (int xs, int ys)
     glBlendFunc (GL_ONE, GL_SRC_ALPHA);
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.2);
-  //  glBlendFunc (GL_ONE, GL_ONE);
     gl->enableTextures (texglitter1->textureID);
     gl->enableLinearTexture (texglitter1->textureID);
     glBegin (GL_QUADS);

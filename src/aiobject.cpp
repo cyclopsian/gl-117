@@ -403,6 +403,9 @@ bool DynamicObj::checkLooping ()
 // discrete movement, called about timestep times per second, timer-dependant, currently without extra thread (GLUT)!
 void DynamicObj::move (Uint32 dt)
 {
+  if (dt <= 0) return;
+  if (realspeed <= 0) realspeed = 1.0F;
+
   float brakepower = 1.0F;
   float timefac = (float) dt / (float) timestep;
 
@@ -681,6 +684,7 @@ void AIObj::aiinit ()
   intelligence = 100;
   aggressivity = 100;
   precision = 100;
+  shield = 10;
   ai = true;
   active = true;
   draw = true;
@@ -2425,7 +2429,7 @@ m [0]->tl->y = target->tl->y;
       dx2 = ex - tl->x; dz2 = ez - tl->z; // estimated distances
       w = (int) phi;
       if (dz2 > -0.0001 && dz2 < 0.0001) dz2 = 0.0001;
-      a = (int) (atan (dx2 / dz2) * 180 / PI);
+      a = (atan (dx2 / dz2) * 180 / PI);
       if (dz2 > 0)
       {
         if (dx2 > 0) a -= 180;

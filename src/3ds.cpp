@@ -634,7 +634,7 @@ void CLoad3DS::Normalize (CModel *model)
   float scy = (maxy - miny) * 0.5;
   float scz = (maxz - minz) * 0.5;
   float sc = scx > scy ? scx : scy;
-  sc = scz > sc ? scz : sc; 
+  sc = scz > sc ? scz : sc;
 
   for (i = 0; i < model->numObjects; i ++)
   {

@@ -31,7 +31,6 @@ TODO:
 - tree colors (fall, spring), draw more tree textures
 - torpedo, water
 - little bigger gauss filter for light mask, 2x2 grid does not look good ???
-- cannon sound
 - clouds to fly through
 - particle systems
 - pseudo random number generator
@@ -4332,7 +4331,7 @@ void game_timer (int dt)
   // create flash during thunderstorm
   if (weather == WEATHER_THUNDERSTORM && flash <= 0 && !myrandom (2000 / dt))
   {
-    flash = 12 * timestep;
+    flash = 15 * timestep;
     int fphi = (int) camphi + myrandom (50) - 25;
     if (fphi < 0) fphi += 360;
     else if (fphi >= 360) fphi -= 360;
@@ -4915,6 +4914,7 @@ int initexplode = 0;
 int initexplode1 = 0;
 int i;
 int inittimer = 0;
+int inittimer_gl117 = 0;
 
 void init_reshape ()
 {
@@ -5032,6 +5032,8 @@ void myFirstInit ()
   g_Load3ds.Import3DS (&model_tent1, dirs->getModels ("tent1.3ds"));
   model_tent1.setName ("TENT");
   g_Load3ds.Import3DS (&model_gl117, dirs->getModels ("gl-117.3ds"));
+  model_gl117.displaylist = false;
+//  model_gl117.scaleTexture (0.10, 0.10);
   g_Load3ds.Import3DS (&model_tank1, dirs->getModels ("tank1.3ds"));
   model_tank1.setName ("WIESEL");
   model_tank1.scaleTexture (0.5, 0.5);
@@ -5143,8 +5145,8 @@ void init_mouse (int button, int state, int x, int y)
   init_key (32, x, y);
 }
 
-const int maxfx = 80;
-const int maxfy = 40;
+const int maxfx = 100;
+const int maxfy = 30;
 
 int heat [maxfy] [maxfx];
 int heat2 [maxfy] [maxfx];
@@ -5173,6 +5175,15 @@ void init_display ()
   // draw gl-117 logo
   if (initexplode1 < 0)
   {
+    for (i = 0; i < model_gl117.numObjects; i ++)
+    {
+      for (int i2 = 0; i2 < model_gl117.object [i]->numVertices; i2 ++)
+      {
+        model_gl117.object [i]->vertex [i2].color.c [0] = (int) (127.0F * SIN(i2 * 100 + inittimer_gl117 / 2) + 128.0F);
+        model_gl117.object [i]->vertex [i2].color.c [1] = model_gl117.object [i]->vertex [i2].color.c [0];
+        model_gl117.object [i]->vertex [i2].color.c [2] = 50;
+      }
+    }
     glPushMatrix ();
     glTranslatef (0, 0, -5);
     model_gl117.draw2 (&vec, &tl2, &rot2, 1.0, initexplode);
@@ -5196,34 +5207,36 @@ void init_display ()
     {
       // rotate through fire colors (white-yellow-red-black-blue-black)
       // col in [0...512]
-      int r = heat [i] [i2]; // blend out late for red->black
+      int yind = i;
+      int r = heat [yind] [i2]; // blend out late for red->black
       if (r > 255) r = 255;
-      int g = heat [i] [i2] - 255; // blend out for yellow->red
+      int g = heat [yind] [i2] - 255; // blend out for yellow->red
       if (g > 255) g = 255;
       else if (g < 0) g = 0;
-      int b = heat [i] [i2] - 512; // blend out early to get white->yellow
+      int b = heat [yind] [i2] - 512; // blend out early to get white->yellow
       if (b > 255) b = 255;
       else if (b < -462) b = (512 + b) * 3; // insert blue shimmer very late
       else if (b < -412) b = (-412 - b) * 3;
       else if (b < 0) b = 0;
       int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
       glColor4ub (r, g, b, a);
-      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * i / maxfy, -zf);
+      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * yind / maxfy, -zf);
 
       // do the same for the next vertex
-      r = heat [i + 1] [i2];
+      yind = i + 1;
+      r = heat [yind] [i2];
       if (r > 255) r = 255;
-      g = heat [i + 1] [i2] - 255;
+      g = heat [yind] [i2] - 255;
       if (g > 255) g = 255;
       else if (g < 0) g = 0;
-      b = heat [i + 1] [i2] - 512;
+      b = heat [yind] [i2] - 512;
       if (b > 255) b = 255;
       else if (b < -462) b = (512 + b) * 3;
       else if (b < -412) b = (-412 - b) * 3;
       else if (b < 0) b = 0;
       a = r >= b ? r : b;
       glColor4ub (r, g, b, a);
-      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * (i + 1) / maxfy, -zf);
+      glVertex3f (-xf + 2.0F * xf * i2 / maxfx, yf - 2.0F * yf * yind / maxfy, -zf);
     }
     glEnd ();
   }
@@ -5254,9 +5267,9 @@ void proceedFire ()
 {
   int i, i2;
   for (i = maxfy - 2; i >= 0; i --)
-    for (i2 = 1; i2 < maxfx - 1; i2 ++)
+    for (i2 = 2; i2 < maxfx - 2; i2 ++)
     {
-      heat2 [i] [i2] = (heat [i + 1] [i2 - 1] + 6 * heat [i + 1] [i2] + heat [i + 1] [i2 + 1]) / 8; // heat diffusion
+      heat2 [i] [i2] = (heat [i + 1] [i2 - 2] + 3 * heat [i + 1] [i2 - 1] + 8 * heat [i + 1] [i2] + 3 * heat [i + 1] [i2 + 1] + heat [i + 1] [i2 + 2]) / 16; // heat diffusion
       heat2 [i] [i2] -= (int) (500.0F / maxfy); // heat sink
       if (heat2 [i] [i2] < 0) heat2 [i] [i2] = 0;
     }
@@ -5267,6 +5280,7 @@ int initsynchrotimer = 0;
 
 void init_timer (Uint32 dt)
 {
+  inittimer_gl117 += dt;
   initsynchrotimer += dt;
   if (initsynchrotimer > 30)
   {

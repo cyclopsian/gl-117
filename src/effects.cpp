@@ -335,7 +335,7 @@ void CBlackSmoke::drawGL (CVector3 *z1, CVector3 *z2, CVector3 *tl, float alpha2
     glAlphaFunc (GL_GEQUAL, 0.02);
     gl->enableTextures (texsmoke3->textureID);
     glBegin (GL_QUADS);
-    int myalpha = 255 - (100 - ttl * 5);
+    int myalpha = 255 - (maxlen - ttl) * 255 / maxlen;
     if (myalpha > 255) myalpha = 255;
     glColor4ub (0, 0, 0, myalpha);
     float myzoom = zoom;
