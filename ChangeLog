@@ -1,3 +1,36 @@
+Version 0.7.5:
+	- different HUDs for the fighters
+	- added soundtrack
+	- higher quality LOD
+	- smooth rolls
+	- greyish material at night
+	- ambient light improvements
+	- sun reflectance on water
+	- brightness adjustments when gazing into the sun
+	- nicer landscape colors
+	- new grass texture, better tree textures
+	- bugfix: difficulty extra points are now added to score
+
+Version 0.7:
+	- added clouds
+	- stable music code (no crashes, mem leaks)
+	- added mouse reverse option
+	- better/easier mouse interface
+	- more bugfixes and improvements
+
+Version 0.6.8:
+	- faster quality mode 2
+	- better level of detail
+	- added dithering option
+	- lots of bugfixes and improvements
+
+Version 0.6.5:
+	- new quality mode 1
+	- new great lens flares
+	- added last campaign mission
+	- visual improvements at higher quality levels
+	- important bugfix that caused the game to crash
+
 Version 0.6:
 	- two new missions (one still missing)
 	- list of pilots and fighter

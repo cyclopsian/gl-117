@@ -38,10 +38,10 @@ pkglibdir = $(libdir)/gl-117
 pkgincludedir = $(includedir)/gl-117
 top_builddir = .
 
-ACLOCAL = ${SHELL} /home/tom/gl-117-0.6.1/missing --run aclocal
-AUTOCONF = ${SHELL} /home/tom/gl-117-0.6.1/missing --run autoconf
-AUTOMAKE = ${SHELL} /home/tom/gl-117-0.6.1/missing --run automake
-AUTOHEADER = ${SHELL} /home/tom/gl-117-0.6.1/missing --run autoheader
+ACLOCAL = ${SHELL} /home/tom/gl-117-0.7.5/missing --run aclocal
+AUTOCONF = ${SHELL} /home/tom/gl-117-0.7.5/missing --run autoconf
+AUTOMAKE = ${SHELL} /home/tom/gl-117-0.7.5/missing --run automake
+AUTOHEADER = ${SHELL} /home/tom/gl-117-0.7.5/missing --run autoheader
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -55,7 +55,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-AMTAR = ${SHELL} /home/tom/gl-117-0.6.1/missing --run tar
+AMTAR = ${SHELL} /home/tom/gl-117-0.7.5/missing --run tar
 AWK = gawk
 CC = gcc
 CXX = g++
@@ -67,7 +67,7 @@ PACKAGE = gl-117
 VERSION = 0.5
 am__include = include
 am__quote = 
-install_sh = /home/tom/gl-117-0.6.1/install-sh
+install_sh = /home/tom/gl-117-0.7.5/install-sh
 
 AUTOMAKE_OPTIONS = gnu
 SUBDIRS = src

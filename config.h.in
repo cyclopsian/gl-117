@@ -1,3 +1,20 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Use GL library */
+#undef HAVE_GL
+
+/* Use GLU library */
+#undef HAVE_GLU
+
+/* Use GLUT library */
+#undef HAVE_GLUT
+
+/* Use SDL library */
 #undef HAVE_SDL
+
+/* Use SDL mixer library */
 #undef HAVE_SDL_MIXER
+
+/* Define if your processor stores words with the most significant byte first
+   (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
