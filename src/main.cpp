@@ -4437,6 +4437,17 @@ void stats_reshape ()
 #endif
 }
 
+void playRandomMusic ()
+{
+  int r = myrandom (3);
+  if (r == 0)
+    sound->playMusic (MUSIC_DARK1);
+  else if (r == 1)
+    sound->playMusic (MUSIC_STANDBY1);
+  else
+    sound->playMusic (MUSIC_ELECTRO1);
+}
+
 void switch_menu ()
 {
   setLightSource ((int) sungamma);
@@ -4444,15 +4455,7 @@ void switch_menu ()
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-  {
-    int r = myrandom (3);
-    if (r == 0)
-      sound->playMusic (MUSIC_DARK1);
-    else if (r == 1)
-      sound->playMusic (MUSIC_STANDBY1);
-    else
-      sound->playMusic (MUSIC_ELECTRO1);
-  }
+    playRandomMusic ();
 }
 
 bool ispromoted;
@@ -4519,7 +4522,7 @@ void switch_mission (int missionid)
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_DARK1);
+    playRandomMusic ();
 }
 
 void switch_fame ()
@@ -4529,7 +4532,7 @@ void switch_fame ()
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_DARK1);
+    playRandomMusic ();
 }
 
 void switch_fighter ()
@@ -4539,7 +4542,7 @@ void switch_fighter ()
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_DARK1);
+    playRandomMusic ();
 }
 
 void switch_create ()
@@ -4552,7 +4555,7 @@ void switch_create ()
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_DARK1);
+    playRandomMusic ();
 }
 
 void switch_join ()
@@ -4565,7 +4568,7 @@ void switch_join ()
   menu_reshape ();
   sound->stop (SOUND_PLANE1);
   if (!sound->musicplaying)
-    sound->playMusic (MUSIC_DARK1);
+    playRandomMusic ();
 }
 
 int creditstimer, finishtimer;
@@ -5879,6 +5882,7 @@ void game_quit ()
   volumemusic = sound->volumemusic;
   save_config ();
   pilots->save (dirs->getSaves ("pilots"));
+  printf ("\nPilots saved"); fflush (stdout);
   for (i = 0; i < maxfighter; i ++)
     delete (fighter [i]);
   for (i = 0; i < maxlaser; i ++)
@@ -5909,11 +5913,10 @@ void game_quit ()
   delete space;
   delete dirs;
   delete gl;
-// free allocated memory (optional)
 #ifndef USE_GLUT
-/*  SDL_CloseAudio();
-  SDL_FreeWAV(wave.sound);*/
-  SDL_Quit ();
+//  SDL_CloseAudio();
+//  SDL_FreeWAV(wave.sound);
+//  SDL_Quit (); // done atexit()
   delete sound;
 #endif
   printf ("\n"); fflush (stdout);
@@ -6341,7 +6344,10 @@ void menu_mouse (int button, int state, int x, int y)
           {
             sound->volumemusic += 10;
             if (sound->volumemusic > 100)
+            {
               sound->volumemusic = 0;
+              sound->haltMusic ();
+            }
             sound->setVolumeMusic ();
             menu_reshape ();
           }
@@ -6353,6 +6359,8 @@ void menu_mouse (int button, int state, int x, int y)
             sound->setVolumeMusic ();
             menu_reshape ();
           }
+          if (sound->volumemusic != 0 && !sound->musicplaying)
+            playRandomMusic ();
         }
       }
 #endif
