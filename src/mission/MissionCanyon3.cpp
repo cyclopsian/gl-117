@@ -108,7 +108,7 @@ void MissionCanyon3::start ()
     fighter [i]->trafo.translation.z = py - i * 3;
   }
   fplayer->target = fighter [5];
-  for (unsigned i = 1; i <= 4; i ++)
+  for (i = 1; i <= 4; i ++)
     fighter [i]->target = fighter [5 + i];
 }
 

@@ -48,15 +48,15 @@ class Math
     Math ();
     
     /// random integer number [0;n-1]
-    int random (int n);
+    static int random (int n);
     /// random integer number [0;n-1]
-    int random (int n, int x, int y);
+    static int random (int n, int x, int y);
     /// random integer number [0;n-1], prefer extremely low/high values
-    int extremeRandom (int n);
+    static int extremeRandom (int n);
     /// random integer number [0;n-1], prefer extremely low/high values
-    int extremeRandom (int n, int x, int y);
+    static int extremeRandom (int n, int x, int y);
     /// distance (Euklidean norm, 2D vector)
-    float dist (float dx, float dy);
+    static float distance (float dx, float dy);
 
   protected:
 

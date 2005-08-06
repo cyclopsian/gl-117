@@ -114,7 +114,7 @@ int Math::extremeRandom (int n, int x, int y)
   return ret;
 }
 
-float Math::dist (float dx, float dy)
+float Math::distance (float dx, float dy)
 {
   return (float) sqrt (dx * dx + dy * dy);
 }
