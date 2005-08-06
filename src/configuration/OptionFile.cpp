@@ -33,13 +33,42 @@ OptionFile::OptionFile (const std::string &filename)
 
   optionList.clear ();
 
-  int ret = file.open (filename.c_str ());
-      printf ("File %s opened.", filename.c_str());
+  FILE *file;
+  file = fopen(filename.c_str(), "rb");
+  if (!file)
+    return;
+/*  int ret = file.open (filename.c_str ());
+    printf ("File %s opened.", filename.c_str());
   DISPLAY_DEBUG(FormatString ("File %s opened.", filename.c_str ()));
   assert (ret);
   if (!ret)
-    return;
-  file.setWhitespace (" \t\r\n");
+    return; */
+  
+  while(fgets(token, 4096, file))
+  {
+    char *tagstart = token;
+    while (*tagstart == ' ' || *tagstart == '\t')
+      tagstart ++;
+    if (*tagstart == '#')
+      continue;
+    char *tagend = tagstart;
+    while (*tagend != '=' && *tagend != '\0' && *tagend != '\r' && *tagend != '\n' && *tagend != ' ')
+      tagend ++;
+    *tagend = '\0';
+    std::string name = tagstart;
+    
+    char *valstart = tagend + 1;
+    while (*valstart == ' ' || *valstart == '\t' || *valstart == '=')
+      valstart ++;
+    if (*valstart == '#')
+      continue;
+    char *valend = valstart;
+    while (*valend != '=' && *valend != '\0' && *valend != '\r' && *valend != '\n' && *valend != ' ')
+      valend ++;
+    *valend = '\0';
+    std::string value = valstart;
+        
+/*  file.setWhitespace (" \t\r\n");
   file.addComment ("#", "\n");
   file.setQuotes ("\"'");
   
@@ -71,16 +100,18 @@ OptionFile::OptionFile (const std::string &filename)
     }
         printf ("V: %s\n", token);
         fflush(stdout);
-    std::string value = token;
+    std::string value = token; */
     
     optionList.insert (std::pair <std::string, std::string> (name, value));
   }
+
+//  file.close ();
+  fclose (file);
 }
 
 OptionFile::~OptionFile ()
 {
   optionList.clear ();
-  file.close ();
 }
 
 bool OptionFile::getString (const std::string &name, std::string &value)
