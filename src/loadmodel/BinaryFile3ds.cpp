@@ -66,7 +66,7 @@ BinaryFile3ds::~BinaryFile3ds ()
 int BinaryFile3ds::readFloat (float *f)
 {
   assert (filepointer < size);
-#ifdef WORDS_BIGENDIAN
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
   ret [0] = data [filepointer + 3];
   ret [1] = data [filepointer + 2];
   ret [2] = data [filepointer + 1];

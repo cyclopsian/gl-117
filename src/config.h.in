@@ -1,0 +1,8 @@
+/* Use SDL library */
+#mesondefine HAVE_SDL
+
+/* Use SDL mixer library */
+#mesondefine HAVE_SDL_MIXER
+
+/* Use SDL net library */
+#mesondefine HAVE_SDL_NET

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-mv news NEWS
-mv install INSTALL
-mv authors AUTHORS
-mv readme README
-mv copying COPYING
-mv faq FAQ

@@ -149,6 +149,7 @@ class ObjectStatistics
 
 #include <time.h>
 
+extern Space *space;
 /**
 * ObjectList is an extended std::vector and stores a vector of type SpaceObj*.
 * It is used to have different vectors for all kinds of Objects like Missiles, Houses, etc.
