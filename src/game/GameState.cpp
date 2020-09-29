@@ -475,7 +475,7 @@ void StatePlay::mouseRelMotion (int xrel, int yrel)
 {
   if (controls != CONTROLS_MOUSE || !mouse_relative) return;
   float xr = (float) xrel / width, yr = (float) yrel / height;
-  
+
   float roll = (float) -xr * 20;
 
   if (roll > 1.0F) roll = 1.0F;
@@ -483,15 +483,15 @@ void StatePlay::mouseRelMotion (int xrel, int yrel)
   fplayer->rolleffect = roll;
   if (roll < 1E-3)
     fplayer->ruddereffect = (float) xr * 200;
-  else 
-    fplayer->ruddereffect = 0.0f; 
+  else
+    fplayer->ruddereffect = 0.0f;
   if (fplayer->ruddereffect > 1.0) fplayer->ruddereffect = 1.0;
   else if (fplayer->ruddereffect < -1.0) fplayer->ruddereffect = -1.0;
 
   fplayer->elevatoreffect = (float) yr * fabs (yr) * 20000;
   if (!mouse_reverse) fplayer->elevatoreffect *= -1;
-  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
-  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
+  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f;
+  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f;
 }
 
 void StatePlay::mouseMotion (int x, int y)
@@ -506,17 +506,17 @@ void StatePlay::mouseMotion (int x, int y)
     dy *= -1;
 
 // mouse interface code added by Lourens Veen
-  float nx = dx / width; // normalised x-coordinate, -1 at lefthand 
-                         // side of the screen, 1 at righthand side 
+  float nx = dx / width; // normalised x-coordinate, -1 at lefthand
+                         // side of the screen, 1 at righthand side
   if (mouse_autorudder)
   {
-    if (fabs(nx) < (1.0f/3.0f)) 
-    if (nx < 0.0f) 
-      fplayer->ruddereffect = 729.0f*nx*(nx+1.0f/3.0f)*(nx+1.0f/3.0f)/4.0f; 
-    else 
-      fplayer->ruddereffect = 729.0f*nx*(nx-1.0f/3.0f)*(nx-1.0f/3.0f)/4.0f; 
-    else 
-      fplayer->ruddereffect = 0.0f; 
+    if (fabs(nx) < (1.0f/3.0f))
+    if (nx < 0.0f)
+      fplayer->ruddereffect = 729.0f*nx*(nx+1.0f/3.0f)*(nx+1.0f/3.0f)/4.0f;
+    else
+      fplayer->ruddereffect = 729.0f*nx*(nx-1.0f/3.0f)*(nx-1.0f/3.0f)/4.0f;
+    else
+      fplayer->ruddereffect = 0.0f;
   }
   else
   {
@@ -525,25 +525,25 @@ void StatePlay::mouseMotion (int x, int y)
 
   const float roll_deadarea = (float) mouse_autorudder / 1000.0F; //(1.0f/30.0f);
 
-  if (fabs(nx) > roll_deadarea) 
-  { 
-    if (nx > 0.0f) nx -= roll_deadarea; 
-    else nx += roll_deadarea; 
+  if (fabs(nx) > roll_deadarea)
+  {
+    if (nx > 0.0f) nx -= roll_deadarea;
+    else nx += roll_deadarea;
 
-    if (nx > 0) 
-      fplayer->rolleffect = -(exp(log(nx) * 1.3f)) * 3.0f; 
-    else 
+    if (nx > 0)
+      fplayer->rolleffect = -(exp(log(nx) * 1.3f)) * 3.0f;
+    else
       fplayer->rolleffect = (exp(log(-nx) * 1.3f)) * 3.0f;
 
     if (fplayer->rolleffect < -1.0F) fplayer->rolleffect = -1.0F;
     if (fplayer->rolleffect > 1.0F) fplayer->rolleffect = 1.0F;
-  } 
-  else 
-    fplayer->rolleffect = 0.0f; 
+  }
+  else
+    fplayer->rolleffect = 0.0f;
 
-  fplayer->elevatoreffect = dy / height * 2.5; 
-  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f; 
-  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f; 
+  fplayer->elevatoreffect = dy / height * 2.5;
+  if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f;
+  else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f;
 
 #ifdef USE_GLUT
   glutPostRedisplay();
@@ -718,7 +718,7 @@ void StateCreate::key (int key, int x, int y)
   if (key == 's')
   {
 //    server->sendMessage (0, "s", 1);
-    if (server->checkStart()) 
+    if (server->checkStart())
     {
       printf ("Starting..");
       createMission (MISSION_MULTIPLAYER_DOGFIGHT);
@@ -831,16 +831,16 @@ void StateMission::display ()
   rot.gamma = 270;
   rot.theta = (270 - missionmenutimer * 4 / timestep) % 360;
   rot.phi = 90;
-  
+
   // Draw dummy missile
 /*  glEnable (GL_LIGHTING);
   Model3dRealizer mr;
   mr.draw (*Model3dRegistry::get (AamHs1Descriptor.name), Transformation(tl, rot, Vector3(0.05)), 1.0, 0);
   glDisable (GL_LIGHTING); */
-  
+
   glEnable (GL_LIGHTING);
   glEnable (GL_DEPTH_TEST);
-  
+
   tl.x = -0.24; tl.y = -0.075; tl.z = -0.5;
   rot.gamma = 300;
   rot.theta = 0;
@@ -914,7 +914,7 @@ void StateMission::display ()
     font1->drawText (xstats / fontscale, texty / fontscale, -2, "SCORE:", *col);
     font1->drawText (xstatstab / fontscale, texty / fontscale, -2, "TRAINING", *col);
   }
-  
+
   font1->drawText (textx / fontscale, piloty / fontscale, -2, "PILOTS:", *col);
   strcpy (buf, pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str ());
   strcat (buf, " ");
@@ -1075,7 +1075,7 @@ void StateFighter::display ()
   else if (aktfighter == 7) { id = RedArrowDescriptor; }
   else if (aktfighter == 8) { id = PhoenixDescriptor; }
   else if (aktfighter == 9) { id = BlackBirdDescriptor; }
-  model = Model3dRegistry::get (id.name); 
+  model = Model3dRegistry::get (id.name);
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_LIGHTING);
@@ -1147,7 +1147,7 @@ void StateFame::display ()
   for (i = MISSION_CAMPAIGN1; i < MISSION_CAMPAIGN2; i ++)
     sum += p->mission_fighterkills [i];
   p->tp [10]->fighterkills = sum;
-  p->tp [10]->name, p->name;
+  p->tp [10]->name = p->name;
   p->tp [10]->ranking = p->ranking;
   int index [11];
   for (i = 0; i < 11; i ++)
@@ -1624,7 +1624,7 @@ void StatePlay::display ()
 
   float pseudoview = l->getView ();
   calcLightFactor (pseudoview); // calculate sunlight factor from angle to sun
-  
+
   if (dynamiclighting)
   {
     calcFlash (); // show a short flash when an object explodes => add to sunfactor
@@ -1654,7 +1654,7 @@ void StatePlay::display ()
   glShadeModel (GL_SMOOTH);
 
   glPushMatrix (); // PUSH -> 1
-  
+
   if (camera != 1 && camera != 5)
     glRotatef (-mycamrot.theta, 0.0, 0.0, 1.0);
   glRotatef (mycamrot.gamma, 1.0, 0.0, 0.0);
@@ -1783,7 +1783,7 @@ void StatePlay::display ()
   }
 
   glPopMatrix (); // POP -> 0
-    
+
   glPushMatrix (); // PUSH -> 1
 
   if (camera != 1 && camera != 5)
@@ -2410,7 +2410,7 @@ void StatePlay::timer (Uint32 dt)
     {
       missionending = 0;
       fplayer->score = mission->getScore (missionstate);
-      if (!mission->id == MISSION_DEMO)
+      if (mission->id != MISSION_DEMO)
       {
         switch_stats ();
       }
@@ -2615,12 +2615,12 @@ void StateJoin::timer (Uint32 dt)
 #ifndef USE_GLUT
   char buf [4096];
   if (client->sock == NULL) client->getServer ("127.0.0.1", "client1");
-  else 
+  else
   {
     SDL_Delay (100);
     statemission.timer (dt);
     client->getMessage (buf);
-  
+
     if (buf [0] == 's')
     {
       createMission (MISSION_MULTIPLAYER_DOGFIGHT);
@@ -2640,7 +2640,7 @@ void StateInit::reshape ()
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  
+
   // angle, aspectratio, nearclip, farclip
   gluPerspective (visibleangle, 1.0, nearclippingplane, 80);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
@@ -2734,7 +2734,7 @@ void StateInit::display ()
     glPopMatrix ();
     glDisable (GL_BLEND);
   }
-  
+
   glDisable (GL_LIGHTING);
   glPopMatrix ();
 

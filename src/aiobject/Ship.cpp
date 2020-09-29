@@ -70,7 +70,7 @@ void Ship::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m
     thrust = 0;
     return;
   }
-  
+
   // do expensive calculations only once
   float myheight = l->getExactHeight (trafo.translation.x, trafo.translation.z);
   float targetheight = trafo.translation.y;
@@ -84,7 +84,7 @@ void Ship::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m
   selectTarget (f);
 
   if (!ai) return;
- 
+
   // which height???
   float recheight2; // this is the height, the object wants to achieve
   int lsdist = 15;
@@ -109,7 +109,7 @@ void Ship::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &m
       recheight = target->trafo.translation.y - targetheight;
     }
   }
-  
+
   // get recommended elevation to target
   if (ai)
   {

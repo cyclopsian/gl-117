@@ -79,7 +79,7 @@ class StatePlay : public GameState
     virtual void view ();
     virtual void display ();
     virtual void timer (Uint32 dt);
-    
+
   protected:
     void calcVibration (Rotation &mycamrot);
     void calcLightFactor (float &pseudoview);

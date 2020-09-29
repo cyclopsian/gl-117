@@ -69,12 +69,12 @@ class Logging
 
     static void setLevel (LogLevel loglevel);
     static void setFile (const std::string &filename);
-    static void display (const std::string &str, LogLevel level, char *file, int line);
+    static void display (const std::string &str, LogLevel level, const char *file, int line);
 
   protected:
 
     static void displayStream (FILE *stream, const std::string &str, LogLevel level,
-                               char *filename, int line);
+                               const char *filename, int line);
 };
 
 #endif

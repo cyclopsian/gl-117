@@ -43,7 +43,7 @@ MissionDeathmatch2::MissionDeathmatch2 ()
   selfighters = 1;
   maxtime = 10000 * timestep;
 }
-  
+
 void MissionDeathmatch2::start ()
 {
   int i;

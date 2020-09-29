@@ -61,7 +61,7 @@ class LoadObj
     LoadObj ();
 
     bool importObj (Model3d *model, char *filename);
-  
+
   private:
 
     void computeNormals (Model3d *model);

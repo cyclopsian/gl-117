@@ -42,7 +42,7 @@ MissionConvoy::MissionConvoy ()
   maxtime = 5000 * timestep;
   alliedpilot [0] = PILOT_PRIMETIME;
 }
-  
+
 void MissionConvoy::start ()
 {
   int i;

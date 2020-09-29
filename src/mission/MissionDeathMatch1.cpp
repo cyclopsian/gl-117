@@ -44,7 +44,7 @@ MissionDeathmatch1::MissionDeathmatch1 ()
   selfighters = 1;
   maxtime = 20000 * timestep;
 }
-  
+
 void MissionDeathmatch1::start ()
 {
   int i;

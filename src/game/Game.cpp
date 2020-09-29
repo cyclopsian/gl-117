@@ -225,7 +225,7 @@ void drawRank (float xp, float yp, float zp, int rank, float zoom)
   glDisable (GL_ALPHA_TEST);
   gl.disableAlphaBlending ();
   glDisable (GL_TEXTURE_2D);
-  
+
 // Example how to pass the glBegin()...glEnd() code using vertex lists
 /*  float vertex [sizeof (float) * 9];
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -509,7 +509,7 @@ void setLightSource (int gamma)
   light_position0 [0] = -COS(gamma);
   light_position0 [1] = SIN(gamma);
   light_position0 [2] = 0;
-  
+
   glLightfv (GL_LIGHT0, GL_POSITION, light_position0);
 }
 
@@ -880,7 +880,7 @@ int game_levelInit ()
 
   redout = 0;
   blackout = 0;
-  
+
   if (!fplayer->ai)
     fplayer->realism = physics;
 
@@ -1587,7 +1587,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 	// Select buffer parameters
 	glSelectBuffer (20 * 4, selectBuff);
 	glGetIntegerv (GL_VIEWPORT, viewport);
-	
+
 	// Enter to selection mode
 	glEnable (GL_DEPTH_TEST);
 	glDisable (GL_LIGHTING);
@@ -1601,7 +1601,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
 	// Set our perpective transformation matrix
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, view * GLOBALSCALE);
 //  gluPerspective (60.0, 1.0, 0.2, 200.0);
-	
+
 	glMatrixMode (GL_MODELVIEW);
 
 	// Render all scene and fill selection buffer
@@ -1855,7 +1855,7 @@ void myFirstInit ()
   font2 = new Font (Directory::getTextures ("font2.tga"), 32, '!', 64);
 
   DISPLAY_DEBUG("Loading 3ds models:");
-  
+
   initModel (FalconDescriptor, "falcon.3ds");
   initModel (HawkDescriptor, "hawk.3ds");
   initModel (SwallowDescriptor, "swallow.3ds");
@@ -1870,7 +1870,7 @@ void myFirstInit ()
   initModel (StormDescriptor, "storm.3ds");
   initModel (TransportDescriptor, "transport.3ds");
   initModel (Transport2Descriptor, "transport2.3ds");
-  
+
   // cannon at daylight
   float cannoncube = 0.025;
   DISPLAY_DEBUG(" * cannon1.3ds");
@@ -1879,7 +1879,7 @@ void myFirstInit ()
   model->nolight = true;
   model->cube.set (cannoncube, cannoncube, cannoncube);
   Model3dRegistry::add ("Cannon1", model);
-  
+
   DISPLAY_DEBUG(" * cannon1b.3ds");
   model = Model3dFactory::getModel (Directory::getModels ("cannon1b.3ds"));
   model->nolight = true;
@@ -2086,7 +2086,7 @@ void proceedFire ()
     }
 
   memcpy (heat, heat2, maxfx * maxfy * sizeof (int)); // copy back buffer to heat array
-  
+
   for (i = 0; i < maxfy; i ++)
   {
     for (i2 = 0; i2 < maxfx + 1; i2 ++)
@@ -2173,7 +2173,7 @@ static void myPassiveMotionFunc (int x, int y)
 {
   mousex = x;
   mousey = y;
-  
+
   if (gamestate == &stateplay)
   {
     gamestate->mouseMotion (x, y);
@@ -2476,7 +2476,7 @@ void sdlMainLoop ()
 {
   int sym = 0;
   SDL_Event event;
-  
+
   while (true)
   {
     while (SDL_PollEvent (&event)) // process events
@@ -2553,7 +2553,7 @@ void sdlMainLoop ()
           break;
       }
     }
-    
+
     if (controls == CONTROLS_JOYSTICK)
     {
       int x = jaxis [getJoystickAxisIndex (joystick_aileron)];
@@ -2566,7 +2566,7 @@ void sdlMainLoop ()
       if (joystickfirebutton)
         myJoystickButtonFunc (joystick_firecannon);
     }
-    
+
     if (sdldisplay)
       myDisplayFunc ();
     sdldisplay = false;
@@ -2774,7 +2774,7 @@ void config_test (int argc, char **argv)
   DISPLAY_INFO("Using SDL and GLUT");
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
-    assert (false);
+    //assert (false);
     DISPLAY_FATAL(FormatString ("Couldn't initialize SDL: %s", SDL_GetError ()));
     exit (EXIT_INIT);
   }
@@ -2919,7 +2919,7 @@ void createMenu ()
 #ifndef USE_GLUT
   EditJoystick *editjoystick;
 #endif
-  
+
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  Register main menu
@@ -3075,7 +3075,7 @@ void createMenu ()
  Register campaign submenu
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
- 
+
   z = 0;
   strcpy (submenu2names [z ++], "FIRST TEST");
   strcpy (submenu2names [z ++], "SECOND TEST");
@@ -3713,7 +3713,7 @@ void createMenu ()
   textfield->setBounds (xf + 1.5, yf, 17, 12.5);
   fightermenu.add (textfield);
   yf -= 13;
-  
+
   sprintf (buf, "         BACK TO MAIN MENU");
   button = new Button (buf);
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
@@ -3855,7 +3855,7 @@ int main (int argc, char **argv)
 #endif
 
   DISPLAY_DEBUG("Getting directory locations");
-  
+
   if (!conf.loadConfig ()) // try to load conf file (conf.cpp) and validate settings
   {
     // no conf file found => create new one
@@ -3921,7 +3921,7 @@ int main (int argc, char **argv)
 
   // parameters: visible angle, aspectracio, z-nearclip, z-farclip
   gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, 50.0 * GLOBALSCALE);
-  
+
   // no keyboard available with GLUT, as there are no KEY_DOWN/UP events
   if (controls <= 0)
     controls = CONTROLS_MOUSE;
@@ -4030,7 +4030,7 @@ int main (int argc, char **argv)
   sdlMainLoop (); // simulate GLUT's main loop (above)
 
 #endif
-  
+
   return 0; // exit without signaling errors
 }
 

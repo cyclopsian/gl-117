@@ -45,7 +45,7 @@ class UnitDescriptor
     int id;
     std::string name;
     std::string displayedName;
-    
+
     UnitDescriptor ();
     UnitDescriptor (int id);
     UnitDescriptor (int id, const std::string &name, const std::string &displayedName);
@@ -85,7 +85,7 @@ class UnitPrototype
     UnitPrototype (const UnitDescriptor &desc)
     {
     }
-    
+
     virtual ~UnitPrototype ()
     {
     }
@@ -94,7 +94,7 @@ class UnitPrototype
 class DynamicObjPrototype : public UnitPrototype
 {
   public:
-  
+
     float impact;    ///< this value will be subtracted from the other objects shield when colliding
     float manoeverability; ///< how fast a fighter can alter its direction
     float nimbility; ///< how fast a fighter responds to alterations of recXXX (recommended XXX)
@@ -112,11 +112,11 @@ class DynamicObjPrototype : public UnitPrototype
 class AiObjPrototype : public DynamicObjPrototype
 {
   public:
-  
+
     bool dualshot;      ///< one or two cannons?
     int maxammo;
     int weight;
-    
+
     AiObjPrototype (const UnitDescriptor &desc);
     virtual ~AiObjPrototype ();
 };
@@ -124,7 +124,7 @@ class AiObjPrototype : public DynamicObjPrototype
 class FighterPrototype : public AiObjPrototype
 {
   public:
-  
+
     int maxchaffs;
     int maxflares;
     int racks;

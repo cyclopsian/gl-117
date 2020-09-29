@@ -36,6 +36,7 @@
 // HAVE_SDL_MIXER means SDL and SDL_mixer are available
 // HAVE_SDL_NET means SDL_net is available
 
+//#undef HAVE_SDL_NET // dummy
 //#undef HAVE_SDL_MIXER // dummy
 //#undef HAVE_SDL // dummy
 
@@ -276,13 +277,13 @@ typedef std::map <std::string, std::string> OptionList;
 class OptionFile
 {
   public:
-  
+
     FileTokenizer file;
     OptionList optionList;
-  
+
     OptionFile (const std::string &filename);
     ~OptionFile ();
-    
+
     bool getString (const std::string &name, std::string &value);
     bool getBoolean (const std::string &name, bool &value);
     bool getInteger (const std::string &name, int &value);
@@ -300,4 +301,3 @@ class OptionFileFactory
 };
 
 #endif
-//#undef HAVE_SDL_NET // dummy

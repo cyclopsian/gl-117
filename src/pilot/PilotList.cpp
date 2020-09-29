@@ -58,7 +58,7 @@ void PilotList::save (const std::string &fname)
 {
   char buf [256];
   int i;
-  
+
   FILE *out = fopen (fname.c_str (), "wb");
   if (out == NULL)
   {
@@ -71,7 +71,7 @@ void PilotList::save (const std::string &fname)
     fprintf (out, "%s ", pilot [i]->name.c_str ());
   }
   fclose (out);
-  
+
   for (i = 0; i < aktpilots; i ++)
   {
     pilot [i]->save ();

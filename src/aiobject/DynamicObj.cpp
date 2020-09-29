@@ -42,7 +42,7 @@ DynamicObj::DynamicObj (const UnitDescriptor &desc)
 {
   id = desc;
   proto = new DynamicObjPrototype (id);
-  
+
   init ();
   initPrototype ();
 }
@@ -98,7 +98,7 @@ void DynamicObj::initPrototype ()
 void DynamicObj::init ()
 {
   SpaceObj::init ();
-  
+
   acc.set (0.0, 0.0, 0.0);
   active = true;
   bomber = false;
@@ -307,7 +307,7 @@ void DynamicObj::collide (DynamicObj *d, Uint32 dt) // d must be the medium (las
 {
   if (immunity > 0 || d->immunity > 0) return;
   if (explode > 0 || sink > 0) return;
-  
+
   bool collide = false;
   if (trafo.translation.x + o->cube.x >= d->trafo.translation.x - d->o->cube.x && trafo.translation.x - o->cube.x <= d->trafo.translation.x + d->o->cube.x &&
       trafo.translation.y + o->cube.y >= d->trafo.translation.y - d->o->cube.y && trafo.translation.y - o->cube.y <= d->trafo.translation.y + d->o->cube.y &&
@@ -556,7 +556,7 @@ void DynamicObj::move (Uint32 dt, float camphi, float camgamma)
 
   if (recthrust > getPrototype ()->maxthrust) // check maximum throttle
     recthrust = getPrototype ()->maxthrust;
-  
+
   float throttlechange = getPrototype ()->maxthrust / 200 * timefac;
   if (recthrust > thrust + throttlechange) // alter throttle effect slowly
   {

@@ -63,8 +63,8 @@ void MissionShip3::start ()
   fighter [1]->trafo.translation.x = 85;
   fighter [1]->trafo.translation.z = 5;
   fighter [1]->currot.phi = 270;
-  
-  objectInit (new Ship (CruiserDescriptor), 0, 200);  
+
+  objectInit (new Ship (CruiserDescriptor), 0, 200);
   fighter [2]->target = fighter [0];
   fighter [2]->trafo.translation.x = -20;
   fighter [2]->trafo.translation.z = 0;
@@ -72,7 +72,7 @@ void MissionShip3::start ()
   fighter [2]->thrust = 0;
   for (i = 3; i <= 6; i ++)
   {
-    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 10);  
+    objectInit (new Fighter (CrowDescriptor), 0, 400 - i * 10);
     fighter [i]->target = fighter [Math::random (2)];
     fighter [i]->trafo.translation.x = -i * 5;
     fighter [i]->trafo.translation.z = 0;

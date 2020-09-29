@@ -358,7 +358,7 @@ int Configuration::loadSaveConfig ()
   else
   { fullscreen = atoi (str); }
   if (fullscreen) fullscreen = 1;
-  
+
   delete cf;
   return 1;
 }

@@ -42,7 +42,7 @@ MissionWaves1::MissionWaves1 ()
   alliedfighters = 1;
   maxtime = 10000 * timestep;
 }
-  
+
 void MissionWaves1::start ()
 {
   int i;

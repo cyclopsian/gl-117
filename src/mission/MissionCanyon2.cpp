@@ -100,7 +100,7 @@ void MissionCanyon2::start ()
   {
     fighter [i]->target = fighter [5 + i];
   }
-  
+
   invertZ (); // only invert if NO objects are mapped to flat ground
 }
 

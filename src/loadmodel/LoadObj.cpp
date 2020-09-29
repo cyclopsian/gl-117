@@ -129,7 +129,7 @@ void LoadObj::normalize (Model3d *model)
   float scy = (float) (maxy - miny) * 0.5F;
   float scz = (float) (maxz - minz) * 0.5F;
   float sc = scx > scy ? scx : scy;
-  sc = scz > sc ? scz : sc; 
+  sc = scz > sc ? scz : sc;
 
   for (i = 0; i < model->numObjects; i ++)
   {

@@ -94,7 +94,7 @@ void EditJoystick::eventJoystick (int button)
   {
     conf.joystick2string (button, buf);
     if (buf [0] != '\0')
-    { 
+    {
       this->button = (int) button;
       execFunction (button);
     }

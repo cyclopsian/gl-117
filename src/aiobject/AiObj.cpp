@@ -121,7 +121,7 @@ AiObj::AiObj ()
 {
   proto = NULL;
   smoke = NULL;
-  
+
   init ();
   smoke = new Smoke (0);
 }
@@ -216,7 +216,7 @@ void AiObj::init ()
 void AiObj::missileCount ()
 {
   if (id < FighterBeginDescriptor || id > AirEndDescriptor) return;
-  
+
   int i;
   for (i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
@@ -251,7 +251,7 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   getPrototype ()->dualshot = false;
   float cubefac = 0.6F; // fighter
   float cubefac1 = 0.7F; // tanks and sams*/
-  
+
 /*  if (id == 200)
   {
     o = Model3dFactory::getModel (Directory::getModels ("gl-16.3ds"));
@@ -260,7 +260,7 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
   else*/
 //  o = getModel (id);
 //  o->cube.set (trafo.scaling);
-  
+
 //  o = Model3dFactory::getModel (Directory::getModels ("gl-15.3ds"));
 //  o = Model3dRegistry::get (id.name);
 
@@ -596,7 +596,7 @@ void AiObj::newinit (const UnitDescriptor &id, int party, int intelligence, int 
     getPrototype ()->impact = 20;
     shield = getPrototype ()->maxshield = 2800;
     o->cube.set (zoom * 0.4, zoom * 0.12, zoom * 0.4);
-  } 
+  }
 
   float missilethrustbase = 1.2F;
   if (id == AamHs1Descriptor)
@@ -1218,7 +1218,7 @@ void AiObj::setSmoke (Uint32 dt)
   float sz = COS(currot.gamma) * COS(currot.phi) * trafo.scaling.z * 1.1; // polar (spherical) coordinates
   float sy = -SIN(currot.gamma) * trafo.scaling.y * 1.1;
   float sx = COS(currot.gamma) * SIN(currot.phi) * trafo.scaling.x * 1.1;
-  
+
   // some smoke elements per discrete movement
   float fg = sqrt (force.x * force.x + force.y * force.y + force.z * force.z) * 13;
   if (fg >= MAXSMOKEELEM) fg = (float) MAXSMOKEELEM - 0.5;
@@ -1462,7 +1462,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
     thrust = 0;
     return;
   }
-  
+
   // do expensive calculations only once
   float myheight = l->getExactHeight (trafo.translation.x, trafo.translation.z);
   float targetheight = trafo.translation.y;
@@ -1485,7 +1485,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
   selectTarget (f);
 
   if (!ai) return;
- 
+
   // which height???
   float recheight2; // this is the height, the object wants to achieve
   int lsdist = 15;
@@ -1563,7 +1563,7 @@ void AiObj::aiAction (Uint32 dt, std::vector<AiObj *> &f, std::vector<AiObj *> &
       }
     }
   }
-  
+
   // get recommended elevation to target
   if (ttl <= 0 && id >= MissileBeginDescriptor && id <= MissileEndDescriptor && id != MineDescriptor)
   { recheight = -100; recheight2 = -100; recrot.gamma = 90; }

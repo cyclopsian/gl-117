@@ -321,7 +321,7 @@ void Mission::objectInit (AiObj *aiobj, int party, int ailevel)
   aiobj->missileCount ();
   aiobj->party = party;
 //  aiobj->newinit (aiobj->id, party, ailevel);
-  
+
   selectMissiles (*aiobj);
 
   // place missiles to racks

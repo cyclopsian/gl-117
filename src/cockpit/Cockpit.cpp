@@ -58,14 +58,14 @@ void Cockpit::drawBlip(int shape, float x, float y, float z, unsigned char r, un
 //  setColor (&color, alpha); // no need here
   glColor4ub (r, g, b, alpha);
   glBegin (GL_QUADS);
- 
+
   switch (shape) {
   case SQUARE_BLIP:
-    glVertex3f (x + blipsize, y + blipsize, z);	  
-    glVertex3f (x + blipsize, y - blipsize, z);	  
+    glVertex3f (x + blipsize, y + blipsize, z);
+    glVertex3f (x + blipsize, y - blipsize, z);
     glVertex3f (x - blipsize, y - blipsize, z);
-    glVertex3f (x - blipsize, y + blipsize, z);	  
-    glVertex3f (x + blipsize, y + blipsize, z);	  
+    glVertex3f (x - blipsize, y + blipsize, z);
+    glVertex3f (x + blipsize, y + blipsize, z);
     break;
   case TRIANGLE_BLIP:
     glVertex3f (x, y + blipsize, z);
@@ -241,7 +241,7 @@ void Cockpit::drawCounter (bool beep)
     float y = m[1] * pos.x + m[5] * pos.y + m[9] * pos.z + m[13];
     float z = m[2] * pos.x + m[6] * pos.y + m[10] * pos.z + m[14];
     pos.x = x; pos.y = y; pos.z = z;
-    
+
     float dist = delta.length ();
 
     // sorry, but some variables names as good as my english :(
@@ -508,7 +508,7 @@ void Cockpit::drawHeading ()
         glEnd ();
       }
     }
-  
+
   sprintf (str, "SPEED %d", (int) (fplayer->realspeed / timestep * 80000.0F));
   font1->drawTextCentered (-8.0, -8.5, -4.0, str, color);
 
@@ -721,20 +721,20 @@ void Cockpit::drawRelativeHeightBar()
   glLineWidth (LINEWIDTH(1.0F));
   glDisable (GL_DEPTH_TEST);
   gl.enableAlphaBlending ();
-  
+
   float xf = 1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
   float px = fplayer->trafo.translation.x, py = fplayer->trafo.translation.y, pz = fplayer->trafo.translation.z;
   float lh = l->getExactHeight(px, pz);
   setColor(80); // low alpha for better visibility
   // add 100.0 to each player_y and land_h to avoid values <= 0.0
-  float rel_height = ((100.0F+py)/(100.0F+lh) * 100.0F) - 100.0F;	
+  float rel_height = ((100.0F+py)/(100.0F+lh) * 100.0F) - 100.0F;
 
   // turn 0 -> 50.0 range to -0.7 -> 0.7 for drawing, 1.4/50=0.0208
   float yfv = (rel_height * 0.0208F)-0.7F;
-  // cap max-min values  
+  // cap max-min values
   if(yfv >  0.7F) yfv =  0.7F;
   if(yfv < -0.7F) yfv = -0.7F;
-  
+
   glBegin (GL_QUADS);
   glVertex3f (xf - xfl, yf - yfl, zf);  // fixed
   glVertex3f (xf + xfl, yf - yfl, zf);  // fixed
@@ -742,7 +742,7 @@ void Cockpit::drawRelativeHeightBar()
   glVertex3f (xf - xfl, yf + yfv, zf);  // var
   glEnd ();
   setColor(alpha);
-  
+
   sprintf (str, "RHEIGHT");
   font1->drawTextCentered (xf*11.0F, (yf-0.85F)*10.0F, zf, str, color);
   glEnd();
@@ -763,7 +763,7 @@ void Cockpit::drawThrustBar()
 
   setColor(80); // don't block visibility too much
   float xf = -1.5F, xfl = 0.06F, yf=0.0F, yfl = 0.7F, zf=-4.0F;
-  
+
   // turn 0.5 -> 1.0 range to -0.7 -> 0.7 for drawing
   float yfv = fplayer->thrust / fplayer->getPrototype ()->maxthrust * 2.8F - 2.1F;
   // cap max-min values

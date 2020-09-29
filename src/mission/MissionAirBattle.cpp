@@ -65,7 +65,7 @@ void MissionAirBattle::start ()
   for (i = 1; i <= 6; i ++)
   {
     alliedInit (FalconDescriptor, alliedpilot [i - 1]);
-    
+
     if (i % 2)
       fighter [i]->trafo.translation.x = ((i + 1) / 2) * 5;
     else

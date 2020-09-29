@@ -404,7 +404,7 @@ void GlLandscape::precalculate ()
     for (i2 = 0; i2 < MAXX; i2 ++)
     {
       drawrule [i] [i2] = 0;
-      
+
       int f1 = f [i] [i2], f2 = f [i + 1] [i2], f3 = f [i] [i2 + 1], f4 = f [i + 1] [i2 + 1];
       if (isType (f1, GRASS))
       {
@@ -450,7 +450,7 @@ void GlLandscape::precalculate ()
       { drawrule [i] [i2] = 1; tex1 [i] [i2] = texrocks->textureID; tex2 [i] [i2] = texrocks->textureID; }
       if (isGlacier (f1) && isGlacier (f2) && isGlacier (f3) && !isGlacier (f4))
       { drawrule [i] [i2] = 1; tex1 [i] [i2] = 0xFF; tex2 [i] [i2] = texrocks->textureID; }
-      
+
       if (isGlacier (f1) && !isGlacier (f2) && isGlacier (f3) && isGlacier (f4))
       { drawrule [i] [i2] = 2; tex1 [i] [i2] = texrocks->textureID; tex2 [i] [i2] = 0xFF; }
       if (!isGlacier (f1) && isGlacier (f2) && !isGlacier (f3) && !isGlacier (f4))
@@ -1677,7 +1677,7 @@ void GlLandscape::drawWaterTexturedQuad (Vector3 &cam, int xs, int ys)
     tf [j] [0] = (float) px [j] * texzoom + waterspeed * lsticker / timestep;
     tf [j] [1] = (float) py [j] * texzoom;
   }
-  
+
   for (j = 0; j < 4; j ++)
   {
     if (texture)
@@ -2045,7 +2045,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   glScalef (hh2, zoomz, hh2);
 
   frustum.extractFrustum ();
-    
+
   float pseudoview = getView ();
   float radius = pseudoview / COS(45);
 
@@ -2377,7 +2377,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
 
 
   // now: render the terrain (also a bunch of code)
-  
+
   // first prepare the vertex arrays to be filled with data
   for (i = 0; i < 20; i ++)
     vertexarrayquad [i].glBegin (GL_QUADS);
@@ -2600,7 +2600,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
               }
               xs += gridstep;
             }
-            
+
             // draw the water in a second pass
             for (xs = ax; xs < zx;)
             {
@@ -2711,7 +2711,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
       if (quality == 2) mydep = 1800;      // x 1.8
       else if (quality == 3) mydep = 2500; // x 1.4
       else if (quality == 4) mydep = 3200; // x 1.3
-      else if (quality == 5) mydep = 3800; // x 1.2  
+      else if (quality == 5) mydep = 3800; // x 1.2
     if (mydep > view * view) mydep = view * view;
     int cutdep = 800;
 
@@ -2804,7 +2804,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
                   if (cg >= 256.0) cg = 255.0;
                   treecolor.c [0] = treecolor.c [1] = treecolor.c [2] = (int) cg;
                   drawTreeQuad (xs, ys, phi, dep < cutdep);
-# endif			    
+# endif
                 }
             ys += treestep;
           } // ys for
@@ -2829,7 +2829,7 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
   }
 
 
-  
+
   // now: draw "towns", only implemented for the Alpen demo, quite similar to the trees
 
   glDisable (GL_TEXTURE_2D);
@@ -3063,7 +3063,7 @@ GlLandscape::GlLandscape (int type, int *heightmask)
       while (!client->getMessage ((char *) f [i])) ;
       client->sendMessage (".", 1);
     }
-  
+
   }
 #endif*/
 

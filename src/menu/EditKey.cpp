@@ -109,7 +109,7 @@ void EditKey::eventKey (unsigned char key)
   {
     conf.key2string (key, buf);
     if (buf [0] != '\0')
-    { 
+    {
       this->key = (int) key;
       specialActive = false;
       execFunction (key);
@@ -125,7 +125,7 @@ void EditKey::eventSpecial (int key)
   {
     conf.key2string (key + 256, buf);
     if (buf [0] != '\0')
-    { 
+    {
       this->special = key;
       specialActive = true;
       execFunction (special + 256);

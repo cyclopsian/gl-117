@@ -61,7 +61,7 @@ void Sphere::init (float radius, int segments, float dx, float dy, float dz, int
   this->dx = dx;
   this->dy = dy;
   this->dz = dz;
-  
+
   int p [4];
   float step = 180.0 / segments;
   Vertex w;

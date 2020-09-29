@@ -44,7 +44,7 @@ MissionTeamBase1::MissionTeamBase1 ()
   selweapons = 2;
   maxtime = 10000 * timestep;
 }
-  
+
 void MissionTeamBase1::start ()
 {
   day = 1;
@@ -239,7 +239,7 @@ int MissionTeamBase1::processtimer (Uint32 dt)
   }
   if (!testb1) return 2;
   if (!testb2) return 1;
-  
+
   for (i = 0; i <= 3; i ++)
   {
     if (!fighter [i]->active && fighter [i]->explode >= 35 * timestep)

@@ -59,11 +59,11 @@ class Color
 
     /// color information as vector, 32 bpp (floats would be faster for the vertex arrays)
     unsigned char c [4];
-  
+
     Color ();
     Color (const Color &color);
     Color (int red, int green, int blue, int alpha = 255);
-  
+
     void set (const Color &color);
     void set (int red, int green, int blue, int alpha = 255);
     bool isEqual (const Color &color) const; // compare colors
@@ -91,12 +91,12 @@ class Texture
     float texgreen;      ///< average of texture's green
     float texblue;       ///< average of texture's blue
     bool alpha;          ///< alpha blending on/off
-  
+
     Texture ();
     Texture (const std::string &filename, int alphaprogram = -1,
               bool mipmap = true, bool alpha = false); // TODO: alpha really necessary?
     ~Texture (); // necessary
-  
+
     /// loadFromTGA is called via gl->genTextureTGA() to not load the same texture twice
     bool loadFromTGA (const std::string &filename, int alphaprogram = -1,
                       bool mipmap = true, bool alpha = false);
@@ -112,19 +112,19 @@ class Texture
 * Vector3 stores the components of a 3D vector (x,y,z).
 * Access x,y,z directly.
 */
-class Vector3 
+class Vector3
 {
   public:
-  
+
     float x; ///< x coordinate
     float y; ///< y coordinate
     float z; ///< z coordinate
-  
+
     Vector3 ();
     Vector3 (float x, float y, float z);
     Vector3 (float xyz);
     Vector3 (const Vector3 &v);
-  
+
     void set (const Vector3 &v);
     void set (float x, float y, float z);
     void neg ();
@@ -145,17 +145,17 @@ class Vector3
 * Vector2 stores the components of a 2D vector (x,y).
 * Access x,y directly.
 */
-class Vector2 
+class Vector2
 {
   public:
-    
+
     float x; ///< x coordinate
     float y; ///< y coordinate
-  
+
     Vector2 ();
     Vector2 (float x, float y);
     Vector2 (const Vector2 &v);
-  
+
     void set (const Vector2 &v);
     void set (float x, float y);
     /// exactly equal in memory (no sense for comparisons)
@@ -177,14 +177,14 @@ class Vertex
     Vector3 vector;  ///< position
     Vector3 normal;  ///< normal vector, interpolation of all surrounding triangles
     Vector2 tex;     ///< 2D texture coordinates
-  
+
     Vertex ();
     Vertex (const Vertex &v);
-  
+
     /// copy data from v
     void set (const Vertex &v);
     /// the normal vector of a vertex can be calculated as average of all adjacent plane normals
-    void addNormal (const Vector3 &n); 
+    void addNormal (const Vector3 &n);
     /// the color of a vertex can be calculated as average of all adjacent plane colors
     void addColor (const Color &c);
 };
@@ -195,14 +195,14 @@ class Vertex
 class Rotation
 {
   public:
-  
+
     float gamma; ///< rotation angle for a plane of the coordinate system
     float theta; ///< rotation angle for a plane of the coordinate system
     float phi;   ///< rotation angle for a plane of the coordinate system
-  
+
     Rotation ();
     Rotation (float gamma, float theta, float phi);
-  
+
     void set (const Rotation &r);
     void set (float gamma, float theta, float phi);
     void add (const Rotation &r);
@@ -243,11 +243,11 @@ class Transformation
 class Triangle
 {
   public:
-    
+
     Vertex *v [3]; ///< references to the three vertices
-  
+
     Triangle ();
-  
+
     void calcNormal (Vector3 *n); ///< return normal n
     void setVertices (Vertex *a, Vertex *b, Vertex *c); // not const as a,b,c may be altered
 };
@@ -260,7 +260,7 @@ class Quad
   public:
 
     Vertex *v [4]; ///< references to the four vertices
-  
+
     Quad ();
 
     void calcNormal (Vector3 *n); ///< return normal n
@@ -285,7 +285,7 @@ class Material
     float uscale;         ///< texture scaling (the importer must calculate u/v due to scaling)
     float vscale;         ///< texture scaling (the importer must calculate u/v due to scaling)
     float wrot;           ///< rotation in degree (the importer must calculate u/v due to wrot)
-  
+
     Material ();
     Material (const Material &material);
 };
@@ -326,7 +326,7 @@ class Object3d
 *   lum=luminance (default 1.0),
 *   explode=radial translation (default 0)
 */
-class Model3d 
+class Model3d
 {
   public:
 
@@ -349,7 +349,7 @@ class Model3d
 
     Model3d ();
     ~Model3d ();
-  
+
     void calcMissiles ();
 //    void setName (const std::string &name);
     void addMaterial (const Material &material);
@@ -432,7 +432,7 @@ class Space; // forward reference
 class SpaceObj
 {
   public:
-  
+
     bool valid;     ///< if not valid, the model is free to be removed
     int draw;       ///< draw/hide
     int explode;    ///< explosion stadium (0=no explosion)
@@ -442,7 +442,7 @@ class SpaceObj
     Model3d *o;     ///< pointer to a model
     Transformation trafo; ///< transformation
     Space *space;
-  
+
     /// reference models (e.g. missiles for fighters)
     std::vector<SpaceObj> ref;
 
@@ -474,7 +474,7 @@ class Space
 //    float lum;      ///< luminance
     std::vector<SpaceObj *> o; ///< reference to all objects in space
 //    Vector3 tl;    ///< translation
-  
+
     Space ();
     virtual ~Space ();
 

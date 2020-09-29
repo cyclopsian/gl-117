@@ -129,8 +129,8 @@ static CGcontext g_shaders_context = 0;
 static unsigned  g_shaders_count   = 0;
 static unsigned  g_statistics[18]; // 10 bins representing # vertices/primitive
 
-static void 
-cgErrorCallback(void) 
+static void
+cgErrorCallback(void)
 {
   CGerror errnum = cgGetError();
   const char * errorString = cgGetErrorString(errnum);
@@ -143,8 +143,8 @@ cgErrorCallback(void)
   abort();
 }
 
-GlShaders * 
-createShaders(GlLandscape& _land) 
+GlShaders *
+createShaders(GlLandscape& _land)
 {
   if(g_shaders_context == 0) {
     cgSetErrorCallback(cgErrorCallback);
@@ -182,14 +182,14 @@ TreeShader::TreeShader(GlLandscape& _land)
   : landscape(_land)
 {
   const char * compiler_extra_args[] = { 0 };
-  
+
   profile  = cgGLGetLatestProfile(CG_GL_VERTEX);
   cgGLSetOptimalOptions(profile); // optimal Cg compiler options
-  treeprog = cgCreateProgramFromFile(g_shaders_context, CG_SOURCE, 
-				     Directory::getShaders("tree.cg"), 
+  treeprog = cgCreateProgramFromFile(g_shaders_context, CG_SOURCE,
+				     Directory::getShaders("tree.cg"),
 				     profile, "main", compiler_extra_args);
 
-  
+
   c_posoffsetxy_param = cgGetNamedParameter(treeprog, "c_posoffsetxy");
   c_vxtex_param       = cgGetNamedParameter(treeprog, "c_vxtex");
   c_cst_param         = cgGetNamedParameter(treeprog, "c_constants");
@@ -198,7 +198,7 @@ TreeShader::TreeShader(GlLandscape& _land)
   rotphi_param        = cgGetNamedParameter(treeprog, "RotPhi");
   fog_param           = cgGetNamedParameter(treeprog, "Fog");
   variation_param     = cgGetNamedParameter(treeprog, "Variation");
-  
+
   // Load random position offset table. Trees in the same quad use
   // controlled random consecutive positions from this table.
   int i = 0;
@@ -231,7 +231,7 @@ TreeShader::TreeShader(GlLandscape& _land)
     { 0.0, 1.4, 0.5, 0.0}
   };
   cgGLSetParameterArray4f(c_vxtex_param, 0, 0, &vxtexquads[0][0]);
-  
+
   cgGLSetParameter4f(c_cst_param, hh2, zoomz, zoomz2, 0.0f);
   cgSetParameterVariability(c_cst_param, CG_LITERAL); // compiled-in
 
@@ -241,7 +241,7 @@ TreeShader::TreeShader(GlLandscape& _land)
     fprintf(stderr,"Shader compilation results:\n%s", compile_msg);
 
   cgGLBindProgram(treeprog);
-  
+
   // define display lists
   for(i=0; i<16; i++) {		// first tree
     for(i2=0; i<16; i++) {	// number of trees
@@ -260,13 +260,13 @@ TreeShader::TreeShader(GlLandscape& _land)
   displist[3][1] = c_treelist31;
   displist[3][2] = c_treelist32;
   displist[3][4] = c_treelist34;
-  
+
   // vertex number, directly interpreted by vertex program,
   // and relative position of horizontal quad.
   static const float vertices[16] = {
     // vertical eye facing area drawn in plane XY
-    0.0f, 0.0f, 
-    1.0f, 0.0f, 
+    0.0f, 0.0f,
+    1.0f, 0.0f,
     2.0f, 0.0f,
     3.0f, 0.0f,
     // second horizontal quad is more efficient.
@@ -325,7 +325,7 @@ TreeShader::TreeShader(GlLandscape& _land)
     }
   }
   glVertexPointer(3, GL_FLOAT, 0, quaddatalq);
-  
+
   // hq trees (whole quad)
   MAKE_LIST(c_treelist01l,  0,  4);
   MAKE_LIST(c_treelist02l,  0,  8);
@@ -337,11 +337,11 @@ TreeShader::TreeShader(GlLandscape& _land)
   MAKE_LIST(c_treelist31l, 24,  4);
   MAKE_LIST(c_treelist32l, 24,  8);
   MAKE_LIST(c_treelist34l, 24, 16);
-  
+
 #undef MAKE_LIST
-  
+
   glDisable(GL_VERTEX_ARRAY);
-} 
+}
 
 TreeShader::~TreeShader(void)
 {
@@ -355,13 +355,13 @@ static const unsigned int c_bush       = 2; // textree5   / tree5n.tga
 static const unsigned int c_dwarfpine  = 3; // textree3   / tree3n.tga
 static const unsigned int c_redtree    = 4; // textree4   / tree4n.tga
 static const unsigned int c_cactus     = 5; // texcactus1 / cactus1.tga
-  
+
 static const unsigned int c_max_species= 6;
 
 #define TREE_BATCH_SIZE (400)
 // an array of such structures holds the lists of quads sorted by tree specie.
 class QuadList {
-public:  
+public:
   struct qlelement {
     int xs;
     int ys;
@@ -373,18 +373,18 @@ private:
   qlelement quads[TREE_BATCH_SIZE];
   unsigned curfree;		// index of 1st free element in quads
 
-public:  
+public:
   void clear(void) {
     curfree = 0;
   }
-  
+
   QuadList(void) {
     clear();
   };
-  
+
   // subroutine inserts a quad in a list
   // returns 1 when list is full after insertion
-  int insert(int xs, int ys, int first, int count, int hq) 
+  int insert(int xs, int ys, int first, int count, int hq)
     throw(std::overflow_error)
   {
     if(count > 0) {
@@ -410,7 +410,7 @@ public:
     if(index >= curfree) return 0; // end marker
     return &quads[index];
   };
-  
+
 };
 
 #define GET_COORD(x) ((x)&(MAXX-1))
@@ -461,7 +461,7 @@ TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
   }
   widthcoef *= hh2;
   // tree height coefficients
-  cgSetParameter3f(variation_param, 
+  cgSetParameter3f(variation_param,
 		   average, variation, widthcoef);
   // save part of rendering state
   glPushAttrib(GL_COLOR_BUFFER_BIT|GL_ENABLE_BIT);
@@ -490,8 +490,8 @@ TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
     int ys = elt->ys;
     int x = GETCOORD(xs);
     int y = GETCOORD(ys);
-    float shade = landscape.g[x][y] * 0.0008 
-      * (landscape.nl[x][y] + (short) landscape.dl[x][y]*16) 
+    float shade = landscape.g[x][y] * 0.0008
+      * (landscape.nl[x][y] + (short) landscape.dl[x][y]*16)
       * landscape.sunlight / 255.0f;
     float transparency = 1.0;	// opaque
 
@@ -509,10 +509,10 @@ TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
 
     // choose display list
     treelist = displist[elt->first][elt->count];
-    
+
     // send transparency, shade (lighting), quad position
     glTexCoord4f(transparency, shade, xs, ys);
-    
+
     // set alpha threshold according to transparency
     glAlphaFunc(GL_GEQUAL, 0.5 * transparency);
 
@@ -558,7 +558,7 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
   QuadList * qlist[c_max_species*2];
   unsigned i;
   for(i=0; i<c_max_species*2; i++) qlist[i] = new QuadList();
-  
+
   int xs, ys;
   static const int cutdep = 800;
   static const float lineartree = 1.0;
@@ -568,7 +568,7 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
   if(ex > cam.x+maxdist) ex = static_cast<int>(cam.x+maxdist);
   if(ay < cam.z-maxdist) ay = static_cast<int>(cam.z-maxdist);
   if(ey > cam.z+maxdist) ey = static_cast<int>(cam.z+maxdist);
-  
+
   // classify and render in batches
   for(xs = ax; xs < ex; xs+=step) {
     float tdx = cam.x - xs;
@@ -586,8 +586,8 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
       unsigned char landtype = landscape.f[x][y];
       int hq = (dep < cutdep);
 
-      if(!landscape.isWoods(landtype) && 
-	 !landscape.isType(landtype,REDTREE0) && 
+      if(!landscape.isWoods(landtype) &&
+	 !landscape.isType(landtype,REDTREE0) &&
 	 !landscape.isType(landtype, CACTUS0)) continue;
 
       // call this expensive function
@@ -595,7 +595,7 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
 				hh2*ys, hh2*2)) continue;
       // insert xs, ys in appropriate list(s)
       if(landtype >= CONIFEROUSWOODS0 && landtype <= BUSHES3) {
-	// for CONIFEROUSWOODS, DECIDUOUSWOODS, MIXEDWOODS, 
+	// for CONIFEROUSWOODS, DECIDUOUSWOODS, MIXEDWOODS,
 	// DWARFPINEWOODS & BUSHES generates 1 to 4 trees in low quality
 	int trees = 4 - ((landtype - CONIFEROUSWOODS0) % 4);
 	// and 1, 3, 5 or 7 trees in hq.
@@ -632,7 +632,7 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
 	    renderTrees(c_deciduous, *qlist[lix], islinear);
 	    qlist[lix]->clear();
 	  }
-	  
+
 	} else if (landtype <= DWARFPINES3) {
 	  unsigned lix = c_dwarfpine + (islinear ? 0 : c_max_species);
 	  if(qlist[lix]->insert(xs, ys, 0, trees, hq)) {
@@ -678,7 +678,7 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
 }
 
 void
-TreeShader::loadFrameUniformParams(int phi) 
+TreeShader::loadFrameUniformParams(int phi)
 {
   // set quality
   int treequal = quality;
@@ -713,7 +713,7 @@ TreeShader::loadFrameUniformParams(int phi)
   cgGLSetStateMatrixParameter(mv_param, CG_GL_MODELVIEW_MATRIX,
 			      CG_GL_MATRIX_IDENTITY);
   static unsigned char frame=0;
-  if(frame == 0) { 
+  if(frame == 0) {
 #if 0
     // display modelview matrix
     GLfloat mvm[16];
@@ -729,7 +729,7 @@ TreeShader::loadFrameUniformParams(int phi)
 #ifdef STATS
     // display statistics histogram
     int i, sum=0, nb=0;
-    
+
     for(i=0; i<sizeof(g_statistics)/sizeof(g_statistics[0]); i++) {
       fprintf(stderr,"%3u ", g_statistics[i]);
       sum += g_statistics[i]*i;
@@ -737,7 +737,7 @@ TreeShader::loadFrameUniformParams(int phi)
       g_statistics[i] = 0U;
     }
     fprintf(stderr,"/%3.0f\n",sum/(float)nb);
-    
+
 #endif
   }
   frame++;
@@ -751,8 +751,8 @@ TreeShader::loadFrameUniformParams(int phi)
   static unsigned char msgcount = 0;
   if(glIsEnabled(GL_FOG)) {
     Fog   fog;
-    GLint fogMode; 
-    
+    GLint fogMode;
+
     glGetFloatv(GL_FOG_COLOR, fog.fogColor);
     glGetIntegerv(GL_FOG_MODE, &fogMode);
     switch(fogMode) {
@@ -769,7 +769,7 @@ TreeShader::loadFrameUniformParams(int phi)
       break;
     }
     // update fog in shader
-    cgSetParameter4f(fog_param, 
+    cgSetParameter4f(fog_param,
 		     fog.fogColor[0],
 		     fog.fogColor[1],
 		     fog.fogColor[2],

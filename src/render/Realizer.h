@@ -195,7 +195,7 @@ class Model3dRealizer
             }
             else
             {
-              if (model.numMaterials && cm->material) 
+              if (model.numMaterials && cm->material)
               {
                 unsigned char *color = cm->material->color.c;
                 int rotcol = 0;
@@ -245,7 +245,7 @@ class Model3dRealizer
             }
             else
             {
-              if (model.numMaterials && cm->material && cm->material->texture->textureID >= 0) 
+              if (model.numMaterials && cm->material && cm->material->texture->textureID >= 0)
               {
                 unsigned char *pColor = model.material [cm->material->texture->textureID]->color.c;
                 va->glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);
@@ -258,7 +258,7 @@ class Model3dRealizer
         }
         va->glEnd ();
       }
-      
+
 /*      float light_specular [4] = {1.0, 1.0, 1.0, 1.0};
       glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
       float light_ambient [3] = {0.0, 0.0, 0.0};
@@ -631,7 +631,7 @@ class Model3dRealizer
 class StarsRealizer
 {
   public:
-  
+
     void draw (unsigned numStars, std::vector<Star *> &star)
     {
       for (unsigned i = 0; i < numStars; i ++)

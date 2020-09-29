@@ -133,7 +133,7 @@ class ObjectStatistics
     int tankkills;    ///< number of tank shots
     int otherkills;   ///< number of other objects (buildings) shot
     bool killed;      ///< this object is already deactivated
-    
+
     ObjectStatistics ()
     {
       points = 0;
@@ -165,18 +165,18 @@ class ObjectList : public std::vector<TSpaceObj>
 {
   public:
     clock_t timer;
-    
+
     void add (TSpaceObj obj)
     {
       this->push_back (obj);
       space->addObject (obj);
     }
-    
+
     void remove (TSpaceObj obj)
     {
       obj->valid = false;
     }
-    
+
     void cleanUp ()
     {
       unsigned i;
@@ -186,7 +186,7 @@ class ObjectList : public std::vector<TSpaceObj>
       if (abs (timer - timenow) < 1000)
         return;
       timer = timenow;
-      
+
       // realign this std::vector
       unsigned removed = 0;
       for (i = 0; i < this->size (); i ++)
@@ -200,7 +200,7 @@ class ObjectList : public std::vector<TSpaceObj>
           this->operator[](i - removed) = this->operator[](i);
         }
       }
-      
+
       // clear invalid objects (at the end of this std::vector)
       for (i = 0; i < removed; i ++)
         this->pop_back ();

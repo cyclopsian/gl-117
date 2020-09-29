@@ -52,7 +52,7 @@ class Model3dRegistry
 
     Model3dRegistry ();
     virtual ~Model3dRegistry ();
-    
+
     static void add (const std::string &name, Model3d *model);
     static Model3d *get (const std::string &name);
 };

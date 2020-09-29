@@ -73,7 +73,7 @@ int Server::getIP()
 {
 #ifdef HAVE_SDL_NET
   return ip.host;
-#else 
+#else
   return 0;
 #endif
 }
@@ -84,8 +84,8 @@ void Server::removeClient(int id_client)
 /*  int i = -1;
   for (int a = 0; a < num_clients; a++)
     if (name == clients[i].name) i = a;
-  
-  if (i == -1) 
+
+  if (i == -1)
   {
     printf ("Not able to remove client: %d",ip);
     return;
@@ -94,10 +94,10 @@ void Server::removeClient(int id_client)
 
   if(i<0 && i>=num_clients)
     return;
-  
+
   // close the old socket, even if it's dead...
   SDLNet_TCP_Close(clients[i].sock);
-  
+
   num_clients--;
   if(num_clients>i)
     memmove(&clients[i], &clients[i+1], (num_clients-i)*sizeof(MyClient));
@@ -187,7 +187,7 @@ int Server::getClientFromID(int id_client)
 int Server::getMessage(int id_client, char *buf)
 {
 #ifdef HAVE_SDL_NET
-  
+
   int numready=SDLNet_CheckSockets(set, 0);
   if(numready==-1)
   {
@@ -205,13 +205,13 @@ int Server::getMessage(int id_client, char *buf)
 //        printf("Received: %.*s\n",len,message);
         return 1;
       }
-      else 
+      else
       {
         removeClient(clients[n].id);
         return 0;
       }
-    }    
-    else 
+    }
+    else
     {
       return 0;
     }

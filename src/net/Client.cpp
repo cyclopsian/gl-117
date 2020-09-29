@@ -78,7 +78,7 @@ bool Client::getServer(char *hostname, char *name)
     SDL_Quit();
     exit(7);
   }
-  
+
   // login with a name
 /*  if(!putMsg(sock,name))
   {
@@ -97,7 +97,7 @@ return false;
 int Client::getMessage(char *buf)
 {
 #ifdef HAVE_SDL_NET
-  
+
   int numready=SDLNet_CheckSockets(set, 0);
   if(numready==-1)
   {
@@ -118,22 +118,22 @@ int Client::getMessage(char *buf)
         }
         return 1;
       }
-      else 
+      else
       {
-        printf ("Server lost, closing connection...");  
+        printf ("Server lost, closing connection...");
         SDLNet_TCP_Close(sock);
         sock = NULL;
         return 0;
       }
-    }    
-    else 
+    }
+    else
     {
-      printf ("Socket not ready");  
+      printf ("Socket not ready");
       return 0;
     }
   }
 // getch();
-// printf ("numready = 0");  
+// printf ("numready = 0");
 return 0;
 #else
 return 0;

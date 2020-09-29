@@ -115,7 +115,7 @@ class Container : public Component
 class Label : public Component
 {
   public:
-  
+
     std::string text;
     bool transparent; ///< no background
 
@@ -176,7 +176,7 @@ class EditKey : public Component
 
     EditKey ();
     EditKey (const std::string &text);
-  
+
     void setText (const std::string &text);
     void setKey (int key); ///< please add 0xFF to two byte keys to distinguish from one byte keys
     int getKey ();         ///< returns special+256 for two byte keys ('+' is special=13, ENTER is key=13)

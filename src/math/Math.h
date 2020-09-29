@@ -44,9 +44,9 @@ class Math
   public:
 
     float smokezoom [MAXSMOKEELEM];
-    
+
     Math ();
-    
+
     /// random integer number [0;n-1]
     static int random (int n);
     /// random integer number [0;n-1]

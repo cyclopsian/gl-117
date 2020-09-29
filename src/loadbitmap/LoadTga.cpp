@@ -5,9 +5,9 @@
     loader_tga.c - Loader for Truevision Targa images
     by Dan Maas <dmaas@dcine.com>   May 15, 2000
     Modified for GL-117 by Piotr Pawlow <pp@siedziba.pl>
-    based on TGA specifications available at: 
+    based on TGA specifications available at:
     http://www.wotsit.org/cgi-bin/search.cgi?TGA
-    header/footer structures courtesy of the GIMP Targa plugin 
+    header/footer structures courtesy of the GIMP Targa plugin
 
     This file is part of GL-117.
 
@@ -45,36 +45,36 @@ static Uint32* flip(Uint32* in, int w, int h);
 
 // TGA pixel formats
 #define TGA_TYPE_MAPPED      1
-#define TGA_TYPE_COLOR       2 
-#define TGA_TYPE_GRAY        3 
-#define TGA_TYPE_MAPPED_RLE  9 
-#define TGA_TYPE_COLOR_RLE  10 
+#define TGA_TYPE_COLOR       2
+#define TGA_TYPE_GRAY        3
+#define TGA_TYPE_MAPPED_RLE  9
+#define TGA_TYPE_COLOR_RLE  10
 #define TGA_TYPE_GRAY_RLE   11
 
 // TGA header flags
-#define TGA_DESC_ABITS      0x0f 
-#define TGA_DESC_HORIZONTAL 0x10 
-#define TGA_DESC_VERTICAL   0x20 
+#define TGA_DESC_ABITS      0x0f
+#define TGA_DESC_HORIZONTAL 0x10
+#define TGA_DESC_VERTICAL   0x20
 
-#define TGA_SIGNATURE "TRUEVISION-XFILE" 
+#define TGA_SIGNATURE "TRUEVISION-XFILE"
 #define TGA_FOOTER_LEN 26
 
 class TgaHeader
 {
   public:
 
-    unsigned char idLength; 
-    unsigned char colorMapType; 
-    unsigned char imageType; 
-    unsigned char colorMapIndexLo, colorMapIndexHi; 
-    unsigned char colorMapLengthLo, colorMapLengthHi; 
-    unsigned char colorMapSize; 
-    unsigned char xOriginLo, xOriginHi; 
-    unsigned char yOriginLo, yOriginHi; 
-    unsigned char widthLo, widthHi; 
-    unsigned char heightLo, heightHi; 
-    unsigned char bpp; 
-    unsigned char descriptor; 
+    unsigned char idLength;
+    unsigned char colorMapType;
+    unsigned char imageType;
+    unsigned char colorMapIndexLo, colorMapIndexHi;
+    unsigned char colorMapLengthLo, colorMapLengthHi;
+    unsigned char colorMapSize;
+    unsigned char xOriginLo, xOriginHi;
+    unsigned char yOriginLo, yOriginHi;
+    unsigned char widthLo, widthHi;
+    unsigned char heightLo, heightHi;
+    unsigned char bpp;
+    unsigned char descriptor;
 };
 
 class TgaFooter
@@ -83,9 +83,9 @@ class TgaFooter
 
     unsigned int extensionAreaOffset;
     unsigned int developerDirectoryOffset;
-    char signature[16]; 
-    char dot; 
-    char null; 
+    char signature[16];
+    char dot;
+    char null;
 };
 
 
@@ -110,87 +110,87 @@ inline void LoadTga::writeRGBA (Uint32 *p, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 
 unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 {
-  FILE      *fp; 
+  FILE      *fp;
   int       bpp, vinverted = 0;
-  int       rle = 0, footer_present = 0; 
-  Uint32    *im_data;   
+  int       rle = 0, footer_present = 0;
+  Uint32    *im_data;
   int       im_w,im_h;
 
-  TgaHeader header; 
-  TgaFooter footer; 
- 
-  fp = fopen(im_file, "rb"); 
+  TgaHeader header;
+  TgaFooter footer;
+
+  fp = fopen(im_file, "rb");
   if(!fp)
   {
     assert(false);
     return 0;
   }
 
-  // read the footer first 
-  fseek (fp, 0L - TGA_FOOTER_LEN, SEEK_END); 
-  if (fread (&footer, TGA_FOOTER_LEN, 1, fp) != 1) 
-  { 
+  // read the footer first
+  fseek (fp, 0L - TGA_FOOTER_LEN, SEEK_END);
+  if (fread (&footer, TGA_FOOTER_LEN, 1, fp) != 1)
+  {
     assert(false);
 	  fclose(fp);
-	  return 0; 
-  } 
-   
-  // check the footer to see if we have a v2.0 TGA file 
-  if (memcmp(footer.signature, TGA_SIGNATURE, sizeof (footer.signature)) == 0) 
-    footer_present = 1; 
-   
-  // now read the header 
-  if (fseek (fp, 0, SEEK_SET) || fread (&header, sizeof (header), 1, fp) != 1)  
-  { 
-    assert(false);
-    fclose(fp);
-    return 0; 
+	  return 0;
   }
-   
-  // skip over alphanumeric ID field 
-  if (header.idLength && fseek (fp, header.idLength, SEEK_CUR)) 
-  { 
-    assert(false);
-    fclose(fp);
-    return 0; 
-  } 
-   
-  // now parse the header 
 
-  // this flag indicated bottom-up pixel storage 
-  vinverted = header.descriptor ^ TGA_DESC_VERTICAL; 
+  // check the footer to see if we have a v2.0 TGA file
+  if (memcmp(footer.signature, TGA_SIGNATURE, sizeof (footer.signature)) == 0)
+    footer_present = 1;
 
-  switch (header.imageType) 
-  { 
-    case TGA_TYPE_COLOR_RLE:
-    case TGA_TYPE_GRAY_RLE:
-      rle = 1; 
-      break; 
-
-    case TGA_TYPE_COLOR: 
-    case TGA_TYPE_GRAY:
-      rle = 0; 
-      break; 
-
-    default: 
-      assert(false);
-      fclose(fp);
-      return 0; 
-  } 
-   
-  // bits per pixel 
-  bpp = header.bpp; 
-
-  if( ! ((bpp == 32) || (bpp == 24) || (bpp == 8)) ) 
-  { 
+  // now read the header
+  if (fseek (fp, 0, SEEK_SET) || fread (&header, sizeof (header), 1, fp) != 1)
+  {
     assert(false);
     fclose(fp);
     return 0;
-  } 
+  }
 
-  // endian-safe loading of 16-bit sizes 
-  im_w = (header.widthHi << 8) | header.widthLo; 
-  im_h = (header.heightHi << 8) | header.heightLo;    
+  // skip over alphanumeric ID field
+  if (header.idLength && fseek (fp, header.idLength, SEEK_CUR))
+  {
+    assert(false);
+    fclose(fp);
+    return 0;
+  }
+
+  // now parse the header
+
+  // this flag indicated bottom-up pixel storage
+  vinverted = header.descriptor ^ TGA_DESC_VERTICAL;
+
+  switch (header.imageType)
+  {
+    case TGA_TYPE_COLOR_RLE:
+    case TGA_TYPE_GRAY_RLE:
+      rle = 1;
+      break;
+
+    case TGA_TYPE_COLOR:
+    case TGA_TYPE_GRAY:
+      rle = 0;
+      break;
+
+    default:
+      assert(false);
+      fclose(fp);
+      return 0;
+  }
+
+  // bits per pixel
+  bpp = header.bpp;
+
+  if( ! ((bpp == 32) || (bpp == 24) || (bpp == 8)) )
+  {
+    assert(false);
+    fclose(fp);
+    return 0;
+  }
+
+  // endian-safe loading of 16-bit sizes
+  im_w = (header.widthHi << 8) | header.widthLo;
+  im_h = (header.heightHi << 8) | header.heightLo;
 
   if ((im_w > 32767) || (im_w < 1) || (im_h > 32767) || (im_h < 1))
   {
@@ -199,16 +199,16 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
     fclose(fp);
     return 0;
   }
-   
+
   {
     unsigned long datasize;
     struct stat ss;
     unsigned char *buf, *bufptr;
-    Uint32 *dataptr; 
+    Uint32 *dataptr;
 
     int   y;
 
-    // allocate the destination buffer 
+    // allocate the destination buffer
     im_data = (Uint32*)malloc(im_w * im_h * sizeof(Uint32));
     if(!im_data)
     {
@@ -218,89 +218,89 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 	     return 0;
     }
 
-    // first we read the file data into a buffer for parsing 
-    // then we decode from RAM 
+    // first we read the file data into a buffer for parsing
+    // then we decode from RAM
 
-    // find out how much data must be read from the file 
-    // (this is NOT simply width*height*4, due to compression) 
-	  
+    // find out how much data must be read from the file
+    // (this is NOT simply width*height*4, due to compression)
+
 	  stat(im_file, &ss);
 	  datasize = ss.st_size - sizeof(TgaHeader) - header.idLength -
 	     (footer_present ? TGA_FOOTER_LEN : 0);
-	
-	  buf = (unsigned char*)malloc(datasize); 
-	  if(!buf) 
+
+	  buf = (unsigned char*)malloc(datasize);
+	  if(!buf)
 	  {
       im_w = 0;
       assert(false);
       fclose(fp);
       return 0;
 	  }
-	
-    // read in the pixel data 
-    if( fread(buf, 1, datasize, fp) != datasize) 
+
+    // read in the pixel data
+    if( fread(buf, 1, datasize, fp) != datasize)
     {
       assert(false);
       fclose(fp);
       return 0;
     }
 
-    // buffer is ready for parsing 
+    // buffer is ready for parsing
 
-    // bufptr is the next byte to be read from the buffer 
-    bufptr = buf; 
+    // bufptr is the next byte to be read from the buffer
+    bufptr = buf;
 
-    // dataptr is the next 32-bit pixel to be filled in 
+    // dataptr is the next 32-bit pixel to be filled in
     dataptr = im_data;
-	
-    // decode uncompressed BGRA data 
-    if(!rle) 
-    { 
-      for(y = 0; y < im_h; y++) // for each row 
-      { 
+
+    // decode uncompressed BGRA data
+    if(!rle)
+    {
+      for(y = 0; y < im_h; y++) // for each row
+      {
         int x;
 
-        // point dataptr at the beginning of the row 
+        // point dataptr at the beginning of the row
         if(!vinverted)
-        // some TGA's are stored upside-down! 
+        // some TGA's are stored upside-down!
         dataptr = im_data + (im_h - (y+1)) * im_w;
         else
         dataptr = im_data + y * im_w;
 
 
-        for(x = 0; x < im_w; x++) // for each pixel in the row 
+        for(x = 0; x < im_w; x++) // for each pixel in the row
         {
           switch(bpp)
           {
 
-            // 32-bit BGRA pixels 
-            case 32: 
-              writeRGBA (dataptr, 
-                *(bufptr + 2),  // R 
-                *(bufptr + 1),  // G 
-                *(bufptr + 0),  // B 
-                *(bufptr + 3)   // A 
+            // 32-bit BGRA pixels
+            case 32:
+              writeRGBA (dataptr,
+                *(bufptr + 2),  // R
+                *(bufptr + 1),  // G
+                *(bufptr + 0),  // B
+                *(bufptr + 3)   // A
                 );
               dataptr++;
               bufptr += 4;
               break;
 
-            // 24-bit BGR pixels 
-            case 24: 
+            // 24-bit BGR pixels
+            case 24:
               writeRGBA (dataptr,
-                *(bufptr + 2),  // R 
-                *(bufptr + 1),  // G 
-                *(bufptr + 0),  // B 
-                (char) 0xff     // A 
+                *(bufptr + 2),  // R
+                *(bufptr + 1),  // G
+                *(bufptr + 0),  // B
+                (char) 0xff     // A
                 );
               dataptr++;
               bufptr += 3;
               break;
 
-            // 8-bit grayscale 
+            // 8-bit grayscale
             case 8:
               writeRGBA (dataptr,
-                *bufptr,      // grayscale 
+                *bufptr,      // grayscale
                 *bufptr,
                 *bufptr,
                 (char) 0xff
@@ -308,36 +308,36 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
               dataptr++;
               bufptr += 1;
               break;
-          }  
+          }
 
-        } // end for (each pixel) 
+        } // end for (each pixel)
 
-      } // end for (each row) 
+      } // end for (each row)
 
-    } // end if (RLE) 
+    } // end if (RLE)
 
-  	// decode RLE compressed data 
-	  else 
-	  { 
-      unsigned char curbyte, red, green, blue, alpha; 
-      Uint32 *final_pixel = dataptr + im_w * im_h; 
+  	// decode RLE compressed data
+	  else
+	  {
+      unsigned char curbyte, red, green, blue, alpha;
+      Uint32 *final_pixel = dataptr + im_w * im_h;
 
-      // loop until we've got all the pixels 
-      while(dataptr < final_pixel)	
-      { 
-		    int count; 
-		    
-		    curbyte = *bufptr++; 
-		    count = (curbyte & 0x7F) + 1; 
-		    
-		    if(curbyte & 0x80)  // RLE packet 
-		    { 
+      // loop until we've got all the pixels
+      while(dataptr < final_pixel)
+      {
+		    int count;
+
+		    curbyte = *bufptr++;
+		    count = (curbyte & 0x7F) + 1;
+
+		    if(curbyte & 0x80)  // RLE packet
+		    {
           int i;
 
           switch(bpp)
           {
             case 32:
-              blue = *bufptr++; green = *bufptr++; red = *bufptr++; 
+              blue = *bufptr++; green = *bufptr++; red = *bufptr++;
               alpha = *bufptr++;
               for(i = 0; i < count; i++)
               {
@@ -347,7 +347,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
               break;
 
             case 24:
-              blue = *bufptr++; green = *bufptr++; red = *bufptr++; 
+              blue = *bufptr++; green = *bufptr++; red = *bufptr++;
               for(i = 0; i < count; i++)
               {
                 writeRGBA (dataptr, red, green, blue, (char) 0xff);
@@ -365,45 +365,45 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
               break;
           }
 
-        } // end if (RLE packet) 
+        } // end if (RLE packet)
 
-        else  // raw packet 
-        { 
+        else  // raw packet
+        {
           int i;
 
-          for(i = 0; i < count; i++) 
-          { 
+          for(i = 0; i < count; i++)
+          {
             switch(bpp)
             {
 
-              // 32-bit BGRA pixels 
-              case 32: 
-                writeRGBA (dataptr, 
-                  *(bufptr + 2),  // R 
-                  *(bufptr + 1),  // G 
-                  *(bufptr + 0),  // B 
-                  *(bufptr + 3)   // A 
+              // 32-bit BGRA pixels
+              case 32:
+                writeRGBA (dataptr,
+                  *(bufptr + 2),  // R
+                  *(bufptr + 1),  // G
+                  *(bufptr + 0),  // B
+                  *(bufptr + 3)   // A
                   );
                 dataptr++;
                 bufptr += 4;
                 break;
 
-              // 24-bit BGR pixels 
-              case 24: 
+              // 24-bit BGR pixels
+              case 24:
                 writeRGBA (dataptr,
-                  *(bufptr + 2),  // R 
-                  *(bufptr + 1),  // G 
-                  *(bufptr + 0),  // B 
-                  (char) 0xff     // A 
+                  *(bufptr + 2),  // R
+                  *(bufptr + 1),  // G
+                  *(bufptr + 0),  // B
+                  (char) 0xff     // A
                   );
                 dataptr++;
                 bufptr += 3;
                 break;
 
-              // 8-bit grayscale 
+              // 8-bit grayscale
               case 8:
                 writeRGBA (dataptr,
-                  *bufptr,      // pseudo-grayscale 
+                  *bufptr,      // pseudo-grayscale
                   *bufptr,
                   *bufptr,
                   (char) 0xff
@@ -411,13 +411,13 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
                 dataptr++;
                 bufptr += 1;
                 break;
-            }  
-          } 
-        } // end if (raw packet)  
+            }
+          }
+        } // end if (raw packet)
 
-      } // end for (each packet) 
+      } // end for (each packet)
 
-      // must now flip a bottom-up image 
+      // must now flip a bottom-up image
 
       /* This is the best of several ugly implementations
       * I considered. It's not very good since the image
@@ -438,11 +438,11 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
         }
       }
 
-	  } // end if (image is RLE)  
+	  } // end if (image is RLE)
 
-	  free(buf); 
+	  free(buf);
   }
-   
+
   fclose(fp);
   *w=im_w; *h=im_h;
   return (unsigned char*)im_data;
@@ -452,7 +452,7 @@ unsigned char *LoadTga::load (const char *im_file, int *w, int *h)
 * flip a Uint32 image block vertically
 * by allocating a new block, then copying
 * the rows in reverse order
-*/ 
+*/
 Uint32* LoadTga::flip(Uint32* in, int w, int h)
 {
   int adv, adv2, i;

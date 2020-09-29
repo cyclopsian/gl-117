@@ -79,7 +79,7 @@ class GlPrimitives
     void enableFog (float view, bool fast = true) const;
     void setFogColor (int r, int g, int b);
     void setFogLuminance (float lum);
-  
+
   private:
 
     std::vector<std::string> texList; ///< texture names
@@ -128,7 +128,7 @@ extern Frustum frustum;
 * (GL_QUADS, GL_TRIANGLES).
 *
 * Usage:
-*   VertexArray quads; 
+*   VertexArray quads;
 *   quads.glBegin (GL_QUADS);
 *   quads.glVertex3f (...);
 *   ... ;

@@ -70,7 +70,7 @@ void Container::eventMouse (int x, int y, int button)
 	// Select buffer parameters
 	glSelectBuffer (20 * 4, selectBuff);
 	glGetIntegerv (GL_VIEWPORT, viewport);
-	
+
 	// Enter to selection mode
 	glEnable (GL_DEPTH_TEST);
 	glDisable (GL_LIGHTING);
@@ -84,12 +84,12 @@ void Container::eventMouse (int x, int y, int button)
 	// Set our perpective transformation matrix
   gluPerspective (80.0, 1.0, 0.25 * GLOBALSCALE, view * GLOBALSCALE);
 //  gluPerspective (60.0, 1.0, 0.2, 200.0);
-	
+
 	glMatrixMode (GL_MODELVIEW);
 
 	// Render all scene and fill selection buffer
 	glRenderMode (GL_SELECT);
-  
+
   glInitNames ();
   glPushName (0);
   draw ();

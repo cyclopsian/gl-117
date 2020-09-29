@@ -58,7 +58,7 @@ class Directory
     static const std::string getMaps (const std::string &name);
     static const std::string getShaders (const std::string &name);
     static const std::string getUnits (const std::string &name);
-  
+
   protected:
 
     static char *strtok (char *str, int len, const char *tok);

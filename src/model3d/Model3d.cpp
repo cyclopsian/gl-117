@@ -340,7 +340,7 @@ void Model3d::scaleTexture (float fx, float fy)
         }
         else
         {
-          if (numMaterials && cm->material) 
+          if (numMaterials && cm->material)
           {
             unsigned char *color = cm->material->color.c;
             if (color [0] > 190 && color [1] > 190 && color [2] < 20)
@@ -384,7 +384,7 @@ void Model3d::scaleTexture (float fx, float fy)
         }
         else
         {
-          if (numMaterials && cm->material && cm->material->texture->textureID >= 0) 
+          if (numMaterials && cm->material && cm->material->texture->textureID >= 0)
           {
             unsigned char *pColor = material [cm->material->texture->textureID]->color.c;
             va->glColor4ub (pColor [0], pColor [1], pColor [2], pColor [3]);

@@ -165,7 +165,7 @@ void Load3ds::processNextChunk (Model3d *model, Chunk3ds *previousChunk)
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
 
-      default: 
+      default:
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
@@ -201,7 +201,7 @@ void Load3ds::processNextObjectChunk (Model3d *model, Object3d *object, Chunk3ds
         break;
 
       case OBJECT_MATERIAL:
-        readObjectMaterial (model, object, currentChunk);      
+        readObjectMaterial (model, object, currentChunk);
         break;
 
       case OBJECT_UV:
@@ -245,7 +245,7 @@ void Load3ds::processNextMaterialChunk (Model3d *model, Chunk3ds *previousChunk)
       case MAT_DIFFUSE:
         readColorChunk (model->material [model->numMaterials - 1], currentChunk);
         break;
-    
+
       case MAT_MAP:
         processNextMaterialChunk (model, currentChunk);
         break;
@@ -263,7 +263,7 @@ void Load3ds::processNextMaterialChunk (Model3d *model, Chunk3ds *previousChunk)
         }
         model->material [model->numMaterials - 1]->filename = buf;
         break;
-    
+
       case MAT_USCALE:
         readUScale (model->material [model->numMaterials - 1], currentChunk);
         break;
@@ -284,7 +284,7 @@ void Load3ds::processNextMaterialChunk (Model3d *model, Chunk3ds *previousChunk)
         readUVRotation (model->material [model->numMaterials - 1], currentChunk);
         break;
 
-      default:  
+      default:
         currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
         break;
     }
@@ -379,7 +379,7 @@ void Load3ds::readUVCoordinates (Object3d *object, Chunk3ds *previousChunk)
   Vector2 *p = new Vector2 [object->numTexVertex];
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
-  
+
   for (int i = 0; i < object->numTexVertex; i ++)
     object->vertex [i].tex.set (p [i]);
   delete []p;
@@ -396,7 +396,7 @@ void Load3ds::readVertices (Object3d *object, Chunk3ds *previousChunk)
   Vector3 *p = new Vector3 [object->numVertices];
 
   previousChunk->bytesRead += file->readFloat ((float *) p, (previousChunk->length - previousChunk->bytesRead) / 4);
-    
+
   for (i = 0; i < object->numVertices; i ++)
   {
     object->vertex [i].vector.set (p [i]);
@@ -427,7 +427,7 @@ void Load3ds::readObjectMaterial (Model3d *model, Object3d *object, Chunk3ds *pr
             (model->material [i]->filename [0] >= 'a' && model->material [i]->filename [0] <= 'z'))
         {
           object->hasTexture = true;
-        }  
+        }
       break;
     }
     else
@@ -437,7 +437,7 @@ void Load3ds::readObjectMaterial (Model3d *model, Object3d *object, Chunk3ds *pr
   }
 
   currentChunk->bytesRead += file->skip (currentChunk->length - currentChunk->bytesRead);
-}      
+}
 
 void Load3ds::compile (Model3d *model)
 {
@@ -542,7 +542,7 @@ void Load3ds::loadTextures (Model3d *model)
           break;
         }
       }
-      
+
       model->object [i]->material->texture = new Texture (str, -1, true, false);
 //      if (model->object [i]->material->texture == NULL)
 //        model->object [i]->hasTexture = false;

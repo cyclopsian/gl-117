@@ -62,7 +62,7 @@ void MapLoader::readMapFile ()
 
   if (!file.open (Directory::getMaps ("maps.txt").c_str ()))
     return;
-  
+
   while (file.nextToken (token, TOKENLEN))
   {
     strcpy (mapfile [mapcount], token);

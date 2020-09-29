@@ -45,7 +45,7 @@ unsigned
 Renderer::count(void)
 {
   checkInitGlobal();
-  
+
   iterator i   = g_render_register->begin();
   iterator end = g_render_register->end();
   unsigned cnt = 0;
@@ -61,7 +61,7 @@ Renderer&
 Renderer::get(unsigned _index)
 {
   checkInitGlobal();
-  
+
   iterator i   = g_render_register->begin();
   iterator end = g_render_register->end();
   unsigned cnt = 0;
@@ -71,7 +71,7 @@ Renderer::get(unsigned _index)
     if(r->isAvailable() && cnt++ == _index) return *r;
   }
   throw std::invalid_argument("_index out of bounds");
-  
+
   return *g_no_render;
 }
 
@@ -79,7 +79,7 @@ Renderer&
 Renderer::get(void)
 {
   checkInitGlobal();
-  
+
   iterator i   = g_render_register->begin();
   iterator end = g_render_register->end();
   float best = 0.0f;

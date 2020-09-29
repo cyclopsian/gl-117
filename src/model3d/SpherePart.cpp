@@ -90,7 +90,7 @@ void SpherePart::init (float radius, int segments, float phi)
         co.quad [co.numQuads ++].setVertices (&co.vertex [p [0]], &co.vertex [p [1]], &co.vertex [p [2]], &co.vertex [p [3]]);
       }
     }
-  
+
   addObject (co);
   setColor (Color (128, 128, 128, 255));
 }

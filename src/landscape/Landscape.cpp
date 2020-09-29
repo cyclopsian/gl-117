@@ -617,7 +617,7 @@ void Landscape::genMoonSurface (int height)
   type = LAND_MOON;
   for (i = 0; i <= MAXX; i ++)
     for (i2 = 0; i2 <= MAXX; i2 ++)
-      h [i] [i2] = 30000 + Math::random (300, i, i2);    
+      h [i] [i2] = 30000 + Math::random (300, i, i2);
 
   int maxholes = 1;
   for (i = 0; i < maxholes; i ++)
@@ -632,16 +632,16 @@ void Landscape::genMoonSurface (int height)
          rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
-           if (rad < 0.67 * radius) 
+           if (rad < 0.67 * radius)
            {
              depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
            }
-           else 
+           else
            {
-             depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
+             depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));
            }
            h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
-         } 
+         }
       }
   }
 
@@ -658,18 +658,18 @@ void Landscape::genMoonSurface (int height)
          rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
-           if (rad < 0.67 * radius) 
+           if (rad < 0.67 * radius)
            {
              depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
            }
-           else 
+           else
            {
-             depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
+             depth2 = (int) (0.3 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));
            }
            h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
-         } 
+         }
       }
-  
+
   }
 
   maxholes = Math::random (10) + 20 ;
@@ -685,17 +685,17 @@ void Landscape::genMoonSurface (int height)
          rad = (int) sqrt ((float) ((x-i2)*(x-i2)+(y-i3)*(y-i3)));
          if (rad < radius)
          {
-           if (rad < 0.67 * radius) 
+           if (rad < 0.67 * radius)
            {
              depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
            }
-           else 
+           else
            {
-             depth2 = (int) (0.6 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
+             depth2 = (int) (0.6 * sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));
            }
            h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
-         } 
-      }  
+         }
+      }
   }
 
   maxholes = Math::random (50) + 400;
@@ -712,11 +712,11 @@ void Landscape::genMoonSurface (int height)
          if (rad < radius)
          {
            if (rad < 0.67 * radius) depth2 = (int) (cos ((float)rad / (2*radius/3) * pi/2) * depth);
-           else depth2 = (int) (sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));  
+           else depth2 = (int) (sin ((float)(radius - rad) / (radius / 3) * pi) * depth * (-1));
            h[GETCOORD(i2)][GETCOORD(i3)] -= depth2;
-         } 
+         }
       }
-  
+
   }
   convolveGauss (2, 0, 65535);
 }

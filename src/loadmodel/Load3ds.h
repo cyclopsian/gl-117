@@ -111,14 +111,14 @@ struct Chunk3ds
 class Load3ds
 {
   public:
-  
+
     BinaryFile3ds *file;
 
     Load3ds ();
 
     void setTextureDir (const std::string &texDir);
     bool import3ds (Model3d *model, const char *filename);
-  
+
   // developer specific loading routines
   private:
 

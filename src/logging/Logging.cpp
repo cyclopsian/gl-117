@@ -56,7 +56,7 @@ void Logging::setFile (const std::string &filename)
   Logging::filename = filename;
 }
 
-void Logging::displayStream (FILE *stream, const std::string &str, LogLevel level, char *file, int line)
+void Logging::displayStream (FILE *stream, const std::string &str, LogLevel level, const char *file, int line)
 {
   assert (stream);
   if (level == LOG_NONE) fprintf (stream, "%s@%d: %s\n", file, line, str.c_str ());
@@ -69,7 +69,7 @@ void Logging::displayStream (FILE *stream, const std::string &str, LogLevel leve
 }
 
 // display log/debug message
-void Logging::display (const std::string &str, LogLevel level, char *file, int line)
+void Logging::display (const std::string &str, LogLevel level, const char *file, int line)
 {
   if (!str.length ())
     return;

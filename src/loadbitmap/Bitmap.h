@@ -57,12 +57,12 @@ class Bitmap
 
 /**
 * Load up a TGA file.
-* 
-* As written the function load() only recognizes the following types of Targas: 
-*		Type 02 - Uncompressed RGB, 24 or 32 bits 
+*
+* As written the function load() only recognizes the following types of Targas:
+*		Type 02 - Uncompressed RGB, 24 or 32 bits
 *		Type 03 - Uncompressed grayscale, 8 bits
 *		Type 10 - RLE-compressed RGB, 24 or 32 bits
-*		Type 11 - RLE-compressed grayscale, 8 bits  
+*		Type 11 - RLE-compressed grayscale, 8 bits
 * There are several other (uncommon) Targa formats which it can't currently handle.
 */
 class LoadTga

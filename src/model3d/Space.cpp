@@ -67,7 +67,7 @@ void Space::removeAllObjects ()
 {
   int i;
   frustum.extractFrustum ();
-  
+
   if (drawLight)
   {
     for (i = 0; i < o.size (); i ++)

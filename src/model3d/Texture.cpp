@@ -153,7 +153,7 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
   this->alpha = alpha;
 
   textureID = gl.registerTexture (filename, data, width, height, mipmap);
-  
+
   return true;
 }
 
@@ -163,10 +163,10 @@ bool Texture::loadFromTGA (const std::string &filename, int alphaprogram, bool m
   if (y < 0) y = (int) -y % height;
   if (x >= width) x = (int) x % width;
   if (y >= height) y = (int) y % height;
-  
+
   int offset = y * width + x;
   offset <<= 2;
-  
+
   color->c [0] = data [offset];
   color->c [1] = data [offset + 1];
   color->c [2] = data [offset + 2];

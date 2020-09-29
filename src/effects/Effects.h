@@ -50,7 +50,7 @@ class Smoke
     int time [MAXSMOKEELEM];
     int last;
     int type;
-  
+
     Smoke (int type);
     virtual ~Smoke ();
 
@@ -92,7 +92,7 @@ class Explosion : public SpaceObj
     int maxlen;
     float maxzoom;
     Vector3 v;
-  
+
     Explosion (Space *space, Model3d *sphere);
     virtual ~Explosion () {}
 
@@ -114,7 +114,7 @@ class BlackSmoke : public SpaceObj
     float maxzoom;
     float myphi; // player's view angle, obsolete since v0.8.5
     float camphi;
-  
+
     BlackSmoke (Space *space);
     virtual ~BlackSmoke () {}
 
@@ -133,7 +133,7 @@ class Star
     int phi;   ///< polar (sphere) coords
     int gamma; ///< polar (sphere) coords
     float size;
-  
+
     Star (int phi, int gamma, float size);
     virtual ~Star () {}
     void draw ();
@@ -162,7 +162,7 @@ class Font
     short letterw [256]; ///< width in the texture
     Color stdcol;
     Color highlightcol;
-  
+
     Font (const std::string &filename, int height, char start, int num); // new Font
     virtual ~Font ();
 
@@ -200,7 +200,7 @@ class HighClouds : public SpaceObj
   public:
 
     SpherePart *sphere;
-  
+
     HighClouds (int theta);
     virtual ~HighClouds ();
 

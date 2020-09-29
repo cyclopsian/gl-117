@@ -102,7 +102,7 @@ void callbackJoystickAxis (Component *comp, int key)
 
   // read text from label of button
   Label *la = (Label *) controlsmenu [2]->components [buttonnum + 1];
-  
+
   int joynum = 0;
   int joyaxis = 0;
   if (la->text [1] == '/') joynum = -1;
@@ -644,13 +644,13 @@ void callbackResolution (Component *comp, int key)
         found = i - 1;
       }
   }
-  
+
   if (found < 0) found = numres - 1;
   else if (found >= numres) found = 0;
-  
+
   wantwidth = resx [found];
   wantheight = resy [found];
-  
+
   sprintf (buf, "%d*%d", wantwidth, wantheight);
   ((Label *) optmenu [0]->components [16])->setText (buf);
 }

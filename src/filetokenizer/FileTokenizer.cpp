@@ -157,7 +157,7 @@ int FileTokenizer::fillBuffer ()
   bytesread = fread (&buffer [n], 1, bytestoread, file);
   bufferLen = bufferLen + bytesread - ptr;
   bufferRead = bytesread;
-  
+
   bufferStart += bytesread;
   if (reverse)
   {

@@ -28,7 +28,7 @@ class Space;
 class Landscape;
 class Vector3;
 
-/** 
+/**
  * This interface exposes the API of an abstract renderer. The
  * capability of a renderer matches the internal game
  * representation stored in Landscape and Model objects. It can
@@ -57,18 +57,18 @@ public:
   /// are available or not. If more that one renderer is available,
   /// some performance indication can be used to help in selection.
   static Renderer& get(void);
-  
+
 private:
   /// private init function
   static void checkInitGlobal(void);
-  
+
   // do not use this constructor
   Renderer(const Renderer&) {};
-  
+
 protected:
   /// Registers all renderers in a global list
   Renderer(void);
-  
+
   /// Unregisters a renderer
   virtual ~Renderer();
 
@@ -77,13 +77,13 @@ protected:
 
   /// Determine availability of a renderer
   virtual bool isAvailable(void) const {return false;};
-  
-    
-  
+
+
+
 public:
   /// Initialize this renderer (precalculate things, cache geometry)
   virtual void init(const Space& _models, const Landscape& _landscape) {};
-  
+
   /// Draw the scene
   virtual void draw(const Vector3 &cam, float phi, float gamma) const {};
 
@@ -91,7 +91,7 @@ public:
   virtual std::string name(void) {
     return std::string("NO RENDER");
   };
-  
+
 };
 
 #include "model3d/Model3d.h"
@@ -100,15 +100,15 @@ public:
 class OpenGlRenderer : public Renderer
 {
   public:
-  
+
     OpenGlRenderer() : Renderer()
     {
     }
-    
+
     virtual void init(const Space &space, const Landscape &landscape)
     {
     }
-    
+
     virtual void draw(const Space &space, const Landscape &landscape) const
     {
       frustum.extractFrustum ();

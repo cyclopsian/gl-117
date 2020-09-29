@@ -41,14 +41,14 @@ int getMsg (TCPsocket sock, char *buf)
   {
     if (SDLNet_GetError () && strlen (SDLNet_GetError ())) // sometimes blank!
       printf ("SDLNet_TCP_Recv: %s\n", SDLNet_GetError ());
-    else 
+    else
       printf ("unknown error"); fflush (stdout);
     return 0;
   }
-  
+
   // swap byte order to our local order
   len = SDL_SwapBE32 (len);
-  
+
   // check if anything is strange, like a zero length buffer
   if (!len)
     return 0;
@@ -83,10 +83,10 @@ int putMsg (TCPsocket sock, const char *buf, int len)
       printf ("SDLNet_TCP_Send: %s\n", SDLNet_GetError ());
     return(0);
   }
-  
+
   // revert to our local byte order
   len = SDL_SwapBE32 (len);
-  
+
   // send the buffer, with the NULL as well
   result = SDLNet_TCP_Send (sock, buf, len);
   if (result < len)
@@ -95,7 +95,7 @@ int putMsg (TCPsocket sock, const char *buf, int len)
       printf ("SDLNet_TCP_Send: %s\n", SDLNet_GetError ());
     return 0;
   }
-  
+
   // return the length sent
   return result;
 }

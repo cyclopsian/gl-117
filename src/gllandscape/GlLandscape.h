@@ -157,7 +157,7 @@ class GlLandscape : public Landscape
     void drawWaterTexturedQuad (Vector3 &cam, int x, int y);
     void drawTexturedTriangle1 (int x, int y);
     void drawTexturedTriangle2 (int x, int y);
-  
+
     void draw (Vector3 &cam, float phi, float gamma); ///< draw ALL
     /// explosions and other light sources light up the surface, calculate dynamically by CPU
 //    void calcDynamicLight (Explosion **explo, SpaceObj **cannon, SpaceObj **missile, SpaceObj **flare);

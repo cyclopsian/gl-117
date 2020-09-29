@@ -43,7 +43,7 @@ MissionConvoy2::MissionConvoy2 ()
   selfighter [1] = Hawk2Descriptor;
   alliedpilot [0] = PILOT_SHADOW;
 }
-  
+
 void MissionConvoy2::start ()
 {
   int i;

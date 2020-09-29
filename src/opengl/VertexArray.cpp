@@ -203,7 +203,7 @@ void VertexArray::glEnd ()
       glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     else
       glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-    
+
     glVertexPointer (3,	GL_FLOAT,	sizeof (float) * stride, &data [0]);
     glNormalPointer (GL_FLOAT, sizeof (float) * stride, &data [3]);
     glColorPointer (4, GL_FLOAT, sizeof (float) * stride, &data [6]);

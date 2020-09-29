@@ -43,7 +43,7 @@ OptionFile::OptionFile (const std::string &filename)
   assert (ret);
   if (!ret)
     return; */
-  
+
   while(fgets(token, 4096, file))
   {
     char *tagstart = token;
@@ -56,7 +56,7 @@ OptionFile::OptionFile (const std::string &filename)
       tagend ++;
     *tagend = '\0';
     std::string name = tagstart;
-    
+
     char *valstart = tagend + 1;
     while (*valstart == ' ' || *valstart == '\t' || *valstart == '=')
       valstart ++;
@@ -67,11 +67,11 @@ OptionFile::OptionFile (const std::string &filename)
       valend ++;
     *valend = '\0';
     std::string value = valstart;
-        
+
 /*  file.setWhitespace (" \t\r\n");
   file.addComment ("#", "\n");
   file.setQuotes ("\"'");
-  
+
   while (file.nextToken (token, 4096))
   {
     std::string name = token;
@@ -101,7 +101,7 @@ OptionFile::OptionFile (const std::string &filename)
         printf ("V: %s\n", token);
         fflush(stdout);
     std::string value = token; */
-    
+
     optionList.insert (std::pair <std::string, std::string> (name, value));
   }
 
@@ -131,7 +131,7 @@ bool OptionFile::getBoolean (const std::string &name, bool &value)
 {
   std::string str;
   if (!getString (name, str)) return false;
-  
+
   if (UpperString (str) == "TRUE") value = true;
   else value = false;
   return true;
@@ -141,7 +141,7 @@ bool OptionFile::getInteger (const std::string &name, int &value)
 {
   std::string str;
   if (!getString (name, str)) return false;
-  
+
   value = atoi (str.c_str ());
   return true;
 }
@@ -150,7 +150,7 @@ bool OptionFile::getFloat (const std::string &name, float &value)
 {
   std::string str;
   if (!getString (name, str)) return false;
-  
+
   char *ptr;
   double d = strtod (str.c_str (), &ptr);
   value = static_cast<float>(d);

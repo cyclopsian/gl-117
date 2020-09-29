@@ -33,7 +33,7 @@ Math math;
 Math::Math ()
 {
   int i;
-  
+
 #ifdef MULTIPLAYER
   int i2;
   for (i = 0; i < 63; i ++)
