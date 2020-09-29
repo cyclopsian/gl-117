@@ -6,3 +6,6 @@
 
 /* Use SDL net library */
 #mesondefine HAVE_SDL_NET
+
+/* Base data directory */
+#mesondefine DATADIR

@@ -1,11 +1,13 @@
+config = configuration_data({
+  'HAVE_SDL': sdl.found(),
+  'HAVE_SDL_MIXER': sdlmixer.found(),
+  'HAVE_SDL_NET': sdlnet.found(),
+})
+config.set_quoted('DATADIR', get_option('prefix') / gl_117_datadir)
 config_h = configure_file(
   input: 'config.h.in',
   output: 'config.h',
-  configuration: configuration_data({
-    'HAVE_SDL': sdl.found(),
-    'HAVE_SDL_MIXER': sdlmixer.found(),
-    'HAVE_SDL_NET': sdlnet.found(),
-  })
+  configuration: config
 )
 
 gl_117_sources = [

@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #endif
 
+#include "config.h"
 #include "configuration/Directory.h"
 #include "logging/Logging.h"
 #include "util/Util.h"
@@ -46,7 +47,7 @@ std::string Directory::maps ("");
 std::string Directory::shaders ("");
 std::string Directory::units ("");
 
-char *Directory::strtok (char *str, int len, char *tok)
+char *Directory::strtok (char *str, int len, const char *tok)
 {
   char *str0 = str;
   int z = 0;
@@ -137,11 +138,7 @@ void Directory::init (char *arg)
   char *env = getenv ("GL117");
   char *path = getenv ("PATH");
   char myfile [4096];
-#ifdef __APPLE__
   strcpy (myfile, DATADIR);
-#else
-  snprintf (myfile, 4096, "%s/gl-117", DATADIR);
-#endif
   bool founddir = false;
   struct stat mystat;
 

@@ -168,7 +168,7 @@ class ObjectList : public std::vector<TSpaceObj>
     
     void add (TSpaceObj obj)
     {
-      push_back (obj);
+      this->push_back (obj);
       space->addObject (obj);
     }
     
@@ -189,21 +189,21 @@ class ObjectList : public std::vector<TSpaceObj>
       
       // realign this std::vector
       unsigned removed = 0;
-      for (i = 0; i < size (); i ++)
+      for (i = 0; i < this->size (); i ++)
       {
-        if (!operator[](i)->valid)
+        if (!this->operator[](i)->valid)
         {
           removed ++;
         }
         else if (removed)
         {
-          operator[](i - removed) = operator[](i);
+          this->operator[](i - removed) = this->operator[](i);
         }
       }
       
       // clear invalid objects (at the end of this std::vector)
       for (i = 0; i < removed; i ++)
-        pop_back ();
+        this->pop_back ();
     }
 };
 

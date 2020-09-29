@@ -140,7 +140,7 @@ return 0;
 #endif
 }
 
-void Client::sendMessage(char *buf, int len)
+void Client::sendMessage(const char *buf, int len)
 {
 #ifdef HAVE_SDL_NET
   if (!putMsg(sock, buf, len)) printf ("FEHLER");

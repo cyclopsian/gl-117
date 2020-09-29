@@ -32,7 +32,7 @@
 
 #ifdef HAVE_SDL_NET
 extern int getMsg(TCPsocket sock, char *buf);
-extern int putMsg(TCPsocket sock, char *buf);
+extern int putMsg(TCPsocket sock, const char *buf, int len);
 #endif
 
 extern int port;
@@ -48,7 +48,7 @@ class Client
   
   bool getServer(char *hostname, char *name);
   char *name;
-  void sendMessage (char *buf, int len);
+  void sendMessage (const char *buf, int len);
   int getMessage(char *buf);
   void sendReady();
 //  private:
@@ -90,8 +90,8 @@ class Server
   int id;
 
 //  private:
-  int num_clients;
 #ifdef HAVE_SDL_NET
+  int num_clients;
   MyClient *clients;
   TCPsocket server;
   IPaddress ip;

@@ -19,10 +19,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef IS_UTIL_H
-
 #include "Util.h"
 
+#include <stdio.h>
 #include <stdarg.h>
 #include <algorithm>
 
@@ -44,7 +43,7 @@ std::string FormatString (const char *format, ...)
 {
   const int MAXALLOCSIZE = 4096;
   std::string retString;
-  unsigned size = 32;
+  int size = 32;
   char *buffer = NULL;
   while (size < MAXALLOCSIZE)
   {
@@ -56,7 +55,7 @@ std::string FormatString (const char *format, ...)
 #ifdef _MSC_VER
       if (_vsnprintf (buffer, size, format, args) != -1)
 #else
-      if (vsnprintf (buffer, size, format, args) != -1)
+      if (vsnprintf (buffer, size, format, args) < size)
 #endif
       {
         retString = buffer;
@@ -68,5 +67,3 @@ std::string FormatString (const char *format, ...)
   }
   return retString;
 }
-
-#endif

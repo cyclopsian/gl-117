@@ -2584,6 +2584,7 @@ void sdlMainLoop ()
   STARTUP METHODS
 ****************************************************************************/
 
+#ifdef USE_GLUT
 // common GLUT screen init code, return 0 on error
 int setGlutScreen (int w, int h, int b, int f)
 {
@@ -2611,6 +2612,7 @@ int setGlutScreen (int w, int h, int b, int f)
   }
   return 1;
 }
+#endif
 
 // set screen to (width, height, bpp, fullscreen), return 0 on error
 int setScreen (int w, int h, int b, int f)

@@ -69,7 +69,7 @@ int getMsg (TCPsocket sock, char *buf)
 // send a string buffer over a TCP socket with error checking
 // returns 0 on any errors, length sent on success
 #ifdef HAVE_SDL_NET
-int putMsg (TCPsocket sock, char *buf, int len)
+int putMsg (TCPsocket sock, const char *buf, int len)
 {
   Uint32 result;
 

@@ -36,7 +36,6 @@
 // HAVE_SDL_MIXER means SDL and SDL_mixer are available
 // HAVE_SDL_NET means SDL_net is available
 
-#undef HAVE_SDL_NET // dummy
 //#undef HAVE_SDL_MIXER // dummy
 //#undef HAVE_SDL // dummy
 
@@ -301,3 +300,4 @@ class OptionFileFactory
 };
 
 #endif
+//#undef HAVE_SDL_NET // dummy

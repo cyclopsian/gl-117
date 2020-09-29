@@ -61,7 +61,7 @@ class Directory
   
   protected:
 
-    static char *strtok (char *str, int len, char *tok);
+    static char *strtok (char *str, int len, const char *tok);
     static void append (std::string &target, const std::string &str); // append subdir/file to path using (back-)slashes
 };
 

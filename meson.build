@@ -14,10 +14,10 @@ sdlnet = dependency('SDL_net', required: false)
 gl = dependency('gl')
 glu = dependency('glu')
 
+gl_117_datadir = get_option('datadir') / meson.project_name()
+
 subdir('src')
 subdir('doc')
-
-gl_117_datadir = get_option('datadir') / meson.project_name()
 
 subdir('maps')
 subdir('models')
