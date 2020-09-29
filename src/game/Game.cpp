@@ -1333,10 +1333,9 @@ void drawCircles (Color *colorstd)
 void drawQuads (Color *colorstd)
 {
   int i;
-  float zf = -3, yf;
+  float zf = -3;
   for (i = 0; i < 14; i ++)
   {
-    yf = -3 + 0.5 * i - (float) (missionmenutimer / timestep & 63) / 64.0;
     glBegin (GL_QUAD_STRIP);
     for (int i2 = 0; i2 < 14; i2 ++)
     {
@@ -1432,7 +1431,7 @@ void pleaseWait ()
   stateplay.view ();
 }
 
-char *getModelText (const UnitDescriptor &id)
+const char *getModelText (const UnitDescriptor &id)
 {
   if (id == FalconDescriptor)
     return "THE FALCON IS A NIMBLE AND\nFAST FIGHTER PROVIDING\nBOTH AIR-AIR AND\nAIR-GROUND-MISSILES.";
@@ -1615,7 +1614,6 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
   GLuint *ptr = selectBuff;
   int mypicks = 0;
   int pickz2 = -1;
-  int pick [100];
 	if (hits > 0)
   {
     int i;
@@ -1636,7 +1634,7 @@ int selectMouse (int x, int y, int motionx, int motiony, int mode, bool shift)
       }
       else
       {
-        pick [mypicks] = *ptr; mypicks ++;
+        mypicks ++;
       }
       ptr += names;
       if (mypicks >= 20) break;
@@ -2094,19 +2092,19 @@ void proceedFire ()
       // rotate through fire colors (white-yellow-red-black-blue-black)
       // col in [0...512]
       int yind = i;
-	    int h = heat [yind] [i2];
-	    int b = h * 5;
-	    if (h > 30) b = (60 - h) * 5;
-	    if (h >= 60) b = 0;
-	    h -= 50;
+      int h = heat [yind] [i2];
+      int b = h * 5;
+      if (h > 30) b = (60 - h) * 5;
+      if (h >= 60) b = 0;
+      h -= 50;
       int r = h * 2; // blend out late for red->black
       if (r > 255) r = 255;
-	    else if (r < 0) r = 0;
-	    h -= 127;
+      else if (r < 0) r = 0;
+      h -= 127;
       int g = h * 2; // blend out for yellow->red
       if (g > 255) g = 255;
       else if (g < 0) g = 0;
-	    h -= 127;
+      h -= 127;
       if (h > 0)
       {
         b = h - 256; // blend out early to get white->yellow
@@ -2115,10 +2113,10 @@ void proceedFire ()
       else if (b < 0) b = 0;
       int a = r >= b ? r : b; // alpha value: transparent after yellow-red phase
       glColor4ub (r, g, b, a);
-	    firetex [(i * maxfx + i2) * 4] = r;
-	    firetex [(i * maxfx + i2) * 4 + 1] = g;
-	    firetex [(i * maxfx + i2) * 4 + 2] = b;
-	    firetex [(i * maxfx + i2) * 4 + 3] = a;
+      firetex [(i * maxfx + i2) * 4] = r;
+      firetex [(i * maxfx + i2) * 4 + 1] = g;
+      firetex [(i * maxfx + i2) * 4 + 2] = b;
+      firetex [(i * maxfx + i2) * 4 + 3] = a;
     }
     glEnd ();
   }
@@ -2801,7 +2799,7 @@ void config_test (int argc, char **argv)
   if (valids == -1)
   {
     DISPLAY_FATAL("No working display modes found! Try editing the file conf yourself. You may not be able to play this game.");
-    assert (false);
+    //assert (false);
     exit (EXIT_INIT);
   }
 
@@ -2872,7 +2870,7 @@ void checkargs (int argc, char **argv)
 void textMouseButton (char *buf, int button)
 {
   if (button == 0) strcpy (buf, "NONE");
-  else sprintf (buf, "BUTTON%d", button);
+  else snprintf (buf, sizeof(buf), "BUTTON%d", button);
 }
 
 int campaignstartid;
@@ -2975,13 +2973,13 @@ void createMenu ()
 */
 
   xf = xsubmenu; yf = ysubmenu; xfstep = 13.5; yfstep = 1;
-  sprintf (buf, "ACTIVE:");
+  snprintf (buf, sizeof(buf), "ACTIVE:");
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   submenu [0]->add (label);
   yf -= yfstep;
 
-  sprintf (buf, "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [pilots->aktpilot]->name.c_str ());
+  snprintf (buf, sizeof(buf), "     %s %s", pilots->pilot [pilots->aktpilot]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [pilots->aktpilot]->name.c_str ());
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   submenu [0]->add (label);
@@ -2990,9 +2988,9 @@ void createMenu ()
   for (i = 0; i < 5; i ++)
   {
     if (i < pilots->aktpilots)
-      sprintf (buf, "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [i]->name.c_str ());
+      snprintf (buf, sizeof(buf), "     %s %s", pilots->pilot [i]->getShortRank (MISSION_CAMPAIGN1, MISSION_CAMPAIGN2 - 1).c_str (), pilots->pilot [i]->name.c_str ());
     else
-      sprintf (buf, "N/A");
+      snprintf (buf, sizeof(buf), "N/A");
     button = new Button (buf);
     button->setFunction (callbackPilotsList);
     button->setBounds (xf, yf, xfstep, yfstep - 0.1);
@@ -3163,7 +3161,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [0]->add (button);
 
-  sprintf (buf, "%d", quality);
+  snprintf (buf, sizeof(buf), "%d", quality);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3175,7 +3173,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [0]->add (button);
 
-  sprintf (buf, "%d", (int) view);
+  snprintf (buf, sizeof(buf), "%d", (int) view);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3239,7 +3237,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [0]->add (button);
 
-  sprintf (buf, "%d%%", brightness);
+  snprintf (buf, sizeof(buf), "%d%%", brightness);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3247,7 +3245,7 @@ void createMenu ()
   yf -= yfstep;
 
   yf -= yfstep / 2;
-  sprintf (buf, "NEED RESTART:");
+  snprintf (buf, sizeof(buf), "NEED RESTART:");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf, yf, 2, yfstep - 0.3);
@@ -3259,7 +3257,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [0]->add (button);
 
-  sprintf (buf, "%d*%d", wantwidth, wantheight);
+  snprintf (buf, sizeof(buf), "%d*%d", wantwidth, wantheight);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab * 2, yf, 2, yfstep - 0.1);
@@ -3271,8 +3269,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [0]->add (button);
 
-  if (wantfullscreen) sprintf (buf, "YES");
-  else sprintf (buf, "NO");
+  if (wantfullscreen) snprintf (buf, sizeof(buf), "YES");
+  else snprintf (buf, sizeof(buf), "NO");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3297,8 +3295,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [1]->add (button);
 
-  if (sound->audio) sprintf (buf, "%d%%", volumesound);
-  else sprintf (buf, "N/A");
+  if (sound->audio) snprintf (buf, sizeof(buf), "%d%%", volumesound);
+  else snprintf (buf, sizeof(buf), "N/A");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3310,8 +3308,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [1]->add (button);
 
-  if (sound->audio) sprintf (buf, "%d%%", volumemusic);
-  else sprintf (buf, "N/A");
+  if (sound->audio) snprintf (buf, sizeof(buf), "%d%%", volumemusic);
+  else snprintf (buf, sizeof(buf), "N/A");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3340,9 +3338,9 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [2]->add (button);
 
-  if (difficulty == 0) sprintf (buf, "%s", "EASY");
-  else if (difficulty == 1) sprintf (buf, "%s", "NORMAL");
-  else if (difficulty == 2) sprintf (buf, "%s", "HARD");
+  if (difficulty == 0) snprintf (buf, sizeof(buf), "%s", "EASY");
+  else if (difficulty == 1) snprintf (buf, sizeof(buf), "%s", "NORMAL");
+  else if (difficulty == 2) snprintf (buf, sizeof(buf), "%s", "HARD");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3354,8 +3352,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   optmenu [2]->add (button);
 
-  if (!physics) sprintf (buf, "%s", "ACTION");
-  else sprintf (buf, "%s", "SIMULATION");
+  if (!physics) snprintf (buf, sizeof(buf), "%s", "ACTION");
+  else snprintf (buf, sizeof(buf), "%s", "SIMULATION");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3468,7 +3466,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (button);
 
-  sprintf (buf, "%d%%", (int) mouse_sensitivity);
+  snprintf (buf, sizeof(buf), "%d%%", (int) mouse_sensitivity);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3480,8 +3478,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (button);
 
-  if (mouse_reverse) sprintf (buf, "ON");
-  else sprintf (buf, "OFF");
+  if (mouse_reverse) snprintf (buf, sizeof(buf), "ON");
+  else snprintf (buf, sizeof(buf), "OFF");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3493,8 +3491,8 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (button);
 
-  if (mouse_relative) sprintf (buf, "ON");
-  else sprintf (buf, "OFF");
+  if (mouse_relative) snprintf (buf, sizeof(buf), "ON");
+  else snprintf (buf, sizeof(buf), "OFF");
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3506,7 +3504,7 @@ void createMenu ()
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (button);
 
-  sprintf (buf, "%d%%", mouse_autorudder);
+  snprintf (buf, sizeof(buf), "%d%%", mouse_autorudder);
   label = new Label (buf);
   label->setTransparent (true);
   label->setBounds (xf + xfstep - xftab, yf, 2, yfstep - 0.1);
@@ -3515,21 +3513,21 @@ void createMenu ()
 
   yf -= 0.5;
   textMouseButton (buf2, mouse_firecannon);
-  sprintf (buf, "FIRE CANNON:            \t %s", buf2);
+  snprintf (buf, sizeof(buf), "FIRE CANNON:            \t %s", buf2);
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (label);
   yf -= yfstep;
 
   textMouseButton (buf2, mouse_firemissile);
-  sprintf (buf, "FIRE MISSILE:            \t %s", buf2);
+  snprintf (buf, sizeof(buf), "FIRE MISSILE:            \t %s", buf2);
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (label);
   yf -= yfstep;
 
   textMouseButton (buf2, mouse_selectmissile);
-  sprintf (buf, "SELECT MISSILE:      \t %s", buf2);
+  snprintf (buf, sizeof(buf), "SELECT MISSILE:      \t %s", buf2);
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [1]->add (label);
@@ -3655,7 +3653,7 @@ void createMenu ()
 */
 
   xf = -10; yf = 9; xfstep = 20; yfstep = 1.2;
-  sprintf (buf, "         PILOTS RANKING");
+  snprintf (buf, sizeof(buf), "         PILOTS RANKING");
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   famemenu.add (label);
@@ -3668,7 +3666,7 @@ void createMenu ()
   yf -= yfstep * 13;
 
   yfstep = 1.1;
-  sprintf (buf, "         BACK TO MAIN MENU");
+  snprintf (buf, sizeof(buf), "         BACK TO MAIN MENU");
   button = new Button (buf);
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   button->setFunction (callbackSwitchMainMenu);
@@ -3682,7 +3680,7 @@ void createMenu ()
 */
 
   xf = -10; yf = 12; xfstep = 20; yfstep = 1.2;
-  sprintf (buf, "          FIGHTER INFO");
+  snprintf (buf, sizeof(buf), "          FIGHTER INFO");
   label = new Label (buf);
   label->setBounds (xf, yf, xfstep, yfstep - 0.1);
   fightermenu.add (label);
@@ -3714,7 +3712,7 @@ void createMenu ()
   fightermenu.add (textfield);
   yf -= 13;
 
-  sprintf (buf, "         BACK TO MAIN MENU");
+  snprintf (buf, sizeof(buf), "         BACK TO MAIN MENU");
   button = new Button (buf);
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   button->setFunction (callbackSwitchMainMenu);
@@ -3847,7 +3845,7 @@ int main (int argc, char **argv)
 
   Logging::setFile (Directory::getSaves ("logfile.txt"));
 
-  sprintf (buf, "Startup %s, %s ... ", argv [0], VERSIONSTRING);
+  snprintf (buf, sizeof(buf), "Startup %s, %s ... ", argv [0], VERSIONSTRING);
   DISPLAY_INFO(buf);
 
 #ifdef _MSC_VER
@@ -3936,8 +3934,8 @@ int main (int argc, char **argv)
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
-      sprintf (buf, "Couldn't initialize SDL: %s", SDL_GetError ());
-      assert (false);
+      snprintf (buf, sizeof(buf), "Couldn't initialize SDL: %s", SDL_GetError ());
+      //assert (false);
       DISPLAY_FATAL(buf);
       exit (EXIT_INIT);
     }
@@ -3960,7 +3958,7 @@ int main (int argc, char **argv)
       conf.loadSaveConfig ();
       if (!setScreen (width, height, bpp, fullscreen))
       {
-        assert (false);
+        //assert (false);
         DISPLAY_FATAL(FormatString ("No working display mode %dx%d found.", width, height));
         exit (EXIT_INIT);
       }
@@ -3999,7 +3997,7 @@ int main (int argc, char **argv)
       SDL_JoystickEventState (SDL_ENABLE);
       sdljoystick [i] = SDL_JoystickOpen (i);
       sdljoystickaxes [i] = SDL_JoystickNumAxes (sdljoystick [i]);
-      sprintf (buf, "Joystick \"%s\" detected", SDL_JoystickName (i));
+      snprintf (buf, sizeof(buf), "Joystick \"%s\" detected", SDL_JoystickName (i));
       DISPLAY_INFO(buf);
     }
   }
