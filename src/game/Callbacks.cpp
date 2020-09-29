@@ -19,6 +19,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#include "SDL_video.h"
 #ifndef IS_CALLBACKS_H
 
 #ifdef COMPILER_EXIT_WORKAROUND
@@ -622,16 +623,20 @@ void callbackBrightness (Component *comp, int key)
 
 void callbackResolution (Component *comp, int key)
 {
-  const int numres = 4;
-  int resx [numres] = { 640, 800, 1024, 1280 };
-  int resy [numres] = { 480, 600, 800, 1024 };
+  Uint32 video_flags = SDL_OPENGL;
+  if (fullscreen)
+    video_flags |= SDL_FULLSCREEN;
+  SDL_Rect * const *modes = SDL_ListModes(NULL, video_flags);
+  int numres = 0;
+  for (SDL_Rect * const *m = modes; *m; m++)
+    numres++;
   int found = 0;
   char buf [256];
 
   if (key == MOUSE_BUTTON_LEFT)
   {
     for (int i = 0; i < numres; i ++)
-      if (wantwidth == resx [i])
+      if (wantwidth == modes [i]->w && wantheight == modes [i]->h)
       {
         found = i + 1;
       }
@@ -639,7 +644,7 @@ void callbackResolution (Component *comp, int key)
   else
   {
     for (int i = 0; i < numres; i ++)
-      if (wantwidth == resx [i])
+      if (wantwidth == modes [i]->w && wantheight == modes [i]->h)
       {
         found = i - 1;
       }
@@ -648,8 +653,8 @@ void callbackResolution (Component *comp, int key)
   if (found < 0) found = numres - 1;
   else if (found >= numres) found = 0;
 
-  wantwidth = resx [found];
-  wantheight = resy [found];
+  wantwidth = modes [found]->w;
+  wantheight = modes [found]->h;
 
   sprintf (buf, "%d*%d", wantwidth, wantheight);
   ((Label *) optmenu [0]->components [16])->setText (buf);
