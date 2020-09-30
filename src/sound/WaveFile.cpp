@@ -31,7 +31,6 @@
 
 WaveFile *wave = NULL;
 
-#ifndef USE_GLUT
 #ifndef HAVE_SDL_MIXER
 void fillrepeat (void *unused, Uint8 *stream, int len)
 {
@@ -78,7 +77,6 @@ void fillonce (void *unused, Uint8 *stream, int len)
   wave->soundpos += len;
 }
 #endif
-#endif
 
 void freqEffect (int channel, void *stream, int len, void *udata)
 {
@@ -98,35 +96,37 @@ void freqEffect (int channel, void *stream, int len, void *udata)
 
 WaveFile::WaveFile ()
 {
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
-  soundpos = 0;
-#else
+#ifdef HAVE_SDL_MIXER
   channel = -1;
-#endif
+#else
+  soundpos = 0;
 #endif
 }
 
 WaveFile::WaveFile (const char *filename)
 {
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
-  soundpos = 0;
-#else
+#ifdef HAVE_SDL_MIXER
   channel = -1;
+#else
+  soundpos = 0;
 #endif
   volume = 100;
   load (filename);
-#endif
 }
 
 WaveFile::~WaveFile () {}
 
 void WaveFile::load (const char *filename)
 {
-#ifndef USE_GLUT
-  char buf [4096];
-#ifndef HAVE_SDL_MIXER
+#ifdef HAVE_SDL_MIXER
+  chunk = Mix_LoadWAV (filename);
+  if (chunk == NULL)
+  {
+    assert (false);
+    DISPLAY_FATAL(FormatString ("SDL_Mixer: %s", Mix_GetError ()));
+    exit (EXIT_LOADFILE);
+  }
+#else
   if (SDL_LoadWAV (filename, &spec, &sound, &soundlen) == NULL)
   {
     assert (false);
@@ -135,22 +135,15 @@ void WaveFile::load (const char *filename)
   }
   spec.callback = fillrepeat;
   wave = this;
-#else
-  chunk = Mix_LoadWAV (filename);
-  if (chunk == NULL)
-  {
-    assert (false);
-    DISPLAY_FATAL(FormatString ("SDL_Mixer: %s", Mix_GetError ()));
-    exit (EXIT_LOADFILE);
-  }
-#endif
 #endif
 }
 
 void WaveFile::play (int chan, bool loop)
 {
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
+#ifdef HAVE_SDL_MIXER
+  if (!loop) channel = Mix_PlayChannel (chan, chunk, 0);
+  else channel = Mix_PlayChannel (chan, chunk, -1);
+#else
   SDL_PauseAudio (1);
   if (wave != NULL)
   {
@@ -158,31 +151,21 @@ void WaveFile::play (int chan, bool loop)
   }
   wave = this;
   SDL_PauseAudio (0);
-#else
-  if (!loop) channel = Mix_PlayChannel (chan, chunk, 0);
-  else channel = Mix_PlayChannel (chan, chunk, -1);
-#endif
 #endif
 }
 
 void WaveFile::stop ()
 {
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
-  // No loop sounds on one channel
-#else
+#ifdef HAVE_SDL_MIXER
   if (channel < 0) return;
   if (Mix_Playing (channel))
     Mix_HaltChannel (channel);
-#endif
 #endif
 }
 
 void WaveFile::setVolume (int level)
 {
-#ifndef USE_GLUT
-#ifndef HAVE_SDL_MIXER
-#else
+#ifdef HAVE_SDL_MIXER
   if (abs (volume - level) <= 5) return;
   volume = level;
   bool pause = false;
@@ -197,7 +180,6 @@ void WaveFile::setVolume (int level)
   Mix_VolumeChunk (chunk, level);
   if (pause && channel >= 0)
     Mix_Resume (channel);
-#endif
 #endif
 }
 

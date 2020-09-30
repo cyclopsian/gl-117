@@ -22,10 +22,6 @@
 #ifndef IS_LOAD3DS_H
 #define IS_LOAD3DS_H
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "model3d/Model3d.h" // ok
 
 

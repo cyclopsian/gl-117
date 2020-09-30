@@ -22,12 +22,6 @@
 #ifndef IS_MODEL3D_H
 #define IS_MODEL3D_H
 
-#define COMPILER_EXIT_WORKAROUND 1
-
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "opengl/includegl.h"
 #include "opengl/GlPrimitives.h"
 #include "util/Math.h"

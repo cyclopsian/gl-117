@@ -21,10 +21,6 @@
 
 #ifndef IS_GAME_H
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "GameState.h"
 #include "Game.h"
 #include "gllandscape/GlLandscape.h"
@@ -91,9 +87,7 @@ void StatePlay::reshape ()
   gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StatePause::reshape ()
@@ -107,9 +101,7 @@ void StatePause::reshape ()
   gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateMenu::reshape ()
@@ -123,9 +115,7 @@ void StateMenu::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateFame::reshape ()
@@ -139,9 +129,7 @@ void StateFame::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateJoin::reshape ()
@@ -155,9 +143,7 @@ void StateJoin::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateCreate::reshape ()
@@ -171,9 +157,7 @@ void StateCreate::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateFighter::reshape ()
@@ -187,9 +171,7 @@ void StateFighter::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateMission::reshape ()
@@ -203,9 +185,7 @@ void StateMission::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateQuit::reshape ()
@@ -219,9 +199,7 @@ void StateQuit::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateCredits::reshape ()
@@ -235,9 +213,7 @@ void StateCredits::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateFinish::reshape ()
@@ -251,9 +227,7 @@ void StateFinish::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StateStats::reshape ()
@@ -268,9 +242,7 @@ void StateStats::reshape ()
   gluPerspective (visibleangle, 1.0, nearclippingplane * GLOBALSCALE, v * GLOBALSCALE);
   glPolygonMode (GL_FRONT_AND_BACK, polygonMode);
 
-#ifndef USE_GLUT
   SDL_ShowCursor (0);
-#endif
 }
 
 void StatePlay::key (int key, int x, int y)
@@ -401,11 +373,7 @@ void StatePlay::key (int key, int x, int y)
       return;
   }
 
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StatePlay::keyUp (int key, int x, int y)
@@ -445,11 +413,7 @@ void StatePlay::keyUp (int key, int x, int y)
       break;
   }
 
-#ifdef USE_GLUT
-    glutPostRedisplay();
-#else
     sdldisplay = true;
-#endif
 }
 
 void StatePlay::mouse (int button, int state, int x, int y)
@@ -545,11 +509,7 @@ void StatePlay::mouseMotion (int x, int y)
   if (fplayer->elevatoreffect > 1.0f) fplayer->elevatoreffect = 1.0f;
   else if (fplayer->elevatoreffect < -0.5f) fplayer->elevatoreffect = -0.5f;
 
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StatePlay::joystickAxis (int x, int y, int rudder, int throttle)
@@ -628,9 +588,7 @@ void StatePlay::joystickButton (int button)
 
 void StatePlay::joystickHat (int normhat)
 {
-#ifndef USE_GLUT
   gamestate->joystickButton (normhat);
-#endif
 }
 
 void StatePlay::view ()
@@ -2061,11 +2019,7 @@ void StatePlay::display ()
   if (firststart)
   {
     int akttime;
-#ifndef USE_GLUT
     akttime = SDL_GetTicks ();
-#else
-    akttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
     if (akttime - starttime < 20000)
       if ((akttime - starttime) / 300 % 3)
       {
@@ -2392,11 +2346,7 @@ void StatePlay::timer (Uint32 dt)
     gamestate = &statepause;
   }
   if (camrot.phi >= 360.0) camrot.phi -= 360.0;
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 
   fplayer->recrot.theta -= dtheta;
   fplayer->recrot.gamma += dgamma;
@@ -2487,11 +2437,7 @@ void StateMenu::timer (Uint32 dt)
   }
 
   int akttime;
-#ifndef USE_GLUT
   akttime = SDL_GetTicks ();
-#else
-  akttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
   if (firststart)
     if (akttime - starttime < 20000)
     {
@@ -2533,31 +2479,19 @@ void StateMenu::timer (Uint32 dt)
         statemenu.reshape ();
       }
     }
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateStats::timer (Uint32 dt)
 {
   menutimer += dt;
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateMission::timer (Uint32 dt)
 {
   missionmenutimer += dt;
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateCredits::timer (Uint32 dt)
@@ -2571,11 +2505,7 @@ void StateCredits::timer (Uint32 dt)
     creditstimer = 0;
 #endif
 
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateFinish::timer (Uint32 dt)
@@ -2583,36 +2513,25 @@ void StateFinish::timer (Uint32 dt)
   finishtimer += dt;
   if (finishtimer > 800 * timestep)
     finishtimer = 0;
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateQuit::timer (Uint32 dt)
 {
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 void StateCreate::timer (Uint32 dt)
 {
-#ifndef USE_GLUT
 //  server->createSocketSet ();
   server->getClient ();
   SDL_Delay (100);
   statemission.timer (dt);
-#endif
 }
 
 void StateJoin::timer (Uint32 dt)
 {
 #ifdef HAVE_SDL_NET
-#ifndef USE_GLUT
   char buf [4096];
   if (client->sock == NULL) client->getServer ("127.0.0.1", "client1");
   else
@@ -2629,7 +2548,6 @@ void StateJoin::timer (Uint32 dt)
       missionactive = true;
     }
   }
-#endif
 #endif
 }
 
@@ -2653,11 +2571,7 @@ void StateInit::key (int key, int x, int y)
   switch_menu ();
   fplayer->ai = true;
   camera = 5;
-#ifndef USE_GLUT
   starttime = SDL_GetTicks ();
-#else
-  starttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
 }
 
 void StateInit::mouse (int button, int state, int x, int y)
@@ -2759,7 +2673,7 @@ void StateInit::display ()
   glPopMatrix ();
   glDisable (GL_BLEND);
 
-  font2->drawText (20, -20, -3, VERSIONSTRING, color);
+  font2->drawText (20, -20, -3, PACKAGE_VERSION, color);
 }
 
 void StateInit::timer (Uint32 dt)
@@ -2821,11 +2735,7 @@ void StateInit::timer (Uint32 dt)
 
   inittimer ++;
 
-#ifdef USE_GLUT
-  glutPostRedisplay();
-#else
   sdldisplay = true;
-#endif
 }
 
 #endif

@@ -53,10 +53,8 @@ extern int joysticks;
 
 const int maxjoysticks = 10;
 
-#ifndef USE_GLUT
 extern SDL_Joystick *sdljoystick [maxjoysticks];
 extern int sdljoystickaxes [maxjoysticks];
-#endif
 
 extern bool missionactive;
 extern int aktfighter;

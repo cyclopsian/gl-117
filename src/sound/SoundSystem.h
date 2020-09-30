@@ -32,16 +32,14 @@ class WaveFile
 {
   public:
 
-#ifndef USE_GLUT
- #ifndef HAVE_SDL_MIXER
+#ifdef HAVE_SDL_MIXER
+    Mix_Chunk *chunk;
+    int channel;
+#else
     SDL_AudioSpec spec;
     Uint8 *sound;
     Uint32 soundlen;
     int soundpos;
- #else
-    Mix_Chunk *chunk;
-    int channel;
- #endif
 #endif
     int volume;
 

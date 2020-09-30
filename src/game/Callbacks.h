@@ -33,10 +33,7 @@ extern void callbackQuit (Component *comp, int key);
 extern void callbackCredits (Component *comp, int key);
 extern void callbackPilots (Component *comp, int key);
 
-#ifndef USE_GLUT
 extern void callbackJoystickAxis (Component *comp, int key);
-#endif
-
 extern void callbackSwitchStartMission (Component *comp, int key);
 extern void callbackFighterPrev (Component *comp, int key);
 extern void callbackFighterNext (Component *comp, int key);

@@ -42,7 +42,7 @@ Client::Client ()
 #endif
 }
 
-bool Client::getServer(char *hostname, char *name)
+bool Client::getServer(const char *hostname, const char *name)
 {
 #ifdef HAVE_SDL_NET
 

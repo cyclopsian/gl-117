@@ -40,23 +40,8 @@ SoundSystem::SoundSystem ()
   musicplaying = false;
   volumesound = 100;
   volumemusic = 100;
-#ifndef USE_GLUT
   char buf [4096];
-#ifndef HAVE_SDL_MIXER
-  waveclick1 = new WaveFile (Directory::getSounds ("click1.wav"));
-  if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
-  {
-    DISPLAY_ERROR(FormatString ("Couldn't open audio: %s, no sound available", SDL_GetError ()));
-    audio = false;
-    delete waveclick1;
-    return;
-  }
-  else
-  {
-    audio = true;
-  }
-  delete waveclick1;
-#else
+#ifdef HAVE_SDL_MIXER
   DISPLAY_INFO("Using SDL_mixer");
   if (Mix_OpenAudio (22050, AUDIO_S16, 2, 4096))
   {
@@ -156,6 +141,20 @@ SoundSystem::SoundSystem ()
     exit (EXIT_LOADFILE);
   }
   playtime = 0;
+#else
+  waveclick1 = new WaveFile (Directory::getSounds ("click1.wav"));
+  if (SDL_OpenAudio (&waveclick1->spec, NULL) < 0)
+  {
+    DISPLAY_ERROR(FormatString ("Couldn't open audio: %s, no sound available", SDL_GetError ()));
+    audio = false;
+    delete waveclick1;
+    return;
+  }
+  else
+  {
+    audio = true;
+  }
+  delete waveclick1;
 #endif
   int i;
   waveexplosion1 = new WaveFile (Directory::getSounds ("explode1.wav").c_str ());
@@ -176,7 +175,6 @@ SoundSystem::SoundSystem ()
   wavecannon1->setVolume (50);
   wavemissile1->setVolume (110);
   waveclick1->setVolume (80);
-#endif
 }
 
 SoundSystem::~SoundSystem ()
@@ -188,9 +186,7 @@ SoundSystem::~SoundSystem ()
     Mix_FreeMusic (music1);
   Mix_CloseAudio ();
 #else
-#ifdef HAVE_SDL
   SDL_CloseAudio ();
-#endif
 #endif
   delete waveexplosion1;
   delete waveclick1;

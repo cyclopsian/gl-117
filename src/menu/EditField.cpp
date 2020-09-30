@@ -32,11 +32,7 @@ EditField::EditField ()
   text = "";
   ptr = 0;
 
-#ifndef USE_GLUT
   timer = SDL_GetTicks ();
-#else
-  timer = glutGet (GLUT_ELAPSED_TIME);
-#endif
 }
 
 EditField::EditField (int maxlen)
@@ -48,11 +44,7 @@ EditField::EditField (int maxlen)
   else if (maxlen < 0) maxlen = 0;
   this->maxlen = maxlen;
 
-#ifndef USE_GLUT
   timer = SDL_GetTicks ();
-#else
-  timer = glutGet (GLUT_ELAPSED_TIME);
-#endif
 }
 
 void EditField::setText (const std::string &text)
@@ -75,11 +67,7 @@ void EditField::draw ()
   str = text;
   if (highlight)
   {
-#ifndef USE_GLUT
     akttime = SDL_GetTicks ();
-#else
-    akttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
 
     if (((akttime - timer) & 0xff) > 128)
     {

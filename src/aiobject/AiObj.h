@@ -24,10 +24,6 @@
 #ifndef IS_AIOBJECT_H
 #define IS_AIOBJECT_H
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "UnitPrototype.h"
 #include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok

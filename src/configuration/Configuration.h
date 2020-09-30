@@ -22,39 +22,16 @@
 #ifndef IS_CONFIGURATION_H
 #define IS_CONFIGURATION_H
 
-#define COMPILER_EXIT_WORKAROUND 1
-
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "../config.h" // defines HAVE_SDL, HAVE_SDL_MIXER
 #include "opengl/includegl.h"
 
-// USE_GLUT means ONLY use GLUT
-// HAVE_SDL means that SDL is available, so USE_GLUT will not be defined
 // HAVE_SDL_MIXER means SDL and SDL_mixer are available
 // HAVE_SDL_NET means SDL_net is available
 
 //#undef HAVE_SDL_NET // dummy
 //#undef HAVE_SDL_MIXER // dummy
-//#undef HAVE_SDL // dummy
-
-#define USE_GLUT
-#ifdef HAVE_SDL
-#undef USE_GLUT
-#else
-#undef HAVE_SDL_MIXER
-#endif
-
-// data types
-#ifdef USE_GLUT
-#define Uint32 unsigned int
-#define Uint16 unsigned short
-#endif
 
 #define GLOBALSCALE 1
-#define VERSIONSTRING "V2.0"
 
 #define LINEWIDTH(x) (float) x * height / 600.0F
 
@@ -119,74 +96,38 @@ const int maxstar = 70;
 #define GAME_FINISH 11
 #define GAME_QUIT 12*/
 
-// define common GLUT/SDL keys
-#ifdef USE_GLUT
-  #define MOUSE_BUTTON_LEFT GLUT_LEFT_BUTTON+1 // LEFT MB=0, but we use 0 for "no button"
-  #define MOUSE_BUTTON_MIDDLE GLUT_MIDDLE_BUTTON+1
-  #define MOUSE_BUTTON_RIGHT GLUT_RIGHT_BUTTON+1
-  #define MOUSE_UP GLUT_UP
-  #define MOUSE_DOWN GLUT_DOWN
-  #define KEY_F1 GLUT_KEY_F1
-  #define KEY_F2 GLUT_KEY_F2
-  #define KEY_F3 GLUT_KEY_F3
-  #define KEY_F4 GLUT_KEY_F4
-  #define KEY_F5 GLUT_KEY_F5
-  #define KEY_F6 GLUT_KEY_F6
-  #define KEY_F7 GLUT_KEY_F7
-  #define KEY_F8 GLUT_KEY_F8
-  #define KEY_F9 GLUT_KEY_F9
-  #define KEY_F10 GLUT_KEY_F10
-  #define KEY_UP GLUT_KEY_UP
-  #define KEY_DOWN GLUT_KEY_DOWN
-  #define KEY_LEFT GLUT_KEY_LEFT
-  #define KEY_RIGHT GLUT_KEY_RIGHT
-  #define KEY_PGUP GLUT_KEY_PAGE_UP
-  #define KEY_PGDOWN GLUT_KEY_PAGE_DOWN
-  #define KEY_LALT -1 // where in glut.h???
-  #define KEY_LCTRL -2
-  #define KEY_LSHIFT -3
-  #define KEY_RSHIFT -4
-  #define KEY_RALT -5
-  #define KEY_RCTRL -6
-  #define KEY_CAPSLOCK -7
-  #define KEY_DELETE -8
-  #define KEY_INSERT GLUT_KEY_INSERT
-  #define KEY_HOME GLUT_KEY_HOME
-  #define KEY_END GLUT_KEY_END
-#else
-  #define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
-  #define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
-  #define MOUSE_BUTTON_RIGHT SDL_BUTTON_RIGHT
-  #define MOUSE_UP SDL_RELEASED
-  #define MOUSE_DOWN SDL_PRESSED
-  #define KEY_F1 SDLK_F1
-  #define KEY_F2 SDLK_F2
-  #define KEY_F3 SDLK_F3
-  #define KEY_F4 SDLK_F4
-  #define KEY_F5 SDLK_F5
-  #define KEY_F6 SDLK_F6
-  #define KEY_F7 SDLK_F7
-  #define KEY_F8 SDLK_F8
-  #define KEY_F9 SDLK_F9
-  #define KEY_F10 SDLK_F10
-  #define KEY_UP SDLK_UP
-  #define KEY_DOWN SDLK_DOWN
-  #define KEY_LEFT SDLK_LEFT
-  #define KEY_RIGHT SDLK_RIGHT
-  #define KEY_PGUP SDLK_PAGEUP
-  #define KEY_PGDOWN SDLK_PAGEDOWN
-  #define KEY_LALT SDLK_LALT
-  #define KEY_RALT SDLK_RALT
-  #define KEY_LCTRL SDLK_LCTRL
-  #define KEY_RCTRL SDLK_RCTRL
-  #define KEY_LSHIFT SDLK_LSHIFT
-  #define KEY_RSHIFT SDLK_RSHIFT
-  #define KEY_CAPSLOCK SDLK_CAPSLOCK
-  #define KEY_DELETE SDLK_DELETE
-  #define KEY_INSERT SDLK_INSERT
-  #define KEY_HOME SDLK_HOME
-  #define KEY_END SDLK_END
-#endif
+#define MOUSE_BUTTON_LEFT SDL_BUTTON_LEFT
+#define MOUSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
+#define MOUSE_BUTTON_RIGHT SDL_BUTTON_RIGHT
+#define MOUSE_UP SDL_RELEASED
+#define MOUSE_DOWN SDL_PRESSED
+#define KEY_F1 SDLK_F1
+#define KEY_F2 SDLK_F2
+#define KEY_F3 SDLK_F3
+#define KEY_F4 SDLK_F4
+#define KEY_F5 SDLK_F5
+#define KEY_F6 SDLK_F6
+#define KEY_F7 SDLK_F7
+#define KEY_F8 SDLK_F8
+#define KEY_F9 SDLK_F9
+#define KEY_F10 SDLK_F10
+#define KEY_UP SDLK_UP
+#define KEY_DOWN SDLK_DOWN
+#define KEY_LEFT SDLK_LEFT
+#define KEY_RIGHT SDLK_RIGHT
+#define KEY_PGUP SDLK_PAGEUP
+#define KEY_PGDOWN SDLK_PAGEDOWN
+#define KEY_LALT SDLK_LALT
+#define KEY_RALT SDLK_RALT
+#define KEY_LCTRL SDLK_LCTRL
+#define KEY_RCTRL SDLK_RCTRL
+#define KEY_LSHIFT SDLK_LSHIFT
+#define KEY_RSHIFT SDLK_RSHIFT
+#define KEY_CAPSLOCK SDLK_CAPSLOCK
+#define KEY_DELETE SDLK_DELETE
+#define KEY_INSERT SDLK_INSERT
+#define KEY_HOME SDLK_HOME
+#define KEY_END SDLK_END
 
 #define KEY_BACKSPACE 8
 #define KEY_TAB 9

@@ -24,10 +24,6 @@
 #ifndef IS_UNITPROTOTYPE_H
 #define IS_UNITPROTOTYPE_H
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "configuration/Configuration.h" // ok
 #include "model3d/Model3d.h" // ok
 #include "util/Util.h"

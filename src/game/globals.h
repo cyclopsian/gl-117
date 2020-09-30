@@ -22,13 +22,7 @@
 #ifndef IS_MAIN_H
 #define IS_MAIN_H
 
-// dummy debug definitions
-//#define HAVE_SDL_MIXER
-//#define USE_GLUT
-
 /* Load definitions of GNU autoconf:
-    USE_GLUT: no SDL
-    HAVE_SDL: SDL installed
     HAVE_SDL_MIXER: SDL_mixer installed
     HAVE_SDL_NET: SDL_net installed */
 

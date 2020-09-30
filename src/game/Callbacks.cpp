@@ -22,10 +22,6 @@
 #include "SDL_video.h"
 #ifndef IS_CALLBACKS_H
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "Callbacks.h"
 #include "globals.h"
 #include "Game.h"
@@ -85,7 +81,6 @@ void callbackPilots (Component *comp, int key)
 
 int currentaxis = 0;
 
-#ifndef USE_GLUT
 void callbackJoystickAxis (Component *comp, int key)
 {
   int i;
@@ -180,7 +175,6 @@ void callbackJoystickAxis (Component *comp, int key)
     la->setText ("N/A");
   }
 }
-#endif
 
 void callbackSwitchStartMission (Component *comp, int key)
 {
@@ -497,9 +491,6 @@ void callbackControls (Component *comp, int key)
     controls ++;
     if (controls > 2) controls = 0;
     if (controls == CONTROLS_JOYSTICK && !joysticks) controls = CONTROLS_KEYBOARD;
-#ifdef USE_GLUT
-    if (controls == CONTROLS_KEYBOARD) controls = CONTROLS_MOUSE;
-#endif
   }
   textControls (buf);
   ((Label *) optmenu [2]->components [5])->setText (buf);

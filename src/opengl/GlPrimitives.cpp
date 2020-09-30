@@ -54,11 +54,7 @@ void GlPrimitives::clearBuffers () const
 
 void GlPrimitives::swapBuffers () const
 {
-#ifdef USE_GLUT
-  glutSwapBuffers();
-#else
   SDL_GL_SwapBuffers ();
-#endif
 }
 
 void GlPrimitives::rotate (float x, float y, float z)

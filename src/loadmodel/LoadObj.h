@@ -24,10 +24,6 @@
 
 #define int32 int
 
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "model3d/Model3d.h" // ok
 
 class TextFileObj

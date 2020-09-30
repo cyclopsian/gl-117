@@ -388,10 +388,8 @@ void adjustBrightness ()
 
 
 
-#ifndef USE_GLUT
 SDL_Joystick *sdljoystick [maxjoysticks];
 int sdljoystickaxes [maxjoysticks];
-#endif
 
 int sdldisplay = true;
 int sdlreshape = true;
@@ -1175,11 +1173,7 @@ void Events::fireCannon ()
   if (!fplayer->active) return;
   if (fplayer->firecannonttl > 0) return;
   if (fplayer->ammo == 0) return;
-#ifdef USE_GLUT
-  fplayer->fireCannon (laser);
-#else
   fplayer->autofire = true;
-#endif
 }
 
 void Events::stopCannon ()
@@ -1281,11 +1275,7 @@ int frames = 0, time2 = 0, time1 = 0;
 void frame ()
 {
   frames ++;
-#ifndef USE_GLUT
   time2 = SDL_GetTicks ();
-#else
-  time2 = glutGet (GLUT_ELAPSED_TIME);
-#endif
   if (time2 - time1 > 1000)
   {
     if (time2 - time1 < 1500)
@@ -1550,12 +1540,10 @@ void game_quit ()
   delete space;
 //  delete dirs;
 //  delete gl;
-#ifndef USE_GLUT
 //  SDL_CloseAudio();
 //  SDL_FreeWAV(wave.sound);
 //  SDL_Quit (); // done atexit()
   delete sound;
-#endif
   exit (EXIT_NORMAL);
 }
 
@@ -2214,9 +2202,6 @@ static void myPassiveMotionFunc (int x, int y)
 
 static void myMouseFunc (int button, int state, int x, int y)
 {
-#ifdef USE_GLUT
-  button ++;
-#endif
   if (gamestate == &stateplay && controls == CONTROLS_MOUSE)
   {
     gamestate->mouse (button, state, x, y);
@@ -2227,41 +2212,26 @@ static void myMouseFunc (int button, int state, int x, int y)
   }
   else if (gamestate == &statemenu)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     allmenus.eventMouse (x, y, button);
 //    gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statemission)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     missionmenu.eventMouse (x, y, button);
     gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statestats)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     statsmenu.eventMouse (x, y, button);
 //    gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statefame)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     famemenu.eventMouse (x, y, button);
 //    gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statefighter)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     fightermenu.eventMouse (x, y, button);
 //    gamestate->mouse (button, state, x, y);
   }
@@ -2275,17 +2245,11 @@ static void myMouseFunc (int button, int state, int x, int y)
   }
   else if (gamestate == &statequit)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     quitmenu.eventMouse (x, y, button);
 //    gamestate->mouse (button, state, x, y);
   }
   else if (gamestate == &statecredits)
   {
-#ifdef USE_GLUT
-    if (state == 0)
-#endif
     gamestate->mouse (button, state, x, y);
   }
 }
@@ -2382,13 +2346,6 @@ static void myDisplayFunc ()
   }
 }
 
-static void myIdleFunc ()
-{
-#ifdef USE_GLUT
-  glutPostRedisplay ();
-#endif
-}
-
 static void myJoystickAxisFunc (int x, int y, int t, int r)
 {
   if (gamestate == &stateplay && controls == CONTROLS_JOYSTICK)
@@ -2408,13 +2365,11 @@ static void myJoystickButtonFunc (int button)
 static void myJoystickHatFunc (int hat)
 {
   int normhat = hat;
-#ifndef USE_GLUT
   if (hat % 1000 == SDL_HAT_RIGHT) normhat = 100;
   if (hat % 1000 == SDL_HAT_UP) normhat = 101;
   if (hat % 1000 == SDL_HAT_LEFT) normhat = 102;
   if (hat % 1000 == SDL_HAT_DOWN) normhat = 103;
   normhat += (hat / 1000) * 1000;
-#endif
   if (gamestate == &stateplay && controls == CONTROLS_JOYSTICK)
     gamestate->joystickHat (normhat);
   else if (gamestate == &statemenu)
@@ -2426,11 +2381,7 @@ static void myJoystickHatFunc (int hat)
 static void myTimerFunc (int value)
 {
   Uint32 akttime, dt;
-#ifndef USE_GLUT
-    akttime = SDL_GetTicks ();
-#else
-    akttime = glutGet (GLUT_ELAPSED_TIME);
-#endif
+  akttime = SDL_GetTicks ();
   if (lasttime == 0) dt = 1;
   else dt = akttime - lasttime;
   lasttime = akttime;
@@ -2456,13 +2407,7 @@ static void myTimerFunc (int value)
   {
     gamestate->timer (dt);
   }
-
-#ifdef USE_GLUT
-  glutTimerFunc (1, myTimerFunc, 0); // do as many timer calls as possible
-#endif
 }
-
-#ifndef USE_GLUT
 
 Uint32 nexttime = 0;
 
@@ -2574,7 +2519,6 @@ void sdlMainLoop ()
     myTimerFunc (1); // dummy value
   }
 }
-#endif
 
 
 
@@ -2582,61 +2526,9 @@ void sdlMainLoop ()
   STARTUP METHODS
 ****************************************************************************/
 
-#ifdef USE_GLUT
-// common GLUT screen init code, return 0 on error
-int setGlutScreen (int w, int h, int b, int f)
-{
-  char gamestr [256];
-  sprintf (gamestr, "%dx%d:%d", w, h, b);
-  glutGameModeString (gamestr);
-  if (f)
-  {
-    if (glutGameModeGet (GLUT_GAME_MODE_POSSIBLE))
-    {
-      glutEnterGameMode ();
-    }
-    else
-    {
-      return 0;
-    }
-  }
-  else
-  {
-    glutInitWindowPosition (0, 0);
-    glutInitWindowSize (w, h);
-    glutwindow = glutCreateWindow ("GL-117");
-    if (glutwindow == GL_FALSE)
-      return 0;
-  }
-  return 1;
-}
-#endif
-
 // set screen to (width, height, bpp, fullscreen), return 0 on error
 int setScreen (int w, int h, int b, int f)
 {
-
-#ifdef USE_GLUT
-
-  if (!setGlutScreen (w, h, b, f))
-  {
-    b = 16;
-    if (!setGlutScreen (w, h, b, f))
-    {
-      b = 8;
-      if (!setGlutScreen (w, h, b, f))
-      {
-        b = 2;
-        if (!setGlutScreen (w, h, b, f))
-        {
-          return 0;
-        }
-      }
-    }
-  }
-
-#else
-
   Uint32 video_flags;
   if (f)
   {
@@ -2693,8 +2585,6 @@ int setScreen (int w, int h, int b, int f)
     }
   }
 
-#endif
-
   glViewport (0, 0, (GLint) w, (GLint) h);
 
   // take over results in global variables
@@ -2720,20 +2610,12 @@ int speedTest ()
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 
-  #ifndef USE_GLUT
     time1 = SDL_GetTicks ();
-  #else
-    time1 = glutGet (GLUT_ELAPSED_TIME);
-  #endif
 
   while (time2 - time1 < 1000)
   {
     frames ++;
-  #ifndef USE_GLUT
     time2 = SDL_GetTicks ();
-  #else
-    time2 = glutGet (GLUT_ELAPSED_TIME);
-  #endif
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -2763,13 +2645,7 @@ void config_test (int argc, char **argv)
   DISPLAY_INFO("No configuration file found. Testing...");
   int bppi [4];
 
-#ifdef USE_GLUT // GLUT ONLY
-  DISPLAY_INFO("Using GLUT only");
-  glutInit (&argc, argv);
-  glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
-  configinit = true;
-#else // SDL
-  DISPLAY_INFO("Using SDL and GLUT");
+  DISPLAY_INFO("Using SDL");
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
   {
     //assert (false);
@@ -2777,7 +2653,6 @@ void config_test (int argc, char **argv)
     exit (EXIT_INIT);
   }
   configinit = true;
-#endif
 
   int valids = -1; // valid screen mode? (-1 = no mode)
   int n = 0;
@@ -2850,7 +2725,7 @@ void checkargs (int argc, char **argv)
     }
     else if (argv [i] [1] == 'v') // display version string
     {
-      DISPLAY(VERSIONSTRING, LOG_NONE);
+      DISPLAY(PACKAGE_VERSION, LOG_NONE);
       exit (EXIT_NORMAL);
     }
     else if (argv [i] [1] == 'h') // display startup help screen
@@ -2914,9 +2789,7 @@ void createMenu ()
   TextField *textfield;
   EditKey *editkey;
   EditField *editfield;
-#ifndef USE_GLUT
   EditJoystick *editjoystick;
-#endif
 
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3284,12 +3157,6 @@ void createMenu ()
 */
 
   yf = 10; xfstep = 13.6; yfstep = 1;
-#ifdef USE_GLUT
-  textfield = new TextField ("PLEASE INSTALL SDL AND\nSDLMIXER AND RECOMIPLE\nGL-117 TO ENABLE SOUND\nAND MUSIC", 0.6);
-  textfield->setBounds (xf, yf, xfstep, 0.6 * 4);
-  optmenu [1]->add (textfield);
-  yf -= 0.6 * 4;
-#else
   button = new Button ("SOUND VOLUME");
   button->setFunction (callbackSound);
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
@@ -3323,7 +3190,6 @@ void createMenu ()
     optmenu [1]->components [2]->setActive (false);
     optmenu [1]->components [3]->setActive (false);
   }
-#endif
 
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3545,7 +3411,6 @@ void createMenu ()
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 
-#ifndef USE_GLUT
   char joystr [4];
 
   xf = xsubmenu + 1; yf = ysubmenu - 6; xfstep = 12.5; yfstep = 0.8;
@@ -3644,7 +3509,6 @@ void createMenu ()
   button->setFunction (callbackDefaultsJoystick);
   button->setBounds (xf, yf, xfstep, yfstep - 0.1);
   controlsmenu [2]->add (button);
-#endif
 
 /*
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3845,7 +3709,7 @@ int main (int argc, char **argv)
 
   Logging::setFile (Directory::getSaves ("logfile.txt"));
 
-  snprintf (buf, sizeof(buf), "Startup %s, %s ... ", argv [0], VERSIONSTRING);
+  snprintf (buf, sizeof(buf), "Startup %s, %s ... ", argv [0], PACKAGE_VERSION);
   DISPLAY_INFO(buf);
 
 #ifdef _MSC_VER
@@ -3880,57 +3744,7 @@ int main (int argc, char **argv)
 
   gamestate = &stateinit;
 
-// NO SDL FOUND => USE GLUT ONLY
-#ifdef USE_GLUT
-
-  DISPLAY_INFO("Using GLUT only");
-  if (!configinit)
-  {
-    glutInit (&argc, argv);
-    glutInitDisplayMode (GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE);
-    if (!setScreen (width, height, bpp, fullscreen))
-    {
-      load_saveconfig ();
-      if (!setScreen (width, height, bpp, fullscreen))
-      {
-        DISPLAY_FATAL(FormatString ("No working display mode %dx%d found", width, height));
-        exit (EXIT_INIT);
-      }
-    }
-  }
-
-  DISPLAY_DEBUG("Calling main initialization method");
-  myFirstInit ();
-
-  DISPLAY_DEBUG("Creating dummy sound system, install SDL to enable sound");
-  sound = new SoundSystem ();
-
-  createMenu ();
-
-  DISPLAY_DEBUG("Registering GLUT callbacks");
-  glutReshapeFunc (myReshapeFunc);
-  glutDisplayFunc (myDisplayFunc);
-  glutKeyboardFunc (myKeyboardFunc);
-  glutSpecialFunc (mySpecialFunc);
-  glutPassiveMotionFunc (myPassiveMotionFunc);
-  glutMouseFunc (myMouseFunc);
-  glutIdleFunc (myIdleFunc);
-  glutTimerFunc (20, myTimerFunc, 0);
-
-  // parameters: visible angle, aspectracio, z-nearclip, z-farclip
-  gluPerspective (visibleangle, (float) width / height, nearclippingplane * GLOBALSCALE, 50.0 * GLOBALSCALE);
-
-  // no keyboard available with GLUT, as there are no KEY_DOWN/UP events
-  if (controls <= 0)
-    controls = CONTROLS_MOUSE;
-
-  DISPLAY_DEBUG("Entering GLUT main loop");
-  glutMainLoop(); // give controls to GLUT
-
-// SDL FOUND
-#else
-
-  DISPLAY_INFO("Using SDL and GLUT");
+  DISPLAY_INFO("Using SDL");
   if (!configinit)
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
@@ -4024,10 +3838,8 @@ int main (int argc, char **argv)
 
   createMenu ();
 
-  DISPLAY_DEBUG("Entering SDL main loop (GLUT emulation)");
+  DISPLAY_DEBUG("Entering SDL main loop");
   sdlMainLoop (); // simulate GLUT's main loop (above)
-
-#endif
 
   return 0; // exit without signaling errors
 }

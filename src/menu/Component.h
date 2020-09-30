@@ -22,12 +22,6 @@
 #ifndef IS_COMPONENT_H
 #define IS_COMPONENT_H
 
-#define COMPILER_EXIT_WORKAROUND 1
-
-#ifdef COMPILER_EXIT_WORKAROUND
-  #define GLUT_BUILDING_LIB 1
-#endif
-
 #include "model3d/Model3d.h" // ok
 #include "effects/Effects.h" // ok
 

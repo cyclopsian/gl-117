@@ -46,7 +46,7 @@ class Client
 
   Client();
 
-  bool getServer(char *hostname, char *name);
+  bool getServer(const char *hostname, const char *name);
   char *name;
   void sendMessage (const char *buf, int len);
   int getMessage(char *buf);
