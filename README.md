@@ -1,4 +1,4 @@
-![GL-117](gl-117.png)
+![GL-117](title.png)
 
 [![License: GPL 2.0 or later][license-img]][license-spdx]
 

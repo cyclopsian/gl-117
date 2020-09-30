@@ -26,3 +26,10 @@ subdir('sounds')
 subdir('shaders')
 subdir('textures')
 subdir('units')
+
+install_data(
+  'gl-117.desktop',
+  install_dir: get_option('datadir')/'applications')
+install_data(
+  'gl-117.png',
+  install_dir: get_option('datadir')/'icons'/'hicolor'/'256x256'/'apps')
