@@ -21,6 +21,7 @@
 
 #ifndef IS_GLPRIMITIVES_H
 
+#include "game/Game.h"
 #include "GlPrimitives.h"
 #include "includegl.h"
 
@@ -54,7 +55,7 @@ void GlPrimitives::clearBuffers () const
 
 void GlPrimitives::swapBuffers () const
 {
-  SDL_GL_SwapBuffers ();
+  SDL_GL_SwapWindow (sdlwindow);
 }
 
 void GlPrimitives::rotate (float x, float y, float z)

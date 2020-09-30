@@ -19,7 +19,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "SDL_video.h"
 #ifndef IS_CALLBACKS_H
 
 #include "Callbacks.h"
@@ -614,20 +613,23 @@ void callbackBrightness (Component *comp, int key)
 
 void callbackResolution (Component *comp, int key)
 {
-  Uint32 video_flags = SDL_OPENGL;
-  if (fullscreen)
-    video_flags |= SDL_FULLSCREEN;
-  SDL_Rect * const *modes = SDL_ListModes(NULL, video_flags);
-  int numres = 0;
-  for (SDL_Rect * const *m = modes; *m; m++)
-    numres++;
+  int display = SDL_GetWindowDisplayIndex(sdlwindow);
+  int numres = SDL_GetNumDisplayModes(display);
+  SDL_DisplayMode modes[numres];
+  for (int i = 0; i < numres; i++)
+  {
+    if (SDL_GetDisplayMode(display, i, &modes[i]) != 0)
+    {
+      memset(&modes[i], 0, sizeof(modes[i]));
+    }
+  }
   int found = 0;
   char buf [256];
 
   if (key == MOUSE_BUTTON_LEFT)
   {
     for (int i = 0; i < numres; i ++)
-      if (wantwidth == modes [i]->w && wantheight == modes [i]->h)
+      if (wantwidth == modes [i].w && wantheight == modes [i].h)
       {
         found = i + 1;
       }
@@ -635,7 +637,7 @@ void callbackResolution (Component *comp, int key)
   else
   {
     for (int i = 0; i < numres; i ++)
-      if (wantwidth == modes [i]->w && wantheight == modes [i]->h)
+      if (wantwidth == modes [i].w && wantheight == modes [i].h)
       {
         found = i - 1;
       }
@@ -644,8 +646,8 @@ void callbackResolution (Component *comp, int key)
   if (found < 0) found = numres - 1;
   else if (found >= numres) found = 0;
 
-  wantwidth = modes [found]->w;
-  wantheight = modes [found]->h;
+  wantwidth = modes [found].w;
+  wantheight = modes [found].h;
 
   sprintf (buf, "%d*%d", wantwidth, wantheight);
   ((Label *) optmenu [0]->components [16])->setText (buf);

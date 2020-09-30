@@ -36,6 +36,7 @@ TODO list:
 - Eugeni Andreeschev: 3d model
 */
 
+#include "SDL_video.h"
 #ifndef IS_MAIN_H
 
 #include "game/globals.h"
@@ -386,7 +387,8 @@ void adjustBrightness ()
   }
 }
 
-
+SDL_Window *sdlwindow = NULL;
+static SDL_GLContext context = NULL;
 
 SDL_Joystick *sdljoystick [maxjoysticks];
 int sdljoystickaxes [maxjoysticks];
@@ -923,9 +925,7 @@ void switch_menu ()
     mainbutton [6]->setVisible (true);
   else
     mainbutton [6]->setVisible (false);
-#ifdef HAVE_SDL
-  SDL_WM_GrabInput (SDL_GRAB_OFF);
-#endif
+  SDL_SetWindowGrab(sdlwindow, SDL_FALSE);
 }
 
 bool ispromoted;
@@ -1135,9 +1135,7 @@ void switch_game ()
     sound->haltMusic ();
   sound->playLoop (SOUND_PLANE1);
   setPlaneVolume ();
-#ifdef HAVE_SDL
-  SDL_WM_GrabInput (SDL_GRAB_ON);
-#endif
+  SDL_SetWindowGrab(sdlwindow, SDL_TRUE);
 }
 
 bool startcannon = false;
@@ -2442,7 +2440,7 @@ void sdlMainLoop ()
           break;
 
         case SDL_KEYDOWN:
-          if (!event.key.keysym.unicode)
+          if (event.key.keysym.sym & SDLK_SCANCODE_MASK)
             mySpecialFunc (event.key.keysym.sym, 0, 0);
           else
             myKeyboardFunc (event.key.keysym.sym, 0, 0);
@@ -2490,9 +2488,15 @@ void sdlMainLoop ()
           myJoystickHatFunc (event.jhat.value + event.jhat.which * 1000);
           break;
 
-        case SDL_ACTIVEEVENT:
-          sdlreshape = true;
-          sdldisplay = true;
+        case SDL_WINDOWEVENT:
+          switch (event.window.event)
+          {
+            case SDL_WINDOWEVENT_SHOWN:
+            case SDL_WINDOWEVENT_FOCUS_GAINED:
+              sdlreshape = true;
+              sdldisplay = true;
+              break;
+          }
           break;
       }
     }
@@ -2529,15 +2533,6 @@ void sdlMainLoop ()
 // set screen to (width, height, bpp, fullscreen), return 0 on error
 int setScreen (int w, int h, int b, int f)
 {
-  Uint32 video_flags;
-  if (f)
-  {
-    video_flags = SDL_OPENGL | SDL_FULLSCREEN;
-  }
-  else
-  {
-    video_flags = SDL_OPENGL;
-  }
   int rgb_size [3];
   switch (b)
   {
@@ -2563,38 +2558,95 @@ int setScreen (int w, int h, int b, int f)
   SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, rgb_size [2]);
   SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16);
   SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-  if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+  if (sdlwindow)
   {
-    if ((b = SDL_VideoModeOK (w, h, b, video_flags)) != 0)
+    int display = SDL_GetWindowDisplayIndex(sdlwindow);
+    if (f)
     {
-      b = 16;
-      SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 5);
-      SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 5);
-      SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 5);
-      if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+      if (SDL_SetWindowFullscreen(sdlwindow, SDL_WINDOW_FULLSCREEN) < 0)
       {
-        b = 8;
-        SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 2);
-        SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 3);
-        SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 3);
-        if (SDL_SetVideoMode (w, h, b, video_flags) == NULL)
+        return 0;
+      }
+      fullscreen = f;
+      wantfullscreen = f;
+      int num_modes = SDL_GetNumDisplayModes(display);
+      for (int i = 0; i < num_modes; i++)
+      {
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(display, i, &mode) != 0)
         {
-          return 0;
+          if (mode.w == w && mode.h == h)
+          {
+            if (SDL_SetWindowDisplayMode(sdlwindow, &mode) < 0)
+            {
+              return 0;
+            }
+            width = w;
+            height = h;
+            wantwidth = w;
+            wantheight = h;
+            glViewport (0, 0, (GLint) w, (GLint) h);
+          }
         }
       }
     }
+    else
+    {
+      if (SDL_SetWindowFullscreen(sdlwindow, 0) < 0)
+      {
+        return 0;
+      }
+      fullscreen = f;
+      wantfullscreen = f;
+      SDL_SetWindowSize(sdlwindow, w, h);
+      width = w;
+      height = h;
+      wantwidth = w;
+      wantheight = h;
+      glViewport (0, 0, (GLint) w, (GLint) h);
+    }
+
+    SDL_GLContext newcontext = SDL_GL_CreateContext(sdlwindow);
+    if (!newcontext)
+    {
+      return 0;
+    }
+    SDL_GL_DeleteContext(context);
+    context = newcontext;
+    bpp = b;
   }
+  else
+  {
+    Uint32 video_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    if (f)
+    {
+      video_flags |= SDL_WINDOW_FULLSCREEN;
+    }
+    sdlwindow = SDL_CreateWindow("GL-117", SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED, w, h, video_flags);
 
-  glViewport (0, 0, (GLint) w, (GLint) h);
+    if (!sdlwindow)
+    {
+      return 0;
+    }
+    context = SDL_GL_CreateContext(sdlwindow);
+    if (!context)
+    {
+      SDL_DestroyWindow(sdlwindow);
+      return 0;
+    }
 
-  // take over results in global variables
-  width = w;
-  height = h;
-  bpp = b;
-  fullscreen = f;
-  wantwidth = w; // requested values for next restart
-  wantheight = h;
-  wantfullscreen = f;
+    glViewport (0, 0, (GLint) w, (GLint) h);
+
+    // take over results in global variables
+    width = w;
+    height = h;
+    bpp = b;
+    fullscreen = f;
+    wantwidth = w; // requested values for next restart
+    wantheight = h;
+    wantfullscreen = f;
+  }
   return 1;
 }
 
@@ -3780,7 +3832,6 @@ int main (int argc, char **argv)
   }
 
   DISPLAY_DEBUG("Setting SDL caption");
-  SDL_WM_SetCaption ("GL-117", "GL-117"); // window name
 
   SDL_ShowCursor (0);
 
@@ -3811,7 +3862,7 @@ int main (int argc, char **argv)
       SDL_JoystickEventState (SDL_ENABLE);
       sdljoystick [i] = SDL_JoystickOpen (i);
       sdljoystickaxes [i] = SDL_JoystickNumAxes (sdljoystick [i]);
-      snprintf (buf, sizeof(buf), "Joystick \"%s\" detected", SDL_JoystickName (i));
+      snprintf (buf, sizeof(buf), "Joystick \"%s\" detected", SDL_JoystickNameForIndex (i));
       DISPLAY_INFO(buf);
     }
   }
@@ -3829,9 +3880,6 @@ int main (int argc, char **argv)
 /*  joysticks = 2;
   sdljoystickaxes [0] = 4;
   sdljoystickaxes [1] = 2;*/
-
-  SDL_EnableUNICODE (1);
-  SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 // Restrict mouse to SDL window
 //  SDL_WM_GrabInput (SDL_GRAB_ON);

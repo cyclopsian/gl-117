@@ -1,5 +1,4 @@
 config = configuration_data({
-  'HAVE_SDL': sdl.found(),
   'HAVE_SDL_MIXER': sdlmixer.found(),
   'HAVE_SDL_NET': sdlnet.found(),
 })

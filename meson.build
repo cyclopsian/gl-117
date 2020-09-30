@@ -8,9 +8,9 @@ project(
   ]
 )
 
-sdl = dependency('sdl')
-sdlmixer = dependency('SDL_mixer', required: false)
-sdlnet = dependency('SDL_net', required: false)
+sdl = dependency('sdl2')
+sdlmixer = dependency('SDL2_mixer', required: false)
+sdlnet = dependency('SDL2_net', required: false)
 gl = dependency('gl')
 glu = dependency('glu')
 

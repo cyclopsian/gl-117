@@ -53,6 +53,8 @@ extern int joysticks;
 
 const int maxjoysticks = 10;
 
+
+extern SDL_Window *sdlwindow;
 extern SDL_Joystick *sdljoystick [maxjoysticks];
 extern int sdljoystickaxes [maxjoysticks];
 
