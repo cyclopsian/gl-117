@@ -42,7 +42,7 @@
 
 // view range borders
 #define VIEW_MIN 30
-#define VIEW_MAX 150
+#define VIEW_MAX 300
 
 extern int width;
 extern int height;

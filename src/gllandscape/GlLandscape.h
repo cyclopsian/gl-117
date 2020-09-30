@@ -30,7 +30,7 @@
 
 
 
-#define PARTS 24 ///< maximum LOD (occlusion culling) parts
+#define PARTS 48 ///< maximum LOD (occlusion culling) parts
 
 // weather
 #define WEATHER_SUNNY 0
