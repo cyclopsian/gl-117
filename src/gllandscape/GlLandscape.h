@@ -83,6 +83,10 @@ extern int specialeffects;
 */
 class GlLandscape : public Landscape
 {
+    VertexArray vertexarrayquadstrip;
+    VertexArray vertexarrayquad [30];
+    VertexArray vertexarraytriangle [30];
+    VertexArray vertexarrayglitter [2];
   public:
 
     short nl [MAXX + 2] [MAXX + 2]; ///< lighting mask, MAXX+1 x MAXX+1 is sufficient, but VC bug or my bug?

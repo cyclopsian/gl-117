@@ -39,7 +39,7 @@ const int LAND_ARCTIC = 4;
 const int MAXCORE     = 10;
 
 // fast coordinate cycle
-#define GETCOORD(x) (x & MAXX_MASK)
+#define GETCOORD(x) ((x) & MAXX_MASK)
 
 // static ID values for the landscape type (array "f")
 const int GRASS            = 0;

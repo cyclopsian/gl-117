@@ -76,6 +76,7 @@ void MapLoader::readMapFile ()
 MapLoader::MapLoader ()
 {
   // initialize map file loader
+  file.init ();
   file.setWhitespace (" \t\r\n");
   file.addComment ("#", "\n");
   file.setQuotes ("\"'`");

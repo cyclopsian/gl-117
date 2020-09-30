@@ -208,8 +208,14 @@ void AiObj::init ()
   ttl = -1;
   ttf = 30 * timestep;
   score = -1;
+  missiletype = 0;
   for (i = 0; i < missiletypes; i ++)
     missiles [i] = 0;
+  for (i = 0; i < missileracks; i ++)
+  {
+    missilerack [i] = 0;
+    missilerackn [i] = 0;
+  }
   timer = 0;
 }
 

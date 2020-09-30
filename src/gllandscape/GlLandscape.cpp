@@ -47,10 +47,6 @@ Texture *textree4, *textree5, *texearth, *texsand, *texredsand, *texgravel1;
 Texture *texglitter1;
 
 VertexArray *va;
-VertexArray vertexarrayquadstrip;
-VertexArray vertexarrayquad [30];
-VertexArray vertexarraytriangle [30];
-VertexArray vertexarrayglitter [2];
 
 /*class IndexCounter
 {
@@ -2109,6 +2105,8 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
       int zy = miny + (int) (dy * (float) (i + 1));
       vmin [i] [i2] = 65535;
       vmax [i] [i2] = 0;
+      vh [i] [i2] = 0;
+      vis  [i] [i2] = false;
       for (int i3 = 0; i3 < zy - ay + 1; i3 += 4)
         for (int i4 = 0; i4 < zx - ax + 1; i4 += 4)
         {

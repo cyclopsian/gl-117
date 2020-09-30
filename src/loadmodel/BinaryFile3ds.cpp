@@ -60,7 +60,7 @@ BinaryFile3ds::BinaryFile3ds (const char *filename)
 
 BinaryFile3ds::~BinaryFile3ds ()
 {
-  delete data;
+  delete[] data;
 }
 
 int BinaryFile3ds::readFloat (float *f)

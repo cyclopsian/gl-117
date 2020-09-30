@@ -1536,6 +1536,7 @@ void game_quit ()
   delete font1;
   delete font2;
   delete space;
+  if (l != NULL) delete l;
 //  delete dirs;
 //  delete gl;
 //  SDL_CloseAudio();
