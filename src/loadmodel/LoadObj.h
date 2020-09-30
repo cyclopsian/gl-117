@@ -34,7 +34,7 @@ class TextFileObj
   int32 filepointer;
   char *data;
 
-  TextFileObj (char *filename);
+  TextFileObj (const char *filename);
   ~TextFileObj ();
   float readFloat (int32 offset);
   float readFloat ();

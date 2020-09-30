@@ -25,8 +25,6 @@
 
 #include "../config.h"
 
-#ifdef HAVE_CGGL
-
 class GlLandscape;
 
 class GlShaders {
@@ -42,7 +40,5 @@ public:
 // Init everything *after* OpenGL has been initialized.
 extern GlShaders * createShaders(GlLandscape& _land);
 extern void destroyShaders(GlShaders *);
-
-#endif // HAVE_CGGL
 
 #endif // IS_SHADERS_H

@@ -30,7 +30,7 @@
 
 
 
-TextFileObj::TextFileObj (char *filename)
+TextFileObj::TextFileObj (const char *filename)
 {
   in = fopen (filename, "rb");
   if (in == NULL)

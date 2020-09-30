@@ -110,9 +110,7 @@ class GlLandscape : public Landscape
     float sunlight;
 //    Space *space;
 
-#ifdef HAVE_CGGL
     GlShaders * shaders;
-#endif
 
   public:
 
@@ -121,10 +119,8 @@ class GlLandscape : public Landscape
     GlLandscape (int type, int *heightmask);
     ~GlLandscape()
     {
-#ifdef HAVE_CGGL
       destroyShaders(shaders);
       shaders = 0;
-#endif
     }
 
     void precalculate (); ///< precalculate everything (colors, light mask)

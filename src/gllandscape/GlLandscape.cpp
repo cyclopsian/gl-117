@@ -2698,11 +2698,16 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     gl.enableTexture (texcactus1->textureID);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#ifdef HAVE_CGGL
+
+    // disabled for now
+    if (false)
+    {
       // load transform in the tree shader
       shaders->loadFrameUniformParams(phi);
       shaders->drawTrees(minx, maxx, miny, maxy, treestep);
-#else
+    }
+    else
+    {
       // how many trees added ? increases like mydep (the square of the
       // depth is homogenous to a surface)
       float mydep = 1000;		         // base 1
@@ -2795,14 +2800,9 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
                   float cg = g [x] [y];
                   fac = treelightfac * (nl [x] [y] + (short) dl [x] [y] * 16) * sunlight;
                   cg *= fac;
-# ifdef HAVE_CGGL
-			    // another supported CGGL option, also faster
-			    shaders->drawTreeQuad(xs, ys, cg/255.0, dep<cutdep);
-# else
                   if (cg >= 256.0) cg = 255.0;
                   treecolor.c [0] = treecolor.c [1] = treecolor.c [2] = (int) cg;
                   drawTreeQuad (xs, ys, phi, dep < cutdep);
-# endif
                 }
             ys += treestep;
           } // ys for
@@ -2816,9 +2816,8 @@ void GlLandscape::draw (Vector3 &cam, float phi, float gamma)
           vertexarrayquad [i3].glEnd ();
           vertexarraytriangle [i3].glEnd ();
         }
-
+      }
     }
-#endif
 
     glDisable (GL_ALPHA_TEST);
     glPopMatrix ();
@@ -3159,9 +3158,7 @@ GlLandscape::GlLandscape (int type, int *heightmask)
   }
 
   if (type >= 0) precalculate (); // do not precalculate anything for custom height maps
-#ifdef HAVE_CGGL
   shaders = createShaders(*this);
-#endif
 }
 
 #endif

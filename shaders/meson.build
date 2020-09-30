@@ -1,5 +1,5 @@
 install_data([
-    'tree.cg',
+    'tree.vert',
   ],
   install_dir: gl_117_datadir / 'shaders'
 )

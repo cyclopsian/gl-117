@@ -22,20 +22,17 @@
 
 #include "shader/GlShaders.h"
 
-#ifdef HAVE_CGGL
-
 #include <stdexcept>
 #include <list>
 #include <cassert>
 #include <cstring>
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
-
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glcorearb.h>
 
 #include "configuration/Configuration.h"
 #include "configuration/Directory.h"
 #include "game/Game.h"
-extern Dirs dirs;
+#include "loadmodel/LoadObj.h"
 
 using std::list;
 
@@ -87,17 +84,14 @@ class QuadList;
 class TreeShader : public GlShaders {
 private:
   GlLandscape& landscape;
-  CGprogram treeprog;
-  CGprofile profile;
+  GLuint treeprog;
 
-  CGparameter c_posoffsetxy_param; // constant
-  CGparameter c_vxtex_param;	// constant
-  CGparameter c_cst_param;	// constant
-  CGparameter mvp_param;	// per frame
-  CGparameter mv_param;		// per frame
-  CGparameter rotphi_param;	// per frame
-  CGparameter fog_param;	// per frame
-  CGparameter variation_param;	// per batch
+  GLuint c_posoffsetxy_param; // constant
+  GLuint c_vxtex_param;	// constant
+  GLuint c_cst_param;	// constant
+  GLuint rotphi_param;	// per frame
+  GLuint fog_param;	// per frame
+  GLuint variation_param;	// per batch
 
   float fadedist;		// max dist at which solid trees are drawn
   float maxdist;		// max dist at which trees are drawn
@@ -125,32 +119,19 @@ public:
 #include "configuration/Configuration.h"  // access to weather & timestep & quality & display()
 
 // global
-static CGcontext g_shaders_context = 0;
 static unsigned  g_shaders_count   = 0;
+#ifdef STATS
 static unsigned  g_statistics[18]; // 10 bins representing # vertices/primitive
+#endif
 
-static void
-cgErrorCallback(void)
-{
-  CGerror errnum = cgGetError();
-  const char * errorString = cgGetErrorString(errnum);
-  fprintf(stderr,"%s (%d)\n", errorString, errnum);
-  if(errnum == CG_COMPILER_ERROR) {
-    fprintf(stderr,"Shader compilation error:\n%s",
-	    cgGetLastListing(g_shaders_context));
-  }
-  cgDestroyContext(g_shaders_context);
-  abort();
-}
+static GLint gl_major;
+static GLint gl_minor;
 
 GlShaders *
 createShaders(GlLandscape& _land)
 {
-  if(g_shaders_context == 0) {
-    cgSetErrorCallback(cgErrorCallback);
-    g_shaders_context = cgCreateContext();
-    cgSetAutoCompile(g_shaders_context, CG_COMPILE_LAZY);
-  }
+  glGetIntegerv(GL_MAJOR_VERSION, &gl_major);
+  glGetIntegerv(GL_MINOR_VERSION, &gl_minor);
   g_shaders_count ++;
   TreeShader * shader = new TreeShader(_land);
   DISPLAY_INFO("Tree shader ready");
@@ -162,10 +143,6 @@ destroyShaders(GlShaders * _shader)
 {
   delete _shader;
   g_shaders_count --;
-  if(g_shaders_count == 0) {
-    cgDestroyContext(g_shaders_context);
-    g_shaders_context = 0;
-  }
 }
 
 //----------------------------------------------------------------------
@@ -178,26 +155,96 @@ static const float hh2 = 2.0*hh;
 static const float zoomz = 1.0/(100.0*MAXX);
 static const float zoomz2 = 32768.0 * zoomz;
 
+static GLuint makeShader(GLenum type, const char *src)
+{
+  GLuint shader = glCreateShader(type);
+  glShaderSource(shader, 1, &src, NULL);
+  glCompileShader(shader);
+  GLint status;
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+  if (status == GL_FALSE)
+  {
+    GLsizei length;
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+    GLchar *log;
+    if (length > 0)
+    {
+      log = (GLchar *) malloc(length);
+      if (log)
+        glGetShaderInfoLog(shader, length, NULL, log);
+    }
+    else
+    {
+      log = strdup("Failed");
+    }
+    if (log)
+    {
+      fprintf(stderr, "glCompileShader: %s\n", log);
+      free(log);
+    }
+  }
+  return shader;
+}
+
+static bool linkAndValidate(GLint program)
+{
+  GLint status;
+
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &status);
+  if (status == GL_FALSE)
+  {
+    GLsizei length;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+    GLchar *log = (GLchar *) malloc(length);
+    if (log)
+    {
+      glGetProgramInfoLog(program, length, NULL, log);
+      fprintf(stderr, "glLinkProgram: %s\n", log);
+      free(log);
+    }
+    return false;
+  }
+  glValidateProgram(program);
+  glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
+  if (status == GL_FALSE)
+  {
+    GLsizei length;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+    GLchar *log = (GLchar *) malloc(length);
+    if (log)
+    {
+      glGetProgramInfoLog(program, length, NULL, log);
+      fprintf(stderr, "glValidateProgram: %s\n", log);
+      free(log);
+    }
+    return false;
+  }
+  return true;
+}
+
 TreeShader::TreeShader(GlLandscape& _land)
   : landscape(_land)
 {
-  const char * compiler_extra_args[] = { 0 };
+  if (gl_major < 2) {
+    treeprog = 0;
+    return;
+  }
+  treeprog = glCreateProgram();
 
-  profile  = cgGLGetLatestProfile(CG_GL_VERTEX);
-  cgGLSetOptimalOptions(profile); // optimal Cg compiler options
-  treeprog = cgCreateProgramFromFile(g_shaders_context, CG_SOURCE,
-				     Directory::getShaders("tree.cg"),
-				     profile, "main", compiler_extra_args);
+  TextFileObj file(Directory::getShaders("tree.vert").c_str());
+  GLuint vert = makeShader(GL_VERTEX_SHADER, file.data);
+  glAttachShader(treeprog, vert);
+  linkAndValidate(treeprog);
+  glDeleteShader(vert);
+  glUseProgram(treeprog);
 
-
-  c_posoffsetxy_param = cgGetNamedParameter(treeprog, "c_posoffsetxy");
-  c_vxtex_param       = cgGetNamedParameter(treeprog, "c_vxtex");
-  c_cst_param         = cgGetNamedParameter(treeprog, "c_constants");
-  mvp_param           = cgGetNamedParameter(treeprog, "ModelViewProj");
-  mv_param            = cgGetNamedParameter(treeprog, "ModelView");
-  rotphi_param        = cgGetNamedParameter(treeprog, "RotPhi");
-  fog_param           = cgGetNamedParameter(treeprog, "Fog");
-  variation_param     = cgGetNamedParameter(treeprog, "Variation");
+  c_posoffsetxy_param = glGetUniformLocation(treeprog, "c_posoffsetxy");
+  c_vxtex_param       = glGetUniformLocation(treeprog, "c_vxtex");
+  c_cst_param         = glGetUniformLocation(treeprog, "c_constants");
+  rotphi_param        = glGetUniformLocation(treeprog, "RotPhi");
+  fog_param           = glGetUniformLocation(treeprog, "Fog");
+  variation_param     = glGetUniformLocation(treeprog, "Variation");
 
   // Load random position offset table. Trees in the same quad use
   // controlled random consecutive positions from this table.
@@ -218,7 +265,7 @@ TreeShader::TreeShader(GlLandscape& _land)
     }
     if(!again) i ++;
   }
-  cgGLSetParameterArray4f(c_posoffsetxy_param, 0, 67, xytree);
+  glUniform4fv(c_posoffsetxy_param, 67, xytree);
 
   static const float vxtexquads[8][4] = {
     { 1.0, 1.0, 0.0, 1.0},
@@ -230,17 +277,9 @@ TreeShader::TreeShader(GlLandscape& _land)
     {-1.4, 0.0, 1.0, 0.0},
     { 0.0, 1.4, 0.5, 0.0}
   };
-  cgGLSetParameterArray4f(c_vxtex_param, 0, 0, &vxtexquads[0][0]);
+  glUniform4fv(c_vxtex_param, 8, &vxtexquads[0][0]);
 
-  cgGLSetParameter4f(c_cst_param, hh2, zoomz, zoomz2, 0.0f);
-  cgSetParameterVariability(c_cst_param, CG_LITERAL); // compiled-in
-
-  cgGLLoadProgram(treeprog);
-  const char * compile_msg = cgGetLastListing(g_shaders_context);
-  if(compile_msg[0]!='\0')
-    fprintf(stderr,"Shader compilation results:\n%s", compile_msg);
-
-  cgGLBindProgram(treeprog);
+  glUniform4f(c_cst_param, hh2, zoomz, zoomz2, 0.0f);
 
   // define display lists
   for(i=0; i<16; i++) {		// first tree
@@ -345,8 +384,10 @@ TreeShader::TreeShader(GlLandscape& _land)
 
 TreeShader::~TreeShader(void)
 {
+  if (!treeprog)
+    return;
   glDeleteLists(DISPLIST_BASE, MAX_NB_TREELISTS);
-  cgDestroyProgram(treeprog);
+  glDeleteProgram(treeprog);
 }
 
 static const unsigned int c_coniferous = 0; // textree2   / tree2n.tga
@@ -419,8 +460,7 @@ public:
 void
 TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
 {
-  // render the trees
-  cgGLEnableProfile(profile);
+  glUseProgram(treeprog);
 
   // select texture and size coefficients
   GLuint texture;
@@ -461,8 +501,8 @@ TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
   }
   widthcoef *= hh2;
   // tree height coefficients
-  cgSetParameter3f(variation_param,
-		   average, variation, widthcoef);
+  glUniform4f(variation_param,
+		   average, variation, widthcoef, 0.0f);
   // save part of rendering state
   glPushAttrib(GL_COLOR_BUFFER_BIT|GL_ENABLE_BIT);
   // set up rendering state
@@ -541,7 +581,7 @@ TreeShader::renderTrees(unsigned char kind, const QuadList& qlist, bool linear)
   // restore rendering state
   glPopAttrib();
 
-  cgGLDisableProfile(profile);
+  glUseProgram(0);
 }
 
 void
@@ -561,7 +601,6 @@ TreeShader::drawTrees(int ax, int ex, int ay, int ey, int step)
 
   int xs, ys;
   static const int cutdep = 800;
-  static const float lineartree = 1.0;
 
   // relimit area
   if(ax < cam.x-maxdist) ax = static_cast<int>(cam.x-maxdist);
@@ -697,21 +736,16 @@ TreeShader::loadFrameUniformParams(int phi)
 
   // update phi
   // Cg shader uses a small 2x3 matrix (only xz).
-  GLfloat rotationphi[6] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+  GLfloat rotationphi[9] = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
   float sine, cosine, phif = phi * PI / 180.0;
   sine =   sinf(phif);
   cosine = cosf(phif);
   rotationphi[0] = cosine;
   rotationphi[2] = sine;
-  rotationphi[3] = -sine;
-  rotationphi[5] = cosine;
-  cgSetMatrixParameterfr(rotphi_param, rotationphi);
+  rotationphi[6] = -sine;
+  rotationphi[8] = cosine;
+  glUniformMatrix3fv(rotphi_param, 1, GL_FALSE, rotationphi);
 
-  // update model view proj transform matrix
-  cgGLSetStateMatrixParameter(mvp_param, CG_GL_MODELVIEW_PROJECTION_MATRIX,
-			      CG_GL_MATRIX_IDENTITY);
-  cgGLSetStateMatrixParameter(mv_param, CG_GL_MODELVIEW_MATRIX,
-			      CG_GL_MATRIX_IDENTITY);
   static unsigned char frame=0;
   if(frame == 0) {
 #if 0
@@ -769,7 +803,7 @@ TreeShader::loadFrameUniformParams(int phi)
       break;
     }
     // update fog in shader
-    cgSetParameter4f(fog_param,
+    glUniform4f(fog_param,
 		     fog.fogColor[0],
 		     fog.fogColor[1],
 		     fog.fogColor[2],
@@ -781,5 +815,3 @@ TreeShader::loadFrameUniformParams(int phi)
     msgcount++;
   }
 }
-
-#endif // HAVE_CGGL
