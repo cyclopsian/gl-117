@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <SDL.h>
 
 #ifndef _MSC_VER // no microsoft?
 #include <unistd.h>
@@ -94,6 +95,7 @@ Directory::Directory ()
 
 void Directory::init (char *arg)
 {
+  char *prefpath = SDL_GetPrefPath(NULL, "gl-117");
 #ifdef _MSC_VER
   char path [4096];
   int bscount = 0;
@@ -127,13 +129,20 @@ void Directory::init (char *arg)
   music = path;
   sounds = path;
   models = path;
-  saves = path;
   maps = path;
   shaders = path;
   units = path;
+  if (prefpath != NULL)
+  {
+    saves = prefpath;
+    SDL_free(prefpath);
+  }
+  else
+  {
+    saves = path;
+  }
   append (saves, "saves");
 #else
-  char buf [4096];
   char *home = getenv ("HOME");
   char *env = getenv ("GL117");
   char *path = getenv ("PATH");
@@ -215,10 +224,16 @@ void Directory::init (char *arg)
 
   } // if (!founddir)
 
-  if (home != NULL)
+  if (prefpath != NULL)
+  {
+    saves = prefpath;
+    SDL_free(prefpath);
+    append (saves, "saves");
+  }
+  else if (home != NULL)
   {
     saves = home;
-    append (saves, ".gl-117");
+    append (saves, ".config/gl-117");
     if (stat (saves.c_str (), &mystat))
     {
       mkdir (saves.c_str (), S_IRWXU);
